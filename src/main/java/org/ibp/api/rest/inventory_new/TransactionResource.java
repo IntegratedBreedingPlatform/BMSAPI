@@ -5,10 +5,13 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.domain.inventory_new.TransactionDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
@@ -40,6 +43,9 @@ public class TransactionResource {
 
 	@Autowired
 	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private UserService userService;
 
 	@ApiOperation(value = "Post transaction search", notes = "Post transaction search")
 	@RequestMapping(value = "/crops/{cropName}/transactions/search", method = RequestMethod.POST)
@@ -110,6 +116,10 @@ public class TransactionResource {
 		@ApiParam("Transaction to be created")
 		@RequestBody final TransactionDto transactionDto) {
 
+
+		final String userName = SecurityUtil.getLoggedInUserName();
+		final WorkbenchUser user = this.userService.getUserByUsername(userName);
+		transactionDto.setUser(user.getUserid().toString());
 		return new ResponseEntity<>(this.transactionService.saveTransaction(transactionDto, lotId, TransactionStatus.COMMITTED), HttpStatus.CREATED);
 	}
 }
