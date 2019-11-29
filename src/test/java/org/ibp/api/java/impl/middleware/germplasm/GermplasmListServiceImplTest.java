@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -56,6 +57,17 @@ public class GermplasmListServiceImplTest {
 
 	}
 
+	@Test(expected = ApiRequestValidationException.class)
+	public void testGetGermplasmListChildrenNodes_InvalidFolderId_ThrowsException() throws ApiRequestValidationException {
+		final String parentId = "1";
+		final GermplasmList germplasmList = new GermplasmList();
+		final String program = RandomStringUtils.randomAlphabetic(3);
+		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
+		Mockito.when(germplasmListManager.getGermplasmListById(Integer.parseInt(parentId))).thenReturn(germplasmList);
+		germplamListService.getGermplasmListChildrenNodes("maize", program, parentId, Boolean.FALSE);
+
+	}
+
 	@Test(expected = ResourceNotFoundException.class)
 	public void testGetGermplasmListChildrenNodes_ProgramInvalid_ThrowsException() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
@@ -101,9 +113,16 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void testGetGermplasmListChildrenNodes_ParentIsAFolder_LoadLists() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
+		final String parentId = "1";
+
+		final GermplasmList germplasmList = new GermplasmList();
+		germplasmList.setType(GermplasmList.FOLDER_TYPE);
+
 		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
-		germplamListService.getGermplasmListChildrenNodes("maize", program, "1", Boolean.FALSE);
-		Mockito.verify(germplasmListManager, times(1)).getGermplasmListByParentFolderIdBatched(1, program, GermplamListServiceImpl.BATCH_SIZE);
+		Mockito.when(germplasmListManager.getGermplasmListById(Integer.parseInt(parentId))).thenReturn(germplasmList);
+
+		germplamListService.getGermplasmListChildrenNodes("maize", program, parentId, Boolean.FALSE);
+		Mockito.verify(germplasmListManager, times(1)).getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), program, GermplamListServiceImpl.BATCH_SIZE);
 	}
 
 }

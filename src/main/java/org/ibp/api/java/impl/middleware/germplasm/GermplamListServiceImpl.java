@@ -104,17 +104,23 @@ public class GermplamListServiceImpl implements GermplamListService {
 	}
 
 	private void validateParentId(final String parentId, final String programUUID) {
-		if (parentId != null && !parentId.equals(PROGRAM_LISTS) && !parentId.equals(CROP_LISTS) && !Util.isPositiveInteger(parentId)) {
+		if (parentId != null && !PROGRAM_LISTS.equals(parentId) && !CROP_LISTS.equals(parentId) && !Util.isPositiveInteger(parentId)) {
 			this.errors.reject("germplasm.list.parent.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if ((PROGRAM_LISTS.equals(parentId) || Util.isPositiveInteger(parentId)) && programUUID == null) {
+		if ((PROGRAM_LISTS.equals(parentId) || Util.isPositiveInteger(parentId)) && StringUtils.isEmpty(programUUID)) {
 			this.errors.reject("germplasm.list.project.mandatory", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		//TODO Missing validation, when parentId is integer and programUUID is not null, then the parentId type must be FOLDER
 
+		if (Util.isPositiveInteger(parentId) && !StringUtils.isEmpty(programUUID)) {
+			final GermplasmList germplasmList = this.germplasmListManager.getGermplasmListById(Integer.parseInt(parentId));
+			if (germplasmList == null || !germplasmList.isFolder()) {
+				this.errors.reject("germplasm.list.parent.id.not.exist", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
 	}
 
 	private void validateFolderOnly(final Boolean folderOnly) {
