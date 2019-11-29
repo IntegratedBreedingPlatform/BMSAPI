@@ -3,10 +3,9 @@ package org.ibp.api.rest.germplasmlist;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.commons.spring.util.ContextUtil;
-import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.ibp.api.java.germplasm.GermplamListService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,29 +17,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
-@Api(value = "Germplasm Services")
+@Api(value = "Germplasm List Services")
 @Controller
-@RequestMapping("/germplasmLists")
 public class GermplasmListResource {
-
-	// FIXME externalize
-	public static final String ERROR = "ERROR";
 
 	@Autowired
 	public GermplamListService germplamListService;
 
-	@Autowired
-	public ContextUtil contextUtil;
-
-	@ApiOperation(value = "Search Germplasm List", notes = "Search Germplasm List")
-	@RequestMapping(value = "/{crop}/search", method = RequestMethod.GET)
+	@ApiOperation(value = "Get germplasm lists given a tree parent node folder", notes = "Get germplasm lists given a tree parent node folder")
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<GermplasmList>> search(
-		@PathVariable final String crop,
-		@ApiParam("Only return the exact match of the search text") @RequestParam final boolean exactMatch,
-		@ApiParam("The name of the list to be searched") @RequestParam final String searchString, final Pageable pageable) {
-		final List<GermplasmList> germplasmLists =
-			this.germplamListService.search(searchString, exactMatch, this.contextUtil.getCurrentProgramUUID(), pageable);
-		return new ResponseEntity<>(germplasmLists, HttpStatus.OK);
+	public ResponseEntity<List<TreeNode>> getGermplasmListByParentFolderId(
+		@ApiParam("The crop type") @PathVariable final String crop,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId,
+		@ApiParam(value = "Only folders") @RequestParam(required = true) final Boolean onlyFolders) {
+		final List<TreeNode> children = this.germplamListService.getGermplasmListChildrenNodes(crop, programUUID, parentFolderId, onlyFolders);
+		return new ResponseEntity<>(children, HttpStatus.OK);
 	}
 }
