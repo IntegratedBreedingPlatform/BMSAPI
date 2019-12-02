@@ -5,6 +5,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -40,6 +42,9 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	@Autowired
 	private PermissionService permissionService;
 
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
+
 	public WorkbenchUserDetailsService() {
 
 	}
@@ -59,21 +64,28 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			}
 			throw new UsernameNotFoundException("Invalid username/password.");
 		} catch (final MiddlewareQueryException e) {
-			throw new AuthenticationServiceException("Data access error while authenticaing user against Workbench.", e);
+			throw new AuthenticationServiceException("Data access error while authenticating user against Workbench.", e);
 		}
 	}
 
 	private Collection<? extends GrantedAuthority> getAuthorities(final WorkbenchUser workbenchUser) {
-		//TODO Load permissions per program
 		// For BrAPI calls, we don't filter permissions by crop/program
 		final String cropName = this.contextResolver.resolveCropNameFromUrl(false, false);
+		final String programUUID = this.contextResolver.resolveProgramUuidFromRequest();
+		final Integer programId = StringUtils.isEmpty(programUUID)? null : getProgramId(programUUID);
+
 		final List<PermissionDto> permissions = this.permissionService.getPermissions( //
 			workbenchUser.getUserid(), //
 				StringUtils.isEmpty(cropName) ? null : cropName, //
-			null);
+				programId);
 		final List<GrantedAuthority> authorities = permissions.stream().map(permissionDto -> new SimpleGrantedAuthority(permissionDto.getName())).collect(
 				Collectors.toCollection(ArrayList::new));
 		return authorities;
+	}
+
+	private Integer getProgramId(final String programUUID) {
+		final Project project = this.workbenchDataManager.getProjectByUuid(programUUID);
+		return project != null ? project.getProjectId().intValue() : null;
 	}
 
 }

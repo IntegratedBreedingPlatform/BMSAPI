@@ -9,4 +9,6 @@ public interface ContextResolver {
 
 	String resolveCropNameFromUrl(boolean doRequireCrop, boolean includeBrAPI) throws ContextResolutionException;
 
+	String resolveProgramUuidFromRequest() throws ContextResolutionException;
+
 }

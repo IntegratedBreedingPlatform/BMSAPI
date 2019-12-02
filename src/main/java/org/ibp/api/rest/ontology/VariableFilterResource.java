@@ -42,7 +42,7 @@ public class VariableFilterResource {
 			@PathVariable String cropname,
 
 			@ApiParam(value = "Use <code>GET /program/list</code> service to retrieve program uuid that can be supplied here.")
-			@RequestParam(value = "programId") String programId,
+			@RequestParam(value = "programUUID") String programUUID,
 
 			@ApiParam(value = "Use <code>GET /ontology/{cropname}/properties</code> service "
 					+ " to retrieve possible property ids that can be supplied here as a comma separated list.")
@@ -78,7 +78,7 @@ public class VariableFilterResource {
 			@RequestParam(value = "propertyClasses", required = false) Set<String> propertyClasses) {
 
 		VariableFilter variableFilter = new VariableFilter();
-		variableFilter.setProgramUuid(programId);
+		variableFilter.setProgramUuid(programUUID);
 
 		if(!Util.isNullOrEmpty(propertyIds)){
 			for(Integer i : propertyIds){
@@ -128,7 +128,7 @@ public class VariableFilterResource {
 			}
 		}
 
-		return new ResponseEntity<>(this.variableService.getVariablesByFilter(cropname, programId, variableFilter), HttpStatus.OK);
+		return new ResponseEntity<>(this.variableService.getVariablesByFilter(cropname, programUUID, variableFilter), HttpStatus.OK);
 	}
 
 }

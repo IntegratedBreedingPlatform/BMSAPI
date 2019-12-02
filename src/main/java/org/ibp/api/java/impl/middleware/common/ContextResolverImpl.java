@@ -39,7 +39,6 @@ public class ContextResolverImpl implements ContextResolver {
 	@Override
 	public String resolveCropNameFromUrl(final boolean doRequireCrop, final boolean includeBrAPI) throws ContextResolutionException {
 		final HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		request.getParameterMap();
 		if (request == null) {
 			throw new ContextResolutionException("Request is null");
 		}
@@ -78,5 +77,22 @@ public class ContextResolverImpl implements ContextResolver {
 		}
 		ContextResolverImpl.LOG.debug("Crop Name: " + cropName);
 		return cropName;
+	}
+
+	@Override
+	public String resolveProgramUuidFromRequest() throws ContextResolutionException {
+		final HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		if (request == null) {
+			throw new ContextResolutionException("Request is null");
+		}
+
+		final String programUuid = request.getParameter("programUUID");
+		if (!StringUtils.isEmpty(programUuid)) {
+			// TODO Check if programUUID is valid and determine if we call ContextHolder.setCurrentProgram here
+			return programUuid;
+		}
+
+		return "";
+
 	}
 }
