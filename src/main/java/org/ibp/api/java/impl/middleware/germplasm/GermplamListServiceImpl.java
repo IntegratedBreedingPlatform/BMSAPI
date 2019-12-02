@@ -53,11 +53,15 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 		final List<TreeNode> treeNodes = new ArrayList<>();
 		if (parentId == null) {
-			treeNodes.add(new TreeNode(GermplamListServiceImpl.CROP_LISTS, AppConstants.CROP_LISTS.getString(), true, LEAD_CLASS,
-				AppConstants.FOLDER_ICON_PNG.getString(), null));
+			final TreeNode cropFolderNode = new TreeNode(GermplamListServiceImpl.CROP_LISTS, AppConstants.CROP_LISTS.getString(), true, LEAD_CLASS,
+					AppConstants.FOLDER_ICON_PNG.getString(), null);
+			cropFolderNode.setNumOfChildren(this.germplasmListManager.getAllTopLevelLists(null).size());
+			treeNodes.add(cropFolderNode);
 			if (programUUID != null) {
-				treeNodes.add(new TreeNode(GermplamListServiceImpl.PROGRAM_LISTS, AppConstants.PROGRAM_LISTS.getString(), true, LEAD_CLASS,
-						AppConstants.FOLDER_ICON_PNG.getString(), programUUID));
+				final TreeNode programFolderNode = new TreeNode(GermplamListServiceImpl.PROGRAM_LISTS, AppConstants.PROGRAM_LISTS.getString(), true, LEAD_CLASS,
+						AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
+				programFolderNode.setNumOfChildren(this.germplasmListManager.getAllTopLevelLists(programUUID).size());
+				treeNodes.add(programFolderNode);
 			}
 		} else {
 			final List<GermplasmList> rootLists;
