@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.fest.util.Collections;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -210,17 +211,17 @@ public class DatasetResource {
 		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "It will retrieve all the observation units in a simple JSON array table format", notes = "It will retrieve all the observation units including observations and props values in a simple JSON Array table format.")
-	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/json", method = RequestMethod.POST)
+	@ApiOperation(value = "It will retrieve all the observation units in a simple JSON array table format, for use in Visualization", notes = "It will retrieve all the observation units including observations and props values in a simple JSON Array table format.")
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/visualization", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<List<Map<String, Object>>> getObservationUnitAsJSONTable(@PathVariable final String cropname, //
+	public ResponseEntity<List<Map<String, Object>>> getObservationUnitAsJSONArray(@PathVariable final String cropname, //
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@RequestBody final ObservationUnitsSearchDTO searchDTO) {
 
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
-		final SortedPageRequest sortedRequest = searchDTO.getSortedRequest();
-		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
+		Preconditions.checkNotNull(searchDTO.getFilter(), "filter inside params cannot be null");
+		Preconditions.checkArgument(!Collections.isEmpty(searchDTO.getFilter().getFilterColumns()), "filterColumns cannot be null or empty");
 
 		return new ResponseEntity(this.studyDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO), HttpStatus.OK);
 	}
