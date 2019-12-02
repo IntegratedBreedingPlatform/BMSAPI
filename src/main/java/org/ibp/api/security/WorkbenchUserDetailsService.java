@@ -1,5 +1,6 @@
 package org.ibp.api.security;
 
+import liquibase.util.StringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -7,6 +8,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.ibp.api.java.impl.middleware.common.ContextResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,6 +28,10 @@ import java.util.stream.Collectors;
 // be MAJOR breakages in the functioning of BMS components. Consult your friendly senior developer first if you are unsure.
 @Component
 public class WorkbenchUserDetailsService implements UserDetailsService {
+
+
+	@Autowired
+	private ContextResolver contextResolver;
 
 
 	@Autowired
@@ -58,10 +64,12 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	}
 
 	private Collection<? extends GrantedAuthority> getAuthorities(final WorkbenchUser workbenchUser) {
-		//TODO Load permissions per crop and program
+		//TODO Load permissions per program
+		// For BrAPI calls, we don't filter permissions by crop/program
+		final String cropName = this.contextResolver.resolveCropNameFromUrl(false, false);
 		final List<PermissionDto> permissions = this.permissionService.getPermissions( //
 			workbenchUser.getUserid(), //
-			null, //
+				StringUtils.isEmpty(cropName) ? null : cropName, //
 			null);
 		final List<GrantedAuthority> authorities = permissions.stream().map(permissionDto -> new SimpleGrantedAuthority(permissionDto.getName())).collect(
 				Collectors.toCollection(ArrayList::new));

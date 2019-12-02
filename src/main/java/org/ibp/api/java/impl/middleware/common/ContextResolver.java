@@ -7,4 +7,6 @@ public interface ContextResolver {
 
 	String resolveCropNameFromUrl() throws ContextResolutionException;
 
+	String resolveCropNameFromUrl(boolean doRequireCrop, boolean includeBrAPI) throws ContextResolutionException;
+
 }
