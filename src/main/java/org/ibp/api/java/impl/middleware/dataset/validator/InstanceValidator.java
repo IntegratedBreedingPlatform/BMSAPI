@@ -55,24 +55,26 @@ public class InstanceValidator {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final Map<String, Integer> instanceGeolocationIdsMap = this.studyDataManager.getInstanceGeolocationIdsMap(studyId);
-		final List<Integer> selectedInstanceIds =
+		final Set<Integer> selectedInstanceIds =
 			instanceGeolocationIdsMap.entrySet().stream().filter(entry -> instanceNumbers.contains(Integer.valueOf(entry.getKey())))
-				.map(entry -> entry.getValue()).collect(Collectors.toList());
+				.map(entry -> entry.getValue()).collect(Collectors.toSet());
 
 		if (instanceNumbers.size() != selectedInstanceIds.size()) {
 			this.errors.reject("dataset.non.existent.instances");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.validateInstancesDeletability(studyId, instanceNumbers, false);
+		this.validateInstancesDeletability(studyId, selectedInstanceIds, false);
 	}
 
-	public void validateInstanceDeletion(final Integer studyId, final Set<Integer> instanceIds, final Boolean enforceAllInstancesDeletable) {
+	public void validateStudyInstance(final Integer studyId, final Set<Integer> instanceIds) {
 		final Integer environmentDatasetId = this.middlewareStudyService.getEnvironmentDatasetId(studyId);
 		this.validate(environmentDatasetId, instanceIds);
+	}
 
+	public void validateStudyInstance(final Integer studyId, final Set<Integer> instanceIds, final Boolean enforceAllInstancesDeletable) {
+		this.validateStudyInstance(studyId, instanceIds);
 		this.validateInstancesDeletability(studyId, instanceIds, enforceAllInstancesDeletable);
-
 	}
 
 	private void validateInstancesDeletability(final Integer studyId, final Set<Integer> instanceIds,
