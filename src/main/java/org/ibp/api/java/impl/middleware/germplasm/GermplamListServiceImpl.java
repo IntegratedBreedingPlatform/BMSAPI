@@ -4,10 +4,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
+import org.generationcp.commons.workbook.generator.RowColumnType;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -38,6 +41,9 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 	@Autowired
 	public WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	public GermplasmDataManager germplasmDataManager;
 
 	private BindingResult errors;
 
@@ -75,7 +81,10 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 			this.germplasmListManager.populateGermplasmListCreatedByName(rootLists);
 
-			final List<TreeNode> childNodes = TreeViewUtil.convertGermplasmListToTreeView(rootLists, folderOnly);
+			final List<UserDefinedField> listTypes = germplasmDataManager
+					.getUserDefinedFieldByFieldTableNameAndType(RowColumnType.LIST_TYPE.getFtable(), RowColumnType.LIST_TYPE.getFtype());
+
+			final List<TreeNode> childNodes = TreeViewUtil.convertGermplasmListToTreeView(rootLists, folderOnly, listTypes);
 
 			final Map<Integer, ListMetadata> allListMetaData = this.germplasmListManager.getGermplasmListMetadata(rootLists);
 
@@ -140,5 +149,9 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
+	}
+
+	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
+		this.germplasmDataManager = germplasmDataManager;
 	}
 }
