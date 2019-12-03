@@ -100,22 +100,6 @@
         ]
       },
       {
-        "call": "studies",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1"
-        ]
-      },
-      {
         "call": "studies/{studyDbId}",
         "dataTypes": [
           "application/json"
