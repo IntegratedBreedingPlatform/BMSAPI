@@ -6,10 +6,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.security.SecurityUtil;
+import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
@@ -120,6 +120,10 @@ public class TransactionResource {
 		final String userName = SecurityUtil.getLoggedInUserName();
 		final WorkbenchUser user = this.userService.getUserByUsername(userName);
 		transactionDto.setUser(user.getUserid().toString());
-		return new ResponseEntity<>(this.transactionService.saveTransaction(transactionDto, lotId, TransactionStatus.COMMITTED), HttpStatus.CREATED);
+		if (transactionDto.getLot() == null) {
+			transactionDto.setLot(new ExtendedLotDto());
+		}
+		transactionDto.getLot().setLotId(Integer.valueOf(lotId));
+		return new ResponseEntity<>(this.transactionService.saveTransaction(transactionDto), HttpStatus.CREATED);
 	}
 }

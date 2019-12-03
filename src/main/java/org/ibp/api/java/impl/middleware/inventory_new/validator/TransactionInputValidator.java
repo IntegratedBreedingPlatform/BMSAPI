@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionDto;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -34,7 +35,7 @@ public class TransactionInputValidator {
 	public void validate(final TransactionDto transactionDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), TransactionDto.class.getName());
 		this.validateTransactionType(transactionDto.getTransactionType());
-		this.validateAmount(transactionDto.getAmount());
+		this.validateAmount(transactionDto);
 		this.validateLotAndScale(transactionDto);
 
 		if (this.errors.hasErrors()) {
@@ -47,8 +48,12 @@ public class TransactionInputValidator {
 		lotsSearchDto.setLotIds(Lists.newArrayList(transactionDto.getLot().getLotId()));
 		final List<ExtendedLotDto> result = this.lotService.searchLots(lotsSearchDto, null);
 		if (result.size() == 1) {
-			final Integer scaleId = result.get(0).getScaleId();
+			final ExtendedLotDto lot = result.get(0);
+			final Integer scaleId = lot.getScaleId();
 			this.inventoryScaleValidator.validateNotNullInventoryScaleId(this.errors, scaleId);
+			if (lot.getStatus().equals(LotStatus.CLOSED.getIntValue())) {
+				this.errors.rejectValue("transaction.closed.lot", "");
+			}
 		} else {
 			this.errors.rejectValue("transaction.wrong.lot", "");
 		}
@@ -61,12 +66,14 @@ public class TransactionInputValidator {
 		}
 	}
 
-	private void validateAmount(final Double amount) {
+	private void validateAmount(final TransactionDto transactionDto) {
+		final Double amount = transactionDto.getAmount();
+		final String transactionType = transactionDto.getTransactionType();
 		if (amount == null) {
 			this.errors.reject("transaction.initial.amount.required", "");
 			return;
 		}
-		if (amount <= 0) {
+		if (TransactionType.DEPOSIT.getValue().equalsIgnoreCase(transactionType) && amount <= 0) {
 			this.errors.reject("transaction.initial.amount.positive.value", "");
 			return;
 		}

@@ -100,13 +100,13 @@ public class LotResource {
 
 	}
 
-	@ApiOperation(value = "Create Lot with Initial Transaction", notes = "Create a new lot and its initial transaction")
+	@ApiOperation(value = "Create Lot", notes = "Create a new lot")
 	@RequestMapping(value = "/crops/{cropName}/lots", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Integer> createLot(
-			@PathVariable final String cropName,
-			@ApiParam("Lot with one transaction to be created")
-			@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
+		@PathVariable final String cropName,
+		@ApiParam("Lot to be created")
+		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
 		return new ResponseEntity<>(lotService.saveLot(lotGeneratorInputDto), HttpStatus.CREATED);
 	}
 }
