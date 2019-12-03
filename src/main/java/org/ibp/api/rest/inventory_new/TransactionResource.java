@@ -5,16 +5,15 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.inventory_new.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -45,7 +44,7 @@ public class TransactionResource {
 	private SearchRequestService searchRequestService;
 
 	@Autowired
-	private UserService userService;
+	private SecurityService securityService;
 
 	@ApiOperation(value = "Post transaction search", notes = "Post transaction search")
 	@RequestMapping(value = "/crops/{cropName}/transactions/search", method = RequestMethod.POST)
@@ -116,9 +115,7 @@ public class TransactionResource {
 		@ApiParam("Transaction to be created")
 		@RequestBody final TransactionDto transactionDto) {
 
-
-		final String userName = SecurityUtil.getLoggedInUserName();
-		final WorkbenchUser user = this.userService.getUserByUsername(userName);
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		transactionDto.setUser(user.getUserid().toString());
 		if (transactionDto.getLot() == null) {
 			transactionDto.setLot(new ExtendedLotDto());
