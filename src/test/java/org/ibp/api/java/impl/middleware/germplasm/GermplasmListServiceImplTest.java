@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -31,12 +32,16 @@ public class GermplasmListServiceImplTest {
 	@Mock
 	private GermplasmListManager germplasmListManager;
 
+	@Mock
+	private GermplasmDataManager germplasmDataManager;
+
 	@Before
 	public void init() {
 		MockitoAnnotations.initMocks(this);
 		germplamListService = new GermplamListServiceImpl();
 		germplamListService.setWorkbenchDataManager(workbenchDataManager);
 		germplamListService.setGermplasmListManager(germplasmListManager);
+		germplamListService.setGermplasmDataManager(germplasmDataManager);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
