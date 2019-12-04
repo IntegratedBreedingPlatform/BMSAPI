@@ -2,7 +2,9 @@
 package org.ibp.api.domain.location;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
+@AutoProperty
 public class LocationDto {
 
 	private Integer id;
