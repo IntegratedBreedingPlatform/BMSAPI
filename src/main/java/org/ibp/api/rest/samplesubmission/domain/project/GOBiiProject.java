@@ -13,42 +13,34 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GOBiiProject {
 
-	private Integer id;
+	private Integer projectId;
 
 	private Integer piContactId;
 
-	private String name;
+	private String projectName;
 
 	private Integer status;
 
-	private String code;
-
-	private String description;
+	private String projectDescription;
 
 	private Map<String, String> properties;
+
+	private String code;
 
 	public Integer getPiContactId() {
 		return piContactId;
 	}
 
-	public Integer getId() {
-		return id;
+	public Integer getProjectId() {
+		return projectId;
 	}
 
-	public void setId(final Integer id) {
-		this.id = id;
+	public void setProjectId(final Integer projectId) {
+		this.projectId = projectId;
 	}
 
 	public void setPiContactId(final Integer piContactId) {
 		this.piContactId = piContactId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(final String name) {
-		this.name = name;
 	}
 
 	public Integer getStatus() {
@@ -59,20 +51,28 @@ public class GOBiiProject {
 		this.status = status;
 	}
 
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(final String projectName) {
+		this.projectName = projectName;
+	}
+
+	public String getProjectDescription() {
+		return projectDescription;
+	}
+
+	public void setProjectDescription(final String projectDescription) {
+		this.projectDescription = projectDescription;
+	}
+
 	public String getCode() {
 		return code;
 	}
 
 	public void setCode(final String code) {
 		this.code = code;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
 	}
 
 	public Map<String, String> getProperties() {

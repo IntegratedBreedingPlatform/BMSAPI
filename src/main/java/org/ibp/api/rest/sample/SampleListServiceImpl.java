@@ -10,7 +10,6 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.ibp.api.rest.samplesubmission.domain.common.GOBiiHeader;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
 import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.domain.sample.GOBiiSample;
@@ -21,11 +20,9 @@ import org.ibp.api.rest.samplesubmission.service.GOBiiSampleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -272,8 +269,8 @@ public class SampleListServiceImpl implements SampleListService {
 	private GOBiiProject buildGOBiiProject(final SampleList sampleListDto) {
 		final GOBiiProject goBiiProject = new GOBiiProject();
 		goBiiProject.setCode(String.valueOf(sampleListDto.getId()));
-		goBiiProject.setDescription(sampleListDto.getListName());
-		goBiiProject.setName(sampleListDto.getListName());
+		goBiiProject.setProjectName(sampleListDto.getListName());
+		goBiiProject.setProjectName(sampleListDto.getListName());
 		goBiiProject.setPiContactId(1);
 		goBiiProject.setProperties(new HashMap<>());
 		goBiiProject.setStatus(1);

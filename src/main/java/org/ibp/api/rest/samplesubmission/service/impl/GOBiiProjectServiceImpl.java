@@ -1,9 +1,7 @@
 package org.ibp.api.rest.samplesubmission.service.impl;
 
-import org.springframework.stereotype.Service;
-
-import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
+import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.service.GOBiiProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +48,7 @@ public class GOBiiProjectServiceImpl implements GOBiiProjectService{
 	}
 
 	public Integer postGOBiiProject(final GOBiiToken goBiiToken, final GOBiiProject goBiiProject) {
-		LOG.debug("Trying to post project {} to GOBii", goBiiProject.getCode());
+		LOG.debug("Trying to post project {} to GOBii", goBiiProject.getProjectName());
 		try {
 
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -67,13 +65,13 @@ public class GOBiiProjectServiceImpl implements GOBiiProjectService{
 						GOBiiProject.class);
 
 			if (response.getStatusCode().equals(HttpStatus.CREATED)) {
-				return response.getBody().getId();
+				return response.getBody().getProjectId();
 			} else {
 				return null;
 			}
 
 		} catch (RestClientException e) {
-			LOG.debug("Error encountered while trying to post project {} to GOBii", goBiiProject.getCode(), e.getMessage());
+			LOG.debug("Error encountered while trying to post project {} to GOBii", goBiiProject.getProjectName(), e.getMessage());
 			throw e;
 		}
 	}
