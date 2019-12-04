@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Api(value = "Study Services")
 @Controller
+@RequestMapping("/crops")
 public class StudyResource {
 
 	@Autowired
@@ -24,20 +25,22 @@ public class StudyResource {
 
 	@ApiOperation(value = "Check if a study is sampled.",
 			notes = "Returns boolean indicating if there are samples associated to the study.")
-	@RequestMapping(value = "/study/{cropName}/{studyId}/sampled", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/sampled", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Boolean> hasSamples(final @PathVariable String cropName,
+	public ResponseEntity<Boolean> hasSamples(final @PathVariable String cropName, @PathVariable final String programUUID,
 			@PathVariable final Integer studyId) {
+		// TODO validate the studyId belongs to given programUUID
 		final Boolean hasSamples = this.studyService.isSampled(studyId);
 		return new ResponseEntity<>(hasSamples, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Partially modifies a study",
 			notes = "As of now, it only allows to update the status")
-	@RequestMapping(value = "/study/{cropName}/{studyId}", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<Void> patchStudy (final @PathVariable String cropName,
+	public ResponseEntity<Void> patchStudy (final @PathVariable String cropName, @PathVariable final String programUUID,
 			@PathVariable final Integer studyId, @RequestBody final Study study) {
+		// TODO validate the studyId belongs to given programUUID
 		// TODO Properly define study entity, Identify which attributes of the Study entity can be updated, Implement patch accordingly
 		study.setId(studyId);
 		this.studyService.updateStudy(study);
