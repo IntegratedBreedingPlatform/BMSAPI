@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 @Api(value = "Study Instance Services")
 @Controller
@@ -34,6 +35,16 @@ public class StudyInstanceResource {
 
 	}
 
+	@ApiOperation(value = "Delete study instance",
+		notes = "Delete study instance")
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances/{instanceId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity<Void> deleteStudyInstance(final @PathVariable String cropname,
+		@PathVariable final Integer studyId, @PathVariable final Integer instanceId) {
+		this.studyInstanceService.deleteStudyInstance(studyId, instanceId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "List all study instances with basic metadata.",
 		notes = "Returns list of all study instances with basic metadata.")
 	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances", method = RequestMethod.GET)
@@ -47,6 +58,16 @@ public class StudyInstanceResource {
 		}
 
 		return new ResponseEntity<>(studyInstances, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get study instance with basic metadata.",
+		notes = "Get study instance with basic metadata.")
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances/{instanceId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<StudyInstance> getStudyInstance(final @PathVariable String cropname,
+		@PathVariable final Integer studyId, @PathVariable final Integer instanceId) {
+		final Optional<StudyInstance> studyInstance = this.studyInstanceService.getStudyInstance(studyId, instanceId);
+		return studyInstance.isPresent()? new ResponseEntity<>(studyInstance.get(), HttpStatus.OK) : new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
 }

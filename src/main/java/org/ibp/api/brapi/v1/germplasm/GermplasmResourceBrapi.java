@@ -11,6 +11,8 @@ import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -44,6 +46,9 @@ public class GermplasmResourceBrapi {
 
 	@Autowired
 	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private StudyDataManager studyDataManager;
 
 	@ApiOperation(value = "Search germplasms", notes = "Search germplasms")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm-search", method = RequestMethod.GET)
@@ -275,4 +280,63 @@ public class GermplasmResourceBrapi {
 				});
 	}
 
+	@ApiOperation(value = "Search germplasms by study", notes = "Search germplasms by study")
+	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/germplasm", method = RequestMethod.GET)
+	@ResponseBody
+	@JsonView(Germplasm.View.GermplasmBrapiV1_3.class)
+	public ResponseEntity<SingleEntityResponse<GermplasmSummaryList>> searchGermplasmsByStudy(
+		@PathVariable final String crop,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize,
+		@PathVariable final Integer studyDbId) {
+
+		final PagedResult<GermplasmDTO> resultPage =
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<GermplasmDTO>() {
+
+				@Override
+				public long getCount() {
+					return GermplasmResourceBrapi.this.germplasmService.countGermplasmByStudy(studyDbId);
+				}
+
+				@Override
+				public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
+					final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+					final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+					return GermplasmResourceBrapi.this.germplasmService
+						.getGermplasmByStudy(studyDbId, finalPageSize, finalPageNumber);
+				}
+			});
+
+		final List<Germplasm> germplasmList = new ArrayList<>();
+
+		if (resultPage.getPageResults() != null) {
+			final ModelMapper mapper = new ModelMapper();
+			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
+				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+				germplasm.setCommonCropName(crop);
+				germplasmList.add(germplasm);
+			}
+		}
+
+		final StudyMetadata studyMetadataForGeolocationId = this.studyDataManager.getStudyMetadataForGeolocationId(studyDbId);
+		final GermplasmSummaryList germplasmSummaryList = new GermplasmSummaryList();
+		germplasmSummaryList.setData(germplasmList);
+		germplasmSummaryList.setTrialName(studyMetadataForGeolocationId.getTrialName());
+		germplasmSummaryList.setStudyDbId(String.valueOf(studyDbId));
+
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+
+		final SingleEntityResponse<GermplasmSummaryList> singleEntityResponse = new SingleEntityResponse<>();
+		singleEntityResponse.setMetadata(metadata);
+		singleEntityResponse.setResult(germplasmSummaryList);
+
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+	}
 }

@@ -20,6 +20,7 @@ import org.generationcp.middleware.util.Debug;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
+import org.ibp.api.java.rpackage.RPackageService;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.junit.After;
 import org.junit.Before;
@@ -177,6 +178,12 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public StudyInstanceService studyInstanceService() {
 			return Mockito.mock(StudyInstanceService.class);
+		}
+
+		@Bean
+		@Primary
+		public RPackageService rPackageService() {
+			return Mockito.mock(RPackageService.class);
 		}
 	}
 
