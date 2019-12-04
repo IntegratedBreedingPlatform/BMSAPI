@@ -39,9 +39,9 @@ public class ContextResolverImpl implements ContextResolver {
 			throw new ContextResolutionException("Request is null");
 		}
 
-		String path = request.getRequestURI().substring(request.getContextPath().length());
+		final String path = request.getRequestURI().substring(request.getContextPath().length());
 		ContextResolverImpl.LOG.debug("Request path: " + path);
-		String[] parts = path.trim().toLowerCase().split("/");
+		final String[] parts = path.trim().toLowerCase().split("/");
 
 
 		String cropName = "";
@@ -83,13 +83,28 @@ public class ContextResolverImpl implements ContextResolver {
 			throw new ContextResolutionException("Request is null");
 		}
 
-		final String programUuid = request.getParameter("programUUID");
-		if (!StringUtils.isEmpty(programUuid)) {
-			// TODO Check if programUUID is valid and determine if we call ContextHolder.setCurrentProgram here
-			return programUuid;
+		final String path = request.getRequestURI().substring(request.getContextPath().length());
+		final String[] parts = path.trim().toLowerCase().split("/");
+		final int programsTokenIndex = Arrays.asList(parts).indexOf("programs");
+		String programUUID = "";
+		// IF the URL contains "programs" token, resolve the program UUID as the next token (eg. crops/maize/programs/abc-123/studies would yield abc-123 as the program UUID)
+		if (programsTokenIndex != -1 && (programsTokenIndex<parts.length-1)) {
+			programUUID = parts[programsTokenIndex+1];
+
+		// If not found in URL path, search in request parameters for "programUUID"
+		} else {
+			final String programUuidRequestParam = request.getParameter("programUUID");
+			if (!StringUtils.isEmpty(programUuidRequestParam)) {
+				programUUID =  programUuidRequestParam;
+			}
 		}
 
-		return "";
+		if (!StringUtils.isEmpty(programUUID)) {
+			// TODO Check if programUUID is valid and determine if we call ContextHolder.setCurrentProgram here
+		}
+
+
+		return programUUID;
 
 	}
 }
