@@ -52,10 +52,10 @@ public class TransactionInputValidator {
 			final Integer scaleId = lot.getScaleId();
 			this.inventoryScaleValidator.validateNotNullInventoryScaleId(this.errors, scaleId);
 			if (lot.getStatus().equalsIgnoreCase(LotStatus.CLOSED.name())) {
-				this.errors.rejectValue("transaction.closed.lot", "");
+				this.errors.reject("transaction.closed.lot", "");
 			}
 		} else {
-			this.errors.rejectValue("transaction.wrong.lot", "");
+			this.errors.reject("transaction.wrong.lot", "");
 		}
 	}
 
