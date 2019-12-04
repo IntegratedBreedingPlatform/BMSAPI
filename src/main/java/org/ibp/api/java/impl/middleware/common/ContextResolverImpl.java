@@ -21,6 +21,7 @@ import java.util.List;
 public class ContextResolverImpl implements ContextResolver {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ContextResolverImpl.class);
+	public static final String BRAPI = "brapi";
 
 	@Autowired
 	private CropService cropService;
@@ -30,14 +31,9 @@ public class ContextResolverImpl implements ContextResolver {
 		return String.format(Constants.DB_NAME_FORMAT, resolveCropNameFromUrl());
 	}
 
+
 	@Override
 	public String resolveCropNameFromUrl() throws ContextResolutionException {
-		return this.resolveCropNameFromUrl(true, true);
-	}
-
-
-	@Override
-	public String resolveCropNameFromUrl(final boolean doRequireCrop, final boolean includeBrAPI) throws ContextResolutionException {
 		final HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		if (request == null) {
 			throw new ContextResolutionException("Request is null");
@@ -46,21 +42,22 @@ public class ContextResolverImpl implements ContextResolver {
 		String path = request.getRequestURI().substring(request.getContextPath().length());
 		ContextResolverImpl.LOG.debug("Request path: " + path);
 		String[] parts = path.trim().toLowerCase().split("/");
-		if (parts.length < 3 && doRequireCrop) {
-			ContextResolverImpl.LOG.error("BAD URL Request :" + path);
-			throw new ContextResolutionException("URL too short:" + path, new Exception("Expecting crop name"));
-		}
+
 
 		String cropName = "";
+		boolean instanceLevelAPI = true;
 		if (parts.length >= 3) {
-			final boolean isBrApiURI = Arrays.stream(parts).anyMatch("brapi"::equals);
-			if (includeBrAPI && isBrApiURI) {
+			final boolean isBrApiURI = Arrays.stream(parts).anyMatch(BRAPI::equals);
+			if (isBrApiURI) {
+				// Exclude instance-level BrAPI calls (eg. /bmsapi/brapi/v1/crops) in crop resolution
 				// BrAPI calls put crop name as first path parameter after context path e.g. /bmsapi/maize/brapi/v1/locations
-				cropName = parts[1];
+				instanceLevelAPI = BRAPI.equals(parts[1]);
+				cropName = instanceLevelAPI? "" : parts[1];
 
-			} else if (!isBrApiURI){
-				// internal BMSAPI calls put crop name as second path parameter after context path e.g. /bmsapi/locations/maize/list
+			} else if ("crops".equals(parts[1])){
+				// internal BMSAPI crop/program services start with "crops" (eg. /bmsapi/crops/maize/locations
 				cropName = parts[2];
+				instanceLevelAPI = false;
 			}
 
 			if (!StringUtils.isEmpty(cropName)) {
@@ -72,7 +69,7 @@ public class ContextResolverImpl implements ContextResolver {
 			}
 		}
 
-		if (doRequireCrop && StringUtils.isEmpty(cropName)) {
+		if (!instanceLevelAPI && StringUtils.isEmpty(cropName)) {
 			throw new ContextResolutionException("Could not resolve crop for URL:" + path);
 		}
 		ContextResolverImpl.LOG.debug("Crop Name: " + cropName);

@@ -69,8 +69,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	}
 
 	private Collection<? extends GrantedAuthority> getAuthorities(final WorkbenchUser workbenchUser) {
-		// For BrAPI calls, we don't filter permissions by crop/program
-		final String cropName = this.contextResolver.resolveCropNameFromUrl(false, false);
+		final String cropName = this.contextResolver.resolveCropNameFromUrl();
 		final String programUUID = this.contextResolver.resolveProgramUuidFromRequest();
 		final Integer programId = StringUtils.isEmpty(programUUID)? null : getProgramId(programUUID);
 
