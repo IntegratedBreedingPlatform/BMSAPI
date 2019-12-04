@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.fest.util.Collections;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -12,9 +11,11 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.rest.dataset.DatasetDTO;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -22,6 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -87,7 +89,7 @@ public class StudyInstanceServiceImplTest {
 				nextInstanceNumber,
 				RandomStringUtils.random(BOUND), false);
 
-		when(this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(datasets);
+		when(this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(datasets);
 		when(this.studyInstanceMiddlewareService.createStudyInstance(this.maizeCropType, studyId, datasetId))
 			.thenReturn(newStudyInstance);
 
@@ -110,7 +112,7 @@ public class StudyInstanceServiceImplTest {
 	public void testCreateStudyInstanceNoEnvironmentDataset() {
 
 		final int studyId = this.random.nextInt(BOUND);
-		when(this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(new ArrayList<>());
+		when(this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(new ArrayList<>());
 
 		try {
 			this.studyInstanceService.createStudyInstance(this.maizeCropType.getCropName(), studyId);
@@ -125,30 +127,100 @@ public class StudyInstanceServiceImplTest {
 	public void testGetStudyInstances() {
 
 		final int studyId = this.random.nextInt(BOUND);
-		final int instanceNumber = this.random.nextInt(BOUND);
 
 		final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance =
-			new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND), this.random.nextInt(BOUND),
+			new StudyInstance(101, this.random.nextInt(BOUND), this.random.nextInt(BOUND),
 				RandomStringUtils.random(BOUND),
 				RandomStringUtils.random(
 					BOUND),
-				instanceNumber,
-				RandomStringUtils.random(BOUND), false);
+				1,
+				RandomStringUtils.random(BOUND), this.random.nextBoolean());
+
+		final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance2 =
+			new StudyInstance(102, this.random.nextInt(BOUND), this.random.nextInt(BOUND),
+				RandomStringUtils.random(BOUND),
+				RandomStringUtils.random(
+					BOUND),
+				2,
+				RandomStringUtils.random(BOUND), this.random.nextBoolean());
 
 		when(this.studyInstanceMiddlewareService.getStudyInstances(studyId))
-			.thenReturn(Arrays.asList(studyInstance));
+			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 
 		final List<org.ibp.api.domain.study.StudyInstance>
 			studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 
-		final org.ibp.api.domain.study.StudyInstance result = studyInstances.get(0);
-		assertEquals(result.getInstanceDbId(), studyInstance.getInstanceDbId());
-		assertEquals(result.getExperimentId(), studyInstance.getExperimentId());
-		assertEquals(result.getInstanceNumber(), studyInstance.getInstanceNumber());
-		assertEquals(result.getLocationName(), studyInstance.getLocationName());
-		assertEquals(result.getLocationAbbreviation(), studyInstance.getLocationAbbreviation());
-		assertEquals(result.getCustomLocationAbbreviation(), studyInstance.getCustomLocationAbbreviation());
-		assertEquals(result.getHasFieldmap(), studyInstance.isHasFieldmap());
+		Mockito.verify(this.studyValidator).validate(studyId, false);
+		assertEquals(2, studyInstances.size());
+		final org.ibp.api.domain.study.StudyInstance result1 = studyInstances.get(0);
+		assertEquals(result1.getInstanceDbId(), studyInstance.getInstanceDbId());
+		assertEquals(result1.getExperimentId(), studyInstance.getExperimentId());
+		assertEquals(result1.getInstanceNumber(), studyInstance.getInstanceNumber());
+		assertEquals(result1.getLocationName(), studyInstance.getLocationName());
+		assertEquals(result1.getLocationAbbreviation(), studyInstance.getLocationAbbreviation());
+		assertEquals(result1.getCustomLocationAbbreviation(), studyInstance.getCustomLocationAbbreviation());
+		assertEquals(result1.getHasFieldmap(), studyInstance.isHasFieldmap());
+
+		final org.ibp.api.domain.study.StudyInstance result2 = studyInstances.get(1);
+		assertEquals(result2.getInstanceDbId(), studyInstance2.getInstanceDbId());
+		assertEquals(result2.getExperimentId(), studyInstance2.getExperimentId());
+		assertEquals(result2.getInstanceNumber(), studyInstance2.getInstanceNumber());
+		assertEquals(result2.getLocationName(), studyInstance2.getLocationName());
+		assertEquals(result2.getLocationAbbreviation(), studyInstance2.getLocationAbbreviation());
+		assertEquals(result2.getCustomLocationAbbreviation(), studyInstance2.getCustomLocationAbbreviation());
+		assertEquals(result2.getHasFieldmap(), studyInstance2.isHasFieldmap());
+	}
+
+	@Test
+	public void testGetStudyInstance() {
+
+		final int studyId = this.random.nextInt(BOUND);
+
+		final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance =
+			new StudyInstance(101, this.random.nextInt(BOUND), this.random.nextInt(BOUND),
+				RandomStringUtils.random(BOUND),
+				RandomStringUtils.random(
+					BOUND),
+				1,
+				RandomStringUtils.random(BOUND), this.random.nextBoolean());
+
+		final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance2 =
+			new StudyInstance(102, this.random.nextInt(BOUND), this.random.nextInt(BOUND),
+				RandomStringUtils.random(BOUND),
+				RandomStringUtils.random(
+					BOUND),
+				2,
+				RandomStringUtils.random(BOUND), this.random.nextBoolean());
+
+		when(this.studyInstanceMiddlewareService.getStudyInstance(studyId, 101))
+			.thenReturn(com.google.common.base.Optional.of(studyInstance));
+		when(this.studyInstanceMiddlewareService.getStudyInstance(studyId, 102))
+			.thenReturn(com.google.common.base.Optional.of(studyInstance2));
+		when(this.studyInstanceMiddlewareService.getStudyInstance(studyId, 103))
+			.thenReturn(com.google.common.base.Optional.absent());
+
+
+		final org.ibp.api.domain.study.StudyInstance result1 = this.studyInstanceService.getStudyInstance(studyId, 101).get();
+		assertEquals(result1.getInstanceDbId(), studyInstance.getInstanceDbId());
+		assertEquals(result1.getExperimentId(), studyInstance.getExperimentId());
+		assertEquals(result1.getInstanceNumber(), studyInstance.getInstanceNumber());
+		assertEquals(result1.getLocationName(), studyInstance.getLocationName());
+		assertEquals(result1.getLocationAbbreviation(), studyInstance.getLocationAbbreviation());
+		assertEquals(result1.getCustomLocationAbbreviation(), studyInstance.getCustomLocationAbbreviation());
+		assertEquals(result1.getHasFieldmap(), studyInstance.isHasFieldmap());
+
+		final org.ibp.api.domain.study.StudyInstance result2 = this.studyInstanceService.getStudyInstance(studyId, 102).get();
+		assertEquals(result2.getInstanceDbId(), studyInstance2.getInstanceDbId());
+		assertEquals(result2.getExperimentId(), studyInstance2.getExperimentId());
+		assertEquals(result2.getInstanceNumber(), studyInstance2.getInstanceNumber());
+		assertEquals(result2.getLocationName(), studyInstance2.getLocationName());
+		assertEquals(result2.getLocationAbbreviation(), studyInstance2.getLocationAbbreviation());
+		assertEquals(result2.getCustomLocationAbbreviation(), studyInstance2.getCustomLocationAbbreviation());
+		assertEquals(result2.getHasFieldmap(), studyInstance2.isHasFieldmap());
+
+		Assert.assertFalse(this.studyInstanceService.getStudyInstance(studyId, 103).isPresent());
+		Mockito.verify(this.studyValidator, Mockito.times(3)).validate(studyId, false);
+		Mockito.verify(this.instanceValidator, Mockito.times(3)).validateStudyInstance(ArgumentMatchers.eq(studyId), ArgumentMatchers.anySet());
 	}
 
 	@Test
@@ -158,7 +230,7 @@ public class StudyInstanceServiceImplTest {
 
 		this.studyInstanceService.deleteStudyInstance(studyId, instanceId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.instanceValidator).validateInstanceDeletion(studyId, Collections.set(instanceId), true);
+		Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId), true);
 		Mockito.verify(this.studyInstanceMiddlewareService).deleteStudyInstance(studyId, instanceId);
 	}
 
