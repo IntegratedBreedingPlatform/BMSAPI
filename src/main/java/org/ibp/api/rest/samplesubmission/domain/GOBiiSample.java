@@ -1,6 +1,5 @@
-package org.ibp.api.rest.samplesubmission.domain.sample;
+package org.ibp.api.rest.samplesubmission.domain;
 
-import org.ibp.api.rest.samplesubmission.domain.GOBiiGermplasm;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 

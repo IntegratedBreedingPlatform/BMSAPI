@@ -1,7 +1,7 @@
 package org.ibp.api.rest.samplesubmission.service;
 
+import org.ibp.api.rest.samplesubmission.domain.GOBiiSampleList;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
-import org.ibp.api.rest.samplesubmission.domain.sample.GOBiiSampleList;
 
 public interface GOBiiSampleService {
 
