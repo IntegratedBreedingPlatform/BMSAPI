@@ -45,7 +45,7 @@ public class TransactionInputValidator {
 
 	private void validateComments(final String comments) {
 		if (comments.length() > 255) {
-			errors.reject("transaction.comments.lenght");
+			errors.reject("transaction.comments.length");
 		}
 	}
 

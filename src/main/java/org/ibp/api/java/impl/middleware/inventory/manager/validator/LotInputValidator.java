@@ -52,7 +52,7 @@ public class LotInputValidator {
 
 	private void validateComments(final String comments) {
 		if (comments.length() > 255) {
-			errors.reject("lot.comments.lenght");
+			errors.reject("lot.comments.length");
 		}
 	}
 
