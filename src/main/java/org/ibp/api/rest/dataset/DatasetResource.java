@@ -211,10 +211,11 @@ public class DatasetResource {
 		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "It will retrieve all the observation units in a simple JSON array table format, for use in Visualization", notes = "It will retrieve all the observation units including observations and props values in a simple JSON Array table format.")
+	@ApiOperation(value = "It will retrieve all the observation units in a simple JSON array table format, this will be used as input data for Visualization tool.",
+		notes = "It will retrieve all data of factors and variate at observation/sub-observation level. Returns data as a simple JSON Array table format.")
 	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/visualization", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<List<Map<String, Object>>> getObservationUnitAsJSONArray(@PathVariable final String cropname, //
+	public ResponseEntity<List<Map<String, Object>>> getObservationUnitTableAsJSONArray(@PathVariable final String cropname, //
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@RequestBody final ObservationUnitsSearchDTO searchDTO) {
@@ -223,7 +224,7 @@ public class DatasetResource {
 		Preconditions.checkNotNull(searchDTO.getFilter(), "filter inside params cannot be null");
 		Preconditions.checkArgument(!Collections.isEmpty(searchDTO.getFilter().getFilterColumns()), "filterColumns cannot be null or empty");
 
-		return new ResponseEntity(this.studyDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO), HttpStatus.OK);
+		return new ResponseEntity<>(this.studyDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")

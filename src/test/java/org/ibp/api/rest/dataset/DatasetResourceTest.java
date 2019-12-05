@@ -416,6 +416,41 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
+	public void testGetObservationUnitRowsAsListMap() throws Exception {
+
+		final Map<String, Object> rowDataMap = new HashMap<>();
+		rowDataMap.put("TRIAL_INSTANCE", "1");
+		rowDataMap.put("TRAIT1", 1);
+		rowDataMap.put("TRAIT2", "ABC");
+
+		Mockito.when(this.studyDatasetService.getObservationUnitRowsAsListMap(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+			ArgumentMatchers.any()))
+			.thenReturn(Lists.newArrayList(rowDataMap));
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final int instanceId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setInstanceId(instanceId);
+		searchDTO.getFilter().getFilterColumns().add("TRIAL_INSTANCE");
+		searchDTO.getFilter().getFilterColumns().add("TRAIT1");
+		searchDTO.getFilter().getFilterColumns().add("TRAIT2");
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders.post(
+				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/visualization",
+				this.cropName,
+				studyId,
+				datasetId).content(this.convertObjectToByte(searchDTO)).contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].TRIAL_INSTANCE", is("1")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].TRAIT1", is(1)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].TRAIT2", is("ABC")));
+	}
+
+	@Test
 	public void testDeleteObservation() throws Exception {
 
 		final Random random = new Random();
