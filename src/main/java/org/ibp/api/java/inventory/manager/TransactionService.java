@@ -1,7 +1,7 @@
-package org.ibp.api.java.inventory_new;
+package org.ibp.api.java.inventory.manager;
 
-import org.generationcp.middleware.domain.inventory_new.TransactionDto;
-import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

@@ -1,8 +1,8 @@
-package org.ibp.api.java.inventory_new;
+package org.ibp.api.java.inventory.manager;
 
-import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory_new.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

@@ -1,5 +1,5 @@
 
-package org.ibp.api.java.Inventory;
+package org.ibp.api.java.inventory;
 
 import java.util.List;
 

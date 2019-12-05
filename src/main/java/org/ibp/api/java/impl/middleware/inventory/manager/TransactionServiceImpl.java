@@ -1,9 +1,9 @@
-package org.ibp.api.java.impl.middleware.inventory_new;
+package org.ibp.api.java.impl.middleware.inventory.manager;
 
-import org.generationcp.middleware.domain.inventory_new.TransactionDto;
-import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
-import org.ibp.api.java.impl.middleware.inventory_new.validator.TransactionInputValidator;
-import org.ibp.api.java.inventory_new.TransactionService;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
+import org.ibp.api.java.inventory.manager.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

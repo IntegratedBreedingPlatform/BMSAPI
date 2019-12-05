@@ -1,9 +1,9 @@
-package org.ibp.api.java.impl.middleware.inventory_new.validator;
+package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory_new.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.inventory.LotService;

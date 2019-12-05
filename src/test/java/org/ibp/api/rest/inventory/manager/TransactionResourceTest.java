@@ -1,12 +1,12 @@
-package org.ibp.api.rest.inventory_new;
+package org.ibp.api.rest.inventory.manager;
 
 import com.beust.jcommander.internal.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
-import org.generationcp.middleware.domain.inventory_new.TransactionDto;
-import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.inventory_new.TransactionService;
+import org.ibp.api.java.inventory.manager.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

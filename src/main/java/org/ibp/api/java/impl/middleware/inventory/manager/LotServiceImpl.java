@@ -1,14 +1,14 @@
-package org.ibp.api.java.impl.middleware.inventory_new;
+package org.ibp.api.java.impl.middleware.inventory.manager;
 
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.spring.util.ContextUtil;
-import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory_new.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.ibp.api.java.impl.middleware.inventory_new.validator.LotInputValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.ibp.api.java.inventory_new.LotService;
+import org.ibp.api.java.inventory.manager.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
