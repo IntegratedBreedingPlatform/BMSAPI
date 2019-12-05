@@ -35,9 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,7 +73,8 @@ public class DatasetResource {
 		@PathVariable final Integer datasetId,
 		@RequestParam(required = false) final Boolean draftMode) {
 
-		final List<MeasurementVariable> observationSetColumns = this.studyDatasetService.getObservationSetColumns(studyId, datasetId, draftMode);
+		final List<MeasurementVariable> observationSetColumns =
+			this.studyDatasetService.getObservationSetColumns(studyId, datasetId, draftMode);
 
 		return new ResponseEntity<>(observationSetColumns, HttpStatus.OK);
 	}
@@ -117,7 +116,8 @@ public class DatasetResource {
 	public ResponseEntity<List<MeasurementVariableDto>> getVariables(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer variableTypeId) {
-		final List<MeasurementVariableDto> variables = this.studyDatasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.getById(variableTypeId));
+		final List<MeasurementVariableDto> variables =
+			this.studyDatasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.getById(variableTypeId));
 		return new ResponseEntity<>(variables, HttpStatus.OK);
 	}
 
@@ -160,9 +160,10 @@ public class DatasetResource {
 	@ApiOperation(value = "Generate and save a sub-observation dataset", notes = "Returns the basic information for the generated dataset")
 	@RequestMapping(value = "/{cropName}/studies/{studyId}/datasets/{parentId}/generation", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<DatasetDTO> generateDataset(@PathVariable
-	final String cropName, @PathVariable final Integer studyId, @PathVariable final Integer parentId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
-		return new ResponseEntity<>(this.studyDatasetService.generateSubObservationDataset(cropName, studyId, parentId, datasetGeneratorInput), HttpStatus.OK);
+	public ResponseEntity<DatasetDTO> generateDataset(@PathVariable final String cropName, @PathVariable final Integer studyId,
+		@PathVariable final Integer parentId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
+		return new ResponseEntity<>(
+			this.studyDatasetService.generateSubObservationDataset(cropName, studyId, parentId, datasetGeneratorInput), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve all the observation units", notes = "It will retrieve all the observation units including observations and props values in a format that will be used by the Observations table.")
@@ -171,7 +172,7 @@ public class DatasetResource {
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname, //
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
-		@RequestBody  final ObservationUnitsSearchDTO searchDTO) {
+		@RequestBody final ObservationUnitsSearchDTO searchDTO) {
 
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 		final SortedPageRequest sortedRequest = searchDTO.getSortedRequest();
@@ -222,7 +223,8 @@ public class DatasetResource {
 
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 		Preconditions.checkNotNull(searchDTO.getFilter(), "filter inside params cannot be null");
-		Preconditions.checkArgument(!Collections.isEmpty(searchDTO.getFilter().getFilterColumns()), "filterColumns cannot be null or empty");
+		Preconditions
+			.checkArgument(!Collections.isEmpty(searchDTO.getFilter().getFilterColumns()), "filterColumns cannot be null or empty");
 
 		return new ResponseEntity<>(this.studyDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO), HttpStatus.OK);
 	}
@@ -244,21 +246,21 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Delete Observation", notes = "Delete Observation")
 	@RequestMapping(
-			value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
-			method = RequestMethod.DELETE)
+		value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
+		method = RequestMethod.DELETE)
 	public ResponseEntity<Void> deleteObservation(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
-			@PathVariable final Integer observationId) {
+		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
+		@PathVariable final Integer observationId) {
 		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Put Observations Dataset", notes = "Put Observations Dataset")
 	@RequestMapping(
-			value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations",
-			method = RequestMethod.PUT)
+		value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations",
+		method = RequestMethod.PUT)
 	public ResponseEntity<Void> postObservationUnits(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId, @RequestBody final ObservationsPutRequestInput input) {
+		@PathVariable final Integer datasetId, @RequestBody final ObservationsPutRequestInput input) {
 		this.studyDatasetService.importObservations(studyId, datasetId, input);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -365,14 +367,13 @@ public class DatasetResource {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
-
 	@ApiOperation(value = "Move draft value to saved value in sub-observation dataset", notes = "Save information for the imported dataset")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/filter/acceptance", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> acceptDraftDataByVariable(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
-		@RequestBody  final ObservationUnitsSearchDTO searchDTO) {
+		@RequestBody final ObservationUnitsSearchDTO searchDTO) {
 		this.studyDatasetService.acceptDraftDataFilteredByVariable(studyId, datasetId, searchDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

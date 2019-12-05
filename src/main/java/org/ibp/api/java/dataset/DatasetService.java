@@ -25,16 +25,18 @@ public interface DatasetService {
 	 * It will always return the union between the factors of the parent dataset, the variables of the specified dataset
 	 * and some virtual columns that needs to be shown in the observations table (i.e. SAMPLES)
 	 * draftMode == TRUE indicates that the dataset variables will only retrieve only the variables that contains draft data
-	 * @param studyId Id of the study
+	 *
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 * @param draftMode Will only retrieve variables with draft data if TRUE
 	 * @return List of Measurement Variables
 	 */
 	List<MeasurementVariable> getObservationSetColumns(Integer studyId, Integer datasetId, Boolean draftMode);
-	
+
 	/**
 	 * Given a dataset, it will retrieve the union between the parent dataset variables and the dataset variables
-	 * @param studyId Id of the Study
+	 *
+	 * @param studyId   Id of the Study
 	 * @param datasetId Id of the Dataset
 	 * @return List of Measurement Variables.
 	 */
@@ -44,8 +46,9 @@ public interface DatasetService {
 	/**
 	 * Given a dataset and a list of variables, it will count how many observations it has associated.
 	 * Count all the dataset observations if variableIds is EMPTY
-	 * @param studyId Id of the study
-	 * @param datasetId Id of the dataset
+	 *
+	 * @param studyId     Id of the study
+	 * @param datasetId   Id of the dataset
 	 * @param variableIds List of variables
 	 * @return Number of observations per variables
 	 */
@@ -54,8 +57,9 @@ public interface DatasetService {
 
 	/**
 	 * Given a dataset and an instance, it will count how many observations it has associated.
-	 * @param studyId Id of the study
-	 * @param datasetId Id of the dataset
+	 *
+	 * @param studyId    Id of the study
+	 * @param datasetId  Id of the dataset
 	 * @param instanceId Id of the instance.
 	 * @return Number of observations by instance
 	 */
@@ -64,8 +68,9 @@ public interface DatasetService {
 
 	/**
 	 * Adds a variable to the dataset. Variable type MUST be Trait or Selection
-	 * @param studyId Id of the study
-	 * @param datasetId Id of the dataset
+	 *
+	 * @param studyId         Id of the study
+	 * @param datasetId       Id of the dataset
 	 * @param datasetVariable Variable to be added
 	 * @return A measurement variable.
 	 */
@@ -73,8 +78,9 @@ public interface DatasetService {
 
 	/**
 	 * Get the list of dataset variables of an specific variable type
-	 * @param studyId Id of the study
-	 * @param datasetId If of the dataset
+	 *
+	 * @param studyId      Id of the study
+	 * @param datasetId    If of the dataset
 	 * @param variableType Variable Type
 	 * @return List of variables
 	 */
@@ -84,7 +90,8 @@ public interface DatasetService {
 
 	/**
 	 * Get the list of dataset variables with specific types indicated in variableTypes list
-	 * @param projectId Id of the project
+	 *
+	 * @param projectId     Id of the project
 	 * @param variableTypes
 	 * @return List of measurement variables
 	 */
@@ -92,15 +99,17 @@ public interface DatasetService {
 
 	/**
 	 * Given a dataset and a list of variables, it will de-associated them from the dataset
-	 * @param studyId Id of the study
-	 * @param datasetId Id of the dataset
+	 *
+	 * @param studyId     Id of the study
+	 * @param datasetId   Id of the dataset
 	 * @param variableIds List of variables
 	 */
 	void removeDatasetVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
 
 	/**
 	 * Return the list of instances for an specific dataset
-	 * @param studyId Id of the study
+	 *
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 * @return List of StudyInstances
 	 */
@@ -108,7 +117,8 @@ public interface DatasetService {
 
 	/**
 	 * Given a list of dataset types and a study, it will retrieve the study datasets with the specified types
-	 * @param studyId Id of the study
+	 *
+	 * @param studyId        Id of the study
 	 * @param datasetTypeIds List of dataset types
 	 * @return List of datasets
 	 */
@@ -116,7 +126,8 @@ public interface DatasetService {
 
 	/**
 	 * Returns the list of observation unit rows (represented as List of HashMap) that matches the search param
-	 * @param studyId Id of the study
+	 *
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 * @param searchDTO Search DTO
 	 * @return List of Variable (Column) Name and Value Map
@@ -126,9 +137,10 @@ public interface DatasetService {
 
 	/**
 	 * Generates a sub-observation dataset for the indicated parent id
-	 * @param cropName Crop name
-	 * @param studyId Id of the study
-	 * @param parentId Id of the parent dataset
+	 *
+	 * @param cropName              Crop name
+	 * @param studyId               Id of the study
+	 * @param parentId              Id of the parent dataset
 	 * @param datasetGeneratorInput Dataset Generator Input.
 	 * @return The new created dataset
 	 */
@@ -137,8 +149,9 @@ public interface DatasetService {
 
 	/**
 	 * Return a dataset given the id
-	 * @param crop Crop name
-	 * @param studyId Id of the study
+	 *
+	 * @param crop      Crop name
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 * @return
 	 */
@@ -146,16 +159,18 @@ public interface DatasetService {
 
 	/**
 	 * Returns a map where the key is the instance id and the value is the list of observation unit rows that belongs to the instance
-	 * @param studyId Id of the study
-	 * @param datasetId Id of the dataset
+	 *
+	 * @param studyId    Id of the study
+	 * @param datasetId  Id of the dataset
 	 * @param instanceId Id of the instance
-	 * @return Map<Integer, List<ObservationUnitRow>>
+	 * @return Map<Integer, List < ObservationUnitRow>>
 	 */
 	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(int studyId, int datasetId, List<Integer> instanceId);
 
 	/**
 	 * Returns the list of observation unit rows that matches the search param
-	 * @param studyId Id of the study
+	 *
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 * @param searchDTO Search DTO
 	 * @return List of ObservationUnitRow
@@ -167,10 +182,11 @@ public interface DatasetService {
 	/**
 	 * Create a new observation for the specified dataset and observation unit id
 	 * Notice that status, updated date and created date are internally set so values in observation object will be discarded
-	 * @param studyId Id of the study
-	 * @param datasetId Id of the dataset
+	 *
+	 * @param studyId           Id of the study
+	 * @param datasetId         Id of the dataset
 	 * @param observationUnitId Id of the observation unit
-	 * @param observation Observation to be added
+	 * @param observation       Observation to be added
 	 * @return The new created ObservationDto
 	 */
 	//TODO Add Json views to ObservationDto
@@ -178,11 +194,12 @@ public interface DatasetService {
 
 	/**
 	 * Modify an existing observation. Some attributes can not be updated
-	 * @param studyId Id of the study
-	 * @param datasetId Id of the dataset
-	 * @param observationId Id of the observation
+	 *
+	 * @param studyId           Id of the study
+	 * @param datasetId         Id of the dataset
+	 * @param observationId     Id of the observation
 	 * @param observationUnitId Id of the observation unit
-	 * @param observationDto Observation to be updated
+	 * @param observationDto    Observation to be updated
 	 * @return Updated ObservationDTO
 	 */
 	ObservationDto updateObservation(
@@ -190,10 +207,11 @@ public interface DatasetService {
 
 	/**
 	 * Delete an existing observation
-	 * @param studyId Id of the study
-	 * @param datasetId Id of the dataset
+	 *
+	 * @param studyId           Id of the study
+	 * @param datasetId         Id of the dataset
 	 * @param observationUnitId Id of the observation unit
-	 * @param observationId Id of the observation to be deleted
+	 * @param observationId     Id of the observation to be deleted
 	 */
 	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
 
@@ -201,17 +219,19 @@ public interface DatasetService {
 	 * It will import a list of observation presented as a List<List<String>>.
 	 * Also allows to specify processing warnings or not.
 	 * As of now, it will only import data in draft mode.
-	 * @param studyId Id of the study
+	 *
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
-	 * @param input ObservationsPutRequestInput
+	 * @param input     ObservationsPutRequestInput
 	 */
 	void importObservations(Integer studyId, Integer datasetId, ObservationsPutRequestInput input);
 
 	/**
 	 * Count how many instances and observations are filtered given a filter with a not null variable
-	 * @param studyId Id of the study
+	 *
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
-	 * @param filter Filter
+	 * @param filter    Filter
 	 * @return FilteredPhenotypesInstancesCountDTO
 	 */
 	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(Integer studyId, Integer datasetId,
@@ -220,21 +240,23 @@ public interface DatasetService {
 	/**
 	 * Count all observation units for a dataset (draftMode = FALSE to count all of them, draftMode = TRUE to count only observation
 	 * units with at least one draft observation)
-	 * @param datasetId Id of the dataset
+	 *
+	 * @param datasetId  Id of the dataset
 	 * @param instanceId Id of the instance
-	 * @param draftMode Indicates to count all observation units  or draft observations
+	 * @param draftMode  Indicates to count all observation units  or draft observations
 	 * @return Number of observations units that matches the dataset id and draftMode
 	 */
 	Integer countAllObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 
 	/**
 	 * Count how many observation units are affected by a filter
-	 *  (draftMode = FALSE to count all of them, draftMode = TRUE to count only observation
-	 * 	 units with at least one draft observation)
-	 * @param datasetId Id of the dataset
+	 * (draftMode = FALSE to count all of them, draftMode = TRUE to count only observation
+	 * units with at least one draft observation)
+	 *
+	 * @param datasetId  Id of the dataset
 	 * @param instanceId Id of the instance
-	 * @param draftMode draftMode
-	 * @param filter Filyer
+	 * @param draftMode  draftMode
+	 * @param filter     Filyer
 	 * @return Number of observation units that matches the datasetId, draftMode and filter
 	 */
 	long countFilteredObservationUnitsForDataset(
@@ -242,28 +264,30 @@ public interface DatasetService {
 
 	/**
 	 * It will accept all the draft data even when there are out of bounds values for numerical types.
-	 * @param studyId Id of the study
+	 *
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 */
 	void acceptAllDatasetDraftData(Integer studyId, Integer datasetId);
 
 	/**
 	 * Accepts the in bounds values for the draft data and set as missing the out of bounds values
-	 * @param studyId Id of the study
+	 *
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 */
 	void acceptDraftDataAndSetOutOfBoundsToMissing(Integer studyId, Integer datasetId);
 
 	/**
 	 * It will reject all the draft data for a dataset
-	 * @param studyId Id of the study
- 	 * @param datasetId Id of the dataset
+	 *
+	 * @param studyId   Id of the study
+	 * @param datasetId Id of the dataset
 	 */
 	void rejectDatasetDraftData(Integer studyId, Integer datasetId);
 
 	/**
-	 *
-	 * @param studyId Id of the study
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 * @return a boolean indicating if the dataset draft data has out of bound values or not
 	 */
@@ -272,7 +296,8 @@ public interface DatasetService {
 	/**
 	 * Accept the draft values that are retrieved after filtering by searchDTO.
 	 * variableId in searchDTO can not be null
-	 * @param studyId Id of the study
+	 *
+	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 * @param searchDTO searchDTO
 	 */
@@ -281,6 +306,7 @@ public interface DatasetService {
 
 	/**
 	 * Set an specific variable to an specific variable
+	 *
 	 * @param datasetId
 	 * @param searchDTO
 	 * @param studyId
