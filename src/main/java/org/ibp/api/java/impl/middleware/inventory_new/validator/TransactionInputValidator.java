@@ -37,9 +37,15 @@ public class TransactionInputValidator {
 		this.validateTransactionType(transactionDto.getTransactionType());
 		this.validateAmount(transactionDto);
 		this.validateLotAndScale(transactionDto);
-
+		this.validateComments(transactionDto.getNotes());
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateComments(final String comments) {
+		if (comments.length() > 255) {
+			errors.reject("transaction.comments.lenght");
 		}
 	}
 
