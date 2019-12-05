@@ -1,9 +1,9 @@
-package org.ibp.api.java.impl.middleware.inventory_new.validator;
+package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.inventory_new.LotDto;
-import org.generationcp.middleware.domain.inventory_new.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;

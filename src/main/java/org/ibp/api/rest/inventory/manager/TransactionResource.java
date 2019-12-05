@@ -1,20 +1,20 @@
-package org.ibp.api.rest.inventory_new;
+package org.ibp.api.rest.inventory.manager;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory_new.TransactionDto;
-import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.ibp.api.java.inventory_new.TransactionService;
+import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;

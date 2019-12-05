@@ -1,4 +1,4 @@
-package org.ibp.api.rest.inventory_new;
+package org.ibp.api.rest.inventory.manager;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

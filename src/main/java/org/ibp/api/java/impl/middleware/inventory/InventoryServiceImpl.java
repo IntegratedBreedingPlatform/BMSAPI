@@ -18,7 +18,7 @@ import org.ibp.api.domain.inventory.GermplasmInventory;
 import org.ibp.api.domain.inventory.InventoryLocation;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.Inventory.InventoryService;
+import org.ibp.api.java.inventory.InventoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
