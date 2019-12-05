@@ -44,8 +44,15 @@ public class LotInputValidator {
 		this.inventoryScaleValidator.validateInventoryScaleId(this.errors, lotGeneratorInputDto.getScaleId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
+		this.validateComments(lotGeneratorInputDto.getComments());
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateComments(final String comments) {
+		if (comments.length() > 255) {
+			errors.reject("lot.comments.lenght");
 		}
 	}
 
