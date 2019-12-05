@@ -57,8 +57,8 @@ public class GOBiiSampleServiceImpl implements GOBiiSampleService {
 
 			HttpEntity<GOBiiSampleList> entity = new HttpEntity<>(goBiiSampleList, headers);
 
-			String urlFormat = "%s/gobii-dev/sample-tracking/v1/projects/%o/samples";
-			String url = String.format(urlFormat, gobiiURL, goBiiSampleList.getProjectId());
+			String urlFormat = "%s/gobii-dev/sample-tracking/v1/samples";
+			String url = String.format(urlFormat, gobiiURL);
 
 			ResponseEntity<GOBiiSampleList> response = restTemplate
 				.exchange(url, HttpMethod.POST, entity,

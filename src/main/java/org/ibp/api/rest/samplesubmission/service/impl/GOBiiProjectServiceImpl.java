@@ -1,7 +1,7 @@
 package org.ibp.api.rest.samplesubmission.service.impl;
 
+import org.ibp.api.rest.samplesubmission.domain.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
-import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.service.GOBiiProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

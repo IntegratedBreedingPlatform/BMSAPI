@@ -3,7 +3,6 @@ package org.ibp.api.rest.samplesubmission.service.impl;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
 import org.ibp.api.rest.samplesubmission.service.GOBiiAuthenticationService;
-import org.ibp.api.rest.samplesubmission.service.GOBiiExperimentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

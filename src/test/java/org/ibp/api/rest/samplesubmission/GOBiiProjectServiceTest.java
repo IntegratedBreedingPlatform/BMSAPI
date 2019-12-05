@@ -1,16 +1,10 @@
 package org.ibp.api.rest.samplesubmission;
 
-import java.util.List;
-
-import org.ibp.api.rest.samplesubmission.domain.common.GOBiiHeader;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
-import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.service.impl.GOBiiProjectServiceImpl;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.ArrayList;
 
 /**
  * Created by clarysabel on 9/12/18.

@@ -1,4 +1,4 @@
-package org.ibp.api.rest.samplesubmission.domain.project;
+package org.ibp.api.rest.samplesubmission.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;

@@ -4,14 +4,14 @@ import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
-import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.rest.samplesubmission.domain.GOBiiGermplasm;
+import org.ibp.api.rest.samplesubmission.domain.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
-import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.domain.sample.GOBiiSample;
 import org.ibp.api.rest.samplesubmission.domain.sample.GOBiiSampleList;
 import org.ibp.api.rest.samplesubmission.service.GOBiiAuthenticationService;
@@ -199,13 +199,22 @@ public class SampleListServiceImpl implements SampleListService {
 				this.saveOrUpdate(sampleList);
 				final GOBiiSampleList goBiiSampleList = new GOBiiSampleList();
 				goBiiSampleList.setProjectId(projectId);
-				for (final Sample sample: sampleList.getSamples()) {
+
+				final List<SampleDetailsDTO> sampleDetailsDTOs = this.getSampleDetailsDTOs(sampleListId);
+				for (final SampleDetailsDTO sample: sampleDetailsDTOs) {
 					final GOBiiSample goBiiSample = new GOBiiSample();
-					goBiiSample.setName(sample.getSampleName());
+					final GOBiiGermplasm goBiiGermplasm = new GOBiiGermplasm();
+					goBiiGermplasm.setExternalCode(String.valueOf(sample.getGid()));
+					goBiiGermplasm.setGermplasmName(sample.getDesignation());
+
+					goBiiSample.setSampleNum(String.valueOf(sample.getEntryNumber()));
+					goBiiSample.setGermplasm(goBiiGermplasm);
+					goBiiSample.setSampleName(sample.getSampleName());
 					goBiiSample.setSampleUuid(sample.getSampleBusinessKey());
 					goBiiSample.setPlateName(sample.getPlateId());
 					goBiiSample.setWellRow(sample.getWell());
-					goBiiSample.setWellColumn(sample.getWell());
+					goBiiSample.setWellCol(sample.getWell());
+					goBiiSample.setProperties(new HashMap<>());
 					goBiiSampleList.getSamples().add(goBiiSample);
 				}
 				goBiiSampleService.postGOBiiSampleList(token, goBiiSampleList);
@@ -269,7 +278,6 @@ public class SampleListServiceImpl implements SampleListService {
 	private GOBiiProject buildGOBiiProject(final SampleList sampleListDto) {
 		final GOBiiProject goBiiProject = new GOBiiProject();
 		goBiiProject.setCode(String.valueOf(sampleListDto.getId()));
-		goBiiProject.setProjectName(sampleListDto.getListName());
 		goBiiProject.setProjectName(sampleListDto.getListName());
 		goBiiProject.setPiContactId(1);
 		goBiiProject.setProperties(new HashMap<>());

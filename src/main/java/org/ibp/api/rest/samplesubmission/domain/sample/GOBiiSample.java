@@ -1,30 +1,29 @@
 package org.ibp.api.rest.samplesubmission.domain.sample;
 
+import org.ibp.api.rest.samplesubmission.domain.GOBiiGermplasm;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
+
+import java.util.Map;
 
 @AutoProperty
 public class GOBiiSample {
 
-	private String name;
+	private String sampleName;
 
 	private String sampleUuid;
 
+	private String sampleNum;
+
 	private String wellRow;
 
-	private String wellColumn;
+	private String wellCol;
 
 	private String plateName;
 
-	private String sampleId;
+	private GOBiiGermplasm germplasm;
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(final String name) {
-		this.name = name;
-	}
+	private Map<String, String> properties;
 
 	public String getSampleUuid() {
 		return sampleUuid;
@@ -42,14 +41,6 @@ public class GOBiiSample {
 		this.wellRow = wellRow;
 	}
 
-	public String getWellColumn() {
-		return wellColumn;
-	}
-
-	public void setWellColumn(final String wellColumn) {
-		this.wellColumn = wellColumn;
-	}
-
 	public String getPlateName() {
 		return plateName;
 	}
@@ -58,12 +49,44 @@ public class GOBiiSample {
 		this.plateName = plateName;
 	}
 
-	public String getSampleId() {
-		return sampleId;
+	public String getSampleName() {
+		return sampleName;
 	}
 
-	public void setSampleId(final String sampleId) {
-		this.sampleId = sampleId;
+	public void setSampleName(final String sampleName) {
+		this.sampleName = sampleName;
+	}
+
+	public String getSampleNum() {
+		return sampleNum;
+	}
+
+	public void setSampleNum(final String sampleNum) {
+		this.sampleNum = sampleNum;
+	}
+
+	public String getWellCol() {
+		return wellCol;
+	}
+
+	public void setWellCol(final String wellCol) {
+		this.wellCol = wellCol;
+	}
+
+	public GOBiiGermplasm getGermplasm() {
+		return germplasm;
+	}
+
+	public void setGermplasm(final GOBiiGermplasm germplasm) {
+		this.germplasm = germplasm;
+	}
+
+	public Map<String, String> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(final Map<String, String> properties) {
+		this.properties = properties;
 	}
 
 	@Override
