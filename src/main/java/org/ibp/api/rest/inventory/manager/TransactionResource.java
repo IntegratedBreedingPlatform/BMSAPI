@@ -118,7 +118,7 @@ public class TransactionResource {
 		@RequestBody final TransactionDto transactionDto) {
 
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-		transactionDto.setUser(user.getUserid().toString());
+		transactionDto.setCreatedByUsername(user.getUserid().toString());
 		if (transactionDto.getLot() == null) {
 			transactionDto.setLot(new ExtendedLotDto());
 		}

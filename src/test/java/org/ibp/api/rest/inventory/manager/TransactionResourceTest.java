@@ -83,7 +83,7 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 		transactionDto.getLot().setScaleName("SEED_AMOUNT_g");
 		transactionDto.getLot().setStockId("ABC-1");
 		transactionDto.setTransactionType("Deposit");
-		transactionDto.setUser("admin");
+		transactionDto.setCreatedByUsername("admin");
 		list.add(transactionDto);
 
 		Mockito.doReturn(list).when(this.transactionService).searchTransactions(Mockito.any(TransactionsSearchDto.class),
