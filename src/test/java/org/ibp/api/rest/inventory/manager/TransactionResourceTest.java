@@ -104,7 +104,7 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$[0].lot.scaleName", is("SEED_AMOUNT_g")))
 			.andExpect(jsonPath("$[0].lot.stockId", is("ABC-1")))
 			.andExpect(jsonPath("$[0].transactionType", is("Deposit")))
-			.andExpect(jsonPath("$[0].user", is("admin")))
+			.andExpect(jsonPath("$[0].createdByUsername", is("admin")))
 		;
 	}
 }
