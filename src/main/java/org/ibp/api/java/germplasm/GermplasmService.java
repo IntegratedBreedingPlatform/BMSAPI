@@ -4,7 +4,7 @@ package org.ibp.api.java.germplasm;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
-import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.v1.GermplasmSearchRequestDto;
 import org.ibp.api.domain.germplasm.DescendantTree;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
