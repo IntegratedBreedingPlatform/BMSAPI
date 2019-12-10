@@ -434,9 +434,9 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 		searchDTO.setInstanceId(instanceId);
-		searchDTO.getFilter().getFilterColumns().add("TRIAL_INSTANCE");
-		searchDTO.getFilter().getFilterColumns().add("TRAIT1");
-		searchDTO.getFilter().getFilterColumns().add("TRAIT2");
+		searchDTO.getFilterColumns().add("TRIAL_INSTANCE");
+		searchDTO.getFilterColumns().add("TRAIT1");
+		searchDTO.getFilterColumns().add("TRAIT2");
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.post(

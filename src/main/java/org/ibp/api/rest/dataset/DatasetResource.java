@@ -177,6 +177,8 @@ public class DatasetResource {
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 		final SortedPageRequest sortedRequest = searchDTO.getSortedRequest();
 		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
+		Preconditions
+			.checkArgument(Collections.isEmpty(searchDTO.getFilterColumns()), "filterColumns should be null or empty");
 
 		final Integer pageNumber = sortedRequest.getPageNumber();
 		final Integer pageSize = sortedRequest.getPageSize();
@@ -224,7 +226,7 @@ public class DatasetResource {
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 		Preconditions.checkNotNull(searchDTO.getFilter(), "filter inside params cannot be null");
 		Preconditions
-			.checkArgument(!Collections.isEmpty(searchDTO.getFilter().getFilterColumns()), "filterColumns cannot be null or empty");
+			.checkArgument(!Collections.isEmpty(searchDTO.getFilterColumns()), "filterColumns cannot be null or empty");
 
 		return new ResponseEntity<>(this.studyDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO), HttpStatus.OK);
 	}
