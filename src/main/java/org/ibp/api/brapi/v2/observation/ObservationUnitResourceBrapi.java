@@ -19,6 +19,7 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class ObservationUnitResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits/{searchResultsDbid}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(PhenotypeSearchDTO.View.PhenotypeBrapiV2.class)
-	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> getSearchObservationUnit(
+	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> getObservationUnitsSearch(
 		@PathVariable final String crop, @PathVariable final String searchResultsDbid,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
@@ -69,16 +70,11 @@ public class ObservationUnitResourceBrapi {
 				new EntityListResponse<>(new Result<>(new ArrayList<PhenotypeSearchDTO>())).withMessage("no search request found"),
 				HttpStatus.NOT_FOUND);
 		}
-		final PhenotypeSearchRequestDTO phenotypeSearchDTO = new PhenotypeSearchRequestDTO();
-		phenotypeSearchDTO.setGermplasmDbIds(observationUnitsSearchRequestDto.getGermplasmDbIds());
-		phenotypeSearchDTO.setLocationDbIds(observationUnitsSearchRequestDto.getLocationDbIds());
-		phenotypeSearchDTO.setObservationLevel(observationUnitsSearchRequestDto.getObservationLevel());
-		phenotypeSearchDTO.setObservationUnitDbIds(observationUnitsSearchRequestDto.getObservationUnitDbIds());
-		phenotypeSearchDTO.setProgramDbIds(observationUnitsSearchRequestDto.getProgramDbIds());
-		phenotypeSearchDTO.setStudyDbIds(observationUnitsSearchRequestDto.getStudyDbIds());
-		phenotypeSearchDTO.setTrialDbIds(observationUnitsSearchRequestDto.getTrialDbIds());
 
-		final PagedResult<PhenotypeSearchDTO> resultPage = this.getObservationUnitDtoPagedResult(phenotypeSearchDTO, currentPage, pageSize);
+		final ModelMapper mapper = ObservationUnitMapper.getInstance();
+		final PhenotypeSearchRequestDTO phenotypeSearchRequestDTO = mapper.map(observationUnitsSearchRequestDto, PhenotypeSearchRequestDTO.class);
+
+		final PagedResult<PhenotypeSearchDTO> resultPage = this.getObservationUnitDtoPagedResult(phenotypeSearchRequestDTO, currentPage, pageSize);
 
 		final Result<PhenotypeSearchDTO> results = new Result<PhenotypeSearchDTO>().withData(resultPage.getPageResults());
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
