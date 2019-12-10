@@ -61,7 +61,7 @@ public class ObservationUnitResourceBrapi {
 		final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto;
 
 		try {
-				observationUnitsSearchRequestDto =
+			observationUnitsSearchRequestDto =
 				(ObservationUnitsSearchRequestDto) this.searchRequestService
 					.getSearchRequest(Integer.valueOf(searchResultsDbid), ObservationUnitsSearchRequestDto.class);
 		} catch (final NumberFormatException | MiddlewareException e) {
