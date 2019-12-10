@@ -440,7 +440,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.post(
-				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/visualization",
+				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/mapList",
 				this.cropName,
 				studyId,
 				datasetId).content(this.convertObjectToByte(searchDTO)).contentType(this.contentType))
