@@ -2,8 +2,8 @@ package org.ibp.api.brapi.v1.search;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.domain.search_request.v1.GermplasmSearchRequestDto;
-import org.generationcp.middleware.domain.search_request.v2.ObservationUnitsSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.search.SearchDto;

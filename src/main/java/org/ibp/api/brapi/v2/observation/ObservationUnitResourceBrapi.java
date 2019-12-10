@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.middleware.domain.search_request.v2.ObservationUnitsSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;

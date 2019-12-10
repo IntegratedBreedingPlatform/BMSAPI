@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.search;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.dao.SearchRequestDAO;
-import org.generationcp.middleware.domain.search_request.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
