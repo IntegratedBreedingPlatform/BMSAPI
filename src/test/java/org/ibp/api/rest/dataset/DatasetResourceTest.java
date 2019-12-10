@@ -424,7 +424,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		rowDataMap.put("TRAIT1", 1);
 		rowDataMap.put("TRAIT2", "ABC");
 
-		Mockito.when(this.studyDatasetService.getObservationUnitRowsAsListMap(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+		Mockito.when(this.studyDatasetService.getObservationUnitRowsAsMapList(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
 			ArgumentMatchers.any()))
 			.thenReturn(Lists.newArrayList(rowDataMap));
 		final Random random = new Random();

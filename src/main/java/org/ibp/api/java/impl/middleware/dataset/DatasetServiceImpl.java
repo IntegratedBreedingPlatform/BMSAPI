@@ -331,7 +331,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getObservationUnitRowsAsListMap(
+	public List<Map<String, Object>> getObservationUnitRowsAsMapList(
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 
 		List<Integer> instanceIds = null;
