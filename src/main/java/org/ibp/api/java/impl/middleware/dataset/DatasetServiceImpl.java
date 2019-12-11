@@ -288,7 +288,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final Map<Integer, List<ObservationUnitRow>> map = new LinkedHashMap<>();
-		for (final Integer instanceNumber : observationUnitRowsMap.keySet()) {
+		for (final Map.Entry<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> entry : observationUnitRowsMap
+			.entrySet()) {
+			final Integer instanceNumber = entry.getKey();
 			final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 				observationUnitRowsMap.get(instanceNumber);
 			final List<ObservationUnitRow> list = new ArrayList<>();
@@ -326,6 +328,19 @@ public class DatasetServiceImpl implements DatasetService {
 		this.mapObservationUnitRows(observationUnitRowMapper, observationUnitRows, list);
 
 		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getObservationUnitRowsAsMapList(
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
+
+		List<Integer> instanceIds = null;
+		if (searchDTO.getInstanceId() != null) {
+			instanceIds = Arrays.asList(searchDTO.getInstanceId());
+		}
+		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, false);
+
+		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO);
 	}
 
 	@Override
@@ -511,7 +526,8 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, false,
 			Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, false, Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, false,
+			Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
 		return this.middlewareDatasetService.countFilteredInstancesAndPhenotypes(datasetId, observationUnitsSearchDTO);
 	}
 
@@ -580,7 +596,8 @@ public class DatasetServiceImpl implements DatasetService {
 				variables.put(data, observationUnitRowMapper.map(dto.getVariables().get(data), ObservationUnitData.class));
 			}
 			for (final String data : dto.getEnvironmentVariables().keySet()) {
-				environmentVariables.put(data, observationUnitRowMapper.map(dto.getEnvironmentVariables().get(data), ObservationUnitData.class));
+				environmentVariables
+					.put(data, observationUnitRowMapper.map(dto.getEnvironmentVariables().get(data), ObservationUnitData.class));
 			}
 			final ObservationUnitRow observationUnitRow = observationUnitRowMapper.map(dto, ObservationUnitRow.class);
 			observationUnitRow.setVariables(variables);
