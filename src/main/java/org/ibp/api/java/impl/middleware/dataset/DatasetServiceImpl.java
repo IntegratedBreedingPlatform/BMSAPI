@@ -340,7 +340,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, false);
 
-		return this.middlewareDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO);
+		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO);
 	}
 
 	@Override
