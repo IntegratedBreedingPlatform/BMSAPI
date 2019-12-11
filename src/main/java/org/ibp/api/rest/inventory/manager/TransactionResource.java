@@ -36,7 +36,7 @@ import java.util.List;
 
 @Api(value = "Transaction Services")
 @RestController
-@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY')")
+@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT')")
 public class TransactionResource {
 
 	@Autowired
