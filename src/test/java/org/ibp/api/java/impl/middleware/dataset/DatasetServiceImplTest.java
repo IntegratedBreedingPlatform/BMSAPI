@@ -263,7 +263,7 @@ public class DatasetServiceImplTest {
 		final List<Map<String, Object>> listOfMap = new ArrayList<>();
 
 		Mockito.doReturn(listOfMap).when(this.middlewareDatasetService)
-			.getObservationUnitRowsAsListMap(ArgumentMatchers.eq(TEST_STUDY_IDENTIFIER), ArgumentMatchers.eq(1), ArgumentMatchers.any(ObservationUnitsSearchDTO.class));
+			.getObservationUnitRowsAsMapList(ArgumentMatchers.eq(TEST_STUDY_IDENTIFIER), ArgumentMatchers.eq(1), ArgumentMatchers.any(ObservationUnitsSearchDTO.class));
 		final List<Map<String, Object>> result =
 			this.studyDatasetService.getObservationUnitRowsAsMapList(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO());
 
