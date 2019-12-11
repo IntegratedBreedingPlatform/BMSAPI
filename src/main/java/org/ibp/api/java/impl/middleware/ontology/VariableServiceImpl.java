@@ -386,8 +386,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 		// Note: Check if variable is deletable or not by checking its usage in variable
-		this.termDeletableValidator.validate(
-				new TermRequest(String.valueOf(id), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId()), errors);
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId()),
+				errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -529,6 +529,21 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 		}
 
+	}
+
+	@Override
+	public List<VariableDetails> getVariablesByFilter(final VariableFilter  variableFilter) {
+		org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
+				new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
+		this.mapVariableFilter(variableFilter, middlewareVariableFilter);
+		List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
+		List<VariableDetails> variableDetailsList = new ArrayList<>();
+		ModelMapper mapper = OntologyMapper.getInstance();
+		for (Variable variable : variables) {
+			VariableDetails variableSummary = mapper.map(variable, VariableDetails.class);
+			variableDetailsList.add(variableSummary);
+		}
+		return variableDetailsList;
 	}
 
 }

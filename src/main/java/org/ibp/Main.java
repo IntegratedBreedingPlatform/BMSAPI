@@ -6,6 +6,7 @@ import com.fasterxml.classmate.TypeResolver;
 import org.ibp.api.java.impl.middleware.common.validator.CropNameValidationInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
@@ -33,6 +35,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.io.File;
 
+import javax.annotation.PostConstruct;
+
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
 @EnableSwagger2
 @Configuration
@@ -42,6 +46,9 @@ public class Main extends WebMvcConfigurerAdapter {
 
 	@Value("${swagger.enable}")
 	private boolean enableSwagger;
+
+	@Autowired
+	com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
 	@Value("${bms.version}")
 	private String bmsVersion;
@@ -142,4 +149,10 @@ public class Main extends WebMvcConfigurerAdapter {
 	protected void setEnableSwagger(final boolean enableSwagger) {
 		this.enableSwagger = enableSwagger;
 	}
+
+	@PostConstruct
+	private void setTimeZone() {
+		objectMapper.setTimeZone(LocaleContextHolder.getTimeZone());
+	}
+
 }
