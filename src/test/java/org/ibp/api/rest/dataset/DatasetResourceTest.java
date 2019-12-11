@@ -184,7 +184,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations", this.cropName, studyId,
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations",
+					this.cropName, studyId,
 					datasetId, observationUnitId)
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(observationDto)))
@@ -413,6 +414,41 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				"$.data[0].variables[\"TEST1\"].status",
 				is(measurement.getStatus().getName())))
 		;
+	}
+
+	@Test
+	public void testGetObservationUnitRowsAsListMap() throws Exception {
+
+		final Map<String, Object> rowDataMap = new HashMap<>();
+		rowDataMap.put("TRIAL_INSTANCE", "1");
+		rowDataMap.put("TRAIT1", 1);
+		rowDataMap.put("TRAIT2", "ABC");
+
+		Mockito.when(this.studyDatasetService.getObservationUnitRowsAsMapList(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+			ArgumentMatchers.any()))
+			.thenReturn(Lists.newArrayList(rowDataMap));
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final int instanceId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setInstanceId(instanceId);
+		searchDTO.getFilterColumns().add("TRIAL_INSTANCE");
+		searchDTO.getFilterColumns().add("TRAIT1");
+		searchDTO.getFilterColumns().add("TRAIT2");
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders.post(
+				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/mapList",
+				this.cropName,
+				studyId,
+				datasetId).content(this.convertObjectToByte(searchDTO)).contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].TRIAL_INSTANCE", is("1")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].TRAIT1", is(1)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].TRAIT2", is("ABC")));
 	}
 
 	@Test
