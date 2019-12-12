@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 
@@ -53,55 +52,56 @@ public class ObservationsTableValidator {
 	public void validateObservationsValuesDataTypes(final Table<String, String, String> inputData,
 			final List<MeasurementVariable> measurementVariables) throws ApiRequestValidationException {
 
-		final Map<String, MeasurementVariable> mappedVariables =
-				Maps.uniqueIndex(measurementVariables, new Function<MeasurementVariable, String>() {
-
-					public String apply(final MeasurementVariable from) {
-						return from.getAlias();
-					}
-				});
+		final Map<String, MeasurementVariable> mappedVariables = Maps.uniqueIndex(measurementVariables, MeasurementVariable::getAlias);
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
 		for (final String observationUnitId : inputData.rowKeySet()) {
-
 			for (final String variableName : inputData.columnKeySet()) {
-
-				if (!this.validateCategoricalVariableHasAPossibleValue(mappedVariables.get(variableName))) {
-					errors.reject("warning.import.save.invalidCategoricalValue",
-							new String[] {variableName}, "");
+				if (!validateCategoricalVariableHasAPossibleValue(mappedVariables.get(variableName))) {
+					errors.reject("warning.import.save.invalidCategoricalValue", new String[] {variableName}, "");
 					throw new ApiRequestValidationException(errors.getAllErrors());
-				} else if (!this.isValidValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName))) {
-					errors.reject("warning.import.save.invalidCellValue",
-							new String[] {variableName, inputData.get(observationUnitId, variableName)}, "");
+				} else if (!validateValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName), errors)) {
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 			}
 		}
 	}
 
-	private boolean isValidValue(final MeasurementVariable var, final String value) {
+	private static boolean validateValue(final MeasurementVariable var, final String value, final BindingResult errors) {
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
-		if (var.getMinRange() != null && var.getMaxRange() != null) {
-			return this.validateIfValueIsMissingOrNumber(value.trim());
-		} else if (var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
-			return Util.isValidDate(value);
-		} else if (StringUtils.isNotBlank(var.getDataType()) && var.getDataType().equalsIgnoreCase(DATA_TYPE_NUMERIC)) {
-			return this.validateIfValueIsMissingOrNumber(value.trim());
+		if (isInvalidNumber(var, value)) {
+			errors.reject("warning.import.save.invalid.cell.numeric.value", new String[] {var.getAlias(), value}, "");
+			return false;
+		} else if (isInvalidDate(var, value)) {
+			errors.reject("warning.import.save.invalid.cell.date.value", new String[] {var.getAlias(), value}, "");
+			return false;
 		}
 		return true;
 	}
 
-	private boolean validateIfValueIsMissingOrNumber(final String value) {
+	private static boolean isInvalidDate(final MeasurementVariable var, final String value) {
+		return var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId() && !Util.isValidDate(value);
+	}
+
+	private static boolean isInvalidNumber(final MeasurementVariable var, final String value) {
+		if ((var.getMinRange() != null && var.getMaxRange() != null)
+			|| (StringUtils.isNotBlank(var.getDataType()) && var.getDataType().equalsIgnoreCase(DATA_TYPE_NUMERIC))) {
+			return !isValueMissingOrNumber(value.trim());
+		}
+		return false;
+	}
+
+	private static boolean isValueMissingOrNumber(final String value) {
 		if (MeasurementData.MISSING_VALUE.equals(value.trim())) {
 			return true;
 		}
 		return NumberUtils.isNumber(value);
 	}
 
-	private boolean validateCategoricalVariableHasAPossibleValue(final MeasurementVariable var) {
+	private static boolean validateCategoricalVariableHasAPossibleValue(final MeasurementVariable var) {
 		if (var.getDataTypeId() !=null && var.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 			return !CollectionUtils.isEmpty(var.getPossibleValues());
 		}
