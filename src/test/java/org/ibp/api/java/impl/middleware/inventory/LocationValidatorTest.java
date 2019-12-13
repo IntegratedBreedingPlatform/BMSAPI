@@ -28,6 +28,12 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 public class LocationValidatorTest {
 
+	public static final int SCALE_ID = TermId.SEED_AMOUNT_G.getId();
+	public static final int LOCATION_ID = 6000;
+	public static final String STOCK_ID = "ABCD";
+	public static final String COMMENTS = "Comments";
+	public static final int GID = 1;
+
 	@Mock
 	private LocationDataManager locationDataManager;
 
@@ -48,19 +54,19 @@ public class LocationValidatorTest {
 	public void testValidateNullLocationId() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
 		final Integer locationId = null;
-		this.lotGeneratorInputDto.setGid(1);
+		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(locationId);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(8264);
-		this.lotGeneratorInputDto.setStockId("ABCD");
-		this.lotGeneratorInputDto.setComments("Comments");
+		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setStockId(STOCK_ID);
+		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 
 		this.locationValidator.validateSeedLocationId(this.errors, locationId);
 
-		Assert.assertTrue(this.errors.getAllErrors().size() == 1);
+		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("location.required"));
 	}
@@ -68,20 +74,19 @@ public class LocationValidatorTest {
 	@Test
 	public void testValidateInvalidLocationId() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
-		final Integer locationId = 6000;
-		this.lotGeneratorInputDto.setGid(1);
-		this.lotGeneratorInputDto.setLocationId(locationId);
+		this.lotGeneratorInputDto.setGid(GID);
+		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(8264);
-		this.lotGeneratorInputDto.setStockId("ABCD");
-		this.lotGeneratorInputDto.setComments("Comments");
+		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setStockId(STOCK_ID);
+		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		Mockito.when(this.locationDataManager.getLocationByID(locationId)).thenReturn(null);
-		this.locationValidator.validateSeedLocationId(this.errors, locationId);
+		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(null);
+		this.locationValidator.validateSeedLocationId(this.errors, LOCATION_ID);
 
-		Assert.assertTrue(this.errors.getAllErrors().size() == 1);
+		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("location.invalid"));
 	}
@@ -89,22 +94,21 @@ public class LocationValidatorTest {
 	@Test
 	public void testValidateInvalidSeedLocation() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
-		final Integer locationId = 6000;
-		this.lotGeneratorInputDto.setGid(1);
-		this.lotGeneratorInputDto.setLocationId(locationId);
+		this.lotGeneratorInputDto.setGid(GID);
+		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(8264);
-		this.lotGeneratorInputDto.setStockId("ABCD");
-		this.lotGeneratorInputDto.setComments("Comments");
+		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setStockId(STOCK_ID);
+		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final Location location = new Location();
-		Mockito.when(this.locationDataManager.getLocationByID(locationId)).thenReturn(location);
-		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(locationId))).thenReturn(Lists.newArrayList());
-		this.locationValidator.validateSeedLocationId(this.errors, locationId);
+		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(location);
+		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(LOCATION_ID))).thenReturn(Lists.newArrayList());
+		this.locationValidator.validateSeedLocationId(this.errors, LOCATION_ID);
 
-		Assert.assertTrue(this.errors.getAllErrors().size() == 1);
+		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("seed.location.invalid"));
 	}
@@ -112,22 +116,21 @@ public class LocationValidatorTest {
 	@Test
 	public void testValidateValidSeedLocation() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
-		final Integer locationId = 6000;
-		this.lotGeneratorInputDto.setGid(1);
-		this.lotGeneratorInputDto.setLocationId(locationId);
+		this.lotGeneratorInputDto.setGid(GID);
+		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(8264);
-		this.lotGeneratorInputDto.setStockId("ABCD");
-		this.lotGeneratorInputDto.setComments("Comments");
+		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setStockId(STOCK_ID);
+		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final Location location = new Location();
 		final List<Location> locationList = Lists.newArrayList(location);
-		Mockito.when(this.locationDataManager.getLocationByID(locationId)).thenReturn(location);
-		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(locationId))).thenReturn(locationList);
-		this.locationValidator.validateSeedLocationId(this.errors, locationId);
+		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(location);
+		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(LOCATION_ID))).thenReturn(locationList);
+		this.locationValidator.validateSeedLocationId(this.errors, LOCATION_ID);
 
-		Assert.assertTrue(this.errors.getAllErrors().size() == 0);
+		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
 	}
 }

@@ -26,6 +26,10 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 public class GermplasmValidatorTest {
 
+	public static final int SCALE_ID = TermId.SEED_AMOUNT_G.getId();
+	public static final int LOCATION_ID = 6000;
+	public static final String STOCK_ID = "ABCD";
+	public static final String COMMENTS = "Comments";
 	@Mock
 	private GermplasmService germplasmService;
 
@@ -35,6 +39,7 @@ public class GermplasmValidatorTest {
 	private LotGeneratorInputDto lotGeneratorInputDto;
 
 	private BindingResult errors;
+	public static final Integer GERMPLASM_ID = 1;
 
 	@Before
 	public void setup() {
@@ -47,19 +52,19 @@ public class GermplasmValidatorTest {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
 		final Integer germplasmId = 1;
 		this.lotGeneratorInputDto.setGid(germplasmId);
-		this.lotGeneratorInputDto.setLocationId(6000);
+		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(8264);
-		this.lotGeneratorInputDto.setStockId("ABCD");
-		this.lotGeneratorInputDto.setComments("Comments");
+		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setStockId(STOCK_ID);
+		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final GermplasmSummary germplasmSummary = new GermplasmSummary();
 		Mockito.when(this.germplasmService.getGermplasm(String.valueOf(germplasmId))).thenReturn(germplasmSummary);
 		this.germplasmValidator.validateGermplasmId(this.errors, germplasmId);
 
-		Assert.assertTrue(this.errors.getAllErrors().size() == 0);
+		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
 	}
 
 	@Test
@@ -67,18 +72,18 @@ public class GermplasmValidatorTest {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
 		final Integer germplasmId = null;
 		this.lotGeneratorInputDto.setGid(germplasmId);
-		this.lotGeneratorInputDto.setLocationId(6000);
+		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(8264);
-		this.lotGeneratorInputDto.setStockId("ABCD");
-		this.lotGeneratorInputDto.setComments("Comments");
+		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setStockId(STOCK_ID);
+		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 
 		this.germplasmValidator.validateGermplasmId(this.errors, germplasmId);
 
-		Assert.assertTrue(this.errors.getAllErrors().size() == 1);
+		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("germplasm.required"));
 	}
@@ -86,20 +91,19 @@ public class GermplasmValidatorTest {
 	@Test
 	public void testValidateInvalidGermplasmId() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
-		final Integer germplasmId = 1;
-		this.lotGeneratorInputDto.setGid(germplasmId);
-		this.lotGeneratorInputDto.setLocationId(6000);
+		this.lotGeneratorInputDto.setGid(GERMPLASM_ID);
+		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(8264);
-		this.lotGeneratorInputDto.setStockId("ABCD");
-		this.lotGeneratorInputDto.setComments("Comments");
+		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setStockId(STOCK_ID);
+		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		Mockito.when(this.germplasmService.getGermplasm(String.valueOf(germplasmId))).thenReturn(null);
-		this.germplasmValidator.validateGermplasmId(this.errors, germplasmId);
+		Mockito.when(this.germplasmService.getGermplasm(String.valueOf(GERMPLASM_ID))).thenReturn(null);
+		this.germplasmValidator.validateGermplasmId(this.errors, GERMPLASM_ID);
 
-		Assert.assertTrue(this.errors.getAllErrors().size() == 1);
+		Assert.assertEquals(this.errors.getAllErrors().size(),  1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("germplasm.invalid"));
 	}

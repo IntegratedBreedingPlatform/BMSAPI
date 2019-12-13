@@ -23,6 +23,11 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionInputValidatorTest {
 
+	public static final double ZERO = 0.0;
+	public static final String DEPOSIT = "Deposit";
+	public static final String NOTES = "notes";
+	public static final String RESERVATION = "Reservation";
+	public static final double TEN = 10.0;
 	@InjectMocks
 	private TransactionInputValidator transactionInputValidator;
 
@@ -40,26 +45,26 @@ public class TransactionInputValidatorTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateDataAmount() {
-		this.transactionDto.setAmount(0.0);
-		this.transactionDto.setTransactionType("Deposit");
-		this.transactionDto.setNotes("notes");
+		this.transactionDto.setAmount(ZERO);
+		this.transactionDto.setTransactionType(DEPOSIT);
+		this.transactionDto.setNotes(NOTES);
 
 		this.transactionInputValidator.validate(this.transactionDto);
 	}
 
 	@Test(expected = NotSupportedException.class)
 	public void testValidateDataTransactionType() {
-		this.transactionDto.setAmount(10.0);
-		this.transactionDto.setTransactionType("Reservation");
-		this.transactionDto.setNotes("notes");
+		this.transactionDto.setAmount(TEN);
+		this.transactionDto.setTransactionType(RESERVATION);
+		this.transactionDto.setNotes(NOTES);
 
 		this.transactionInputValidator.validate(this.transactionDto);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateDataNotes() {
-		this.transactionDto.setAmount(10.0);
-		this.transactionDto.setTransactionType("Deposit");
+		this.transactionDto.setAmount(TEN);
+		this.transactionDto.setTransactionType(DEPOSIT);
 		this.transactionDto.setNotes(
 			"notesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotes");
 
@@ -68,8 +73,8 @@ public class TransactionInputValidatorTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void validateCloseLot() {
-		this.transactionDto.setAmount(10.0);
-		this.transactionDto.setTransactionType("Deposit");
+		this.transactionDto.setAmount(TEN);
+		this.transactionDto.setTransactionType(DEPOSIT);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(Lists.newArrayList(this.transactionDto.getLot().getLotId()));
 		final ExtendedLotDto lot = new ExtendedLotDto();
@@ -83,7 +88,7 @@ public class TransactionInputValidatorTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void validateEmptyLot() {
 		this.transactionDto.setAmount(10.0);
-		this.transactionDto.setTransactionType("Deposit");
+		this.transactionDto.setTransactionType(DEPOSIT);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(Lists.newArrayList(this.transactionDto.getLot().getLotId()));
 
