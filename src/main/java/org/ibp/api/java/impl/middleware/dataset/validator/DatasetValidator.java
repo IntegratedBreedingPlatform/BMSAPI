@@ -49,17 +49,18 @@ public class DatasetValidator {
 		// Empty constructor expected by MockMvcRequestBuilder
 	}
 
-	public void validateDataset(final Integer studyId, final Integer datasetId, final Boolean shouldBeSubobservationDataset) {
+	public void validateDataset(final Integer studyId, final Integer datasetId, final Boolean shouldBeObservationOrSubobservationDataset) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		if (datasetId == null) {
 			this.errors.reject("dataset.required", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
-		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
+		this.validateDataset(studyId, dataSet, shouldBeObservationOrSubobservationDataset);
 	}
 
-	private void validateDataset(final Integer studyId, final DatasetDTO dataSet, final Boolean shouldBeSubobservationDataset) {
+	private void validateDataset(
+		final Integer studyId, final DatasetDTO dataSet, final Boolean shouldBeObservationOrSubobservationDataset) {
 
 		if (dataSet == null) {
 			this.errors.reject("dataset.does.not.exist", "");
@@ -69,7 +70,7 @@ public class DatasetValidator {
 		this.validateDatasetBelongsToStudy(studyId, dataSet.getDatasetId());
 
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
-		if (shouldBeSubobservationDataset && !datasetType.isSubObservationType()) {
+		if (shouldBeObservationOrSubobservationDataset && !datasetType.isObservationType() && !datasetType.isSubObservationType()) {
 			this.errors.reject("dataset.type.not.subobservation", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));
 		}

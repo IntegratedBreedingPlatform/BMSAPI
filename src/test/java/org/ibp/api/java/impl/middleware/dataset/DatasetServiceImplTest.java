@@ -648,7 +648,7 @@ public class DatasetServiceImplTest {
 		final int datasetId = random.nextInt();
 		this.studyDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, true);
 	}
 
 }

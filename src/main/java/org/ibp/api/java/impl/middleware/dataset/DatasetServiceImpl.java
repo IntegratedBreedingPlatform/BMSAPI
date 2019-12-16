@@ -506,7 +506,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.middlewareDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
 	}
 

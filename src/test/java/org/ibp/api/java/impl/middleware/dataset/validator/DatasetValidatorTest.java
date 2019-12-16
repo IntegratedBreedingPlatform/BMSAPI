@@ -92,9 +92,13 @@ public class DatasetValidatorTest {
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final DatasetDTO dataset = new DatasetDTO();
 		dataset.setDatasetId(datasetId);
-		dataset.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
+		dataset.setDatasetTypeId(DatasetTypeEnum.STUDY_CONDITIONS.getId());
 		when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 
+		final DatasetTypeDTO datasetType = new DatasetTypeDTO();
+		datasetType.setObservationType(false);
+		datasetType.setSubObservationType(false);
+		when(this.datasetTypeService.getDatasetTypeById(dataset.getDatasetTypeId())).thenReturn(datasetType);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 	}
 
