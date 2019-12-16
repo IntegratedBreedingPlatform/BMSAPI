@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -65,9 +66,7 @@ public class TransactionInputValidatorTest {
 	public void testValidateDataNotes() {
 		this.transactionDto.setAmount(TEN);
 		this.transactionDto.setTransactionType(DEPOSIT);
-		this.transactionDto.setNotes(
-			"notesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotesnotes");
-
+		this.transactionDto.setNotes(RandomStringUtils.randomAlphabetic(256));
 		this.transactionInputValidator.validate(this.transactionDto);
 	}
 

@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.inventory.LotService;
@@ -53,9 +54,7 @@ public class LotInputValidatorTest {
 		this.lotGeneratorInputDto.setGenerateStock(false);
 		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(
-			"CommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsCommentsComments");
-
+		this.lotGeneratorInputDto.setComments(RandomStringUtils.randomAlphabetic(256));
 		this.lotInputValidator.validate(this.lotGeneratorInputDto);
 	}
 
