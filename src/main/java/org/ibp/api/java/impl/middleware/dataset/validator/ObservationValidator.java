@@ -77,7 +77,6 @@ public class ObservationValidator {
 		}
 	}
 
-	// TODO merge with ObservationsTableValidator.isValidValue
 	private static boolean isValidValue(final Variable var, final String value) {
 		if (StringUtils.isBlank(value)) {
 			return true;

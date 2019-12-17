@@ -385,7 +385,7 @@ public class DatasetServiceImplTest {
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalidCellValue"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalid.cell.numeric.value"));
 			throw e;
 		}
 	}
