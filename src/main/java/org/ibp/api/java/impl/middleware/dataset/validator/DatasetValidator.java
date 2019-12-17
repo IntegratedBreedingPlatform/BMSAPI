@@ -71,7 +71,7 @@ public class DatasetValidator {
 
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
 		if (shouldBeObservationOrSubobservationDataset && !datasetType.isObservationType() && !datasetType.isSubObservationType()) {
-			this.errors.reject("dataset.type.not.subobservation", "");
+			this.errors.reject("dataset.type.not.plot.or.subobservation", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));
 		}
 	}
