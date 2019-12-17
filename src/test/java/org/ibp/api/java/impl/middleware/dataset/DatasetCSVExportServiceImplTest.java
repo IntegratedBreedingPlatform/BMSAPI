@@ -208,7 +208,7 @@ public class DatasetCSVExportServiceImplTest {
 
 		final File result = this.datasetExportService
 			.generateInSingleFile(
-				this.study, instanceObservationUnitRowsMap,
+				this.study, this.dataSetDTO, instanceObservationUnitRowsMap,
 				measurementVariables, this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
 
 		verify(this.datasetCSVGenerator)
