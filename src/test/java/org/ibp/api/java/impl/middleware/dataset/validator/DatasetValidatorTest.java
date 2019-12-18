@@ -100,7 +100,7 @@ public class DatasetValidatorTest {
 		datasetType.setSubObservationType(false);
 		when(this.datasetTypeService.getDatasetTypeById(dataset.getDatasetTypeId())).thenReturn(datasetType);
 		this.datasetValidator.validateDataset(studyId, datasetId);
-		this.datasetValidator.validateDatasetType(datasetId);
+		this.datasetValidator.validateObservationDatasetType(datasetId);
 	}
 
 	@Test
@@ -117,7 +117,7 @@ public class DatasetValidatorTest {
 		when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 
 		this.datasetValidator.validateDataset(studyId, datasetId);
-		this.datasetValidator.validateDatasetType(datasetId);
+		this.datasetValidator.validateObservationDatasetType(datasetId);
 	}
 
 	@Test(expected = ResourceNotFoundException.class)

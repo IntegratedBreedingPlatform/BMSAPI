@@ -469,7 +469,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public Boolean hasDatasetDraftDataOutOfBounds(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
-		this.datasetValidator.validateDatasetType(datasetId);
+		this.datasetValidator.validateObservationDatasetType(datasetId);
 		return this.middlewareDatasetService.hasDatasetDraftDataOutOfBounds(datasetId);
 	}
 
@@ -508,7 +508,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
-		this.datasetValidator.validateDatasetType(datasetId);
+		this.datasetValidator.validateObservationDatasetType(datasetId);
 		this.middlewareDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
 	}
 
@@ -516,7 +516,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public void rejectDatasetDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
-		this.datasetValidator.validateDatasetType(datasetId);
+		this.datasetValidator.validateObservationDatasetType(datasetId);
 		this.middlewareDatasetService.rejectDatasetDraftData(datasetId);
 	}
 

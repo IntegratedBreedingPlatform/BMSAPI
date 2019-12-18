@@ -70,7 +70,7 @@ public class DatasetValidator {
 		this.validateDatasetBelongsToStudy(studyId, dataSet.getDatasetId());
 	}
 
-	public void validateDatasetType(final Integer datasetId) {
+	public void validateObservationDatasetType(final Integer datasetId) {
 		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
 		if (!datasetType.isObservationType() && !datasetType.isSubObservationType()) {
