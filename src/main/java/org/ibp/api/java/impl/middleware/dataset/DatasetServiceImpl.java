@@ -477,6 +477,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
+		this.datasetValidator.validateObservationDatasetType(datasetId);
 		this.middlewareDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
 	}
 
