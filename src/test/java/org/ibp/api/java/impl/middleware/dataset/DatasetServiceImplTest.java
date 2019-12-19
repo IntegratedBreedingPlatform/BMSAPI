@@ -216,11 +216,12 @@ public class DatasetServiceImplTest {
 		final int observationUnitId = random.nextInt();
 		final int observationId = random.nextInt();
 		final int observableId = random.nextInt();
-		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
 
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setObservableId(observableId);
 		Mockito.when(this.middlewareDatasetService.getPhenotype(observationUnitId, observationId)).thenReturn(phenotype);
+
+		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
 		Mockito.verify(this.observationValidator).validateObservation(studyId, datasetId, observationUnitId, observationId, null);
