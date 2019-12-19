@@ -184,7 +184,7 @@ public class DatasetExcelExportServiceImplTest {
 
 		final File result = this.datasetExportService
 			.generateInSingleFile(
-				this.study, instanceObservationUnitRowsMap,
+				this.study, this.dataSetDTO, instanceObservationUnitRowsMap,
 				measurementVariables, this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
 
 		verify(this.datasetExcelGenerator)
