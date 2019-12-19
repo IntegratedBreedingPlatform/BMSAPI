@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -388,7 +389,11 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, null);
+
+		final Integer observableId = this.middlewareDatasetService.getPhenotype(observationUnitId, observationId).getObservableId();
+
 		this.middlewareDatasetService.deletePhenotype(observationId);
+		this.middlewareDatasetService.updateDependentPhenotypesAsOutOfSync(observableId, observationUnitId);
 
 	}
 
@@ -514,7 +519,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public void rejectDatasetDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		this.middlewareDatasetService.rejectDatasetDraftData(datasetId);
+		this.middlewareDatasetService.rejectDatasetDraftData(studyId, datasetId);
 	}
 
 	@Override
