@@ -79,7 +79,7 @@ public class DatasetValidatorTest {
 			.when(this.studyDatasetService)
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		when(this.studyDatasetService.getDataset(datasetId)).thenReturn(null);
-		this.datasetValidator.validateDataset(studyId, datasetId, ran.nextBoolean());
+		this.datasetValidator.validateDataset(studyId, datasetId);
 	}
 
 	@Test(expected = NotSupportedException.class)
@@ -92,10 +92,15 @@ public class DatasetValidatorTest {
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final DatasetDTO dataset = new DatasetDTO();
 		dataset.setDatasetId(datasetId);
-		dataset.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
+		dataset.setDatasetTypeId(DatasetTypeEnum.STUDY_CONDITIONS.getId());
 		when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		final DatasetTypeDTO datasetType = new DatasetTypeDTO();
+		datasetType.setObservationType(false);
+		datasetType.setSubObservationType(false);
+		when(this.datasetTypeService.getDatasetTypeById(dataset.getDatasetTypeId())).thenReturn(datasetType);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		this.datasetValidator.validateObservationDatasetType(datasetId);
 	}
 
 	@Test
@@ -111,7 +116,8 @@ public class DatasetValidatorTest {
 		dataset.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		this.datasetValidator.validateObservationDatasetType(datasetId);
 	}
 
 	@Test(expected = ResourceNotFoundException.class)
@@ -126,7 +132,7 @@ public class DatasetValidatorTest {
 		this.createDataset(datasetId, Optional.<Integer>absent());
 
 		final DatasetVariable datasetVariable = new DatasetVariable(ran.nextInt(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, ran.nextBoolean(), datasetVariable, ran.nextBoolean());
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, ran.nextBoolean());
 	}
 
 	@Test(expected = NotSupportedException.class)
@@ -141,7 +147,7 @@ public class DatasetValidatorTest {
 		this.createDataset(datasetId, Optional.<Integer>absent());
 
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.ANALYSIS.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, ran.nextBoolean(), datasetVariable, ran.nextBoolean());
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, ran.nextBoolean());
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -163,7 +169,7 @@ public class DatasetValidatorTest {
 		when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
 
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, ran.nextBoolean(), datasetVariable, false);
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -221,7 +227,7 @@ public class DatasetValidatorTest {
 		when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
 		
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, ran.nextBoolean(), datasetVariable, false);
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
 	}
 
 	@Test
@@ -238,7 +244,7 @@ public class DatasetValidatorTest {
 		when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
 		
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, ran.nextBoolean(), datasetVariable, true);
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, true);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -257,7 +263,7 @@ public class DatasetValidatorTest {
 		final StandardVariable nonDatasetVariable = this.createStandardVariable(nonDatasetVariableId);
 		when(this.ontologyDataManager.getStandardVariable(nonDatasetVariableId, this.PROGRAM_UUID)).thenReturn(nonDatasetVariable);
 
-		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Arrays.asList(variableId, nonDatasetVariableId));
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Arrays.asList(variableId, nonDatasetVariableId));
 	}
 
 	private StandardVariable createStandardVariable(final Integer traitId) {
