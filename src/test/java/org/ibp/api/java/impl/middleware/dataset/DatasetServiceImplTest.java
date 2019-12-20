@@ -12,7 +12,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.pojos.SortedPageRequest;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -215,18 +214,12 @@ public class DatasetServiceImplTest {
 		final int datasetId = random.nextInt();
 		final int observationUnitId = random.nextInt();
 		final int observationId = random.nextInt();
-		final int observableId = random.nextInt();
-
-		final Phenotype phenotype = new Phenotype();
-		phenotype.setObservableId(observableId);
-		Mockito.when(this.middlewareDatasetService.getPhenotype(observationUnitId, observationId)).thenReturn(phenotype);
 
 		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
 		Mockito.verify(this.observationValidator).validateObservation(studyId, datasetId, observationUnitId, observationId, null);
 		Mockito.verify(this.middlewareDatasetService).deletePhenotype(observationId);
-		Mockito.verify(this.middlewareDatasetService).updateDependentPhenotypesAsOutOfSync(observableId, observationUnitId);
 	}
 
 	@Test
