@@ -3,49 +3,108 @@ package org.ibp.api.java.impl.middleware.common;
 
 import javax.servlet.http.HttpServletRequest;
 
+import liquibase.util.StringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.crop.CropService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class ContextResolverImpl implements ContextResolver {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ContextResolverImpl.class);
+	public static final String BRAPI = "brapi";
+
+	@Autowired
+	private CropService cropService;
 
 	@Override
 	public String resolveDatabaseFromUrl() throws ContextResolutionException {
 		return String.format(Constants.DB_NAME_FORMAT, resolveCropNameFromUrl());
 	}
 
+
 	@Override
 	public String resolveCropNameFromUrl() throws ContextResolutionException {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-
+		final HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		if (request == null) {
 			throw new ContextResolutionException("Request is null");
 		}
 
-		String path = request.getRequestURI().substring(request.getContextPath().length());
+		final String path = request.getRequestURI().substring(request.getContextPath().length());
 		ContextResolverImpl.LOG.debug("Request path: " + path);
-		String[] parts = path.trim().toLowerCase().split("/");
-		if (parts.length < 3) {
-			ContextResolverImpl.LOG.error("BAD URL Request :" + path);
-			throw new ContextResolutionException("BAD URL:" + path, new Exception("Expecting crop name"));
-		}
+		final String[] parts = path.trim().toLowerCase().split("/");
+
 
 		String cropName = "";
-		if ("brapi".equals(parts[2])) {
-			// BrAPI calls put crop name as first path parameter after context path e.g. /bmsapi/maize/brapi/v1/locations
-			cropName = parts[1];
-		} else {
-			// internal BMSAPI calls put crop name as second path parameter after context path e.g. /bmsapi/locations/maize/list
-			cropName = parts[2];
+		boolean instanceLevelAPI = true;
+		if (parts.length >= 3) {
+			final boolean isBrApiURI = Arrays.stream(parts).anyMatch(BRAPI::equals);
+			if (isBrApiURI) {
+				// Exclude instance-level BrAPI calls (eg. /bmsapi/brapi/v1/crops) in crop resolution
+				// BrAPI calls put crop name as first path parameter after context path e.g. /bmsapi/maize/brapi/v1/locations
+				instanceLevelAPI = BRAPI.equals(parts[1]);
+				cropName = instanceLevelAPI? "" : parts[1];
+
+			} else if ("crops".equals(parts[1])){
+				// internal BMSAPI crop/program services start with "crops" (eg. /bmsapi/crops/maize/locations
+				cropName = parts[2];
+				instanceLevelAPI = false;
+			}
+
+			if (!StringUtils.isEmpty(cropName)) {
+				final List<String> installedCrops = this.cropService.getInstalledCrops();
+				if (!installedCrops.contains(cropName)) {
+					throw new ContextResolutionException("Invalid crop " + cropName + " for URL:" + path);
+				}
+				ContextHolder.setCurrentCrop(cropName);
+			}
 		}
-		ContextHolder.setCurrentCrop(cropName);
+
+		if (!instanceLevelAPI && StringUtils.isEmpty(cropName)) {
+			throw new ContextResolutionException("Could not resolve crop for URL:" + path);
+		}
 		ContextResolverImpl.LOG.debug("Crop Name: " + cropName);
 		return cropName;
+	}
+
+	@Override
+	public String resolveProgramUuidFromRequest() throws ContextResolutionException {
+		final HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		if (request == null) {
+			throw new ContextResolutionException("Request is null");
+		}
+
+		final String path = request.getRequestURI().substring(request.getContextPath().length());
+		final String[] parts = path.trim().toLowerCase().split("/");
+		final int programsTokenIndex = Arrays.asList(parts).indexOf("programs");
+		String programUUID = "";
+		// IF the URL contains "programs" token, resolve the program UUID as the next token (eg. crops/maize/programs/abc-123/studies would yield abc-123 as the program UUID)
+		if (programsTokenIndex != -1 && (programsTokenIndex<parts.length-1)) {
+			programUUID = parts[programsTokenIndex+1];
+
+		// If not found in URL path, search in request parameters for "programUUID"
+		} else {
+			final String programUuidRequestParam = request.getParameter("programUUID");
+			if (!StringUtils.isEmpty(programUuidRequestParam)) {
+				programUUID =  programUuidRequestParam;
+			}
+		}
+
+		if (!StringUtils.isEmpty(programUUID)) {
+			// TODO Check if programUUID is valid and determine if we call ContextHolder.setCurrentProgram here
+		}
+
+
+		return programUUID;
+
 	}
 }

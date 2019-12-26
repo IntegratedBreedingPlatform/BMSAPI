@@ -28,21 +28,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Api(value = "Ontology Variable Filter Service")
 @Controller
-@RequestMapping("/ontology")
+@RequestMapping("/crops")
 public class VariableFilterResource {
 
 	@Autowired
 	private VariableService variableService;
 
 	@ApiOperation(value = "All variables using given filter", notes = "Gets all variables using filter")
-	@RequestMapping(value = "/{cropname}/filtervariables", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/ontology/filtervariables", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<VariableDetails>> listAllVariablesUsingFilter(
 			@ApiParam(value = "Use <code>GET /crop/list</code> service to retrieve possible crop name values that can be supplied here.", required = true)
 			@PathVariable String cropname,
 
 			@ApiParam(value = "Use <code>GET /program/list</code> service to retrieve program uuid that can be supplied here.")
-			@RequestParam(value = "programId") String programId,
+			@RequestParam(value = "programUUID") String programUUID,
 
 			@ApiParam(value = "Use <code>GET /ontology/{cropname}/properties</code> service "
 					+ " to retrieve possible property ids that can be supplied here as a comma separated list.")
@@ -78,7 +78,7 @@ public class VariableFilterResource {
 			@RequestParam(value = "propertyClasses", required = false) Set<String> propertyClasses) {
 
 		VariableFilter variableFilter = new VariableFilter();
-		variableFilter.setProgramUuid(programId);
+		variableFilter.setProgramUuid(programUUID);
 
 		if(!Util.isNullOrEmpty(propertyIds)){
 			for(Integer i : propertyIds){
@@ -128,7 +128,7 @@ public class VariableFilterResource {
 			}
 		}
 
-		return new ResponseEntity<>(this.variableService.getVariablesByFilter(cropname, programId, variableFilter), HttpStatus.OK);
+		return new ResponseEntity<>(this.variableService.getVariablesByFilter(cropname, programUUID, variableFilter), HttpStatus.OK);
 	}
 
 }
