@@ -8,6 +8,7 @@ import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(value = "Variable Cache Controller")
 @RestController
-@RequestMapping(value = "/variableCache")
+@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_ONTOLOGIES')")
 public class VariableCacheController {
 
 	@Autowired
@@ -25,12 +26,12 @@ public class VariableCacheController {
 
 	@ResponseBody
 	@ApiOperation(value = "Delete Variables from VariableCache", notes = "Remove Variables from VariableCache by Ids")
-	@RequestMapping(value = "/{cropName}/{variablesIds}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "crops/{cropName}/variable-cache/{variablesIds}", method = RequestMethod.DELETE)
 	public ResponseEntity<String> deleteVariablesFromCache(
 			@ApiParam(value = "name of the crop", required = true) @PathVariable final String cropName,
 			@ApiParam(value = "Comma separated list of variable ids", required = true) @PathVariable final Integer[] variablesIds,
-			@RequestParam(value = "programId") final String programId) {
-		this.variableService.deleteVariablesFromCache(cropName, variablesIds, programId);
+			@RequestParam(value = "programUUID") final String programUUID) {
+		this.variableService.deleteVariablesFromCache(cropName, variablesIds, programUUID);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
