@@ -7,6 +7,7 @@ import org.ibp.api.domain.ontology.TermSummary;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Api(value = "Check Insertion Manner Service")
 @Controller
+@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT')")
 @RequestMapping("/crops")
 public class CheckInsertionMannerResource {
 
