@@ -75,4 +75,26 @@ public class StudyValidator {
 		}
 	}
 
+	public void validate(final Integer studyId, final String programUUID) {
+
+		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		if (studyId == null) {
+			this.errors.reject("study.required", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		final Study study = studyDataManager.getStudy(studyId);
+
+		if (study == null) {
+			errors.reject("study.not.exist", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
+		if (programUUID != null && programUUID.equals(study.getProgramUUID())) {
+			this.errors.reject("invalid.program.uuid.study", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
 }
