@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -58,6 +59,17 @@ public class StudyValidator {
 			errors.reject("study.is.locked", "");
 			throw new ForbiddenException(errors.getAllErrors().get(0));
 		}
+
+		// It is assumed that program UUID is always set in ContextHolder beforehand
+		final String programUUID = ContextHolder.getCurrentProgram();
+		if (programUUID == null) {
+			this.errors.reject("study.required", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		if (!programUUID.equals(study.getProgramUUID())) {
+			this.errors.reject("invalid.program.uuid.study", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	public void validate(final Integer studyId, final Boolean shouldBeUnlocked, final Boolean allInstancesShouldBeDeletable) {
@@ -72,28 +84,6 @@ public class StudyValidator {
 				this.errors.reject("at.least.one.instance.cannot.be.deleted");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
-		}
-	}
-
-	public void validate(final Integer studyId, final String programUUID) {
-
-		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-
-		if (studyId == null) {
-			this.errors.reject("study.required", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-		final Study study = studyDataManager.getStudy(studyId);
-
-		if (study == null) {
-			errors.reject("study.not.exist", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
-		}
-
-		if (programUUID != null && programUUID.equals(study.getProgramUUID())) {
-			this.errors.reject("invalid.program.uuid.study", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 

@@ -45,6 +45,7 @@ import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
@@ -80,6 +81,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private ObservationValidator observationValidator;
+
+	@Autowired
+	private StudyValidator studyValidator;
 
 	@Autowired
 	private ValidationUtil validationUtil;
@@ -496,6 +500,7 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public Boolean isSampled(final Integer studyId) {
 		try {
+			this.studyValidator.validate(studyId, false);
 			return this.sampleService.studyHasSamples(studyId);
 		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
@@ -513,11 +518,14 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public StudyReference getStudyReference(final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
 		return this.studyDataManager.getStudyReference(studyId);
 	}
 
 	@Override
 	public void updateStudy(final Study study) {
-		this.studyDataManager.updateStudyLockedStatus(study.getId(), study.isLocked());
+		final int studyId = study.getId();
+		this.studyValidator.validate(studyId, false);
+		this.studyDataManager.updateStudyLockedStatus(studyId, study.isLocked());
 	}
 }
