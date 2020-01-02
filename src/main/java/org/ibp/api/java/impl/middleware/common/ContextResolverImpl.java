@@ -7,6 +7,7 @@ import liquibase.util.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.crop.CropService;
+import org.ibp.api.java.program.ProgramService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class ContextResolverImpl implements ContextResolver {
 
 	@Autowired
 	private CropService cropService;
+
+	@Autowired
+	private ProgramService programService;
 
 	@Override
 	public String resolveDatabaseFromUrl() throws ContextResolutionException {
@@ -99,8 +103,19 @@ public class ContextResolverImpl implements ContextResolver {
 			}
 		}
 
+		// If program UUID was supplied, verify that it is valid for given crop
 		if (!StringUtils.isEmpty(programUUID)) {
-			// TODO Check if programUUID is valid and determine if we call ContextHolder.setCurrentProgram here
+			final String crop = this.resolveCropNameFromUrl();
+			if (StringUtils.isEmpty(crop)) {
+				throw new ContextResolutionException("Could not resolve crop for program: " + programUUID + " for service with path " + path);
+			}
+			if (programService.getByUUIDAndCrop(crop,programUUID) == null){
+				throw new ContextResolutionException("Invalid program: " + programUUID + " for crop: " + crop + " for service with path " + path);
+			}
+
+			ContextHolder.setCurrentProgram(programUUID);
+		} else {
+			ContextHolder.setCurrentProgram(null);
 		}
 
 
