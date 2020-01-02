@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.preset;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.ToolSection;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
@@ -9,7 +10,6 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.SubObservationDatasetLabelPrinting;
 import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
@@ -30,9 +30,6 @@ import java.util.List;
 public class PresetDTOValidator {
 
 	private static Integer FIELDBOOK_TOOL_ID = 23;
-
-	@Autowired
-	private ProgramService programService;
 
 	@Autowired
 	private PresetService presetService;
@@ -61,9 +58,12 @@ public class PresetDTOValidator {
 			errors.reject("preset.invalid.type", "");
 		}
 
-		//Validate Program
-		if (StringUtils.isEmpty(presetDTO.getProgramUUID()) || programService.getByUUIDAndCrop(crop, presetDTO.getProgramUUID()) == null) {
-			errors.reject("preset.invalid.program", "");
+		final String programUUID = presetDTO.getProgramUUID();
+		if (StringUtils.isEmpty(programUUID)) {
+			errors.reject("preset.program.uuid.required", "");
+		// It is assumed that programUUID was set in ContextHolder. Check that it is the same specified in DTO
+		} else if (!programUUID.equals(ContextHolder.getCurrentProgram())) {
+			errors.reject("preset.invalid.program.uuid", "");
 		}
 
 		if (StringUtils.isEmpty(presetDTO.getName())) {
@@ -75,7 +75,7 @@ public class PresetDTOValidator {
 		}
 
 		final List<ProgramPreset> presets = this.presetService
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), programUUID, presetDTO.getToolId(),
 						presetDTO.getToolSection());
 		if (!presets.isEmpty()) {
 			errors.reject("preset.name.invalid", "");
