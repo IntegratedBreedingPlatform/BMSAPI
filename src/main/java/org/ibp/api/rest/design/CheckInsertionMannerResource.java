@@ -23,7 +23,7 @@ public class CheckInsertionMannerResource {
 	@ApiOperation(value = "Gets insertion manners for checks")
 	@RequestMapping(value= "/{crop}/check-insertion-manners", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<TermSummary>> retrieveCheckInsertionManners(@PathVariable final String crop) {
+	public ResponseEntity<List<TermSummary>> retrieveCheckInsertionManners(@PathVariable final String crop, @RequestParam(required = false) final String programUUID) {
 		final List<TermSummary> terms = new ArrayList<>();
 		final ModelMapper map = new ModelMapper();
 		for (final InsertionMannerItem item : InsertionMannerItem.values()) {

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class StudyTypeResource {
 	@ApiOperation(value = "List all study type", notes = "Returns a list of all study types.")
 	@RequestMapping(value = "/{cropname}/study-types/visible", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<StudyTypeDto>> listStudyTypes(final @PathVariable String cropname) {
+	public ResponseEntity<List<StudyTypeDto>> listStudyTypes(final @PathVariable String cropname, @RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.studyService.getStudyTypes(), HttpStatus.OK);
 	}
 }

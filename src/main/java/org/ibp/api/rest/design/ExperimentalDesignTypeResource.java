@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
@@ -28,7 +29,7 @@ public class ExperimentalDesignTypeResource {
 	@ApiOperation(value = "Gets all experimental design types supported for design generation")
 	@RequestMapping(value= "/{crop}/experimental-design-types", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<ExperimentDesignType>> retrieveDesignTypes(@PathVariable final String crop) {
+	public ResponseEntity<List<ExperimentDesignType>> retrieveDesignTypes(@PathVariable final String crop, @RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.experimentalDesignService.getExperimentalDesignTypes(),
 			HttpStatus.OK);
 	}
