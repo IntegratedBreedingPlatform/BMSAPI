@@ -3,7 +3,6 @@ package org.ibp.api.rest.sample;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -110,34 +109,16 @@ public class SampleListValidatorTest {
 	public void testvalidateFolderId() {
 
 		try {
-			validator.validateFolderId(1);
+			validator.validateFolderIdAndProgram(1);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Expcected to NOT throw ApiRequestValidationException");
 		}
 
 		try {
-			validator.validateFolderId(null);
+			validator.validateFolderIdAndProgram(null);
 			Assert.fail("Expcected to throw ApiRequestValidationException");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("sample.list.parent.id.is.null", e.getErrors().get(0).getCode());
-		}
-
-	}
-
-	@Test
-	public void testvalidateProgramUUID() {
-
-		try {
-			validator.validateProgramUUID("UUID");
-		} catch (final ApiRequestValidationException e) {
-			Assert.fail("Expcected to NOT throw ApiRequestValidationException");
-		}
-
-		try {
-			validator.validateProgramUUID(null);
-			Assert.fail("Expcected to throw ApiRequestValidationException");
-		} catch (final ApiRequestValidationException e) {
-			Assert.assertEquals("sample.list.program.uuid.is.null", e.getErrors().get(0).getCode());
 		}
 
 	}
