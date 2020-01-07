@@ -1,6 +1,7 @@
 package org.ibp.api.rest.user;
 
 import io.swagger.annotations.ApiOperation;
+import liquibase.util.StringUtils;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,18 +27,16 @@ public class UserResource {
 	@Autowired
 	private UserService userService;
 
-	@ApiOperation(value = "List all users of one projectUUID", notes = "List all users")
-	@RequestMapping(value = "/projects/{projectUUID}/users", method = RequestMethod.GET)
-	public ResponseEntity<List<UserDetailDto>> list(@PathVariable final String projectUUID) {
-		return new ResponseEntity<>(this.userService.getUsersByProjectUUID(projectUUID), HttpStatus.OK);
-	}
-
 	@ApiOperation(value = "List all users", notes = "List all users in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
-	public ResponseEntity<List<UserDetailDto>> listUsers() {
-		return new ResponseEntity<>(this.userService.getAllUsersSortedByLastName(), HttpStatus.OK);
+	public ResponseEntity<List<UserDetailDto>> listUsers(@RequestParam(required=false) final String programUUID) {
+		if (StringUtils.isEmpty(programUUID)) {
+			return new ResponseEntity<>(this.userService.getAllUsersSortedByLastName(), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(this.userService.getUsersByProjectUUID(programUUID), HttpStatus.OK);
+		}
 	}
 
 	@ApiOperation(value = "Create user", notes = "Create user in this deployment instance of BMSAPI. ")
