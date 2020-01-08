@@ -15,7 +15,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
-import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -90,9 +90,6 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
-
-	@Autowired
-	private ContextUtil contextUtil;
 
 	@Override
 	public File generateSingleInstanceFile(
@@ -695,7 +692,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	MeasurementVariable createLocationNameVariable(final String variableAlias, final String locationName) {
 		final MeasurementVariable locationNameVariable = new MeasurementVariable();
 		final StandardVariable standardVariable =
-			this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID());
+			this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), ContextHolder.getCurrentProgram());
 		locationNameVariable.setAlias(variableAlias);
 		locationNameVariable.setName(standardVariable.getName());
 		locationNameVariable.setDescription(standardVariable.getDescription());
