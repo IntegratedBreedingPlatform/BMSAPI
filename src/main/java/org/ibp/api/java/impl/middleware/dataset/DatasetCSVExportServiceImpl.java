@@ -20,11 +20,7 @@ import org.springframework.validation.MapBindingResult;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,8 +51,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 
-		final List<MeasurementVariable> allVariables = new ArrayList<>();
-		allVariables.addAll(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
+		final List<MeasurementVariable> allVariables = new ArrayList<>(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());
 	}
 
@@ -77,7 +72,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 			entryTypes.stream().collect(Collectors.toMap(Enumeration::getDescription, Enumeration::getName));
 
 		final List<ObservationUnitRow> allRows =
-			observationUnitRowMap.values().stream().flatMap(list -> list.stream()).collect(Collectors.toList());
+			observationUnitRowMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
 		allRows.forEach(row -> {
 			final ObservationUnitData data = row.getVariables().get(TermId.ENTRY_TYPE.name());
 			data.setValue(entryTypeDescriptionNameMap.get(data.getValue()));
