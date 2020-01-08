@@ -1,11 +1,8 @@
 
 package org.ibp.api.java.impl.middleware.common;
 
-import javax.servlet.http.HttpServletRequest;
-
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.ContextHolder;
-import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.program.ProgramService;
 import org.slf4j.Logger;
@@ -15,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 
@@ -103,17 +101,15 @@ public class ContextResolverImpl implements ContextResolver {
 			}
 		}
 
-		// If program UUID was supplied, verify that it is valid for given crop
+		// If program UUID was supplied, verify that it is valid for given crop (if specified too)
+		// It is possible for crop to not have been supplied, eg. for instance-level resources like GET /users
 		if (!StringUtils.isEmpty(programUUID)) {
 			final String crop = this.resolveCropNameFromUrl();
-			if (StringUtils.isEmpty(crop)) {
-				throw new ContextResolutionException("Could not resolve crop for program: " + programUUID + " for service with path " + path);
-			}
-			if (programService.getByUUIDAndCrop(crop,programUUID) == null){
+			if (!StringUtils.isEmpty(crop) && programService.getByUUIDAndCrop(crop,programUUID) == null) {
 				throw new ContextResolutionException("Invalid program: " + programUUID + " for crop: " + crop + " for service with path " + path);
 			}
-
 			ContextHolder.setCurrentProgram(programUUID);
+
 		} else {
 			ContextHolder.setCurrentProgram(null);
 		}
