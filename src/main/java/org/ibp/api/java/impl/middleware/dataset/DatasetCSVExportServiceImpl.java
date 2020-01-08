@@ -66,7 +66,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(),
 			new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 		this.transformEntryTypeValues(observationUnitRowMap);
-		this.addLocationIdValues(observationUnitRowMap);
+		this.addLocationIdValues(observationUnitRowMap, selectedDatasetInstancesMap);
 		return observationUnitRowMap;
 	}
 
@@ -84,12 +84,10 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		});
 	}
 
-	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap) {
-		// FIXME IBP-3048: With location id now a property of StudyInstance, the query below is likely not needed
-		final Map<Integer, String> instanceIdLocationIdMap = this.studyDataManager.getInstanceIdLocationIdMap(new ArrayList<>(observationUnitRowMap.keySet()));
+	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		for(final Integer instanceId: observationUnitRowMap.keySet()) {
 			final ObservationUnitData locationIdData = new ObservationUnitData();
-			locationIdData.setValue(instanceIdLocationIdMap.get(instanceId));
+			locationIdData.setValue(selectedDatasetInstancesMap.get(instanceId).getLocationId().toString());
 			observationUnitRowMap.get(instanceId).forEach(row -> {
 				row.getVariables().put(LOCATION_ID_VARIABLE_NAME, locationIdData);
 			});
