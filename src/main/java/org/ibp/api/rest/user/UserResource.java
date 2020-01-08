@@ -1,7 +1,6 @@
 package org.ibp.api.rest.user;
 
 import io.swagger.annotations.ApiOperation;
-import liquibase.util.StringUtils;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +30,16 @@ public class UserResource {
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
-	public ResponseEntity<List<UserDetailDto>> listUsers(@RequestParam(required=false) final String programUUID) {
-		if (StringUtils.isEmpty(programUUID)) {
-			return new ResponseEntity<>(this.userService.getAllUsersSortedByLastName(), HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(this.userService.getUsersByProjectUUID(programUUID), HttpStatus.OK);
-		}
+	public ResponseEntity<List<UserDetailDto>> listUsers() {
+		return new ResponseEntity<>(this.userService.getAllUsersSortedByLastName(), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Filter users", notes = "List all users in this deployment instance of BMSAPI. ")
+	@RequestMapping(value = "/users/filter", method = RequestMethod.GET)
+	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN', 'BREEDING_ACTIVITIES', 'MANAGE_STUDIES')")
+	public ResponseEntity<List<UserDetailDto>> filterUsers(@RequestParam final String programUUID) {
+		return new ResponseEntity<>(this.userService.getUsersByProjectUUID(programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create user", notes = "Create user in this deployment instance of BMSAPI. ")
