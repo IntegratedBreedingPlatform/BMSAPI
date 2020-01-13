@@ -83,11 +83,14 @@ public class SampleListValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final SampleList sampleList = this.sampleListServiceMW.getSampleList(folderId);
-		// Verify that folder belongs to program in ContextHolder
-		if (!contextProgramUUID.equals(sampleList.getProgramUUID())){
-			this.errors.reject("sample.list.program.uuid.is.invalid","Invalid programUUID for sample list folder");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		// FolderID is zero if it's the root crop/program folder
+		if (folderId != 0) {
+			final SampleList sampleList = this.sampleListServiceMW.getSampleList(folderId);
+			// Verify that folder belongs to program in ContextHolder
+			if (sampleList != null && !contextProgramUUID.equals(sampleList.getProgramUUID())){
+				this.errors.reject("sample.list.program.uuid.is.invalid","Invalid programUUID for sample list folder");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
 		}
 
 	}
