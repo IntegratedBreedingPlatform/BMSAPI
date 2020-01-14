@@ -200,7 +200,7 @@ public class BVDesignLicenseServiceTest {
 	private DesignLicenseInfo createBVDesignLicenseInfo() {
 		final DesignLicenseInfo bvDesignLicenseInfo = new DesignLicenseInfo();
 		final Status status = new Status();
-		final License license = new License("Succesful license checkout", "73", "31-DEC-2019");
+		final License license = new License("Succesful license checkout", "", "");
 		status.setLicense(license);
 		bvDesignLicenseInfo.setStatus(status);
 		return bvDesignLicenseInfo;
