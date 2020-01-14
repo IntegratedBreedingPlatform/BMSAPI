@@ -370,7 +370,7 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Void> checkOutOfBoundDraftData(
-		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 		final Boolean hasOutOfBounds = this.studyDatasetService.hasDatasetDraftDataOutOfBounds(studyId, datasetId);
 
