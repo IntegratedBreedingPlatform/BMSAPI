@@ -38,7 +38,7 @@ public class UserResource {
 	@RequestMapping(value = "/users/filter", method = RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN', 'BREEDING_ACTIVITIES', 'MANAGE_STUDIES')")
-	public ResponseEntity<List<UserDetailDto>> filterUsers(@RequestParam final String programUUID) {
+	public ResponseEntity<List<UserDetailDto>> filterUsers(@RequestParam final String cropName, @RequestParam final String programUUID) {
 		return new ResponseEntity<>(this.userService.getUsersByProjectUUID(programUUID), HttpStatus.OK);
 	}
 
