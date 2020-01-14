@@ -102,10 +102,12 @@ public class ContextResolverImpl implements ContextResolver {
 		}
 
 		// If program UUID was supplied, verify that it is valid for given crop (if specified too)
-		// It is possible for crop to not have been supplied, eg. for instance-level resources like GET /users
 		if (!StringUtils.isEmpty(programUUID)) {
 			final String crop = this.resolveCropNameFromUrl();
-			if (!StringUtils.isEmpty(crop) && programService.getByUUIDAndCrop(crop,programUUID) == null) {
+			if (StringUtils.isEmpty(crop)) {
+				throw new ContextResolutionException("Could not resolve crop for program: " + programUUID + " for service with path " + path);
+			}
+			if (programService.getByUUIDAndCrop(crop,programUUID) == null){
 				throw new ContextResolutionException("Invalid program: " + programUUID + " for crop: " + crop + " for service with path " + path);
 			}
 			ContextHolder.setCurrentProgram(programUUID);
