@@ -30,7 +30,11 @@ public class ContextResolverImpl implements ContextResolver {
 
 	@Override
 	public String resolveDatabaseFromUrl() throws ContextResolutionException {
-		return String.format(Constants.DB_NAME_FORMAT, resolveCropNameFromUrl());
+		final String crop = resolveCropNameFromUrl();
+		if (StringUtils.isEmpty(crop)) {
+			throw new ContextResolutionException("Could not resolve database because crop name was not found");
+		}
+		return String.format(Constants.DB_NAME_FORMAT, crop);
 	}
 
 
@@ -48,27 +52,32 @@ public class ContextResolverImpl implements ContextResolver {
 
 		String cropName = "";
 		boolean instanceLevelAPI = true;
-		if (parts.length >= 3) {
-			final boolean isBrApiURI = Arrays.stream(parts).anyMatch(BRAPI::equals);
-			if (isBrApiURI) {
-				// Exclude instance-level BrAPI calls (eg. /bmsapi/brapi/v1/crops) in crop resolution
-				// BrAPI calls put crop name as first path parameter after context path e.g. /bmsapi/maize/brapi/v1/locations
-				instanceLevelAPI = BRAPI.equals(parts[1]);
-				cropName = instanceLevelAPI? "" : parts[1];
+		final boolean isBrApiURI = Arrays.stream(parts).anyMatch(BRAPI::equals);
+		if (isBrApiURI) {
+			// Exclude instance-level BrAPI calls (eg. /bmsapi/brapi/v1/crops) in crop resolution
+			// BrAPI calls put crop name as first path parameter after context path e.g. /bmsapi/maize/brapi/v1/locations
+			instanceLevelAPI = BRAPI.equals(parts[1]);
+			cropName = instanceLevelAPI? "" : parts[1];
 
-			} else if ("crops".equals(parts[1])){
-				// internal BMSAPI crop/program services start with "crops" (eg. /bmsapi/crops/maize/locations
-				cropName = parts[2];
-				instanceLevelAPI = false;
-			}
+		} else if ("crops".equals(parts[1])){
+			// internal BMSAPI crop/program services start with "crops" (eg. /bmsapi/crops/maize/locations
+			cropName = parts[2];
+			instanceLevelAPI = false;
 
-			if (!StringUtils.isEmpty(cropName)) {
-				final List<String> installedCrops = this.cropService.getInstalledCrops();
-				if (!installedCrops.contains(cropName)) {
-					throw new ContextResolutionException("Invalid crop " + cropName + " for URL:" + path);
-				}
-				ContextHolder.setCurrentCrop(cropName);
+			// If not found in URL path, search in request parameters for "cropName"
+		} else {
+			final String cropNameRequestParam = request.getParameter("cropName");
+			if (!StringUtils.isEmpty(cropNameRequestParam)) {
+				cropName =  cropNameRequestParam;
 			}
+		}
+
+		if (!StringUtils.isEmpty(cropName)) {
+			final List<String> installedCrops = this.cropService.getInstalledCrops();
+			if (!installedCrops.contains(cropName)) {
+				throw new ContextResolutionException("Invalid crop " + cropName + " for URL:" + path);
+			}
+			ContextHolder.setCurrentCrop(cropName);
 		}
 
 		if (!instanceLevelAPI && StringUtils.isEmpty(cropName)) {
@@ -119,5 +128,13 @@ public class ContextResolverImpl implements ContextResolver {
 
 		return programUUID;
 
+	}
+
+	void setCropService(final CropService cropService) {
+		this.cropService = cropService;
+	}
+
+	void setProgramService(final ProgramService programService) {
+		this.programService = programService;
 	}
 }
