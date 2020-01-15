@@ -69,6 +69,7 @@ public class BreedingViewResource {
 		Preconditions.checkArgument(!StringUtils.isEmpty(studyId), "studyId is required.");
 		Preconditions.checkArgument(!StringUtils.isEmpty(inputDataSetId), "inputDataSetId is required.");
 		Preconditions.checkArgument(!StringUtils.isEmpty(outputDataSetId), "outputDataSetId is required.");
+		Preconditions.checkArgument(!StringUtils.isEmpty(cropName), "cropName is required.");
 
 		final Map<String, String> params = new HashMap<>();
 		final List<String> errors = new ArrayList<>();
