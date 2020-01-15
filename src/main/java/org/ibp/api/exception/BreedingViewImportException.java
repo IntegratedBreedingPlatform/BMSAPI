@@ -1,5 +1,5 @@
 
-package org.ibp.api.ibpworkbench.exceptions;
+package org.ibp.api.exception;
 
 public class BreedingViewImportException extends Exception {
 
@@ -9,11 +9,11 @@ public class BreedingViewImportException extends Exception {
 		super("Error with importing breeding view output file.");
 	}
 
-	public BreedingViewImportException(String message) {
+	public BreedingViewImportException(final String message) {
 		super(message);
 	}
 
-	public BreedingViewImportException(String message, Throwable cause) {
+	public BreedingViewImportException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 }

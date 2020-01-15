@@ -9,9 +9,9 @@
  *
  *******************************************************************************/
 
-package org.ibp.api.ibpworkbench.service;
+package org.ibp.api.java.breedingview;
 
-import org.ibp.api.ibpworkbench.exceptions.IBPWebServiceException;
+import org.ibp.api.exception.IBPWebServiceException;
 
 import java.util.List;
 import java.util.Map;

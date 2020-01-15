@@ -9,7 +9,7 @@
  *
  *******************************************************************************/
 
-package org.ibp.api.ibpworkbench.model;
+package org.ibp.api.domain.breedingview;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -17,15 +17,15 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "Response")
 @XmlType(propOrder = {"successful", "message"})
-public class DataResponse {
+public class BreedingViewResponse {
 
 	private boolean successful;
 	private String message;
 
-	public DataResponse() {
+	public BreedingViewResponse() {
 	}
 
-	public DataResponse(boolean successful, String message) {
+	public BreedingViewResponse(final boolean successful, final String message) {
 		this.successful = successful;
 		this.message = message;
 	}
@@ -35,7 +35,7 @@ public class DataResponse {
 		return this.successful;
 	}
 
-	public void setSuccessful(boolean successful) {
+	public void setSuccessful(final boolean successful) {
 		this.successful = successful;
 	}
 
@@ -44,7 +44,7 @@ public class DataResponse {
 		return this.message;
 	}
 
-	public void setMessage(String message) {
+	public void setMessage(final String message) {
 		this.message = message;
 	}
 

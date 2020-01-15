@@ -9,17 +9,18 @@
  *
  *******************************************************************************/
 
-package org.ibp.api.ibpworkbench.constants;
+package org.ibp.api.java.impl.middleware.breedingview;
 
-public enum WebAPIConstants {
+public enum BreedingViewParameter {
 
-	MAIN_OUTPUT_FILE_PATH("mainOutputFilePath"), SUMMARY_OUTPUT_FILE_PATH("summaryOutputFilePath"), STUDY_ID("StudyId"), WORKBENCH_PROJECT_ID(
-			"WorkbenchProjectId"), INPUT_DATASET_ID("InputDataSetId"), OUTPUT_DATASET_ID("OutputDataSetId"), OUTLIER_OUTPUT_FILE_PATH(
-			"OutlierFilePath");
+	MAIN_OUTPUT_FILE_PATH("mainOutputFilePath"), SUMMARY_OUTPUT_FILE_PATH("summaryOutputFilePath"), STUDY_ID(
+		"StudyId"), WORKBENCH_PROJECT_ID(
+		"WorkbenchProjectId"), INPUT_DATASET_ID("InputDataSetId"), OUTPUT_DATASET_ID("OutputDataSetId"), OUTLIER_OUTPUT_FILE_PATH(
+		"OutlierFilePath");
 
-	private String paramValue;
+	private final String paramValue;
 
-	private WebAPIConstants(String param) {
+	private BreedingViewParameter(final String param) {
 		this.paramValue = param;
 	}
 

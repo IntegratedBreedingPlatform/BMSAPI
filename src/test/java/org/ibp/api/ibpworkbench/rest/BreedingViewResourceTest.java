@@ -1,9 +1,9 @@
 
 package org.ibp.api.ibpworkbench.rest;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.ibp.api.ibpworkbench.model.DataResponse;
-import org.ibp.api.ibpworkbench.service.BreedingViewService;
+import org.ibp.api.domain.breedingview.BreedingViewResponse;
+import org.ibp.api.java.breedingview.BreedingViewService;
+import org.ibp.api.rest.breedingview.BreedingViewResource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class BreedingViewResourceTest {
 		final String outputDataSetId = "0";
 		final String cropName = "maize";
 
-		final DataResponse response =
+		final BreedingViewResponse response =
 			this.breedingView.saveSingleSiteAnalysisData(mainOutputFilePath, summaryOutputFilePath, outlierOutputFilePath,
 				workbenchProjectId, studyId, inputDataSetId, outputDataSetId, cropName);
 		Assert.assertTrue("Web service should succeed", response.isSuccessful());

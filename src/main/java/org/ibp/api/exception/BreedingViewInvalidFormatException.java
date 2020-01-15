@@ -1,5 +1,5 @@
 
-package org.ibp.api.ibpworkbench.exceptions;
+package org.ibp.api.exception;
 
 public class BreedingViewInvalidFormatException extends Exception {
 

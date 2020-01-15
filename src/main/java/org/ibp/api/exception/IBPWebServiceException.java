@@ -1,5 +1,5 @@
 
-package org.ibp.api.ibpworkbench.exceptions;
+package org.ibp.api.exception;
 
 public class IBPWebServiceException extends Exception {
 
@@ -9,7 +9,7 @@ public class IBPWebServiceException extends Exception {
 		super();
 	}
 
-	public IBPWebServiceException(String message) {
+	public IBPWebServiceException(final String message) {
 		super(message);
 	}
 
