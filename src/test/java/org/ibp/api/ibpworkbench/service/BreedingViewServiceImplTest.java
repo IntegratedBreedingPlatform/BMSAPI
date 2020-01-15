@@ -8,8 +8,9 @@ import java.util.Map;
 
 import org.generationcp.commons.exceptions.BreedingViewImportException;
 import org.generationcp.commons.service.BreedingViewImportService;
-import org.ibp.api.ibpworkbench.constants.WebAPIConstants;
-import org.ibp.api.ibpworkbench.exceptions.IBPWebServiceException;
+import org.ibp.api.java.impl.middleware.breedingview.BreedingViewParameter;
+import org.ibp.api.exception.IBPWebServiceException;
+import org.ibp.api.java.impl.middleware.breedingview.BreedingViewServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class BreedingViewServiceImplTest {
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		this.breedingViewService = new BreedingViewServiceImpl();
-		this.breedingViewService.setImportService(this.bvImportService);
+		this.breedingViewService.setBreedingViewImportService(this.bvImportService);
 	}
 	
 	private String getFileName(final String absoluteUrl) {
@@ -136,13 +137,13 @@ public class BreedingViewServiceImplTest {
 			final String outlierOutputFilePath, final String workbenchProjectId, final String studyId, final String inputDataSetId,
 			final String outputDataSetId) {
 		final Map<String, String> params = new HashMap<String, String>();
-		params.put(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue(), mainOutputFilePath);
-		params.put(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue(), summaryOutputFilePath);
-		params.put(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue(), outlierOutputFilePath);
-		params.put(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue(), workbenchProjectId);
-		params.put(WebAPIConstants.STUDY_ID.getParamValue(), studyId);
-		params.put(WebAPIConstants.INPUT_DATASET_ID.getParamValue(), inputDataSetId);
-		params.put(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue(), outputDataSetId);
+		params.put(BreedingViewParameter.MAIN_OUTPUT_FILE_PATH.getParamValue(), mainOutputFilePath);
+		params.put(BreedingViewParameter.SUMMARY_OUTPUT_FILE_PATH.getParamValue(), summaryOutputFilePath);
+		params.put(BreedingViewParameter.OUTLIER_OUTPUT_FILE_PATH.getParamValue(), outlierOutputFilePath);
+		params.put(BreedingViewParameter.WORKBENCH_PROJECT_ID.getParamValue(), workbenchProjectId);
+		params.put(BreedingViewParameter.STUDY_ID.getParamValue(), studyId);
+		params.put(BreedingViewParameter.INPUT_DATASET_ID.getParamValue(), inputDataSetId);
+		params.put(BreedingViewParameter.OUTPUT_DATASET_ID.getParamValue(), outputDataSetId);
 		return params;
 	}
 

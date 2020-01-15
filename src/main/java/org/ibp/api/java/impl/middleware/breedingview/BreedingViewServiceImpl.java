@@ -9,30 +9,29 @@
  *
  *******************************************************************************/
 
-package org.ibp.api.ibpworkbench.service;
+package org.ibp.api.java.impl.middleware.breedingview;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
+import com.rits.cloning.Cloner;
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.ibp.api.ibpworkbench.constants.WebAPIConstants;
-import org.ibp.api.ibpworkbench.exceptions.IBPWebServiceException;
+import org.ibp.api.exception.IBPWebServiceException;
+import org.ibp.api.java.breedingview.BreedingViewService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.rits.cloning.Cloner;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class BreedingViewServiceImpl implements BreedingViewService {
 
 	@Autowired
-	private BreedingViewImportService importService;
+	private BreedingViewImportService breedingViewImportService;
 
 	@Autowired
 	private Cloner cloner;
@@ -50,19 +49,19 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 		try {
 
-			final String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
-			final String summaryOutputFilePath = params.get(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue());
-			final String outlierOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
-			final int studyId = Integer.parseInt(params.get(WebAPIConstants.STUDY_ID.getParamValue()));
+			final String mainOutputFilePath = params.get(BreedingViewParameter.MAIN_OUTPUT_FILE_PATH.getParamValue());
+			final String summaryOutputFilePath = params.get(BreedingViewParameter.SUMMARY_OUTPUT_FILE_PATH.getParamValue());
+			final String outlierOutputFilePath = params.get(BreedingViewParameter.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
+			final int studyId = Integer.parseInt(params.get(BreedingViewParameter.STUDY_ID.getParamValue()));
 
-			this.importService.importMeansData(new File(mainOutputFilePath), studyId);
+			this.breedingViewImportService.importMeansData(new File(mainOutputFilePath), studyId);
 
 			if (outlierOutputFilePath != null && !"".equals(outlierOutputFilePath)) {
-				this.importService.importOutlierData(new File(outlierOutputFilePath), studyId);
+				this.breedingViewImportService.importOutlierData(new File(outlierOutputFilePath), studyId);
 			}
 
 			if (summaryOutputFilePath != null && !"".equals(summaryOutputFilePath)) {
-				this.importService.importSummaryStatsData(new File(summaryOutputFilePath), studyId);
+				this.breedingViewImportService.importSummaryStatsData(new File(summaryOutputFilePath), studyId);
 			}
 
 		} catch (final Exception e) {
@@ -96,8 +95,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		return this.variableTypeListSummaryStats;
 	}
 
-	public void setImportService(final BreedingViewImportService importService) {
-		this.importService = importService;
+	public void setBreedingViewImportService(final BreedingViewImportService breedingViewImportService) {
+		this.breedingViewImportService = breedingViewImportService;
 	}
 
 }
