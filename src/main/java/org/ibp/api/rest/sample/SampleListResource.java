@@ -164,7 +164,7 @@ public class SampleListResource {
 	@ApiOperation(value = "Download Sample List as CSV file", notes = "Download Sample List as CSV file")
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES','INFORMATION_MANAGEMENT')")
 	@RequestMapping(value = "/{crop}/sample-lists/{listId}/download", method = RequestMethod.GET)
-	public ResponseEntity<FileSystemResource> download(@PathVariable final String crop, @PathVariable final Integer listId,
+	public ResponseEntity<FileSystemResource> download(@PathVariable final String crop, @PathVariable final Integer listId, @RequestParam final String programUUID,
 		@RequestParam final String listName) throws IOException {
 
 		final List<SampleDetailsDTO> sampleDetailsDTOs = this.sampleListService.getSampleDetailsDTOs(listId);
@@ -193,7 +193,7 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/sample-lists/{listId}/samples", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity saveSamplePlateInformation(
-		@PathVariable final String crop, @PathVariable final Integer listId, @RequestBody final List<SampleDTO> sampleDTOs) {
+		@PathVariable final String crop, @PathVariable final Integer listId, @RequestParam final String programUUID, @RequestBody final List<SampleDTO> sampleDTOs) {
 		this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
