@@ -15,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ContextResolverImpl implements ContextResolver {
@@ -74,7 +75,7 @@ public class ContextResolverImpl implements ContextResolver {
 
 		if (!StringUtils.isEmpty(cropName)) {
 			final List<String> installedCrops = this.cropService.getInstalledCrops();
-			if (!installedCrops.contains(cropName)) {
+			if (!installedCrops.stream().map(crop -> crop.toUpperCase()).collect(Collectors.toList()).contains(cropName.toUpperCase())) {
 				throw new ContextResolutionException("Invalid crop " + cropName + " for URL:" + path);
 			}
 			ContextHolder.setCurrentCrop(cropName);
