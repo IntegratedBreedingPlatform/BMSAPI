@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -49,7 +50,7 @@ public class ObservationUnitResourceBrapi {
 	@ApiOperation(value = "Get Observation Unit search", notes = "Get the results of a Observation Unit search request")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits/{searchResultsDbid}", method = RequestMethod.GET)
 	@ResponseBody
-	@JsonView(PhenotypeSearchDTO.View.PhenotypeBrapiV2.class)
+	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> getObservationUnitsSearch(
 		@PathVariable final String crop, @PathVariable final String searchResultsDbid,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
