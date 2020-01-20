@@ -90,10 +90,4 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 
 	}
 
-	void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
-		final MeasurementVariable locationIdVariable = new MeasurementVariable();
-		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
-		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);
-		environmentDetailAndConditionVariables.add(0, locationIdVariable);
-	}
 }

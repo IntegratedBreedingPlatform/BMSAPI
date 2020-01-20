@@ -62,6 +62,7 @@ public class DatasetCSVExportServiceImplTest {
 	private static final String TEST_ENTRY_DESCRIPTION = "Test Entry";
 	private static final String TEST_ENTRY_NAME = "T";
 	private static final Integer LOCATION_ID = 1;
+	private static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
 	@Mock
 	private StudyValidator studyValidator;
 
@@ -286,7 +287,7 @@ public class DatasetCSVExportServiceImplTest {
 	@Test
 	public void testAddLocationIdVariable() {
 		final List<MeasurementVariable> measurementVariableList = new ArrayList<>();
-		this.datasetExportService.addLocationIdVariable(measurementVariableList);
+		this.addLocationIdVariable(measurementVariableList);
 		Assert.assertEquals(1, measurementVariableList.size());
 		Assert.assertEquals(TermId.LOCATION_ID.name(), measurementVariableList.get(0).getAlias());
 		Assert.assertEquals(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME, measurementVariableList.get(0).getName());
@@ -357,6 +358,13 @@ public class DatasetCSVExportServiceImplTest {
 		mvar3.setAlias("TRIAL_INSTANCE");
 		measurementVariables.add(mvar3);
 		return measurementVariables;
+	}
+
+	private void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
+		final MeasurementVariable locationIdVariable = new MeasurementVariable();
+		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
+		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);
+		environmentDetailAndConditionVariables.add(0, locationIdVariable);
 	}
 
 }
