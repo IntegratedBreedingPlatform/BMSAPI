@@ -62,7 +62,6 @@ public class DatasetCSVExportServiceImplTest {
 	private static final String TEST_ENTRY_DESCRIPTION = "Test Entry";
 	private static final String TEST_ENTRY_NAME = "T";
 	private static final Integer LOCATION_ID = 1;
-	private static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
 	@Mock
 	private StudyValidator studyValidator;
 
@@ -363,7 +362,7 @@ public class DatasetCSVExportServiceImplTest {
 	private void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
 		final MeasurementVariable locationIdVariable = new MeasurementVariable();
 		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
-		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);
+		locationIdVariable.setName(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME);
 		environmentDetailAndConditionVariables.add(0, locationIdVariable);
 	}
 
