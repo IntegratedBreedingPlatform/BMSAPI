@@ -83,9 +83,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		for(final Integer instanceId: observationUnitRowMap.keySet()) {
 			final ObservationUnitData locationIdData = new ObservationUnitData();
 			locationIdData.setValue(selectedDatasetInstancesMap.get(instanceId).getLocationId().toString());
-			observationUnitRowMap.get(instanceId).forEach(row -> {
-				row.getVariables().put(LOCATION_ID_VARIABLE_NAME, locationIdData);
-			});
+			observationUnitRowMap.get(instanceId).forEach(row -> row.getVariables().put(LOCATION_ID_VARIABLE_NAME, locationIdData));
 		}
 
 	}
