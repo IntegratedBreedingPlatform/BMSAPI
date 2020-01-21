@@ -20,11 +20,7 @@ import org.springframework.validation.MapBindingResult;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,8 +51,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 
-		final List<MeasurementVariable> allVariables = new ArrayList<>();
-		allVariables.addAll(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
+		final List<MeasurementVariable> allVariables = new ArrayList<>(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());
 	}
 
@@ -66,7 +61,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(),
 			new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 		this.transformEntryTypeValues(observationUnitRowMap);
-		this.addLocationIdValues(observationUnitRowMap);
+		this.addLocationIdValues(observationUnitRowMap, selectedDatasetInstancesMap);
 		return observationUnitRowMap;
 	}
 
@@ -77,30 +72,20 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 			entryTypes.stream().collect(Collectors.toMap(Enumeration::getDescription, Enumeration::getName));
 
 		final List<ObservationUnitRow> allRows =
-			observationUnitRowMap.values().stream().flatMap(list -> list.stream()).collect(Collectors.toList());
+			observationUnitRowMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
 		allRows.forEach(row -> {
 			final ObservationUnitData data = row.getVariables().get(TermId.ENTRY_TYPE.name());
 			data.setValue(entryTypeDescriptionNameMap.get(data.getValue()));
 		});
 	}
 
-	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap) {
-		// FIXME IBP-3048: With location id now a property of StudyInstance, the query below is likely not needed
-		final Map<Integer, String> instanceIdLocationIdMap = this.studyDataManager.getInstanceIdLocationIdMap(new ArrayList<>(observationUnitRowMap.keySet()));
+	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		for(final Integer instanceId: observationUnitRowMap.keySet()) {
 			final ObservationUnitData locationIdData = new ObservationUnitData();
-			locationIdData.setValue(instanceIdLocationIdMap.get(instanceId));
-			observationUnitRowMap.get(instanceId).forEach(row -> {
-				row.getVariables().put(LOCATION_ID_VARIABLE_NAME, locationIdData);
-			});
+			locationIdData.setValue(selectedDatasetInstancesMap.get(instanceId).getLocationId().toString());
+			observationUnitRowMap.get(instanceId).forEach(row -> row.getVariables().put(LOCATION_ID_VARIABLE_NAME, locationIdData));
 		}
 
 	}
 
-	void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
-		final MeasurementVariable locationIdVariable = new MeasurementVariable();
-		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
-		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);
-		environmentDetailAndConditionVariables.add(0, locationIdVariable);
-	}
 }
