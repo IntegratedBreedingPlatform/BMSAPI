@@ -87,7 +87,7 @@ public class SampleListValidator {
 		if (folderId != 0) {
 			final SampleList sampleList = this.sampleListServiceMW.getSampleList(folderId);
 			// Verify that folder belongs to program in ContextHolder
-			if (sampleList != null && !contextProgramUUID.equals(sampleList.getProgramUUID())){
+			if (sampleList != null && sampleList.getProgramUUID() != null && !contextProgramUUID.equals(sampleList.getProgramUUID())){
 				this.errors.reject("sample.list.program.uuid.is.invalid","Invalid programUUID for sample list folder");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
