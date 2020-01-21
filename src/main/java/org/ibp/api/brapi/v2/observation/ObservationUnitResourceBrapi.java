@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -132,5 +133,20 @@ public class ObservationUnitResourceBrapi {
 							.searchPhenotypes(finalPageSize, finalPageNumber, phenotypeSearchDTO);
 					}
 				});
+	}
+
+	@ApiOperation(value = "Patch Observation Unit", notes = "Modified some fields from an Observation Unit")
+	@RequestMapping(value = "/{crop}/brapi/v2/observationunits/{observationUnitDbId}", method = RequestMethod.PATCH)
+	public ResponseEntity<Void> patchObservationUnit(
+		@PathVariable final String crop,
+		@PathVariable String observationUnitDbId,
+		@RequestBody final ObservationUnitPatchRequestDTO requestDTO) {
+
+		final ModelMapper mapper = new ModelMapper();
+		final org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPatchRequestDTO observationUnitPatchRequestDTO
+			= mapper.map(requestDTO, org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPatchRequestDTO.class);
+		this.observationUnitService.update(observationUnitDbId, observationUnitPatchRequestDTO);
+
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
