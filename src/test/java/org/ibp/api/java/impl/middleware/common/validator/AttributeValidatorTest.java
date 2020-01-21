@@ -39,8 +39,8 @@ public class AttributeValidatorTest {
 	@Test
 	public void testForInvalidAttributeId() throws MiddlewareQueryException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
-		Integer attributeById = 1;
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
+		final Integer attributeById = 1;
 
 		Mockito.doReturn(null).when(this.germplasmDataManager).getAttributeById(attributeById);
 
@@ -51,10 +51,10 @@ public class AttributeValidatorTest {
 	@Test
 	public void testForValidProgramId() throws MiddlewareQueryException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
-		Integer attributeById = 1;
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
+		final Integer attributeById = 1;
 
-		Attribute attribute = new Attribute();
+		final Attribute attribute = new Attribute();
 		attribute.setAid(1);
 		Mockito.doReturn(attribute).when(this.germplasmDataManager).getAttributeById(attributeById);
 

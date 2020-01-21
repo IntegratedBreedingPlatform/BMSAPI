@@ -19,8 +19,8 @@ public class AttributeValidator {
 		if (attributeIds == null) {
 			return;
 		}
-		for (String id: attributeIds) {
-			final Attribute attribute = germplasmDataManager.getAttributeById(Integer.valueOf(id));
+		for (final String id: attributeIds) {
+			final Attribute attribute = this.germplasmDataManager.getAttributeById(Integer.valueOf(id));
 			if (attribute == null) {
 				errors.reject("attribute.invalid", "");
 				return;
