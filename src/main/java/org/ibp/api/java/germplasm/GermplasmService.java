@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.germplasm;
 
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -38,4 +39,9 @@ public interface GermplasmService {
 	long countGermplasmByStudy(final Integer studyDbId);
 
 	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, int pageSize, int pageNumber);
+
+	List<AttributeDTO> getAttributesByGid(
+		final String gid, final List<String> attributeDbIds, final Integer pageSize, Integer pageNUmber);
+
+	long countAttributesByGid(String gid, final List<String> attributeDbIds);
 }
