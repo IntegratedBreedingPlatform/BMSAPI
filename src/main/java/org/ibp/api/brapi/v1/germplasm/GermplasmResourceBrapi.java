@@ -21,6 +21,7 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -30,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -209,6 +211,21 @@ public class GermplasmResourceBrapi {
 		}
 
 		return new ResponseEntity<>(new SingleEntityResponse<>(progenyDTO), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Post germplasm search", notes = "Post germplasm search")
+	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasm(
+		@PathVariable final String crop, @RequestBody final GermplasmSearchRequestDto germplasmSearchRequestDto) {
+		final String searchRequestId =
+			this.searchRequestService.saveSearchRequest(germplasmSearchRequestDto, GermplasmSearchRequestDto.class).toString();
+
+		final SearchDto searchDto = new SearchDto(searchRequestId);
+		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<>(searchDto);
+
+		return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
+
 	}
 
 	@ApiOperation(value = "Get germplasm search", notes = "Get the results of a Germplasm search request")

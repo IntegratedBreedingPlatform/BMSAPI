@@ -15,7 +15,9 @@ import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -26,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,6 +49,26 @@ public class ObservationUnitResourceBrapi {
 
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private ObservationUnitService observationUnitService;
+
+	@ApiOperation(value = "Post observation units search", notes = "Post observation units search")
+	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchObservationUnits(
+		@PathVariable final String crop,
+		@RequestBody final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto) {
+
+		final String searchRequestId =
+			this.searchRequestService.saveSearchRequest(observationUnitsSearchRequestDto, ObservationUnitsSearchRequestDto.class).toString();
+
+		final SearchDto searchDto = new SearchDto(searchRequestId);
+		final SingleEntityResponse<SearchDto> singleObservationUnitsResponse = new SingleEntityResponse<>(searchDto);
+
+		return new ResponseEntity<>(singleObservationUnitsResponse, HttpStatus.OK);
+
+	}
 
 	@ApiOperation(value = "Get Observation Unit search", notes = "Get the results of a Observation Unit search request")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits/{searchResultsDbid}", method = RequestMethod.GET)
