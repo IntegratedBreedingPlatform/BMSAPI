@@ -51,7 +51,8 @@ public class GermplasmResourceBrapi {
 	@Autowired
 	private StudyDataManager studyDataManager;
 
-	@ApiOperation(value = "Search germplasms", notes = "Search germplasms")
+	@Deprecated
+	@ApiOperation(value = "Search germplasms", notes = "Search germplasms. <p>DEPRECATED: use /search/germplasm</p> ")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm-search", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_2.class)
