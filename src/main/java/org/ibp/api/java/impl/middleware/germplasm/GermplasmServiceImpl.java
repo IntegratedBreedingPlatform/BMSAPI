@@ -33,6 +33,7 @@ import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.domain.germplasm.PedigreeTreeNode;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -358,6 +359,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
 		this.germplasmValidator.validateGermplasmId(this.errors, Integer.valueOf(gid));
+		if (this.errors.hasErrors()) {
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
 		this.attributeValidator.validateAttributeIds(this.errors, attributeDbIds);
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
