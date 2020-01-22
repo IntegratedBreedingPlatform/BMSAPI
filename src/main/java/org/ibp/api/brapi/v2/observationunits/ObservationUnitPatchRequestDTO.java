@@ -1,4 +1,4 @@
-package org.ibp.api.brapi.v2.observation;
+package org.ibp.api.brapi.v2.observationunits;
 
 import io.swagger.annotations.ApiModel;
 

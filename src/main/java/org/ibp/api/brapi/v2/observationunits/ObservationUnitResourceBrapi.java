@@ -1,4 +1,4 @@
-package org.ibp.api.brapi.v2.observation;
+package org.ibp.api.brapi.v2.observationunits;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
