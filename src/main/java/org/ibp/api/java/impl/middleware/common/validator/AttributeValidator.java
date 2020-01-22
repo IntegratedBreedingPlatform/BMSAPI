@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +20,19 @@ public class AttributeValidator {
 		if (attributeIds == null) {
 			return;
 		}
-		for (final String id: attributeIds) {
-			final Attribute attribute = this.germplasmDataManager.getAttributeById(Integer.valueOf(id));
-			if (attribute == null) {
-				errors.reject("attribute.invalid", "");
-				return;
+
+		final List<Integer> ids = (List<Integer>) CollectionUtils.collect(attributeIds, new org.apache.commons.collections.Transformer() {
+			@Override
+			public Integer transform(final Object input) {
+				final String id = (String) input;
+				return Integer.valueOf(id);
 			}
+		});
+
+		final List<Attribute> attributes = this.germplasmDataManager.getAttributeByIds(ids);
+		if (attributes.size() != attributeIds.size()) {
+			errors.reject("attributes.invalid", "");
+			return;
 		}
 	}
 
