@@ -61,6 +61,7 @@ public class DatasetCSVExportServiceImplTest {
 	private static final int RANDOM_STRING_LENGTH = 10;
 	private static final String TEST_ENTRY_DESCRIPTION = "Test Entry";
 	private static final String TEST_ENTRY_NAME = "T";
+	private static final Integer LOCATION_ID = 1;
 	@Mock
 	private StudyValidator studyValidator;
 
@@ -153,7 +154,7 @@ public class DatasetCSVExportServiceImplTest {
 			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
 		verify(this.studyValidator).validate(this.study.getId(), false);
-		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId(), false);
+		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId());
 		verify(this.instanceValidator).validate(this.dataSetDTO.getDatasetId(), instanceIds);
 		verify(this.studyDatasetService)
 			.getInstanceObservationUnitRowsMap(eq(this.study.getId()), eq(this.dataSetDTO.getDatasetId()), any(ArrayList.class));
@@ -208,7 +209,7 @@ public class DatasetCSVExportServiceImplTest {
 
 		final File result = this.datasetExportService
 			.generateInSingleFile(
-				this.study, instanceObservationUnitRowsMap,
+				this.study, this.dataSetDTO, instanceObservationUnitRowsMap,
 				measurementVariables, this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
 
 		verify(this.datasetCSVGenerator)
@@ -285,7 +286,7 @@ public class DatasetCSVExportServiceImplTest {
 	@Test
 	public void testAddLocationIdVariable() {
 		final List<MeasurementVariable> measurementVariableList = new ArrayList<>();
-		this.datasetExportService.addLocationIdVariable(measurementVariableList);
+		this.addLocationIdVariable(measurementVariableList);
 		Assert.assertEquals(1, measurementVariableList.size());
 		Assert.assertEquals(TermId.LOCATION_ID.name(), measurementVariableList.get(0).getAlias());
 		Assert.assertEquals(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME, measurementVariableList.get(0).getName());
@@ -293,14 +294,14 @@ public class DatasetCSVExportServiceImplTest {
 
 	@Test
 	public void testAddLocationIdValues() {
-		final Map<Integer, String> instanceIdLocationIdMap = new HashMap<>();
-		instanceIdLocationIdMap.put(5, "10060");
+		HashMap<Integer, StudyInstance> studyInstanceHashMap = new HashMap<>();
+		studyInstanceHashMap.put(5, this.createStudyInstance(5));
+
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.createObservationUnitRowMap(TermId.LOCATION_ID.name(), "UNKNOWN");
-		Mockito.when(this.studyDataManager.getInstanceIdLocationIdMap(new ArrayList<>(observationUnitRowMap.keySet()))).thenReturn(instanceIdLocationIdMap);
-		this.datasetExportService.addLocationIdValues(observationUnitRowMap);
+		this.datasetExportService.addLocationIdValues(observationUnitRowMap, studyInstanceHashMap);
 		final Map<String, ObservationUnitData> variables = observationUnitRowMap.get(5).get(0).getVariables();
 		Assert.assertEquals(2, variables.size());
-		Assert.assertEquals("10060", variables.get(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
+		Assert.assertEquals(this.LOCATION_ID.toString(), variables.get(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
 	}
 
 	@Test
@@ -335,6 +336,7 @@ public class DatasetCSVExportServiceImplTest {
 		studyInstance.setInstanceDbId(instanceId);
 		studyInstance.setInstanceNumber(this.random.nextInt());
 		studyInstance.setLocationName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
+		studyInstance.setLocationId(this.LOCATION_ID);
 		return studyInstance;
 	}
 
@@ -355,6 +357,13 @@ public class DatasetCSVExportServiceImplTest {
 		mvar3.setAlias("TRIAL_INSTANCE");
 		measurementVariables.add(mvar3);
 		return measurementVariables;
+	}
+
+	private void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
+		final MeasurementVariable locationIdVariable = new MeasurementVariable();
+		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
+		locationIdVariable.setName(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME);
+		environmentDetailAndConditionVariables.add(0, locationIdVariable);
 	}
 
 }

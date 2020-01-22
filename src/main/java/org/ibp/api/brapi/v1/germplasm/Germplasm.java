@@ -3,6 +3,7 @@ package org.ibp.api.brapi.v1.germplasm;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -13,17 +14,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @AutoProperty
 public class Germplasm {
-
-	public static class View {
-
-		public static class GermplasmBrapiV1_3 {
-
-		}
-
-		public static class GermplasmBrapiV1_2 {
-
-		}
-	}
 
 	private String germplasmDbId;
 
@@ -37,7 +27,7 @@ public class Germplasm {
 
 	private String pedigree;
 
-	@JsonView(View.GermplasmBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String germplasmSeedSource;
 
 	private List<String> synonyms = new ArrayList<>();
@@ -71,22 +61,22 @@ public class Germplasm {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date acquisitionDate;
 
-	@JsonView(View.GermplasmBrapiV1_3.class)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private String breedingMethodDbId;
 
-	@JsonView(View.GermplasmBrapiV1_3.class)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private String germplasmGenus;
 
-	@JsonView(View.GermplasmBrapiV1_3.class)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private String germplasmSpecies;
 
-	@JsonView(View.GermplasmBrapiV1_3.class)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private String seedSource;
 
-	@JsonView(View.GermplasmBrapiV1_3.class)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private final static String documentationURL = null;
 
-	@JsonView(View.GermplasmBrapiV1_3.class)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private String entryNumber;
 
 	public Germplasm() {

@@ -70,7 +70,7 @@ public abstract class AbstractDatasetExportService {
 
 	protected void validate(final int studyId, final int datasetId, final Set<Integer> instanceIds) {
 		this.studyValidator.validate(studyId, false);
-		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId);
 		this.instanceValidator.validate(datasetId, instanceIds);
 	}
 
@@ -94,7 +94,7 @@ public abstract class AbstractDatasetExportService {
 		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
 
 		if (singleFile) {
-			return this.generateInSingleFile(study, observationUnitRowMap, columns, generator, fileExtension);
+			return this.generateInSingleFile(study, dataSet, observationUnitRowMap, columns, generator, fileExtension);
 		} else {
 			return this
 				.generateFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension);
@@ -104,12 +104,15 @@ public abstract class AbstractDatasetExportService {
 
 	File generateInSingleFile(
 		final Study study,
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final DatasetDTO dataSet, final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+		final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
 
 		final File temporaryFolder = Files.createTempDir();
-		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s_AllInstances." + fileExtension, study.getName()));
+		final String dataSetName =
+			DatasetTypeEnum.PLOT_DATA.getId() == dataSet.getDatasetTypeId() ? DatasetServiceImpl.PLOT_DATASET_NAME : dataSet.getName();
+		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s_%s.%s", study.getName(), dataSetName, fileExtension));
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
 		return generator.generateMultiInstanceFile(observationUnitRowMap, columns, fileNameFullPath);
