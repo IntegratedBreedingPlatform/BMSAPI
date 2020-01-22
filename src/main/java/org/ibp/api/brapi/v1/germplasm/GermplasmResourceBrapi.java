@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearc
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
@@ -53,7 +54,7 @@ public class GermplasmResourceBrapi {
 	@ApiOperation(value = "Search germplasms", notes = "Search germplasms")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm-search", method = RequestMethod.GET)
 	@ResponseBody
-	@JsonView(Germplasm.View.GermplasmBrapiV1_2.class)
+	@JsonView(BrapiView.BrapiV1_2.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> searchGermplasms(
 		@PathVariable final String crop,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
@@ -212,7 +213,7 @@ public class GermplasmResourceBrapi {
 	@ApiOperation(value = "Get germplasm search", notes = "Get the results of a Germplasm search request")
 	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm/{searchResultsDbid}", method = RequestMethod.GET)
 	@ResponseBody
-	@JsonView(Germplasm.View.GermplasmBrapiV1_3.class)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> getSearchGermplasm(
 		@PathVariable final String crop, @PathVariable final String searchResultsDbid,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
@@ -283,7 +284,7 @@ public class GermplasmResourceBrapi {
 	@ApiOperation(value = "Search germplasms by study", notes = "Search germplasms by study")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/germplasm", method = RequestMethod.GET)
 	@ResponseBody
-	@JsonView(Germplasm.View.GermplasmBrapiV1_3.class)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<GermplasmSummaryList>> searchGermplasmsByStudy(
 		@PathVariable final String crop,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
