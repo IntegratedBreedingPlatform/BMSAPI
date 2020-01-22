@@ -3,6 +3,7 @@ package org.ibp.api.brapi.v1.observation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.service.api.study.ObservationVariableDto;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -10,6 +11,7 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.dataset.DatasetTypeService;
+import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Api(value = "BrAPI Observation Services")
@@ -30,6 +33,9 @@ public class ObservationResourceBrapi {
 
 	@Autowired
 	private DatasetTypeService datasetTypeService;
+
+	@Autowired
+	private StudyService studyService;
 
 	@ApiOperation(value = "Get observation levels", notes = "Returns a list of supported observation levels")
 	@RequestMapping(value = "/{crop}/brapi/v1/observationLevels", method = RequestMethod.GET)
@@ -64,11 +70,52 @@ public class ObservationResourceBrapi {
 
 		final Result<String> results = new Result<String>().withData(observationLevels);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
 		final EntityListResponse<String> entityListResponse = new EntityListResponse<>(metadata, results);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get studies observation variables by studyDbId", notes = "Get studies observation variables by studyDbId")
+	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationvariables", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<EntityListResponse<ObservationVariableDto>> getObservationVariables(final HttpServletResponse response,
+		@PathVariable final String crop, @PathVariable final int studyDbId,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize) {
+
+		final PagedResult<ObservationVariableDto> resultPage =
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<ObservationVariableDto>() {
+
+				@Override
+				public long getCount() {
+					return ObservationResourceBrapi.this.studyService.countObservationVariables(studyDbId);
+				}
+
+				@Override
+				public List<ObservationVariableDto> getResults(final PagedResult<ObservationVariableDto> pagedResult) {
+					final int pageNumber = pagedResult.getPageNumber() + 1;
+					return ObservationResourceBrapi.this.studyService
+						.getObservationVariables(pagedResult.getPageSize(), pageNumber, studyDbId);
+				}
+			});
+
+		final List<ObservationVariableDto> observationVariables = resultPage.getPageResults();
+
+		final Result<ObservationVariableDto> results = new Result<ObservationVariableDto>().withData(observationVariables);
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+
+		final EntityListResponse<ObservationVariableDto> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}

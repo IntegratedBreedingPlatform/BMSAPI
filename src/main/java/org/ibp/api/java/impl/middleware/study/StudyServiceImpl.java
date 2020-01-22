@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestD
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.ObservationVariableDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -45,6 +47,7 @@ import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
@@ -56,6 +59,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +82,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private StudyValidator studyValidator;
 
 	@Autowired
 	private ObservationValidator observationValidator;
@@ -519,5 +527,19 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public void updateStudy(final Study study) {
 		this.studyDataManager.updateStudyLockedStatus(study.getId(), study.isLocked());
+	}
+
+	@Override
+	public long countObservationVariables(final int studyDbId) {
+		this.studyValidator.validate(studyDbId, false);
+		return this.middlewareStudyService.countObservationVariables(studyDbId, Collections.unmodifiableList(
+			Arrays.asList(VariableType.TRAIT.getId())));
+	}
+
+	@Override
+	public List<ObservationVariableDto> getObservationVariables(final int pageSize, final int pageNumber, final int studyDbId) {
+		this.studyValidator.validate(studyDbId, false);
+		return this.middlewareStudyService.getObservationVariables(pageSize, pageNumber, studyDbId, Collections.unmodifiableList(
+			Arrays.asList(VariableType.TRAIT.getId())));
 	}
 }
