@@ -72,7 +72,7 @@ public class SampleListServiceImplTest {
 		final Map<String, Object> result = this.sampleListService.moveSampleListFolder(folderId, newParentId, isCropList, PROGRAM_UUID);
 
 		Mockito.verify(this.sampleListValidator).validateFolderIdAndProgram(folderId);
-		Mockito.verify(this.sampleListValidator).validateFolderIdAndProgram(newParentId);
+		Mockito.verify(this.sampleListValidator).validateFolderId(newParentId);
 		Assert.assertEquals(String.valueOf(newParentId), result.get(SampleListServiceImpl.PARENT_ID));
 	}
 
