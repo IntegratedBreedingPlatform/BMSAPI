@@ -5,12 +5,16 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.ibp.api.java.impl.middleware.common.ContextResolver;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -31,6 +35,7 @@ import java.util.List;
 public class WorkbenchUserDetailsServiceTest {
 
 	private static final String TEST_USER = "testUser";
+	public static final String CROP_NAME = "Maize";
 
 	@Mock
 	private UserService userService;
@@ -38,9 +43,25 @@ public class WorkbenchUserDetailsServiceTest {
 	@Mock
 	private PermissionService permissionService;
 
+	@Mock
+	private ContextResolver contextResolver;
+
+	@Mock
+	private WorkbenchDataManager workbenchDataManager;
+
 	@InjectMocks
 	private WorkbenchUserDetailsService service = new WorkbenchUserDetailsService();
+	public static final String PROGRAM_UUID = "1234567";
 
+	@Before
+	public void setUp() {
+		Mockito.when(this.contextResolver.resolveCropNameFromUrl()).thenReturn(CROP_NAME);
+		Mockito.when(this.contextResolver.resolveProgramUuidFromRequest()).thenReturn(PROGRAM_UUID);
+
+		final Project project = new Project();
+		project.setProjectId(new Long(1));
+		Mockito.when(this.workbenchDataManager.getProjectByUuid(PROGRAM_UUID)).thenReturn(project);
+	}
 
 	@Test
 	public void testLoadUserByUserName() {
@@ -60,7 +81,7 @@ public class WorkbenchUserDetailsServiceTest {
 			final PermissionDto permissionDto = new PermissionDto();
 			permissionDto.setName("ADMIN");
 			final List<PermissionDto> permissions = Lists.newArrayList(permissionDto);
-			Mockito.when(this.permissionService.getPermissions(testUserWorkbench.getUserid(),null,null)).thenReturn(permissions);
+			Mockito.when(this.permissionService.getPermissions(testUserWorkbench.getUserid(),CROP_NAME,1)).thenReturn(permissions);
 
 			UserDetails userDetails = this.service.loadUserByUsername(WorkbenchUserDetailsServiceTest.TEST_USER);
 			Assert.assertEquals(testUserWorkbench.getName(), userDetails.getUsername());
