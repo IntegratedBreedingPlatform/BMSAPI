@@ -7,7 +7,6 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
-import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -357,14 +356,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
 		this.germplasmValidator.validateGermplasmId(this.errors, Integer.valueOf(gid));
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 		this.attributeValidator.validateAttributeIds(this.errors, attributeDbIds);
 		if (this.errors.hasErrors()) {
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 	}
 }

@@ -31,7 +31,7 @@ public class AttributeValidator {
 
 		final List<Attribute> attributes = this.germplasmDataManager.getAttributeByIds(ids);
 		if (attributes.size() != attributeIds.size()) {
-			errors.reject("attributes.invalid", "");
+			errors.reject("attribute.invalid", "");
 			return;
 		}
 	}
