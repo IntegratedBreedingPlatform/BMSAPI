@@ -17,7 +17,7 @@ public class AttributeValidator {
 	private GermplasmDataManager germplasmDataManager;
 
 	public void validateAttributeIds(final BindingResult errors, final List<String> attributeIds) {
-		if (attributeIds == null) {
+		if (attributeIds == null || attributeIds.isEmpty()) {
 			return;
 		}
 
