@@ -2,9 +2,11 @@ package org.ibp.api.brapi.v1.germplasm;
 
 import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.List;
 
+@AutoProperty
 public class GermplasmAttributes {
 
 	private List<AttributeDTO> data;

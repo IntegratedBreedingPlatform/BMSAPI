@@ -22,7 +22,7 @@ public interface GermplasmService {
 
 	GermplasmSummary getGermplasm(String germplasmId);
 
-	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, final Boolean includeSiblings);
+	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, Boolean includeSiblings);
 
 	ProgenyDTO getProgeny(Integer germplasmDbId);
 
@@ -36,12 +36,12 @@ public interface GermplasmService {
 
 	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
-	long countGermplasmByStudy(final Integer studyDbId);
+	long countGermplasmByStudy(Integer studyDbId);
 
 	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, int pageSize, int pageNumber);
 
 	List<AttributeDTO> getAttributesByGid(
-		final String gid, final List<String> attributeDbIds, final Integer pageSize, Integer pageNUmber);
+		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNUmber);
 
-	long countAttributesByGid(String gid, final List<String> attributeDbIds);
+	long countAttributesByGid(String gid, List<String> attributeDbIds);
 }

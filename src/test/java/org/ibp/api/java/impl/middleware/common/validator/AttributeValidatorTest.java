@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
@@ -40,7 +41,7 @@ public class AttributeValidatorTest {
 	public void testForInvalidAttributeId() throws MiddlewareQueryException {
 
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
-		final Integer attributeById = 1;
+		final Integer attributeById = Integer.valueOf(RandomStringUtils.randomNumeric(1));
 
 		Mockito.doReturn(null).when(this.germplasmDataManager).getAttributeById(attributeById);
 
