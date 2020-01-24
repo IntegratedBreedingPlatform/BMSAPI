@@ -337,6 +337,21 @@
         "versions": [
           "2.0"
         ]
-      }
+      },
+    {
+      "call": "/germplasm/{germplasmDbId}/attributes",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "versions": [
+        "1.3"
+      ]
+    }
     ]
 }
