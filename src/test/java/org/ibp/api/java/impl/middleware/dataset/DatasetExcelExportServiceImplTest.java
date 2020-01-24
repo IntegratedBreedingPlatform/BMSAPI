@@ -133,7 +133,7 @@ public class DatasetExcelExportServiceImplTest {
 			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
 		verify(this.studyValidator).validate(this.study.getId(), false);
-		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId(), false);
+		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId());
 		verify(this.instanceValidator).validate(this.dataSetDTO.getDatasetId(), instanceIds);
 		assertSame(result, zipFile);
 	}

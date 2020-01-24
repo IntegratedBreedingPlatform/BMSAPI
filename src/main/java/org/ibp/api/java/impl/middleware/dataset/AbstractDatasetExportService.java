@@ -70,7 +70,7 @@ public abstract class AbstractDatasetExportService {
 
 	protected void validate(final int studyId, final int datasetId, final Set<Integer> instanceIds) {
 		this.studyValidator.validate(studyId, false);
-		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId);
 		this.instanceValidator.validate(datasetId, instanceIds);
 	}
 
