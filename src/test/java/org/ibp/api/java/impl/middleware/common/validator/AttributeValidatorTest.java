@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class AttributeValidatorTest {
 
@@ -53,11 +54,12 @@ public class AttributeValidatorTest {
 	public void testForValidProgramId() throws MiddlewareQueryException {
 
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
-		final Integer attributeById = 1;
+		final Integer attributeById = Integer.valueOf(RandomStringUtils.randomNumeric(1));
 
 		final Attribute attribute = new Attribute();
-		attribute.setAid(1);
-		Mockito.doReturn(attribute).when(this.germplasmDataManager).getAttributeById(attributeById);
+		attribute.setAid(attributeById);
+		List<Attribute> attributeLists = Lists.newArrayList(attribute);
+		Mockito.doReturn(attributeLists).when(this.germplasmDataManager).getAttributeByIds(Lists.newArrayList(attributeById));
 
 		this.attributeValidator.validateAttributeIds(bindingResult, Lists.newArrayList(String.valueOf(attributeById)));
 
