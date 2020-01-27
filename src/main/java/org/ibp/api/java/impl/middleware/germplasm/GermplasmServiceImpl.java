@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import com.google.common.collect.Sets;
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -31,7 +32,10 @@ import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.domain.germplasm.PedigreeTreeNode;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +52,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class GermplasmServiceImpl implements GermplasmService {
+
+	@Autowired
+	private GermplasmValidator germplasmValidator;
+
+	@Autowired
+	private AttributeValidator attributeValidator;
+
+	private BindingResult errors;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -331,4 +343,27 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
+	@Override
+	public List<AttributeDTO> getAttributesByGid(
+		final String gid, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
+		this.validateGidAndAttributes(gid, attributeDbIds);
+		return this.germplasmDataManager.getAttributesByGid(gid, attributeDbIds, pageSize, pageNumber);
+	}
+
+	@Override
+	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
+		return this.germplasmDataManager.countAttributesByGid(gid, attributeDbIds);
+	}
+
+	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
+		this.germplasmValidator.validateGermplasmId(this.errors, Integer.valueOf(gid));
+		if (this.errors.hasErrors()) {
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+		this.attributeValidator.validateAttributeIds(this.errors, attributeDbIds);
+		if (this.errors.hasErrors()) {
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+	}
 }
