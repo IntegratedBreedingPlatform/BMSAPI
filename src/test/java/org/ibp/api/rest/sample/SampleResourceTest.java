@@ -52,7 +52,7 @@ public class SampleResourceTest extends ApiUnitTestBase {
 
 		Mockito.when(this.sampleService.filter(null, null, null)).thenReturn(list);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?obsUnitId=" + obsUnitId).contentType(this.contentType)) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/programs/{programUUID}/samples?obsUnitId=" + obsUnitId, this.cropName, this.programUuid).contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(jsonPath("$", Matchers.empty())) //
@@ -71,7 +71,7 @@ public class SampleResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(list).when(sampleService).filter(anyString(), Mockito.isNull(Integer.class), org.mockito.Matchers.any(Pageable.class));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?obsUnitId=" + obsUnitId).contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/programs/{programUUID}/samples?obsUnitId=" + obsUnitId, this.cropName, this.programUuid).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andExpect(jsonPath("$", IsCollectionWithSize.hasSize(list.size()))) //

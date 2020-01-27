@@ -87,7 +87,7 @@ public class PresetResourceTest extends ApiUnitTestBase {
 
 		doReturn(savedPresetDTO).when(this.bmsapiPresetService).savePreset(this.cropName, presetDTO);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.put("/crops/{crop}/presets", this.cropName).contentType(this.contentType)
+		this.mockMvc.perform(MockMvcRequestBuilders.put("/crops/{cropname}/programs/{programUUID}/presets", this.cropName, this.programUUID).contentType(this.contentType)
 				.content(this.convertObjectToByte(presetDTO))).andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(savedPresetDTO.getId())));
@@ -99,7 +99,7 @@ public class PresetResourceTest extends ApiUnitTestBase {
 		final List<PresetDTO> presetDTOs = Arrays.asList(buildPresetDTO());
 		doReturn(presetDTOs).when(this.bmsapiPresetService).getPresets(programUUID, toolId, toolSection);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/presets", this.cropName).param("programUUID", programUUID)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/programs/{programUUID}/presets", this.cropName, this.programUUID)
 				.param("toolId", String.valueOf(toolId)).param("toolSection", toolSection)).andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(presetDTOs.size())));
@@ -110,7 +110,7 @@ public class PresetResourceTest extends ApiUnitTestBase {
 
 		doNothing().when(this.bmsapiPresetService).deletePreset(this.cropName, 1);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/crops/{crop}/presets/{presetId}", this.cropName, 1))
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/crops/{cropname}/programs/{programUUID}/presets/{presetId}", this.cropName, this.programUUID, 1))
 				.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 

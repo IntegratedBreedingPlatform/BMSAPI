@@ -71,9 +71,6 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	@Autowired
 	protected OntologyVariableDataManager ontologyVariableDataManager;
 
-	@Autowired
-	private ContextUtil contextUtil;
-
 	@Before
 	public void setup() throws Exception {
 		super.setUp();
@@ -92,7 +89,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		project.setUniqueID(FormulaResourceTest.PROGRAM_UUID);
 		project.setProjectId(1l);
 		ContextHolder.setCurrentCrop(this.cropName);
-		doReturn(this.programUuid).when(this.contextUtil).getCurrentProgramUUID();
+		ContextHolder.setCurrentProgram(this.programUuid);
 		Mockito.doReturn(project).when(workbenchDataManager).getLastOpenedProjectAnyUser();
 	}
 
@@ -117,7 +114,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		when(this.termDataManager.getTermByNameAndCvId(inputName, CvId.VARIABLES.getId())).thenReturn(term);
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -139,7 +136,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(new Term()).when(this.termDataManager).getTermByName(anyString());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -157,7 +154,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		formulaDto.setDefinition("{{1}}");
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -178,7 +175,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(null).when(this.termDataManager).getTermById(anyInt());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -204,7 +201,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(null).when(this.termDataManager).getTermByNameAndCvId(inputName, CvId.VARIABLES.getId());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -231,7 +228,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 			.when(this.ontologyVariableDataManager).getVariableTypes(anyInt());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -260,7 +257,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doThrow(new JexlException(null, ERROR_JEXL_EXCEPTION)).when(this.processor).evaluateFormula(anyString(), anyMapOf(String.class, Object.class));
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -283,7 +280,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(false).when(this.ontologyVariableDataManager).isVariableUsedInStudy(formulaDto.getTarget().getId());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId)) //
+			.perform(MockMvcRequestBuilders.delete("/crops/{cropname}/formula/{formulaId}?programUUID=" + this.programUuid, this.cropName, formulaId)) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.status().isNoContent()) //
 		;
@@ -301,7 +298,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(true).when(this.ontologyVariableDataManager).isVariableUsedInStudy(formulaDto.getTarget().getId());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId)) //
+			.perform(MockMvcRequestBuilders.delete("/crops/{cropname}/formula/{formulaId}?programUUID=" + this.programUuid, this.cropName, formulaId)) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.status().isNoContent())
 		;
@@ -322,7 +319,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(formula).when(this.service).getById(formulaId);
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId) //
+			.perform(MockMvcRequestBuilders.put("/crops/{cropname}/formula/{formulaId}?programUUID=" + this.programUuid, this.cropName, formulaId) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -346,7 +343,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(Optional.absent()).when(this.service).getById(formulaId);
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId) //
+			.perform(MockMvcRequestBuilders.put("/crops/{cropname}/formula/{formulaId}?programUUID=" + this.programUuid, this.cropName, formulaId) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
