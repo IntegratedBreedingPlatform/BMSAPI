@@ -33,30 +33,34 @@ public class LotListValidator {
 		}
 
 		//Validate that none of the elements in the list is null
-		if (lotList.stream().filter(Objects::nonNull).collect(Collectors.toList()).size() != lotList.size()){
+		if (filterNonNullElements(lotList).size() != lotList.size()) {
 			errors.reject("lot.input.list.item.null", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		//Validate gids. All of them must: 1) not be null, 2) exists
+		this.validateGermplasmList(lotList);
+		this.validateStorageLocations(lotList);
+
+	}
+
+	private void validateGermplasmList(final List<LotItemDto> lotList) {
 		final List<Integer> gids = lotList.stream().map(LotItemDto::getGid).distinct().collect(Collectors.toList());
-		if (gids.stream().filter(Objects::nonNull).collect(Collectors.toList()).size() != gids.size()){
+		if (filterNonNullElements(gids).size() != gids.size()) {
 			errors.reject("lot.input.list.gid.null", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		final List<Germplasm> germplasms = germplasmDataManager.getGermplasms(gids);
-		if (germplasms.size()!= gids.size()) {
+		if (germplasms.size() != gids.size()) {
 			final List<Integer> existingGids = germplasms.stream().map(Germplasm::getGid).collect(Collectors.toList());
 			List<Integer> invalidGids = new ArrayList<>(gids);
 			invalidGids.removeAll(existingGids);
-			errors.reject("lot.input.invalid.gids", new String[]{this.buildErrorMessageFromList(invalidGids)}, "");
+			errors.reject("lot.input.invalid.gids", new String[] {this.buildErrorMessageFromList(invalidGids)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+	}
 
-		if (this.errors.hasErrors()) {
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
+	private void validateStorageLocations(final List<LotItemDto> lotList) {
 
 	}
 
@@ -72,6 +76,10 @@ public class LotListValidator {
 		}
 
 		return stringBuilder.toString();
+	}
+
+	private <T> List<T> filterNonNullElements(final List<T> list) {
+		return list.stream().filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 }
