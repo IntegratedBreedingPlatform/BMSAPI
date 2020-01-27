@@ -107,7 +107,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		variableFilter.setProgramUuid(this.programUuid);
 		Mockito.doReturn(variables).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/variables?programId=" + this.programUuid, this.cropName)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/variables?programUUID=" + this.programUuid, this.cropName)
 			.contentType(this.contentType)).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(variables.size())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is(String.valueOf(variables.get(0).getId()))))
@@ -131,7 +131,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * get variable by given id with status code 200 : Ok
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -154,7 +154,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(
-				MockMvcRequestBuilders.get("/ontology/{cropname}/variables/{id}?programId=" + this.programUuid, this.cropName,
+				MockMvcRequestBuilders.get("/crops/{cropname}/variables/{id}?programUUID=" + this.programUuid, this.cropName,
 					ontologyVariable.getId()).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -188,7 +188,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * add new variable and return new generated variable Id with status code 201 : Created
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -237,7 +237,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.post("/ontology/{cropname}/variables?programId=" + this.programUuid, this.cropName)
+						MockMvcRequestBuilders.post("/crops/{cropname}/variables?programUUID=" + this.programUuid, this.cropName)
 								.contentType(this.contentType).content(this.convertObjectToByte(variableDetails)))
 				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(String.valueOf(variableTerm.getId()))));
@@ -248,7 +248,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * update variable using given Id and data if exist and return status code 204 : No Content
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -297,7 +297,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 				.perform(
 						MockMvcRequestBuilders
-								.put("/ontology/{cropname}/variables/{id}?programId=" + this.programUuid, this.cropName,
+								.put("/crops/{cropname}/variables/{id}?programUUID=" + this.programUuid, this.cropName,
 										variableTerm.getId()).contentType(this.contentType)
 								.content(this.convertObjectToByte(variableDetails))).andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -308,7 +308,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * delete variable using given Id if exist and return status code 204 : No Content
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -326,7 +326,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.delete("/ontology/{cropname}/variables/{id}", this.cropName, ontologyVariable.getId())
+						MockMvcRequestBuilders.delete("/crops/{cropname}/variables/{id}?programUUID=" + this.programUuid, this.cropName, ontologyVariable.getId())
 								.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isNoContent())
 				.andDo(MockMvcResultHandlers.print());
 

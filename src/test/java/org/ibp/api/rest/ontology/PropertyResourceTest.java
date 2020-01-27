@@ -63,7 +63,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * Get All properties. It should respond with 200.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -74,7 +74,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(propertyList).when(this.ontologyPropertyDataManager).getAllProperties();
 
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/properties", this.cropName).contentType(this.contentType))
+				.perform(MockMvcRequestBuilders.get("/crops/{cropname}/properties?programUUID=" + this.programUuid, this.cropName).contentType(this.contentType))
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(propertyList.size())))
@@ -91,7 +91,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * Get All properties that have given class. It should respond with 200.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -105,7 +105,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.get("/ontology/{cropname}/properties?class=" + className, this.cropName).contentType(
+						MockMvcRequestBuilders.get("/crops/{cropname}/properties?programUUID=" + this.programUuid +"&class=" + className, this.cropName).contentType(
 								this.contentType))
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
@@ -137,7 +137,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.get("/ontology/{cropname}/properties/{id}", this.cropName, property.getId()).contentType(
+						MockMvcRequestBuilders.get("/crops/{cropname}/properties/{id}?programUUID=" + this.programUuid, this.cropName, property.getId()).contentType(
 								this.contentType)).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(property.getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(property.getName())))
@@ -159,7 +159,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(null).when(this.termDataManager).getTermById(1);
 
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/properties/{id}", this.cropName, 1).contentType(this.contentType))
+				.perform(MockMvcRequestBuilders.get("/crops/{cropname}/properties/{id}?programUUID=" + this.programUuid, this.cropName, 1).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.termDataManager, Mockito.times(1)).getTermById(1);
@@ -167,7 +167,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 	/*
 	 * This test should expect 201 : Created*
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -196,7 +196,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.post("/ontology/{cropname}/properties", this.cropName).contentType(this.contentType)
+						MockMvcRequestBuilders.post("/crops/{cropname}/properties?programUUID=" + this.programUuid, this.cropName).contentType(this.contentType)
 								.content(this.convertObjectToByte(propertyDetails))).andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(property.getId()))))
 				.andDo(MockMvcResultHandlers.print());
@@ -206,7 +206,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 	/*
 	 * This test should expect 204 : No Content*
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -225,7 +225,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.put("/ontology/{cropname}/properties/{id}", this.cropName, property.getId())
+						MockMvcRequestBuilders.put("/crops/{cropname}/properties/{id}?programUUID=" + this.programUuid, this.cropName, property.getId())
 								.contentType(this.contentType).content(this.convertObjectToByte(propertyDetails)))
 				.andExpect(MockMvcResultMatchers.status().isNoContent()).andDo(MockMvcResultHandlers.print());
 
@@ -250,7 +250,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.delete("/ontology/{cropname}/properties/{id}", this.cropName, property.getId()).contentType(
+						MockMvcRequestBuilders.delete("/crops/{cropname}/properties/{id}?programUUID=" + this.programUuid, this.cropName, property.getId()).contentType(
 								this.contentType)).andExpect(MockMvcResultMatchers.status().isNoContent())
 				.andDo(MockMvcResultHandlers.print());
 

@@ -70,7 +70,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(methodList).when(this.ontologyMethodDataManager).getAllMethods();
 
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/methods", this.cropName).contentType(this.contentType))
+				.perform(MockMvcRequestBuilders.get("/crops/{cropname}/methods?programUUID=" + this.programUuid, this.cropName).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(methodList.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Is.is(String.valueOf(methodList.get(0).getId()))))
@@ -102,7 +102,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.get("/ontology/{cropname}/methods/{id}", this.cropName, method.getId()).contentType(
+						MockMvcRequestBuilders.get("/crops/{cropname}/methods/{id}?programUUID=" + this.programUuid, this.cropName, method.getId()).contentType(
 								this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Is.is(String.valueOf(method.getId()))))
@@ -134,7 +134,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(null).when(this.termDataManager).getTermById(1);
 
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/methods/{id}", this.cropName, 1).contentType(this.contentType))
+				.perform(MockMvcRequestBuilders.get("/crops/{cropname}/methods/{id}?programUUID=" + this.programUuid, this.cropName, 1).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.termDataManager, Mockito.times(1)).getTermById(1);
@@ -172,7 +172,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.post("/ontology/{cropname}/methods", this.cropName).contentType(this.contentType)
+						MockMvcRequestBuilders.post("/crops/{cropname}/methods?programUUID=" + this.programUuid, this.cropName).contentType(this.contentType)
 								.content(this.convertObjectToByte(methodDetails))).andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Is.is(String.valueOf(method.getId()))))
 				.andDo(MockMvcResultHandlers.print());
@@ -206,7 +206,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.put("/ontology/{cropname}/methods/{id}", this.cropName, method.getId())
+						MockMvcRequestBuilders.put("/crops/{cropname}/methods/{id}?programUUID=" + this.programUuid, this.cropName, method.getId())
 								.contentType(this.contentType).content(this.convertObjectToByte(methodDetails)))
 				.andExpect(MockMvcResultMatchers.status().isNoContent()).andDo(MockMvcResultHandlers.print());
 
@@ -236,7 +236,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.delete("/ontology/{cropname}/methods/{id}", this.cropName, method.getId()).contentType(
+						MockMvcRequestBuilders.delete("/crops/{cropname}/methods/{id}?programUUID=" + this.programUuid, this.cropName, method.getId()).contentType(
 								this.contentType)).andExpect(MockMvcResultMatchers.status().isNoContent())
 				.andDo(MockMvcResultHandlers.print());
 
