@@ -295,6 +295,10 @@ public class StudyServiceImpl implements StudyService {
 		this.observationValidator = observationValidator;
 	}
 
+	void setStudyValidator(final StudyValidator studyValidator) {
+		this.studyValidator = studyValidator;
+	}
+
 	@Override
 	public String getProgramUUID(final Integer studyIdentifier) {
 		return this.middlewareStudyService.getProgramUUID(studyIdentifier);
