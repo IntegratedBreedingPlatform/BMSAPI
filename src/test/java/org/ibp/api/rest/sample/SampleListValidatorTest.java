@@ -1,10 +1,15 @@
 package org.ibp.api.rest.sample;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.service.api.SampleListService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.ObjectError;
 
@@ -15,7 +20,17 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class SampleListValidatorTest {
 
+	@Mock
+	private SampleListService sampleListServiceMW;
+
+	@InjectMocks
 	private final SampleListValidator validator = new SampleListValidator();
+
+	@Before
+	public void setUp() {
+		ContextHolder.setCurrentProgram("23487325-dwfkjfsfdsaf-32874829374");
+		ContextHolder.setCurrentCrop("maize");
+	}
 
 	@Test
 	public void testValidateSampleListSuccess() {
