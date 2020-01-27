@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -45,9 +46,6 @@ public class DatasetValidatorTest {
 	private DatasetService studyDatasetService;
 
 	@Mock
-	private ContextUtil contextUtil;
-
-	@Mock
 	private DatasetTypeService datasetTypeService;
 
 	@InjectMocks
@@ -56,8 +54,9 @@ public class DatasetValidatorTest {
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		Mockito.doReturn(this.PROGRAM_UUID).when(this.contextUtil).getCurrentProgramUUID();
-
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
+		ContextHolder.setCurrentCrop("maize");
+		
 		final DatasetTypeDTO plotDatasetType = new DatasetTypeDTO(DatasetTypeEnum.PLOT_DATA.getId(), "PLOT_DATA");
 		plotDatasetType.setObservationType(true);
 		plotDatasetType.setSubObservationType(false);
@@ -225,7 +224,7 @@ public class DatasetValidatorTest {
 		final StandardVariable standardVariable = this.createStandardVariable(existingTraitId);
 		this.createDataset(datasetId, Optional.of(existingTraitId));
 		when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
-		
+
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
 		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
 	}
@@ -242,7 +241,7 @@ public class DatasetValidatorTest {
 		final StandardVariable standardVariable = this.createStandardVariable(variableId);
 		this.createDataset(datasetId, Optional.of(variableId));
 		when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
-		
+
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
 		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, true);
 	}

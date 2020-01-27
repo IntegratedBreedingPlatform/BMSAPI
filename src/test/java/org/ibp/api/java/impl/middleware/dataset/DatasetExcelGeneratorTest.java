@@ -1,10 +1,12 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -67,6 +69,7 @@ public class DatasetExcelGeneratorTest {
 	private static final String VARIABLE_VALUE_1 = "VARIABLE_VALUE_1";
 	private static final String VARIABLE_VALUE_2 = "VARIABLE_VALUE_2";
 	private static final int valueIndex = 7;
+	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphabetic(10);
 
 	private List<ObservationUnitRow> observationUnitRows;
 
@@ -85,9 +88,6 @@ public class DatasetExcelGeneratorTest {
 
 	@Mock
 	private OntologyDataManager ontologyDataManager;
-
-	@Mock
-	private ContextUtil contextUtil;
 
 	@InjectMocks
 	private DatasetExcelGenerator datasetExcelGenerator;
@@ -198,6 +198,9 @@ public class DatasetExcelGeneratorTest {
 
 		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
 		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
+
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
+		ContextHolder.setCurrentCrop("maize");
 	}
 
 	@Test
@@ -349,7 +352,7 @@ public class DatasetExcelGeneratorTest {
 
 		final StandardVariable standardVariable =
 			StandardVariableTestDataInitializer.createStandardVariable(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME");
-		when(this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID()))
+		when(this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), PROGRAM_UUID))
 			.thenReturn(standardVariable);
 		final Map<Integer, String> geoLocationMap = new HashMap<>();
 		geoLocationMap.put(someVariableTermId, someVariableValue);
@@ -377,7 +380,7 @@ public class DatasetExcelGeneratorTest {
 
 		final StandardVariable standardVariable =
 			StandardVariableTestDataInitializer.createStandardVariable(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME");
-		when(this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID()))
+		when(this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), PROGRAM_UUID))
 			.thenReturn(standardVariable);
 
 		final MeasurementVariable result = this.datasetExcelGenerator.createLocationNameVariable("Alias", "Philippines");

@@ -1,6 +1,7 @@
 package org.ibp.api.rest.dataset.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.doReturn;
 public class StudyValidatorTest {
 
 	private static final int USER_ID = 10;
-
+	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphabetic(10);
 	@Mock
 	private SecurityService securityService;
 
@@ -46,6 +47,8 @@ public class StudyValidatorTest {
 
 	@Before
 	public void setup() {
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
+		ContextHolder.setCurrentCrop("maize");
 	}
 
 	@Test (expected = ResourceNotFoundException.class)
@@ -80,6 +83,7 @@ public class StudyValidatorTest {
 		study.setId(studyId);
 		study.setLocked(true);
 		study.setCreatedBy(String.valueOf(USER_ID));
+		study.setProgramUUID(PROGRAM_UUID);
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		studyValidator.validate(studyId, true);
 	}
@@ -95,6 +99,7 @@ public class StudyValidatorTest {
 		study.setId(studyId);
 		study.setLocked(true);
 		study.setCreatedBy("1");
+		study.setProgramUUID(PROGRAM_UUID);
 
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		studyValidator.validate(studyId, true);
@@ -108,6 +113,7 @@ public class StudyValidatorTest {
 		study.setId(studyId);
 		study.setLocked(false);
 		study.setCreatedBy("1");
+		study.setProgramUUID(PROGRAM_UUID);
 
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
@@ -141,6 +147,7 @@ public class StudyValidatorTest {
 		study.setId(studyId);
 		study.setLocked(false);
 		study.setCreatedBy("1");
+		study.setProgramUUID(PROGRAM_UUID);
 
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
@@ -169,6 +176,7 @@ public class StudyValidatorTest {
 		study.setId(studyId);
 		study.setLocked(false);
 		study.setCreatedBy("1");
+		study.setProgramUUID(PROGRAM_UUID);
 
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		studyValidator.validate(studyId, ran.nextBoolean(), false);

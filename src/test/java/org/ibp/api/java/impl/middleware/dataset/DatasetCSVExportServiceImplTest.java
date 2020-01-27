@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.ZipUtil;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -62,6 +63,8 @@ public class DatasetCSVExportServiceImplTest {
 	private static final String TEST_ENTRY_DESCRIPTION = "Test Entry";
 	private static final String TEST_ENTRY_NAME = "T";
 	private static final Integer LOCATION_ID = 1;
+	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphabetic(10);
+
 	@Mock
 	private StudyValidator studyValidator;
 
@@ -94,9 +97,6 @@ public class DatasetCSVExportServiceImplTest {
 
 	@Mock
 	private OntologyDataManager ontologyDataManager;
-
-	@Mock
-	private ContextUtil contextUtil;
 
 	@InjectMocks
 	private DatasetCSVExportServiceImpl datasetExportService;
@@ -135,8 +135,10 @@ public class DatasetCSVExportServiceImplTest {
 		enumeration.setName(TEST_ENTRY_NAME);
 		standardVariable.setEnumerations(Arrays.asList(enumeration));
 		when(this.ontologyDataManager
-			.getStandardVariable(TermId.ENTRY_TYPE.getId(), this.contextUtil.getCurrentProgramUUID())).thenReturn(standardVariable);
+			.getStandardVariable(TermId.ENTRY_TYPE.getId(), PROGRAM_UUID)).thenReturn(standardVariable);
 
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
+		ContextHolder.setCurrentCrop("maize");
 	}
 
 	@Test
