@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
@@ -110,5 +111,14 @@ public class LotResource {
 		@ApiParam("Lot to be created")
 		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
 		return new ResponseEntity<>(lotService.saveLot(lotGeneratorInputDto), HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Create list of lots with an initial balance", notes = "Create list of lots with an initial balance")
+	@RequestMapping(
+		value = "/crops/{crop}/lot-lists",
+		method = RequestMethod.POST)
+	public ResponseEntity<Void> importLotsWithInitialBalance(@PathVariable final String crop, @RequestBody final List<LotItemDto> lotList) {
+		this.lotService.importLotsWithInitialTransaction(lotList);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

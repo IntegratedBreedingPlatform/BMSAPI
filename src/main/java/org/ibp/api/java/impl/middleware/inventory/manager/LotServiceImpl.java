@@ -4,9 +4,11 @@ import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotListValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class LotServiceImpl implements LotService {
 
 	@Autowired
 	private LotInputValidator lotInputValidator;
+
+	@Autowired
+	private LotListValidator lotListValidator;
 
 	@Autowired
 	private SecurityService securityService;
@@ -65,5 +70,11 @@ public class LotServiceImpl implements LotService {
 		}
 
 		return lotService.saveLot(lotGeneratorInputDto, this.contextUtil.getProjectInContext().getCropType());
+	}
+
+	@Override
+	public void importLotsWithInitialTransaction(final List<LotItemDto> lotItemDtoList) {
+		this.lotListValidator.validate(lotItemDtoList);
+		this.lotService.saveLotsWithInitialTransaction(lotItemDtoList);
 	}
 }
