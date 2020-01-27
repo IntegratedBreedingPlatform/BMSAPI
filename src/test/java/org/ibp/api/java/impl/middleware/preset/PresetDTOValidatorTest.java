@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.preset;
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.constant.ToolSection;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.ApiUnitTestBase;
@@ -66,6 +67,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@Before
 	public void init() {
 		programUUID = RandomStringUtils.randomAlphabetic(10);
+		ContextHolder.setCurrentProgram(this.programUUID);
 		name = RandomStringUtils.randomAlphabetic(10);
 		toolSection = ToolSection.DATASET_LABEL_PRINTING_PRESET.name();
 		toolId = 23;
