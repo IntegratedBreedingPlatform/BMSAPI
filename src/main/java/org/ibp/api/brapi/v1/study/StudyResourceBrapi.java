@@ -15,7 +15,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
-import org.generationcp.middleware.service.api.study.VariableDto;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -287,7 +287,7 @@ public class StudyResourceBrapi {
 	@ApiOperation(value = "Get studies observation variables by studyDbId", notes = "Get studies observation variables by studyDbId")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationvariables", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<EntityListResponse<VariableDto>> getObservationVariables(final HttpServletResponse response,
+	public ResponseEntity<EntityListResponse<VariableDTO>> getObservationVariables(final HttpServletResponse response,
 		@PathVariable final String crop, @PathVariable final int studyDbId,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
@@ -296,8 +296,8 @@ public class StudyResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
 
-		final PagedResult<VariableDto> resultPage =
-			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDto>() {
+		final PagedResult<VariableDTO> resultPage =
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
 
 				@Override
 				public long getCount() {
@@ -305,14 +305,14 @@ public class StudyResourceBrapi {
 				}
 
 				@Override
-				public List<VariableDto> getResults(final PagedResult<VariableDto> pagedResult) {
+				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return StudyResourceBrapi.this.studyService
 						.getVariablesByStudyId(pagedResult.getPageSize(), pageNumber, studyDbId, crop);
 				}
 			});
 
-		final List<VariableDto> observationVariables = resultPage.getPageResults();
+		final List<VariableDTO> observationVariables = resultPage.getPageResults();
 
 		final String studyName = this.studyService.getStudyReference(studyDbId).getName();
 		final ObservationVariableResult result = new ObservationVariableResult().withData(observationVariables).withStudyId(studyDbId)
@@ -322,7 +322,7 @@ public class StudyResourceBrapi {
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
-		final EntityListResponse<VariableDto> entityListResponse = new EntityListResponse<>(metadata, result);
+		final EntityListResponse<VariableDTO> entityListResponse = new EntityListResponse<>(metadata, result);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}

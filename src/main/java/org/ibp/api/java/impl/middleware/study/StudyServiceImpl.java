@@ -25,7 +25,7 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestD
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.VariableDto;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -537,7 +537,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<VariableDto> getVariablesByStudyId(final int pageSize, final int pageNumber, final int studyDbId,
+	public List<VariableDTO> getVariablesByStudyId(final int pageSize, final int pageNumber, final int studyDbId,
 		final String cropname) {
 		this.studyValidator.validate(studyDbId, false);
 		return this.middlewareStudyService.getVariablesByStudyId(pageSize, pageNumber, studyDbId, Collections.unmodifiableList(
@@ -551,7 +551,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<VariableDto> getVariables(final int pageSize, final int pageNumber,
+	public List<VariableDTO> getVariables(final int pageSize, final int pageNumber,
 		final String cropname) {
 		return this.middlewareStudyService.getVariables(pageSize, pageNumber, Collections.unmodifiableList(
 			Arrays.asList(VariableType.TRAIT.getId())), cropname);

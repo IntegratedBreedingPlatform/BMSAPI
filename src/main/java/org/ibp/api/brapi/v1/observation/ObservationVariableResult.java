@@ -1,11 +1,11 @@
 package org.ibp.api.brapi.v1.observation;
 
-import org.generationcp.middleware.service.api.study.VariableDto;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.v1.common.Result;
 
 import java.util.List;
 
-public class ObservationVariableResult extends Result<VariableDto> {
+public class ObservationVariableResult extends Result<VariableDTO> {
 
 	private int studyId;
 	private String trialName;
@@ -37,7 +37,7 @@ public class ObservationVariableResult extends Result<VariableDto> {
 	}
 
 	@Override
-	public ObservationVariableResult withData(final List<VariableDto> data) {
+	public ObservationVariableResult withData(final List<VariableDTO> data) {
 		this.setData(data);
 		return this;
 	}

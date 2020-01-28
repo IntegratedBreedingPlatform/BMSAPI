@@ -3,7 +3,7 @@ package org.ibp.api.brapi.v1.variable;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.middleware.service.api.study.VariableDto;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -36,7 +36,7 @@ public class VariableResourceBrapi {
 	@ApiOperation(value = "Call to retrieve a list of observation variables available in the system.")
 	@RequestMapping(value = "/{crop}/brapi/v1/variables", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<EntityListResponse<VariableDto>> getAllVariables(final HttpServletResponse response,
+	public ResponseEntity<EntityListResponse<VariableDTO>> getAllVariables(final HttpServletResponse response,
 		@PathVariable final String crop,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
@@ -45,8 +45,8 @@ public class VariableResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
 
-		final PagedResult<VariableDto> resultPage =
-			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDto>() {
+		final PagedResult<VariableDTO> resultPage =
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
 
 				@Override
 				public long getCount() {
@@ -54,22 +54,22 @@ public class VariableResourceBrapi {
 				}
 
 				@Override
-				public List<VariableDto> getResults(final PagedResult<VariableDto> pagedResult) {
+				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return VariableResourceBrapi.this.studyService
 						.getVariables(pagedResult.getPageSize(), pageNumber, crop);
 				}
 			});
 
-		final List<VariableDto> observationVariables = resultPage.getPageResults();
+		final List<VariableDTO> observationVariables = resultPage.getPageResults();
 
-		final Result<VariableDto> result = new Result<VariableDto>().withData(observationVariables);
+		final Result<VariableDTO> result = new Result<VariableDTO>().withData(observationVariables);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
-		final EntityListResponse<VariableDto> entityListResponse = new EntityListResponse<>(metadata, result);
+		final EntityListResponse<VariableDTO> entityListResponse = new EntityListResponse<>(metadata, result);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}

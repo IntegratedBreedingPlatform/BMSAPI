@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.VariableDto;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -75,10 +75,10 @@ public interface StudyService {
 
 	long countVariablesByStudyId(int studyDbId);
 
-	List<VariableDto> getVariablesByStudyId(int pageSize, int pageNumber, int studyDbId, String cropname);
+	List<VariableDTO> getVariablesByStudyId(int pageSize, int pageNumber, int studyDbId, String cropname);
 
 	long countVariables();
 
-	List<VariableDto> getVariables(int pageSize, int pageNumber,
+	List<VariableDTO> getVariables(int pageSize, int pageNumber,
 		String cropname);
 }
