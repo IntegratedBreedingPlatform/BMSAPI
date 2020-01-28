@@ -23,7 +23,7 @@ public class LocationServiceImpl implements LocationService {
 	private LocationDataManager locationDataManager;
 
 	@Override
-	public List<LocationDto> getLocations(final Set<Integer> locationTypes, final String programUUID, final boolean favoriteLocations) {
+	public List<LocationDto> getLocations(final Set<Integer> locationTypes, final String programUUID, final boolean favoriteLocations, final List<String> locationAbbreviations) {
 		final List<org.generationcp.middleware.pojos.Location> locations;
 		final ModelMapper mapper = LocationMapper.getInstance();
 		List<Integer> locationIds = null;
@@ -32,7 +32,7 @@ public class LocationServiceImpl implements LocationService {
 			locationIds = locationDataManager.getFavoriteProjectLocationIds(programUUID);
 		}
 
-		locations = locationDataManager.getFilteredLocations(locationTypes, locationIds, programUUID);
+		locations = locationDataManager.getFilteredLocations(locationTypes, locationIds, programUUID, locationAbbreviations);
 
 		if(locations.isEmpty()){
 			return new ArrayList<>();
