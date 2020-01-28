@@ -67,12 +67,13 @@ public interface StudyService {
 
 	void updateStudy(final Study study);
 
-	long countVariablesByStudyId(int studyDbId);
+	long countVariablesByStudyId(final int studyDbId, final List<Integer> variableTypes);
 
-	List<VariableDTO> getVariablesByStudyId(int pageSize, int pageNumber, int studyDbId, String cropname);
+	List<VariableDTO> getVariablesByStudyId(final int pageSize, final int pageNumber, final int studyDbId, final String cropname,
+		final List<Integer> variableTypes);
 
-	long countVariables();
+	long countVariables(final List<Integer> variableTypes);
 
 	List<VariableDTO> getVariables(int pageSize, int pageNumber,
-		String cropname);
+		String cropname, final List<Integer> variableTypes);
 }

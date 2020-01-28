@@ -3,6 +3,7 @@ package org.ibp.api.brapi.v1.variable;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Api(value = "BrAPI Variable Services")
@@ -50,14 +53,16 @@ public class VariableResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return VariableResourceBrapi.this.studyService.countVariables();
+					return VariableResourceBrapi.this.studyService.countVariables(Collections.unmodifiableList(
+						Arrays.asList(VariableType.TRAIT.getId())));
 				}
 
 				@Override
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return VariableResourceBrapi.this.studyService
-						.getVariables(pagedResult.getPageSize(), pageNumber, crop);
+						.getVariables(pagedResult.getPageSize(), pageNumber, crop, Collections.unmodifiableList(
+							Arrays.asList(VariableType.TRAIT.getId())));
 				}
 			});
 

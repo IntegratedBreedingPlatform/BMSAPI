@@ -11,13 +11,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -52,6 +53,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -301,14 +303,16 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyService.countVariablesByStudyId(studyDbId);
+					return StudyResourceBrapi.this.studyService.countVariablesByStudyId(studyDbId, Collections.unmodifiableList(
+						Arrays.asList(VariableType.TRAIT.getId())));
 				}
 
 				@Override
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return StudyResourceBrapi.this.studyService
-						.getVariablesByStudyId(pagedResult.getPageSize(), pageNumber, studyDbId, crop);
+						.getVariablesByStudyId(pagedResult.getPageSize(), pageNumber, studyDbId, crop, Collections.unmodifiableList(
+							Arrays.asList(VariableType.TRAIT.getId())));
 				}
 			});
 

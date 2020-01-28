@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -44,8 +43,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -387,30 +384,26 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public long countVariablesByStudyId(final int studyDbId) {
+	public long countVariablesByStudyId(final int studyDbId, final List<Integer> variableTypes) {
 		this.studyValidator.validate(studyDbId, false);
-		return this.middlewareStudyService.countVariablesByStudyId(studyDbId, Collections.unmodifiableList(
-			Arrays.asList(VariableType.TRAIT.getId())));
+		return this.middlewareStudyService.countVariablesByStudyId(studyDbId, variableTypes);
 	}
 
 	@Override
 	public List<VariableDTO> getVariablesByStudyId(final int pageSize, final int pageNumber, final int studyDbId,
-		final String cropname) {
+		final String cropname, final List<Integer> variableTypes) {
 		this.studyValidator.validate(studyDbId, false);
-		return this.middlewareStudyService.getVariablesByStudyId(pageSize, pageNumber, studyDbId, Collections.unmodifiableList(
-			Arrays.asList(VariableType.TRAIT.getId())), cropname);
+		return this.middlewareStudyService.getVariablesByStudyId(pageSize, pageNumber, studyDbId, variableTypes, cropname);
 	}
 
 	@Override
-	public long countVariables() {
-		return this.middlewareStudyService.countVariables(Collections.unmodifiableList(
-			Arrays.asList(VariableType.TRAIT.getId())));
+	public long countVariables(final List<Integer> variableTypes) {
+		return this.middlewareStudyService.countVariables(variableTypes);
 	}
 
 	@Override
 	public List<VariableDTO> getVariables(final int pageSize, final int pageNumber,
-		final String cropname) {
-		return this.middlewareStudyService.getVariables(pageSize, pageNumber, Collections.unmodifiableList(
-			Arrays.asList(VariableType.TRAIT.getId())), cropname);
+		final String cropname, final List<Integer> variableTypes) {
+		return this.middlewareStudyService.getVariables(pageSize, pageNumber, variableTypes, cropname);
 	}
 }
