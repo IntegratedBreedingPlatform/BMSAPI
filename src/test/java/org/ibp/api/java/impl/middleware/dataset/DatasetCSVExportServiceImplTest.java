@@ -174,7 +174,7 @@ public class DatasetCSVExportServiceImplTest {
 		final File zipFile = new File("");
 
 		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables),
-			ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(), any(StudyInstance.class)))
+			ArgumentMatchers.anyList(), anyString(), any(StudyInstance.class)))
 			.thenReturn(new File(""));
 		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 		this.datasetExportService.setZipUtil(this.zipUtil);
@@ -191,7 +191,7 @@ public class DatasetCSVExportServiceImplTest {
 				this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
 		verify(this.datasetCSVGenerator, Mockito.times(studyInstanceMap.size()))
 			.generateSingleInstanceFile(
-				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(),
+				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.anyList(), anyString(),
 				any(StudyInstance.class));
 
 		verify(this.zipUtil).zipFiles(eq(this.study.getName()), anyListOf(File.class));
@@ -226,7 +226,7 @@ public class DatasetCSVExportServiceImplTest {
 		final File csvFile = new File("");
 
 		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables),
-			ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(), any(StudyInstance.class)))
+			ArgumentMatchers.anyList(), anyString(), any(StudyInstance.class)))
 			.thenReturn(csvFile);
 
 		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
@@ -242,7 +242,7 @@ public class DatasetCSVExportServiceImplTest {
 
 		verify(this.datasetCSVGenerator)
 			.generateSingleInstanceFile(
-				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(),
+				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.anyList(), anyString(),
 				any(StudyInstance.class));
 
 		verify(this.zipUtil, times(0)).zipFiles(anyString(), anyListOf(File.class));
@@ -296,14 +296,14 @@ public class DatasetCSVExportServiceImplTest {
 
 	@Test
 	public void testAddLocationIdValues() {
-		HashMap<Integer, StudyInstance> studyInstanceHashMap = new HashMap<>();
+		final HashMap<Integer, StudyInstance> studyInstanceHashMap = new HashMap<>();
 		studyInstanceHashMap.put(5, this.createStudyInstance(5));
 
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.createObservationUnitRowMap(TermId.LOCATION_ID.name(), "UNKNOWN");
 		this.datasetExportService.addLocationIdValues(observationUnitRowMap, studyInstanceHashMap);
 		final Map<String, ObservationUnitData> variables = observationUnitRowMap.get(5).get(0).getVariables();
 		Assert.assertEquals(2, variables.size());
-		Assert.assertEquals(this.LOCATION_ID.toString(), variables.get(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
+		Assert.assertEquals(LOCATION_ID.toString(), variables.get(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
 	}
 
 	@Test
@@ -338,7 +338,7 @@ public class DatasetCSVExportServiceImplTest {
 		studyInstance.setInstanceDbId(instanceId);
 		studyInstance.setInstanceNumber(this.random.nextInt());
 		studyInstance.setLocationName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
-		studyInstance.setLocationId(this.LOCATION_ID);
+		studyInstance.setLocationId(LOCATION_ID);
 		return studyInstance;
 	}
 

@@ -69,7 +69,7 @@ public class SampleResourceTest extends ApiUnitTestBase {
 				nextInt());
 		list.add(sample);
 
-		Mockito.doReturn(list).when(sampleService).filter(anyString(), Mockito.isNull(Integer.class), org.mockito.Matchers.any(Pageable.class));
+		Mockito.doReturn(list).when(this.sampleService).filter(anyString(), Mockito.isNull(Integer.class), org.mockito.Matchers.any(Pageable.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/programs/{programUUID}/samples?obsUnitId=" + obsUnitId, this.cropName, this.programUuid).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print()) //

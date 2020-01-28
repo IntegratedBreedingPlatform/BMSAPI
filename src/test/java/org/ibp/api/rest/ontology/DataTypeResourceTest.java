@@ -38,7 +38,7 @@ public class DataTypeResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllDataTypes() throws Exception {
 
-		List<DataType> dataTypes = new ArrayList<>();
+		final List<DataType> dataTypes = new ArrayList<>();
 		DataType dataType = TestDataProvider.NUMERICAL_DATA_TYPE;
 		dataTypes.add(dataType);
 		dataType = TestDataProvider.CATEGORICAL_DATA_TYPE;

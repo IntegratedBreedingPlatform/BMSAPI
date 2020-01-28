@@ -37,7 +37,7 @@ public class ClassResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllClasses() throws Exception {
 
-		List<String> classes = new ArrayList<>();
+		final List<String> classes = new ArrayList<>();
 		classes.add(TestDataProvider.MW_TERM_LIST.get(0).getName());
 		classes.add(TestDataProvider.MW_TERM_LIST.get(1).getName());
 		classes.add(TestDataProvider.MW_TERM_LIST.get(2).getName());

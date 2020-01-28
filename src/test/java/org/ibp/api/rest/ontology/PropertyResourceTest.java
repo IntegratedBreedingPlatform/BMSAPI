@@ -69,7 +69,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllProperties() throws Exception {
 
-		List<Property> propertyList = TestDataProvider.getTestProperties(3);
+		final List<Property> propertyList = TestDataProvider.getTestProperties(3);
 
 		Mockito.doReturn(propertyList).when(this.ontologyPropertyDataManager).getAllProperties();
 
@@ -97,9 +97,9 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllPropertiesUsingClass() throws Exception {
 
-		String className = "Agronomic";
+		final String className = "Agronomic";
 
-		List<Property> propertyList = TestDataProvider.getTestProperties(3);
+		final List<Property> propertyList = TestDataProvider.getTestProperties(3);
 
 		Mockito.doReturn(propertyList).when(this.ontologyPropertyDataManager).getAllPropertiesWithClass(className);
 
@@ -129,8 +129,8 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void getPropertyById() throws Exception {
 
-		Property property = TestDataProvider.getTestProperty();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Property property = TestDataProvider.getTestProperty();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
 		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId(), true);
@@ -173,7 +173,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void addProperty() throws Exception {
 
-		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
+		final PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
 		// Setting id as null to ignore checking editable field validation.
 		propertyDetails.setId(null);
 
@@ -184,10 +184,10 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		Mockito.doAnswer(new Answer<Void>() {
 
 			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				Object[] arguments = invocation.getArguments();
+			public Void answer(final InvocationOnMock invocation) {
+				final Object[] arguments = invocation.getArguments();
 				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
-					Property entity = (Property) arguments[0];
+					final Property entity = (Property) arguments[0];
 					entity.setId(property.getId());
 				}
 				return null;
@@ -212,11 +212,11 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void updateProperty() throws Exception {
 
-		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
-		Property property = TestDataProvider.getTestProperty();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
+		final Property property = TestDataProvider.getTestProperty();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
 
-		ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
+		final ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
@@ -240,8 +240,8 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void deleteProperty() throws Exception {
 
-		Property property = TestDataProvider.getTestProperty();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Property property = TestDataProvider.getTestProperty();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
 		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId(), true);

@@ -65,7 +65,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllMethods() throws Exception {
 
-		List<Method> methodList = TestDataProvider.getTestMethodList(3);
+		final List<Method> methodList = TestDataProvider.getTestMethodList(3);
 
 		Mockito.doReturn(methodList).when(this.ontologyMethodDataManager).getAllMethods();
 
@@ -95,7 +95,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void getMethodById() throws Exception {
 
-		Method method = TestDataProvider.getTestMethod();
+		final Method method = TestDataProvider.getTestMethod();
 
 		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager).getTermById(method.getId());
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId(), true);
@@ -160,10 +160,10 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		Mockito.doAnswer(new Answer<Void>() {
 
 			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				Object[] arguments = invocation.getArguments();
+			public Void answer(final InvocationOnMock invocation) {
+				final Object[] arguments = invocation.getArguments();
 				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
-					Method entity = (Method) arguments[0];
+					final Method entity = (Method) arguments[0];
 					entity.setId(method.getId());
 				}
 				return null;
@@ -188,16 +188,16 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void updateMethod() throws Exception {
 
-		MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
-		Method method = TestDataProvider.getTestMethod();
+		final MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
+		final Method method = TestDataProvider.getTestMethod();
 
 		/**
 		 * We Need equals method inside Method (Middleware) because it throws hashcode matching error. So Added ArgumentCaptor that will
 		 * implement equals()
 		 */
-		ArgumentCaptor<Method> captor = ArgumentCaptor.forClass(Method.class);
+		final ArgumentCaptor<Method> captor = ArgumentCaptor.forClass(Method.class);
 
-		Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(method.getId());
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermByNameAndCvId("method name", CvId.METHODS.getId());
@@ -212,7 +212,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 
 		Mockito.verify(this.ontologyMethodDataManager).updateMethod(captor.capture());
 
-		Method captured = captor.getValue();
+		final Method captured = captor.getValue();
 
 		Assert.assertEquals(method.getName(), captured.getName());
 		Assert.assertEquals(method.getDefinition(), captured.getDefinition());
@@ -226,8 +226,8 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void deleteMethod() throws Exception {
 
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Method method = TestDataProvider.getTestMethod();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Method method = TestDataProvider.getTestMethod();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(method.getId());
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId(), true);

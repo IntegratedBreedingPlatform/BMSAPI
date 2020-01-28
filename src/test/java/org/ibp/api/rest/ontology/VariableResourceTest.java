@@ -95,15 +95,15 @@ public class VariableResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllVariables() throws Exception {
 
-		List<Variable> variables = TestDataProvider.getTestVariables(4);
+		final List<Variable> variables = TestDataProvider.getTestVariables(4);
 
-		Project project = new Project();
+		final Project project = new Project();
 		project.setCropType(new CropType(this.cropName));
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
 
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(this.programUuid, this.cropName);
-		VariableFilter variableFilter = new VariableFilter();
+		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(this.programUuid);
 		Mockito.doReturn(variables).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
 
@@ -137,9 +137,9 @@ public class VariableResourceTest extends ApiUnitTestBase {
 	@Test
 	public void getVariableById() throws Exception {
 
-		Variable ontologyVariable = TestDataProvider.getTestVariable();
+		final Variable ontologyVariable = TestDataProvider.getTestVariable();
 
-		Project project = new Project();
+		final Project project = new Project();
 		project.setCropType(new CropType(this.cropName));
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
@@ -194,20 +194,20 @@ public class VariableResourceTest extends ApiUnitTestBase {
 	@Test
 	public void addVariable() throws Exception {
 		final Term variableTerm = TestDataProvider.getVariableTerm();
-		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
 
-		Project project = new Project();
+		final Project project = new Project();
 		project.setCropType(new CropType(this.cropName));
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
 
 		// Set variable id to null for post request.
 		variableDetails.setId(null);
-		Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
-		Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
-		Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
+		final Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
+		final Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
+		final Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
 
-		VariableFilter variableFilter = new VariableFilter();
+		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addMethodId(methodId);
 		variableFilter.addPropertyId(propertyId);
 		variableFilter.addScaleId(scaleId);
@@ -225,10 +225,10 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doAnswer(new Answer<Void>() {
 
 			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				Object[] arguments = invocation.getArguments();
+			public Void answer(final InvocationOnMock invocation) {
+				final Object[] arguments = invocation.getArguments();
 				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
-					OntologyVariableInfo entity = (OntologyVariableInfo) arguments[0];
+					final OntologyVariableInfo entity = (OntologyVariableInfo) arguments[0];
 					entity.setId(variableTerm.getId());
 				}
 				return null;
@@ -254,30 +254,30 @@ public class VariableResourceTest extends ApiUnitTestBase {
 	@Test
 	public void updateVariable() throws Exception {
 
-		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
 
-		Project project = new Project();
+		final Project project = new Project();
 		project.setCropType(new CropType(this.cropName));
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
 
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
-		Term variableTerm = TestDataProvider.getVariableTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term variableTerm = TestDataProvider.getVariableTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
-		Variable variable = TestDataProvider.getTestVariable();
+		final Scale scale = TestDataProvider.getTestScale();
+		final Variable variable = TestDataProvider.getTestVariable();
 		variable.setMethod(new Method(methodTerm));
 		variable.setProperty(new Property(propertyTerm));
 		variable.setScale(scale);
 	  	variable.setHasUsage(false);
 
-		Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
-		Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
-		Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
+		final Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
+		final Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
+		final Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
 
-		VariableFilter variableFilter = new VariableFilter();
+		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addMethodId(methodId);
 		variableFilter.addPropertyId(propertyId);
 		variableFilter.addScaleId(scaleId);
@@ -314,9 +314,9 @@ public class VariableResourceTest extends ApiUnitTestBase {
 	@Test
 	public void deleteVariable() throws Exception {
 
-		Term term = TestDataProvider.getVariableTerm();
+		final Term term = TestDataProvider.getVariableTerm();
 
-		Variable ontologyVariable = TestDataProvider.getTestVariable();
+		final Variable ontologyVariable = TestDataProvider.getTestVariable();
 
 		Mockito.doReturn(term).when(this.termDataManager).getTermById(ontologyVariable.getId());
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, ontologyVariable.getId(),

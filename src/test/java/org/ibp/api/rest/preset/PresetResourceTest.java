@@ -65,22 +65,22 @@ public class PresetResourceTest extends ApiUnitTestBase {
 	@Before
 	public void setup() throws Exception {
 		super.setUp();
-		programUUID = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(10);
-		name = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(10);
-		toolSection = ToolSection.DATASET_LABEL_PRINTING_PRESET.name();
-		toolId = 23;
+		this.programUUID = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(10);
+		this.name = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(10);
+		this.toolSection = ToolSection.DATASET_LABEL_PRINTING_PRESET.name();
+		this.toolId = 23;
 
-		type = PresetType.LABEL_PRINTING_PRESET.getName();
-		selectedField = Arrays.asList(Arrays.asList(4, 13));
-		barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList(2));
-		filePresetConfigurationDTO = new FilePresetConfigurationDTO();
-		filePresetConfigurationDTO.setOutputType("csv");
+		this.type = PresetType.LABEL_PRINTING_PRESET.getName();
+		this.selectedField = Arrays.asList(Arrays.asList(4, 13));
+		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList(2));
+		this.filePresetConfigurationDTO = new FilePresetConfigurationDTO();
+		this.filePresetConfigurationDTO.setOutputType("csv");
 	}
 
 	@Test
 	public void createPreset_Ok() throws Exception {
 
-		final PresetDTO presetDTO = buildPresetDTO();
+		final PresetDTO presetDTO = this.buildPresetDTO();
 
 		final PresetDTO savedPresetDTO = SerializationUtils.clone(presetDTO);
 		savedPresetDTO.setId(1);
@@ -96,11 +96,11 @@ public class PresetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void getPresets_Ok() throws Exception {
-		final List<PresetDTO> presetDTOs = Arrays.asList(buildPresetDTO());
-		doReturn(presetDTOs).when(this.bmsapiPresetService).getPresets(programUUID, toolId, toolSection);
+		final List<PresetDTO> presetDTOs = Arrays.asList(this.buildPresetDTO());
+		doReturn(presetDTOs).when(this.bmsapiPresetService).getPresets(this.programUUID, this.toolId, this.toolSection);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/programs/{programUUID}/presets", this.cropName, this.programUUID)
-				.param("toolId", String.valueOf(toolId)).param("toolSection", toolSection)).andDo(MockMvcResultHandlers.print())
+				.param("toolId", String.valueOf(this.toolId)).param("toolSection", this.toolSection)).andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(presetDTOs.size())));
 	}
@@ -116,16 +116,16 @@ public class PresetResourceTest extends ApiUnitTestBase {
 
 	private PresetDTO buildPresetDTO() {
 		final LabelPrintingPresetDTO presetDTO = new LabelPrintingPresetDTO();
-		presetDTO.setToolSection(toolSection);
-		presetDTO.setType(type);
-		presetDTO.setName(name);
-		presetDTO.setToolId(toolId);
-		presetDTO.setProgramUUID(programUUID);
-		presetDTO.setSelectedFields(selectedField);
-		FilePresetConfigurationDTO filePresetConfigurationDTO = new FilePresetConfigurationDTO();
+		presetDTO.setToolSection(this.toolSection);
+		presetDTO.setType(this.type);
+		presetDTO.setName(this.name);
+		presetDTO.setToolId(this.toolId);
+		presetDTO.setProgramUUID(this.programUUID);
+		presetDTO.setSelectedFields(this.selectedField);
+		final FilePresetConfigurationDTO filePresetConfigurationDTO = new FilePresetConfigurationDTO();
 		filePresetConfigurationDTO.setOutputType("csv");
 		presetDTO.setFileConfiguration(filePresetConfigurationDTO);
-		presetDTO.setBarcodeSetting(barcodeSetting);
+		presetDTO.setBarcodeSetting(this.barcodeSetting);
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
 				new LabelPrintingPresetDTO.BarcodeSetting(false, false, new ArrayList<>());
 		presetDTO.setBarcodeSetting(barcodeSetting);

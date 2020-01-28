@@ -54,9 +54,9 @@ public class StudyValidatorTest {
 	@Test (expected = ResourceNotFoundException.class)
 	public void testStudyDoesNotExist() {
 		final Random ran = new Random();
-		final Integer studyId = ran.nextInt();
-		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(null);
-		studyValidator.validate(studyId, ran.nextBoolean());
+		final int studyId = ran.nextInt();
+		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(null);
+		this.studyValidator.validate(studyId, ran.nextBoolean());
 	}
 
 	@Test (expected = ForbiddenException.class)
@@ -64,13 +64,13 @@ public class StudyValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(USER_ID, new Role(2, "Breeder"));
 		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
 		final Random ran = new Random();
-		final Integer studyId = ran.nextInt();
+		final int studyId = ran.nextInt();
 		final Study study = new Study();
 		study.setId(studyId);
 		study.setLocked(true);
 		study.setCreatedBy("1");
-		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
-		studyValidator.validate(studyId, true);
+		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
+		this.studyValidator.validate(studyId, true);
 	}
 
 	@Test
@@ -84,8 +84,8 @@ public class StudyValidatorTest {
 		study.setLocked(true);
 		study.setCreatedBy(String.valueOf(USER_ID));
 		study.setProgramUUID(PROGRAM_UUID);
-		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
-		studyValidator.validate(studyId, true);
+		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
+		this.studyValidator.validate(studyId, true);
 	}
 
 	@Test
@@ -101,8 +101,8 @@ public class StudyValidatorTest {
 		study.setCreatedBy("1");
 		study.setProgramUUID(PROGRAM_UUID);
 
-		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
-		studyValidator.validate(studyId, true);
+		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
+		this.studyValidator.validate(studyId, true);
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class StudyValidatorTest {
 		study.setCreatedBy("1");
 		study.setProgramUUID(PROGRAM_UUID);
 
-		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
+		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
@@ -131,7 +131,7 @@ public class StudyValidatorTest {
 		Mockito.when(this.studyInstanceMiddlewareService.getStudyInstances(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 		try {
-			studyValidator.validate(studyId, ran.nextBoolean(), true);
+			this.studyValidator.validate(studyId, ran.nextBoolean(), true);
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -149,7 +149,7 @@ public class StudyValidatorTest {
 		study.setCreatedBy("1");
 		study.setProgramUUID(PROGRAM_UUID);
 
-		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
+		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
@@ -165,7 +165,7 @@ public class StudyValidatorTest {
 		Mockito.when(this.studyInstanceMiddlewareService.getStudyInstances(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 
-		studyValidator.validate(studyId, ran.nextBoolean(), true);
+		this.studyValidator.validate(studyId, ran.nextBoolean(), true);
 	}
 
 	@Test
@@ -178,8 +178,8 @@ public class StudyValidatorTest {
 		study.setCreatedBy("1");
 		study.setProgramUUID(PROGRAM_UUID);
 
-		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
-		studyValidator.validate(studyId, ran.nextBoolean(), false);
+		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
+		this.studyValidator.validate(studyId, ran.nextBoolean(), false);
 		Mockito.verifyZeroInteractions(this.studyInstanceMiddlewareService);
 	}
 

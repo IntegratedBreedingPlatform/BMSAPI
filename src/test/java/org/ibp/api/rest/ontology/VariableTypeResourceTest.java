@@ -37,7 +37,7 @@ public class VariableTypeResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllVariableTypes() throws Exception {
 
-		List<VariableType> variableTypes = TestDataProvider.getVariableTypes();
+		final List<VariableType> variableTypes = TestDataProvider.getVariableTypes();
 
 		Mockito.doReturn(variableTypes).when(this.modelService).getAllVariableTypes();
 

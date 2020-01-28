@@ -54,7 +54,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	private static final String PROGRAM_UUID = "50a7e02e-db60-4240-bd64-417b34606e46";
 
 
-	private static Locale locale = Locale.getDefault();
+	private static final Locale locale = Locale.getDefault();
 
 	@Autowired
 	private FormulaService service;
@@ -90,7 +90,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		project.setProjectId(1l);
 		ContextHolder.setCurrentCrop(this.cropName);
 		ContextHolder.setCurrentProgram(this.programUuid);
-		Mockito.doReturn(project).when(workbenchDataManager).getLastOpenedProjectAnyUser();
+		Mockito.doReturn(project).when(this.workbenchDataManager).getLastOpenedProjectAnyUser();
 	}
 
 	@Test
@@ -307,7 +307,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testUpdate() throws Exception {
 		final Integer formulaId = nextInt();
-		final FormulaDto formulaDto = buildFormulaDto(formulaId);
+		final FormulaDto formulaDto = this.buildFormulaDto(formulaId);
 		final FormulaVariable input = formulaDto.getInputs().get(0);
 		final Term term = new Term();
 		term.setId(input.getId());
@@ -331,7 +331,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testUpdate_formulaIdNotExists() throws Exception {
 		final Integer formulaId = nextInt();
-		final FormulaDto formulaDto = buildFormulaDto(formulaId);
+		final FormulaDto formulaDto = this.buildFormulaDto(formulaId);
 		final FormulaVariable input = formulaDto.getInputs().get(0);
 		final Term term = new Term();
 		term.setId(input.getId());
@@ -349,7 +349,8 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 				.content(this.convertObjectToByte(formulaDto))) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(getMessage("variable.formula.not.exist", new Integer[] {formulaDto.getFormulaId()})))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(
+				this.getMessage("variable.formula.not.exist", new Integer[] {formulaDto.getFormulaId()})))) //
 		;
 	}
 
@@ -370,7 +371,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		final String inputName = "SomeInvalidInputName";
 		formulaDto.setDefinition("{{" + inputName + "}} + {{" + inputName + "}}");
 		final List<FormulaVariable> inputs = new ArrayList<>();
-		final FormulaVariable input = buildInput(inputName, inputId);
+		final FormulaVariable input = this.buildInput(inputName, inputId);
 		inputs.add(input);
 		inputs.add(input);
 		formulaDto.setInputs(inputs);

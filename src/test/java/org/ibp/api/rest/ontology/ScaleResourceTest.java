@@ -88,7 +88,7 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		final Project project = new Project();
 		project.setUniqueID(PROGRAM_UUID);
 		project.setProjectId(1l);
-		Mockito.doReturn(project).when(workbenchDataManager).getLastOpenedProjectAnyUser();
+		Mockito.doReturn(project).when(this.workbenchDataManager).getLastOpenedProjectAnyUser();
 		Mockito.doReturn(PROGRAM_UUID).when(this.contextUtil).getCurrentProgramUUID();
 		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 
@@ -166,7 +166,7 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		Mockito.doAnswer(new Answer<Void>() {
 
 			@Override
-			public Void answer(final InvocationOnMock invocation) throws Throwable {
+			public Void answer(final InvocationOnMock invocation) {
 				final Object[] arguments = invocation.getArguments();
 				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
 					final Scale entity = (Scale) arguments[0];
