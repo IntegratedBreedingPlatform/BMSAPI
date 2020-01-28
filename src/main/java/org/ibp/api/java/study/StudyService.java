@@ -24,8 +24,6 @@ public interface StudyService {
 
 	List<StudySummary> search(final String programUniqueId, String cropname, String principalInvestigator, String location, String season);
 
-	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
-
 	List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize,
 			final String sortBy, final String sortOrder);
 
@@ -36,8 +34,6 @@ public interface StudyService {
 	List<Observation> updateObservations(final Integer studyIdentifier, List<Observation> observation);
 
 	List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer);
-
-	StudyDetails getStudyDetails(String studyId);
 
 	TrialObservationTable getTrialObservationTable(final int studyIdentifier);
 
@@ -50,8 +46,6 @@ public interface StudyService {
 	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
 
 	Map<Integer, FieldMap> getFieldMap(final String studyIdentifier);
-
-	List<StudyFolder> getAllStudyFolders();
 
 	String getProgramUUID(Integer studyIdentifier);
 

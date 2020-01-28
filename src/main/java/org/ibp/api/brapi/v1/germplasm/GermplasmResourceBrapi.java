@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -340,4 +341,54 @@ public class GermplasmResourceBrapi {
 
 		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Get germplasm attributes", notes = "Get the attributes of a Germplasm")
+	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm/{germplasmDbId}/attributes", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<GermplasmAttributes>> getAttributesByGid(
+		@PathVariable final String crop, @PathVariable final String germplasmDbId,
+		@ApiParam(value = "Restrict the response to only the listed attributeDbIds.", required = false)
+		@RequestParam(value = "attributeDbIds",
+			required = false) final List<String> attributeDbIds,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize
+	) {
+		final PagedResult<AttributeDTO> resultPage =
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<AttributeDTO>() {
+
+				@Override
+				public long getCount() {
+					return GermplasmResourceBrapi.this.germplasmService.countAttributesByGid(germplasmDbId, attributeDbIds);
+				}
+
+				@Override
+				public List<AttributeDTO> getResults(final PagedResult<AttributeDTO> pagedResult) {
+					final int pageNumber = pagedResult.getPageNumber() + 1;
+					return GermplasmResourceBrapi.this.germplasmService
+						.getAttributesByGid(germplasmDbId, attributeDbIds, pagedResult.getPageSize(), pageNumber);
+				}
+			});
+
+		final List<AttributeDTO> attributeDTOS = resultPage.getPageResults();
+
+		final GermplasmAttributes germplasmAttributes = new GermplasmAttributes();
+		germplasmAttributes.setData(attributeDTOS);
+		germplasmAttributes.setGermplasmDbId(germplasmDbId);
+
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+
+		final SingleEntityResponse<GermplasmAttributes> singleEntityResponse = new SingleEntityResponse<>();
+		singleEntityResponse.setMetadata(metadata);
+		singleEntityResponse.setResult(germplasmAttributes);
+
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+	}
+
 }

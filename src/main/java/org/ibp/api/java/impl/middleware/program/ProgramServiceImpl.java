@@ -10,9 +10,9 @@ import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +28,8 @@ import java.util.Set;
 public class ProgramServiceImpl implements ProgramService {
 
 	@Autowired
+	@Lazy
 	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
-	private SecurityService securityService;
 
 	@Autowired
 	private UserService userService;

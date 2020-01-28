@@ -37,7 +37,7 @@ public class ClassResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllClasses() throws Exception {
 
-		List<String> classes = new ArrayList<>();
+		final List<String> classes = new ArrayList<>();
 		classes.add(TestDataProvider.MW_TERM_LIST.get(0).getName());
 		classes.add(TestDataProvider.MW_TERM_LIST.get(1).getName());
 		classes.add(TestDataProvider.MW_TERM_LIST.get(2).getName());
@@ -45,7 +45,7 @@ public class ClassResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(TestDataProvider.MW_TERM_LIST).when(this.termDataManager).getTermByCvId(CvId.TRAIT_CLASS.getId());
 		Mockito.doReturn(classes).when(this.modelService).getAllClasses();
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/classes", this.cropName).contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/classes?programUUID=" + this.programUuid, this.cropName).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(TestDataProvider.MW_TERM_LIST.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]", Matchers.is(TestDataProvider.MW_TERM_LIST.get(0).getName())))

@@ -4,8 +4,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.pojo.FileExportInfo;
 import org.generationcp.commons.service.CsvExportSampleListService;
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.DateUtil;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -42,7 +42,6 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -53,7 +52,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 
-import static org.mockito.ArgumentMatchers.isNull;
 
 public class SampleListResourceTest extends ApiUnitTestBase {
 
@@ -67,7 +65,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private WorkbenchUser user;
 	private String folderName;
 	private Integer parentId;
-	private String programUUID;
 
 	private static final SimpleDateFormat DATE_FORMAT = DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT_3);
 
@@ -96,9 +93,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
 
 	@Autowired
-	private ContextUtil contextUtil;
-
-	@Autowired
 	private CsvExportSampleListService csvExportSampleListService;
 
 	@Resource
@@ -121,13 +115,15 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		this.dto.setCropName("maize");
 		this.dto.setListName("SamplesTest");
 		this.dto.setCreatedDate("2017-10-12");
-		this.dto.setProgramUUID("c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
+		this.dto.setProgramUUID(this.programUuid);
 		this.user = new WorkbenchUser();
 		this.user.setName(SampleListResourceTest.ADMIN);
 
 		this.folderName = "Folder Name";
 		this.parentId = 1;
-		this.programUUID = "c35c7769-bdad-4c70-a6c4-78c0dbf784e5";
+
+		ContextHolder.setCurrentCrop(this.cropName);
+		ContextHolder.setCurrentProgram(this.programUuid);
 
 	}
 
@@ -137,12 +133,11 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		result.put("id", SampleListResourceTest.VALUE);
 		final SampleList sampleList = new SampleList();
 		sampleList.setId(Integer.valueOf(SampleListResourceTest.VALUE));
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sampleLists/maize/sampleLists").build().encode();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
 		Mockito.when(this.sampleListServiceMW.createSampleList(org.mockito.Matchers.any(SampleListDTO.class))).thenReturn(sampleList);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/crops/{crop}/sample-lists?programUUID=" + this.programUuid, this.cropName).contentType(this.contentType)
 			.content(this.convertObjectToByte(this.dto))).andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
 	}
@@ -156,9 +151,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(Integer.valueOf(SampleListResourceTest.VALUE)).when(this.sampleListServiceMW).createSampleListFolder(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(),
 			org.mockito.ArgumentMatchers.isNull(String.class), org.mockito.Matchers.anyString());
 
-		final String url = String.format("/sampleLists/maize/sampleListFolder?folderName=%s&parentId=%s&programUUID=%s", this.folderName,
-			this.parentId, this.programUUID);
-		this.mockMvc.perform(MockMvcRequestBuilders.post(url)).andExpect(MockMvcResultMatchers.status().isOk())
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/crops/{crop}/programs/{programUUID}/sample-list-folders?folderName="+ this.folderName + "&parentId=" + this.parentId, this.cropName, this.programUuid)).andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
 	}
 
@@ -175,11 +168,10 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		folder.setHierarchy(parentFolder);
 		folder.setType(SampleListType.FOLDER);
 
-		final String url = String.format("/sampleLists/maize/sampleListFolder/{folderId}?newFolderName=%s", newFolderName);
 		Mockito.when(this.sampleListServiceMW.updateSampleListFolderName(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyString()))
 			.thenReturn(folder);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId)).andExpect(MockMvcResultMatchers.status().isOk())
+		this.mockMvc.perform(MockMvcRequestBuilders.put("/crops/{crop}/programs/{programUUID}/sample-list-folders/{folderId}?newFolderName=" + newFolderName, this.cropName, this.programUuid, folderId)).andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(folder.getId().toString())));
 	}
@@ -199,12 +191,9 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		folder.setHierarchy(parentFolder);
 		folder.setType(SampleListType.FOLDER);
 
-		final String url =
-			String.format("/sampleLists/maize/sampleListFolder/{folderId}/move?newParentId=%s&isCropList=false&programUUID=%s",
-				newParentFolderId, programUUID);
-		Mockito.when(this.sampleListServiceMW.moveSampleList(folderId, newParentFolderId, false, programUUID)).thenReturn(folder);
+		Mockito.when(this.sampleListServiceMW.moveSampleList(folderId, newParentFolderId, false, programUuid)).thenReturn(folder);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId)).andExpect(MockMvcResultMatchers.status().isOk())
+		this.mockMvc.perform(MockMvcRequestBuilders.put("/crops/{crop}/programs/{programUUID}/sample-list-folders/{folderId}/move?newParentId="+ newParentFolderId+ "&isCropList=false", this.cropName, this.programUuid, folderId)).andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.parentId", Matchers.is(folder.getHierarchy().getId().toString())));
 	}
@@ -221,7 +210,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 			}
 		}).when(this.sampleListServiceMW).deleteSampleListFolder(folderId);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/sampleLists/maize/sampleListFolder/{folderId}", folderId))
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/crops/{crop}/programs/{programUUID}/sample-list-folders/{folderId}", this.cropName, this.programUuid, folderId))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print());
 	}
 
@@ -237,14 +226,15 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		sampleList.setDescription("Description");
 		list.add(sampleList);
 
-		Mockito.when(this.contextUtil.getCurrentProgramUUID()).thenReturn(this.programUUID);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
 		Mockito.doReturn(list).when(sampleListServiceMW
 			).searchSampleLists(Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
 				Mockito.any(Pageable.class));
 
 		this.mockMvc.perform(
-			MockMvcRequestBuilders.get("/sampleLists/maize/search").param("searchString", searchString).param("exactMatch", "false")
+			MockMvcRequestBuilders.get("/crops/{crop}/sample-lists/search?programUUID=" + this.programUuid, this.cropName)
+				.param("exactMatch", "false")
+				.param("searchString", searchString)
 				.contentType(this.contentType).content(this.convertObjectToByte(this.dto)))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(list.size())))
@@ -274,7 +264,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 					String.class), Mockito.anyString()))
 				.thenReturn(fileExportInfo);
 
-			this.mockMvc.perform(MockMvcRequestBuilders.get("/sampleLists/maize/download?listId=" + listId + "&listName=" + listName)
+			this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/sample-lists/{listId}/download?programUUID=" + this.programUuid + "&listName=" + listName, this.cropName, listId)
 				.contentType(this.csvContentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
 		} finally {
@@ -291,7 +281,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		final List<SampleDTO> sampleDTOs = createSampleDto(2);
 		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(ArgumentMatchers.<Set<String>>any(),ArgumentMatchers.any(Integer.class))).thenReturn(2l);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
+		this.mockMvc.perform(MockMvcRequestBuilders.patch("/crops/{crop}/sample-lists/{listId}/samples?programUUID=" +  this.programUuid, crop, listId)
 			.content(this.convertObjectToByte(sampleDTOs))
 			.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
@@ -309,7 +299,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		sampleDTOs.get(0).setSampleBusinessKey(null);
 
 		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(ArgumentMatchers.<Set<String>>any(), Mockito.anyInt())).thenReturn(2l);
-		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
+		this.mockMvc.perform(MockMvcRequestBuilders.patch("/crops/{crop}/sample-lists/{listId}/samples?programUUID=" +  this.programUuid, crop, listId)
 			.content(this.convertObjectToByte(sampleDTOs))
 			//
 			.contentType(this.contentType) //
@@ -332,7 +322,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		sampleDTO.setPlateId(RandomStringUtils.random(256));
 
 		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(ArgumentMatchers.<Set<String>>any(), Mockito.anyInt())).thenReturn(2l);
-		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
+		this.mockMvc.perform(MockMvcRequestBuilders.patch("/crops/{crop}/sample-lists/{listId}/samples?programUUID=" +  this.programUuid, crop, listId)
 			.content(this.convertObjectToByte(sampleDTOs)) //
 			.contentType(this.contentType) //
 			.locale(locale) //
@@ -352,7 +342,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		SampleDTO sampleDTO = sampleDTOs.get(0);
 		sampleDTO.setWell(RandomStringUtils.random(256));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
+		this.mockMvc.perform(MockMvcRequestBuilders.patch("/crops/{crop}/sample-lists/{listId}/samples?programUUID=" +  this.programUuid, crop, listId)
 			.content(this.convertObjectToByte(sampleDTOs)) //
 			.contentType(this.contentType) //
 			.locale(locale) //
@@ -371,7 +361,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		final List<SampleDTO> sampleDTOs = createSampleDto(2);
 		SampleDTO sampleDTO = sampleDTOs.get(1);
 		sampleDTO.setSampleBusinessKey(sampleDTOs.get(0).getSampleBusinessKey());
-		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
+		this.mockMvc.perform(MockMvcRequestBuilders.patch("/crops/{crop}/sample-lists/{listId}/samples?programUUID=" +  this.programUuid, crop, listId)
 			.content(this.convertObjectToByte(sampleDTOs)) //
 			.contentType(this.contentType) //
 			.locale(locale)) //

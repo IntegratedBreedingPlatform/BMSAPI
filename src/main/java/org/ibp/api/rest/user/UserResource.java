@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,12 +26,6 @@ public class UserResource {
 	@Autowired
 	private UserService userService;
 
-	@ApiOperation(value = "List all users of one projectUUID", notes = "List all users")
-	@RequestMapping(value = "/projects/{projectUUID}/users", method = RequestMethod.GET)
-	public ResponseEntity<List<UserDetailDto>> list(@PathVariable final String projectUUID) {
-		return new ResponseEntity<>(this.userService.getUsersByProjectUUID(projectUUID), HttpStatus.OK);
-	}
-
 	@ApiOperation(value = "List all users", notes = "List all users in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	@ResponseBody
@@ -39,11 +34,19 @@ public class UserResource {
 		return new ResponseEntity<>(this.userService.getAllUsersSortedByLastName(), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Filter users", notes = "List all users in this deployment instance of BMSAPI. ")
+	@RequestMapping(value = "/users/filter", method = RequestMethod.GET)
+	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN', 'BREEDING_ACTIVITIES', 'MANAGE_STUDIES')")
+	public ResponseEntity<List<UserDetailDto>> filterUsers(@RequestParam final String cropName, @RequestParam final String programUUID) {
+		return new ResponseEntity<>(this.userService.getUsersByProjectUUID(programUUID), HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Create user", notes = "Create user in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/users", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
-	public ResponseEntity<Map<String, Object>> createUser(@RequestBody
+	public ResponseEntity<Map<String, Object>> createUser(@RequestBody final
 	UserDetailDto user) {
 		final Map<String, Object> map = this.userService.createUser(user);
 
@@ -58,8 +61,8 @@ public class UserResource {
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
 	public ResponseEntity<Map<String, Object>> updateUser(final @PathVariable
-	String id, @RequestBody UserDetailDto user) {
-		Map<String, Object> map = this.userService.updateUser(user);
+	String id, @RequestBody final UserDetailDto user) {
+		final Map<String, Object> map = this.userService.updateUser(user);
 		if (map.get("ERROR") != null) {
 			return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
 		}

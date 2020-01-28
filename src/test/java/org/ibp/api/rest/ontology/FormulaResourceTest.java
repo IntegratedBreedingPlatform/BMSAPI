@@ -54,7 +54,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	private static final String PROGRAM_UUID = "50a7e02e-db60-4240-bd64-417b34606e46";
 
 
-	private static Locale locale = Locale.getDefault();
+	private static final Locale locale = Locale.getDefault();
 
 	@Autowired
 	private FormulaService service;
@@ -70,9 +70,6 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	protected OntologyVariableDataManager ontologyVariableDataManager;
-
-	@Autowired
-	private ContextUtil contextUtil;
 
 	@Before
 	public void setup() throws Exception {
@@ -92,8 +89,8 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		project.setUniqueID(FormulaResourceTest.PROGRAM_UUID);
 		project.setProjectId(1l);
 		ContextHolder.setCurrentCrop(this.cropName);
-		doReturn(this.programUuid).when(this.contextUtil).getCurrentProgramUUID();
-		Mockito.doReturn(project).when(workbenchDataManager).getLastOpenedProjectAnyUser();
+		ContextHolder.setCurrentProgram(this.programUuid);
+		Mockito.doReturn(project).when(this.workbenchDataManager).getLastOpenedProjectAnyUser();
 	}
 
 	@Test
@@ -117,7 +114,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		when(this.termDataManager.getTermByNameAndCvId(inputName, CvId.VARIABLES.getId())).thenReturn(term);
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -139,7 +136,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(new Term()).when(this.termDataManager).getTermByName(anyString());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -157,7 +154,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		formulaDto.setDefinition("{{1}}");
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -178,7 +175,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(null).when(this.termDataManager).getTermById(anyInt());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -204,7 +201,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(null).when(this.termDataManager).getTermByNameAndCvId(inputName, CvId.VARIABLES.getId());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -231,7 +228,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 			.when(this.ontologyVariableDataManager).getVariableTypes(anyInt());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -260,7 +257,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doThrow(new JexlException(null, ERROR_JEXL_EXCEPTION)).when(this.processor).evaluateFormula(anyString(), anyMapOf(String.class, Object.class));
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+			.perform(MockMvcRequestBuilders.post("/crops/{cropname}/formula?programUUID=" + this.programUuid, this.cropName) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -283,7 +280,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(false).when(this.ontologyVariableDataManager).isVariableUsedInStudy(formulaDto.getTarget().getId());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId)) //
+			.perform(MockMvcRequestBuilders.delete("/crops/{cropname}/formula/{formulaId}?programUUID=" + this.programUuid, this.cropName, formulaId)) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.status().isNoContent()) //
 		;
@@ -301,7 +298,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(true).when(this.ontologyVariableDataManager).isVariableUsedInStudy(formulaDto.getTarget().getId());
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId)) //
+			.perform(MockMvcRequestBuilders.delete("/crops/{cropname}/formula/{formulaId}?programUUID=" + this.programUuid, this.cropName, formulaId)) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.status().isNoContent())
 		;
@@ -310,7 +307,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testUpdate() throws Exception {
 		final Integer formulaId = nextInt();
-		final FormulaDto formulaDto = buildFormulaDto(formulaId);
+		final FormulaDto formulaDto = this.buildFormulaDto(formulaId);
 		final FormulaVariable input = formulaDto.getInputs().get(0);
 		final Term term = new Term();
 		term.setId(input.getId());
@@ -322,7 +319,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(formula).when(this.service).getById(formulaId);
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId) //
+			.perform(MockMvcRequestBuilders.put("/crops/{cropname}/formula/{formulaId}?programUUID=" + this.programUuid, this.cropName, formulaId) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
@@ -334,7 +331,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testUpdate_formulaIdNotExists() throws Exception {
 		final Integer formulaId = nextInt();
-		final FormulaDto formulaDto = buildFormulaDto(formulaId);
+		final FormulaDto formulaDto = this.buildFormulaDto(formulaId);
 		final FormulaVariable input = formulaDto.getInputs().get(0);
 		final Term term = new Term();
 		term.setId(input.getId());
@@ -346,13 +343,14 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		doReturn(Optional.absent()).when(this.service).getById(formulaId);
 
 		this.mockMvc //
-			.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId) //
+			.perform(MockMvcRequestBuilders.put("/crops/{cropname}/formula/{formulaId}?programUUID=" + this.programUuid, this.cropName, formulaId) //
 				.contentType(this.contentType) //
 				.locale(locale) //
 				.content(this.convertObjectToByte(formulaDto))) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(getMessage("variable.formula.not.exist", new Integer[] {formulaDto.getFormulaId()})))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(
+				this.getMessage("variable.formula.not.exist", new Integer[] {formulaDto.getFormulaId()})))) //
 		;
 	}
 
@@ -373,7 +371,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		final String inputName = "SomeInvalidInputName";
 		formulaDto.setDefinition("{{" + inputName + "}} + {{" + inputName + "}}");
 		final List<FormulaVariable> inputs = new ArrayList<>();
-		final FormulaVariable input = buildInput(inputName, inputId);
+		final FormulaVariable input = this.buildInput(inputName, inputId);
 		inputs.add(input);
 		inputs.add(input);
 		formulaDto.setInputs(inputs);

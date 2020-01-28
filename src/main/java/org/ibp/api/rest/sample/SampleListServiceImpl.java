@@ -65,8 +65,8 @@ public class SampleListServiceImpl implements SampleListService {
 	public Map<String, Object> createSampleListFolder(final String folderName, final Integer parentId, final String programUUID) {
 
 		this.sampleListValidator.validateFolderName(folderName);
-		this.sampleListValidator.validateFolderId(parentId);
-		this.sampleListValidator.validateProgramUUID(programUUID);
+		this.sampleListValidator.validateFolderIdAndProgram(parentId);
+
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
@@ -86,7 +86,7 @@ public class SampleListServiceImpl implements SampleListService {
 	public Map<String, Object> updateSampleListFolderName(final Integer folderId, final String newFolderName) {
 
 		this.sampleListValidator.validateFolderName(newFolderName);
-		this.sampleListValidator.validateFolderId(folderId);
+		this.sampleListValidator.validateFolderIdAndProgram(folderId);
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		final SampleList result = this.sampleListServiceMW.updateSampleListFolderName(folderId, newFolderName);
@@ -109,7 +109,7 @@ public class SampleListServiceImpl implements SampleListService {
 	public Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId, final boolean isCropList,
 			final String programUUID) {
 
-		this.sampleListValidator.validateFolderId(folderId);
+		this.sampleListValidator.validateFolderIdAndProgram(folderId);
 		this.sampleListValidator.validateFolderId(newParentId);
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
@@ -125,7 +125,7 @@ public class SampleListServiceImpl implements SampleListService {
 	 */
 	@Override
 	public void deleteSampleListFolder(final Integer folderId) {
-		this.sampleListValidator.validateFolderId(folderId);
+		this.sampleListValidator.validateFolderIdAndProgram(folderId);
 		this.sampleListServiceMW.deleteSampleListFolder(folderId);
 	}
 
@@ -136,7 +136,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Override
 	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer listId) {
-		return sampleListServiceMW.getSampleDetailsDTOs(listId);
+		return this.sampleListServiceMW.getSampleDetailsDTOs(listId);
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 		this.sampleValidator.validateSamplesForImportPlate(listId, sampleDTOs);
 
-		final Map<String, SamplePlateInfo> samplePlateInfoMap = convertToSamplePlateInfoMap(sampleDTOs);
+		final Map<String, SamplePlateInfo> samplePlateInfoMap = this.convertToSamplePlateInfoMap(sampleDTOs);
 		this.sampleListServiceMW.updateSamplePlateInfo(listId, samplePlateInfoMap);
 
 	}

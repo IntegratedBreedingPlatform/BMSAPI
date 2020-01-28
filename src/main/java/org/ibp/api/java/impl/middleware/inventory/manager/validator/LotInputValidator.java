@@ -34,6 +34,10 @@ public class LotInputValidator {
 
 	private BindingResult errors;
 
+	private static final Integer STOCK_ID_MAX_LENGTH = 35;
+
+	private static final Integer PREFIX_MAX_LENGTH = 15;
+
 
 	public LotInputValidator() {
 	}
@@ -69,6 +73,10 @@ public class LotInputValidator {
 				this.errors.reject("lot.stock.id.required", "");
 				return;
 			}
+			if (stockId.length() > STOCK_ID_MAX_LENGTH) {
+				this.errors.reject("lot.stock.id.length.higher.than.maximum", new String[] {String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
+				return;
+			}
 			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 			lotsSearchDto.setStockId(stockId);
 			final long lotsCount = this.lotService.countSearchLots(lotsSearchDto);
@@ -79,9 +87,12 @@ public class LotInputValidator {
 				this.errors.reject("lot.stock.prefix.not.empty", "");
 			}
 		} else {
-			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && !lotGeneratorInputDto.getStockPrefix()
-				.matches("[a-zA-Z]+")) {
-				this.errors.reject("lot.stock.prefix.invalid", "");
+			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && !lotGeneratorInputDto.getStockPrefix().matches("[a-zA-Z]+")) {
+				this.errors.reject("lot.stock.prefix.invalid.characters", "");
+				return;
+			}
+			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && lotGeneratorInputDto.getStockPrefix().length() > PREFIX_MAX_LENGTH) {
+				this.errors.reject("lot.stock.prefix.invalid.length", new String[] {String.valueOf(PREFIX_MAX_LENGTH)}, "");
 				return;
 			}
 			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockId())){

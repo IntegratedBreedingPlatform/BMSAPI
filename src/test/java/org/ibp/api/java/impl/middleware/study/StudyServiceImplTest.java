@@ -22,6 +22,7 @@ import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -59,6 +60,9 @@ public class StudyServiceImplTest {
 	private SecurityService securityService;
 
 	@Mock
+	private StudyValidator studyValidator;
+
+	@Mock
 	private ObservationValidator observationValidator;
 
 	private final String programUID = UUID.randomUUID().toString();
@@ -73,18 +77,19 @@ public class StudyServiceImplTest {
 		}
 
 	};
-	
+
 
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		
+
 		this.studyServiceImpl = new StudyServiceImpl();
 		this.studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
 		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
 		this.studyServiceImpl.setSecurityService(this.securityService);
 		this.studyServiceImpl.setValidationUtil(new ValidationUtil());
 		this.studyServiceImpl.setObservationValidator(this.observationValidator);
+		this.studyServiceImpl.setStudyValidator(this.studyValidator);
 		// Make all test data accessible
 		Mockito.when(this.securityService.isAccessible(Matchers.any(org.generationcp.middleware.service.api.study.StudySummary.class),
 			Matchers.anyString()))
