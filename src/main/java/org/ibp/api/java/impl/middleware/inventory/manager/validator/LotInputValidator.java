@@ -87,15 +87,12 @@ public class LotInputValidator {
 				this.errors.reject("lot.stock.prefix.not.empty", "");
 			}
 		} else {
-			if (StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix())) {
-				this.errors.reject("lot.stock.prefix.required", "");
+			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && !lotGeneratorInputDto.getStockPrefix().matches("[a-zA-Z]+")) {
+				this.errors.reject("lot.stock.prefix.invalid.characters", "");
 				return;
 			}
-			if (lotGeneratorInputDto.getStockPrefix().length() > PREFIX_MAX_LENGTH) {
+			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && lotGeneratorInputDto.getStockPrefix().length() > PREFIX_MAX_LENGTH) {
 				this.errors.reject("lot.stock.prefix.invalid.length", new String[] {String.valueOf(PREFIX_MAX_LENGTH)}, "");
-			}
-			if (!lotGeneratorInputDto.getStockPrefix().matches("[a-zA-Z]+")) {
-				this.errors.reject("lot.stock.prefix.invalid.characters", "");
 				return;
 			}
 			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockId())){
