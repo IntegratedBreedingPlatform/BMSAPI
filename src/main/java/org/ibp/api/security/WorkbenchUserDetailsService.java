@@ -1,12 +1,16 @@
 package org.ibp.api.security;
 
+import liquibase.util.StringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.ibp.api.java.impl.middleware.common.ContextResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,10 +33,17 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 
 
 	@Autowired
+	private ContextResolver contextResolver;
+
+
+	@Autowired
 	private UserService userService;
 
 	@Autowired
 	private PermissionService permissionService;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	public WorkbenchUserDetailsService() {
 
@@ -53,19 +64,27 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			}
 			throw new UsernameNotFoundException("Invalid username/password.");
 		} catch (final MiddlewareQueryException e) {
-			throw new AuthenticationServiceException("Data access error while authenticaing user against Workbench.", e);
+			throw new AuthenticationServiceException("Data access error while authenticating user against Workbench.", e);
 		}
 	}
 
 	private Collection<? extends GrantedAuthority> getAuthorities(final WorkbenchUser workbenchUser) {
-		//TODO Load permissions per crop and program
+		final String cropName = this.contextResolver.resolveCropNameFromUrl();
+		final String programUUID = this.contextResolver.resolveProgramUuidFromRequest();
+		final Integer programId = StringUtils.isEmpty(programUUID)? null : this.getProgramId(programUUID);
+
 		final List<PermissionDto> permissions = this.permissionService.getPermissions( //
 			workbenchUser.getUserid(), //
-			null, //
-			null);
+				StringUtils.isEmpty(cropName) ? null : cropName, //
+				programId);
 		final List<GrantedAuthority> authorities = permissions.stream().map(permissionDto -> new SimpleGrantedAuthority(permissionDto.getName())).collect(
 				Collectors.toCollection(ArrayList::new));
 		return authorities;
+	}
+
+	private Integer getProgramId(final String programUUID) {
+		final Project project = this.workbenchDataManager.getProjectByUuid(programUUID);
+		return project != null ? project.getProjectId().intValue() : null;
 	}
 
 }

@@ -38,7 +38,7 @@ public class DataTypeResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllDataTypes() throws Exception {
 
-		List<DataType> dataTypes = new ArrayList<>();
+		final List<DataType> dataTypes = new ArrayList<>();
 		DataType dataType = TestDataProvider.NUMERICAL_DATA_TYPE;
 		dataTypes.add(dataType);
 		dataType = TestDataProvider.CATEGORICAL_DATA_TYPE;
@@ -46,7 +46,7 @@ public class DataTypeResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(dataTypes).when(this.modelService).getAllDataTypes();
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/datatypes").contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/data-types?programUUID=" + this.programUuid, this.cropName).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(dataTypes.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(dataTypes.get(0).getId())))

@@ -95,19 +95,19 @@ public class VariableResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllVariables() throws Exception {
 
-		List<Variable> variables = TestDataProvider.getTestVariables(4);
+		final List<Variable> variables = TestDataProvider.getTestVariables(4);
 
-		Project project = new Project();
+		final Project project = new Project();
 		project.setCropType(new CropType(this.cropName));
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
 
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(this.programUuid, this.cropName);
-		VariableFilter variableFilter = new VariableFilter();
+		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(this.programUuid);
 		Mockito.doReturn(variables).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/variables?programId=" + this.programUuid, this.cropName)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/variables?programUUID=" + this.programUuid, this.cropName)
 			.contentType(this.contentType)).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(variables.size())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is(String.valueOf(variables.get(0).getId()))))
@@ -131,15 +131,15 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * get variable by given id with status code 200 : Ok
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void getVariableById() throws Exception {
 
-		Variable ontologyVariable = TestDataProvider.getTestVariable();
+		final Variable ontologyVariable = TestDataProvider.getTestVariable();
 
-		Project project = new Project();
+		final Project project = new Project();
 		project.setCropType(new CropType(this.cropName));
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
@@ -154,7 +154,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(
-				MockMvcRequestBuilders.get("/ontology/{cropname}/variables/{id}?programId=" + this.programUuid, this.cropName,
+				MockMvcRequestBuilders.get("/crops/{cropname}/variables/{id}?programUUID=" + this.programUuid, this.cropName,
 					ontologyVariable.getId()).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -188,26 +188,26 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * add new variable and return new generated variable Id with status code 201 : Created
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void addVariable() throws Exception {
 		final Term variableTerm = TestDataProvider.getVariableTerm();
-		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
 
-		Project project = new Project();
+		final Project project = new Project();
 		project.setCropType(new CropType(this.cropName));
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
 
 		// Set variable id to null for post request.
 		variableDetails.setId(null);
-		Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
-		Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
-		Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
+		final Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
+		final Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
+		final Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
 
-		VariableFilter variableFilter = new VariableFilter();
+		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addMethodId(methodId);
 		variableFilter.addPropertyId(propertyId);
 		variableFilter.addScaleId(scaleId);
@@ -225,10 +225,10 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doAnswer(new Answer<Void>() {
 
 			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				Object[] arguments = invocation.getArguments();
+			public Void answer(final InvocationOnMock invocation) {
+				final Object[] arguments = invocation.getArguments();
 				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
-					OntologyVariableInfo entity = (OntologyVariableInfo) arguments[0];
+					final OntologyVariableInfo entity = (OntologyVariableInfo) arguments[0];
 					entity.setId(variableTerm.getId());
 				}
 				return null;
@@ -237,7 +237,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.post("/ontology/{cropname}/variables?programId=" + this.programUuid, this.cropName)
+						MockMvcRequestBuilders.post("/crops/{cropname}/variables?programUUID=" + this.programUuid, this.cropName)
 								.contentType(this.contentType).content(this.convertObjectToByte(variableDetails)))
 				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(String.valueOf(variableTerm.getId()))));
@@ -248,36 +248,36 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * update variable using given Id and data if exist and return status code 204 : No Content
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void updateVariable() throws Exception {
 
-		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
 
-		Project project = new Project();
+		final Project project = new Project();
 		project.setCropType(new CropType(this.cropName));
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
 
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
-		Term variableTerm = TestDataProvider.getVariableTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term variableTerm = TestDataProvider.getVariableTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
-		Variable variable = TestDataProvider.getTestVariable();
+		final Scale scale = TestDataProvider.getTestScale();
+		final Variable variable = TestDataProvider.getTestVariable();
 		variable.setMethod(new Method(methodTerm));
 		variable.setProperty(new Property(propertyTerm));
 		variable.setScale(scale);
 	  	variable.setHasUsage(false);
 
-		Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
-		Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
-		Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
+		final Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
+		final Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
+		final Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
 
-		VariableFilter variableFilter = new VariableFilter();
+		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addMethodId(methodId);
 		variableFilter.addPropertyId(propertyId);
 		variableFilter.addScaleId(scaleId);
@@ -297,7 +297,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 				.perform(
 						MockMvcRequestBuilders
-								.put("/ontology/{cropname}/variables/{id}?programId=" + this.programUuid, this.cropName,
+								.put("/crops/{cropname}/variables/{id}?programUUID=" + this.programUuid, this.cropName,
 										variableTerm.getId()).contentType(this.contentType)
 								.content(this.convertObjectToByte(variableDetails))).andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -308,15 +308,15 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * delete variable using given Id if exist and return status code 204 : No Content
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void deleteVariable() throws Exception {
 
-		Term term = TestDataProvider.getVariableTerm();
+		final Term term = TestDataProvider.getVariableTerm();
 
-		Variable ontologyVariable = TestDataProvider.getTestVariable();
+		final Variable ontologyVariable = TestDataProvider.getTestVariable();
 
 		Mockito.doReturn(term).when(this.termDataManager).getTermById(ontologyVariable.getId());
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, ontologyVariable.getId(),
@@ -326,7 +326,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.delete("/ontology/{cropname}/variables/{id}", this.cropName, ontologyVariable.getId())
+						MockMvcRequestBuilders.delete("/crops/{cropname}/variables/{id}?programUUID=" + this.programUuid, this.cropName, ontologyVariable.getId())
 								.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isNoContent())
 				.andDo(MockMvcResultHandlers.print());
 

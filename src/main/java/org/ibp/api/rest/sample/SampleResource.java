@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,16 +25,17 @@ import java.util.List;
 
 @Api(value = "Sample Services")
 @Controller
-@RequestMapping("/sample")
+@RequestMapping("/crops")
+@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES','INFORMATION_MANAGEMENT')")
 public class SampleResource {
 
 	@Autowired
 	public SampleService sampleService;
 
 	@ApiOperation(value = "Get samples", notes = "Get samples")
-	@RequestMapping(value = "/{crop}/samples", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/samples", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<SampleDTO>> filter(@PathVariable final String crop,
+	public ResponseEntity<List<SampleDTO>> filter(@PathVariable final String crop, @PathVariable final String programUUID,
         @RequestParam(required = false) @ApiParam(value = "The observation unit to which the samples belong") final String obsUnitId,
         @RequestParam(required = false) @ApiParam(value = "The list to which the samples belong") final Integer listId,
 		// TODO describe in swagger?
