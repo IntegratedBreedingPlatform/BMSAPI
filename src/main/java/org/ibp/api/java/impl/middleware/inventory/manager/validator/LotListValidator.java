@@ -29,6 +29,10 @@ import java.util.stream.Collectors;
 @Component
 public class LotListValidator {
 
+	private static Integer COMMENTS_MAX_LENGTH = 255;
+
+	private static Integer STOCK_ID_MAX_LENGTH = 35;
+
 	private BindingResult errors;
 
 	@Autowired
@@ -60,7 +64,7 @@ public class LotListValidator {
 		this.validateStorageLocations(lotList);
 		this.validateScaleNames(lotList);
 		this.validateStockIds(lotList);
-		this.validateInitialAmounts(lotList);
+		this.validateInitialBalances(lotList);
 		this.validateComments(lotList);
 	}
 
@@ -128,15 +132,33 @@ public class LotListValidator {
 			errors.reject("lot.input.list.stock.ids.null.or.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+		if (stockIds.stream().filter(c -> c.length() > STOCK_ID_MAX_LENGTH).count()>0) {
+			errors.reject("lot.stock.id.length.higher.than.maximum", new String[]{String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		//TODO Complete stockId validations
 
 	}
 
-	private void validateInitialAmounts(final List<LotItemDto> lotList) {
-
+	private void validateInitialBalances(final List<LotItemDto> lotList) {
+		final List<Double> initialBalances = lotList.stream().map(LotItemDto::getInitialBalance).collect(Collectors.toList());
+		if (countNullElements(initialBalances) > 0) {
+			errors.reject("lot.input.list.initial.balances.null", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		final long negativeOrZeroValues = initialBalances.stream().filter(d -> d <= 0).count();
+		if (negativeOrZeroValues>0) {
+			errors.reject("lot.input.list.initial.balances.negative.values", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	private void validateComments(final List<LotItemDto> lotList) {
-
+		final List<String> comments = lotList.stream().map(LotItemDto::getNotes).distinct().collect(Collectors.toList());
+		if (comments.stream().filter(c -> c != null && c.length() > COMMENTS_MAX_LENGTH).count()>0) {
+			errors.reject("lot.input.list.initial.balances.negative.values", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	private <T> String buildErrorMessageFromList(final List<T> elements) {
