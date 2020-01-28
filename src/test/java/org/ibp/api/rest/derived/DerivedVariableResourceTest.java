@@ -57,7 +57,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", this.cropName, 100,
+					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", this.cropName, this.programUuid, 100,
 					102)
 				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
 			.andDo(MockMvcResultHandlers.print())
@@ -90,7 +90,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", this.cropName, 100,
+					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", this.cropName, this.programUuid, 100,
 					102)
 				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
 			.andDo(MockMvcResultHandlers.print())
@@ -119,7 +119,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", this.cropName, 100,
+					"/crops/{crop}/programs/{programUUID}, /studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", this.cropName, this.programUuid, 100,
 					102)
 				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
 			.andDo(MockMvcResultHandlers.print())
@@ -141,8 +141,8 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/missing",
-					this.cropName, 100, 101, 103)
+					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/missing",
+					this.cropName, this.programUuid, 100, 101, 103)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -166,8 +166,8 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/formula-variables/",
-					this.cropName, 100, 101)
+					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/formula-variables/",
+					this.cropName, this.programUuid, 100, 101)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -187,7 +187,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.head("/crops/{crop}/studies/{studyId}/derived-variables", this.cropName, 100, 102)
+				.head("/crops/{crop}/programs/{programUUID}/studies/{studyId}/derived-variables", this.cropName, this.programUuid, 100, 102)
 				.param("datasetIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -211,8 +211,8 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/dataset-map",
-					this.cropName, 100, 101, 103)
+					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/dataset-map",
+					this.cropName, this.programUuid, 100, 101, 103)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())

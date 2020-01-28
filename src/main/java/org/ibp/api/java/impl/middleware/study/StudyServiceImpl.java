@@ -3,18 +3,9 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -31,20 +22,15 @@ import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
-import org.ibp.api.domain.ontology.TermSummary;
-import org.ibp.api.domain.study.DatasetSummary;
-import org.ibp.api.domain.study.Environment;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyAttribute;
-import org.ibp.api.domain.study.StudyDetails;
-import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
@@ -80,6 +66,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private ObservationValidator observationValidator;
+
+	@Autowired
+	private StudyValidator studyValidator;
 
 	@Autowired
 	private ValidationUtil validationUtil;
@@ -122,11 +111,6 @@ public class StudyServiceImpl implements StudyService {
 			throw new ApiRuntimeException("Error! Caused by: " + e.getMessage(), e);
 		}
 		return studySummaries;
-	}
-
-	@Override
-	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
-		return this.middlewareStudyService.countTotalObservationUnits(studyIdentifier, instanceId);
 	}
 
 	@Override
@@ -287,124 +271,6 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public StudyDetails getStudyDetails(final String studyId) {
-		try {
-			final Integer studyIdentifier = Integer.valueOf(studyId);
-			final Study study = this.studyDataManager.getStudy(studyIdentifier);
-			if (study == null) {
-				throw new ApiRuntimeException("No study identified by the supplied studyId [" + studyId + "] was found.");
-			}
-
-			// Basic Info.
-			final StudyDetails studyDetails = new StudyDetails();
-			studyDetails.setId(String.valueOf(study.getId()));
-			studyDetails.setName(study.getName());
-			studyDetails.setTitle(study.getDescription());
-			studyDetails.setObjective(study.getObjective());
-			studyDetails.setType(study.getType()
-				.getName());
-			studyDetails.setStartDate(String.valueOf(study.getStartDate()));
-			studyDetails.setEndDate(String.valueOf(study.getEndDate()));
-
-			// Factors, Settings tab.
-			final List<Variable> conditions = study.getConditions()
-				.getVariables();
-			final VariableTypeList factors = this.studyDataManager.getAllStudyFactors(studyIdentifier);
-			final List<DMSVariableType> factorDetails = factors.getVariableTypes();
-			for (final DMSVariableType factorDetail : factorDetails) {
-				String value = null;
-				for (final Variable condition : conditions) {
-					final String conditionName = condition.getVariableType()
-						.getLocalName();
-					if (factorDetail.getLocalName()
-						.equals(conditionName)) {
-						value = condition.getDisplayValue();
-					}
-				}
-
-				// Only add the attribute if there is a value associated.
-				if (value != null) {
-					final StudyAttribute attr = new StudyAttribute();
-					attr.setId(String.valueOf(factorDetail.getId()));
-					attr.setName(factorDetail.getLocalName());
-					attr.setDescription(factorDetail.getLocalDescription());
-					attr.setValue(value);
-					studyDetails.addGeneralInfo(attr);
-				}
-			}
-
-			// Variates - Measurements tab.
-			final VariableTypeList variates = this.studyDataManager.getAllStudyVariates(studyIdentifier);
-			final List<DMSVariableType> variateDetails = variates.getVariableTypes();
-			for (final DMSVariableType variateDetail : variateDetails) {
-				final TermSummary trait = new TermSummary();
-				trait.setId(String.valueOf(variateDetail.getId()));
-				trait.setName(variateDetail.getStandardVariable()
-					.getName());
-				trait.setDescription(variateDetail.getStandardVariable()
-					.getDescription());
-				studyDetails.addTrait(trait);
-			}
-
-			final DataSet trialDataset =
-				this.studyDataManager.findOneDataSetByType(studyIdentifier, DatasetTypeEnum.SUMMARY_DATA.getId());
-
-			// Datasets
-			final List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyIdentifier);
-			if (datasetReferences != null && !datasetReferences.isEmpty()) {
-				for (final DatasetReference dsRef : datasetReferences) {
-					final DatasetSummary dsSummary = new DatasetSummary();
-					dsSummary.setId(dsRef.getId()
-						.toString());
-					dsSummary.setName(dsRef.getName());
-					dsSummary.setDescription(dsRef.getDescription());
-					studyDetails.addDataSet(dsSummary);
-
-					if (dsRef.getId().equals(trialDataset.getId())) {
-						// Logic derived from by RepresentationDataSetQuery.loadItems(int, int) method of the GermplasmStudyBrowser,
-						// which is used to show dataset tables in the study browser UI.
-						final List<Experiment> experiments = this.studyDataManager.getExperiments(dsRef.getId(), 0, Integer.MAX_VALUE);
-						for (final Experiment experiment : experiments) {
-							final List<Variable> variables = new ArrayList<>();
-							final VariableList fac = experiment.getFactors();
-							if (fac != null) {
-								variables.addAll(fac.getVariables());
-							}
-							final VariableList var = experiment.getVariates();
-							if (var != null) {
-								variables.addAll(var.getVariables());
-							}
-
-							final Environment env = new Environment();
-							for (final Variable variable : variables) {
-								final StudyAttribute attr = new StudyAttribute();
-								attr.setId(String.valueOf(variable.getVariableType()
-									.getId()));
-								attr.setName(variable.getVariableType()
-									.getLocalName());
-								attr.setDescription(variable.getVariableType()
-									.getLocalDescription());
-								attr.setValue(variable.getDisplayValue());
-								env.addEnvironmentDetail(attr);
-							}
-							studyDetails.addEnvironment(env);
-						}
-					}
-				}
-			}
-
-			// Germplasm
-			studyDetails.getGermplasm()
-				.addAll(this.getStudyGermplasmList(studyIdentifier));
-			return studyDetails;
-		} catch (final NumberFormatException nfe) {
-			throw new ApiRuntimeException("Supplied study identifier [" + studyId + "] is not valid, it must be a numeric value.");
-		} catch (final MiddlewareException e) {
-			throw new ApiRuntimeException("Error! Caused by: " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
 		return this.fieldMapService.getFieldMap(studyId);
 	}
@@ -429,17 +295,8 @@ public class StudyServiceImpl implements StudyService {
 		this.observationValidator = observationValidator;
 	}
 
-	@Override
-	public List<StudyFolder> getAllStudyFolders() {
-		final List<StudyFolder> studyFolders = new ArrayList<>();
-		final List<FolderReference> middlewareFolders = this.studyDataManager.getAllFolders();
-
-		for (final FolderReference folderRef : middlewareFolders) {
-			studyFolders.add(new StudyFolder(folderRef.getId(), folderRef.getName(), folderRef.getDescription(), folderRef
-				.getParentFolderId()));
-		}
-
-		return studyFolders;
+	void setStudyValidator(final StudyValidator studyValidator) {
+		this.studyValidator = studyValidator;
 	}
 
 	@Override
@@ -496,6 +353,7 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public Boolean isSampled(final Integer studyId) {
 		try {
+			this.studyValidator.validate(studyId, false);
 			return this.sampleService.studyHasSamples(studyId);
 		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
@@ -513,11 +371,14 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public StudyReference getStudyReference(final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
 		return this.studyDataManager.getStudyReference(studyId);
 	}
 
 	@Override
 	public void updateStudy(final Study study) {
-		this.studyDataManager.updateStudyLockedStatus(study.getId(), study.isLocked());
+		final int studyId = study.getId();
+		this.studyValidator.validate(studyId, false);
+		this.studyDataManager.updateStudyLockedStatus(studyId, study.isLocked());
 	}
 }

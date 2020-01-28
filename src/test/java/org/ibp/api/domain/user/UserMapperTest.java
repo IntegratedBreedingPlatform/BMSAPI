@@ -54,11 +54,10 @@ public class UserMapperTest {
 		this.userServiceImpl.setUserValidator(this.userValidator);
 		this.userServiceImpl.setSecurityService(this.securityService);
 		this.userServiceImpl.setMessageSource(this.messageSource);
-		this.userServiceImpl.setContextUtil(this.contextUtil);
 		this.userServiceImpl.setUserService(this.middlewareUserService);
 
 		final CropType cropType = new CropType("maize");
-		Project project = new Project();
+		final Project project = new Project();
 		project.setUniqueID("");
 		project.setProjectId(1L);
 		project.setCropType(cropType);

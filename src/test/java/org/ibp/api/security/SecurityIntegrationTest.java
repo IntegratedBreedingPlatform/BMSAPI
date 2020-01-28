@@ -70,8 +70,8 @@ public class SecurityIntegrationTest {
 		@Primary
 		public UserDetailsService userDetailsService() {
 			// Application context is using BCryptPasswordEncoder so setting encrypted password in memory test user store.
-			String bcryptPassword = new BCryptPasswordEncoder().encode(TEST_PASS);
-			UserDetails testUser = new User(TEST_USER, bcryptPassword, Lists.newArrayList(new SimpleGrantedAuthority(TEST_ROLE)));
+			final String bcryptPassword = new BCryptPasswordEncoder().encode(TEST_PASS);
+			final UserDetails testUser = new User(TEST_USER, bcryptPassword, Lists.newArrayList(new SimpleGrantedAuthority(TEST_ROLE)));
 			return new InMemoryUserDetailsManager(Lists.newArrayList(testUser));
 		}
 	}
@@ -88,7 +88,7 @@ public class SecurityIntegrationTest {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/datatypes").contentType(this.contentType))
 		.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isUnauthorized());
 	}
-	
+
 	@Test
 	public void testOptionsRequestsAlwaysPermitted() throws Exception {
 		// Make an OPTIONS request (crop listing service chosen at random). It should always be allowed without authentication token.
@@ -103,16 +103,16 @@ public class SecurityIntegrationTest {
 	public void testAuthorizedRequest() throws Exception {
 
 		// Hit the /authentication resource to obtain token first.
-		String tokenUrl = String.format("/authenticate?username=%s&password=%s", TEST_USER, TEST_PASS);
+		final String tokenUrl = String.format("/authenticate?username=%s&password=%s", TEST_USER, TEST_PASS);
 		final MvcResult authResult = this.mockMvc.perform(MockMvcRequestBuilders.post(tokenUrl)).andReturn();
 		Assert.assertEquals("Was expecting a successful token retrieval.", HttpStatus.OK.value(), authResult.getResponse().getStatus());
 
 		// Parse the response to get token
-		Token token = new ObjectMapper().readValue(authResult.getResponse().getContentAsByteArray(), Token.class);
+		final Token token = new ObjectMapper().readValue(authResult.getResponse().getContentAsByteArray(), Token.class);
 
 		// Call one of the services requiring authentication (ontology datatype service chosen at random) with a valid auth header
 		//   and expect 200 OK response
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/datatypes")
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/data-types?programUUID=12345", "maize")
 				.contentType(this.contentType)
 				.header("X-Auth-Token", token.getToken()))
 				.andDo(MockMvcResultHandlers.print())

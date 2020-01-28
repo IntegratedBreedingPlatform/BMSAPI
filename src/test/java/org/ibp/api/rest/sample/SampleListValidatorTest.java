@@ -1,11 +1,15 @@
 package org.ibp.api.rest.sample;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.service.api.SampleListService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.ObjectError;
 
@@ -16,7 +20,17 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class SampleListValidatorTest {
 
+	@Mock
+	private SampleListService sampleListServiceMW;
+
+	@InjectMocks
 	private final SampleListValidator validator = new SampleListValidator();
+
+	@Before
+	public void setUp() {
+		ContextHolder.setCurrentProgram("23487325-dwfkjfsfdsaf-32874829374");
+		ContextHolder.setCurrentCrop("maize");
+	}
 
 	@Test
 	public void testValidateSampleListSuccess() {
@@ -28,7 +42,7 @@ public class SampleListValidatorTest {
 		sampleListDto.setCreatedDate("2019-01-01");
 
 		try {
-			validator.validateSampleList(sampleListDto);
+			this.validator.validateSampleList(sampleListDto);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Expcected to NOT hrow ApiRequestValidationException");
 		}
@@ -45,7 +59,7 @@ public class SampleListValidatorTest {
 		sampleListDto.setCreatedDate("");
 
 		try {
-			validator.validateSampleList(sampleListDto);
+			this.validator.validateSampleList(sampleListDto);
 			Assert.fail("Expcected to throw ApiRequestValidationException");
 		} catch (final ApiRequestValidationException e) {
 			final List<String> codes = new ArrayList<>();
@@ -74,7 +88,7 @@ public class SampleListValidatorTest {
 		sampleListDto.setCreatedDate("2019-01-01");
 
 		try {
-			validator.validateSampleList(sampleListDto);
+			this.validator.validateSampleList(sampleListDto);
 			Assert.fail("Expcected to throw ApiRequestValidationException");
 		} catch (final ApiRequestValidationException e) {
 			final List<String> codes = new ArrayList<>();
@@ -92,13 +106,13 @@ public class SampleListValidatorTest {
 	public void testValidateFolderName() {
 
 		try {
-			validator.validateFolderName("Name");
+			this.validator.validateFolderName("Name");
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Expcected to NOT throw ApiRequestValidationException");
 		}
 
 		try {
-			validator.validateFolderName(null);
+			this.validator.validateFolderName(null);
 			Assert.fail("Expcected to throw ApiRequestValidationException");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("sample.list.folder.is.null", e.getErrors().get(0).getCode());
@@ -110,34 +124,16 @@ public class SampleListValidatorTest {
 	public void testvalidateFolderId() {
 
 		try {
-			validator.validateFolderId(1);
+			this.validator.validateFolderIdAndProgram(1);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Expcected to NOT throw ApiRequestValidationException");
 		}
 
 		try {
-			validator.validateFolderId(null);
+			this.validator.validateFolderIdAndProgram(null);
 			Assert.fail("Expcected to throw ApiRequestValidationException");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("sample.list.parent.id.is.null", e.getErrors().get(0).getCode());
-		}
-
-	}
-
-	@Test
-	public void testvalidateProgramUUID() {
-
-		try {
-			validator.validateProgramUUID("UUID");
-		} catch (final ApiRequestValidationException e) {
-			Assert.fail("Expcected to NOT throw ApiRequestValidationException");
-		}
-
-		try {
-			validator.validateProgramUUID(null);
-			Assert.fail("Expcected to throw ApiRequestValidationException");
-		} catch (final ApiRequestValidationException e) {
-			Assert.assertEquals("sample.list.program.uuid.is.null", e.getErrors().get(0).getCode());
 		}
 
 	}
