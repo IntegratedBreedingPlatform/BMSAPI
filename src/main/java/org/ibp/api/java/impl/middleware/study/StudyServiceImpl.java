@@ -25,7 +25,7 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestD
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.ObservationVariableDto;
+import org.generationcp.middleware.service.api.study.VariableDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -530,16 +530,30 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public long countObservationVariables(final int studyDbId) {
+	public long countVariablesByStudyId(final int studyDbId) {
 		this.studyValidator.validate(studyDbId, false);
-		return this.middlewareStudyService.countObservationVariables(studyDbId, Collections.unmodifiableList(
+		return this.middlewareStudyService.countVariablesByStudyId(studyDbId, Collections.unmodifiableList(
 			Arrays.asList(VariableType.TRAIT.getId())));
 	}
 
 	@Override
-	public List<ObservationVariableDto> getObservationVariables(final int pageSize, final int pageNumber, final int studyDbId) {
+	public List<VariableDto> getVariablesByStudyId(final int pageSize, final int pageNumber, final int studyDbId,
+		final String cropname) {
 		this.studyValidator.validate(studyDbId, false);
-		return this.middlewareStudyService.getObservationVariables(pageSize, pageNumber, studyDbId, Collections.unmodifiableList(
+		return this.middlewareStudyService.getVariablesByStudyId(pageSize, pageNumber, studyDbId, Collections.unmodifiableList(
+			Arrays.asList(VariableType.TRAIT.getId())), cropname);
+	}
+
+	@Override
+	public long countVariables() {
+		return this.middlewareStudyService.countVariables(Collections.unmodifiableList(
 			Arrays.asList(VariableType.TRAIT.getId())));
+	}
+
+	@Override
+	public List<VariableDto> getVariables(final int pageSize, final int pageNumber,
+		final String cropname) {
+		return this.middlewareStudyService.getVariables(pageSize, pageNumber, Collections.unmodifiableList(
+			Arrays.asList(VariableType.TRAIT.getId())), cropname);
 	}
 }
