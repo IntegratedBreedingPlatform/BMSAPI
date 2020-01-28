@@ -136,7 +136,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Override
 	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer listId) {
-		return sampleListServiceMW.getSampleDetailsDTOs(listId);
+		return this.sampleListServiceMW.getSampleDetailsDTOs(listId);
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 		this.sampleValidator.validateSamplesForImportPlate(listId, sampleDTOs);
 
-		final Map<String, SamplePlateInfo> samplePlateInfoMap = convertToSamplePlateInfoMap(sampleDTOs);
+		final Map<String, SamplePlateInfo> samplePlateInfoMap = this.convertToSamplePlateInfoMap(sampleDTOs);
 		this.sampleListServiceMW.updateSamplePlateInfo(listId, samplePlateInfoMap);
 
 	}

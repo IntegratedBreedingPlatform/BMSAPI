@@ -54,7 +54,7 @@ public class VariableResource {
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addVariable(@PathVariable final String cropname, @RequestParam final String programUUID,
-			@RequestBody VariableDetails variable) {
+			@RequestBody final VariableDetails variable) {
 		return new ResponseEntity<>(this.variableService.addVariable(cropname, programUUID, variable), HttpStatus.CREATED);
 	}
 
@@ -79,7 +79,8 @@ public class VariableResource {
 	@ApiOperation(value = "Delete Variable", notes = "Delete Variable by Id")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity deleteVariable(@PathVariable String cropname, @RequestParam String programUUID, @PathVariable String id) {
+	public ResponseEntity deleteVariable(@PathVariable final String cropname, @RequestParam final String programUUID, @PathVariable
+	final String id) {
 		this.variableService.deleteVariable(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

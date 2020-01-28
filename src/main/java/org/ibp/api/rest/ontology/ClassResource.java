@@ -30,7 +30,7 @@ public class ClassResource {
 	@ApiOperation(value = "All Classes", notes = "Get all Classes")
 	@RequestMapping(value = "/{cropname}/classes", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<String>> listAllClasses(@PathVariable String cropname, @RequestParam final String programUUID) {
+	public ResponseEntity<List<String>> listAllClasses(@PathVariable final String cropname, @RequestParam final String programUUID) {
 		return new ResponseEntity<>(this.modelService.getAllClasses(), HttpStatus.OK);
 	}
 }

@@ -46,7 +46,7 @@ public class UserResource {
 	@RequestMapping(value = "/users", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
-	public ResponseEntity<Map<String, Object>> createUser(@RequestBody
+	public ResponseEntity<Map<String, Object>> createUser(@RequestBody final
 	UserDetailDto user) {
 		final Map<String, Object> map = this.userService.createUser(user);
 
@@ -61,8 +61,8 @@ public class UserResource {
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
 	public ResponseEntity<Map<String, Object>> updateUser(final @PathVariable
-	String id, @RequestBody UserDetailDto user) {
-		Map<String, Object> map = this.userService.updateUser(user);
+	String id, @RequestBody final UserDetailDto user) {
+		final Map<String, Object> map = this.userService.updateUser(user);
 		if (map.get("ERROR") != null) {
 			return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
 		}

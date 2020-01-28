@@ -35,7 +35,7 @@ public class PresetResource {
 		@PathVariable final String cropname, @PathVariable final String programUUID,
 		@RequestBody
 			PresetDTO presetDTO) {
-		presetDTO = presetService.savePreset(cropname, presetDTO);
+		presetDTO = this.presetService.savePreset(cropname, presetDTO);
 		return new ResponseEntity<>(presetDTO, HttpStatus.OK);
 	}
 
@@ -49,11 +49,11 @@ public class PresetResource {
 			final String cropname,
 		@PathVariable
 			final String programUUID,
-		@RequestParam
-			Integer toolId,
-		@RequestParam
-			String toolSection) {
-		final List<PresetDTO> presetDTOs = presetService.getPresets(programUUID, toolId, toolSection);
+		@RequestParam final
+		Integer toolId,
+		@RequestParam final
+		String toolSection) {
+		final List<PresetDTO> presetDTOs = this.presetService.getPresets(programUUID, toolId, toolSection);
 		return new ResponseEntity<>(presetDTOs, HttpStatus.OK);
 	}
 
@@ -66,9 +66,9 @@ public class PresetResource {
 			final String cropname,
 		@PathVariable
 			final String programUUID,
-		@PathVariable
-			Integer presetId) {
-		presetService.deletePreset(cropname, presetId);
+		@PathVariable final
+		Integer presetId) {
+		this.presetService.deletePreset(cropname, presetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

@@ -116,7 +116,7 @@ public class LabelPrintingResource {
 
 		final LabelsData labelsData = labelPrintingStrategy.getLabelsData(labelsGeneratorInput);
 
-		File file;
+		final File file;
 		try {
 			file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
 		} catch (final IOException e) {
@@ -144,7 +144,7 @@ public class LabelPrintingResource {
 
 		switch (labelPrintingTypeEnum) {
 			case SUBOBSERVATION_DATASET:
-				labelPrintingStrategy = subObservationDatasetLabelPrinting;
+				labelPrintingStrategy = this.subObservationDatasetLabelPrinting;
 				break;
 			default:
 				labelPrintingStrategy = null;
@@ -163,10 +163,10 @@ public class LabelPrintingResource {
 		}
 		switch (fileType) {
 			case CSV:
-				labelsFileGenerator = csvLabelsFileGenerator;
+				labelsFileGenerator = this.csvLabelsFileGenerator;
 				break;
 			case PDF:
-				labelsFileGenerator = pdfLabelsFileGenerator;
+				labelsFileGenerator = this.pdfLabelsFileGenerator;
 				break;
 			default:
 				labelsFileGenerator = null;

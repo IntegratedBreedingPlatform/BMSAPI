@@ -71,7 +71,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	private Collection<? extends GrantedAuthority> getAuthorities(final WorkbenchUser workbenchUser) {
 		final String cropName = this.contextResolver.resolveCropNameFromUrl();
 		final String programUUID = this.contextResolver.resolveProgramUuidFromRequest();
-		final Integer programId = StringUtils.isEmpty(programUUID)? null : getProgramId(programUUID);
+		final Integer programId = StringUtils.isEmpty(programUUID)? null : this.getProgramId(programUUID);
 
 		final List<PermissionDto> permissions = this.permissionService.getPermissions( //
 			workbenchUser.getUserid(), //

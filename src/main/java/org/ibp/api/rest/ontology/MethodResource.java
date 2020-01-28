@@ -55,7 +55,8 @@ public class MethodResource {
 	@ApiOperation(value = "Update Method", notes = "Update a Method by Id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestParam final String programUUID, @RequestBody MethodDetails method) {
+	public ResponseEntity updateMethod(@PathVariable final String cropname, @PathVariable final String id, @RequestParam final String programUUID, @RequestBody
+	final MethodDetails method) {
 		this.methodService.updateMethod(id, method);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

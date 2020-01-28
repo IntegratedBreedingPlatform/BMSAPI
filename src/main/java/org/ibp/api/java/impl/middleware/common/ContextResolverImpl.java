@@ -31,7 +31,7 @@ public class ContextResolverImpl implements ContextResolver {
 
 	@Override
 	public String resolveDatabaseFromUrl() throws ContextResolutionException {
-		final String crop = resolveCropNameFromUrl();
+		final String crop = this.resolveCropNameFromUrl();
 		if (StringUtils.isEmpty(crop)) {
 			throw new ContextResolutionException("Could not resolve database because crop name was not found");
 		}
@@ -117,7 +117,7 @@ public class ContextResolverImpl implements ContextResolver {
 			if (StringUtils.isEmpty(crop)) {
 				throw new ContextResolutionException("Could not resolve crop for program: " + programUUID + " for service with path " + path);
 			}
-			if (programService.getByUUIDAndCrop(crop,programUUID) == null){
+			if (this.programService.getByUUIDAndCrop(crop,programUUID) == null){
 				throw new ContextResolutionException("Invalid program: " + programUUID + " for crop: " + crop + " for service with path " + path);
 			}
 			ContextHolder.setCurrentProgram(programUUID);

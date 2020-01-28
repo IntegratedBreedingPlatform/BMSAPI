@@ -38,91 +38,91 @@ public class VariableFilterResource {
 	@ResponseBody
 	public ResponseEntity<List<VariableDetails>> listAllVariablesUsingFilter(
 			@ApiParam(value = "Use <code>GET /crop/list</code> service to retrieve possible crop name values that can be supplied here.", required = true)
-			@PathVariable String cropname,
+			@PathVariable final String cropname,
 
 			@ApiParam(value = "Use <code>GET /program/list</code> service to retrieve program uuid that can be supplied here.")
-			@RequestParam(value = "programUUID") String programUUID,
+			@RequestParam(value = "programUUID") final String programUUID,
 
 			@ApiParam(value = "Use <code>GET /ontology/{cropname}/properties</code> service "
 					+ " to retrieve possible property ids that can be supplied here as a comma separated list.")
-			@RequestParam(value = "propertyIds", required = false) Set<Integer> propertyIds,
+			@RequestParam(value = "propertyIds", required = false) final Set<Integer> propertyIds,
 
 			@ApiParam(value = "Use <code>GET /ontology/{cropname}/methods</code> service "
 					+ " to retrieve possible method ids that can be supplied here as a comma separated list.")
-			@RequestParam(value = "methodIds", required = false) Set<Integer> methodIds,
+			@RequestParam(value = "methodIds", required = false) final Set<Integer> methodIds,
 
 			@ApiParam(value = "Use <code>GET /ontology/{cropname}/scales</code> service "
 					+ " to retrieve possible scale ids that can be supplied here as a comma separated list.")
-			@RequestParam(value = "scaleIds", required = false) Set<Integer> scaleIds,
+			@RequestParam(value = "scaleIds", required = false) final Set<Integer> scaleIds,
 
 			@ApiParam(value = "Use <code>GET /ontology/{cropname}/variables</code> service "
 					+ " to retrieve possible variable ids that can be supplied here as a comma separated list.")
-			@RequestParam(value = "variableIds", required = false) Set<Integer> variableIds,
+			@RequestParam(value = "variableIds", required = false) final Set<Integer> variableIds,
 
 			@ApiParam(value = "Specify ids of variables to exclude."
 					+ " Use <code>GET /ontology/{cropname}/variables</code> service"
 					+ " to retrieve possible variable ids that can be supplied here as a comma separated list.")
-			@RequestParam(value = "exclusionVariableIds", required = false) Set<Integer> exclusionVariableIds,
+			@RequestParam(value = "exclusionVariableIds", required = false) final Set<Integer> exclusionVariableIds,
 
 			@ApiParam(value = "Use <code>GET /ontology/datatypes</code> service "
 					+ " to retrieve possible data type ids that can be supplied here as a comma separated list.")
-			@RequestParam(value = "dataTypeIds", required = false) Set<Integer> dataTypeIds,
+			@RequestParam(value = "dataTypeIds", required = false) final Set<Integer> dataTypeIds,
 
 			@ApiParam(value = "Use <code>GET /ontology/variableTypes</code> service "
 					+ " to list possible variable type ids that can be supplied here as a comma separated list. ")
-			@RequestParam(value = "variableTypeIds", required = false) Set<Integer> variableTypeIds,
+			@RequestParam(value = "variableTypeIds", required = false) final Set<Integer> variableTypeIds,
 
 			@ApiParam(value = "Use <code>GET /ontology/{cropname}/classes</code> service "
 					+ " to retrieve possible property class values that can be supplied here as a comma separated list.")
-			@RequestParam(value = "propertyClasses", required = false) Set<String> propertyClasses) {
+			@RequestParam(value = "propertyClasses", required = false) final Set<String> propertyClasses) {
 
-		VariableFilter variableFilter = new VariableFilter();
+		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(programUUID);
 
 		if(!Util.isNullOrEmpty(propertyIds)){
-			for(Integer i : propertyIds){
+			for(final Integer i : propertyIds){
 				variableFilter.addPropertyId(i);
 			}
 		}
 
 		if(!Util.isNullOrEmpty(methodIds)){
-			for(Integer i : methodIds){
+			for(final Integer i : methodIds){
 				variableFilter.addMethodId(i);
 			}
 		}
 
 		if(!Util.isNullOrEmpty(scaleIds)){
-			for(Integer i : scaleIds){
+			for(final Integer i : scaleIds){
 				variableFilter.addScaleId(i);
 			}
 		}
 
 		if(!Util.isNullOrEmpty(variableIds)){
-			for(Integer i : variableIds){
+			for(final Integer i : variableIds){
 				variableFilter.addVariableId(i);
 			}
 		}
 
 		if(!Util.isNullOrEmpty(exclusionVariableIds)){
-			for(Integer i : exclusionVariableIds){
+			for(final Integer i : exclusionVariableIds){
 				variableFilter.addExcludedVariableId(i);
 			}
 		}
 
 		if(!Util.isNullOrEmpty(dataTypeIds)){
-			for(Integer i : dataTypeIds){
+			for(final Integer i : dataTypeIds){
 				variableFilter.addDataType(i);
 			}
 		}
 
 		if(!Util.isNullOrEmpty(variableTypeIds)){
-			for(Integer i : variableTypeIds){
+			for(final Integer i : variableTypeIds){
 				variableFilter.addVariableType(i);
 			}
 		}
 
 		if(!Util.isNullOrEmpty(propertyClasses)){
-			for(String s : propertyClasses){
+			for(final String s : propertyClasses){
 				variableFilter.addPropertyClass(s);
 			}
 		}

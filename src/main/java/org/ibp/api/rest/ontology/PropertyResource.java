@@ -37,10 +37,10 @@ public class PropertyResource {
 		@RequestParam final String programUUID, @RequestParam(value = "class",
 		defaultValue = "", required = false) final String className) {
 		if (Strings.isNullOrEmpty(className)) {
-			List<PropertyDetails> propertyList = this.propertyService.getAllProperties();
+			final List<PropertyDetails> propertyList = this.propertyService.getAllProperties();
 			return new ResponseEntity<>(propertyList, HttpStatus.OK);
 		}
-		List<PropertyDetails> propertyList = this.propertyService.getAllPropertiesByClass(className);
+		final List<PropertyDetails> propertyList = this.propertyService.getAllPropertiesByClass(className);
 		return new ResponseEntity<>(propertyList, HttpStatus.OK);
 	}
 
@@ -56,7 +56,7 @@ public class PropertyResource {
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addProperty(@PathVariable final String cropname, @RequestParam final String programUUID,
-		@RequestBody PropertyDetails property) {
+		@RequestBody final PropertyDetails property) {
 		return new ResponseEntity<>(this.propertyService.addProperty(property), HttpStatus.CREATED);
 	}
 

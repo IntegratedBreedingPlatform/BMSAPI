@@ -36,18 +36,18 @@ public class StudyValidator {
 
 	public void validate(final Integer studyId, final Boolean shouldBeUnlocked) {
 
-		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		if (studyId == null) {
 			this.errors.reject("study.required", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final Study study = studyDataManager.getStudy(studyId);
+		final Study study = this.studyDataManager.getStudy(studyId);
 
 		if (study == null) {
-			errors.reject("study.not.exist", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+			this.errors.reject("study.not.exist", "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
@@ -56,8 +56,8 @@ public class StudyValidator {
 			&& study.isLocked()
 			&& !study.getCreatedBy().equals(loggedInUser.getUserid().toString())
 			&& !loggedInUser.isSuperAdmin()) {
-			errors.reject("study.is.locked", "");
-			throw new ForbiddenException(errors.getAllErrors().get(0));
+			this.errors.reject("study.is.locked", "");
+			throw new ForbiddenException(this.errors.getAllErrors().get(0));
 		}
 
 		// It is assumed that program UUID is always set in ContextHolder beforehand
