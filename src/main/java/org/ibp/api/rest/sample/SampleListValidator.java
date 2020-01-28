@@ -1,7 +1,10 @@
 package org.ibp.api.rest.sample;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.pojos.SampleList;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -10,6 +13,9 @@ import java.util.HashMap;
 
 @Component
 public class SampleListValidator {
+
+	@Autowired
+	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
 
 	private BindingResult errors;
 
@@ -58,24 +64,37 @@ public class SampleListValidator {
 		}
 	}
 
-	public void validateFolderId(final Integer parentId) {
-
+	public void validateFolderId(final Integer folderId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (parentId == null) {
+		if (folderId == null) {
 			this.errors.reject("sample.list.parent.id.is.null","The parent Id must not be null");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	public void validateProgramUUID(final String programUUID) {
+	public void validateFolderIdAndProgram(final Integer folderId) {
+		this.validateFolderId(folderId);
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-
-		if (programUUID == null) {
+		// It is assumed that programUUID is set in ContextHolder from API path variable or request parameter
+		final String contextProgramUUID = ContextHolder.getCurrentProgram();
+		if (StringUtils.isBlank(contextProgramUUID)){
 			this.errors.reject("sample.list.program.uuid.is.null","The program UUID must not be null");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+
+		// FolderID is zero if it's the root crop/program folder
+		if (folderId != 0) {
+			final SampleList sampleList = this.sampleListServiceMW.getSampleList(folderId);
+			// Verify that folder belongs to program in ContextHolder
+			if (sampleList != null && sampleList.getProgramUUID() != null && !contextProgramUUID.equals(sampleList.getProgramUUID())){
+				this.errors.reject("sample.list.program.uuid.is.invalid","Invalid programUUID for sample list folder");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
+
 	}
+
+
 
 }

@@ -37,11 +37,11 @@ public class VariableTypeResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllVariableTypes() throws Exception {
 
-		List<VariableType> variableTypes = TestDataProvider.getVariableTypes();
+		final List<VariableType> variableTypes = TestDataProvider.getVariableTypes();
 
 		Mockito.doReturn(variableTypes).when(this.modelService).getAllVariableTypes();
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/variableTypes").contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/variable-types?programUUID=" + this.programUuid, this.cropName).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(variableTypes.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(variableTypes.get(0).getName())))

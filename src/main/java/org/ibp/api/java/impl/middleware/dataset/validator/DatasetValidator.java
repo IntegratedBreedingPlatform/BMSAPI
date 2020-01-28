@@ -1,7 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
-import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -36,9 +36,6 @@ public class DatasetValidator {
 
 	@Autowired
 	private DatasetService middlewareDatasetService;
-
-	@Autowired
-	private ContextUtil contextUtil;
 
 	@Resource
 	private DatasetTypeService datasetTypeService;
@@ -90,7 +87,7 @@ public class DatasetValidator {
 		final VariableType variableType = this.validateVariableType(datasetVariable.getVariableTypeId());
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable standardVariable =
-			this.ontologyDataManager.getStandardVariable(variableId, this.contextUtil.getCurrentProgramUUID());
+			this.ontologyDataManager.getStandardVariable(variableId, ContextHolder.getCurrentProgram());
 		this.validateVariable(standardVariable, variableType);
 
 		this.validateIfDatasetVariableAlreadyExists(variableId, shouldBeDatasetVariable, dataSet);
@@ -107,7 +104,7 @@ public class DatasetValidator {
 
 		for (final Integer variableId : variableIds) {
 			// If the variable does not exist, MiddlewareQueryException will be thrown
-			this.ontologyDataManager.getStandardVariable(variableId, this.contextUtil.getCurrentProgramUUID());
+			this.ontologyDataManager.getStandardVariable(variableId, ContextHolder.getCurrentProgram());
 			this.validateIfDatasetVariableAlreadyExists(variableId, true, dataSet);
 		}
 
