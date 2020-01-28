@@ -75,9 +75,6 @@ public class StudyServiceImpl implements StudyService {
 	private ObservationValidator observationValidator;
 
 	@Autowired
-	private StudyValidator studyValidator;
-
-	@Autowired
 	private ValidationUtil validationUtil;
 
 	@Autowired
