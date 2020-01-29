@@ -117,8 +117,9 @@ public class LotListValidator {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final List<VariableDetails> existingInventoryScales = this.variableService.getVariablesByFilter(variableFilter);
-		if (existingInventoryScales.size() != scaleNames.size()) {
-			final List<String> existingScaleNames = existingInventoryScales.stream().map(VariableDetails::getAlias).collect(Collectors.toList());
+		final List<String> existingScaleNames = existingInventoryScales.stream().map(VariableDetails::getName).collect(Collectors.toList());
+
+		if (!existingScaleNames.containsAll(scaleNames)) {
 			final List<String> invalidScaleNames = new ArrayList<>(scaleNames);
 			invalidScaleNames.removeAll(existingScaleNames);
 			errors.reject("lot.input.invalid.units", new String[] {this.buildErrorMessageFromList(invalidScaleNames)}, "");
@@ -136,6 +137,7 @@ public class LotListValidator {
 			errors.reject("lot.stock.id.length.higher.than.maximum", new String[]{String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+		//Verify if there are duplicated stockIds in the input
 		//TODO Complete stockId validations
 
 	}
