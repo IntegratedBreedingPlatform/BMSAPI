@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotListValidator;
@@ -74,7 +75,9 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public void importLotsWithInitialTransaction(final List<LotItemDto> lotItemDtoList) {
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+		final CropType cropType = this.contextUtil.getProjectInContext().getCropType();
 		this.lotListValidator.validate(lotItemDtoList);
-		this.lotService.saveLotsWithInitialTransaction(lotItemDtoList);
+		this.lotService.saveLotsWithInitialTransaction(cropType, loggedInUser.getUserid(), lotItemDtoList);
 	}
 }
