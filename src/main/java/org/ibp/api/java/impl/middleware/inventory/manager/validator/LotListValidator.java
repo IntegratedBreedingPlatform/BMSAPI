@@ -8,6 +8,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -44,6 +45,9 @@ public class LotListValidator {
 	@Autowired
 	private VariableService variableService;
 
+	@Autowired
+	private LotService lotService;
+
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 
 	public void validate(final List<LotItemDto> lotList) {
@@ -52,6 +56,10 @@ public class LotListValidator {
 		if (lotList == null) {
 			errors.reject("lot.input.list.null", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (lotList.isEmpty()) {
+			return;
 		}
 
 		//Validate that none of the elements in the list is null
@@ -128,18 +136,26 @@ public class LotListValidator {
 	}
 
 	private void validateStockIds(final List<LotItemDto> lotList) {
-		final List<String> stockIds = lotList.stream().map(LotItemDto::getStockId).distinct().collect(Collectors.toList());
-		if (countNullOrEmptyStrings(stockIds) > 0) {
+		final List<String> uniqueStockIds = lotList.stream().map(LotItemDto::getStockId).distinct().collect(Collectors.toList());
+		if (countNullOrEmptyStrings(uniqueStockIds) > 0) {
 			errors.reject("lot.input.list.stock.ids.null.or.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		if (stockIds.stream().filter(c -> c.length() > STOCK_ID_MAX_LENGTH).count()>0) {
+		if (uniqueStockIds.stream().filter(c -> c.length() > STOCK_ID_MAX_LENGTH).count()>0) {
 			errors.reject("lot.stock.id.length.higher.than.maximum", new String[]{String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		//Verify if there are duplicated stockIds in the input
-		//TODO Complete stockId validations
-
+		final List<String> allStockIds = lotList.stream().map(LotItemDto::getStockId).collect(Collectors.toList());
+		if (allStockIds.size() != uniqueStockIds.size()) {
+			errors.reject("lot.input.list.stock.ids.duplicated","");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		final List<LotDto> existingLotDtos = this.lotService.getLotsByStockIds(uniqueStockIds);
+		if (!existingLotDtos.isEmpty()){
+			final List<String> existingStockIds = existingLotDtos.stream().map(LotDto::getStockId).collect(Collectors.toList());
+			errors.reject("lot.input.list.stock.ids.invalid", new String[] {this.buildErrorMessageFromList(existingStockIds)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	private void validateInitialBalances(final List<LotItemDto> lotList) {
