@@ -325,7 +325,7 @@ public class StudyResourceBrapi {
 
 		final List<VariableDTO> observationVariables = resultPage.getPageResults();
 
-		final String studyName = this.studyService.getStudyReference(studyDbId).getName();
+		final String studyName = this.studyDataManager.getStudyReference(studyDbId).getName();
 		final ObservationVariableResult result = new ObservationVariableResult().withData(observationVariables).withStudyId(studyDbId)
 			.withTrialName(studyName);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
