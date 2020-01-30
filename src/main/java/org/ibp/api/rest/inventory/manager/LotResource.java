@@ -5,18 +5,27 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.location.LocationDto;
+import org.ibp.api.domain.ontology.VariableDetails;
+import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.java.inventory.manager.LotExcelTemplateExportService;
 import org.ibp.api.java.inventory.manager.LotService;
+import org.ibp.api.java.location.LocationService;
+import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,7 +39,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Api(value = "Lot Services")
 @RestController
@@ -41,6 +53,15 @@ public class LotResource {
 
 	@Autowired
 	private LotService lotService;
+
+	@Autowired
+	private LotExcelTemplateExportService lotExcelTemplateExportServiceImpl;
+
+	@Autowired
+	private VariableService variableService;
+
+	@Autowired
+	LocationService locationService;
 
 	@Autowired
 	private SearchRequestService searchRequestService;
@@ -121,4 +142,26 @@ public class LotResource {
 		this.lotService.importLotsWithInitialTransaction(lotList);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Download Template as excel file", notes = "Download Template as excel file")
+	@RequestMapping(
+		value = "/crops/{cropName}/lot-lists/templates/xls",
+		method = RequestMethod.GET)
+	public ResponseEntity<FileSystemResource> getTemplate(@PathVariable final String cropName) {
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
+		Set<Integer> locationTypes =new HashSet<>();
+		locationTypes.add(1500); //"c00fa18c-a9b2-405b-8fbb-3171214a7f85"
+		final List<LocationDto> locations = locationService.getLocations(locationTypes, "c00fa18c-a9b2-405b-8fbb-3171214a7f85", false, null);
+
+		final File file = this.lotExcelTemplateExportServiceImpl.export(locations, units);
+		final HttpHeaders headers = new HttpHeaders();
+		headers
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+		final FileSystemResource fileSystemResource = new FileSystemResource(file);
+		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+	}
+
 }
