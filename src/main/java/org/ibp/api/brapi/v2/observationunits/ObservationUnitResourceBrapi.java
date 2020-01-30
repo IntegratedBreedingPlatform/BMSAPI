@@ -135,7 +135,8 @@ public class ObservationUnitResourceBrapi {
 				});
 	}
 
-	@ApiOperation(value = "Patch Observation Unit", notes = "Modified some fields from an Observation Unit")
+	// TODO complete PUT see plantbreeding/API/issues/411
+	@ApiOperation(value = "Patch Observation Unit", notes = "Modified some fields from an Observation Unit <p><strong>Note:</strong> non-standard BrAPI call</p>")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationunits/{observationUnitDbId}", method = RequestMethod.PATCH)
 	public ResponseEntity<Void> patchObservationUnit(
 		@PathVariable final String crop,
