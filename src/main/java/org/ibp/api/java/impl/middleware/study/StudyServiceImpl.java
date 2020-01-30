@@ -385,14 +385,12 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public long countVariablesByStudyId(final int studyDbId, final List<Integer> variableTypes) {
-		this.studyValidator.validate(studyDbId, false);
 		return this.middlewareStudyService.countVariablesByStudyId(studyDbId, variableTypes);
 	}
 
 	@Override
 	public List<VariableDTO> getVariablesByStudyId(final int pageSize, final int pageNumber, final int studyDbId,
 		final String cropname, final List<Integer> variableTypes) {
-		this.studyValidator.validate(studyDbId, false);
 		return this.middlewareStudyService.getVariablesByStudyId(pageSize, pageNumber, studyDbId, variableTypes, cropname);
 	}
 

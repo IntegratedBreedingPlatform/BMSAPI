@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -28,6 +29,7 @@ import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.exception.BrapiNotFoundException;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -296,7 +298,12 @@ public class StudyResourceBrapi {
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
-			required = false) final Integer pageSize) {
+			required = false) final Integer pageSize) throws BrapiNotFoundException {
+
+		final StudyReference study = this.studyDataManager.getStudyReference(studyDbId);
+		if (study == null) {
+			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
+		}
 
 		final PagedResult<VariableDTO> resultPage =
 			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
