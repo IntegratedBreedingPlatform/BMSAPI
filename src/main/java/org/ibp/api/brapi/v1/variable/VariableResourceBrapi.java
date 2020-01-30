@@ -53,7 +53,7 @@ public class VariableResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return VariableResourceBrapi.this.studyService.countVariables(Collections.unmodifiableList(
+					return VariableResourceBrapi.this.studyService.countAllVariables(Collections.unmodifiableList(
 						Arrays.asList(VariableType.TRAIT.getId())));
 				}
 
@@ -61,7 +61,7 @@ public class VariableResourceBrapi {
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return VariableResourceBrapi.this.studyService
-						.getVariables(pagedResult.getPageSize(), pageNumber, crop, Collections.unmodifiableList(
+						.getAllVariables(pagedResult.getPageSize(), pageNumber, crop, Collections.unmodifiableList(
 							Arrays.asList(VariableType.TRAIT.getId())));
 				}
 			});

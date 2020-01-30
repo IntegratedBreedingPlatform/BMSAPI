@@ -72,8 +72,8 @@ public interface StudyService {
 	List<VariableDTO> getVariablesByStudyId(final int pageSize, final int pageNumber, final int studyDbId, final String cropname,
 		final List<Integer> variableTypes);
 
-	long countVariables(final List<Integer> variableTypes);
+	long countAllVariables(final List<Integer> variableTypes);
 
-	List<VariableDTO> getVariables(int pageSize, int pageNumber,
+	List<VariableDTO> getAllVariables(int pageSize, int pageNumber,
 		String cropname, final List<Integer> variableTypes);
 }

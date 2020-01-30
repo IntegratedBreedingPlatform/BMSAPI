@@ -395,13 +395,13 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public long countVariables(final List<Integer> variableTypes) {
-		return this.middlewareStudyService.countVariables(variableTypes);
+	public long countAllVariables(final List<Integer> variableTypes) {
+		return this.middlewareStudyService.countAllVariables(variableTypes);
 	}
 
 	@Override
-	public List<VariableDTO> getVariables(final int pageSize, final int pageNumber,
+	public List<VariableDTO> getAllVariables(final int pageSize, final int pageNumber,
 		final String cropname, final List<Integer> variableTypes) {
-		return this.middlewareStudyService.getVariables(pageSize, pageNumber, variableTypes, cropname);
+		return this.middlewareStudyService.getAllVariables(pageSize, pageNumber, variableTypes, cropname);
 	}
 }
