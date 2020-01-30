@@ -195,12 +195,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final Set<Integer> datasetTypeIdList = new TreeSet<>();
-		final Study study = this.studyDataManager.getStudy(studyId);
-
-		if (study == null) {
-			errors.reject("study.not.exist", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
-		}
+		this.studyValidator.validate(studyId, false);
 
 		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypesMap();
 		if (datasetTypeIds != null) {
@@ -232,15 +227,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId) {
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-
-		final Study study = this.studyDataManager.getStudy(studyId);
-
-		if (study == null) {
-			errors.reject("study.not.exist", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
-		}
-
+		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
 

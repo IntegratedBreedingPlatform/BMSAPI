@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.user;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.commons.security.SecurityUtil;
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -63,9 +62,6 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
-	private ContextUtil contextUtil;
 
 	@Override
 	public List<UserDetailDto> getAllUsersSortedByLastName() {
@@ -297,14 +293,6 @@ public class UserServiceImpl implements UserService {
 
 	private String getMessage(final String code, final Object[] args) {
 		return this.messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
-	}
-
-	public ContextUtil getContextUtil() {
-		return contextUtil;
-	}
-
-	public void setContextUtil(ContextUtil contextUtil) {
-		this.contextUtil = contextUtil;
 	}
 
 	public void setUserService(final org.generationcp.middleware.service.api.user.UserService userService) {

@@ -11,6 +11,7 @@ import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +27,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Api(value = "Ontology Variable Service")
 @Controller
-@RequestMapping("/ontology")
+@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
+@RequestMapping("/crops")
 public class VariableResource {
 
 	@Autowired
@@ -35,32 +37,31 @@ public class VariableResource {
 	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<VariableDetails>> listAllVariables(@PathVariable String cropname, @RequestParam(value = "property",
-			required = false) String propertyId, @RequestParam(value = "favourite", required = false) Boolean favourite, @RequestParam(
-			value = "programId") String programId) {
-		return new ResponseEntity<>(this.variableService.getAllVariablesByFilter(cropname, programId, propertyId, favourite), HttpStatus.OK);
+	public ResponseEntity<List<VariableDetails>> listAllVariables(@PathVariable final String cropname, @RequestParam(value = "property",
+			required = false) final String propertyId, @RequestParam(value = "favourite", required = false) final Boolean favourite, @RequestParam final String programUUID) {
+		return new ResponseEntity<>(this.variableService.getAllVariablesByFilter(cropname, programUUID, propertyId, favourite), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<VariableDetails> getVariableById(@PathVariable String cropname,
-			@RequestParam(value = "programId") String programId, @PathVariable String id) {
-		return new ResponseEntity<>(this.variableService.getVariableById(cropname, programId, id), HttpStatus.OK);
+	public ResponseEntity<VariableDetails> getVariableById(@PathVariable final String cropname,
+			@RequestParam final String programUUID, @PathVariable final String id) {
+		return new ResponseEntity<>(this.variableService.getVariableById(cropname, programUUID, id), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Add Variable", notes = "Add new variable using given data")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
-			@RequestBody VariableDetails variable) {
-		return new ResponseEntity<>(this.variableService.addVariable(cropname, programId, variable), HttpStatus.CREATED);
+	public ResponseEntity<GenericResponse> addVariable(@PathVariable final String cropname, @RequestParam final String programUUID,
+			@RequestBody final VariableDetails variable) {
+		return new ResponseEntity<>(this.variableService.addVariable(cropname, programUUID, variable), HttpStatus.CREATED);
 	}
 
 	/**
 	 *
 	 * @param cropname The name of the crop which is we wish to add variable.
-	 * @param programId programId to which variable is related
+	 * @param programUUID programUUID to which variable is related
 	 * @param id variable id
 	 * @param variable the variable data to update with.
 	 */
@@ -68,9 +69,9 @@ public class VariableResource {
 	@ApiOperation(value = "Update Variable", notes = "Update variable using given data")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
-			@PathVariable String id, @RequestBody VariableDetails variable) {
-		this.variableService.updateVariable(cropname, programId, id, variable);
+	public ResponseEntity updateVariable(@PathVariable final String cropname, final @RequestParam String programUUID,
+			@PathVariable final String id, @RequestBody final VariableDetails variable) {
+		this.variableService.updateVariable(cropname, programUUID, id, variable);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
@@ -78,7 +79,8 @@ public class VariableResource {
 	@ApiOperation(value = "Delete Variable", notes = "Delete Variable by Id")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity deleteVariable(@PathVariable String cropname, @PathVariable String id) {
+	public ResponseEntity deleteVariable(@PathVariable final String cropname, @RequestParam final String programUUID, @PathVariable
+	final String id) {
 		this.variableService.deleteVariable(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

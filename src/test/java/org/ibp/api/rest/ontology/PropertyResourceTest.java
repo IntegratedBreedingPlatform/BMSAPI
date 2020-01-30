@@ -63,18 +63,18 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * Get All properties. It should respond with 200.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void listAllProperties() throws Exception {
 
-		List<Property> propertyList = TestDataProvider.getTestProperties(3);
+		final List<Property> propertyList = TestDataProvider.getTestProperties(3);
 
 		Mockito.doReturn(propertyList).when(this.ontologyPropertyDataManager).getAllProperties();
 
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/properties", this.cropName).contentType(this.contentType))
+				.perform(MockMvcRequestBuilders.get("/crops/{cropname}/properties?programUUID=" + this.programUuid, this.cropName).contentType(this.contentType))
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(propertyList.size())))
@@ -91,21 +91,21 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * Get All properties that have given class. It should respond with 200.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void listAllPropertiesUsingClass() throws Exception {
 
-		String className = "Agronomic";
+		final String className = "Agronomic";
 
-		List<Property> propertyList = TestDataProvider.getTestProperties(3);
+		final List<Property> propertyList = TestDataProvider.getTestProperties(3);
 
 		Mockito.doReturn(propertyList).when(this.ontologyPropertyDataManager).getAllPropertiesWithClass(className);
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.get("/ontology/{cropname}/properties?class=" + className, this.cropName).contentType(
+						MockMvcRequestBuilders.get("/crops/{cropname}/properties?programUUID=" + this.programUuid +"&class=" + className, this.cropName).contentType(
 								this.contentType))
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
@@ -129,15 +129,15 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void getPropertyById() throws Exception {
 
-		Property property = TestDataProvider.getTestProperty();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Property property = TestDataProvider.getTestProperty();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
 		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId(), true);
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.get("/ontology/{cropname}/properties/{id}", this.cropName, property.getId()).contentType(
+						MockMvcRequestBuilders.get("/crops/{cropname}/properties/{id}?programUUID=" + this.programUuid, this.cropName, property.getId()).contentType(
 								this.contentType)).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(property.getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(property.getName())))
@@ -159,7 +159,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(null).when(this.termDataManager).getTermById(1);
 
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/properties/{id}", this.cropName, 1).contentType(this.contentType))
+				.perform(MockMvcRequestBuilders.get("/crops/{cropname}/properties/{id}?programUUID=" + this.programUuid, this.cropName, 1).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.termDataManager, Mockito.times(1)).getTermById(1);
@@ -167,13 +167,13 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 	/*
 	 * This test should expect 201 : Created*
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void addProperty() throws Exception {
 
-		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
+		final PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
 		// Setting id as null to ignore checking editable field validation.
 		propertyDetails.setId(null);
 
@@ -184,10 +184,10 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		Mockito.doAnswer(new Answer<Void>() {
 
 			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				Object[] arguments = invocation.getArguments();
+			public Void answer(final InvocationOnMock invocation) {
+				final Object[] arguments = invocation.getArguments();
 				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
-					Property entity = (Property) arguments[0];
+					final Property entity = (Property) arguments[0];
 					entity.setId(property.getId());
 				}
 				return null;
@@ -196,7 +196,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.post("/ontology/{cropname}/properties", this.cropName).contentType(this.contentType)
+						MockMvcRequestBuilders.post("/crops/{cropname}/properties?programUUID=" + this.programUuid, this.cropName).contentType(this.contentType)
 								.content(this.convertObjectToByte(propertyDetails))).andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(property.getId()))))
 				.andDo(MockMvcResultHandlers.print());
@@ -206,17 +206,17 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 	/*
 	 * This test should expect 204 : No Content*
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void updateProperty() throws Exception {
 
-		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
-		Property property = TestDataProvider.getTestProperty();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
+		final Property property = TestDataProvider.getTestProperty();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
 
-		ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
+		final ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
@@ -225,7 +225,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.put("/ontology/{cropname}/properties/{id}", this.cropName, property.getId())
+						MockMvcRequestBuilders.put("/crops/{cropname}/properties/{id}?programUUID=" + this.programUuid, this.cropName, property.getId())
 								.contentType(this.contentType).content(this.convertObjectToByte(propertyDetails)))
 				.andExpect(MockMvcResultMatchers.status().isNoContent()).andDo(MockMvcResultHandlers.print());
 
@@ -240,8 +240,8 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void deleteProperty() throws Exception {
 
-		Property property = TestDataProvider.getTestProperty();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Property property = TestDataProvider.getTestProperty();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
 		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId(), true);
@@ -250,7 +250,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(
-						MockMvcRequestBuilders.delete("/ontology/{cropname}/properties/{id}", this.cropName, property.getId()).contentType(
+						MockMvcRequestBuilders.delete("/crops/{cropname}/properties/{id}?programUUID=" + this.programUuid, this.cropName, property.getId()).contentType(
 								this.contentType)).andExpect(MockMvcResultMatchers.status().isNoContent())
 				.andDo(MockMvcResultHandlers.print());
 

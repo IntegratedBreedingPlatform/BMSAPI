@@ -8,6 +8,7 @@ import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Api(value = "Study Services")
 @Controller
+@RequestMapping("/crops")
 public class StudyResource {
 
 	@Autowired
@@ -24,9 +26,10 @@ public class StudyResource {
 
 	@ApiOperation(value = "Check if a study is sampled.",
 			notes = "Returns boolean indicating if there are samples associated to the study.")
-	@RequestMapping(value = "/study/{cropName}/{studyId}/sampled", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/sampled", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
 	@ResponseBody
-	public ResponseEntity<Boolean> hasSamples(final @PathVariable String cropName,
+	public ResponseEntity<Boolean> hasSamples(final @PathVariable String cropName, @PathVariable final String programUUID,
 			@PathVariable final Integer studyId) {
 		final Boolean hasSamples = this.studyService.isSampled(studyId);
 		return new ResponseEntity<>(hasSamples, HttpStatus.OK);
@@ -34,9 +37,10 @@ public class StudyResource {
 
 	@ApiOperation(value = "Partially modifies a study",
 			notes = "As of now, it only allows to update the status")
-	@RequestMapping(value = "/study/{cropName}/{studyId}", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}", method = RequestMethod.PATCH)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@ResponseBody
-	public ResponseEntity<Void> patchStudy (final @PathVariable String cropName,
+	public ResponseEntity<Void> patchStudy (final @PathVariable String cropName, @PathVariable final String programUUID,
 			@PathVariable final Integer studyId, @RequestBody final Study study) {
 		// TODO Properly define study entity, Identify which attributes of the Study entity can be updated, Implement patch accordingly
 		study.setId(studyId);
