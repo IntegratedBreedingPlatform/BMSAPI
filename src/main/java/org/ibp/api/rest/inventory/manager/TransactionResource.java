@@ -9,6 +9,8 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
@@ -122,6 +124,9 @@ public class TransactionResource {
 		if (transactionDto.getLot() == null) {
 			transactionDto.setLot(new ExtendedLotDto());
 		}
+		//FIXME when this resource is completed
+		transactionDto.setTransactionStatus(TransactionStatus.CONFIRMED.getValue());
+		transactionDto.setTransactionType(TransactionType.DEPOSIT.getValue());
 		transactionDto.getLot().setLotId(Integer.valueOf(lotId));
 		return new ResponseEntity<>(this.transactionService.saveTransaction(transactionDto), HttpStatus.CREATED);
 	}
