@@ -7,6 +7,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -68,55 +69,65 @@ public class LotExcelTemplateGenerator {
 		currentRowNum = this.writeUnitsSection(currentRowNum, xlsBook, xlsSheet, units);
 		xlsSheet.createRow(currentRowNum++);
 		xlsSheet.setColumnWidth(LotExcelTemplateGenerator.CODES_SHEET_FIRST_COLUMN_INDEX, 34 * 250);
-		xlsSheet.setColumnWidth(LotExcelTemplateGenerator.CODES_SHEET_SECOND_COLUMN_INDEX, 50 * 250);
+		xlsSheet.setColumnWidth(LotExcelTemplateGenerator.CODES_SHEET_SECOND_COLUMN_INDEX, 65 * 250);
 
-	}
-
-	private int writeUnitsSection(final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final List<VariableDetails> units) {
-		final CellStyle backgroundStyle = xlsBook.createCellStyle();
-		final HSSFFont blackFont = xlsBook.createFont();
-
-		blackFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
-		backgroundStyle.setFont(blackFont);
-		int rowNumIndex = currentRowNum;
-
-		for (VariableDetails variableDetail : units) {
-			final HSSFRow row = xlsSheet.createRow(rowNumIndex++);
-
-			HSSFCell cell = row.createCell(0, CellType.STRING);
-			cell.setCellStyle(this.getcellStyle(xlsBook, this.getColorIndex(xlsBook, 127, 196, 249)));
-			cell.setCellValue(variableDetail.getName());
-
-			cell = row.createCell(1, CellType.STRING);
-			cell.setCellStyle(this.getcellStyle(xlsBook, this.getColorIndex(xlsBook, 51, 153, 102)));
-			cell.setCellValue(variableDetail.getDescription());
-
-		}
-		return rowNumIndex;
 	}
 
 	private int writeLocationSection(final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final List<LocationDto> locations) {
 		final CellStyle backgroundStyle = xlsBook.createCellStyle();
 		final HSSFFont blackFont = xlsBook.createFont();
-
+		blackFont.setFontName("calibri");
 		blackFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+		blackFont.setFontHeightInPoints((short) 11);
 		backgroundStyle.setFont(blackFont);
+		
 		int rowNumIndex = currentRowNum;
-
+		int count = locations.size();
 		for (LocationDto locationDto : locations) {
 			final HSSFRow row = xlsSheet.createRow(rowNumIndex++);
-
-			HSSFCell cell = row.createCell(CODES_SHEET_FIRST_COLUMN_INDEX, CellType.STRING);
-			cell.setCellStyle(this.getcellStyle(xlsBook, this.getColorIndex(xlsBook, 127, 196, 249)));
-			cell.setCellValue(locationDto.getAbbreviation());
-
-			cell = row.createCell(CODES_SHEET_SECOND_COLUMN_INDEX, CellType.STRING);
-			cell.setCellStyle(this.getcellStyle(xlsBook, this.getColorIndex(xlsBook, 51, 153, 102)));
-			cell.setCellValue(locationDto.getName());
-
+			row.setHeightInPoints(16);
+			this.writeCell(LotExcelTemplateGenerator.CODES_SHEET_FIRST_COLUMN_INDEX, locationDto.getAbbreviation(), count, xlsBook,row);
+			this.writeCell(LotExcelTemplateGenerator.CODES_SHEET_SECOND_COLUMN_INDEX, locationDto.getName(), count, xlsBook,row);
+			count--;
 		}
 		return rowNumIndex;
 	}
+
+	private int writeUnitsSection(final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final List<VariableDetails> units) {
+		final CellStyle backgroundStyle = xlsBook.createCellStyle();
+		final HSSFFont blackFont = xlsBook.createFont();
+		blackFont.setFontName("calibri");
+		blackFont.setFontHeightInPoints((short) 11);
+		blackFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+		backgroundStyle.setFont(blackFont);
+
+		int rowNumIndex = currentRowNum;
+		int count = units.size();
+
+		for (VariableDetails variableDetail : units) {
+			final HSSFRow row = xlsSheet.createRow(rowNumIndex++);
+			row.setHeightInPoints(16);
+			this.writeCell(LotExcelTemplateGenerator.CODES_SHEET_FIRST_COLUMN_INDEX, variableDetail.getName(), count, xlsBook,row);
+			this.writeCell(LotExcelTemplateGenerator.CODES_SHEET_SECOND_COLUMN_INDEX, variableDetail.getDescription(), count, xlsBook,row);
+			count--;
+		}
+
+		return rowNumIndex;
+	}
+
+	private void writeCell(final int codesSheetFirstColumnIndex, final String value, final int count, final HSSFWorkbook xlsBook, final HSSFRow row) {
+		HSSFCell cell = row.createCell(codesSheetFirstColumnIndex, CellType.STRING);
+		cell.setCellStyle(this.getcellStyle(
+			xlsBook,
+			codesSheetFirstColumnIndex == 0 ? this.getColorIndex(xlsBook, 127, 196, 249) : this.getColorIndex(xlsBook, 181, 241, 126)));
+		cell.setCellValue(value);
+		cell.getCellStyle().setBorderLeft(BorderStyle.THIN);
+		cell.getCellStyle().setBorderRight(BorderStyle.THIN);
+		if (count == 1) {
+			cell.getCellStyle().setBorderBottom(BorderStyle.THIN);
+		}
+	}
+
 
 	private void writeLotsSheet(final HSSFWorkbook xlsBook) {
 		final Locale locale = LocaleContextHolder.getLocale();
@@ -178,7 +189,7 @@ public class LotExcelTemplateGenerator {
 			this.messageSource.getMessage("export.inventory.manager.lot.template.storage.location.abbr.column", null, locale));
 
 		cell = row.createCell(LotExcelTemplateGenerator.CODES_SHEET_SECOND_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, this.getColorIndex(xlsBook,  51, 153, 102)));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, this.getColorIndex(xlsBook,  181,  241,126)));
 		cell.setCellValue(
 			this.messageSource.getMessage("export.inventory.manager.lot.template.storage.location.name.column", null, locale));
 
@@ -195,7 +206,7 @@ public class LotExcelTemplateGenerator {
 		cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.units.column", null, locale));
 
 		cell = row.createCell(LotExcelTemplateGenerator.CODES_SHEET_SECOND_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, this.getColorIndex(xlsBook, 51, 153, 102)));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, this.getColorIndex(xlsBook, 181,  241,126)));
 		cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.units.description.column", null, locale));
 
 	}
@@ -203,20 +214,28 @@ public class LotExcelTemplateGenerator {
 	private CellStyle getHeaderStyle(final HSSFWorkbook xlsBook, final short colorIndex) {
 		final HSSFFont blackFont = xlsBook.createFont();
 		blackFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
-		blackFont.setBold(true);
+		blackFont.setFontName("calibri");
 		blackFont.setFontHeightInPoints((short) 11);
+		blackFont.setBold(true);
 
 		final CellStyle cellStyle = xlsBook.createCellStyle();
 		cellStyle.setFillForegroundColor(colorIndex);
 		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		cellStyle.setFont(blackFont);
+
+		cellStyle.setBorderTop(BorderStyle.THIN);
+		cellStyle.setBorderBottom(BorderStyle.THIN);
+		cellStyle.setBorderLeft(BorderStyle.THIN);
+		cellStyle.setBorderRight(BorderStyle.THIN);
+
 		return cellStyle;
 	}
 
 	private CellStyle getcellStyle(final HSSFWorkbook xlsBook, final short colorIndex) {
 		final HSSFFont blackFont = xlsBook.createFont();
 		blackFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
-
+		blackFont.setFontName("calibri");
+		blackFont.setFontHeightInPoints((short) 11);
 		final CellStyle cellStyle = xlsBook.createCellStyle();
 		cellStyle.setFillForegroundColor(colorIndex);
 		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
