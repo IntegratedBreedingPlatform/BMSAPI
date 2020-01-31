@@ -384,14 +384,14 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public long countVariablesByStudyId(final int studyDbId, final List<Integer> variableTypes) {
-		return this.middlewareStudyService.countVariablesByStudyId(studyDbId, variableTypes);
+	public long countVariablesByDatasetId(final int studyDbId, final List<Integer> variableTypes) {
+		return this.middlewareStudyService.countVariablesByDatasetId(studyDbId, variableTypes);
 	}
 
 	@Override
-	public List<VariableDTO> getVariablesByStudyId(final int pageSize, final int pageNumber, final int studyDbId,
+	public List<VariableDTO> getVariablesByDatasetId(final int pageSize, final int pageNumber, final int studyDbId,
 		final String cropname, final List<Integer> variableTypes) {
-		return this.middlewareStudyService.getVariablesByStudyId(pageSize, pageNumber, studyDbId, variableTypes, cropname);
+		return this.middlewareStudyService.getVariablesByDatasetId(pageSize, pageNumber, studyDbId, variableTypes, cropname);
 	}
 
 	@Override

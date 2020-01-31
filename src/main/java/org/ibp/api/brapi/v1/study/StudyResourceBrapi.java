@@ -11,8 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
@@ -300,8 +300,9 @@ public class StudyResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) throws BrapiNotFoundException {
 
-		final StudyReference study = this.studyDataManager.getStudyReference(studyDbId);
-		if (study == null) {
+		// Resolve the datasetId in which StudyDbId belongs to. (In BRAPI, studyDbId is nd_geolocation_id)
+		final Integer datasetId = this.studyDataManager.getDatasetIdByStudyDbIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		if (datasetId == null) {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
 		}
 
@@ -310,7 +311,7 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyService.countVariablesByStudyId(studyDbId, Collections.unmodifiableList(
+					return StudyResourceBrapi.this.studyService.countVariablesByDatasetId(datasetId, Collections.unmodifiableList(
 						Arrays.asList(VariableType.TRAIT.getId())));
 				}
 
@@ -318,16 +319,17 @@ public class StudyResourceBrapi {
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return StudyResourceBrapi.this.studyService
-						.getVariablesByStudyId(pagedResult.getPageSize(), pageNumber, studyDbId, crop, Collections.unmodifiableList(
+						.getVariablesByDatasetId(pagedResult.getPageSize(), pageNumber, datasetId, crop, Collections.unmodifiableList(
 							Arrays.asList(VariableType.TRAIT.getId())));
 				}
 			});
 
 		final List<VariableDTO> observationVariables = resultPage.getPageResults();
 
-		final String studyName = this.studyDataManager.getStudyReference(studyDbId).getName();
-		final ObservationVariableResult result = new ObservationVariableResult().withData(observationVariables).withStudyId(studyDbId)
-			.withTrialName(studyName);
+		final String trialName = this.studyDataManager.getProject(datasetId).getStudy().getName();
+
+		final ObservationVariableResult result = new ObservationVariableResult().withData(observationVariables).withStudyDbId(studyDbId)
+			.withTrialName(trialName);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 

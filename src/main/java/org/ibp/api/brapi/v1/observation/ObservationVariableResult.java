@@ -7,15 +7,15 @@ import java.util.List;
 
 public class ObservationVariableResult extends Result<VariableDTO> {
 
-	private int studyId;
+	private int studyDbId;
 	private String trialName;
 
-	public int getStudyId() {
-		return this.studyId;
+	public int getStudyDbId() {
+		return this.studyDbId;
 	}
 
-	public void setStudyId(final int studyId) {
-		this.studyId = studyId;
+	public void setStudyDbId(final int studyDbId) {
+		this.studyDbId = studyDbId;
 	}
 
 	public String getTrialName() {
@@ -26,8 +26,8 @@ public class ObservationVariableResult extends Result<VariableDTO> {
 		this.trialName = trialName;
 	}
 
-	public ObservationVariableResult withStudyId(final int studyId) {
-		this.studyId = studyId;
+	public ObservationVariableResult withStudyDbId(final int studyId) {
+		this.studyDbId = studyId;
 		return this;
 	}
 
