@@ -105,7 +105,7 @@ public class LotListValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		final List<Location> existingLocations =
-				locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE, null, null, locationAbbreviations);
+				locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE,  null, locationAbbreviations);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 			final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
 			final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);
