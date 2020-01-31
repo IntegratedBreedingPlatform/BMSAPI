@@ -32,7 +32,7 @@ public class LocationServiceImpl implements LocationService {
 			locationIds = locationDataManager.getFavoriteProjectLocationIds(programUUID);
 		}
 
-		locations = locationDataManager.getFilteredLocations(locationTypes, locationIds, programUUID, locationAbbreviations);
+		locations = locationDataManager.getFilteredLocations(locationTypes, locationIds, locationAbbreviations);
 
 		if(locations.isEmpty()){
 			return new ArrayList<>();
