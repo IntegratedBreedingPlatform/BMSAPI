@@ -153,8 +153,8 @@ public class LotResource {
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
 		Set<Integer> locationTypes =new HashSet<>();
-		locationTypes.add(1500); //"c00fa18c-a9b2-405b-8fbb-3171214a7f85"
-		final List<LocationDto> locations = locationService.getLocations(locationTypes, "c00fa18c-a9b2-405b-8fbb-3171214a7f85", false, null);
+		locationTypes.add(1500);
+		final List<LocationDto> locations = locationService.getLocations(locationTypes, null, false, null);
 
 		final File file = this.lotExcelTemplateExportServiceImpl.export(locations, units);
 		final HttpHeaders headers = new HttpHeaders();
