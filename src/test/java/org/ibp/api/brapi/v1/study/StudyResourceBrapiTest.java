@@ -299,7 +299,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 			+ "|" + observationVariablesId.get(0) + "\n";
 
 		final Object[] dataArray = data.get(0).toArray();
-
+ 
 		for (int i = 0; i < dataArray.length; i++) {
 			stringResult = stringResult + dataArray[i] + "\t";
 		}
@@ -317,17 +317,4 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 	}
 
-	@Test
-	public void testGetObservationVariables() throws Exception {
-
-		final int studyDbId = current().nextInt();
-
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}/observationvariables")
-			.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDbId).build());
-
-		final MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
-			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andReturn();
-
-	}
 }
