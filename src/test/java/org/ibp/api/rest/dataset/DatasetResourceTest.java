@@ -64,7 +64,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	public static final String DATASET_NAME = "TEST1234";
 	public static final int STUDY_ID = 12345;
 	public static final int PARENT_ID = 200;
-	public static final String DATASETS_GENERATION_URL = "/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation";
+	public static final String DATASETS_GENERATION_URL = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{parentId}/generation";
 	protected final MediaType xlsContentType =
 		new MediaType(MediaType.APPLICATION_OCTET_STREAM.getType(), MediaType.APPLICATION_OCTET_STREAM.getSubtype(),
 			Charset.forName("utf8"));
@@ -104,7 +104,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.head("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables/observations", this.cropName, 100, 102)
+				.head("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables/observations", this.cropName, this.programUuid, 100, 102)
 				.param("variableIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -118,7 +118,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.head("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{instanceId}", this.cropName, 100, 102, 103)
+				.head("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/{instanceId}", this.cropName, this.programUuid, 100, 102, 103)
 				.param("variableIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -138,7 +138,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName, studyId, datasetId)
+				.put("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName, this.programUuid, studyId, datasetId)
 				.contentType(this.contentType).content(this.convertObjectToByte(datasetVariable)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
@@ -150,7 +150,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int datasetId = 102;
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.delete("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName, studyId, datasetId)
+				.delete("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName, this.programUuid, studyId, datasetId)
 				.param("variableIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
@@ -165,7 +165,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables/{variableTypeId}", this.cropName, studyId, datasetId,
+					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables/{variableTypeId}", this.cropName, this.programUuid, studyId, datasetId,
 					variableTypeId)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
@@ -184,7 +184,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations", this.cropName, studyId,
+				.post("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations",
+					this.cropName, this.programUuid, studyId,
 					datasetId, observationUnitId)
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(observationDto)))
@@ -209,8 +210,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.patch(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
-					this.cropName, studyId, datasetId, observationUnitId, observationId)
+					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
+					this.cropName, this.programUuid, studyId, datasetId, observationUnitId, observationId)
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(observationDto)))
 			.andDo(MockMvcResultHandlers.print())
@@ -229,7 +230,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);
 
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets", this.cropName, 100)
+			.perform(MockMvcRequestBuilders.get("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets", this.cropName, this.programUuid, 100)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -242,7 +243,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);
 
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets", this.cropName, 100)
+			.perform(MockMvcRequestBuilders.get("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets", this.cropName, this.programUuid, 100)
 				.param("datasetTypeIds", "4").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -256,7 +257,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.studyDatasetService.getDatasets(100, null))
 			.thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets", this.cropName, 100)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets", this.cropName, this.programUuid, 100)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -273,7 +274,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.studyDatasetService.getDatasets(100, datasetTypeIds))
 			.thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets", this.cropName, 100)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets", this.cropName, this.programUuid, 100)
 			.param("datasetTypeIds", "100").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -286,7 +287,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		doReturn(dataset).when(this.studyDatasetService).getDataset(this.cropName, 100, 101);
 
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/{datasetId}", this.cropName, 100, 101)
+			.perform(MockMvcRequestBuilders.get("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}", this.cropName, this.programUuid, 100, 101)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -325,7 +326,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.studyDatasetService.getDataset(this.cropName, 1000, 1001)).thenThrow(
 			new ResourceNotFoundException(errors.getAllErrors().get(0)));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/{datasetId}", this.cropName, 1000, 1001)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}", this.cropName, this.programUuid, 1000, 1001)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -342,7 +343,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.studyDatasetService.getDataset(this.cropName, 1011, 1012)).thenThrow(
 			new ResourceNotFoundException(errors.getAllErrors().get(0)));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/{datasetId}", this.cropName, 1011, 1012)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}", this.cropName, this.programUuid, 1011, 1012)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -385,8 +386,9 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.post(
-				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table",
+				"/crops/{cropname}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/table",
 				this.cropName,
+				this.programUuid,
 				studyId,
 				datasetId).content(this.convertObjectToByte(searchDTO)).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
@@ -416,6 +418,42 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
+	public void testGetObservationUnitRowsAsListMap() throws Exception {
+
+		final Map<String, Object> rowDataMap = new HashMap<>();
+		rowDataMap.put("TRIAL_INSTANCE", "1");
+		rowDataMap.put("TRAIT1", 1);
+		rowDataMap.put("TRAIT2", "ABC");
+
+		Mockito.when(this.studyDatasetService.getObservationUnitRowsAsMapList(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+			ArgumentMatchers.any()))
+			.thenReturn(Lists.newArrayList(rowDataMap));
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final int instanceId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setInstanceId(instanceId);
+		searchDTO.getFilterColumns().add("TRIAL_INSTANCE");
+		searchDTO.getFilterColumns().add("TRAIT1");
+		searchDTO.getFilterColumns().add("TRAIT2");
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders.post(
+				"/crops/{cropname}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/mapList",
+				this.cropName,
+				this.programUuid,
+				studyId,
+				datasetId).content(this.convertObjectToByte(searchDTO)).contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].TRIAL_INSTANCE", is("1")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].TRAIT1", is(1)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].TRAIT2", is("ABC")));
+	}
+
+	@Test
 	public void testDeleteObservation() throws Exception {
 
 		final Random random = new Random();
@@ -427,8 +465,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.delete(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
-					this.cropName, studyId, datasetId, observationUnitId, observationId)
+					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
+					this.cropName, this.programUuid, studyId, datasetId, observationUnitId, observationId)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
@@ -455,7 +493,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					DATASETS_GENERATION_URL, this.cropName, STUDY_ID, PARENT_ID,
+					DATASETS_GENERATION_URL, this.cropName, this.programUuid, STUDY_ID, PARENT_ID,
 					datasetGeneratorInput)
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(datasetGeneratorInput)))
@@ -574,7 +612,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					DATASETS_GENERATION_URL, this.cropName, STUDY_ID, PARENT_ID,
+					DATASETS_GENERATION_URL, this.cropName, this.programUuid, STUDY_ID, PARENT_ID,
 					datasetGeneratorInput)
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(datasetGeneratorInput)))
@@ -619,8 +657,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}",
-					this.cropName, studyId, datasetId, DatasetResource.CSV)
+					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/{fileType}",
+					this.cropName, this.programUuid, studyId, datasetId, DatasetResource.CSV)
 				.param("instanceIds", "1,2,3")
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
 				.param("singleFile", String.valueOf(false))
@@ -648,8 +686,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}",
-					this.cropName, studyId, datasetId, DatasetResource.CSV)
+					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/{fileType}",
+					this.cropName, this.programUuid, studyId, datasetId, DatasetResource.CSV)
 				.param("instanceIds", "1,2,3")
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
 				.param("singleFile", String.valueOf(false))
@@ -670,7 +708,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final PreconditionFailedException exception = new PreconditionFailedException(new ArrayList<ObjectError>());
 		Mockito.doThrow(exception).when(this.studyDatasetService).importObservations(studyId, datasetId, observationsPutRequestInput);
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, studyId,
+			.put("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, this.programUuid, studyId,
 				datasetId).contentType(this.contentType).content(this.convertObjectToByte(observationsPutRequestInput)))
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 	}
@@ -692,7 +730,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			}
 		}).when(this.studyDatasetService).importObservations(studyId, datasetId, observationsPutRequestInput);
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, studyId,
+			.put("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, this.programUuid, studyId,
 				datasetId).contentType(this.contentType).content(this.convertObjectToByte(observationsPutRequestInput)))
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk());
 	}
@@ -709,7 +747,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final ApiRequestValidationException exception = new ApiRequestValidationException(new ArrayList<ObjectError>());
 		Mockito.doThrow(exception).when(this.studyDatasetService).importObservations(studyId, datasetId, observationsPutRequestInput);
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, studyId,
+			.put("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, this.programUuid, studyId,
 				datasetId).contentType(this.contentType).content(this.convertObjectToByte(observationsPutRequestInput)))
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isBadRequest());
 	}
@@ -723,7 +761,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/acceptance", this.cropName, studyId,
+				.post("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/acceptance", this.cropName, this.programUuid, studyId,
 					datasetId)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
@@ -739,7 +777,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/rejection", this.cropName, studyId,
+				.post("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/rejection", this.cropName, this.programUuid, studyId,
 					datasetId)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
@@ -757,7 +795,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.get("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds", this.cropName, studyId,
+				.get("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds", this.cropName, this.programUuid, studyId,
 					datasetId)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
@@ -775,8 +813,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.get("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds",
-					this.cropName, studyId, datasetId)
+				.get("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds",
+					this.cropName, this.programUuid, studyId, datasetId)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
@@ -791,7 +829,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/set-as-missing", this.cropName,
+				.post("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/set-as-missing", this.cropName,
+					this.programUuid,
 					studyId,
 					datasetId)
 				.contentType(this.contentType))
@@ -823,7 +862,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/filter/set-value", this.cropName, studyId,
+				.post("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/filter/set-value", this.cropName, this.programUuid, studyId,
 					datasetId)
 				.contentType(this.contentType).content(this.convertObjectToByte(paramDTO)))
 			.andDo(MockMvcResultHandlers.print())
@@ -848,7 +887,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/filter/acceptance", this.cropName,
+				.post("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/filter/acceptance", this.cropName,
+					this.programUuid,
 					studyId,
 					datasetId)
 				.contentType(this.contentType).content(this.convertObjectToByte(searchDTO)))
@@ -875,7 +915,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/observations/filter/count", this.cropName,
+				.post("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/observations/filter/count", this.cropName,
+					this.programUuid,
 					studyId,
 					datasetId)
 				.contentType(this.contentType).content(this.convertObjectToByte(searchDTO)))

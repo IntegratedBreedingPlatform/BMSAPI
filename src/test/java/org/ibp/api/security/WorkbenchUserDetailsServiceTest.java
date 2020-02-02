@@ -5,12 +5,16 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.ibp.api.java.impl.middleware.common.ContextResolver;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -31,6 +35,7 @@ import java.util.List;
 public class WorkbenchUserDetailsServiceTest {
 
 	private static final String TEST_USER = "testUser";
+	public static final String CROP_NAME = "Maize";
 
 	@Mock
 	private UserService userService;
@@ -38,18 +43,34 @@ public class WorkbenchUserDetailsServiceTest {
 	@Mock
 	private PermissionService permissionService;
 
-	@InjectMocks
-	private WorkbenchUserDetailsService service = new WorkbenchUserDetailsService();
+	@Mock
+	private ContextResolver contextResolver;
 
+	@Mock
+	private WorkbenchDataManager workbenchDataManager;
+
+	@InjectMocks
+	private final WorkbenchUserDetailsService service = new WorkbenchUserDetailsService();
+	public static final String PROGRAM_UUID = "1234567";
+
+	@Before
+	public void setUp() {
+		Mockito.when(this.contextResolver.resolveCropNameFromUrl()).thenReturn(CROP_NAME);
+		Mockito.when(this.contextResolver.resolveProgramUuidFromRequest()).thenReturn(PROGRAM_UUID);
+
+		final Project project = new Project();
+		project.setProjectId(new Long(1));
+		Mockito.when(this.workbenchDataManager.getProjectByUuid(PROGRAM_UUID)).thenReturn(project);
+	}
 
 	@Test
 	public void testLoadUserByUserName() {
 		try {
-			List<WorkbenchUser> matchingUsers = new ArrayList<>();
-			WorkbenchUser testUserWorkbench = new WorkbenchUser();
+			final List<WorkbenchUser> matchingUsers = new ArrayList<>();
+			final WorkbenchUser testUserWorkbench = new WorkbenchUser();
 			testUserWorkbench.setName(WorkbenchUserDetailsServiceTest.TEST_USER);
 			testUserWorkbench.setPassword("password");
-			UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
+			final UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
 			testUserWorkbench.setRoles(Arrays.asList(testUserRole));
 			matchingUsers.add(testUserWorkbench);
 
@@ -60,41 +81,41 @@ public class WorkbenchUserDetailsServiceTest {
 			final PermissionDto permissionDto = new PermissionDto();
 			permissionDto.setName("ADMIN");
 			final List<PermissionDto> permissions = Lists.newArrayList(permissionDto);
-			Mockito.when(this.permissionService.getPermissions(testUserWorkbench.getUserid(),null,null)).thenReturn(permissions);
+			Mockito.when(this.permissionService.getPermissions(testUserWorkbench.getUserid(),CROP_NAME,1)).thenReturn(permissions);
 
-			UserDetails userDetails = this.service.loadUserByUsername(WorkbenchUserDetailsServiceTest.TEST_USER);
+			final UserDetails userDetails = this.service.loadUserByUsername(WorkbenchUserDetailsServiceTest.TEST_USER);
 			Assert.assertEquals(testUserWorkbench.getName(), userDetails.getUsername());
 			Assert.assertEquals(testUserWorkbench.getPassword(), userDetails.getPassword());
 			Assert.assertEquals(1, userDetails.getAuthorities().size());
 			Assert.assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority(testUserRole.getRole().getCapitalizedRole())));
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
 	}
 
 	@Test
-	public void testLoadUserByUsernameUTF8Support() throws Exception {
-		String htmlEscaptedUTF8Username = "&#28900;&#29482;";
-		String rawUTF8Username = "烤猪";
+	public void testLoadUserByUsernameUTF8Support() {
+		final String htmlEscaptedUTF8Username = "&#28900;&#29482;";
+		final String rawUTF8Username = "烤猪";
 
-		List<WorkbenchUser> matchingUsers = new ArrayList<WorkbenchUser>();
-		WorkbenchUser testUserWorkbench = new WorkbenchUser();
+		final List<WorkbenchUser> matchingUsers = new ArrayList<WorkbenchUser>();
+		final WorkbenchUser testUserWorkbench = new WorkbenchUser();
 		testUserWorkbench.setName(rawUTF8Username);
 		testUserWorkbench.setPassword("password");
-		UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
+		final UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
 		testUserWorkbench.setRoles(Arrays.asList(testUserRole));
 		matchingUsers.add(testUserWorkbench);
 
 		Mockito.when(this.userService.getUserByName(rawUTF8Username, 0, 1, Operation.EQUAL)).thenReturn(matchingUsers);
 
-		UserDetails userDetails = this.service.loadUserByUsername(htmlEscaptedUTF8Username);
+		final UserDetails userDetails = this.service.loadUserByUsername(htmlEscaptedUTF8Username);
 		Assert.assertEquals(testUserWorkbench.getName(), userDetails.getUsername());
 	}
 
 	@Test(expected = UsernameNotFoundException.class)
 	public void testLoadUserByNonExistantUserName() throws MiddlewareQueryException {
 		Mockito.when(this.userService.getUserByName(WorkbenchUserDetailsServiceTest.TEST_USER, 0, 1, Operation.EQUAL)).thenReturn(
-				Collections.<WorkbenchUser>emptyList());
+				Collections.emptyList());
 		this.service.loadUserByUsername(WorkbenchUserDetailsServiceTest.TEST_USER);
 	}
 

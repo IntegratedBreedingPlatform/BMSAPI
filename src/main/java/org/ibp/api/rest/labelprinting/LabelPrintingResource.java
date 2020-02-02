@@ -19,6 +19,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Api(value = "Label Printing Services")
+@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 @RestController
 public class LabelPrintingResource {
 	@Autowired
@@ -46,17 +48,14 @@ public class LabelPrintingResource {
 	private PDFLabelsFileGenerator pdfLabelsFileGenerator;
 
 
-	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/summary", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/labels/summary", method = RequestMethod.POST)
 	@ApiOperation(value = "Get Summary of Labels Needed according to the specified printing label type",
 			notes = "Returns summary of labels needed according to the printing label type and input in the request body.")
 	@ResponseBody
 	public ResponseEntity<LabelsNeededSummaryResponse> getLabelsNeededSummary(
-			@PathVariable
-			String cropname,
-			@PathVariable
-			String labelPrintingType,
-			@RequestBody
-				LabelsInfoInput labelsInfoInput) {
+			@PathVariable final String cropname, @PathVariable final String programUUID,
+			@PathVariable final String labelPrintingType,
+			@RequestBody final LabelsInfoInput labelsInfoInput) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
 		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
@@ -67,17 +66,14 @@ public class LabelPrintingResource {
 		return new ResponseEntity<>(labelsNeededSummaryResponse, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/metadata", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/metadata", method = RequestMethod.POST)
 	@ApiOperation(value = "Get the metadata according to the specified printing label type and the input in the request body",
 			notes = "Returns summary of labels needed according to the printing label type and input in the request body.")
 	@ResponseBody
 	public ResponseEntity<OriginResourceMetadata> getOriginResourceMetadada(
-			@PathVariable
-			String cropname,
-			@PathVariable
-			String labelPrintingType,
-			@RequestBody
-			LabelsInfoInput labelsInfoInput) {
+			@PathVariable final String cropname, @PathVariable final String programUUID,
+			@PathVariable final String labelPrintingType,
+			@RequestBody final LabelsInfoInput labelsInfoInput) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
 		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
@@ -86,17 +82,14 @@ public class LabelPrintingResource {
 		return new ResponseEntity<>(originResourceMetadata, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labelTypes", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/labelTypes", method = RequestMethod.POST)
 	@ApiOperation(value = "Get the list of available label fields according to the specified printing label type and the input in the request body",
 			notes = "Returns list of available label fields grouped by type according to the printing label type and input in the request body.")
 	@ResponseBody
 	public ResponseEntity<List<LabelType>> getAvailableLabelFields(
-		@PathVariable
-			String cropname,
-		@PathVariable
-			String labelPrintingType,
-		@RequestBody
-			LabelsInfoInput labelsInfoInput) {
+		@PathVariable final String cropname, @PathVariable final String programUUID,
+		@PathVariable final String labelPrintingType,
+		@RequestBody final LabelsInfoInput labelsInfoInput) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
 		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
@@ -105,18 +98,14 @@ public class LabelPrintingResource {
 		return new ResponseEntity<>(labelTypes, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/{fileExtension}", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/labels/{fileExtension}", method = RequestMethod.POST)
 	@ApiOperation(value = "Export the labels to a specified file type")
 	@ResponseBody
 	public ResponseEntity<FileSystemResource> getLabelsFile(
-		@PathVariable
-			String cropname,
-		@PathVariable
-			String labelPrintingType,
-		@PathVariable
-			String fileExtension,
-		@RequestBody
-			LabelsGeneratorInput labelsGeneratorInput ) {
+		@PathVariable final String cropname, @PathVariable final String programUUID,
+		@PathVariable final String labelPrintingType,
+		@PathVariable final String fileExtension,
+		@RequestBody final LabelsGeneratorInput labelsGeneratorInput ) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
 		final LabelsFileGenerator labelsFileGenerator = this.getLabelsFileGenerator(fileExtension, labelPrintingStrategy);
@@ -127,7 +116,7 @@ public class LabelPrintingResource {
 
 		final LabelsData labelsData = labelPrintingStrategy.getLabelsData(labelsGeneratorInput);
 
-		File file;
+		final File file;
 		try {
 			file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
 		} catch (final IOException e) {
@@ -155,7 +144,7 @@ public class LabelPrintingResource {
 
 		switch (labelPrintingTypeEnum) {
 			case SUBOBSERVATION_DATASET:
-				labelPrintingStrategy = subObservationDatasetLabelPrinting;
+				labelPrintingStrategy = this.subObservationDatasetLabelPrinting;
 				break;
 			default:
 				labelPrintingStrategy = null;
@@ -174,10 +163,10 @@ public class LabelPrintingResource {
 		}
 		switch (fileType) {
 			case CSV:
-				labelsFileGenerator = csvLabelsFileGenerator;
+				labelsFileGenerator = this.csvLabelsFileGenerator;
 				break;
 			case PDF:
-				labelsFileGenerator = pdfLabelsFileGenerator;
+				labelsFileGenerator = this.pdfLabelsFileGenerator;
 				break;
 			default:
 				labelsFileGenerator = null;

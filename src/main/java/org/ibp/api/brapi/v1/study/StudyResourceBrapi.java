@@ -75,7 +75,8 @@ public class StudyResourceBrapi {
 	private LocationDataManager locationDataManager;
 
 	@ApiOperation(value = "List of study summaries", notes = "Get a list of study summaries.")
-	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
+	// TODO implement
+	// @RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<StudySummariesDto> listStudySummaries(@PathVariable final String crop,
 			@ApiParam(

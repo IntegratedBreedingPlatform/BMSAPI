@@ -71,7 +71,7 @@ public class ObservationsTableValidatorTest {
 		try {
 			observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalidCellValue"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalid.cell.numeric.value"));
 			throw e;
 		}
 	}
@@ -88,7 +88,7 @@ public class ObservationsTableValidatorTest {
 		try {
 			observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalidCellValue"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalid.cell.numeric.value"));
 			throw e;
 		}
 	}
@@ -129,7 +129,7 @@ public class ObservationsTableValidatorTest {
 		try {
 			observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalidCellValue"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalid.cell.date.value"));
 			throw e;
 		}
 	}

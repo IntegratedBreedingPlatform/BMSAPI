@@ -44,11 +44,10 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testListUsersByProjectUuidFailDoNotHaveUsers() throws Exception {
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/projects/d8d59d89-f4ca-4b83-90e2-be2d82407144/users").build().encode();
-		Mockito.when(this.userService.getUsersByProjectUUID("d8d59d89-f4ca-4b83-90e2-be2d82407144"))
+		Mockito.when(this.userService.getUsersByProjectUUID(this.programUuid))
 				.thenThrow(new IllegalStateException("don't exists users for this projectUUID"));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/filter?cropName=" + this.cropName + "&programUUID=" + this.programUuid).contentType(this.contentType))
 				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isInternalServerError())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", Matchers.is("don't exists users for this projectUUID")));
 	}
@@ -60,11 +59,10 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testListUsersByProjectUuidFailQuery() throws Exception {
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/projects/d8d59d89-f4ca-4b83-90e2-be2d82407145/users").build().encode();
-		Mockito.when(this.userService.getUsersByProjectUUID("d8d59d89-f4ca-4b83-90e2-be2d82407145"))
+		Mockito.when(this.userService.getUsersByProjectUUID(this.programUuid))
 				.thenThrow(new NullPointerException("An internal error occurred while trying to get the users"));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/filter?cropName=" + this.cropName + "&programUUID=" + this.programUuid).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isInternalServerError()).andExpect(
 				MockMvcResultMatchers.jsonPath("$.errors[0].message", Matchers.is("An internal error occurred while trying to get the users")));
@@ -78,12 +76,9 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testListUsersByProjectUuid() throws Exception {
 		final List<UserDetailDto> users = UserTestDataGenerator.initializeListUserDetailDto();
-		final UriComponents uriComponents =
-			UriComponentsBuilder.newInstance().path("/projects/d8d59d89-f4ca-4b83-90e2-be2d82407146/users").build().encode();
+		Mockito.when(this.userService.getUsersByProjectUUID(this.programUuid)).thenReturn(users);
 
-		Mockito.when(this.userService.getUsersByProjectUUID("d8d59d89-f4ca-4b83-90e2-be2d82407146")).thenReturn(users);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/filter?cropName=" + this.cropName + "&programUUID=" + this.programUuid).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(users.size())))
@@ -114,7 +109,7 @@ public class UserResourceTest  extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].lastName", Matchers.is(users.get(0).getLastName())))
 			.andExpect(
 				MockMvcResultMatchers.jsonPath("$[0].userRoles[0].role.id", Matchers.is(users.get(0).getUserRoles().get(0).getRole().getId())));
-;	}
+	}
 
 	/**
 	 * Should respond with 201 and return the id of the created user. * *

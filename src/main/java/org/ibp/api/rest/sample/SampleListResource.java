@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.FileExportInfo;
 import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +35,7 @@ import java.util.Map;
 
 @Api(value = "Sample Services")
 @Controller
-@RequestMapping("/sampleLists")
+@RequestMapping("/crops")
 public class SampleListResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SampleListResource.class);
@@ -49,16 +49,16 @@ public class SampleListResource {
 	public SampleListService sampleListService;
 
 	@Autowired
-	public ContextUtil contextUtil;
-
-	@Autowired
 	public CsvExportSampleListService csvExportSampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
-	@RequestMapping(value = "/{crop}/sampleLists", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES','INFORMATION_MANAGEMENT')")
+	@RequestMapping(value = "/{crop}/sample-lists", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestBody final SampleListDto dto) {
+	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestParam final String programUUID, @RequestBody final SampleListDto dto) {
 		dto.setCropName(crop);
+		// The programUUID in request is the program where sample list is made from. It is used to filter permissions for a program-level user
+		// It is not necessarily set in the SampleListDto as the list might be a crop-level list
 		final Map<String, Object> map;
 		try {
 			map = this.sampleListService.createSampleList(dto);
@@ -77,10 +77,11 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Create sample list folder", notes = "Create sample list folder. ")
-	@RequestMapping(value = "/{crop}/sampleListFolder", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity createSampleListFolder(@PathVariable final String crop, @RequestParam final String folderName,
-		@RequestParam final Integer parentId, @RequestParam final String programUUID) {
+	public ResponseEntity createSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID, @RequestParam final String folderName,
+		@RequestParam final Integer parentId) {
 		final Map<String, Object> map;
 		try {
 			map = this.sampleListService.createSampleListFolder(folderName, parentId, programUUID);
@@ -95,10 +96,11 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Update sample list folder", notes = "Update sample list folder. ")
-	@RequestMapping(value = "/{crop}/sampleListFolder/{folderId}", method = RequestMethod.PUT)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders/{folderId}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateSampleListFolderName(@PathVariable final String crop, @RequestParam final String newFolderName,
-		@PathVariable final Integer folderId) {
+	public ResponseEntity updateSampleListFolderName(@PathVariable final String crop, @PathVariable final String programUUID,
+		@PathVariable final Integer folderId, @RequestParam final String newFolderName) {
 		final Map<String, Object> map;
 		try {
 			map = this.sampleListService.updateSampleListFolderName(folderId, newFolderName);
@@ -112,10 +114,12 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Move sample list folder", notes = "Move sample list folder. ")
-	@RequestMapping(value = "/{crop}/sampleListFolder/{folderId}/move", method = RequestMethod.PUT)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders/{folderId}/move", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity moveSampleListFolder(@PathVariable final String crop, @PathVariable final Integer folderId,
-		@RequestParam final Integer newParentId, @RequestParam final boolean isCropList, @RequestParam final String programUUID) {
+	public ResponseEntity moveSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID,
+		@PathVariable final Integer folderId,
+		@RequestParam final Integer newParentId, @RequestParam final boolean isCropList) {
 		final Map<String, Object> map;
 		try {
 			map = this.sampleListService.moveSampleListFolder(folderId, newParentId, isCropList, programUUID);
@@ -129,11 +133,12 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Delete sample list folder", notes = "Delete sample list folder. ")
-	@RequestMapping(value = "/{crop}/sampleListFolder/{folderId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders/{folderId}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity deleteSampleListFolder(@PathVariable final String crop, @PathVariable final String folderId) {
+	public ResponseEntity deleteSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer folderId) {
 		try {
-			this.sampleListService.deleteSampleListFolder(Integer.valueOf(folderId));
+			this.sampleListService.deleteSampleListFolder(folderId);
 		} catch (final MiddlewareException e) {
 			LOG.error("Error deleting sample list folder", e);
 			final ErrorResponse response = new ErrorResponse();
@@ -144,19 +149,22 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Search Sample List", notes = "Search Sample List")
-	@RequestMapping(value = "/{crop}/search", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES','INFORMATION_MANAGEMENT')")
+	@RequestMapping(value = "/{crop}/sample-lists/search", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<org.generationcp.middleware.pojos.SampleList>> search(@PathVariable final String crop,
+		@RequestParam final String programUUID,
 		@ApiParam("Only return the exact match of the search text") @RequestParam final boolean exactMatch,
 		@ApiParam("The name of the list to be searched") @RequestParam final String searchString, final Pageable pageable) {
 		final List<org.generationcp.middleware.pojos.SampleList> sampleLists =
-			this.sampleListService.search(searchString, exactMatch, this.contextUtil.getCurrentProgramUUID(), pageable);
+			this.sampleListService.search(searchString, exactMatch, programUUID, pageable);
 		return new ResponseEntity<>(sampleLists, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Download Sample List as CSV file", notes = "Download Sample List as CSV file")
-	@RequestMapping(value = "/{crop}/download", method = RequestMethod.GET)
-	public ResponseEntity<FileSystemResource> download(@PathVariable final String crop, @RequestParam final Integer listId,
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES','INFORMATION_MANAGEMENT')")
+	@RequestMapping(value = "/{crop}/sample-lists/{listId}/download", method = RequestMethod.GET)
+	public ResponseEntity<FileSystemResource> download(@PathVariable final String crop, @PathVariable final Integer listId, @RequestParam final String programUUID,
 		@RequestParam final String listName) throws IOException {
 
 		final List<SampleDetailsDTO> sampleDetailsDTOs = this.sampleListService.getSampleDetailsDTOs(listId);
@@ -181,10 +189,11 @@ public class SampleListResource {
 
 	//TODO: Is necessary make a refactor in the future with this service for do it more generic to import samples not only Plate Id and well.
 	@ApiOperation(value = "Import Plate Information", notes = "Current implementation only supports patch on plateId and well attributes")
-	@RequestMapping(value = "/{crop}/sampleList/{listId}/samples", method = RequestMethod.PATCH)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@RequestMapping(value = "/{crop}/sample-lists/{listId}/samples", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity saveSamplePlateInformation(
-		@PathVariable final String crop, @PathVariable final Integer listId, @RequestBody final List<SampleDTO> sampleDTOs) {
+		@PathVariable final String crop, @PathVariable final Integer listId, @RequestParam final String programUUID, @RequestBody final List<SampleDTO> sampleDTOs) {
 		this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

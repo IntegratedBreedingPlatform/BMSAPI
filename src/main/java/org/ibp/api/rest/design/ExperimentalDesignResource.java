@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import org.ibp.api.java.design.ExperimentalDesignService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,8 +23,9 @@ public class ExperimentalDesignResource {
 	private ExperimentalDesignService experimentalDesignService;
 
 	@ApiOperation(value = "Generate experimental design for study", notes = "Generate experimental design for study")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/experimental-designs/generation", method = RequestMethod.POST)
-	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop,
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/experimental-designs/generation", method = RequestMethod.POST)
+	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
 		@RequestBody final ExperimentalDesignInput experimentalDesignInput) {
 
@@ -34,8 +36,9 @@ public class ExperimentalDesignResource {
 
 
 	@ApiOperation(value = "Delete experimental design of study", notes = "Delete experimental design of study")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/experimental-designs", method = RequestMethod.DELETE)
-	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop,
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/experimental-designs", method = RequestMethod.DELETE)
+	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
 		this.experimentalDesignService.deleteDesign(studyId);
 

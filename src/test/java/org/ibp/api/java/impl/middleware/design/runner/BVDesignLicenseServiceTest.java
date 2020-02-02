@@ -59,7 +59,7 @@ public class BVDesignLicenseServiceTest {
 		final SimpleDateFormat df = new SimpleDateFormat(BVDesignLicenseService.LICENSE_DATE_FORMAT);
 		this.bvDesignLicenseInfo.getStatus().getLicense().setExpiry(df.format(calendar.getTime()));
 
-		Assert.assertTrue(bvDesignLicenseService.isExpired());
+		Assert.assertTrue(this.bvDesignLicenseService.isExpired());
 	}
 
 	@Test
@@ -68,7 +68,7 @@ public class BVDesignLicenseServiceTest {
 		final SimpleDateFormat df = new SimpleDateFormat(BVDesignLicenseService.LICENSE_DATE_FORMAT);
 		this.bvDesignLicenseInfo.getStatus().getLicense().setExpiry(df.format(DateUtil.getCurrentDateWithZeroTime()));
 
-		Assert.assertFalse(bvDesignLicenseService.isExpired());
+		Assert.assertFalse(this.bvDesignLicenseService.isExpired());
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class BVDesignLicenseServiceTest {
 		final SimpleDateFormat df = new SimpleDateFormat(BVDesignLicenseService.LICENSE_DATE_FORMAT);
 		this.bvDesignLicenseInfo.getStatus().getLicense().setExpiry(df.format(calendar.getTime()));
 
-		Assert.assertFalse(bvDesignLicenseService.isExpired());
+		Assert.assertFalse(this.bvDesignLicenseService.isExpired());
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class BVDesignLicenseServiceTest {
 
 		final File file = Mockito.mock(File.class);
 		this.bvDesignLicenseInfo.getStatus().setReturnCode(BVDesignLicenseService.LICENSE_SUCCESS_CODE);
-		Mockito.when(objectMapper.readValue(file, DesignLicenseInfo.class)).thenReturn(this.bvDesignLicenseInfo);
+		Mockito.when(this.objectMapper.readValue(file, DesignLicenseInfo.class)).thenReturn(this.bvDesignLicenseInfo);
 
 		try {
 			this.bvDesignLicenseService.readLicenseInfoFromJsonFile(file);
@@ -111,7 +111,7 @@ public class BVDesignLicenseServiceTest {
 		final String errorMessage = "There is an error.";
 		this.bvDesignLicenseInfo.getStatus().setReturnCode(errorStatusCode);
 		this.bvDesignLicenseInfo.getStatus().setAppStatus(errorMessage);
-		Mockito.when(objectMapper.readValue(file, DesignLicenseInfo.class)).thenReturn(this.bvDesignLicenseInfo);
+		Mockito.when(this.objectMapper.readValue(file, DesignLicenseInfo.class)).thenReturn(this.bvDesignLicenseInfo);
 
 		try {
 			this.bvDesignLicenseService.readLicenseInfoFromJsonFile(file);
@@ -128,7 +128,7 @@ public class BVDesignLicenseServiceTest {
 	public void testReadLicenseInfoFromJsonFile_IOException() throws IOException {
 
 		final File file = Mockito.mock(File.class);
-		Mockito.doThrow(new IOException()).when(objectMapper).readValue(file, DesignLicenseInfo.class);
+		Mockito.doThrow(new IOException()).when(this.objectMapper).readValue(file, DesignLicenseInfo.class);
 
 		try {
 			this.bvDesignLicenseService.readLicenseInfoFromJsonFile(file);
@@ -144,9 +144,9 @@ public class BVDesignLicenseServiceTest {
 	public void testGenerateBVDesignLicenseJsonFileSuccess() throws IOException {
 
 		final String bvDesignLocation = "parentDirectory/bvDesign";
-		bvDesignLicenseService.setBvDesignPath(bvDesignLocation);
+		this.bvDesignLicenseService.setBvDesignPath(bvDesignLocation);
 		try {
-			bvDesignLicenseService.generateBVDesignLicenseJsonFile();
+			this.bvDesignLicenseService.generateBVDesignLicenseJsonFile();
 			Mockito.verify(this.processRunner).setDirectory("parentDirectory");
 			Mockito.verify(this.processRunner).run(bvDesignLocation, "-status", "-json");
 		} catch (final BVLicenseParseException e) {
@@ -158,7 +158,7 @@ public class BVDesignLicenseServiceTest {
 	@Test
 	public void testGenerateBVDesignLicenseJsonFileFailed() throws IOException {
 		final String bvDesignLocation = "parentDirectory/bvDesign";
-		bvDesignLicenseService.setBvDesignPath(bvDesignLocation);
+		this.bvDesignLicenseService.setBvDesignPath(bvDesignLocation);
 		Mockito.when(this.processRunner.run(bvDesignLocation, "-status", "-json")).thenThrow(new IOException());
 
 		try {
@@ -181,7 +181,7 @@ public class BVDesignLicenseServiceTest {
 
 		this.bvDesignLicenseInfo.getStatus().setReturnCode(BVDesignLicenseService.LICENSE_SUCCESS_CODE);
 
-		Mockito.when(objectMapper.readValue(ArgumentMatchers.any(File.class), ArgumentMatchers.eq(DesignLicenseInfo.class))).thenReturn(this.bvDesignLicenseInfo);
+		Mockito.when(this.objectMapper.readValue(ArgumentMatchers.any(File.class), ArgumentMatchers.eq(DesignLicenseInfo.class))).thenReturn(this.bvDesignLicenseInfo);
 
 		try {
 
@@ -189,7 +189,7 @@ public class BVDesignLicenseServiceTest {
 			Mockito.verify(this.processRunner).setDirectory("parentDirectory");
 			Mockito.verify(this.processRunner).run(bvDesignLocation, "-status", "-json");
 			Mockito.verify(this.objectMapper).readValue(ArgumentMatchers.any(File.class), ArgumentMatchers.eq(DesignLicenseInfo.class));
-			Assert.assertEquals(licenseInfo, bvDesignLicenseInfo);
+			Assert.assertEquals(licenseInfo, this.bvDesignLicenseInfo);
 
 		} catch (final BVLicenseParseException e) {
 			Assert.fail("retrieveLicenseInfo should not throw a BVLicenseParseException");
@@ -200,7 +200,7 @@ public class BVDesignLicenseServiceTest {
 	private DesignLicenseInfo createBVDesignLicenseInfo() {
 		final DesignLicenseInfo bvDesignLicenseInfo = new DesignLicenseInfo();
 		final Status status = new Status();
-		final License license = new License("Succesful license checkout", "73", "31-DEC-2019");
+		final License license = new License("Succesful license checkout", "", "");
 		status.setLicense(license);
 		bvDesignLicenseInfo.setStatus(status);
 		return bvDesignLicenseInfo;

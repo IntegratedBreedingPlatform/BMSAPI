@@ -133,7 +133,7 @@ public class DatasetExcelExportServiceImplTest {
 			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
 		verify(this.studyValidator).validate(this.study.getId(), false);
-		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId(), false);
+		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId());
 		verify(this.instanceValidator).validate(this.dataSetDTO.getDatasetId(), instanceIds);
 		assertSame(result, zipFile);
 	}
@@ -184,7 +184,7 @@ public class DatasetExcelExportServiceImplTest {
 
 		final File result = this.datasetExportService
 			.generateInSingleFile(
-				this.study, instanceObservationUnitRowsMap,
+				this.study, this.dataSetDTO, instanceObservationUnitRowsMap,
 				measurementVariables, this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
 
 		verify(this.datasetExcelGenerator)

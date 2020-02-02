@@ -1,10 +1,11 @@
 
 package org.ibp.api.java.germplasm;
 
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
-import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.ibp.api.domain.germplasm.DescendantTree;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
@@ -21,7 +22,7 @@ public interface GermplasmService {
 
 	GermplasmSummary getGermplasm(String germplasmId);
 
-	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, final Boolean includeSiblings);
+	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, Boolean includeSiblings);
 
 	ProgenyDTO getProgeny(Integer germplasmDbId);
 
@@ -35,7 +36,12 @@ public interface GermplasmService {
 
 	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
-	long countGermplasmByStudy(final Integer studyDbId);
+	long countGermplasmByStudy(Integer studyDbId);
 
 	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, int pageSize, int pageNumber);
+
+	List<AttributeDTO> getAttributesByGid(
+		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNUmber);
+
+	long countAttributesByGid(String gid, List<String> attributeDbIds);
 }

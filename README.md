@@ -42,18 +42,11 @@ For Code Contributing Developers
 Setup, build from source, install and deploy.
 
 ## Pre Requisites ##
-* Git
-* Maven
-* MySQL
-* JDK
-* An existing BMS installation with at least one program in it. Or a BMS development environment can be setup using instructions [here](https://github.com/IntegratedBreedingPlatform/DBScripts/tree/master/setuputils).
+See [BMS Manual setup]
 
 ### Setup ###
-* Get the source code:
-  * BMSAPI: `git clone https://github.com/IntegratedBreedingPlatform/BMSAPI.git`.
-  * Middleware: `git clone https://github.com/IntegratedBreedingPlatform/Middleware.git` which is a required dependency of BMSAPI.
-  * BMSConfig : `git clone https://github.com/IntegratedBreedingPlatform/BMSConfig.git` - this is where your environment configuration will be read from during build.
-* Create and configure your environment specific folder under [BMSConfig](https://github.com/IntegratedBreedingPlatform/BMSConfig) project and set values as per your environment such as for MySQL database parameters, tomcat server port etc. For more details see existing user's config folders and the readme the on [BMSConfig](https://github.com/IntegratedBreedingPlatform/BMSConfig) project.
+* Get the source code (See [Pre Requisites](#pre-requisites))
+* Create and configure your environment specific folder under BMSConfig folder and set values as per your environment such as for MySQL database parameters, tomcat server port etc.
 * The main properties that BMSAPI rely on can be seen in `src/main/resources/application.properties` and in Middleware project at `src/main/resources/database.properties`. The values are substituted by Maven build from your environment specific configuration folder in BMSConfig.
 * First run `mvn clean install` on Middleware.
 * Then run `mvn clean install` on BMSAPI.
@@ -90,5 +83,4 @@ db.workbench.name=workbench
 ```
 then run with the usual `java -jar bmsapi.war` and BMS API will pick up the `application.properties` file from local directory and override the defaults.
 
-
-
+[BMS Manual setup]: https://github.com/IntegratedBreedingPlatform/Documentation/wiki/Manual-setup

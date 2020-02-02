@@ -1,7 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
-import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -37,9 +37,6 @@ public class DatasetValidator {
 	@Autowired
 	private DatasetService middlewareDatasetService;
 
-	@Autowired
-	private ContextUtil contextUtil;
-
 	@Resource
 	private DatasetTypeService datasetTypeService;
 
@@ -49,17 +46,18 @@ public class DatasetValidator {
 		// Empty constructor expected by MockMvcRequestBuilder
 	}
 
-	public void validateDataset(final Integer studyId, final Integer datasetId, final Boolean shouldBeSubobservationDataset) {
+	public void validateDataset(final Integer studyId, final Integer datasetId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		if (datasetId == null) {
 			this.errors.reject("dataset.required", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
-		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
+		this.validateDataset(studyId, dataSet);
 	}
 
-	private void validateDataset(final Integer studyId, final DatasetDTO dataSet, final Boolean shouldBeSubobservationDataset) {
+	private void validateDataset(
+		final Integer studyId, final DatasetDTO dataSet) {
 
 		if (dataSet == null) {
 			this.errors.reject("dataset.does.not.exist", "");
@@ -67,27 +65,29 @@ public class DatasetValidator {
 		}
 
 		this.validateDatasetBelongsToStudy(studyId, dataSet.getDatasetId());
+	}
 
+	public void validateObservationDatasetType(final Integer datasetId) {
+		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
-		if (shouldBeSubobservationDataset && !datasetType.isSubObservationType()) {
-			this.errors.reject("dataset.type.not.subobservation", "");
+		if (!datasetType.isObservationType() && !datasetType.isSubObservationType()) {
+			this.errors.reject("dataset.type.not.observation", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));
 		}
 	}
 
 	public StandardVariable validateDatasetVariable(
-		final Integer studyId, final Integer datasetId,
-		final Boolean shouldBeSubobservationDataset, final DatasetVariable datasetVariable, final Boolean shouldBeDatasetVariable) {
+		final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable, final Boolean shouldBeDatasetVariable) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
-		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
+		this.validateDataset(studyId, dataSet);
 
 		// Validate if variable exists and of supported variable type
 		final VariableType variableType = this.validateVariableType(datasetVariable.getVariableTypeId());
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable standardVariable =
-			this.ontologyDataManager.getStandardVariable(variableId, this.contextUtil.getCurrentProgramUUID());
+			this.ontologyDataManager.getStandardVariable(variableId, ContextHolder.getCurrentProgram());
 		this.validateVariable(standardVariable, variableType);
 
 		this.validateIfDatasetVariableAlreadyExists(variableId, shouldBeDatasetVariable, dataSet);
@@ -96,16 +96,15 @@ public class DatasetValidator {
 	}
 
 	public void validateExistingDatasetVariables(
-		final Integer studyId, final Integer datasetId,
-		final Boolean shouldBeSubobservationDataset, final List<Integer> variableIds) {
+		final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
-		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
+		this.validateDataset(studyId, dataSet);
 
 		for (final Integer variableId : variableIds) {
 			// If the variable does not exist, MiddlewareQueryException will be thrown
-			this.ontologyDataManager.getStandardVariable(variableId, this.contextUtil.getCurrentProgramUUID());
+			this.ontologyDataManager.getStandardVariable(variableId, ContextHolder.getCurrentProgram());
 			this.validateIfDatasetVariableAlreadyExists(variableId, true, dataSet);
 		}
 

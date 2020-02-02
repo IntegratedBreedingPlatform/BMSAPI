@@ -131,7 +131,7 @@ public class DatasetServiceImplTest {
 		final int instanceId = random.nextInt();
 		this.studyDatasetService.countObservationsByInstance(studyId, datasetId, instanceId);
 		Mockito.verify(this.studyValidator).validate(studyId, false);
-		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.verify(this.instanceValidator).validate(datasetId, Sets.newHashSet(instanceId));
 		Mockito.verify(this.middlewareDatasetService).countObservationsByInstance(datasetId, instanceId);
 	}
@@ -147,12 +147,12 @@ public class DatasetServiceImplTest {
 		final String alias = RandomStringUtils.randomAlphabetic(20);
 		final DatasetVariable datasetVariable = new DatasetVariable(variableTypeId, variableId, alias);
 		Mockito.doReturn(this.standardVariable).when(this.datasetValidator)
-			.validateDatasetVariable(studyId, datasetId, false, datasetVariable, false);
+			.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
 		Mockito.doReturn(this.variable).when(this.measurementVariableTransformer).transform(this.standardVariable, false);
 
 		this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, false, datasetVariable, false);
+		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, datasetVariable, false);
 		Mockito.verify(this.middlewareDatasetService).addDatasetVariable(datasetId, variableId, variableType, alias);
 		Mockito.verify(this.measurementVariableTransformer).transform(this.standardVariable, false);
 		Mockito.verify(this.variable).setName(alias);
@@ -168,7 +168,7 @@ public class DatasetServiceImplTest {
 		final List<Integer> variableIds = Arrays.asList(random.nextInt(), random.nextInt(), random.nextInt());
 		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateExistingDatasetVariables(studyId, datasetId, false, variableIds);
+		Mockito.verify(this.datasetValidator).validateExistingDatasetVariables(studyId, datasetId, variableIds);
 		Mockito.verify(this.middlewareDatasetService).removeDatasetVariables(datasetId, variableIds);
 	}
 
@@ -183,7 +183,7 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.createObservation(studyId, datasetId, observationUnitId, observationDto);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator)
-			.validateExistingDatasetVariables(studyId, datasetId, false, Arrays.asList(observationDto.getVariableId()));
+			.validateExistingDatasetVariables(studyId, datasetId, Arrays.asList(observationDto.getVariableId()));
 		Mockito.verify(this.observationValidator).validateObservationUnit(datasetId, observationUnitId);
 		Mockito.verify(this.middlewareDatasetService).createObservation(observationDto);
 	}
@@ -200,7 +200,7 @@ public class DatasetServiceImplTest {
 		observationDto.setValue(random.toString());
 		this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationDto);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.verify(this.observationValidator).validateObservation(studyId, datasetId, observationUnitId, observationId,
 			observationDto);
 		Mockito.verify(this.middlewareDatasetService)
@@ -216,7 +216,7 @@ public class DatasetServiceImplTest {
 		final int observationId = random.nextInt();
 		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.verify(this.observationValidator).validateObservation(studyId, datasetId, observationUnitId, observationId, null);
 		Mockito.verify(this.middlewareDatasetService).deletePhenotype(observationId);
 	}
@@ -241,7 +241,7 @@ public class DatasetServiceImplTest {
 	public void testValidateStudyDatasetAndInstances() {
 		this.studyDatasetService.validateStudyDatasetAndInstances(1, 1, Arrays.asList(1), true);
 		Mockito.verify(this.studyValidator).validate(1, false);
-		Mockito.verify(this.datasetValidator).validateDataset(1, 1, true);
+		Mockito.verify(this.datasetValidator).validateDataset(1, 1);
 		Mockito.verify(this.instanceValidator).validate(1, new HashSet<>(Arrays.asList(1)));
 	}
 
@@ -255,6 +255,19 @@ public class DatasetServiceImplTest {
 			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO());
 
 		Assert.assertEquals(this.mapObservationUnitRows(observationDtoTestData), actualObservations);
+
+	}
+
+	@Test
+	public void testGetObservationUnitRowsAsMapList() {
+		final List<Map<String, Object>> listOfMap = new ArrayList<>();
+
+		Mockito.doReturn(listOfMap).when(this.middlewareDatasetService)
+			.getObservationUnitRowsAsMapList(ArgumentMatchers.eq(TEST_STUDY_IDENTIFIER), ArgumentMatchers.eq(1), ArgumentMatchers.any(ObservationUnitsSearchDTO.class));
+		final List<Map<String, Object>> result =
+			this.studyDatasetService.getObservationUnitRowsAsMapList(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO());
+
+		Assert.assertSame(listOfMap, result);
 
 	}
 
@@ -303,7 +316,7 @@ public class DatasetServiceImplTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
 		} catch (final ApiRequestValidationException e) {
@@ -329,7 +342,7 @@ public class DatasetServiceImplTest {
 		measurementVariables.add(measurementVariable);
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
 		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
 			.thenReturn(storedData);
@@ -365,14 +378,14 @@ public class DatasetServiceImplTest {
 		observationUnitRow.setVariables(observationUnitDataMap);
 		storedData.put("A", observationUnitRow);
 		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
 			.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalidCellValue"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalid.cell.numeric.value"));
 			throw e;
 		}
 	}
@@ -405,7 +418,7 @@ public class DatasetServiceImplTest {
 		observationUnitRow.setVariables(observationUnitDataMap);
 		storedData.put("1", observationUnitRow);
 		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
 			.thenReturn(storedData);
@@ -446,7 +459,7 @@ public class DatasetServiceImplTest {
 		observationUnitRow.setVariables(observationUnitDataMap);
 		storedData.put("1", observationUnitRow);
 		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
 			.thenReturn(storedData);
@@ -487,7 +500,7 @@ public class DatasetServiceImplTest {
 		observationUnitRow.setVariables(observationUnitDataMap);
 		storedData.put("1", observationUnitRow);
 		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(
 			this.middlewareDatasetService.getObservationUnitsAsMap(anyInt(), anyListOf(MeasurementVariable.class), anyListOf(String.class)))
@@ -582,7 +595,7 @@ public class DatasetServiceImplTest {
 		paramDTO.getObservationUnitsSearchDTO().getFilter().setVariableId(555);
 		this.studyDatasetService.acceptDraftDataFilteredByVariable(studyId, datasetId, searchDTO);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
 
 		Mockito.verify(this.middlewareDatasetService).acceptDraftDataFilteredByVariable(datasetId, searchDTO, studyId);
 	}
@@ -613,7 +626,7 @@ public class DatasetServiceImplTest {
 		paramDTO.getObservationUnitsSearchDTO().getFilter().setVariableId(555);
 		this.studyDatasetService.setValueToVariable(studyId, datasetId, paramDTO);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
 
 		Mockito.verify(this.middlewareDatasetService).setValueToVariable(datasetId, paramDTO, studyId);
 	}
@@ -625,7 +638,7 @@ public class DatasetServiceImplTest {
 		final int datasetId = random.nextInt();
 		this.studyDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
 	}
 
 	@Test
@@ -635,7 +648,7 @@ public class DatasetServiceImplTest {
 		final int datasetId = random.nextInt();
 		this.studyDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
 	}
 
 }

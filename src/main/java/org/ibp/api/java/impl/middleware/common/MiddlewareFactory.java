@@ -5,13 +5,19 @@ import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 import com.rits.cloning.Cloner;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.commons.ruleengine.impl.RulesServiceImpl;
+import org.generationcp.commons.ruleengine.service.RulesService;
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.service.GermplasmNamingService;
+import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.service.impl.GermplasmNamingServiceImpl;
+import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
@@ -56,10 +62,12 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.MethodServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -69,6 +77,7 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
@@ -82,6 +91,8 @@ import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
+import org.generationcp.middleware.service.impl.inventory.LotServiceImpl;
+import org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl;
 import org.generationcp.middleware.service.impl.rpackage.RPackageServiceImpl;
 import org.generationcp.middleware.service.impl.study.MeasurementVariableServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
@@ -455,6 +466,18 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public LotService getLotService() {
+		return new LotServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public TransactionServiceImpl getTransactionService() {
+		return new TransactionServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyInstanceService studyInstanceMiddlewareService() {
 		return new StudyInstanceServiceImpl(this.getCropDatabaseSessionProvider());
 	}
@@ -463,6 +486,30 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public RPackageService rPackageMiddlewareService() {
 		return new RPackageServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StockService getStockService() {
+		return new StockServiceImpl();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public RulesService getRulesService() {
+		return new RulesServiceImpl();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public InventoryService getInventoryService() {
+		return new InventoryServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public ObservationUnitService getObservationUnitService() {
+		return new ObservationUnitServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

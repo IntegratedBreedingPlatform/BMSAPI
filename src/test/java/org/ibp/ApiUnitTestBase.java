@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -184,6 +185,12 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public RPackageService rPackageService() {
 			return Mockito.mock(RPackageService.class);
+		}
+
+		@Bean
+		@Primary
+		public ObservationUnitService observationUnitService() {
+			return Mockito.mock(ObservationUnitService.class);
 		}
 	}
 

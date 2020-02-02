@@ -5,6 +5,8 @@ import org.apache.commons.io.IOUtils;
 import org.ibp.api.java.calls.CallService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,6 +20,9 @@ public class CallServiceImpl implements CallService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CallServiceImpl.class);
 
+	@Value("classpath:brapi/calls.json")
+	private Resource calls;
+
 	@Override
 	public List<Map<String, Object>> getAllCalls(final String dataType, final Integer pageSize, final Integer pageNumber) {
 		try {
@@ -30,7 +35,7 @@ public class CallServiceImpl implements CallService {
 				jsonPath = "$.data.*";
 			}
 
-			final InputStream is = CallServiceImpl.class.getClassLoader().getResourceAsStream("brapi/calls.json");
+			final InputStream is = this.calls.getInputStream();
 			final String jsonTxt = IOUtils.toString( is );
 			brapiCalls = JsonPath.parse(jsonTxt).read(jsonPath);
 
