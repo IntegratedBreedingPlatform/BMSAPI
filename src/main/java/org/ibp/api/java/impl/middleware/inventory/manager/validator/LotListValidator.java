@@ -170,7 +170,7 @@ public class LotListValidator {
 	private void validateComments(final List<LotItemDto> lotList) {
 		final List<String> comments = lotList.stream().map(LotItemDto::getNotes).distinct().collect(Collectors.toList());
 		if (comments.stream().filter(c -> c != null && c.length() > COMMENTS_MAX_LENGTH).count()>0) {
-			errors.reject("lot.input.list.initial.balances.negative.values", "");
+			errors.reject("lot.comments.length", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
