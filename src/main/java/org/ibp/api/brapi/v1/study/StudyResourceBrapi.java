@@ -293,6 +293,8 @@ public class StudyResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> listObservationUnitsByStudy(
 		@PathVariable final String crop, @PathVariable final int studyDbId,
+		@ApiParam(value = "The granularity level of observation units. see GET /observationlevels") @RequestParam(required = false)
+		final String observationLevel,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION) @RequestParam(required = false) final Integer page,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(required = false) final Integer pageSize) {
 
@@ -301,6 +303,7 @@ public class StudyResourceBrapi {
 
 		final PhenotypeSearchRequestDTO phenotypeSearchDTO = new PhenotypeSearchRequestDTO();
 		phenotypeSearchDTO.setStudyDbIds(Lists.newArrayList(String.valueOf(studyDbId)));
+		phenotypeSearchDTO.setObservationLevel(observationLevel);
 
 		final BrapiPagedResult<PhenotypeSearchDTO> resultPage = new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize,
 			new SearchSpec<PhenotypeSearchDTO>() {
