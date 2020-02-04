@@ -124,7 +124,7 @@ public class TransactionResource {
 		if (transactionDto.getLot() == null) {
 			transactionDto.setLot(new ExtendedLotDto());
 		}
-		//FIXME when this resource is completed
+		//FIXME when this resource is completed on  https://ibplatform.atlassian.net/browse/IBP-3455
 		transactionDto.setTransactionStatus(TransactionStatus.CONFIRMED.getValue());
 		transactionDto.setTransactionType(TransactionType.DEPOSIT.getValue());
 		transactionDto.getLot().setLotId(Integer.valueOf(lotId));
