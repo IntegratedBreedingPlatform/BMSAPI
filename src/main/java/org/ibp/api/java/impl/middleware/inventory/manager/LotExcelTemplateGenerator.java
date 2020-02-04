@@ -83,7 +83,7 @@ public class LotExcelTemplateGenerator {
 		
 		int rowNumIndex = currentRowNum;
 		int count = locations.size();
-		for (LocationDto locationDto : locations) {
+		for (final LocationDto locationDto : locations) {
 			final HSSFRow row = xlsSheet.createRow(rowNumIndex++);
 			row.setHeightInPoints(16);
 			this.writeCell(LotExcelTemplateGenerator.CODES_SHEET_FIRST_COLUMN_INDEX, locationDto.getAbbreviation(), count, xlsBook,row);
@@ -104,7 +104,7 @@ public class LotExcelTemplateGenerator {
 		int rowNumIndex = currentRowNum;
 		int count = units.size();
 
-		for (VariableDetails variableDetail : units) {
+		for (final VariableDetails variableDetail : units) {
 			final HSSFRow row = xlsSheet.createRow(rowNumIndex++);
 			row.setHeightInPoints(16);
 			this.writeCell(LotExcelTemplateGenerator.CODES_SHEET_FIRST_COLUMN_INDEX, variableDetail.getName(), count, xlsBook,row);
