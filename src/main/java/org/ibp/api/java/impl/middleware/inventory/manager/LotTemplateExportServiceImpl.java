@@ -18,6 +18,8 @@ import java.util.List;
 @Service
 public class LotTemplateExportServiceImpl implements LotTemplateExportService {
 
+	private static final String FILE_NAME = "template_import_lots.xls";
+
 	@Resource
 	private LotExcelTemplateGenerator lotExcelTemplateGenerator;
 
@@ -25,8 +27,8 @@ public class LotTemplateExportServiceImpl implements LotTemplateExportService {
 	public File export(final List<LocationDto> locations, final List<VariableDetails> units) {
 		try {
 			final File temporaryFolder = Files.createTempDir();
-			final String sanitizedFileName = "template_import_lots.xls";
-			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
+
+			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + LotTemplateExportServiceImpl.FILE_NAME;
 			return lotExcelTemplateGenerator.generateTemplateFile(fileNameFullPath, locations, units);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
