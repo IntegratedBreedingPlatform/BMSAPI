@@ -243,9 +243,9 @@ public class LotExcelTemplateGenerator {
 		return cellStyle;
 	}
 
-	private short getColorIndex(final HSSFWorkbook xlsBook, final int c1, final int c2, final int c3) {
+	private short getColorIndex(final HSSFWorkbook xlsBook, final int red, final int green, final int blue) {
 		final HSSFPalette palette = xlsBook.getCustomPalette();
-		final HSSFColor color = palette.findSimilarColor(c1, c2, c3);
+		final HSSFColor color = palette.findSimilarColor(red, green, blue);
 		return color.getIndex();
 	}
 
