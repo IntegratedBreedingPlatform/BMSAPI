@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class LotTemplateExportServiceImpl implements LotTemplateExportService {
+public class LotExcelTemplateExportServiceImpl implements LotTemplateExportService {
 
 	private static final String FILE_NAME = "template_import_lots.xls";
 
@@ -28,7 +28,7 @@ public class LotTemplateExportServiceImpl implements LotTemplateExportService {
 		try {
 			final File temporaryFolder = Files.createTempDir();
 
-			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + LotTemplateExportServiceImpl.FILE_NAME;
+			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + LotExcelTemplateExportServiceImpl.FILE_NAME;
 			return lotExcelTemplateGenerator.generateTemplateFile(fileNameFullPath, locations, units);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
