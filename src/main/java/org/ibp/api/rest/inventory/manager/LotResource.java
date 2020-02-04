@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +52,7 @@ import java.util.Set;
 @PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY')")
 public class LotResource {
 
+	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 
 	@Autowired
 	private LotService lotService;
@@ -153,9 +155,7 @@ public class LotResource {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
-		Set<Integer> locationTypes =new HashSet<>();
-		locationTypes.add(1500);
-		final List<LocationDto> locations = locationService.getLocations(locationTypes, null, false, null);
+		final List<LocationDto> locations = locationService.getLocations(LotResource.STORAGE_LOCATION_TYPE, null, false, null);
 
 		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
 		final HttpHeaders headers = new HttpHeaders();
