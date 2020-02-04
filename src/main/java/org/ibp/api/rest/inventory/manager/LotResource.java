@@ -18,7 +18,7 @@ import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
-import org.ibp.api.java.inventory.manager.LotExcelTemplateExportService;
+import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.location.LocationService;
 import org.ibp.api.java.ontology.VariableService;
@@ -56,7 +56,7 @@ public class LotResource {
 	private LotService lotService;
 
 	@Autowired
-	private LotExcelTemplateExportService lotExcelTemplateExportServiceImpl;
+	private LotTemplateExportService lotTemplateExportServiceImpl;
 
 	@Autowired
 	private VariableService variableService;
@@ -157,7 +157,7 @@ public class LotResource {
 		locationTypes.add(1500);
 		final List<LocationDto> locations = locationService.getLocations(locationTypes, null, false, null);
 
-		final File file = this.lotExcelTemplateExportServiceImpl.export(locations, units);
+		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
 		final HttpHeaders headers = new HttpHeaders();
 		headers
 			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));

@@ -6,7 +6,7 @@ import org.ibp.api.domain.ontology.VariableDetails;
 import java.io.File;
 import java.util.List;
 
-public interface LotExcelTemplateExportService {
+public interface LotTemplateExportService {
 
 	File export(final List<LocationDto> locations, final List<VariableDetails> scales);
 }

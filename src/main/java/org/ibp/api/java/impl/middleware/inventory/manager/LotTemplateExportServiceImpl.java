@@ -4,7 +4,7 @@ import com.google.common.io.Files;
 import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.exception.ResourceNotFoundException;
-import org.ibp.api.java.inventory.manager.LotExcelTemplateExportService;
+import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class LotExcelTemplateExportServiceImpl implements LotExcelTemplateExportService {
+public class LotTemplateExportServiceImpl implements LotTemplateExportService {
 
 	@Resource
 	private LotExcelTemplateGenerator lotExcelTemplateGenerator;
