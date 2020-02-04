@@ -41,7 +41,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public List<TransactionStatus>  getAllTransactionStatuses() {
+	public List<TransactionStatus> getAllTransactionStatus() {
 		return TransactionStatus.getAll();
 	}
 
