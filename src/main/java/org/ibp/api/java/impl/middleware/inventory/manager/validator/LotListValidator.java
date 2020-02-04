@@ -96,10 +96,6 @@ public class LotListValidator {
 	private void validateStorageLocations(final List<LotItemDto> lotList) {
 		final List<String> locationAbbreviations =
 				lotList.stream().map(LotItemDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
-		if (countNullElements(locationAbbreviations) > 0) {
-			errors.reject("lot.input.list.gid.null.or.empty", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
 		if (countNullOrEmptyStrings(locationAbbreviations)>0) {
 			errors.reject("lot.input.list.location.abbreviation.null.or.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
