@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public class LotExcelTemplateExportServiceImpl implements LotTemplateExportService {
 
-	private static final String FILE_NAME = "template_import_lots.xls";
+	private static final String FILE_NAME = "basic_template_import_lots.xls";
 
 	@Resource
 	private LotExcelTemplateGenerator lotExcelTemplateGenerator;
