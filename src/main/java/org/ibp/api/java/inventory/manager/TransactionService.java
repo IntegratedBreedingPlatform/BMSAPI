@@ -16,7 +16,7 @@ public interface TransactionService {
 
 	Integer saveTransaction(TransactionDto transactionDto);
 
-	List<TransactionStatus>  getAllTransactionStatuses();
+	List<TransactionStatus> getAllTransactionStatus();
 
 	List<TransactionType>  getAllTransactionTypes();
 }
