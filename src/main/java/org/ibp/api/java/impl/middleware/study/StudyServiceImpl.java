@@ -19,6 +19,8 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
+import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
@@ -380,5 +382,15 @@ public class StudyServiceImpl implements StudyService {
 		final int studyId = study.getId();
 		this.studyValidator.validate(studyId, false);
 		this.studyDataManager.updateStudyLockedStatus(studyId, study.isLocked());
+	}
+
+	@Override
+	public long countStudyDTOs(final StudySearchFilter studySearchFilter) {
+		return this.middlewareStudyService.countStudyDTOs(studySearchFilter);
+	}
+
+	@Override
+	public List<StudyDto> getStudyDTOs(final StudySearchFilter studySearchFilter) {
+		return this.middlewareStudyService.getStudyDTOs(studySearchFilter);
 	}
 }

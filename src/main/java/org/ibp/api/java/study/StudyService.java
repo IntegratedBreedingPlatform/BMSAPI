@@ -8,13 +8,12 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
+import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyDetails;
-import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 
 import java.util.List;
@@ -67,4 +66,7 @@ public interface StudyService {
 
 	void updateStudy (final Study study);
 
+	long countStudyDTOs(StudySearchFilter studySearchFilter);
+
+	List<StudyDto> getStudyDTOs(StudySearchFilter studySearchFilter);
 }
