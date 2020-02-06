@@ -1,11 +1,13 @@
 package org.ibp.api.rest.inventory.manager;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -72,6 +74,7 @@ public class LotResource {
 							"Multiple sort criteria are supported.")
 	})
 	@ResponseBody
+	@JsonView(InventoryView.LotView.class)
 	public ResponseEntity<List<ExtendedLotDto>> getLots(@PathVariable final String cropName, //
 		@RequestParam final Integer searchRequestId, @ApiIgnore
 	final Pageable pageable) {

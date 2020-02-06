@@ -1,11 +1,13 @@
 package org.ibp.api.rest.inventory.manager;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -77,6 +79,7 @@ public class TransactionResource {
 				"Multiple sort criteria are supported.")
 	})
 	@ResponseBody
+	@JsonView(InventoryView.TransactionView.class)
 	public ResponseEntity<List<TransactionDto>> getTransactions(
 		@PathVariable final String cropName, //
 		@RequestParam final Integer searchRequestId, @ApiIgnore
