@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
@@ -18,11 +20,13 @@ import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
+import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -73,6 +78,9 @@ public class StudyResourceBrapi {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
+
+	@Autowired
+	private DatasetService studyDatasetService;
 
 	@ApiOperation(value = "List of study summaries", notes = "Get a list of study summaries.")
 	// TODO implement
@@ -277,4 +285,25 @@ public class StudyResourceBrapi {
 		return new ResponseEntity<>(fileSystemResource, respHeaders, HttpStatus.OK);
 
 	}
+
+	@ApiOperation(value = "Put Observations", notes = "Put Observations")
+	@RequestMapping(
+		value = "/{crop}/brapi/v1/studies/{studyDbId}/observations",
+		method = RequestMethod.PUT)
+	public ResponseEntity<EntityListResponse<ObservationDTO>> postObservationUnits(
+		@PathVariable final String crop,
+		@PathVariable final Integer studyDbId,
+		@RequestBody final List<ObservationDTO> input) {
+
+		this.studyDatasetService.importObservations(studyDbId, input);
+
+		final Result<ObservationDTO> results = new Result<ObservationDTO>().withData(input);
+		@SuppressWarnings("unchecked")
+		final Metadata metadata = new Metadata().withStatus(
+				Lists.newArrayList(Collections.singletonMap("ignored-fields", "collector, observationDbId, observationTimeStamp")));
+		final EntityListResponse<ObservationDTO> entityListResponse = new EntityListResponse<>(metadata, results);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
 }

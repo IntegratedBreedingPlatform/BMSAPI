@@ -1,5 +1,6 @@
 package org.ibp.api.java.dataset;
 
+import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -225,6 +226,14 @@ public interface DatasetService {
 	 * @param input     ObservationsPutRequestInput
 	 */
 	void importObservations(Integer studyId, Integer datasetId, ObservationsPutRequestInput input);
+
+	/**
+	 * Imports a list of observations for the environment
+	 *
+	 * @param studyDbId   Id of the study/environment
+	 * @param input     ObservationsPutRequestInput
+	 */
+	void importObservations(Integer studyDbId, List<ObservationDTO> input);
 
 	/**
 	 * Count how many instances and observations are filtered given a filter with a not null variable
