@@ -290,7 +290,7 @@ public class StudyResourceBrapi {
 	@RequestMapping(
 		value = "/{crop}/brapi/v1/studies/{studyDbId}/observations",
 		method = RequestMethod.PUT)
-	public ResponseEntity<EntityListResponse<ObservationDTO>> postObservationUnits(
+	public ResponseEntity<EntityListResponse<ObservationDTO>> putObservations(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyDbId,
 		@RequestBody final List<ObservationDTO> input) {
