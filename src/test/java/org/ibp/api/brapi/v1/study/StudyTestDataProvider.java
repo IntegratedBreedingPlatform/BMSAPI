@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +34,12 @@ public class StudyTestDataProvider {
 
 	public static StudyMetadata getStudyMetadata() {
 		final List<String> seasons = Lists.newArrayList("WET");
+
+		final Date startDate = new Date("2016-01-01");
+		final Date endDate = new Date("2017-01-01");
+
 		final StudyMetadata metadata =
-				new StudyMetadata().setActive(Boolean.TRUE).setEndDate("20161010").setStartDate("20161010").setLocationId(2)
+				new StudyMetadata().setActive(Boolean.TRUE).setEndDate(endDate).setStartDate(startDate).setLocationId(2)
 						.setNurseryOrTrialId(5).setSeasons(seasons).setStudyType(StudyTypeDto.TRIAL_NAME).setTrialName("TN").setTrialDbId(2)
 					.setStudyName("SN")
 						.setStudyDbId(5);
