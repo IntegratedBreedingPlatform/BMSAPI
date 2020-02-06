@@ -301,7 +301,7 @@ public class StudyResourceBrapi {
 			required = false) final Integer pageSize) throws BrapiNotFoundException {
 
 		// Resolve the datasetId in which StudyDbId belongs to. (In BRAPI, studyDbId is nd_geolocation_id)
-		final Integer datasetId = this.studyDataManager.getDatasetIdByStudyDbIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		final Integer datasetId = this.studyDataManager.getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
 		if (datasetId == null) {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
 		}
@@ -319,8 +319,8 @@ public class StudyResourceBrapi {
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return StudyResourceBrapi.this.studyService
-						.getVariablesByDatasetId(pagedResult.getPageSize(), pageNumber, datasetId, crop, Collections.unmodifiableList(
-							Arrays.asList(VariableType.TRAIT.getId())));
+						.getVariablesByDatasetId(datasetId, crop, Collections.unmodifiableList(
+							Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
 				}
 			});
 

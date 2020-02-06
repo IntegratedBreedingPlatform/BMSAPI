@@ -61,8 +61,8 @@ public class VariableResourceBrapi {
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return VariableResourceBrapi.this.studyService
-						.getAllVariables(pagedResult.getPageSize(), pageNumber, crop, Collections.unmodifiableList(
-							Arrays.asList(VariableType.TRAIT.getId())));
+						.getAllVariables(crop, Collections.unmodifiableList(
+							Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
 				}
 			});
 

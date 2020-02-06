@@ -384,14 +384,14 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public long countVariablesByDatasetId(final int studyDbId, final List<Integer> variableTypes) {
-		return this.middlewareStudyService.countVariablesByDatasetId(studyDbId, variableTypes);
+	public long countVariablesByDatasetId(final int datasetId, final List<Integer> variableTypes) {
+		return this.middlewareStudyService.countVariablesByDatasetId(datasetId, variableTypes);
 	}
 
 	@Override
-	public List<VariableDTO> getVariablesByDatasetId(final int pageSize, final int pageNumber, final int studyDbId,
-		final String cropname, final List<Integer> variableTypes) {
-		return this.middlewareStudyService.getVariablesByDatasetId(pageSize, pageNumber, studyDbId, variableTypes, cropname);
+	public List<VariableDTO> getVariablesByDatasetId(final int datasetId, final String cropname, final List<Integer> variableTypes,
+		final int pageSize, final int pageNumber) {
+		return this.middlewareStudyService.getVariablesByDatasetId(datasetId, variableTypes, cropname, pageSize, pageNumber);
 	}
 
 	@Override
@@ -400,8 +400,8 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<VariableDTO> getAllVariables(final int pageSize, final int pageNumber,
-		final String cropname, final List<Integer> variableTypes) {
-		return this.middlewareStudyService.getAllVariables(pageSize, pageNumber, variableTypes, cropname);
+	public List<VariableDTO> getAllVariables(final String cropname, final List<Integer> variableTypes, final int pageSize,
+		final int pageNumber) {
+		return this.middlewareStudyService.getAllVariables(variableTypes, cropname, pageSize, pageNumber);
 	}
 }

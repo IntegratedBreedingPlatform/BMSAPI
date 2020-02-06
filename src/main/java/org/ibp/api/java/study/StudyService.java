@@ -6,14 +6,12 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyDetails;
-import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
 
@@ -69,11 +67,10 @@ public interface StudyService {
 
 	long countVariablesByDatasetId(final int studyDbId, final List<Integer> variableTypes);
 
-	List<VariableDTO> getVariablesByDatasetId(final int pageSize, final int pageNumber, final int studyDbId, final String cropname,
-		final List<Integer> variableTypes);
+	List<VariableDTO> getVariablesByDatasetId(final int studyDbId, final String cropname,
+		final List<Integer> variableTypes, final int pageSize, final int pageNumber);
 
 	long countAllVariables(final List<Integer> variableTypes);
 
-	List<VariableDTO> getAllVariables(int pageSize, int pageNumber,
-		String cropname, final List<Integer> variableTypes);
+	List<VariableDTO> getAllVariables(String cropname, final List<Integer> variableTypes, int pageSize, int pageNumber);
 }
