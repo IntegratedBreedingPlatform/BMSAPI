@@ -6,13 +6,10 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.domain.location.LocationDto;
-import org.ibp.api.exception.ResourceNotFoundException;
-import org.ibp.api.java.impl.middleware.common.validator.CropNameValidationInterceptor;
 import org.ibp.api.java.location.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,7 +46,8 @@ public class LocationResource {
 		if (project == null) {
 			return new ResponseEntity("programUUID: " + programUUID + " not found", HttpStatus.NOT_FOUND);
 		}
-		final List<LocationDto> locations = locationService.getLocations(locationTypes, programUUID, favoriteLocations);
+		//TODO Expose locationAbbreviations
+		final List<LocationDto> locations = locationService.getLocations(locationTypes, programUUID, favoriteLocations, null);
 		return new ResponseEntity<>(locations, HttpStatus.OK);
 
 	}
