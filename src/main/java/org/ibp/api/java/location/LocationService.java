@@ -7,5 +7,5 @@ import java.util.Set;
 
 public interface LocationService {
 
-	List<LocationDto> getLocations(final Set<Integer> locationTypes, final String programUUID, final boolean favoriteLocations);
+	List<LocationDto> getLocations(Set<Integer> locationTypes, String programUUID, boolean favoriteLocations, List<String> locationAbbreviations);
 }
