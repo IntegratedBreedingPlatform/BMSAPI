@@ -5,6 +5,7 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.junit.Before;
@@ -60,7 +61,7 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 		transactionsSearchDto.setScaleIds(Lists.newArrayList(8264));
 		transactionsSearchDto.setStockId("ABC-1");
 		transactionsSearchDto.setTransactionIds(Lists.newArrayList(100, 200));
-		transactionsSearchDto.setTransactionType("Deposit");
+		transactionsSearchDto.setTransactionTypes(Lists.newArrayList(TransactionType.DEPOSIT.getId()));
 		transactionsSearchDto.setCreatedByUsername("admin");
 
 		final int searchResultsDbid = 1;
