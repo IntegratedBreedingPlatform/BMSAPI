@@ -138,7 +138,7 @@ public class ObservationUnitResourceBrapi {
 	// TODO complete PUT see plantbreeding/API/issues/411
 	@ApiOperation(value = "Patch Observation Unit", notes = "Modified some fields from an Observation Unit <p><strong>Note:</strong> non-standard BrAPI call</p>")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationunits/{observationUnitDbId}", method = RequestMethod.PATCH)
-	public ResponseEntity<Void> patchObservationUnit(
+	public ResponseEntity<SingleEntityResponse<ObservationUnitPatchRequestDTO>> patchObservationUnit(
 		@PathVariable final String crop,
 		@PathVariable String observationUnitDbId,
 		@RequestBody final ObservationUnitPatchRequestDTO requestDTO) {
@@ -148,6 +148,6 @@ public class ObservationUnitResourceBrapi {
 			= mapper.map(requestDTO, org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPatchRequestDTO.class);
 		this.observationUnitService.update(observationUnitDbId, observationUnitPatchRequestDTO);
 
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(new SingleEntityResponse<>(requestDTO), HttpStatus.OK);
 	}
 }
