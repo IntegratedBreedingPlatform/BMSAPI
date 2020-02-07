@@ -61,7 +61,7 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 		transactionsSearchDto.setScaleIds(Lists.newArrayList(8264));
 		transactionsSearchDto.setStockId("ABC-1");
 		transactionsSearchDto.setTransactionIds(Lists.newArrayList(100, 200));
-		transactionsSearchDto.setTransactionType(TransactionType.DEPOSIT.getId());
+		transactionsSearchDto.setTransactionTypes(Lists.newArrayList(TransactionType.DEPOSIT.getId()));
 		transactionsSearchDto.setCreatedByUsername("admin");
 
 		final int searchResultsDbid = 1;
