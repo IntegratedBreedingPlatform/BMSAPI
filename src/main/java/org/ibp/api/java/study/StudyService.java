@@ -51,6 +51,8 @@ public interface StudyService {
 
 	StudyDetailsDto getStudyDetailsForGeolocation (final Integer geolocationId);
 
+	StudyDetailsDto getStudyDetailsByGeolocation (final Integer geolocationId);
+
 	Long countStudies(final Map<StudyFilters, String> filters);
 
 	List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO);
@@ -62,7 +64,7 @@ public interface StudyService {
 	Boolean isSampled (final Integer studyId);
 
 	List<StudyTypeDto> getStudyTypes();
-	
+
 	StudyReference getStudyReference(final Integer studyId);
 
 	void updateStudy (final Study study);

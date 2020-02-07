@@ -319,6 +319,11 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
+	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
+		return this.middlewareStudyService.getStudyDetailsByGeolocation(geolocationId);
+	}
+
+	@Override
 	public Long countStudies(final Map<StudyFilters, String> filters) {
 		return this.studyDataManager.countAllStudies(filters);
 	}
