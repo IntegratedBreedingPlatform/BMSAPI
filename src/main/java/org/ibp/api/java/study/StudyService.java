@@ -49,8 +49,6 @@ public interface StudyService {
 
 	String getProgramUUID(Integer studyIdentifier);
 
-	StudyDetailsDto getStudyDetailsForGeolocation (final Integer geolocationId);
-
 	StudyDetailsDto getStudyDetailsByGeolocation (final Integer geolocationId);
 
 	Long countStudies(final Map<StudyFilters, String> filters);
