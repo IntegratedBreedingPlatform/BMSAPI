@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 @Api(value = "BrAPI v2 Study Services")
-@Controller
-public class StudyResourceV2Brapi {
+@Controller(value = "StudyResourceBrapiV2")
+public class StudyResourceBrapi {
 
 	@Autowired
 	private StudyService studyService;
