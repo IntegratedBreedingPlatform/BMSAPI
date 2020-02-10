@@ -31,6 +31,7 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -84,6 +85,9 @@ public class StudyResourceBrapi {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
+
+	@Autowired
+	InstanceValidator instanceValidator;
 
 	@ApiOperation(value = "List of study summaries", notes = "Get a list of study summaries.")
 	// TODO implement
@@ -306,6 +310,8 @@ public class StudyResourceBrapi {
 		final String observationLevel,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION) @RequestParam(required = false) final Integer page,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(required = false) final Integer pageSize) {
+
+		this.instanceValidator.validateStudyDbId(studyDbId);
 
 		final Integer finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final Integer finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;

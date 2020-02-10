@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.BooleanUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -40,7 +41,7 @@ public class InstanceValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (!this.studyDataManager.existInstances(instanceIds)) {
+		if (!this.studyDataManager.instanceExists(instanceIds)) {
 			this.errors.reject("dataset.non.existent.instances", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -48,6 +49,14 @@ public class InstanceValidator {
 		if (datasetId != null && !this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
 			this.errors.reject("dataset.invalid.instances", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validateStudyDbId(final int studyDbId) {
+		if (!this.studyDataManager.instanceExists(Sets.newHashSet(studyDbId))) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			errors.reject("studydbid.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
