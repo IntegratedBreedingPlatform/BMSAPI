@@ -58,7 +58,6 @@ public class LotServiceImpl implements LotService {
 	public Integer saveLot(
 		final LotGeneratorInputDto lotGeneratorInputDto) {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		lotGeneratorInputDto.setUserId(loggedInUser.getUserid());
 		lotInputValidator.validate(lotGeneratorInputDto);
 		if (lotGeneratorInputDto.getGenerateStock()) {
 			final String nextStockIDPrefix;
@@ -70,7 +69,7 @@ public class LotServiceImpl implements LotService {
 			lotGeneratorInputDto.setStockId(nextStockIDPrefix + "1");
 		}
 
-		return lotService.saveLot(lotGeneratorInputDto, this.contextUtil.getProjectInContext().getCropType());
+		return lotService.saveLot(this.contextUtil.getProjectInContext().getCropType(), loggedInUser.getUserid(), lotGeneratorInputDto);
 	}
 
 	@Override
