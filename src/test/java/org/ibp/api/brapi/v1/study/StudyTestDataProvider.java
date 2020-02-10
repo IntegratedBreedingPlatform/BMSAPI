@@ -1,6 +1,9 @@
 package org.ibp.api.brapi.v1.study;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
@@ -47,11 +50,18 @@ public class StudyTestDataProvider {
 		return properties;
 	}
 
+	public static List<MeasurementVariable> getEnvironmentParameters() {
+		final  List<MeasurementVariable> environmentParameters = new ArrayList<>();
+		environmentParameters.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.BLOCK_ID.getId(), TermId.BLOCK_ID.name(), "1"));
+		return environmentParameters;
+	}
+
 	public static StudyDetailsDto getStudyDetailsDto() {
 		StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
 		studyDetailsDto.setMetadata(StudyTestDataProvider.getStudyMetadata());
 		studyDetailsDto.setContacts(Lists.newArrayList(StudyTestDataProvider.getUserDto()));
 		studyDetailsDto.setAdditionalInfo(StudyTestDataProvider.getStudyProperties());
+		studyDetailsDto.setEnvironmentParameters(StudyTestDataProvider.getEnvironmentParameters());
 		return studyDetailsDto;
 	}
 

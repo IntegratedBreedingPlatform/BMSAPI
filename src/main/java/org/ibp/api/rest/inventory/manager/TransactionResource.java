@@ -1,14 +1,18 @@
 package org.ibp.api.rest.inventory.manager;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
@@ -77,6 +81,7 @@ public class TransactionResource {
 				"Multiple sort criteria are supported.")
 	})
 	@ResponseBody
+	@JsonView(InventoryView.TransactionView.class)
 	public ResponseEntity<List<TransactionDto>> getTransactions(
 		@PathVariable final String cropName, //
 		@RequestParam final Integer searchRequestId, @ApiIgnore
@@ -122,6 +127,9 @@ public class TransactionResource {
 		if (transactionDto.getLot() == null) {
 			transactionDto.setLot(new ExtendedLotDto());
 		}
+		//FIXME when this resource is completed on  https://ibplatform.atlassian.net/browse/IBP-3455
+		transactionDto.setTransactionStatus(TransactionStatus.CONFIRMED.getValue());
+		transactionDto.setTransactionType(TransactionType.DEPOSIT.getValue());
 		transactionDto.getLot().setLotId(Integer.valueOf(lotId));
 		return new ResponseEntity<>(this.transactionService.saveTransaction(transactionDto), HttpStatus.CREATED);
 	}
