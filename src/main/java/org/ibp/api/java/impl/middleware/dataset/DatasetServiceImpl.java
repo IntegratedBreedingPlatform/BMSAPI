@@ -511,7 +511,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	}
 
-	// TODO move to ObservationUnitsTableBuilder
 	static ObservationsPutRequestInput transformObservations(
 		final List<ObservationDTO> observations,
 		final List<MeasurementVariable> datasetMeasurementVariables) {
