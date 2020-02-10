@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -52,7 +51,7 @@ public class LocationValidatorTest {
 
 	@Test
 	public void testValidateNullLocationId() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		final Integer locationId = null;
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(locationId);
@@ -73,7 +72,7 @@ public class LocationValidatorTest {
 
 	@Test
 	public void testValidateInvalidLocationId() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
@@ -93,7 +92,7 @@ public class LocationValidatorTest {
 
 	@Test
 	public void testValidateInvalidSeedLocation() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
@@ -115,7 +114,7 @@ public class LocationValidatorTest {
 
 	@Test
 	public void testValidateValidSeedLocation() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);

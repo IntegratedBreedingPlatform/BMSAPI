@@ -49,7 +49,7 @@ public interface StudyService {
 
 	String getProgramUUID(Integer studyIdentifier);
 
-	StudyDetailsDto getStudyDetailsForGeolocation (final Integer geolocationId);
+	StudyDetailsDto getStudyDetailsByGeolocation (final Integer geolocationId);
 
 	Long countStudies(final Map<StudyFilters, String> filters);
 
@@ -62,7 +62,7 @@ public interface StudyService {
 	Boolean isSampled (final Integer studyId);
 
 	List<StudyTypeDto> getStudyTypes();
-	
+
 	StudyReference getStudyReference(final Integer studyId);
 
 	void updateStudy (final Study study);
