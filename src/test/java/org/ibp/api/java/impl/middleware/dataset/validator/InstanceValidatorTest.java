@@ -46,7 +46,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		Mockito.doReturn(datasetId).when(this.middlewareStudyService).getEnvironmentDatasetId(ArgumentMatchers.anyInt());
 		when(this.studyDataManager.areAllInstancesExistInDataset(ArgumentMatchers.eq(this.datasetId), ArgumentMatchers.anySet()))
 			.thenReturn(true);
-		when(this.studyDataManager.existInstances(ArgumentMatchers.anySet())).thenReturn(true);
+		when(this.studyDataManager.instanceExists(ArgumentMatchers.anySet())).thenReturn(true);
 	}
 
 	@Test

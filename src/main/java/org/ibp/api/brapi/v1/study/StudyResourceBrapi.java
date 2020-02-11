@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +21,8 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -34,6 +37,7 @@ import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.BrapiNotFoundException;
 import org.ibp.api.java.ontology.VariableService;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -91,6 +95,9 @@ public class StudyResourceBrapi {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
+
+	@Autowired
+	InstanceValidator instanceValidator;
 
 	@ApiOperation(value = "List of study summaries", notes = "Get a list of study summaries.")
 	// TODO implement
@@ -352,5 +359,51 @@ public class StudyResourceBrapi {
 		final EntityListResponse<VariableDTO> entityListResponse = new EntityListResponse<>(metadata, result);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+	@JsonView(BrapiView.BrapiV1_3.class)
+	@ApiOperation(value = "Get observation units by studyDbId")
+	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationunits", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> listObservationUnitsByStudy(
+		@PathVariable final String crop, @PathVariable final int studyDbId,
+		@ApiParam(value = "The granularity level of observation units. see GET /observationlevels") @RequestParam(required = false)
+		final String observationLevel,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION) @RequestParam(required = false) final Integer page,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(required = false) final Integer pageSize) {
+
+		this.instanceValidator.validateStudyDbId(studyDbId);
+
+		final Integer finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
+		final Integer finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+
+		final PhenotypeSearchRequestDTO phenotypeSearchDTO = new PhenotypeSearchRequestDTO();
+		phenotypeSearchDTO.setStudyDbIds(Lists.newArrayList(String.valueOf(studyDbId)));
+		phenotypeSearchDTO.setObservationLevel(observationLevel);
+
+		final BrapiPagedResult<PhenotypeSearchDTO> resultPage = new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize,
+			new SearchSpec<PhenotypeSearchDTO>() {
+
+				@Override
+				public long getCount() {
+					return studyService.countPhenotypes(phenotypeSearchDTO);
+				}
+
+				@Override
+				public List<PhenotypeSearchDTO> getResults(final PagedResult<PhenotypeSearchDTO> pagedResult) {
+					return studyService.searchPhenotypes(finalPageSize, finalPageNumber, phenotypeSearchDTO);
+				}
+			});
+
+		final Result<PhenotypeSearchDTO> results = new Result<PhenotypeSearchDTO>().withData(resultPage.getPageResults());
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+
+		final EntityListResponse<PhenotypeSearchDTO> entityListResponse = new EntityListResponse<>(metadata, results);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+
 	}
 }
