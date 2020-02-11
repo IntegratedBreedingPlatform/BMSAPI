@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -36,8 +37,9 @@ import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.BrapiNotFoundException;
-import org.ibp.api.java.ontology.VariableService;
+import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -49,6 +51,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -95,6 +98,9 @@ public class StudyResourceBrapi {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
+
+	@Autowired
+	private DatasetService studyDatasetService;
 
 	@Autowired
 	InstanceValidator instanceValidator;
@@ -406,4 +412,25 @@ public class StudyResourceBrapi {
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 
 	}
+
+	@ApiOperation(value = "Put Observations", notes = "Put Observations")
+	@RequestMapping(
+		value = "/{crop}/brapi/v1/studies/{studyDbId}/observations",
+		method = RequestMethod.PUT)
+	public ResponseEntity<EntityListResponse<ObservationDTO>> putObservations(
+		@PathVariable final String crop,
+		@PathVariable final Integer studyDbId,
+		@RequestBody final List<ObservationDTO> input) {
+
+		this.studyDatasetService.importObservations(studyDbId, input);
+
+		final Result<ObservationDTO> results = new Result<ObservationDTO>().withData(input);
+		@SuppressWarnings("unchecked")
+		final Metadata metadata = new Metadata().withStatus(
+				Lists.newArrayList(Collections.singletonMap("ignored-fields", "collector, observationDbId, observationTimeStamp")));
+		final EntityListResponse<ObservationDTO> entityListResponse = new EntityListResponse<>(metadata, results);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
 }

@@ -3,10 +3,10 @@ package org.ibp.api.java.impl.middleware.dataset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -56,6 +56,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -445,6 +447,100 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
 
+	}
+
+	// FIXME assuming one dataset for now
+	@Override
+	public void importObservations(final Integer studyDbId, final List<ObservationDTO> observations) {
+
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+
+		final org.generationcp.middleware.domain.dms.DatasetDTO
+			dataset = this.middlewareDatasetService.getDatasetByObsUnitDbId(observations.get(0).getObservationUnitDbId());
+		final int datasetId = dataset.getDatasetId();
+
+		final List<MeasurementVariable> datasetMeasurementVariables =
+			this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
+
+		if (datasetMeasurementVariables.isEmpty()) {
+			errors.reject("no.variables.dataset", null, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		// transform BrAPI format to DatasetService format
+		final ObservationsPutRequestInput input = transformObservations(observations, datasetMeasurementVariables);
+
+		this.observationsTableValidator.validateList(input.getData());
+
+		final ObservationUnitsTableBuilder observationUnitsTableBuilder = new ObservationUnitsTableBuilder();
+		final Table<String, String, String> table = observationUnitsTableBuilder.build(input.getData(), datasetMeasurementVariables);
+
+		// Get Map<OBS_UNIT_ID, Observations>
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = this.middlewareDatasetService
+			.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
+
+		if (storedData.isEmpty()) {
+			errors.reject("none.obs.unit.id.matches", null, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final int rowsNotBelongingToDataset = table.rowKeySet().size() - storedData.size();
+
+		// remove elements that does not belong to the dataset
+		if (rowsNotBelongingToDataset != 0) {
+			final List<String> obsUnitIdsList = new ArrayList<>(table.rowKeySet());
+			obsUnitIdsList.removeAll(storedData.keySet());
+			for (final String obsUnitId : obsUnitIdsList) {
+				table.row(obsUnitId).clear();
+			}
+		}
+
+		// Check for data issues
+		this.observationsTableValidator.validateObservationsValuesDataTypes(table, datasetMeasurementVariables);
+
+		// Processing warnings
+		if (input.isProcessWarnings()) {
+			errors = this.processObservationsDataWarningsAsErrors(table, storedData, rowsNotBelongingToDataset,
+				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
+		}
+		if (!errors.hasErrors()) {
+			this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode());
+		} else {
+			throw new PreconditionFailedException(errors.getAllErrors());
+		}
+
+	}
+
+	static ObservationsPutRequestInput transformObservations(
+		final List<ObservationDTO> observations,
+		final List<MeasurementVariable> datasetMeasurementVariables) {
+
+		final Map<Integer, MeasurementVariable> varMap =
+			datasetMeasurementVariables.stream().collect(Collectors.toMap(MeasurementVariable::getTermId, Function.identity()));
+		final Set<Integer> variableIds = new TreeSet(
+			observations.stream().map(ObservationDTO::getObservationVariableDbId).collect(Collectors.toSet()));
+		final Map<String, Map<Integer, List<ObservationDTO>>> tree = observations.stream().collect(Collectors
+			.groupingBy(ObservationDTO::getObservationUnitDbId, Collectors.groupingBy(ObservationDTO::getObservationVariableDbId)));
+		final List<String> variableNames =
+			variableIds.stream().map(termId -> varMap.get(termId).getName()).collect(Collectors.toList());
+
+		final ObservationsPutRequestInput input = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		final List<String> headers = new ArrayList<>();
+		headers.add("OBS_UNIT_ID");
+		headers.addAll(variableNames);
+		data.add(headers);
+		for (final Map.Entry<String, Map<Integer, List<ObservationDTO>>> obsUnit : tree.entrySet()) {
+			final List<String> row = new ArrayList<>();
+			row.add(obsUnit.getKey());
+			for (final Integer variableId : variableIds) {
+				final List<ObservationDTO> dtos = obsUnit.getValue().get(variableId);
+				row.add(dtos != null ? dtos.get(0).getValue() : "");
+			}
+			data.add(row);
+		}
+		input.setData(data);
+		return input;
 	}
 
 	@Override

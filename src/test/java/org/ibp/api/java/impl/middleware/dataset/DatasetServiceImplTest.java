@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -29,6 +30,7 @@ import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
@@ -48,6 +50,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
@@ -649,6 +652,51 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
+	}
+
+	@Test
+	@Ignore // FIXME
+	public void testTransformObservations() {
+		final List<ObservationDTO> list = new ArrayList<>();
+		final ObservationDTO obs = new ObservationDTO();
+		obs.setObservationDbId(12);
+		obs.setObservationUnitDbId(RandomStringUtils.randomAlphanumeric(36));
+		obs.setObservationVariableDbId(24);
+		obs.setValue("356");
+		list.add(obs);
+		final ObservationDTO obs2 = new ObservationDTO();
+		obs2.setObservationDbId(13);
+		final String obs2ObsUnitDbId = RandomStringUtils.randomAlphanumeric(36);
+		obs2.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs2.setObservationVariableDbId(25);
+		obs2.setValue("200");
+		list.add(obs2);
+		final ObservationDTO obs3 = new ObservationDTO();
+		obs3.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs3.setObservationVariableDbId(27);
+		obs3.setValue("280");
+		list.add(obs3);
+
+		final List<MeasurementVariable> variables = new ArrayList<>();
+		final MeasurementVariable var1 = new MeasurementVariable();
+		var1.setName("Var 1");
+		var1.setTermId(24);
+		variables.add(var1);
+		final MeasurementVariable var2 = new MeasurementVariable();
+		var2.setName("Var 2");
+		var2.setTermId(25);
+		variables.add(var2);
+		final MeasurementVariable var3 = new MeasurementVariable();
+		var3.setName("Var 3");
+		var3.setTermId(27);
+		variables.add(var3);
+
+		final ObservationsPutRequestInput t = DatasetServiceImpl.transformObservations(list, variables);
+
+		// FIXME order may change
+		final List<List<String>> data = t.getData();
+		Assert.assertThat(data.get(1).get(2), is("200"));
+		Assert.assertThat(data.get(1).get(3), is("280"));
 	}
 
 }
