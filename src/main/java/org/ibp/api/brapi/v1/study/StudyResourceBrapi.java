@@ -1,6 +1,7 @@
 
 package org.ibp.api.brapi.v1.study;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -11,10 +12,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
@@ -61,6 +64,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Study services.
@@ -176,11 +180,17 @@ public class StudyResourceBrapi {
 
 	@ApiOperation(value = "Get study details", notes = "Get study details")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsForGeolocation(studyDbId);
+		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
 
 		if (mwStudyDetails != null) {
+			//Add environment parameters to addtionalInfo
+			Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
+				Collectors.toMap(MeasurementVariable::getDescription, MeasurementVariable::getValue));
+			mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
+
 			final StudyDetails studyDetails = new StudyDetails();
 			final Metadata metadata = new Metadata();
 			final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
