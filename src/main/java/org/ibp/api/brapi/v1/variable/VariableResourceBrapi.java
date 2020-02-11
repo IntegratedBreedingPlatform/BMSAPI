@@ -11,6 +11,7 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -34,7 +35,7 @@ import java.util.List;
 public class VariableResourceBrapi {
 
 	@Autowired
-	private StudyService studyService;
+	private VariableService variableService;
 
 	@ApiOperation(value = "Call to retrieve a list of observation variables available in the system.")
 	@RequestMapping(value = "/{crop}/brapi/v1/variables", method = RequestMethod.GET)
@@ -53,14 +54,14 @@ public class VariableResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return VariableResourceBrapi.this.studyService.countAllVariables(Collections.unmodifiableList(
+					return VariableResourceBrapi.this.variableService.countAllVariables(Collections.unmodifiableList(
 						Arrays.asList(VariableType.TRAIT.getId())));
 				}
 
 				@Override
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
-					return VariableResourceBrapi.this.studyService
+					return VariableResourceBrapi.this.variableService
 						.getAllVariables(crop, Collections.unmodifiableList(
 							Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
 				}

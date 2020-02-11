@@ -4,7 +4,6 @@ package org.ibp.api.exception;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
-import org.apache.commons.lang3.time.DateUtils;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;

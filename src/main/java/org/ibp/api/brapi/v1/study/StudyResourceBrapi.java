@@ -33,6 +33,7 @@ import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.BrapiNotFoundException;
+import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -84,6 +85,9 @@ public class StudyResourceBrapi {
 
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private VariableService variableService;
 
 	@Autowired
 	private LocationDataManager locationDataManager;
@@ -321,14 +325,14 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyService.countVariablesByDatasetId(datasetId, Collections.unmodifiableList(
+					return StudyResourceBrapi.this.variableService.countVariablesByDatasetId(datasetId, Collections.unmodifiableList(
 						Arrays.asList(VariableType.TRAIT.getId())));
 				}
 
 				@Override
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
-					return StudyResourceBrapi.this.studyService
+					return StudyResourceBrapi.this.variableService
 						.getVariablesByDatasetId(datasetId, crop, Collections.unmodifiableList(
 							Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
 				}

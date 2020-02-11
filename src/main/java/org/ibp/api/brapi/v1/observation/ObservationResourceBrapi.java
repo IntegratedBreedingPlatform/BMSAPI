@@ -10,7 +10,6 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.dataset.DatasetTypeService;
-import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +30,6 @@ public class ObservationResourceBrapi {
 
 	@Autowired
 	private DatasetTypeService datasetTypeService;
-
-	@Autowired
-	private StudyService studyService;
 
 	@ApiOperation(value = "Get observation levels", notes = "Returns a list of supported observation levels")
 	@RequestMapping(value = "/{crop}/brapi/v1/observationLevels", method = RequestMethod.GET)

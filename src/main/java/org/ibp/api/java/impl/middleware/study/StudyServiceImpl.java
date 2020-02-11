@@ -383,25 +383,4 @@ public class StudyServiceImpl implements StudyService {
 		this.studyDataManager.updateStudyLockedStatus(studyId, study.isLocked());
 	}
 
-	@Override
-	public long countVariablesByDatasetId(final int datasetId, final List<Integer> variableTypes) {
-		return this.middlewareStudyService.countVariablesByDatasetId(datasetId, variableTypes);
-	}
-
-	@Override
-	public List<VariableDTO> getVariablesByDatasetId(final int datasetId, final String cropname, final List<Integer> variableTypes,
-		final int pageSize, final int pageNumber) {
-		return this.middlewareStudyService.getVariablesByDatasetId(datasetId, variableTypes, cropname, pageSize, pageNumber);
-	}
-
-	@Override
-	public long countAllVariables(final List<Integer> variableTypes) {
-		return this.middlewareStudyService.countAllVariables(variableTypes);
-	}
-
-	@Override
-	public List<VariableDTO> getAllVariables(final String cropname, final List<Integer> variableTypes, final int pageSize,
-		final int pageNumber) {
-		return this.middlewareStudyService.getAllVariables(variableTypes, cropname, pageSize, pageNumber);
-	}
 }
