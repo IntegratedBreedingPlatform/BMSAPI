@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -196,6 +197,14 @@ public class DefaultExceptionHandler {
 		}
 		response.addError(sb.toString());
 		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.TEXT_PLAIN_VALUE})
+	@ExceptionHandler(BrapiNotFoundException.class)
+	@ResponseStatus(value = NOT_FOUND)
+	@ResponseBody
+	public String handleBrapiNotFoundException(final BrapiNotFoundException ex) {
+		return "ERROR - " + Instant.now().toString() + " - " + ex.getMessage();
 	}
 
 	private ErrorResponse buildErrorResponse(final List<ObjectError> objectErrors){

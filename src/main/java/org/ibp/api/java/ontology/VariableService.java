@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.ontology;
 
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
@@ -75,4 +76,13 @@ public interface VariableService {
 	void deleteVariablesFromCache(String cropname, final Integer[] variablesIds, String programId);
 
 	List<VariableDetails> getVariablesByFilter(VariableFilter variableFilter);
+
+	long countVariablesByDatasetId(final int studyDbId, final List<Integer> variableTypes);
+
+	List<VariableDTO> getVariablesByDatasetId(final int datasetId, final String cropname,
+		final List<Integer> variableTypes, final int pageSize, final int pageNumber);
+
+	long countAllVariables(final List<Integer> variableTypes);
+
+	List<VariableDTO> getAllVariables(String cropname, final List<Integer> variableTypes, int pageSize, int pageNumber);
 }
