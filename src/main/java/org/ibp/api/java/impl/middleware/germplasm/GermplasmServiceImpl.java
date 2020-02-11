@@ -36,6 +36,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +82,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private InstanceValidator instanceValidator;
 
 	@Override
 	public List<GermplasmSummary> searchGermplasm(final String searchText, final int pageNumber, final int pageSize) {
@@ -316,7 +320,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmDTO> getGermplasmByStudy(final int studyDbId, final int pageSize, final int pageNumber) {
 		try {
 
-			this.validateStudyDbId(studyDbId);
+			this.instanceValidator.validateStudyDbId(studyDbId);
 
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
 				.getGermplasmByStudy(studyDbId, pageNumber, pageSize);
@@ -332,14 +336,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("An error has occurred when trying to search germplasms", e);
-		}
-	}
-
-	private void validateStudyDbId(final int studyDbId) {
-		if (!this.studyDataManager.existInstances(Sets.newHashSet(studyDbId))) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-			errors.reject("germplasm.search.invalid.instances", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 

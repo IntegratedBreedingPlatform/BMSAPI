@@ -205,7 +205,8 @@ public class TrialResourceBrapi {
 		return "";
 	}
 
-	@ApiOperation(value = "Get trial observation details as table", notes = "Get trial observation details as table")
+	@ApiOperation(value = "Get trial observation details as table", notes = "Get trial observation details as table "
+		+ "<p><strong>Note: </strong> non-standard BrAPI call</p>")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials/{trialDbId}/table", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<TrialObservations> getTrialObservationsAsTable(@PathVariable final String crop,
