@@ -20,8 +20,8 @@ import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
-import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.inventory.manager.LotService;
+import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -50,11 +50,10 @@ import java.util.Set;
 
 @Api(value = "Lot Services")
 @RestController
-
-@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY')")
 public class LotResource {
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
+	private static final String HAS_MANAGE_LOTS = "hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_LOTS')";
 
 	@Autowired
 	private LotService lotService;
@@ -73,6 +72,7 @@ public class LotResource {
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS', 'CREATE_LOTS', 'IMPORT_LOTS')")
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchLots(
 		@PathVariable final String cropName, @RequestBody final LotsSearchDto lotsSearchDto) {
@@ -98,6 +98,7 @@ public class LotResource {
 							"Default sort order is ascending. " +
 							"Multiple sort criteria are supported.")
 	})
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS', 'CREATE_LOTS', 'IMPORT_LOTS')")
 	@ResponseBody
 	@JsonView(InventoryView.LotView.class)
 	public ResponseEntity<List<ExtendedLotDto>> getLots(@PathVariable final String cropName, //
@@ -132,6 +133,7 @@ public class LotResource {
 
 	@ApiOperation(value = "Create Lot", notes = "Create a new lot")
 	@RequestMapping(value = "/crops/{cropName}/lots", method = RequestMethod.POST)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('CREATE_LOTS')")
 	@ResponseBody
 	public ResponseEntity<Integer> createLot(
 		@PathVariable final String cropName,
@@ -144,6 +146,7 @@ public class LotResource {
 	@RequestMapping(
 		value = "/crops/{crop}/lot-lists",
 		method = RequestMethod.POST)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
 	public ResponseEntity<Void> importLotsWithInitialBalance(@PathVariable final String crop, @RequestBody final List<LotItemDto> lotList) {
 		this.lotService.importLotsWithInitialTransaction(lotList);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -153,6 +156,7 @@ public class LotResource {
 	@RequestMapping(
 		value = "/crops/{cropName}/lot-lists/templates/xls",
 		method = RequestMethod.GET)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
 	public ResponseEntity<FileSystemResource> getTemplate(@PathVariable final String cropName) {
 
 		final VariableFilter variableFilter = new VariableFilter();
