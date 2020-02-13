@@ -373,7 +373,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> environmentDetails =
 			filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
 		final Map<Integer, String> geoLocationMap =
-			this.studyDataManager.getGeolocationByVariableId(environmentDatasetId, instance.getInstanceDbId());
+			this.studyDataManager.getEnvironmentVariableIdValuesMap(environmentDatasetId, instance.getExperimentId()s);
 
 		final ListIterator<MeasurementVariable> iterator = environmentDetails.listIterator();
 		while (iterator.hasNext()) {

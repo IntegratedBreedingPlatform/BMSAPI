@@ -59,7 +59,7 @@ public class FieldMapService {
 		return fieldMaps;
 	}
 
-	public String getBlockId(final int datasetId, final String trialInstance) {
+	public String getBlockId(final int datasetId, final Integer trialInstance) {
 		return studyDataManager.getBlockId(datasetId, trialInstance);
 	}
 
@@ -158,7 +158,7 @@ public class FieldMapService {
 		fieldPlot.setPlotNumber(fieldMapLabel.getPlotNo());
 		fieldPlot.setRepetitionNumber(fieldMapLabel.getRep());
 		fieldPlot.setDatasetId(rawDataFromMiddleware.getFieldmapDataset().getDatasetId());
-		fieldPlot.setGeolocationId(middlewareFieldMapTrialInstanceInfo.getGeolocationId());
+		fieldPlot.setGeolocationId(middlewareFieldMapTrialInstanceInfo.getEnvironmentId());
 		return fieldPlot;
 	}
 
