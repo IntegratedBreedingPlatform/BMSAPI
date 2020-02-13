@@ -56,7 +56,7 @@ public class TransactionResource {
 
 	@ApiOperation(value = "Post transaction search", notes = "Post transaction search")
 	@RequestMapping(value = "/crops/{cropName}/transactions/search", method = RequestMethod.POST)
-	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS', 'CREATE_TRANSACTIONS', 'IMPORT_TRANSACTIONS')")
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchTransactions(
 		@PathVariable final String cropName, @RequestBody final TransactionsSearchDto transactionsSearchDto) {
@@ -83,7 +83,7 @@ public class TransactionResource {
 				"Default sort order is ascending. " +
 				"Multiple sort criteria are supported.")
 	})
-	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS', 'CREATE_TRANSACTIONS', 'IMPORT_TRANSACTIONS')")
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
 	@JsonView(InventoryView.TransactionView.class)
 	public ResponseEntity<List<TransactionDto>> getTransactions(
@@ -119,7 +119,6 @@ public class TransactionResource {
 
 	@ApiOperation(value = "Create Transaction", notes = "Create a new transaction")
 	@RequestMapping(value = "/crops/{cropName}/lots/{lotId}/transactions", method = RequestMethod.POST)
-	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CREATE_TRANSACTIONS')")
 	@ResponseBody
 	public ResponseEntity<Integer> createTransaction(
 		@PathVariable final String cropName,
