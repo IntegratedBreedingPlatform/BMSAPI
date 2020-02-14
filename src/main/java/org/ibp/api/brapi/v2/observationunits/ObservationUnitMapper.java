@@ -1,4 +1,4 @@
-package org.ibp.api.brapi.v2.observation;
+package org.ibp.api.brapi.v2.observationunits;
 
 import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;

@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.service.api.inventory.LotService;
@@ -43,7 +42,7 @@ public class LotInputValidator {
 	}
 
 	public void validate(final LotGeneratorInputDto lotGeneratorInputDto) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.locationValidator.validateSeedLocationId(this.errors, lotGeneratorInputDto.getLocationId());
 		this.inventoryScaleValidator.validateInventoryScaleId(this.errors, lotGeneratorInputDto.getScaleId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());

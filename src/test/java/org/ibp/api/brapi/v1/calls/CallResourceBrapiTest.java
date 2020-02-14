@@ -94,6 +94,7 @@ public class CallResourceBrapiTest extends ApiUnitTestBase {
 
 	@Test
 	public void testListAvailableCalls() throws Exception {
+		// TODO user test/resources/brapi/calls.json
 		Mockito.when(this.callService.getAllCalls(null, null, null)).thenReturn(this.calls);
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/calls").build();
 

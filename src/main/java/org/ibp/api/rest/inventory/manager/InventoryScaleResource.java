@@ -35,7 +35,7 @@ public class InventoryScaleResource {
 			final String cropName) {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		List<VariableDetails> variables = this.variableService.getVariablesByFilter(variableFilter);
+		final List<VariableDetails> variables = this.variableService.getVariablesByFilter(variableFilter);
 		return new ResponseEntity<>(variables, HttpStatus.OK);
 	}
 }

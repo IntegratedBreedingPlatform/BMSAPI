@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
-import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.hamcrest.CoreMatchers;
@@ -49,7 +48,7 @@ public class GermplasmValidatorTest {
 
 	@Test
 	public void testValidateValidGermplasmId() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		final Integer germplasmId = 1;
 		this.lotGeneratorInputDto.setGid(germplasmId);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
@@ -69,7 +68,7 @@ public class GermplasmValidatorTest {
 
 	@Test
 	public void testValidateNullGermplasmId() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		final Integer germplasmId = null;
 		this.lotGeneratorInputDto.setGid(germplasmId);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
@@ -90,7 +89,7 @@ public class GermplasmValidatorTest {
 
 	@Test
 	public void testValidateInvalidGermplasmId() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.lotGeneratorInputDto.setGid(GERMPLASM_ID);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);

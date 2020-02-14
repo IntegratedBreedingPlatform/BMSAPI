@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -65,12 +66,11 @@ public class DefaultExceptionHandler {
 		Throwable rootCause = ex.getRootCause();
 		if (rootCause instanceof UnrecognizedPropertyException) {
 			UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) ex.getCause();
-			response.addError(this.messageSource.getMessage("not.recognised.field",
-					new Object[] {unrecognizedPropertyException.getPropertyName()}, LocaleContextHolder.getLocale()));
+			response.addError(this.getMessage("not.recognised.field", new Object[] {unrecognizedPropertyException.getPropertyName()}));
 		} else if (rootCause instanceof JsonParseException) {
-			response.addError(this.messageSource.getMessage("request.body.invalid", null, LocaleContextHolder.getLocale()));
+			response.addError(this.getMessage("request.body.invalid", null));
 		} else if (rootCause instanceof JsonMappingException) {
-			response.addError(this.messageSource.getMessage("request.body.invalid", null, LocaleContextHolder.getLocale()));
+			response.addError(this.getMessage("request.body.invalid", null));
 		}
 		return response;
 	}
@@ -83,7 +83,7 @@ public class DefaultExceptionHandler {
 		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
 		DefaultExceptionHandler.LOG.error("Request not supported with given input", ex);
-		response.addError(this.messageSource.getMessage("request.method.not.supported", null, LocaleContextHolder.getLocale()));
+		response.addError(this.getMessage("request.method.not.supported", null));
 		return response;
 	}
 
@@ -105,7 +105,7 @@ public class DefaultExceptionHandler {
 		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
 
-		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		String message = this.getMessage(ex.getError().getCode(), ex.getError().getArguments());
 		response.addError(message);
 
 		return response;
@@ -119,7 +119,7 @@ public class DefaultExceptionHandler {
 		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
 
-		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		String message = this.getMessage(ex.getError().getCode(), ex.getError().getArguments());
 		response.addError(message);
 
 		return response;
@@ -133,12 +133,12 @@ public class DefaultExceptionHandler {
 		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
 
-		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		final ObjectError error = ex.getError();
+		String message = this.getMessage(error.getCode(), error.getArguments());
 		response.addError(message);
 
 		return response;
 	}
-
 
 	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ExceptionHandler(ConflictException.class)
@@ -154,10 +154,11 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(MiddlewareRequestException.class)
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
-	public ErrorResponse handleUncaughtException(MiddlewareRequestException ex) {
+	public ErrorResponse handleMiddlewareRequestException(MiddlewareRequestException ex) {
 		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
-		response.addError(ex.getMessage());
+		String message = this.getMessage(ex.getErrorCode(), null);
+		response.addError(message);
 		return response;
 	}
 
@@ -178,7 +179,7 @@ public class DefaultExceptionHandler {
 	public ErrorResponse handleBVDesignException(BVDesignException ex) {
 		final ErrorResponse response = new ErrorResponse();
 		DefaultExceptionHandler.LOG.error("BVDesign app failed to execute.", ex);
-		response.addError(this.messageSource.getMessage(ex.getBvErrorCode(), null, LocaleContextHolder.getLocale()));
+		response.addError(this.getMessage(ex.getBvErrorCode(), null));
 		return response;
 	}
 
@@ -188,7 +189,7 @@ public class DefaultExceptionHandler {
 	@ResponseBody
 	public ErrorResponse handleBVLicenseParseException(final BVLicenseParseException ex) {
 		final ErrorResponse response = new ErrorResponse();
-		final String mainError = this.messageSource.getMessage(ex.getBvErrorCode(), null, LocaleContextHolder.getLocale());
+		final String mainError = this.getMessage(ex.getBvErrorCode(), null);
 		DefaultExceptionHandler.LOG.error("BVDesign license checking failed: " + mainError, ex);
 		final StringBuilder sb = new StringBuilder(mainError);
 		if (ex.getMessageFromApp() != null) {
@@ -198,10 +199,18 @@ public class DefaultExceptionHandler {
 		return response;
 	}
 
+	@RequestMapping(produces = {MediaType.TEXT_PLAIN_VALUE})
+	@ExceptionHandler(BrapiNotFoundException.class)
+	@ResponseStatus(value = NOT_FOUND)
+	@ResponseBody
+	public String handleBrapiNotFoundException(final BrapiNotFoundException ex) {
+		return "ERROR - " + Instant.now().toString() + " - " + ex.getMessage();
+	}
+
 	private ErrorResponse buildErrorResponse(final List<ObjectError> objectErrors){
 		final ErrorResponse response = new ErrorResponse();
 		for (ObjectError error : objectErrors) {
-			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
+			String message = this.getMessage(error.getCode(), error.getArguments());
 			if (error instanceof FieldError) {
 				FieldError fieldError = (FieldError) error;
 				response.addError(message, fieldError.getField());
@@ -210,5 +219,9 @@ public class DefaultExceptionHandler {
 			}
 		}
 		return response;
+	}
+
+	private String getMessage(final String code, final Object[] arguments) {
+		return this.messageSource.getMessage(code, arguments, LocaleContextHolder.getLocale());
 	}
 }
