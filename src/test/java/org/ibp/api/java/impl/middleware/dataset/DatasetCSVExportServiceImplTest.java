@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
@@ -335,7 +334,7 @@ public class DatasetCSVExportServiceImplTest {
 
 	private StudyInstance createStudyInstance(final Integer instanceId) {
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(instanceId);
+		studyInstance.setExperimentId(instanceId);
 		studyInstance.setInstanceNumber(this.random.nextInt());
 		studyInstance.setLocationName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		studyInstance.setLocationId(LOCATION_ID);

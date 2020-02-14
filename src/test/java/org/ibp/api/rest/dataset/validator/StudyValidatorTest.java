@@ -116,13 +116,13 @@ public class StudyValidatorTest {
 		study.setProgramUUID(PROGRAM_UUID);
 
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
-		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
 			RandomStringUtils.randomAlphabetic(10), false);
 		studyInstance.setCanBeDeleted(false);
-		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
@@ -150,13 +150,13 @@ public class StudyValidatorTest {
 		study.setProgramUUID(PROGRAM_UUID);
 
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
-		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
 			RandomStringUtils.randomAlphabetic(10), false);
 		studyInstance.setCanBeDeleted(true);
-		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,

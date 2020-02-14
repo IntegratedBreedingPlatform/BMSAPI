@@ -172,7 +172,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
@@ -226,7 +226,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(random.nextInt());
@@ -273,7 +273,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		dataset.setDatasetTypeId(DatasetTypeEnum.MEANS_DATA.getId());
@@ -321,7 +321,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -369,7 +369,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -422,7 +422,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -474,7 +474,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -527,7 +527,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -583,7 +583,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -634,7 +634,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setInstanceIds(instanceIds);
@@ -682,7 +682,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setExperimentId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setInstanceIds(instanceIds);

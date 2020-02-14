@@ -224,7 +224,7 @@ public class DatasetKsuExportServiceImplTest {
 
 	private StudyInstance createStudyInstance(final Integer instanceId) {
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(instanceId);
+		studyInstance.setExperimentId(instanceId);
 		studyInstance.setInstanceNumber(instanceId);
 		studyInstance.setLocationName("IRRI");
 		return studyInstance;

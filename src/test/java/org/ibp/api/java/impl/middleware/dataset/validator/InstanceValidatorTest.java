@@ -16,10 +16,8 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static org.hamcrest.Matchers.hasItem;
@@ -46,7 +44,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		Mockito.doReturn(datasetId).when(this.middlewareStudyService).getEnvironmentDatasetId(ArgumentMatchers.anyInt());
 		when(this.studyDataManager.areAllInstancesExistInDataset(ArgumentMatchers.eq(this.datasetId), ArgumentMatchers.anySet()))
 			.thenReturn(true);
-		when(this.studyDataManager.instanceExists(ArgumentMatchers.anySet())).thenReturn(true);
+		when(this.studyDataManager.areAllInstancesExistInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anySet())).thenReturn(true);
 	}
 
 	@Test
@@ -89,7 +87,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceNumbersFail_StudyHasNoInstances() {
-		Mockito.doReturn(Collections.emptyMap()).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
+		Mockito.doReturn(Collections.emptyList()).when(this.studyInstanceService).getStudyInstances(ArgumentMatchers.anyInt());
 		try {
 			this.instanceValidator.validateInstanceNumbers(random.nextInt(), Collections.singleton(random.nextInt()));
 			Assert.fail("Expected validation exception to be thrown but was not.");
@@ -101,11 +99,11 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceNumbersFail_InstanceNumbersDontExistInStudy() {
-		final Map<String, Integer> instancesMap = new HashMap<>();
-		instancesMap.put("1", 101);
-		instancesMap.put("2", 202);
-		instancesMap.put("3", 303);
-		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
+		final List<StudyInstance> instances = new ArrayList<>();
+		instances.add(new StudyInstance(101, 1, false, false, false, true));
+		instances.add(new StudyInstance(202, 2, false, false, false, true));
+		instances.add(new StudyInstance(303, 3, false, false, false, true));
+		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(ArgumentMatchers.anyInt());
 		try {
 			this.instanceValidator.validateInstanceNumbers(random.nextInt(), new HashSet<>(Arrays.asList(1, 102)));
 			Assert.fail("Expected validation exception to be thrown but was not.");
@@ -117,12 +115,6 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceNumbersFail_AllSelectedInstancesCantBeDeleted() {
-		final Map<String, Integer> instancesMap = new HashMap<>();
-		instancesMap.put("1", 101);
-		instancesMap.put("2", 102);
-		instancesMap.put("3", 103);
-		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
-
 		final int studyId = random.nextInt();
 		final List<StudyInstance> instances = this.createTestInstances();
 		instances.get(0).setCanBeDeleted(Boolean.FALSE);
@@ -140,12 +132,6 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceNumbersSuccess_SomeSelectedInstancesCantBeDeleted() {
-		final Map<String, Integer> instancesMap = new HashMap<>();
-		instancesMap.put("1", 101);
-		instancesMap.put("2", 102);
-		instancesMap.put("3", 103);
-		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
-
 		final int studyId = random.nextInt();
 		final List<StudyInstance> instances = this.createTestInstances(3);
 		instances.get(0).setCanBeDeleted(Boolean.FALSE);
@@ -156,11 +142,6 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceNumbersSuccess_AllInstancesCanBeDeleted() {
-		final Map<String, Integer> instancesMap = new HashMap<>();
-		instancesMap.put("1", 101);
-		instancesMap.put("2", 102);
-		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
-
 		final int studyId = random.nextInt();
 		final List<StudyInstance> instances = this.createTestInstances(2);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
@@ -170,10 +151,6 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceNumbersSuccess_StudyHasOneInstance() {
-		final Map<String, Integer> instancesMap = new HashMap<>();
-		instancesMap.put("1", 101);
-		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
-
 		final int studyId = random.nextInt();
 		final List<StudyInstance> instances = this.createTestInstances(1);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
@@ -222,7 +199,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		for (int i = 1; i <= count; i++) {
 			final StudyInstance instance = new StudyInstance();
 			instance.setInstanceNumber(i);
-			instance.setInstanceDbId(100 + i);
+			instance.setExperimentId(100 + i);
 			instance.setCanBeDeleted(Boolean.TRUE);
 			instance.setHasExperimentalDesign(true);
 			instances.add(instance);
