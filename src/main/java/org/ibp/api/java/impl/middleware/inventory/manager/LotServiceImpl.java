@@ -5,6 +5,7 @@ import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
+import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -18,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional
@@ -83,7 +82,7 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public Map<String, BigInteger> getLotsSearchMetadata(final LotsSearchDto lotsSearchDto) {
+	public LotSearchMetadata getLotsSearchMetadata(final LotsSearchDto lotsSearchDto) {
 		return lotService.getLotSearchMetadata(lotsSearchDto);
 	}
 }

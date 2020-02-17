@@ -1,7 +1,6 @@
 package org.ibp.api.rest.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -12,6 +11,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
+import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -21,8 +21,8 @@ import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
-import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.inventory.manager.LotService;
+import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -44,11 +44,9 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Api(value = "Lot Services")
@@ -179,9 +177,7 @@ public class LotResource {
 		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
 			.getSearchRequest(searchRequestId, LotsSearchDto.class);
 
-		final Map<String, BigInteger> countLotsPerScale = lotService.getLotsSearchMetadata(searchDTO);
-
-		return new ResponseEntity<>(new LotSearchMetadata(countLotsPerScale), HttpStatus.OK);
+		return new ResponseEntity<>(lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
 	}
 
 }
