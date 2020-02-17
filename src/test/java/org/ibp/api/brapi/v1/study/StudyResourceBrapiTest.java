@@ -181,7 +181,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final LocationDetailsDto location = locations.get(0);
 
 
-		Mockito.when(this.studyServiceMW.getStudyDetailsByGeolocation(studyDetailsDto.getMetadata().getStudyDbId())).thenReturn(studyDetailsDto);
+		Mockito.when(this.studyServiceMW.getStudyDetailsByEnvironment(studyDetailsDto.getMetadata().getStudyDbId())).thenReturn(studyDetailsDto);
 		Mockito.when(this.locationDataManager.getLocationsByFilter(0, 1, filters)).thenReturn(locations);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}")
