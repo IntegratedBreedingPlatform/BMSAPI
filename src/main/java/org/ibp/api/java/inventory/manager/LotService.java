@@ -6,7 +6,10 @@ import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.springframework.data.domain.Pageable;
 
+import javax.print.DocFlavor;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 public interface LotService {
 
@@ -17,5 +20,7 @@ public interface LotService {
 	Integer saveLot(LotGeneratorInputDto lotGeneratorInputDto);
 
 	void importLotsWithInitialTransaction(List<LotItemDto> lotList);
+
+	Map<String, BigInteger> getLotsSearchMetadata(LotsSearchDto lotsSearchDto);
 
 }

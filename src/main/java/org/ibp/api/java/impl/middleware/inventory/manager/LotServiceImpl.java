@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -78,5 +80,10 @@ public class LotServiceImpl implements LotService {
 		final CropType cropType = this.contextUtil.getProjectInContext().getCropType();
 		this.lotListValidator.validate(lotItemDtoList);
 		this.lotService.saveLotsWithInitialTransaction(cropType, loggedInUser.getUserid(), lotItemDtoList);
+	}
+
+	@Override
+	public Map<String, BigInteger> getLotsSearchMetadata(final LotsSearchDto lotsSearchDto) {
+		return lotService.getLotSearchMetadata(lotsSearchDto);
 	}
 }

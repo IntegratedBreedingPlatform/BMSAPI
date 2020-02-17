@@ -1,6 +1,7 @@
 package org.ibp.api.rest.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -43,9 +44,11 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Api(value = "Lot Services")
@@ -80,9 +83,9 @@ public class LotResource {
 			this.searchRequestService.saveSearchRequest(lotsSearchDto, LotsSearchDto.class).toString();
 
 		final SearchDto searchDto = new SearchDto(searchRequestId);
-		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<SearchDto>(searchDto);
+		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse<SearchDto>(searchDto);
 
-		return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
 
 	}
 
@@ -166,6 +169,19 @@ public class LotResource {
 			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "It will retrieve metadata for a lot search", notes = "It will retrieve metadata for a lot search")
+	@RequestMapping(value = "/crops/{cropName}/lots/search/metadata", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(@PathVariable final String cropName, //
+		@RequestParam final Integer searchRequestId) {
+		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
+			.getSearchRequest(searchRequestId, LotsSearchDto.class);
+
+		final Map<String, BigInteger> countLotsPerScale = lotService.getLotsSearchMetadata(searchDTO);
+
+		return new ResponseEntity<>(new LotSearchMetadata(countLotsPerScale), HttpStatus.OK);
 	}
 
 }
