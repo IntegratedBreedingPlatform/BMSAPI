@@ -249,7 +249,7 @@ public class DatasetExcelExportServiceImplTest {
 
 	private StudyInstance createStudyInstance(final Integer instanceId) {
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(instanceId);
+		studyInstance.setExperimentId(instanceId);
 		studyInstance.setInstanceNumber(this.random.nextInt());
 		studyInstance.setLocationName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		return studyInstance;

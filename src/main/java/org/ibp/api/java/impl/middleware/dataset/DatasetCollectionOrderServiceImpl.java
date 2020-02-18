@@ -29,7 +29,7 @@ public class DatasetCollectionOrderServiceImpl implements DatasetCollectionOrder
 
 		for (final Integer instanceDBID : observationUnitRowMap.keySet()) {
 			final String blockId =
-				this.fieldMapService.getBlockId(trialDatasetId, String.valueOf(selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber()));
+				this.fieldMapService.getBlockId(trialDatasetId, selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber());
 
 			FieldmapBlockInfo fieldmapBlockInfo = null;
 			if (blockId != null) {

@@ -107,7 +107,7 @@ public class DatasetGeneratorInputValidator {
 		final Function<StudyInstance, Integer> studyInstancesToIds = new Function<StudyInstance, Integer>() {
 
 			public Integer apply(final StudyInstance i) {
-				return i.getInstanceDbId();
+				return i.getExperimentId();
 			}
 		};
 

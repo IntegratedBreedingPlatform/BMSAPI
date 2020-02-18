@@ -14,7 +14,6 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,7 +40,7 @@ public class InstanceValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (!this.studyDataManager.instanceExists(instanceIds)) {
+		if (!this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
 			this.errors.reject("dataset.non.existent.instances", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -53,7 +52,7 @@ public class InstanceValidator {
 	}
 
 	public void validateStudyDbId(final int studyDbId) {
-		if (!this.studyDataManager.instanceExists(Sets.newHashSet(studyDbId))) {
+		if (!this.studyDataManager.instancesExist(Sets.newHashSet(studyDbId))) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("studydbid.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -63,10 +62,10 @@ public class InstanceValidator {
 	public void validateInstanceNumbers(final Integer studyId, final Set<Integer> instanceNumbers) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		final Map<String, Integer> instanceGeolocationIdsMap = this.studyDataManager.getInstanceGeolocationIdsMap(studyId);
+		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 		final Set<Integer> selectedInstanceIds =
-			instanceGeolocationIdsMap.entrySet().stream().filter(entry -> instanceNumbers.contains(Integer.valueOf(entry.getKey())))
-				.map(entry -> entry.getValue()).collect(Collectors.toSet());
+			studyInstances.stream().filter(instance -> instanceNumbers.contains(instance.getInstanceNumber()))
+				.map(StudyInstance::getExperimentId).collect(Collectors.toSet());
 
 		if (instanceNumbers.size() != selectedInstanceIds.size()) {
 			this.errors.reject("dataset.non.existent.instances");
@@ -98,7 +97,7 @@ public class InstanceValidator {
 
 		final List<Integer> restrictedInstances =
 			studyInstances.stream().filter(instance -> BooleanUtils.isFalse(instance.getCanBeDeleted()))
-				.map(instance -> instance.getInstanceDbId()).collect(Collectors.toList());
+				.map(StudyInstance::getExperimentId).collect(Collectors.toList());
 
 		// Raise error if any of the instances are not deletable when enforceAllInstancesDeletable = true
 		if (enforceAllInstancesDeletable && !instanceIds.stream()

@@ -18,7 +18,6 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,7 +40,7 @@ public class DatasetCollectionOrderServiceImplTest {
 		this.datasetCollectionOrderService.reorder(DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER,
 			1, selectedDatasetInstancesMap, observationUnitRowMap);
 
-		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockId(anyInt(), anyString());
+		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockId(anyInt(), anyInt());
 		Mockito.verify(this.fieldMapService, Mockito.never()).getBlockInformation(anyInt());
 		Mockito.verify(this.dataCollectionSorter, Mockito.never()).orderByRange(any(FieldmapBlockInfo.class), any(ArrayList.class));
 		Mockito.verify(this.dataCollectionSorter, Mockito.never()).orderByColumn(any(FieldmapBlockInfo.class), any(ArrayList.class));
@@ -49,7 +48,7 @@ public class DatasetCollectionOrderServiceImplTest {
 
 	@Test
 	public void testReorderForSERPENTINE_ALONG_ROWS() {
-		Mockito.when(this.fieldMapService.getBlockId(anyInt(), anyString())).thenReturn("1");
+		Mockito.when(this.fieldMapService.getBlockId(anyInt(), anyInt())).thenReturn("1");
 		final FieldmapBlockInfo fieldmapBlockInfo = Mockito.mock(FieldmapBlockInfo.class);
 		Mockito.when(this.fieldMapService.getBlockInformation(anyInt())).thenReturn(fieldmapBlockInfo);
 
@@ -59,7 +58,7 @@ public class DatasetCollectionOrderServiceImplTest {
 		this.datasetCollectionOrderService.reorder(DatasetCollectionOrderServiceImpl.CollectionOrder.SERPENTINE_ALONG_ROWS,
 			1, selectedDatasetInstancesMap, observationUnitRowMap);
 
-		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockId(anyInt(), anyString());
+		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockId(anyInt(), anyInt());
 		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockInformation(anyInt());
 		Mockito.verify(this.dataCollectionSorter, Mockito.times(2)).orderByRange(eq(fieldmapBlockInfo), any(ArrayList.class));
 		Mockito.verify(this.dataCollectionSorter, Mockito.never()).orderByColumn(eq(fieldmapBlockInfo), any(ArrayList.class));
@@ -67,7 +66,7 @@ public class DatasetCollectionOrderServiceImplTest {
 
 	@Test
 	public void testReorderForSERPENTINE_ALONG_COLUMNS() {
-		Mockito.when(this.fieldMapService.getBlockId(anyInt(), anyString())).thenReturn("1");
+		Mockito.when(this.fieldMapService.getBlockId(anyInt(), anyInt())).thenReturn("1");
 		final FieldmapBlockInfo fieldmapBlockInfo = Mockito.mock(FieldmapBlockInfo.class);
 		Mockito.when(this.fieldMapService.getBlockInformation(anyInt())).thenReturn(fieldmapBlockInfo);
 
@@ -77,7 +76,7 @@ public class DatasetCollectionOrderServiceImplTest {
 		this.datasetCollectionOrderService.reorder(DatasetCollectionOrderServiceImpl.CollectionOrder.SERPENTINE_ALONG_COLUMNS,
 			1, selectedDatasetInstancesMap, observationUnitRowMap);
 
-		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockId(anyInt(), anyString());
+		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockId(anyInt(), anyInt());
 		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockInformation(anyInt());
 		Mockito.verify(this.dataCollectionSorter, Mockito.never()).orderByRange(eq(fieldmapBlockInfo), any(ArrayList.class));
 		Mockito.verify(this.dataCollectionSorter, Mockito.times(2)).orderByColumn(eq(fieldmapBlockInfo), any(ArrayList.class));
@@ -94,7 +93,7 @@ public class DatasetCollectionOrderServiceImplTest {
 
 	private StudyInstance createStudyInstance(final Integer instanceId) {
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(instanceId);
+		studyInstance.setExperimentId(instanceId);
 		studyInstance.setInstanceNumber(instanceId);
 		studyInstance.setLocationName("LOC - " + instanceId);
 		return studyInstance;
