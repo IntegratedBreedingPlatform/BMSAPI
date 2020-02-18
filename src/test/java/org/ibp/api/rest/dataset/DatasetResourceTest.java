@@ -306,7 +306,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].dataType", is(dataset.getVariables().get(0).getDataType())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].dataTypeId", is(dataset.getVariables().get(0).getDataTypeId())))
 
-			.andExpect(MockMvcResultMatchers.jsonPath("$.instances[0].instanceDbId", is(dataset.getInstances().get(0).getInstanceDbId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.instances[0].locationName", is(dataset.getInstances().get(0).getLocationName())))
 			.andExpect(MockMvcResultMatchers
 				.jsonPath("$.instances[0].locationAbbreviation", is(dataset.getInstances().get(0).getLocationAbbreviation())))
@@ -513,7 +512,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].dataType", is(dataset.getVariables().get(0).getDataType())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].dataTypeId", is(dataset.getVariables().get(0).getDataTypeId())))
 
-			.andExpect(MockMvcResultMatchers.jsonPath("$.instances[0].instanceDbId", is(dataset.getInstances().get(0).getInstanceDbId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.instances[0].locationName", is(dataset.getInstances().get(0).getLocationName())))
 			.andExpect(MockMvcResultMatchers
 				.jsonPath("$.instances[0].locationAbbreviation", is(dataset.getInstances().get(0).getLocationAbbreviation())))
@@ -955,7 +953,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		datasetDTO.setVariables(variables);
 
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(67);
+		studyInstance.setExperimentId(67);
 		studyInstance.setLocationName("CENTER FOR INTERNATIONAL FORESTRY RESEARCH");
 		studyInstance.setLocationAbbreviation("CIFOR");
 		studyInstance.setInstanceNumber(1);

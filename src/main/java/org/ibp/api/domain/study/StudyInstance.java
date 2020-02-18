@@ -8,7 +8,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class StudyInstance {
 
-	private int instanceDbId;
 	private int experimentId;
 	private String locationName;
 	private String locationAbbreviation;
@@ -23,23 +22,14 @@ public class StudyInstance {
 
 	}
 
-	public StudyInstance(final int instanceDbId, final int experimentId, final String locationName, final String locationAbbreviation,
+	public StudyInstance(final int experimentId, final String locationName, final String locationAbbreviation,
 		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldmap) {
-		this.instanceDbId = instanceDbId;
 		this.experimentId = experimentId;
 		this.locationName = locationName;
 		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
 		this.customLocationAbbreviation = customLocationAbbreviation;
 		this.hasFieldmap = hasFieldmap;
-	}
-
-	public int getInstanceDbId() {
-		return this.instanceDbId;
-	}
-
-	public void setInstanceDbId(final int instanceDbId) {
-		this.instanceDbId = instanceDbId;
 	}
 
 	public String getLocationName() {
@@ -120,12 +110,12 @@ public class StudyInstance {
 			return false;
 		}
 		final StudyInstance castOther = (StudyInstance) other;
-		return new EqualsBuilder().append(this.instanceDbId, castOther.instanceDbId).isEquals();
+		return new EqualsBuilder().append(this.experimentId, castOther.experimentId).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.instanceDbId).toHashCode();
+		return new HashCodeBuilder().append(this.experimentId).toHashCode();
 	}
 
 	@Override

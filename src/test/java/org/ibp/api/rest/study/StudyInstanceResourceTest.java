@@ -36,7 +36,7 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 		final int studyId = new Random().nextInt();
 		final int instanceNumber = 2;
 
-		final StudyInstance studyInstance = new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND),
+		final StudyInstance studyInstance = new StudyInstance(this.random.nextInt(BOUND),
 			RandomStringUtils.random(BOUND),
 			RandomStringUtils.random(
 				BOUND),
@@ -50,7 +50,6 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$.instanceDbId", Matchers.is(studyInstance.getInstanceDbId())))
 			.andExpect(jsonPath("$.experimentId", Matchers.is(studyInstance.getExperimentId())))
 			.andExpect(jsonPath("$.instanceNumber", Matchers.is(studyInstance.getInstanceNumber())))
 			.andExpect(jsonPath("$.locationName", Matchers.is(studyInstance.getLocationName())))
@@ -65,13 +64,13 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 
 		final int studyId = this.random.nextInt(BOUND);
 
-		final StudyInstance studyInstance = new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND),
+		final StudyInstance studyInstance = new StudyInstance(this.random.nextInt(BOUND),
 			RandomStringUtils.random(BOUND),
 			RandomStringUtils.random(
 				BOUND),
 			1,
 			RandomStringUtils.random(BOUND), this.random.nextBoolean());
-		final StudyInstance studyInstance2 = new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND),
+		final StudyInstance studyInstance2 = new StudyInstance(this.random.nextInt(BOUND),
 			RandomStringUtils.random(BOUND),
 			RandomStringUtils.random(
 				BOUND),
@@ -85,14 +84,12 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$[0].instanceDbId", Matchers.is(studyInstance.getInstanceDbId())))
 			.andExpect(jsonPath("$[0].experimentId", Matchers.is(studyInstance.getExperimentId())))
 			.andExpect(jsonPath("$[0].instanceNumber", Matchers.is(studyInstance.getInstanceNumber())))
 			.andExpect(jsonPath("$[0].locationName", Matchers.is(studyInstance.getLocationName())))
 			.andExpect(jsonPath("$[0].locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
 			.andExpect(jsonPath("$[0].hasFieldmap", Matchers.is(studyInstance.getHasFieldmap())))
 			.andExpect(jsonPath("$[0].customLocationAbbreviation", Matchers.is(studyInstance.getCustomLocationAbbreviation())))
-			.andExpect(jsonPath("$[1].instanceDbId", Matchers.is(studyInstance2.getInstanceDbId())))
 			.andExpect(jsonPath("$[1].experimentId", Matchers.is(studyInstance2.getExperimentId())))
 			.andExpect(jsonPath("$[1].instanceNumber", Matchers.is(studyInstance2.getInstanceNumber())))
 			.andExpect(jsonPath("$[1].locationName", Matchers.is(studyInstance2.getLocationName())))
@@ -123,7 +120,7 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
 
-		final StudyInstance studyInstance = new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND),
+		final StudyInstance studyInstance = new StudyInstance(this.random.nextInt(BOUND),
 			RandomStringUtils.random(BOUND),
 			RandomStringUtils.random(
 				BOUND),
@@ -137,7 +134,6 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$.instanceDbId", Matchers.is(studyInstance.getInstanceDbId())))
 			.andExpect(jsonPath("$.experimentId", Matchers.is(studyInstance.getExperimentId())))
 			.andExpect(jsonPath("$.instanceNumber", Matchers.is(studyInstance.getInstanceNumber())))
 			.andExpect(jsonPath("$.locationName", Matchers.is(studyInstance.getLocationName())))
