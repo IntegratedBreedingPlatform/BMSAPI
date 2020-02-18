@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class StudyInstanceResourceTest extends ApiUnitTestBase {
 
-	public static final int BOUND = 10;
+	private static final int BOUND = 10;
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
@@ -42,8 +42,8 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 				BOUND),
 			instanceNumber,
 			RandomStringUtils.random(BOUND), false);
-		when(this.studyInstanceService.createStudyInstance(CropType.CropEnum.MAIZE.name().toLowerCase(), studyId))
-			.thenReturn(studyInstance);
+		when(this.studyInstanceService.createStudyInstances(CropType.CropEnum.MAIZE.name().toLowerCase(), studyId, 1))
+			.thenReturn(Collections.singletonList(studyInstance));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/generation", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)

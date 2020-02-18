@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -41,20 +42,26 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private InstanceValidator instanceValidator;
 
 	@Override
-	public StudyInstance createStudyInstance(final String cropName, final int studyId) {
-
+	public List<StudyInstance> createStudyInstances(final String cropName, final int studyId, final Integer numberOfInstancesToGenerate) {
+		if (numberOfInstancesToGenerate < 1) {
+			throw new ApiRuntimeException("Invalid number of instances to generate.");
+		}
 		this.studyValidator.validate(studyId, true);
 
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
 		final List<DatasetDTO> datasets = this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
+		final List<StudyInstance> studyInstances = new ArrayList<>();
 		if (!datasets.isEmpty()) {
 			// Add Study Instance in Environment (Summary Data) Dataset
-			final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance =
-				this.studyInstanceMiddlewareService.createStudyInstance(cropType, studyId, datasets.get(0).getDatasetId());
+			final List<org.generationcp.middleware.service.impl.study.StudyInstance> instances =
+				this.studyInstanceMiddlewareService.createStudyInstances(cropType, studyId, datasets.get(0).getDatasetId(), numberOfInstancesToGenerate);
 			final ModelMapper mapper = new ModelMapper();
 			mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-			return mapper.map(studyInstance, StudyInstance.class);
+			for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : instances) {
+				studyInstances.add(mapper.map(instance, StudyInstance.class));
+			}
+			return studyInstances;
 		} else {
 			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
 		}
@@ -83,7 +90,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	public Optional<StudyInstance> getStudyInstance(final int studyId, final Integer instanceId) {
 		this.studyValidator.validate(studyId, false);
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));
-		final com.google.common.base.Optional<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstance =
+		final Optional<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstance =
 			this.studyInstanceMiddlewareService.getStudyInstance(studyId, instanceId);
 
 		final ModelMapper mapper = new ModelMapper();

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -90,20 +91,20 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(BOUND), false);
 
 		when(this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(datasets);
-		when(this.studyInstanceMiddlewareService.createStudyInstance(this.maizeCropType, studyId, datasetId))
-			.thenReturn(newStudyInstance);
+		when(this.studyInstanceMiddlewareService.createStudyInstances(this.maizeCropType, studyId, datasetId, 1))
+			.thenReturn(Collections.singletonList(newStudyInstance));
 
-		final org.ibp.api.domain.study.StudyInstance
-			result = this.studyInstanceService.createStudyInstance(this.maizeCropType.getCropName(), studyId);
+		final List<org.ibp.api.domain.study.StudyInstance>
+			result = this.studyInstanceService.createStudyInstances(this.maizeCropType.getCropName(), studyId, 1);
 
 		verify(this.studyValidator).validate(studyId, true);
 
-		assertEquals(result.getExperimentId(), newStudyInstance.getExperimentId());
+		assertEquals(result.get(0).getExperimentId(), newStudyInstance.getExperimentId());
 		assertEquals(nextInstanceNumber, newStudyInstance.getInstanceNumber());
-		assertEquals(result.getLocationName(), newStudyInstance.getLocationName());
-		assertEquals(result.getLocationAbbreviation(), newStudyInstance.getLocationAbbreviation());
-		assertEquals(result.getCustomLocationAbbreviation(), newStudyInstance.getCustomLocationAbbreviation());
-		assertEquals(result.getHasFieldmap(), newStudyInstance.isHasFieldmap());
+		assertEquals(result.get(0).getLocationName(), newStudyInstance.getLocationName());
+		assertEquals(result.get(0).getLocationAbbreviation(), newStudyInstance.getLocationAbbreviation());
+		assertEquals(result.get(0).getCustomLocationAbbreviation(), newStudyInstance.getCustomLocationAbbreviation());
+		assertEquals(result.get(0).getHasFieldmap(), newStudyInstance.isHasFieldmap());
 
 	}
 
@@ -114,7 +115,7 @@ public class StudyInstanceServiceImplTest {
 		when(this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(new ArrayList<>());
 
 		try {
-			this.studyInstanceService.createStudyInstance(this.maizeCropType.getCropName(), studyId);
+			this.studyInstanceService.createStudyInstances(this.maizeCropType.getCropName(), studyId, 1);
 			fail("Method should throw an exception.");
 		} catch (final ApiRuntimeException e) {
 			verify(this.studyValidator).validate(studyId, true);
@@ -190,11 +191,11 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(BOUND), this.random.nextBoolean());
 
 		when(this.studyInstanceMiddlewareService.getStudyInstance(studyId, 101))
-			.thenReturn(com.google.common.base.Optional.of(studyInstance));
+			.thenReturn(Optional.of(studyInstance));
 		when(this.studyInstanceMiddlewareService.getStudyInstance(studyId, 102))
-			.thenReturn(com.google.common.base.Optional.of(studyInstance2));
+			.thenReturn(Optional.of(studyInstance2));
 		when(this.studyInstanceMiddlewareService.getStudyInstance(studyId, 103))
-			.thenReturn(com.google.common.base.Optional.absent());
+			.thenReturn(Optional.empty());
 
 
 		final org.ibp.api.domain.study.StudyInstance result1 = this.studyInstanceService.getStudyInstance(studyId, 101).get();

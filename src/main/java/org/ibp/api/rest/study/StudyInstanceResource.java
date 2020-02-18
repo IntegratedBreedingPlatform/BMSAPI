@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
@@ -25,14 +26,14 @@ public class StudyInstanceResource {
 	@Resource
 	private StudyInstanceService studyInstanceService;
 
-	@ApiOperation(value = "Create new study instance",
+	@ApiOperation(value = "Create new study instances",
 		notes = "Create new study instance")
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/generation", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<StudyInstance> createStudyInstance(final @PathVariable String cropname, @PathVariable final String programUUID,
-		@PathVariable final Integer studyId) {
-		return new ResponseEntity<>(this.studyInstanceService.createStudyInstance(cropname, studyId),
+	public ResponseEntity<List<StudyInstance>> createStudyInstance(final @PathVariable String cropname, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @RequestParam final Integer numberOfInstancesToGenerate) {
+		return new ResponseEntity<>(this.studyInstanceService.createStudyInstances(cropname, studyId, numberOfInstancesToGenerate),
 			HttpStatus.OK);
 
 	}

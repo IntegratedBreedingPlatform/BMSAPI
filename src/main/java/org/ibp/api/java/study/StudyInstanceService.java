@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface StudyInstanceService {
 
-	StudyInstance createStudyInstance(final String cropName, final int studyId);
+	List<StudyInstance> createStudyInstances(final String cropName, final int studyId, final Integer numberOfInstancesToGenerate);
 
 	List<StudyInstance> getStudyInstances(int studyId);
 
