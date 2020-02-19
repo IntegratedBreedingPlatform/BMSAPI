@@ -27,7 +27,7 @@ public class StudyInstanceResource {
 	private StudyInstanceService studyInstanceService;
 
 	@ApiOperation(value = "Create new study instances",
-		notes = "Create new study instance")
+		notes = "Create new study instances")
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/generation", method = RequestMethod.POST)
 	@ResponseBody
@@ -38,14 +38,14 @@ public class StudyInstanceResource {
 
 	}
 
-	@ApiOperation(value = "Delete study instance",
-		notes = "Delete study instance")
+	@ApiOperation(value = "Delete study instances",
+		notes = "Delete study instances")
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<Void> deleteStudyInstance(final @PathVariable String cropname, @PathVariable final String programUUID,
-		@PathVariable final Integer studyId, @PathVariable final Integer instanceId) {
-		this.studyInstanceService.deleteStudyInstance(studyId, instanceId);
+		@PathVariable final Integer studyId, @RequestParam final List<Integer> instanceIds) {
+		this.studyInstanceService.deleteStudyInstances(studyId, instanceIds);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

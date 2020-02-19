@@ -172,7 +172,7 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
-		Mockito.verify(this.studyInstanceService).deleteStudyInstance(studyId, instanceId);
+		Mockito.verify(this.studyInstanceService).deleteStudyInstances(studyId, Collections.singletonList(instanceId));
 
 	}
 

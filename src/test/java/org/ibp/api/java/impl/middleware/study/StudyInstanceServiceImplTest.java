@@ -224,10 +224,10 @@ public class StudyInstanceServiceImplTest {
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
 
-		this.studyInstanceService.deleteStudyInstance(studyId, instanceId);
+		this.studyInstanceService.deleteStudyInstances(studyId, Collections.singletonList(instanceId));
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId), true);
-		Mockito.verify(this.studyInstanceMiddlewareService).deleteStudyInstance(studyId, instanceId);
+		Mockito.verify(this.studyInstanceMiddlewareService).deleteStudyInstances(studyId, Collections.singletonList(instanceId));
 	}
 
 

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,10 +81,10 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public void deleteStudyInstance(final Integer studyId, final Integer instanceId) {
+	public void deleteStudyInstances(final Integer studyId, final List<Integer> instanceIds) {
 		this.studyValidator.validate(studyId, true);
-		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId), true);
-		this.studyInstanceMiddlewareService.deleteStudyInstance(studyId, instanceId);
+		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(instanceIds), true);
+		this.studyInstanceMiddlewareService.deleteStudyInstances(studyId, instanceIds);
 	}
 
 	@Override

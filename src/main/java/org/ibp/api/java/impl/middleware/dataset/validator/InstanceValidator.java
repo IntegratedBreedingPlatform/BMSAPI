@@ -89,8 +89,8 @@ public class InstanceValidator {
 		final Boolean enforceAllInstancesDeletable) {
 		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 
-		// Raise error if the environment to be deleted is the only remaining environment for study
-		if (enforceAllInstancesDeletable && studyInstances.size() < 2) {
+		// Raise error if the environment/s to be deleted will cause study to have no remaining environment
+		if (enforceAllInstancesDeletable && (studyInstances.size() - instanceIds.size()) < 1) {
 			this.errors.reject("cannot.delete.last.instance");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
