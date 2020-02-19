@@ -63,7 +63,9 @@ import java.util.stream.Collectors;
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
 
-	public static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
+	private static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
+	private static final List<Integer> PROTECTED_VARIABLE_IDS =
+		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId());
 
 	@Autowired
 	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
@@ -164,6 +166,13 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void removeDatasetVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, true);
+		for (final Integer variableId : variableIds) {
+			if (DatasetServiceImpl.PROTECTED_VARIABLE_IDS.contains(variableId)) {
+				final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+				errors.reject("dataset.protected.variable.cannot.be.deleted", new Object[] {String.valueOf(variableId)}, "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+		}
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, variableIds);
 		this.middlewareDatasetService.removeDatasetVariables(datasetId, variableIds);
 	}
