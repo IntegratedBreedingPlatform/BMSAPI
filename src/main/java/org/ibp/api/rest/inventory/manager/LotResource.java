@@ -176,6 +176,7 @@ public class LotResource {
 	@ApiOperation(value = "It will retrieve metadata for a lot search", notes = "It will retrieve metadata for a lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search/metadata", method = RequestMethod.GET)
 	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(@PathVariable final String cropName, //
 		@RequestParam final Integer searchRequestId) {
 		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
