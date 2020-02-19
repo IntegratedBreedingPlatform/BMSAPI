@@ -21,7 +21,7 @@ import java.util.Random;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-public class StudyInstanceResourceTest extends ApiUnitTestBase {
+public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 
 	private static final int BOUND = 10;
 
