@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
@@ -181,7 +180,7 @@ public class DatasetValidatorTest {
 		final Integer variableId = ran.nextInt();
 		final DatasetDTO dataset = this.createDataset(datasetId,  Optional.of(variableId));
 
-		this.datasetValidator.validateIfDatasetVariableAlreadyExists(variableId, false, dataset);
+		this.datasetValidator.validateIfDatasetVariableAlreadyExists(variableId, false, dataset, null);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -194,7 +193,7 @@ public class DatasetValidatorTest {
 		final Integer variableId = ran.nextInt();
 		final DatasetDTO dataset = this.createDataset(datasetId, Optional.absent());
 
-		this.datasetValidator.validateIfDatasetVariableAlreadyExists(variableId, true, dataset);
+		this.datasetValidator.validateIfDatasetVariableAlreadyExists(variableId, true, dataset, null);
 	}
 
 	@Test(expected = NotSupportedException.class)
@@ -208,7 +207,7 @@ public class DatasetValidatorTest {
 		final DatasetDTO dataset = this.createDataset(datasetId, Optional.of(variableId));
 		dataset.getVariables().get(0).setVariableType(VariableType.ANALYSIS_SUMMARY);
 
-		this.datasetValidator.validateIfDatasetVariableAlreadyExists(variableId, true, dataset);
+		this.datasetValidator.validateIfDatasetVariableAlreadyExists(variableId, true, dataset, null);
 	}
 
 	@Test
