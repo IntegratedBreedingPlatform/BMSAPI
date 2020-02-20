@@ -3,13 +3,12 @@ package org.ibp.api.java.impl.middleware.study;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.study.StudyEnvironmentService;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
-import org.ibp.api.java.study.StudyInstanceService;
+import org.ibp.api.java.study.StudyEnvironmentService;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -26,10 +25,10 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class StudyInstanceServiceImpl implements StudyInstanceService {
+public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 
 	@Resource
-	private StudyEnvironmentService middlewareStudyEnvironmentService;
+	private org.generationcp.middleware.service.api.study.StudyEnvironmentService middlewareStudyEnvironmentService;
 
 	@Resource
 	private WorkbenchDataManager workbenchDataManager;
@@ -44,8 +43,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private InstanceValidator instanceValidator;
 
 	@Override
-	public List<StudyInstance> createStudyInstances(final String cropName, final int studyId, final Integer numberOfInstancesToGenerate) {
-		if (numberOfInstancesToGenerate < 1) {
+	public List<StudyInstance> createStudyEnvironments(final String cropName, final int studyId, final Integer numberOfEnvironmentsToGenerate) {
+		if (numberOfEnvironmentsToGenerate < 1) {
 			throw new ApiRuntimeException("Invalid number of instances to generate.");
 		}
 		this.studyValidator.validate(studyId, true);
@@ -58,7 +57,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			// Add Study Instance in Environment (Summary Data) Dataset
 			final List<org.generationcp.middleware.service.impl.study.StudyInstance> instances =
 				this.middlewareStudyEnvironmentService
-					.createStudyEnvironments(cropType, studyId, datasets.get(0).getDatasetId(), numberOfInstancesToGenerate);
+					.createStudyEnvironments(cropType, studyId, datasets.get(0).getDatasetId(), numberOfEnvironmentsToGenerate);
 			final ModelMapper mapper = new ModelMapper();
 			mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 			for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : instances) {
@@ -72,7 +71,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public List<StudyInstance> getStudyInstances(final int studyId) {
+	public List<StudyInstance> getStudyEnvironments(final int studyId) {
 		this.studyValidator.validate(studyId, false);
 		final List<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstances =
 			this.middlewareStudyEnvironmentService.getStudyEnvironments(studyId);
@@ -83,18 +82,18 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public void deleteStudyInstances(final Integer studyId, final List<Integer> instanceIds) {
+	public void deleteStudyEnvironments(final Integer studyId, final List<Integer> environmentIds) {
 		this.studyValidator.validate(studyId, true);
-		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(instanceIds), true);
-		this.middlewareStudyEnvironmentService.deleteStudyEnvironments(studyId, instanceIds);
+		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(environmentIds), true);
+		this.middlewareStudyEnvironmentService.deleteStudyEnvironments(studyId, environmentIds);
 	}
 
 	@Override
-	public Optional<StudyInstance> getStudyInstance(final int studyId, final Integer instanceId) {
+	public Optional<StudyInstance> getStudyEnvironment(final int studyId, final Integer environmentId) {
 		this.studyValidator.validate(studyId, false);
-		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));
+		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(environmentId));
 		final Optional<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstance =
-			this.middlewareStudyEnvironmentService.getStudyEnvironments(studyId, instanceId);
+			this.middlewareStudyEnvironmentService.getStudyEnvironment(studyId, environmentId);
 
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());

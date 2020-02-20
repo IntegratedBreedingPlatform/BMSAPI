@@ -3,7 +3,7 @@ package org.ibp.api.rest.study;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.study.StudyInstance;
-import org.ibp.api.java.study.StudyInstanceService;
+import org.ibp.api.java.study.StudyEnvironmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class StudyEnvironmentResource {
 
 	@Resource
-	private StudyInstanceService studyInstanceService;
+	private StudyEnvironmentService studyEnvironmentService;
 
 	@ApiOperation(value = "Create new study environments",
 		notes = "Create new study environments")
@@ -33,7 +33,7 @@ public class StudyEnvironmentResource {
 	@ResponseBody
 	public ResponseEntity<List<StudyInstance>> createStudyEnvironments(final @PathVariable String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestParam final Integer numberOfEnvironmentsToGenerate) {
-		return new ResponseEntity<>(this.studyInstanceService.createStudyInstances(cropname, studyId, numberOfEnvironmentsToGenerate),
+		return new ResponseEntity<>(this.studyEnvironmentService.createStudyEnvironments(cropname, studyId, numberOfEnvironmentsToGenerate),
 			HttpStatus.OK);
 
 	}
@@ -45,7 +45,7 @@ public class StudyEnvironmentResource {
 	@ResponseBody
 	public ResponseEntity<Void> deleteStudyEnvironments(final @PathVariable String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestParam final List<Integer> environmentIds) {
-		this.studyInstanceService.deleteStudyInstances(studyId, environmentIds);
+		this.studyEnvironmentService.deleteStudyEnvironments(studyId, environmentIds);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -56,7 +56,7 @@ public class StudyEnvironmentResource {
 	@ResponseBody
 	public ResponseEntity<List<StudyInstance>> listStudyEnvironments(final @PathVariable String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
-		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
+		final List<StudyInstance> studyInstances = this.studyEnvironmentService.getStudyEnvironments(studyId);
 
 		if (studyInstances.isEmpty()) {
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -72,7 +72,7 @@ public class StudyEnvironmentResource {
 	@ResponseBody
 	public ResponseEntity<StudyInstance> getStudyInstance(final @PathVariable String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer environmentId) {
-		final Optional<StudyInstance> studyInstance = this.studyInstanceService.getStudyInstance(studyId, environmentId);
+		final Optional<StudyInstance> studyInstance = this.studyEnvironmentService.getStudyEnvironment(studyId, environmentId);
 		return studyInstance.isPresent()? new ResponseEntity<>(studyInstance.get(), HttpStatus.OK) : new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 

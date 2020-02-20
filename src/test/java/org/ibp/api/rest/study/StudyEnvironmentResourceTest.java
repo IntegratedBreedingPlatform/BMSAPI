@@ -5,7 +5,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.study.StudyInstance;
-import org.ibp.api.java.study.StudyInstanceService;
+import org.ibp.api.java.study.StudyEnvironmentService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 	private static final int BOUND = 10;
 
 	@Autowired
-	private StudyInstanceService studyInstanceService;
+	private StudyEnvironmentService studyEnvironmentService;
 
 	private final Random random = new Random();
 
@@ -42,7 +42,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 				BOUND),
 			instanceNumber,
 			RandomStringUtils.random(BOUND), false);
-		when(this.studyInstanceService.createStudyInstances(CropType.CropEnum.MAIZE.name().toLowerCase(), studyId, 1))
+		when(this.studyEnvironmentService.createStudyEnvironments(CropType.CropEnum.MAIZE.name().toLowerCase(), studyId, 1))
 			.thenReturn(Collections.singletonList(studyInstance));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
@@ -76,7 +76,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 				BOUND),
 			2,
 			RandomStringUtils.random(BOUND), this.random.nextBoolean());
-		when(this.studyInstanceService.getStudyInstances(studyId))
+		when(this.studyEnvironmentService.getStudyEnvironments(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
@@ -104,7 +104,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 	public void testGetStudyInstances_NoInstances() throws Exception {
 
 		final int studyId = this.random.nextInt(BOUND);
-		when(this.studyInstanceService.getStudyInstances(studyId))
+		when(this.studyEnvironmentService.getStudyEnvironments(studyId))
 			.thenReturn(Collections.emptyList());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
@@ -126,7 +126,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 				BOUND),
 			1,
 			RandomStringUtils.random(BOUND), this.random.nextBoolean());
-		when(this.studyInstanceService.getStudyInstance(studyId, instanceId))
+		when(this.studyEnvironmentService.getStudyEnvironment(studyId, instanceId))
 			.thenReturn(Optional.of(studyInstance));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
@@ -150,7 +150,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
 
-		when(this.studyInstanceService.getStudyInstance(studyId, instanceId))
+		when(this.studyEnvironmentService.getStudyEnvironment(studyId, instanceId))
 			.thenReturn(Optional.empty());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
@@ -172,7 +172,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
-		Mockito.verify(this.studyInstanceService).deleteStudyInstances(studyId, Collections.singletonList(instanceId));
+		Mockito.verify(this.studyEnvironmentService).deleteStudyEnvironments(studyId, Collections.singletonList(instanceId));
 
 	}
 
