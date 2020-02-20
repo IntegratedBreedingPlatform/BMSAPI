@@ -352,7 +352,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
 		this.datasetValidator.validateDatasetBelongsToStudy(studyId, parentId);
-		this.instanceValidator.validate(null, Sets.newHashSet(datasetGeneratorInput.getInstanceIds()));
+		this.instanceValidator.validate(parentId, Sets.newHashSet(datasetGeneratorInput.getInstanceIds()));
 		this.datasetGeneratorInputValidator.validateBasicData(cropName, studyId, parentId, datasetGeneratorInput, bindingResult);
 
 		if (bindingResult.hasErrors()) {

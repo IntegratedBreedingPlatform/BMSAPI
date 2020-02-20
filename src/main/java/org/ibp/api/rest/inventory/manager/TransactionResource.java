@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,9 +40,10 @@ import java.util.List;
 
 @Api(value = "Transaction Services")
 @RestController
-//FIXME Uncomment next line when BMSAPI properly loads the permissions
-//@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY')")
 public class TransactionResource {
+
+	private static final String HAS_MANAGE_TRANSACTIONS =
+		"hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_TRANSACTIONS')";
 
 	@Autowired
 	private TransactionService transactionService;
@@ -54,6 +56,7 @@ public class TransactionResource {
 
 	@ApiOperation(value = "Post transaction search", notes = "Post transaction search")
 	@RequestMapping(value = "/crops/{cropName}/transactions/search", method = RequestMethod.POST)
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchTransactions(
 		@PathVariable final String cropName, @RequestBody final TransactionsSearchDto transactionsSearchDto) {
@@ -80,6 +83,7 @@ public class TransactionResource {
 				"Default sort order is ascending. " +
 				"Multiple sort criteria are supported.")
 	})
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
 	@JsonView(InventoryView.TransactionView.class)
 	public ResponseEntity<List<TransactionDto>> getTransactions(
