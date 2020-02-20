@@ -46,7 +46,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 			.thenReturn(Collections.singletonList(studyInstance));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/generation", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments/generation", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -80,7 +80,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -108,7 +108,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 			.thenReturn(Collections.emptyList());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -130,7 +130,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 			.thenReturn(Optional.of(studyInstance));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
+			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments/{environmentId}", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -154,7 +154,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 			.thenReturn(Optional.empty());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
+			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments/{environmentId}", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -168,7 +168,7 @@ public class StudyEnvironmentResourceTest extends ApiUnitTestBase {
 		final int instanceId = random.nextInt();
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.delete("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
+			.delete("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments/{environmentId}", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());

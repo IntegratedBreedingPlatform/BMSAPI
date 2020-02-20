@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.study.StudyEnvironmentService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
@@ -34,11 +35,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StudyInstanceServiceImplTest {
+public class StudyEnvironmentServiceImplTest {
 
 	public static final int BOUND = 10;
 	@Mock
-	private org.generationcp.middleware.service.api.study.StudyInstanceService studyInstanceMiddlewareService;
+	private StudyEnvironmentService studyEnvironmentService;
 
 	@Mock
 	private WorkbenchDataManager workbenchDataManager;
@@ -91,7 +92,7 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(BOUND), false);
 
 		when(this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(datasets);
-		when(this.studyInstanceMiddlewareService.createStudyInstances(this.maizeCropType, studyId, datasetId, 1))
+		when(this.studyEnvironmentService.createStudyEnvironments(this.maizeCropType, studyId, datasetId, 1))
 			.thenReturn(Collections.singletonList(newStudyInstance));
 
 		final List<org.ibp.api.domain.study.StudyInstance>
@@ -144,7 +145,7 @@ public class StudyInstanceServiceImplTest {
 				2,
 				RandomStringUtils.random(BOUND), this.random.nextBoolean());
 
-		when(this.studyInstanceMiddlewareService.getStudyInstances(studyId))
+		when(this.studyEnvironmentService.getStudyEnvironments(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 
 		final List<org.ibp.api.domain.study.StudyInstance>
@@ -190,11 +191,11 @@ public class StudyInstanceServiceImplTest {
 				2,
 				RandomStringUtils.random(BOUND), this.random.nextBoolean());
 
-		when(this.studyInstanceMiddlewareService.getStudyInstance(studyId, 101))
+		when(this.studyEnvironmentService.getStudyEnvironments(studyId, 101))
 			.thenReturn(Optional.of(studyInstance));
-		when(this.studyInstanceMiddlewareService.getStudyInstance(studyId, 102))
+		when(this.studyEnvironmentService.getStudyEnvironments(studyId, 102))
 			.thenReturn(Optional.of(studyInstance2));
-		when(this.studyInstanceMiddlewareService.getStudyInstance(studyId, 103))
+		when(this.studyEnvironmentService.getStudyEnvironments(studyId, 103))
 			.thenReturn(Optional.empty());
 
 
@@ -227,7 +228,7 @@ public class StudyInstanceServiceImplTest {
 		this.studyInstanceService.deleteStudyInstances(studyId, Collections.singletonList(instanceId));
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId), true);
-		Mockito.verify(this.studyInstanceMiddlewareService).deleteStudyInstances(studyId, Collections.singletonList(instanceId));
+		Mockito.verify(this.studyEnvironmentService).deleteStudyEnvironments(studyId, Collections.singletonList(instanceId));
 	}
 
 
