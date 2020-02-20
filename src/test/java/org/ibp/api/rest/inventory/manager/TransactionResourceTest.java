@@ -58,7 +58,7 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 		transactionsSearchDto.setMaxAmount(10.0);
 		transactionsSearchDto.setMinAmount(-10.0);
 		transactionsSearchDto.setNotes("Deposit");
-		transactionsSearchDto.setScaleIds(Lists.newArrayList(8264));
+		transactionsSearchDto.setUnitIds(Lists.newArrayList(8264));
 		transactionsSearchDto.setStockId("ABC-1");
 		transactionsSearchDto.setTransactionIds(Lists.newArrayList(100, 200));
 		transactionsSearchDto.setTransactionTypes(Lists.newArrayList(TransactionType.DEPOSIT.getId()));
