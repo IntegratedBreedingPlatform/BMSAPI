@@ -47,7 +47,7 @@ public class LotInputValidator {
 		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
-		this.validateNotes(lotGeneratorInputDto.getComments());
+		this.validateNotes(lotGeneratorInputDto.getNotes());
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}

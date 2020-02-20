@@ -59,7 +59,7 @@ public class InventoryScaleValidatorTest {
 		final Integer unitId = null;
 		this.lotGeneratorInputDto.setUnitId(unitId);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(COMMENTS);
+		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		Mockito.when(this.variableService.getVariablesByFilter(variableFilter)).thenReturn(Lists.newArrayList());
@@ -78,7 +78,7 @@ public class InventoryScaleValidatorTest {
 		this.lotGeneratorInputDto.setGenerateStock(false);
 		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(COMMENTS);
+		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		Mockito.when(this.variableService.getVariablesByFilter(variableFilter)).thenReturn(Lists.newArrayList());
@@ -97,7 +97,7 @@ public class InventoryScaleValidatorTest {
 		this.lotGeneratorInputDto.setGenerateStock(false);
 		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(COMMENTS);
+		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final VariableDetails variableDetail = new VariableDetails();

@@ -59,7 +59,7 @@ public class LocationValidatorTest {
 
 		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(COMMENTS);
+		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 
@@ -79,7 +79,7 @@ public class LocationValidatorTest {
 
 		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(COMMENTS);
+		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(null);
@@ -99,7 +99,7 @@ public class LocationValidatorTest {
 
 		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(COMMENTS);
+		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final Location location = new Location();
@@ -121,7 +121,7 @@ public class LocationValidatorTest {
 
 		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(COMMENTS);
+		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final Location location = new Location();
