@@ -57,7 +57,7 @@ public class TransactionInputValidator {
 		final List<ExtendedLotDto> result = this.lotService.searchLots(lotsSearchDto, null);
 		if (result.size() == 1) {
 			final ExtendedLotDto lot = result.get(0);
-			final Integer scaleId = lot.getScaleId();
+			final Integer scaleId = lot.getUnitId();
 			this.inventoryScaleValidator.validateNotNullInventoryScaleId(this.errors, scaleId);
 			if (lot.getStatus().equalsIgnoreCase(LotStatus.CLOSED.name())) {
 				this.errors.reject("transaction.closed.lot", "");

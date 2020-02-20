@@ -44,7 +44,7 @@ public class LotInputValidator {
 	public void validate(final LotGeneratorInputDto lotGeneratorInputDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.locationValidator.validateSeedLocationId(this.errors, lotGeneratorInputDto.getLocationId());
-		this.inventoryScaleValidator.validateInventoryScaleId(this.errors, lotGeneratorInputDto.getScaleId());
+		this.inventoryScaleValidator.validateInventoryScaleId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
 		this.validateComments(lotGeneratorInputDto.getComments());

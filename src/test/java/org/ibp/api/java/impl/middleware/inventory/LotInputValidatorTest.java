@@ -21,7 +21,7 @@ public class LotInputValidatorTest {
 
 	public static final int GID = 1;
 	public static final int LOCATION_ID = 6000;
-	public static final int SCALE_ID = TermId.SEED_AMOUNT_G.getId();
+	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
 	public static final String STOCK_ID = "ABCD";
 	public static final String COMMENTS = "Comments";
 	public static final String STOCK_PREFIX = "123";
@@ -52,7 +52,7 @@ public class LotInputValidatorTest {
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setComments(RandomStringUtils.randomAlphabetic(256));
 		this.lotInputValidator.validate(this.lotGeneratorInputDto);
@@ -62,7 +62,7 @@ public class LotInputValidatorTest {
 	public void testValidateDataGenerateStockNull() {
 		this.lotGeneratorInputDto.setGid(1);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setComments(COMMENTS);
 
@@ -73,7 +73,7 @@ public class LotInputValidatorTest {
 	public void testValidateDataGenerateStockTrue() {
 		this.lotGeneratorInputDto.setGid(1);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setComments(COMMENTS);
 		this.lotGeneratorInputDto.setGenerateStock(true);
@@ -85,7 +85,7 @@ public class LotInputValidatorTest {
 	public void testValidateDataGenerateStockTrueWithPrefix() {
 		this.lotGeneratorInputDto.setGid(1);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setStockPrefix(STOCK_PREFIX);
 		this.lotGeneratorInputDto.setComments(COMMENTS);
@@ -98,7 +98,7 @@ public class LotInputValidatorTest {
 	public void testValidateDataGenerateStockTrueWithInvalidPrefix() {
 		this.lotGeneratorInputDto.setGid(1);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setStockPrefix(RandomStringUtils.randomAlphabetic(20));
 		this.lotGeneratorInputDto.setComments(COMMENTS);
@@ -111,7 +111,7 @@ public class LotInputValidatorTest {
 	public void testValidateDataGenerateStockFalse() {
 		this.lotGeneratorInputDto.setGid(1);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setComments(COMMENTS);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 		this.lotGeneratorInputDto.setStockPrefix(STOCK_PREFIX);
@@ -123,7 +123,7 @@ public class LotInputValidatorTest {
 	public void testValidateDataGenerateStockFalseWithInvalidStock() {
 		this.lotGeneratorInputDto.setGid(1);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setComments(COMMENTS);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 		this.lotGeneratorInputDto.setStockId(RandomStringUtils.randomAlphabetic(40));

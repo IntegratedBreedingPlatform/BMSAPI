@@ -25,7 +25,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 public class GermplasmValidatorTest {
 
-	public static final int SCALE_ID = TermId.SEED_AMOUNT_G.getId();
+	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
 	public static final int LOCATION_ID = 6000;
 	public static final String STOCK_ID = "ABCD";
 	public static final String COMMENTS = "Comments";
@@ -54,7 +54,7 @@ public class GermplasmValidatorTest {
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
@@ -74,7 +74,7 @@ public class GermplasmValidatorTest {
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
@@ -94,7 +94,7 @@ public class GermplasmValidatorTest {
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();

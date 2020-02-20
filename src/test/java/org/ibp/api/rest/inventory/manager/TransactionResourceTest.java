@@ -80,7 +80,7 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 		transactionDto.getLot().setGid(1);
 		transactionDto.getLot().setLotId(2);
 		transactionDto.setNotes("Deposit");
-		transactionDto.getLot().setScaleId(8264);
+		transactionDto.getLot().setUnitId(8264);
 		transactionDto.getLot().setScaleName("SEED_AMOUNT_g");
 		transactionDto.getLot().setStockId("ABC-1");
 		transactionDto.setTransactionType("Deposit");

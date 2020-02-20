@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
+import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -44,6 +45,8 @@ public class TransactionResource {
 
 	private static final String HAS_MANAGE_TRANSACTIONS =
 		"hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_TRANSACTIONS')";
+
+	private static final String HAS_MANAGE_LOTS = "hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_LOTS')";
 
 	@Autowired
 	private TransactionService transactionService;
@@ -136,5 +139,35 @@ public class TransactionResource {
 		transactionDto.setTransactionType(TransactionType.DEPOSIT.getValue());
 		transactionDto.getLot().setLotId(Integer.valueOf(lotId));
 		return new ResponseEntity<>(this.transactionService.saveTransaction(transactionDto), HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Create Pending Withdrawals", notes = "Create new withdrawals with pending status for a set os filtered lots")
+		 @RequestMapping(value = "/crops/{cropName}/lots/{lotsSearchRequestId}/pending-withdrawals-lists", method = RequestMethod.POST)
+		 @ResponseBody
+		 @PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_PENDING_WITHDRAWALS')")
+		 public ResponseEntity<Void> createPendingWithdrawals(
+			@PathVariable final String cropName,
+			@PathVariable final Integer lotsSearchRequestId,
+			@ApiParam("Inventory to be reserved per unit")
+			@RequestBody final LotWithdrawalInputDto transactionDto) {
+
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Create Confirmed Withdrawals", notes = "Create new withdrawals with confirmed status for a set os filtered lots")
+	@RequestMapping(value = "/crops/{cropName}/lots/{lotsSearchRequestId}/confirmed-withdrawals-lists", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_CONFIRMED_WITHDRAWALS')")
+	public ResponseEntity<Void> createConfirmedWithdrawals(
+			@PathVariable final String cropName,
+			@PathVariable final Integer lotsSearchRequestId,
+			@ApiParam("Inventory to be reserved per unit")
+			@RequestBody final LotWithdrawalInputDto transactionDto) {
+
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 }
