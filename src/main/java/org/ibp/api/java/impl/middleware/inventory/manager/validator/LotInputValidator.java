@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.impl.middleware.common.validator.InventoryScaleValidator;
+import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ public class LotInputValidator {
 	private LocationValidator locationValidator;
 
 	@Autowired
-	private InventoryScaleValidator inventoryScaleValidator;
+	private InventoryUnitValidator inventoryUnitValidator;
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
@@ -44,7 +44,7 @@ public class LotInputValidator {
 	public void validate(final LotGeneratorInputDto lotGeneratorInputDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.locationValidator.validateSeedLocationId(this.errors, lotGeneratorInputDto.getLocationId());
-		this.inventoryScaleValidator.validateInventoryScaleId(this.errors, lotGeneratorInputDto.getUnitId());
+		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
 		this.validateComments(lotGeneratorInputDto.getComments());

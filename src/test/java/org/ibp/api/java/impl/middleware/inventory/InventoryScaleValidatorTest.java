@@ -7,7 +7,7 @@ import org.hamcrest.CoreMatchers;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ConflictException;
-import org.ibp.api.java.impl.middleware.common.validator.InventoryScaleValidator;
+import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,7 +35,7 @@ public class InventoryScaleValidatorTest {
 	public static final int UNIT_ID = 1;
 
 	@InjectMocks
-	private InventoryScaleValidator inventoryScaleValidator;
+	private InventoryUnitValidator inventoryUnitValidator;
 
 	@Mock
 	private VariableService variableService;
@@ -56,18 +56,18 @@ public class InventoryScaleValidatorTest {
 		this.lotGeneratorInputDto.setGid(1);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
-		final Integer scaleId = null;
-		this.lotGeneratorInputDto.setUnitId(scaleId);
+		final Integer unitId = null;
+		this.lotGeneratorInputDto.setUnitId(unitId);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setComments(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		Mockito.when(this.variableService.getVariablesByFilter(variableFilter)).thenReturn(Lists.newArrayList());
-		this.inventoryScaleValidator.validateNotNullInventoryScaleId(this.errors, scaleId);
+		this.inventoryUnitValidator.validateNotNullInventoryScaleId(this.errors, unitId);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
-		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("inventory.scale.required"));
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("inventory.unit.required"));
 	}
 
 	@Test
@@ -82,11 +82,11 @@ public class InventoryScaleValidatorTest {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		Mockito.when(this.variableService.getVariablesByFilter(variableFilter)).thenReturn(Lists.newArrayList());
-		this.inventoryScaleValidator.validateInventoryScaleId(this.errors, UNIT_ID);
+		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, UNIT_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
-		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("inventory.scale.invalid"));
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("inventory.unit.invalid"));
 	}
 
 	@Test
@@ -106,7 +106,7 @@ public class InventoryScaleValidatorTest {
 		final List<VariableDetails> variables = Lists.newArrayList(variableDetail);
 
 		Mockito.when(this.variableService.getVariablesByFilter(variableFilter)).thenReturn(variables);
-		this.inventoryScaleValidator.validateInventoryScaleId(this.errors, UNIT_ID);
+		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, UNIT_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(),0);
 	}

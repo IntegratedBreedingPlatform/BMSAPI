@@ -9,7 +9,7 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
-import org.ibp.api.java.impl.middleware.common.validator.InventoryScaleValidator;
+import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -22,7 +22,7 @@ import java.util.List;
 public class TransactionInputValidator {
 
 	@Autowired
-	private InventoryScaleValidator inventoryScaleValidator;
+	private InventoryUnitValidator inventoryUnitValidator;
 
 	@Autowired
 	private LotService lotService;
@@ -57,8 +57,8 @@ public class TransactionInputValidator {
 		final List<ExtendedLotDto> result = this.lotService.searchLots(lotsSearchDto, null);
 		if (result.size() == 1) {
 			final ExtendedLotDto lot = result.get(0);
-			final Integer scaleId = lot.getUnitId();
-			this.inventoryScaleValidator.validateNotNullInventoryScaleId(this.errors, scaleId);
+			final Integer unitId = lot.getUnitId();
+			this.inventoryUnitValidator.validateNotNullInventoryScaleId(this.errors, unitId);
 			if (lot.getStatus().equalsIgnoreCase(LotStatus.CLOSED.name())) {
 				this.errors.reject("transaction.closed.lot", "");
 			}
