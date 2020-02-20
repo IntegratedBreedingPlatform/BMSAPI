@@ -1,19 +1,24 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.middleware.domain.dms.EnvironmentData;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.study.StudyEnvironmentService;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -42,31 +47,33 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 	@Resource
 	private InstanceValidator instanceValidator;
 
+	@Resource
+	private DatasetValidator datasetValidator;
+
+	@Autowired
+	private ObservationValidator observationValidator;
+
 	@Override
 	public List<StudyInstance> createStudyEnvironments(final String cropName, final int studyId, final Integer numberOfEnvironmentsToGenerate) {
-		if (numberOfEnvironmentsToGenerate < 1) {
-			throw new ApiRuntimeException("Invalid number of instances to generate.");
+		if (numberOfEnvironmentsToGenerate < 1 || numberOfEnvironmentsToGenerate > 999) {
+			throw new ApiRuntimeException("Invalid number of environments to generate. Please specify number between 1 to 999.");
 		}
 		this.studyValidator.validate(studyId, true);
 
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
-
-		final List<DatasetDTO> datasets = this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
+		final Integer datasetId = this.getEnvironmentDatasetId(studyId);
+		// Add Study Instances in Environment (Summary Data) Dataset
+		final List<org.generationcp.middleware.service.impl.study.StudyInstance> instances =
+			this.middlewareStudyEnvironmentService
+				.createStudyEnvironments(cropType, studyId, datasetId, numberOfEnvironmentsToGenerate);
+		final ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final List<StudyInstance> studyInstances = new ArrayList<>();
-		if (!datasets.isEmpty()) {
-			// Add Study Instance in Environment (Summary Data) Dataset
-			final List<org.generationcp.middleware.service.impl.study.StudyInstance> instances =
-				this.middlewareStudyEnvironmentService
-					.createStudyEnvironments(cropType, studyId, datasets.get(0).getDatasetId(), numberOfEnvironmentsToGenerate);
-			final ModelMapper mapper = new ModelMapper();
-			mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-			for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : instances) {
-				studyInstances.add(mapper.map(instance, StudyInstance.class));
-			}
-			return studyInstances;
-		} else {
-			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
+		for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : instances) {
+			studyInstances.add(mapper.map(instance, StudyInstance.class));
 		}
+		return studyInstances;
+
 
 	}
 
@@ -98,6 +105,51 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		return studyInstance.isPresent()? Optional.of(mapper.map(studyInstance.get(), StudyInstance.class)) : Optional.empty();
+	}
+
+	@Override
+	public EnvironmentData addEnvironmentData(final Integer studyId, final Integer environmentId, final EnvironmentData environmentData) {
+		this.studyValidator.validate(studyId, true);
+		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(environmentId));
+
+		final Integer datasetId = this.getEnvironmentDatasetId(studyId);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(environmentData.getVariableId()));
+		this.observationValidator.validateObservationUnit(datasetId, environmentData.getEnvironmentId());
+		this.observationValidator.validateObservationValue(studyId, environmentData.getVariableId(), environmentData.getValue());
+
+		// TODO validate is environment condition value
+		// TODO validate that record for environment variable does not exist yet
+		environmentData.setEnvironmentId(environmentId);
+		this.middlewareStudyEnvironmentService.addEnvironmentData(environmentData);
+		return environmentData;
+	}
+
+	@Override
+	public EnvironmentData updateEnvironmentData(final Integer studyId, final Integer environmentId, final Integer environmentDataId,
+		final EnvironmentData environmentData) {
+		this.studyValidator.validate(studyId, true);
+		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(environmentId));
+
+		final Integer datasetId = this.getEnvironmentDatasetId(studyId);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(environmentData.getVariableId()));
+		this.observationValidator.validateObservationUnit(datasetId, environmentData.getEnvironmentId());
+		this.observationValidator.validateObservationValue(studyId, environmentData.getVariableId(), environmentData.getValue());
+		// TODO validate environmentDataId
+		// TODO validate is environment condition
+		environmentData.setEnvironmentDataId(environmentDataId);
+		environmentData.setEnvironmentId(environmentId);
+		this.middlewareStudyEnvironmentService.updateEnvironmentData(environmentData);
+		return environmentData;
+	}
+
+	private Integer getEnvironmentDatasetId(final Integer studyId) {
+		final List<DatasetDTO> datasets =
+			this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
+		if (!CollectionUtils.isEmpty(datasets)) {
+			return datasets.get(0).getDatasetId();
+		} else {
+			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
+		}
 	}
 
 }

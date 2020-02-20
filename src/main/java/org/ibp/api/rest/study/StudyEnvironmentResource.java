@@ -2,6 +2,7 @@ package org.ibp.api.rest.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.domain.dms.EnvironmentData;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.study.StudyEnvironmentService;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -74,6 +76,31 @@ public class StudyEnvironmentResource {
 		@PathVariable final Integer studyId, @PathVariable final Integer environmentId) {
 		final Optional<StudyInstance> studyInstance = this.studyEnvironmentService.getStudyEnvironment(studyId, environmentId);
 		return studyInstance.isPresent()? new ResponseEntity<>(studyInstance.get(), HttpStatus.OK) : new ResponseEntity(HttpStatus.NOT_FOUND);
+	}
+
+	@ApiOperation(value = "Add study environment data",
+		notes = "Add study environment data")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/environments/{environmentId}/environment-data", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<EnvironmentData> addEnvironmentData(final @PathVariable String cropname, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @PathVariable final Integer environmentId,
+		@RequestBody final EnvironmentData environmentData) {
+		return new ResponseEntity<>(this.studyEnvironmentService.addEnvironmentData(studyId, environmentId, environmentData),
+			HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Update study environment data",
+		notes = "Update study environment data")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/environments/{environmentId}/environment-data/{environmentDataId}", method = RequestMethod.PATCH)
+	@ResponseBody
+	public ResponseEntity<EnvironmentData> updateEnvironmentData(final @PathVariable String cropname,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @PathVariable final Integer environmentId, @PathVariable final Integer environmentDataId,
+		@RequestBody final EnvironmentData environmentData) {
+		return new ResponseEntity<>(this.studyEnvironmentService.updateEnvironmentData(studyId, environmentId, environmentDataId, 	environmentData),
+			HttpStatus.OK);
 	}
 
 }
