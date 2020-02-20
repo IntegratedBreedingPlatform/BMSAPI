@@ -47,16 +47,16 @@ public class LotInputValidator {
 		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
-		this.validateComments(lotGeneratorInputDto.getComments());
+		this.validateNotes(lotGeneratorInputDto.getComments());
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateComments(final String comments) {
-		if (comments != null) {
-			if (comments.length() > 255) {
-				this.errors.reject("lot.comments.length");
+	private void validateNotes(final String notes) {
+		if (notes != null) {
+			if (notes.length() > 255) {
+				this.errors.reject("lot.notes.length");
 			}
 		}
 	}
