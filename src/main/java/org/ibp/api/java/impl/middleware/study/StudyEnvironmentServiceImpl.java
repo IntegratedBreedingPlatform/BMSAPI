@@ -1,10 +1,12 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.domain.dms.EnvironmentData;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.domain.study.StudyInstance;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
@@ -19,10 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -113,16 +118,16 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(environmentId));
 
 		final Integer datasetId = this.getEnvironmentDatasetId(studyId);
-		this.observationValidator.validateObservationUnit(datasetId, environmentData.getEnvironmentId());
 		final Integer variableId = environmentData.getVariableId();
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
 		this.observationValidator.validateObservationValue(variableId, environmentData.getValue());
 
-		// TODO validate is environment condition value
-		// TODO validate that record for environment variable does not exist yet
 		environmentData.setEnvironmentId(environmentId);
-		this.middlewareStudyEnvironmentService.addEnvironmentData(environmentData);
+		final boolean isEnvironmentCondition =
+			this.datasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.STUDY_CONDITION).stream()
+				.anyMatch(v -> v.getId().equals(variableId));
+		this.middlewareStudyEnvironmentService.addEnvironmentData(environmentData, isEnvironmentCondition);
 		return environmentData;
 	}
 
@@ -136,14 +141,27 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 		final Integer variableId = environmentData.getVariableId();
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
-		this.observationValidator.validateObservationUnit(datasetId, environmentData.getEnvironmentId());
 		this.observationValidator.validateObservationValue(variableId, environmentData.getValue());
 
-		// TODO validate environmentDataId
-		// TODO validate is environment condition
+		final boolean isEnvironmentCondition =
+			this.datasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.STUDY_CONDITION).stream()
+				.anyMatch(v -> v.getId().equals(variableId));
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final Optional<EnvironmentData> existingEnvironmentData =
+			this.middlewareStudyEnvironmentService.getEnvironmentData(environmentId, environmentDataId, isEnvironmentCondition);
+		if (!existingEnvironmentData.isPresent()) {
+			errors.reject("invalid.environment.data.id");
+		} else if (!existingEnvironmentData.get().getVariableId().equals(variableId)) {
+			errors.reject("invalid.variable.for.environment.data");
+		}
+
+		if (!errors.getAllErrors().isEmpty()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
 		environmentData.setEnvironmentDataId(environmentDataId);
 		environmentData.setEnvironmentId(environmentId);
-		this.middlewareStudyEnvironmentService.updateEnvironmentData(environmentData);
+		this.middlewareStudyEnvironmentService.updateEnvironmentData(environmentData, isEnvironmentCondition);
 		return environmentData;
 	}
 
