@@ -113,9 +113,11 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(environmentId));
 
 		final Integer datasetId = this.getEnvironmentDatasetId(studyId);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(environmentData.getVariableId()));
 		this.observationValidator.validateObservationUnit(datasetId, environmentData.getEnvironmentId());
-		this.observationValidator.validateObservationValue(studyId, environmentData.getVariableId(), environmentData.getValue());
+		final Integer variableId = environmentData.getVariableId();
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
+			variableId));
+		this.observationValidator.validateObservationValue(variableId, environmentData.getValue());
 
 		// TODO validate is environment condition value
 		// TODO validate that record for environment variable does not exist yet
@@ -131,9 +133,12 @@ public class StudyEnvironmentServiceImpl implements StudyEnvironmentService {
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(environmentId));
 
 		final Integer datasetId = this.getEnvironmentDatasetId(studyId);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(environmentData.getVariableId()));
+		final Integer variableId = environmentData.getVariableId();
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
+			variableId));
 		this.observationValidator.validateObservationUnit(datasetId, environmentData.getEnvironmentId());
-		this.observationValidator.validateObservationValue(studyId, environmentData.getVariableId(), environmentData.getValue());
+		this.observationValidator.validateObservationValue(variableId, environmentData.getValue());
+
 		// TODO validate environmentDataId
 		// TODO validate is environment condition
 		environmentData.setEnvironmentDataId(environmentDataId);

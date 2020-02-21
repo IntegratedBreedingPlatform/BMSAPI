@@ -184,7 +184,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Arrays.asList(observation.getVariableId()));
 		this.observationValidator.validateObservationUnit(datasetId, observationUnitId);
-		this.observationValidator.validateObservationValue(studyId, observation.getVariableId(), observation.getValue());
+		this.observationValidator.validateObservationValue(observation.getVariableId(), observation.getValue());
 		return this.middlewareDatasetService.createObservation(observation);
 
 	}
@@ -195,7 +195,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final ObservationDto observationDto) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
-		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, observationDto);
+		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId, observationDto);
 		observationDto.setObservationUnitId(observationUnitId);
 		observationDto.setObservationId(observationId);
 		return this.middlewareDatasetService.updatePhenotype(observationId, observationDto);
@@ -385,7 +385,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
-		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, null);
+		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId, null);
 		this.middlewareDatasetService.deletePhenotype(observationId);
 
 	}
@@ -611,7 +611,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator
 			.validateExistingDatasetVariables(
 				studyId, datasetId, Lists.newArrayList(variableId));
-		this.observationValidator.validateObservationValue(studyId, variableId, paramDTO.getNewValue());
+		this.observationValidator.validateObservationValue(variableId, paramDTO.getNewValue());
 		this.middlewareDatasetService.setValueToVariable(datasetId, paramDTO, studyId);
 	}
 
