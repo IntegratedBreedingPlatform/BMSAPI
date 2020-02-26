@@ -1,5 +1,7 @@
 package org.ibp.api.java.inventory.manager;
 
+import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -19,4 +21,6 @@ public interface TransactionService {
 	List<TransactionStatus> getAllTransactionStatus();
 
 	List<TransactionType>  getAllTransactionTypes();
+
+	void saveWithdrawals(Integer userId, LotsSearchDto lotsSearchDto, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus);
 }

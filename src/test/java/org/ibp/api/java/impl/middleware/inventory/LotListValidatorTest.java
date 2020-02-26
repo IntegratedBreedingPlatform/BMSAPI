@@ -9,7 +9,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotListValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotItemDtoListValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class LotListValidatorTest {
 	public static final String SEED_AMOUNT_g = "SEED_AMOUNT_g";
 
 	@InjectMocks
-	private LotListValidator lotListValidator;
+	private LotItemDtoListValidator lotItemDtoListValidator;
 
 	@Mock
 	private GermplasmDataManager germplasmDataManager;
@@ -57,7 +57,7 @@ public class LotListValidatorTest {
 	@Test
 	public void testValidateListNull() {
 		try {
-			this.lotListValidator.validate(null);
+			this.lotItemDtoListValidator.validate(null);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.null"));
 
@@ -68,7 +68,7 @@ public class LotListValidatorTest {
 	public void testValidateListEmpty() {
 		this.lotList.add(null);
 		try {
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.item.null"));
 		}
@@ -81,7 +81,7 @@ public class LotListValidatorTest {
 		try {
 			lotItemDto.setGid(null);
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.gid.null"));
 		}
@@ -95,7 +95,7 @@ public class LotListValidatorTest {
 
 		try {
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.invalid.gids"));
 
@@ -111,7 +111,7 @@ public class LotListValidatorTest {
 		try {
 			lotItemDto.setStorageLocationAbbr("");
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.location.abbreviation.null.or.empty"));
 		}
@@ -126,7 +126,7 @@ public class LotListValidatorTest {
 		try {
 			lotItemDto.setStorageLocationAbbr("");
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.location.abbreviation.null.or.empty"));
 		}
@@ -148,7 +148,7 @@ public class LotListValidatorTest {
 		try {
 			lotItemDto.setScaleName(null);
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.units.null.or.empty"));
 		}
@@ -176,7 +176,7 @@ public class LotListValidatorTest {
 		try {
 			lotItemDto.setScaleName("Amount");
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.invalid.units"));
 		}
@@ -204,7 +204,7 @@ public class LotListValidatorTest {
 		try {
 			lotItemDto.setStockId(null);
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.stock.ids.null.or.empty"));
 		}
@@ -232,7 +232,7 @@ public class LotListValidatorTest {
 		try {
 			lotItemDto.setStockId(RandomStringUtils.randomAlphabetic(256));
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.stock.id.length.higher.than.maximum"));
 		}
@@ -263,7 +263,7 @@ public class LotListValidatorTest {
 			lotItemDto1.setGid(2);
 			this.lotList.add(lotItemDto);
 			this.lotList.add(lotItemDto1);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.stock.ids.duplicated"));
 		}
@@ -290,7 +290,7 @@ public class LotListValidatorTest {
 
 		try {
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.stock.ids.invalid"));
 		}
@@ -318,7 +318,7 @@ public class LotListValidatorTest {
 		try {
 			lotItemDto.setInitialBalance(null);
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.initial.balances.null"));
 
@@ -347,7 +347,7 @@ public class LotListValidatorTest {
 		try {
 			lotItemDto.setInitialBalance((double) -11);
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.initial.balances.negative.values"));
 
@@ -376,7 +376,7 @@ public class LotListValidatorTest {
 		try {
 			lotItemDto.setNotes(RandomStringUtils.randomAlphabetic(256));
 			this.lotList.add(lotItemDto);
-			this.lotListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(this.lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.notes.length"));
 		}

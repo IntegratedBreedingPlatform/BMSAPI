@@ -28,9 +28,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class LotListValidator {
+public class LotItemDtoListValidator {
 
-	private static Integer COMMENTS_MAX_LENGTH = 255;
+	private static Integer NOTES_MAX_LENGTH = 255;
 
 	private static Integer STOCK_ID_MAX_LENGTH = 35;
 
@@ -73,7 +73,7 @@ public class LotListValidator {
 		this.validateScaleNames(lotList);
 		this.validateStockIds(lotList);
 		this.validateInitialBalances(lotList);
-		this.validateComments(lotList);
+		this.validateNotes(lotList);
 	}
 
 	private void validateGermplasmList(final List<LotItemDto> lotList) {
@@ -167,9 +167,9 @@ public class LotListValidator {
 		}
 	}
 
-	private void validateComments(final List<LotItemDto> lotList) {
-		final List<String> comments = lotList.stream().map(LotItemDto::getNotes).distinct().collect(Collectors.toList());
-		if (comments.stream().filter(c -> c != null && c.length() > COMMENTS_MAX_LENGTH).count()>0) {
+	private void validateNotes(final List<LotItemDto> lotList) {
+		final List<String> notes = lotList.stream().map(LotItemDto::getNotes).distinct().collect(Collectors.toList());
+		if (notes.stream().filter(c -> c != null && c.length() > NOTES_MAX_LENGTH).count()>0) {
 			errors.reject("lot.input.list.notes.length", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
