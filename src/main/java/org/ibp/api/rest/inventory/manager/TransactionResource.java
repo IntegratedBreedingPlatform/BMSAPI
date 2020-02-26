@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -149,9 +150,12 @@ public class TransactionResource {
 			@PathVariable final String cropName,
 			@PathVariable final Integer lotsSearchRequestId,
 			@ApiParam("Inventory to be reserved per unit")
-			@RequestBody final LotWithdrawalInputDto transactionDto) {
+			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
 
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
+			.getSearchRequest(lotsSearchRequestId, LotsSearchDto.class);
+		this.transactionService.saveWithdrawals(user.getUserid(), searchDTO, lotWithdrawalInputDto, TransactionStatus.PENDING);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
@@ -164,9 +168,12 @@ public class TransactionResource {
 			@PathVariable final String cropName,
 			@PathVariable final Integer lotsSearchRequestId,
 			@ApiParam("Inventory to be reserved per unit")
-			@RequestBody final LotWithdrawalInputDto transactionDto) {
+			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
 
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
+			.getSearchRequest(lotsSearchRequestId, LotsSearchDto.class);
+		this.transactionService.saveWithdrawals(user.getUserid(), searchDTO, lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
