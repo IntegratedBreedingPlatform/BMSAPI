@@ -27,7 +27,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
-public class LotListValidatorTest {
+public class LotItemDtoListValidatorTest {
 
 	public static final String SEED_STORAGE_LOCATION = "DSS";
 	public static final String SEED_AMOUNT_g = "SEED_AMOUNT_g";
@@ -387,7 +387,7 @@ public class LotListValidatorTest {
 		lotItemDto.setGid(Integer.valueOf(RandomStringUtils.randomNumeric(9)));
 		lotItemDto.setStorageLocationAbbr(SEED_STORAGE_LOCATION);
 		lotItemDto.setInitialBalance((double) 30);
-		lotItemDto.setScaleName(LotListValidatorTest.SEED_AMOUNT_g);
+		lotItemDto.setScaleName(LotItemDtoListValidatorTest.SEED_AMOUNT_g);
 		lotItemDto.setStockId(RandomStringUtils.randomAlphabetic(30));
 		lotItemDto.setNotes(RandomStringUtils.randomAlphabetic(200));
 		return lotItemDto;

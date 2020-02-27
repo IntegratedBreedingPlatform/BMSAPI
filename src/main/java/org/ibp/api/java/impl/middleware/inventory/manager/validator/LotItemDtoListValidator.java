@@ -9,6 +9,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -88,7 +89,7 @@ public class LotItemDtoListValidator {
 			final List<Integer> existingGids = existingGermplasms.stream().map(Germplasm::getGid).collect(Collectors.toList());
 			final List<Integer> invalidGids = new ArrayList<>(gids);
 			invalidGids.removeAll(existingGids);
-			errors.reject("lot.input.invalid.gids", new String[] {this.buildErrorMessageFromList(invalidGids)}, "");
+			errors.reject("lot.input.invalid.gids", new String[] {Util.buildErrorMessageFromList(invalidGids, 3)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -101,12 +102,12 @@ public class LotItemDtoListValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		final List<Location> existingLocations =
-				locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE,  null, locationAbbreviations);
+				locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE, null, locationAbbreviations);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 			final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
 			final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);
 			invalidAbbreviations.removeAll(existingAbbreviations);
-			errors.reject("lot.input.invalid.abbreviations", new String[] {this.buildErrorMessageFromList(invalidAbbreviations)}, "");
+			errors.reject("lot.input.invalid.abbreviations", new String[] {Util.buildErrorMessageFromList(invalidAbbreviations, 3)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		
@@ -126,7 +127,7 @@ public class LotItemDtoListValidator {
 		if (!existingScaleNames.containsAll(scaleNames)) {
 			final List<String> invalidScaleNames = new ArrayList<>(scaleNames);
 			invalidScaleNames.removeAll(existingScaleNames);
-			errors.reject("lot.input.invalid.units", new String[] {this.buildErrorMessageFromList(invalidScaleNames)}, "");
+			errors.reject("lot.input.invalid.units", new String[] {Util.buildErrorMessageFromList(invalidScaleNames, 3)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -149,7 +150,7 @@ public class LotItemDtoListValidator {
 		final List<LotDto> existingLotDtos = this.lotService.getLotsByStockIds(uniqueStockIds);
 		if (!existingLotDtos.isEmpty()){
 			final List<String> existingStockIds = existingLotDtos.stream().map(LotDto::getStockId).collect(Collectors.toList());
-			errors.reject("lot.input.list.stock.ids.invalid", new String[] {this.buildErrorMessageFromList(existingStockIds)}, "");
+			errors.reject("lot.input.list.stock.ids.invalid", new String[] {Util.buildErrorMessageFromList(existingStockIds, 3)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -175,17 +176,6 @@ public class LotItemDtoListValidator {
 		}
 	}
 
-	private <T> String buildErrorMessageFromList(final List<T> elements) {
-		final StringBuilder stringBuilder = new StringBuilder();
-
-		stringBuilder.append(elements.stream().limit(3).map(Object::toString).collect(Collectors.joining(" , ")));
-
-		if (elements.size() > 3) {
-			stringBuilder.append(" and ").append(elements.size() - 3).append(" more");
-		}
-
-		return stringBuilder.toString();
-	}
 
 	private <T> long countNullElements(final List<T> list) {
 		return list.stream().filter(Objects::isNull).count();
