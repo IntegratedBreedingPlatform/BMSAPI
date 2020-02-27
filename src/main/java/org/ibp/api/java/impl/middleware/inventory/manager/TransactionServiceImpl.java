@@ -7,9 +7,11 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawalInputDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +41,9 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	private ExtendedLotListValidator extendedLotListValidator;
+
+	@Autowired
+	private SecurityService securityService;
 
 	@Override
 	public List<TransactionDto> searchTransactions(
@@ -73,11 +78,13 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void saveWithdrawals(final Integer userId, final LotsSearchDto lotsSearchDto, final LotWithdrawalInputDto lotWithdrawalInputDto,
+	public void saveWithdrawals(final LotsSearchDto lotsSearchDto, final LotWithdrawalInputDto lotWithdrawalInputDto,
 		final TransactionStatus transactionStatus) {
 		try {
 			//FIXME we should only locking the affected lots
 			lock.lock();
+
+			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
 			final List<ExtendedLotDto> lotDtos = lotService.searchLots(lotsSearchDto, null);
 
@@ -85,8 +92,8 @@ public class TransactionServiceImpl implements TransactionService {
 			extendedLotListValidator.validateClosedLots(lotDtos);
 			lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto, lotDtos);
 
-			this.lotService
-				.withdrawLots(userId, lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()), lotWithdrawalInputDto,
+			this.transactionService
+				.withdrawLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()), lotWithdrawalInputDto,
 					transactionStatus);
 
 		} finally {

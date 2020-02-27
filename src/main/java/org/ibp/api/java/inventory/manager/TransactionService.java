@@ -22,5 +22,5 @@ public interface TransactionService {
 
 	List<TransactionType>  getAllTransactionTypes();
 
-	void saveWithdrawals(Integer userId, LotsSearchDto lotsSearchDto, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus);
+	void saveWithdrawals(LotsSearchDto lotsSearchDto, LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus);
 }

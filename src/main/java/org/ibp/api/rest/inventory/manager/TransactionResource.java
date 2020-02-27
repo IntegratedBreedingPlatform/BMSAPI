@@ -151,10 +151,9 @@ public class TransactionResource {
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
 
-		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
 			.getSearchRequest(lotWithdrawalInputDto.getLotsSearchId(), LotsSearchDto.class);
-		this.transactionService.saveWithdrawals(user.getUserid(), searchDTO, lotWithdrawalInputDto, TransactionStatus.PENDING);
+		this.transactionService.saveWithdrawals(searchDTO, lotWithdrawalInputDto, TransactionStatus.PENDING);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
@@ -168,10 +167,9 @@ public class TransactionResource {
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
 
-		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
 			.getSearchRequest(lotWithdrawalInputDto.getLotsSearchId(), LotsSearchDto.class);
-		this.transactionService.saveWithdrawals(user.getUserid(), searchDTO, lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
+		this.transactionService.saveWithdrawals(searchDTO, lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
