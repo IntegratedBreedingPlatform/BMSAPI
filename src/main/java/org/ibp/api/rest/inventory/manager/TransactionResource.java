@@ -143,36 +143,34 @@ public class TransactionResource {
 	}
 
 	@ApiOperation(value = "Create Pending Withdrawals", notes = "Create new withdrawals with pending status for a set os filtered lots")
-		 @RequestMapping(value = "/crops/{cropName}/lots/{lotsSearchRequestId}/pending-withdrawals-lists", method = RequestMethod.POST)
+		 @RequestMapping(value = "/crops/{cropName}/transactions/pending-withdrawals-lists", method = RequestMethod.POST)
 		 @ResponseBody
 		 @PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_PENDING_WITHDRAWALS')")
 		 public ResponseEntity<Void> createPendingWithdrawals(
 			@PathVariable final String cropName,
-			@PathVariable final Integer lotsSearchRequestId,
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
 
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
-			.getSearchRequest(lotsSearchRequestId, LotsSearchDto.class);
+			.getSearchRequest(lotWithdrawalInputDto.getLotsSearchId(), LotsSearchDto.class);
 		this.transactionService.saveWithdrawals(user.getUserid(), searchDTO, lotWithdrawalInputDto, TransactionStatus.PENDING);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Create Confirmed Withdrawals", notes = "Create new withdrawals with confirmed status for a set os filtered lots")
-	@RequestMapping(value = "/crops/{cropName}/lots/{lotsSearchRequestId}/confirmed-withdrawals-lists", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-withdrawals-lists", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_CONFIRMED_WITHDRAWALS')")
 	public ResponseEntity<Void> createConfirmedWithdrawals(
 			@PathVariable final String cropName,
-			@PathVariable final Integer lotsSearchRequestId,
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
 
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
-			.getSearchRequest(lotsSearchRequestId, LotsSearchDto.class);
+			.getSearchRequest(lotWithdrawalInputDto.getLotsSearchId(), LotsSearchDto.class);
 		this.transactionService.saveWithdrawals(user.getUserid(), searchDTO, lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
