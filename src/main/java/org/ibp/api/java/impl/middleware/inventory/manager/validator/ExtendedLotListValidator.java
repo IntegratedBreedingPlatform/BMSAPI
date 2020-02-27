@@ -18,6 +18,13 @@ public class ExtendedLotListValidator {
 
 	private BindingResult errors;
 
+	public void validateEmptyList(final List<ExtendedLotDto> extendedLotDtos) {
+		if (extendedLotDtos==null || extendedLotDtos.isEmpty()){
+			errors.reject("no.lots.selected", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
 	public void validateEmptyUnits(final List<ExtendedLotDto> extendedLotDtos) {
 		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
 		//Validate that none of them has null unit id

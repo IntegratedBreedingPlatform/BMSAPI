@@ -88,6 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 			final List<ExtendedLotDto> lotDtos = lotService.searchLots(lotsSearchDto, null);
 
+			extendedLotListValidator.validateEmptyList(lotDtos);
 			extendedLotListValidator.validateEmptyUnits(lotDtos);
 			extendedLotListValidator.validateClosedLots(lotDtos);
 			lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto, lotDtos);
