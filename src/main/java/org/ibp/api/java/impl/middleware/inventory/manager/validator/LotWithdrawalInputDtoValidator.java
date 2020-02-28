@@ -42,8 +42,8 @@ public class LotWithdrawalInputDtoValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		if (lotWithdrawalInputDto.getNotes() != null && lotWithdrawalInputDto.getNotes().length() >= NOTES_MAX_LENGTH) {
-			errors.reject("lot.notes.length", "");
+		if (lotWithdrawalInputDto.getNotes() != null && lotWithdrawalInputDto.getNotes().length() > NOTES_MAX_LENGTH) {
+			errors.reject("transaction.notes.length", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
