@@ -78,7 +78,7 @@ public class LotResource {
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS', 'CREATE_LOTS', 'IMPORT_LOTS','WITHDRAW_INVENTORY', 'CREATE_CONFIRMED_WITHDRAWALS', 'CREATE_PENDING_WITHDRAWALS')")
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchLots(
 		@PathVariable final String cropName, @RequestBody final LotsSearchDto lotsSearchDto) {
