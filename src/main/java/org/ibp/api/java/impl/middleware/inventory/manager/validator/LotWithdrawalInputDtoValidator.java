@@ -43,8 +43,9 @@ public class LotWithdrawalInputDtoValidator {
 		}
 
 		//Validate that searchId or list of lots are provided
-		if (lotWithdrawalInputDto.getLotsSearchId()== null && (lotWithdrawalInputDto.getLotIds() == null || lotWithdrawalInputDto.getLotIds().isEmpty()) ||
-			lotWithdrawalInputDto.getLotsSearchId()!= null && (lotWithdrawalInputDto.getLotIds() != null)){
+		if (lotWithdrawalInputDto.getLotsSearchId() == null && (lotWithdrawalInputDto.getLotIds() == null || lotWithdrawalInputDto
+			.getLotIds().isEmpty()) ||
+			lotWithdrawalInputDto.getLotsSearchId() != null && (lotWithdrawalInputDto.getLotIds() != null)) {
 			errors.reject("lot.selection.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -86,13 +87,14 @@ public class LotWithdrawalInputDtoValidator {
 		});
 	}
 
-	public void validateWithdrawalInstructionsUnits(final LotWithdrawalInputDto lotWithdrawalInputDto, final List<ExtendedLotDto> extendedLotDtos) {
+	public void validateWithdrawalInstructionsUnits(final LotWithdrawalInputDto lotWithdrawalInputDto,
+		final List<ExtendedLotDto> extendedLotDtos) {
 		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
 		//All units resulted the search request, must be indicated in the map
 		final Set<String> specifiedUnits = lotWithdrawalInputDto.getWithdrawalsPerUnit().keySet();
 		final List<String> lotsUnits = extendedLotDtos.stream().map(ExtendedLotDto::getUnitName).collect(Collectors.toList());
-		if (!specifiedUnits.containsAll(lotsUnits)){
+		if (!specifiedUnits.containsAll(lotsUnits)) {
 			final List<String> missingUnits = new ArrayList<>(lotsUnits);
 			missingUnits.removeAll(specifiedUnits);
 			errors.reject("lot.input.instructions.missing.for.units", new String[] {Util.buildErrorMessageFromList(missingUnits, 3)}, "");
