@@ -203,6 +203,14 @@ public class LotResource {
 			searchDTO.setLotIds(new ArrayList<>(lotIds));
 		}
 
+		if (searchRequestId==null){
+			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
+			if (extendedLotDtos.size() != lotIds.size()) {
+				errors.reject("lots.does.not.exist", "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+		}
+
 		return new ResponseEntity<>(lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
 	}
 
