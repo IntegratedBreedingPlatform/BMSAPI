@@ -21,6 +21,7 @@ import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
@@ -34,6 +35,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +47,9 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -174,13 +179,29 @@ public class LotResource {
 	}
 
 	@ApiOperation(value = "It will retrieve metadata for a lot search", notes = "It will retrieve metadata for a lot search")
-	@RequestMapping(value = "/crops/{cropName}/lots/search/metadata", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/lots/metadata", method = RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(@PathVariable final String cropName, //
-		@RequestParam final Integer searchRequestId) {
-		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
-			.getSearchRequest(searchRequestId, LotsSearchDto.class);
+		@RequestParam (required = false) final Integer searchRequestId, @RequestParam (required = false) final Set<Integer> lotIds) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		//Validate that searchId or list of lots are provided
+		if (searchRequestId== null && (lotIds == null || lotIds.isEmpty()) ||
+			searchRequestId!= null && (lotIds != null)){
+			errors.reject("lot.selection.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		LotsSearchDto searchDTO;
+		if (searchRequestId!=null) {
+			searchDTO = (LotsSearchDto) this.searchRequestService
+				.getSearchRequest(searchRequestId, LotsSearchDto.class);
+		}  else {
+			searchDTO = new LotsSearchDto();
+			searchDTO.setLotIds(new ArrayList<>(lotIds));
+		}
 
 		return new ResponseEntity<>(lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
 	}

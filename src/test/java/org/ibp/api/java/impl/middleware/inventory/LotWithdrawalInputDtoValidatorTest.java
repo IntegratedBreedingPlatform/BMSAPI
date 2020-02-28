@@ -126,8 +126,6 @@ public class LotWithdrawalInputDtoValidatorTest {
 			final ExtendedLotDto extendedLotDto1 = new ExtendedLotDto();
 			extendedLotDto1.setUnitName("kg");
 
-			final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(extendedLotDto1);
-
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.withdraw.amount.invalid"));
