@@ -19,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class LotWithdrawalInputDtoValidatorTest {
 	@Test
 	public void testValidateLotWithdrawalInputDtoValidatorIsNull() {
 		try {
-			this.lotWithdrawalInputDtoValidator.validate(null, null);
+			this.lotWithdrawalInputDtoValidator.validate(null);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.withdrawal.input.null"));
 
@@ -57,11 +58,24 @@ public class LotWithdrawalInputDtoValidatorTest {
 	}
 
 	@Test
+	public void testValidateLotWithdrawalInputDtoValidatorLotsAreNotProperlySet() {
+		try {
+			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
+			lotWithdrawalInputDto.setLotsSearchId(1);
+			lotWithdrawalInputDto.setLotIds(new HashSet<>(Arrays.asList(1)));
+			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
+		} catch (ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.selection.invalid"));
+		}
+	}
+
+	@Test
 	public void testValidateLotWithdrawalInputDtoValidatorInvalidNotes() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
+			lotWithdrawalInputDto.setLotsSearchId(1);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(256));
-			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto, null);
+			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("transaction.notes.length"));
 
@@ -72,8 +86,9 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorNullWithdrawalInstructions() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
+			lotWithdrawalInputDto.setLotsSearchId(1);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
-			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto, null);
+			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.withdrawal.input.null"));
 		}
@@ -83,22 +98,47 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorUnsupportedUnitName() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
+			lotWithdrawalInputDto.setLotsSearchId(1);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final LotWithdrawalInputDto.WithdrawalAmountInstruction withdrawalAmountInstruction =
 				new LotWithdrawalInputDto.WithdrawalAmountInstruction();
 			final Map<String, LotWithdrawalInputDto.WithdrawalAmountInstruction> withdrawalsPerUnit = new HashMap<>();
 			withdrawalsPerUnit.put("pounds", withdrawalAmountInstruction);
 			lotWithdrawalInputDto.setWithdrawalsPerUnit(withdrawalsPerUnit);
-			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto, null);
+			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.invalid.units"));
 		}
 	}
 
 	@Test
-	public void testValidateLotWithdrawalInputDtoValidatorMissingWithdrawalsIstructionsForUnit() {
+	public void testValidateLotWithdrawalInputDtoValidatorInvalidAmount() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
+			lotWithdrawalInputDto.setLotsSearchId(1);
+			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
+			final LotWithdrawalInputDto.WithdrawalAmountInstruction withdrawalAmountInstruction =
+				new LotWithdrawalInputDto.WithdrawalAmountInstruction();
+			final Map<String, LotWithdrawalInputDto.WithdrawalAmountInstruction> withdrawalsPerUnit = new HashMap<>();
+			withdrawalsPerUnit.put("kg", withdrawalAmountInstruction);
+			lotWithdrawalInputDto.setWithdrawalsPerUnit(withdrawalsPerUnit);
+
+			final ExtendedLotDto extendedLotDto1 = new ExtendedLotDto();
+			extendedLotDto1.setUnitName("kg");
+
+			final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(extendedLotDto1);
+
+			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
+		} catch (ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.withdraw.amount.invalid"));
+		}
+	}
+
+	@Test
+	public void testValidateLotWithdrawalInputDtoValidatorMissingWithdrawalsInstructionsForUnit() {
+		try {
+			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
+			lotWithdrawalInputDto.setLotsSearchId(1);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final LotWithdrawalInputDto.WithdrawalAmountInstruction withdrawalAmountInstruction =
 				new LotWithdrawalInputDto.WithdrawalAmountInstruction();
@@ -113,31 +153,9 @@ public class LotWithdrawalInputDtoValidatorTest {
 
 			final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(extendedLotDto1, extendedLotDto2);
 
-			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto, extendedLotDtos);
+			this.lotWithdrawalInputDtoValidator.validateWithdrawalInstructionsUnits(lotWithdrawalInputDto, extendedLotDtos);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.instructions.missing.for.units"));
-		}
-	}
-
-	@Test
-	public void testValidateLotWithdrawalInputDtoValidatorInvalidAmount() {
-		try {
-			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
-			final LotWithdrawalInputDto.WithdrawalAmountInstruction withdrawalAmountInstruction =
-				new LotWithdrawalInputDto.WithdrawalAmountInstruction();
-			final Map<String, LotWithdrawalInputDto.WithdrawalAmountInstruction> withdrawalsPerUnit = new HashMap<>();
-			withdrawalsPerUnit.put("kg", withdrawalAmountInstruction);
-			lotWithdrawalInputDto.setWithdrawalsPerUnit(withdrawalsPerUnit);
-
-			final ExtendedLotDto extendedLotDto1 = new ExtendedLotDto();
-			extendedLotDto1.setUnitName("kg");
-
-			final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(extendedLotDto1);
-
-			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto, extendedLotDtos);
-		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.withdraw.amount.invalid"));
 		}
 	}
 

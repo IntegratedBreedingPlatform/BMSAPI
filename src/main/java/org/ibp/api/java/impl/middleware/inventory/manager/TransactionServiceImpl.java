@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDt
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -44,6 +46,10 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private SearchRequestService searchRequestService;
+
 
 	@Override
 	public List<TransactionDto> searchTransactions(
@@ -78,7 +84,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void saveWithdrawals(final LotsSearchDto lotsSearchDto, final LotWithdrawalInputDto lotWithdrawalInputDto,
+	public void saveWithdrawals(final LotWithdrawalInputDto lotWithdrawalInputDto,
 		final TransactionStatus transactionStatus) {
 		try {
 			//FIXME we should only locking the affected lots
@@ -86,12 +92,23 @@ public class TransactionServiceImpl implements TransactionService {
 
 			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
-			final List<ExtendedLotDto> lotDtos = lotService.searchLots(lotsSearchDto, null);
+			lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 
+			LotsSearchDto searchDTO;
+			if (lotWithdrawalInputDto.getLotsSearchId() != null) {
+				searchDTO = (LotsSearchDto) this.searchRequestService
+					.getSearchRequest(lotWithdrawalInputDto.getLotsSearchId(), LotsSearchDto.class);
+			} else {
+				searchDTO = new LotsSearchDto();
+				searchDTO.setLotIds(new ArrayList<>(lotWithdrawalInputDto.getLotIds()));
+			}
+			final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
+
+			extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotWithdrawalInputDto.getLotIds());
 			extendedLotListValidator.validateEmptyList(lotDtos);
 			extendedLotListValidator.validateEmptyUnits(lotDtos);
 			extendedLotListValidator.validateClosedLots(lotDtos);
-			lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto, lotDtos);
+			lotWithdrawalInputDtoValidator.validateWithdrawalInstructionsUnits(lotWithdrawalInputDto, lotDtos);
 
 			this.transactionService
 				.withdrawLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()), lotWithdrawalInputDto,

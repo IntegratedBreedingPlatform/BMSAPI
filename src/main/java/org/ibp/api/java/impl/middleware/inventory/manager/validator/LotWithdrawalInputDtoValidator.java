@@ -33,12 +33,19 @@ public class LotWithdrawalInputDtoValidator {
 	@Autowired
 	private VariableService variableService;
 
-	public void validate(final LotWithdrawalInputDto lotWithdrawalInputDto, List<ExtendedLotDto> extendedLotDtos) {
+	public void validate(final LotWithdrawalInputDto lotWithdrawalInputDto) {
 		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
 		//Validate notes length
 		if (lotWithdrawalInputDto == null) {
 			errors.reject("lot.withdrawal.input.null", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		//Validate that searchId or list of lots are provided
+		if (lotWithdrawalInputDto.getLotsSearchId()== null && (lotWithdrawalInputDto.getLotIds() == null || lotWithdrawalInputDto.getLotIds().isEmpty()) ||
+			lotWithdrawalInputDto.getLotsSearchId()!= null && (lotWithdrawalInputDto.getLotIds() != null)){
+			errors.reject("lot.selection.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
@@ -67,15 +74,6 @@ public class LotWithdrawalInputDtoValidator {
 
 		}
 
-		//All units resulted the search request, must be indicated in the map
-		final List<String> lotsUnits = extendedLotDtos.stream().map(ExtendedLotDto::getUnitName).collect(Collectors.toList());
-		if (!specifiedUnits.containsAll(lotsUnits)){
-			final List<String> missingUnits = new ArrayList<>(lotsUnits);
-			missingUnits.removeAll(specifiedUnits);
-			errors.reject("lot.input.instructions.missing.for.units", new String[] {Util.buildErrorMessageFromList(missingUnits, 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
 		lotWithdrawalInputDto.getWithdrawalsPerUnit().forEach((k, v) -> {
 			if (v.isReserveAllAvailableBalance() && v.getWithdrawalAmount() != null && !v.getWithdrawalAmount().equals(0D)) {
 				errors.reject("lot.withdraw.amount.invalid", "");
@@ -86,7 +84,19 @@ public class LotWithdrawalInputDtoValidator {
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 		});
-
 	}
 
+	public void validateWithdrawalInstructionsUnits(final LotWithdrawalInputDto lotWithdrawalInputDto, final List<ExtendedLotDto> extendedLotDtos) {
+		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
+
+		//All units resulted the search request, must be indicated in the map
+		final Set<String> specifiedUnits = lotWithdrawalInputDto.getWithdrawalsPerUnit().keySet();
+		final List<String> lotsUnits = extendedLotDtos.stream().map(ExtendedLotDto::getUnitName).collect(Collectors.toList());
+		if (!specifiedUnits.containsAll(lotsUnits)){
+			final List<String> missingUnits = new ArrayList<>(lotsUnits);
+			missingUnits.removeAll(specifiedUnits);
+			errors.reject("lot.input.instructions.missing.for.units", new String[] {Util.buildErrorMessageFromList(missingUnits, 3)}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
 }

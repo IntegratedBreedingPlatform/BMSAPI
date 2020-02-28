@@ -9,6 +9,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by clarysabel on 2/27/20.
@@ -19,6 +20,7 @@ public class ExtendedLotListValidator {
 	private BindingResult errors;
 
 	public void validateEmptyList(final List<ExtendedLotDto> extendedLotDtos) {
+		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
 		if (extendedLotDtos==null || extendedLotDtos.isEmpty()){
 			errors.reject("no.lots.selected", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -41,6 +43,14 @@ public class ExtendedLotListValidator {
 		final long closedLotsCount = extendedLotDtos.stream().filter(lot -> lot.getStatus().equals(LotStatus.CLOSED.toString())).count();
 		if (closedLotsCount != 0) {
 			errors.reject("selected.lots.closed", new String[] {String.valueOf(closedLotsCount)}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	public void validateAllProvidedLotIdsExist(final List<ExtendedLotDto> extendedLotDtos, final Set<Integer> lotIds){
+		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
+		if (lotIds!=null && !lotIds.isEmpty() && lotIds.size() != extendedLotDtos.size()) {
+			errors.reject("lots.does.not.exist", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}

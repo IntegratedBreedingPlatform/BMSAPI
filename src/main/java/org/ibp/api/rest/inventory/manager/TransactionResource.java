@@ -9,7 +9,6 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
-import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -151,9 +150,7 @@ public class TransactionResource {
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
 
-		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
-			.getSearchRequest(lotWithdrawalInputDto.getLotsSearchId(), LotsSearchDto.class);
-		this.transactionService.saveWithdrawals(searchDTO, lotWithdrawalInputDto, TransactionStatus.PENDING);
+		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.PENDING);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
@@ -167,9 +164,7 @@ public class TransactionResource {
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
 
-		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
-			.getSearchRequest(lotWithdrawalInputDto.getLotsSearchId(), LotsSearchDto.class);
-		this.transactionService.saveWithdrawals(searchDTO, lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
+		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
