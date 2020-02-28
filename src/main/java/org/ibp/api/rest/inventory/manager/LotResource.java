@@ -183,27 +183,27 @@ public class LotResource {
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(@PathVariable final String cropName, //
-		@RequestParam (required = false) final Integer searchRequestId, @RequestParam (required = false) final Set<Integer> lotIds) {
+		@RequestParam(required = false) final Integer searchRequestId, @RequestParam(required = false) final Set<Integer> lotIds) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		//Validate that searchId or list of lots are provided
-		if (searchRequestId== null && (lotIds == null || lotIds.isEmpty()) ||
-			searchRequestId!= null && (lotIds != null)){
+		if (searchRequestId == null && (lotIds == null || lotIds.isEmpty()) ||
+			searchRequestId != null && (lotIds != null)) {
 			errors.reject("lot.selection.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		LotsSearchDto searchDTO;
-		if (searchRequestId!=null) {
+		if (searchRequestId != null) {
 			searchDTO = (LotsSearchDto) this.searchRequestService
 				.getSearchRequest(searchRequestId, LotsSearchDto.class);
-		}  else {
+		} else {
 			searchDTO = new LotsSearchDto();
 			searchDTO.setLotIds(new ArrayList<>(lotIds));
 		}
 
-		if (searchRequestId==null){
+		if (searchRequestId == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 			if (extendedLotDtos.size() != lotIds.size()) {
 				errors.reject("lots.does.not.exist", "");
