@@ -61,7 +61,7 @@ public class ExtendedLotListValidatorTest {
 			final ExtendedLotDto extendedLotDto = new ExtendedLotDto();
 			extendedLotDto.setLotId(1);
 			final List<ExtendedLotDto> lotDtoList = Arrays.asList(extendedLotDto);
-			final Set<Integer> lotIds = new HashSet<>(Arrays.asList(1,2));
+			final Set<Integer> lotIds = new HashSet<>(Arrays.asList(1, 2));
 			this.extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtoList, lotIds);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lots.does.not.exist"));
