@@ -1,23 +1,34 @@
 
 package org.ibp.api.brapi.v1.study;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -25,6 +36,12 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
+import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
+import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.exception.BrapiNotFoundException;
+import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -37,6 +54,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,11 +69,13 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Study services.
@@ -77,7 +97,16 @@ public class StudyResourceBrapi {
 	private StudyService studyService;
 
 	@Autowired
+	private VariableService variableService;
+
+	@Autowired
 	private LocationDataManager locationDataManager;
+
+	@Autowired
+	private DatasetService studyDatasetService;
+
+	@Autowired
+	InstanceValidator instanceValidator;
 
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
@@ -125,7 +154,7 @@ public class StudyResourceBrapi {
 				@Override
 				public long getCount() {
 					return StudyResourceBrapi.this.studyService.countStudyDTOs(studySearchFilter);
-				}
+			}
 
 				@Override
 				public List<StudyDto> getResults(final PagedResult<StudyDto> pagedResult) {
@@ -202,11 +231,17 @@ public class StudyResourceBrapi {
 
 	@ApiOperation(value = "Get study details", notes = "Get study details")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsForGeolocation(studyDbId);
+		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
 
 		if (mwStudyDetails != null) {
+			//Add environment parameters to addtionalInfo
+			Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
+				Collectors.toMap(MeasurementVariable::getDescription, MeasurementVariable::getValue));
+			mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
+
 			final StudyDetails studyDetails = new StudyDetails();
 			final Metadata metadata = new Metadata();
 			final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
@@ -313,4 +348,123 @@ public class StudyResourceBrapi {
 		return new ResponseEntity<>(fileSystemResource, respHeaders, HttpStatus.OK);
 
 	}
+
+	@ApiOperation(value = "Get studies observation variables by studyDbId", notes = "Get studies observation variables by studyDbId")
+	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationvariables", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<EntityListResponse<VariableDTO>> getObservationVariables(final HttpServletResponse response,
+		@PathVariable final String crop, @PathVariable final int studyDbId,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize) throws BrapiNotFoundException {
+
+		// Resolve the datasetId in which StudyDbId belongs to. (In BRAPI, studyDbId is nd_geolocation_id)
+		final Integer datasetId = this.studyDataManager.getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		if (datasetId == null) {
+			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
+		}
+
+		final PagedResult<VariableDTO> resultPage =
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
+
+				@Override
+				public long getCount() {
+					return StudyResourceBrapi.this.variableService.countVariablesByDatasetId(datasetId, Collections.unmodifiableList(
+						Arrays.asList(VariableType.TRAIT.getId())));
+				}
+
+				@Override
+				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
+					final int pageNumber = pagedResult.getPageNumber() + 1;
+					return StudyResourceBrapi.this.variableService
+						.getVariablesByDatasetId(datasetId, crop, Collections.unmodifiableList(
+							Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
+				}
+			});
+
+		final List<VariableDTO> observationVariables = resultPage.getPageResults();
+
+		final String trialName = this.studyDataManager.getProject(datasetId).getStudy().getName();
+
+		final ObservationVariableResult result = new ObservationVariableResult().withData(observationVariables).withStudyDbId(studyDbId)
+			.withTrialName(trialName);
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+
+		final EntityListResponse<VariableDTO> entityListResponse = new EntityListResponse<>(metadata, result);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+	@JsonView(BrapiView.BrapiV1_3.class)
+	@ApiOperation(value = "Get observation units by studyDbId")
+	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationunits", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> listObservationUnitsByStudy(
+		@PathVariable final String crop, @PathVariable final int studyDbId,
+		@ApiParam(value = "The granularity level of observation units. see GET /observationlevels") @RequestParam(required = false)
+		final String observationLevel,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION) @RequestParam(required = false) final Integer page,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(required = false) final Integer pageSize) {
+
+		this.instanceValidator.validateStudyDbId(studyDbId);
+
+		final Integer finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
+		final Integer finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+
+		final PhenotypeSearchRequestDTO phenotypeSearchDTO = new PhenotypeSearchRequestDTO();
+		phenotypeSearchDTO.setStudyDbIds(Lists.newArrayList(String.valueOf(studyDbId)));
+		phenotypeSearchDTO.setObservationLevel(observationLevel);
+
+		final BrapiPagedResult<PhenotypeSearchDTO> resultPage = new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize,
+			new SearchSpec<PhenotypeSearchDTO>() {
+
+				@Override
+				public long getCount() {
+					return studyService.countPhenotypes(phenotypeSearchDTO);
+				}
+
+				@Override
+				public List<PhenotypeSearchDTO> getResults(final PagedResult<PhenotypeSearchDTO> pagedResult) {
+					return studyService.searchPhenotypes(finalPageSize, finalPageNumber, phenotypeSearchDTO);
+				}
+			});
+
+		final Result<PhenotypeSearchDTO> results = new Result<PhenotypeSearchDTO>().withData(resultPage.getPageResults());
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+
+		final EntityListResponse<PhenotypeSearchDTO> entityListResponse = new EntityListResponse<>(metadata, results);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+
+	}
+
+	@ApiOperation(value = "Put Observations", notes = "Put Observations")
+	@RequestMapping(
+		value = "/{crop}/brapi/v1/studies/{studyDbId}/observations",
+		method = RequestMethod.PUT)
+	public ResponseEntity<EntityListResponse<ObservationDTO>> putObservations(
+		@PathVariable final String crop,
+		@PathVariable final Integer studyDbId,
+		@RequestBody final List<ObservationDTO> input) {
+
+		this.studyDatasetService.importObservations(studyDbId, input);
+
+		final Result<ObservationDTO> results = new Result<ObservationDTO>().withData(input);
+		@SuppressWarnings("unchecked")
+		final Metadata metadata = new Metadata().withStatus(
+				Lists.newArrayList(Collections.singletonMap("ignored-fields", "collector, observationDbId, observationTimeStamp")));
+		final EntityListResponse<ObservationDTO> entityListResponse = new EntityListResponse<>(metadata, results);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
 }

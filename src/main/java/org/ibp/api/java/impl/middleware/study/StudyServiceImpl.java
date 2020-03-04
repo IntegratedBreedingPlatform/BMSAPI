@@ -22,6 +22,7 @@ import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.study.FieldMap;
@@ -67,10 +68,10 @@ public class StudyServiceImpl implements StudyService {
 	private SecurityService securityService;
 
 	@Autowired
-	private ObservationValidator observationValidator;
+	private StudyValidator studyValidator;
 
 	@Autowired
-	private StudyValidator studyValidator;
+	private ObservationValidator observationValidator;
 
 	@Autowired
 	private ValidationUtil validationUtil;
@@ -316,8 +317,8 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsForGeolocation(final Integer geolocationId) {
-		return this.middlewareStudyService.getStudyDetailsForGeolocation(geolocationId);
+	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
+		return this.middlewareStudyService.getStudyDetailsByGeolocation(geolocationId);
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
-import org.ibp.api.java.impl.middleware.common.validator.InventoryScaleValidator;
+import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class TransactionInputValidatorTest {
 	private TransactionInputValidator transactionInputValidator;
 
 	@Mock
-	private InventoryScaleValidator inventoryScaleValidator;
+	private InventoryUnitValidator inventoryUnitValidator;
 
 	@Mock
 	private LotService lotService;
@@ -77,7 +77,7 @@ public class TransactionInputValidatorTest {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(Lists.newArrayList(this.transactionDto.getLot().getLotId()));
 		final ExtendedLotDto lot = new ExtendedLotDto();
-		lot.setScaleId(1);
+		lot.setUnitId(1);
 		lot.setStatus(LotStatus.CLOSED.name());
 		final List<ExtendedLotDto> result = Lists.newArrayList(lot);
 		Mockito.when(this.lotService.searchLots(lotsSearchDto, null)).thenReturn(result);

@@ -1,13 +1,12 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.impl.middleware.common.validator.InventoryScaleValidator;
+import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,7 @@ public class LotInputValidator {
 	private LocationValidator locationValidator;
 
 	@Autowired
-	private InventoryScaleValidator inventoryScaleValidator;
+	private InventoryUnitValidator inventoryUnitValidator;
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
@@ -43,21 +42,21 @@ public class LotInputValidator {
 	}
 
 	public void validate(final LotGeneratorInputDto lotGeneratorInputDto) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.locationValidator.validateSeedLocationId(this.errors, lotGeneratorInputDto.getLocationId());
-		this.inventoryScaleValidator.validateInventoryScaleId(this.errors, lotGeneratorInputDto.getScaleId());
+		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
-		this.validateComments(lotGeneratorInputDto.getComments());
+		this.validateNotes(lotGeneratorInputDto.getNotes());
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateComments(final String comments) {
-		if (comments != null) {
-			if (comments.length() > 255) {
-				this.errors.reject("lot.comments.length");
+	private void validateNotes(final String notes) {
+		if (notes != null) {
+			if (notes.length() > 255) {
+				this.errors.reject("lot.notes.length");
 			}
 		}
 	}

@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
-import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.hamcrest.CoreMatchers;
@@ -26,7 +25,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 public class GermplasmValidatorTest {
 
-	public static final int SCALE_ID = TermId.SEED_AMOUNT_G.getId();
+	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
 	public static final int LOCATION_ID = 6000;
 	public static final String STOCK_ID = "ABCD";
 	public static final String COMMENTS = "Comments";
@@ -49,15 +48,15 @@ public class GermplasmValidatorTest {
 
 	@Test
 	public void testValidateValidGermplasmId() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		final Integer germplasmId = 1;
 		this.lotGeneratorInputDto.setGid(germplasmId);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(COMMENTS);
+		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final GermplasmSummary germplasmSummary = new GermplasmSummary();
@@ -69,15 +68,15 @@ public class GermplasmValidatorTest {
 
 	@Test
 	public void testValidateNullGermplasmId() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		final Integer germplasmId = null;
 		this.lotGeneratorInputDto.setGid(germplasmId);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(COMMENTS);
+		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 
@@ -90,14 +89,14 @@ public class GermplasmValidatorTest {
 
 	@Test
 	public void testValidateInvalidGermplasmId() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.lotGeneratorInputDto.setGid(GERMPLASM_ID);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
-		this.lotGeneratorInputDto.setScaleId(SCALE_ID);
+		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
-		this.lotGeneratorInputDto.setComments(COMMENTS);
+		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		Mockito.when(this.germplasmService.getGermplasm(String.valueOf(GERMPLASM_ID))).thenReturn(null);

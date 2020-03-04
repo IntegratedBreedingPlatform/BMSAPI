@@ -1,14 +1,19 @@
 package org.ibp.api.rest.inventory.manager;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.InventoryView;
+import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
@@ -22,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,9 +41,12 @@ import java.util.List;
 
 @Api(value = "Transaction Services")
 @RestController
-//FIXME Uncomment next line when BMSAPI properly loads the permissions
-//@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY')")
 public class TransactionResource {
+
+	private static final String HAS_MANAGE_TRANSACTIONS =
+		"hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_TRANSACTIONS')";
+
+	private static final String HAS_MANAGE_LOTS = "hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_LOTS')";
 
 	@Autowired
 	private TransactionService transactionService;
@@ -50,6 +59,7 @@ public class TransactionResource {
 
 	@ApiOperation(value = "Post transaction search", notes = "Post transaction search")
 	@RequestMapping(value = "/crops/{cropName}/transactions/search", method = RequestMethod.POST)
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchTransactions(
 		@PathVariable final String cropName, @RequestBody final TransactionsSearchDto transactionsSearchDto) {
@@ -76,7 +86,9 @@ public class TransactionResource {
 				"Default sort order is ascending. " +
 				"Multiple sort criteria are supported.")
 	})
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
+	@JsonView(InventoryView.TransactionView.class)
 	public ResponseEntity<List<TransactionDto>> getTransactions(
 		@PathVariable final String cropName, //
 		@RequestParam final Integer searchRequestId, @ApiIgnore
@@ -122,7 +134,38 @@ public class TransactionResource {
 		if (transactionDto.getLot() == null) {
 			transactionDto.setLot(new ExtendedLotDto());
 		}
+		//FIXME when this resource is completed on  https://ibplatform.atlassian.net/browse/IBP-3455
+		transactionDto.setTransactionStatus(TransactionStatus.CONFIRMED.getValue());
+		transactionDto.setTransactionType(TransactionType.DEPOSIT.getValue());
 		transactionDto.getLot().setLotId(Integer.valueOf(lotId));
 		return new ResponseEntity<>(this.transactionService.saveTransaction(transactionDto), HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Create Pending Withdrawals", notes = "Create new withdrawals with pending status for a set os filtered lots")
+		 @RequestMapping(value = "/crops/{cropName}/transactions/pending-withdrawals-lists", method = RequestMethod.POST)
+		 @ResponseBody
+		 @PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_PENDING_WITHDRAWALS')")
+		 public ResponseEntity<Void> createPendingWithdrawals(
+			@PathVariable final String cropName,
+			@ApiParam("Inventory to be reserved per unit")
+			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
+
+		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.PENDING);
+
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Create Confirmed Withdrawals", notes = "Create new withdrawals with confirmed status for a set os filtered lots")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-withdrawals-lists", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_CONFIRMED_WITHDRAWALS')")
+	public ResponseEntity<Void> createConfirmedWithdrawals(
+			@PathVariable final String cropName,
+			@ApiParam("Inventory to be reserved per unit")
+			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
+
+		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
+
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 }
