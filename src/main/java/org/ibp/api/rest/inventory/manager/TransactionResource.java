@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
+import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -167,5 +168,17 @@ public class TransactionResource {
 		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Confirm Transactions", notes = "Confirm any transaction with pending status")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmations", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_CONFIRMED_WITHDRAWALS')")
+	public ResponseEntity<Void> confirmTransaction(@PathVariable final String cropName, //
+		@ApiParam("Inventory to be reserved per unit")
+		@RequestBody final SearchCompositeDto searchCompositeDto){
+
+		this.transactionService.confirmTransaction(searchCompositeDto);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
