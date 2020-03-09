@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -84,6 +85,17 @@ public class TransactionInputValidator {
 		if (TransactionType.DEPOSIT.getValue().equalsIgnoreCase(transactionType) && amount <= 0) {
 			this.errors.reject("transaction.initial.amount.positive.value", "");
 			return;
+		}
+	}
+
+	public void validatePendingStatus(final List<TransactionDto> transactionDtos) {
+		errors = new MapBindingResult(new HashMap<String, String>(), TransactionDto.class.getName());
+		final long pendingTransactionCount = transactionDtos.stream()
+			.filter(transactionDto -> TransactionStatus.PENDING.getValue().equalsIgnoreCase(transactionDto.getTransactionStatus())).count();
+
+		if (pendingTransactionCount != transactionDtos.size()) {
+			this.errors.reject("transaction.wrong.transaction.status", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 }
