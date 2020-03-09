@@ -7,7 +7,6 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -42,7 +41,6 @@ import org.ibp.api.exception.BrapiNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -154,7 +152,7 @@ public class StudyResourceBrapi {
 				@Override
 				public long getCount() {
 					return StudyResourceBrapi.this.studyService.countStudyDTOs(studySearchFilter);
-			}
+				}
 
 				@Override
 				public List<StudyDto> getResults(final PagedResult<StudyDto> pagedResult) {
@@ -459,9 +457,8 @@ public class StudyResourceBrapi {
 		this.studyDatasetService.importObservations(studyDbId, input);
 
 		final Result<ObservationDTO> results = new Result<ObservationDTO>().withData(input);
-		@SuppressWarnings("unchecked")
-		final Metadata metadata = new Metadata().withStatus(
-				Lists.newArrayList(Collections.singletonMap("ignored-fields", "collector, observationDbId, observationTimeStamp")));
+		@SuppressWarnings("unchecked") final Metadata metadata = new Metadata().withStatus(
+			Lists.newArrayList(Collections.singletonMap("ignored-fields", "collector, observationDbId, observationTimeStamp")));
 		final EntityListResponse<ObservationDTO> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
