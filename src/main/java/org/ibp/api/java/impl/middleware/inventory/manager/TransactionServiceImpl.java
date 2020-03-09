@@ -152,9 +152,11 @@ public class TransactionServiceImpl implements TransactionService {
 			final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
 			final Set<ExtendedLotDto> lotDtos = transactionDtos.stream().map(TransactionDto::getLot).collect(
 				Collectors.toSet());
+
 			transactionInputValidator.validatePendingStatus(transactionDtos);
 			extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
-			//TransactionStatus.CONFIRMED
+
+			this.transactionService.confirmTransaction(transactionDtos);
 		} finally {
 			lock.unlock();
 		}
