@@ -134,7 +134,7 @@ public class StudyResourceBrapi {
 			required = false) final Integer pageSize) {
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage + 1;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 		studySearchFilter.setCommonCropName(crop);
 		studySearchFilter.setStudyTypeDbId(studyTypeDbId);
