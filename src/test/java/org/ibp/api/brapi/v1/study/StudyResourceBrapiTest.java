@@ -194,6 +194,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}")
 			.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDetailsDto.getMetadata().getStudyDbId()).build())
 			.encode();
+		final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -205,8 +206,8 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$.result.seasons[0]", is(studyDetailsDto.getMetadata().getSeasons().get(0))))
 			.andExpect(jsonPath("$.result.trialDbId", is(studyDetailsDto.getMetadata().getTrialDbId())))
 			.andExpect(jsonPath("$.result.trialName", is(studyDetailsDto.getMetadata().getTrialName())))
-			.andExpect(jsonPath("$.result.startDate", is(studyDetailsDto.getMetadata().getStartDate())))
-			.andExpect(jsonPath("$.result.endDate", is(studyDetailsDto.getMetadata().getEndDate())))
+			.andExpect(jsonPath("$.result.startDate", is(simpleDateFormat.format(studyDetailsDto.getMetadata().getStartDate()))))
+			.andExpect(jsonPath("$.result.endDate", is(simpleDateFormat.format(studyDetailsDto.getMetadata().getEndDate()))))
 			.andExpect(jsonPath("$.result.active", is(studyDetailsDto.getMetadata().getActive())))
 			.andExpect(jsonPath("$.result.location.locationDbId", is(location.getLocationDbId())))
 			.andExpect(jsonPath("$.result.location.locationType", is(location.getLocationType())))

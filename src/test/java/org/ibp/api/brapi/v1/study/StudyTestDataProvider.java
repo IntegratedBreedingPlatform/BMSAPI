@@ -14,6 +14,8 @@ import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -39,11 +41,12 @@ public class StudyTestDataProvider {
 		return user;
 	}
 
-	public static StudyMetadata getStudyMetadata() {
+	public static StudyMetadata getStudyMetadata() throws ParseException {
 		final List<String> seasons = Lists.newArrayList("WET");
 
-		final Date startDate = new Date("2016-01-01");
-		final Date endDate = new Date("2017-01-01");
+		final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		final Date startDate = simpleDateFormat.parse("2016-01-01");
+		final Date endDate = simpleDateFormat.parse("2017-01-01");
 
 		final StudyMetadata metadata =
 			new StudyMetadata().setActive(Boolean.TRUE).setEndDate(endDate).setStartDate(startDate).setLocationId(2)
@@ -66,7 +69,7 @@ public class StudyTestDataProvider {
 		return environmentParameters;
 	}
 
-	public static StudyDetailsDto getStudyDetailsDto() {
+	public static StudyDetailsDto getStudyDetailsDto() throws ParseException {
 		StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
 		studyDetailsDto.setMetadata(StudyTestDataProvider.getStudyMetadata());
 		studyDetailsDto.setContacts(Lists.newArrayList(StudyTestDataProvider.getUserDto()));
