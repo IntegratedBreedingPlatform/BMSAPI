@@ -186,22 +186,7 @@ public class LotResource {
 		@RequestParam(required = false) final Integer searchRequestId, @RequestParam(required = false) final Set<Integer> lotIds) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-
-		//Validate that searchId or list of lots are provided
-		if (searchRequestId == null && (lotIds == null || lotIds.isEmpty()) ||
-			searchRequestId != null && (lotIds != null)) {
-			errors.reject("lot.selection.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
-		LotsSearchDto searchDTO;
-		if (searchRequestId != null) {
-			searchDTO = (LotsSearchDto) this.searchRequestService
-				.getSearchRequest(searchRequestId, LotsSearchDto.class);
-		} else {
-			searchDTO = new LotsSearchDto();
-			searchDTO.setLotIds(new ArrayList<>(lotIds));
-		}
+		final LotsSearchDto searchDTO = validateSearchComposite(searchRequestId, lotIds, errors);
 
 		if (searchRequestId == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
@@ -212,6 +197,29 @@ public class LotResource {
 		}
 
 		return new ResponseEntity<>(lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
+	}
+
+	// TODO Move elsewhere, accept SearchCompositeDto
+	private LotsSearchDto validateSearchComposite(
+		final Integer searchRequestId,
+		final Set<Integer> lotIds,
+		final BindingResult errors) {
+
+		// Validate that searchId or list of lots are provided
+		if (searchRequestId == null && (lotIds == null || lotIds.isEmpty()) ||
+			searchRequestId != null && (lotIds != null)) {
+			errors.reject("lot.selection.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final LotsSearchDto searchDTO;
+		if (searchRequestId != null) {
+			searchDTO = (LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
+		} else {
+			searchDTO = new LotsSearchDto();
+			searchDTO.setLotIds(new ArrayList<>(lotIds));
+		}
+		return searchDTO;
 	}
 
 }
