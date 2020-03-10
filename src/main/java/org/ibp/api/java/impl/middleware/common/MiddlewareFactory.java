@@ -54,7 +54,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
-import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
+import org.generationcp.middleware.operation.builder.TrialInstanceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
@@ -430,8 +430,8 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public TrialEnvironmentBuilder trialEnvironmentBuilder() {
-		return new TrialEnvironmentBuilder(this.getCropDatabaseSessionProvider());
+	public TrialInstanceBuilder trialInstanceBuilder() {
+		return new TrialInstanceBuilder(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

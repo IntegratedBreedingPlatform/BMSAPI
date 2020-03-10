@@ -342,7 +342,7 @@ public class GermplasmResourceBrapi {
 			}
 		}
 
-		final StudyMetadata studyMetadataForEnvironmentId = this.studyDataManager.getStudyMetadataForEnvironmentId(studyDbId);
+		final StudyMetadata studyMetadataForEnvironmentId = this.studyDataManager.getStudyMetadataForInstanceId(studyDbId);
 		final GermplasmSummaryList germplasmSummaryList = new GermplasmSummaryList();
 		germplasmSummaryList.setData(germplasmList);
 		germplasmSummaryList.setTrialName(studyMetadataForEnvironmentId.getTrialName());
