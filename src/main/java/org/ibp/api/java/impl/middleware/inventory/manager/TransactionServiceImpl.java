@@ -126,7 +126,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void confirmTransaction(final SearchCompositeDto searchCompositeDto) {
+	public void confirmPendingTransaction(final SearchCompositeDto searchCompositeDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
 		try{
@@ -156,7 +156,7 @@ public class TransactionServiceImpl implements TransactionService {
 			transactionInputValidator.validatePendingStatus(transactionDtos);
 			extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
 
-			this.transactionService.confirmTransaction(transactionDtos);
+			this.transactionService.confirmPendingTransaction(transactionDtos);
 		} finally {
 			lock.unlock();
 		}

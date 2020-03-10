@@ -179,7 +179,7 @@ public class TransactionResource {
 		@ApiParam("Inventory to be reserved per unit")
 		@RequestBody final SearchCompositeDto searchCompositeDto){
 
-		this.transactionService.confirmTransaction(searchCompositeDto);
+		this.transactionService.confirmPendingTransaction(searchCompositeDto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
