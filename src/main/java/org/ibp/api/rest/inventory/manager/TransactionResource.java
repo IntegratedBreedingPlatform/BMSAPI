@@ -170,11 +170,12 @@ public class TransactionResource {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
-	@ApiOperation(value = "Confirm Transactions", notes = "Confirm any transaction with pending status")
-	@RequestMapping(value = "/crops/{cropName}/transactions/confirmations", method = RequestMethod.PATCH)
+	@ApiOperation(value = "Confirm pending Transactions", notes = "Confirm any transaction with pending status")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmation", method = RequestMethod.PATCH)
 	@ResponseBody
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_CONFIRMED_WITHDRAWALS')")
-	public ResponseEntity<Void> confirmTransaction(@PathVariable final String cropName, //
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CONFIRM_TRANSACTIONS')")
+	public ResponseEntity<Void> confirmPendingTransaction(
+		@PathVariable final String cropName, //
 		@ApiParam("Inventory to be reserved per unit")
 		@RequestBody final SearchCompositeDto searchCompositeDto){
 
