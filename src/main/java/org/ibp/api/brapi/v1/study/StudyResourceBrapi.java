@@ -328,7 +328,7 @@ public class StudyResourceBrapi {
 			required = false) final Integer pageSize) throws BrapiNotFoundException {
 
 		// Resolve the datasetId in which StudyDbId belongs to. (In BRAPI, studyDbId is experimentId)
-		final Integer datasetId = this.studyDataManager.getDatasetIdByInstanceIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		final Integer datasetId = this.studyDataManager.getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
 		if (datasetId == null) {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
 		}
