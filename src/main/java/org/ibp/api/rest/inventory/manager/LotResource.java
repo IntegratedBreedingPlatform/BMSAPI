@@ -11,8 +11,10 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
@@ -146,6 +148,35 @@ public class LotResource {
 		@ApiParam("Lot to be created")
 		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
 		return new ResponseEntity<>(lotService.saveLot(lotGeneratorInputDto), HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Update Lots", notes = "Update one or more Lots")
+	@RequestMapping(value = "/crops/{cropName}/lots/update", method = RequestMethod.POST)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('UPDATE_LOTS')")
+	@ResponseBody
+	public ResponseEntity<Void> updateLots(
+		@PathVariable final String cropName,
+		@ApiParam("Request with fields to update and criteria to update") @RequestBody final LotUpdateRequestDto lotRequest) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		Integer searchRequestId = null;
+		Set<Integer> lotIds = null;
+		final SearchCompositeDto searchCompositeDto = lotRequest.getSearchComposite();
+		if (searchCompositeDto != null) {
+			searchRequestId = searchCompositeDto.getSearchId();
+			lotIds = searchCompositeDto.getListIds();
+		}
+		final LotsSearchDto searchDTO = validateSearchComposite(searchRequestId, lotIds, errors);
+
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
+		if (extendedLotDtos == null || (searchRequestId == null && lotIds != null && extendedLotDtos.size() != lotIds.size())) {
+			errors.reject("lots.does.not.exist", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		this.lotService.updateLots(extendedLotDtos, lotRequest);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
 	}
 
 	@ApiOperation(value = "Create list of lots with an initial balance", notes = "Create list of lots with an initial balance")
