@@ -20,7 +20,7 @@ public interface TransactionService {
 
 	List<TransactionStatus> getAllTransactionStatus();
 
-	List<TransactionType>  getAllTransactionTypes();
+	List<TransactionType> getAllTransactionTypes();
 
 	void saveWithdrawals(LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus);
 
