@@ -4,7 +4,9 @@ import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Util {
 
@@ -18,5 +20,17 @@ public class Util {
 			return false;
 		}
 		return str.chars().allMatch(Character::isDigit);
+	}
+
+	public static <T> String buildErrorMessageFromList(final List<T> elements, final Integer elementsToShow) {
+		final StringBuilder stringBuilder = new StringBuilder();
+
+		stringBuilder.append(elements.stream().limit(elementsToShow).map(Object::toString).collect(Collectors.joining(", ")));
+
+		if (elements.size() > elementsToShow) {
+			stringBuilder.append(" and ").append(elements.size() - elementsToShow).append(" more");
+		}
+
+		return stringBuilder.toString();
 	}
 }

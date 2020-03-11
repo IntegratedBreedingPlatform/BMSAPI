@@ -58,7 +58,7 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 		transactionsSearchDto.setMaxAmount(10.0);
 		transactionsSearchDto.setMinAmount(-10.0);
 		transactionsSearchDto.setNotes("Deposit");
-		transactionsSearchDto.setScaleIds(Lists.newArrayList(8264));
+		transactionsSearchDto.setUnitIds(Lists.newArrayList(8264));
 		transactionsSearchDto.setStockId("ABC-1");
 		transactionsSearchDto.setTransactionIds(Lists.newArrayList(100, 200));
 		transactionsSearchDto.setTransactionTypes(Lists.newArrayList(TransactionType.DEPOSIT.getId()));
@@ -80,8 +80,8 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 		transactionDto.getLot().setGid(1);
 		transactionDto.getLot().setLotId(2);
 		transactionDto.setNotes("Deposit");
-		transactionDto.getLot().setScaleId(8264);
-		transactionDto.getLot().setScaleName("SEED_AMOUNT_g");
+		transactionDto.getLot().setUnitId(8264);
+		transactionDto.getLot().setUnitName("SEED_AMOUNT_g");
 		transactionDto.getLot().setStockId("ABC-1");
 		transactionDto.setTransactionType("Deposit");
 		transactionDto.setCreatedByUsername("admin");
@@ -101,8 +101,8 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$[0].lot.gid", is(1)))
 			.andExpect(jsonPath("$[0].lot.designation", is("germplasm")))
 			.andExpect(jsonPath("$[0].notes", is("Deposit")))
-			.andExpect(jsonPath("$[0].lot.scaleId", is(8264)))
-			.andExpect(jsonPath("$[0].lot.scaleName", is("SEED_AMOUNT_g")))
+			.andExpect(jsonPath("$[0].lot.unitId", is(8264)))
+			.andExpect(jsonPath("$[0].lot.unitName", is("SEED_AMOUNT_g")))
 			.andExpect(jsonPath("$[0].lot.stockId", is("ABC-1")))
 			.andExpect(jsonPath("$[0].transactionType", is("Deposit")))
 			.andExpect(jsonPath("$[0].createdByUsername", is("admin")))
