@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -167,5 +168,19 @@ public class TransactionResource {
 		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Update Pending Withdrawals", notes = "Update Amount and Notes for pending withdrawals, Modify the lot available balance through the pending transaction")
+	@RequestMapping(value = "/crops/{cropName}/pending-transactions", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('')")
+	public ResponseEntity<Void> updatePendingTransactions(
+		@PathVariable final String cropName,
+		@ApiParam("New amount or New Available Balance and Notes to be updated per transaction")
+		@RequestBody final List<TransactionUpdateRequestDto> transactionUpdateInputDtos) {
+
+		this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
