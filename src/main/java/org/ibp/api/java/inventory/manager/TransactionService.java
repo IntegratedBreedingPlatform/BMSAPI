@@ -24,5 +24,5 @@ public interface TransactionService {
 
 	void saveWithdrawals(LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus);
 
-	void confirmPendingTransaction(SearchCompositeDto searchCompositeDto);
+	void confirmPendingTransactions(SearchCompositeDto searchCompositeDto);
 }
