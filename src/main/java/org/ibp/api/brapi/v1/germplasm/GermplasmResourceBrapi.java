@@ -361,7 +361,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get germplasm attributes", notes = "Get the attributes of a Germplasm")
-	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm/{germplasmDbId}/attributes", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/attributes", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<GermplasmAttributes>> getAttributesByGid(
 		@PathVariable final String crop, @PathVariable final String germplasmDbId,
