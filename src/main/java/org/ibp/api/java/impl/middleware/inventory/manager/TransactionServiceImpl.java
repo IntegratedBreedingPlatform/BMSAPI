@@ -135,7 +135,7 @@ public class TransactionServiceImpl implements TransactionService {
 			//Validate that searchId or list of lots are provided
 			if (searchCompositeDto.getSearchId() == null && (searchCompositeDto.getListIds() == null || searchCompositeDto
 				.getListIds().isEmpty()) ||
-				searchCompositeDto.getSearchId() != null && (searchCompositeDto.getListIds() != null)) {
+				(searchCompositeDto.getSearchId() != null && searchCompositeDto.getListIds() != null)) {
 				errors.reject("transaction.selection.invalid", "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
