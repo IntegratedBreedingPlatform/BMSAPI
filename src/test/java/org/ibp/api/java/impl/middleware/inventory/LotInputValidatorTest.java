@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
@@ -36,6 +37,9 @@ public class LotInputValidatorTest {
 
 	@Mock
 	private LotService lotService;
+
+	@Mock
+	private TransactionService transactionService;
 
 	private LotGeneratorInputDto lotGeneratorInputDto;
 
