@@ -143,7 +143,7 @@ public class TransactionServiceImpl implements TransactionService {
 			TransactionsSearchDto transactionsSearchDto;
 			if (searchCompositeDto.getSearchId() != null) {
 				transactionsSearchDto =
-					(TransactionsSearchDto) this.searchRequestService.getSearchRequest(searchCompositeDto.getSearchId(), null);
+					(TransactionsSearchDto) this.searchRequestService.getSearchRequest(searchCompositeDto.getSearchId(), TransactionsSearchDto.class);
 			} else {
 				transactionsSearchDto = new TransactionsSearchDto();
 				transactionsSearchDto.setTransactionIds(new ArrayList<>(searchCompositeDto.getListIds()));
