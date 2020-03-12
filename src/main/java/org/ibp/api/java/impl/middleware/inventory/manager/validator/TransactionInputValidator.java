@@ -18,6 +18,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Component
 public class TransactionInputValidator {
@@ -90,10 +91,9 @@ public class TransactionInputValidator {
 
 	public void validatePendingStatus(final List<TransactionDto> transactionDtos) {
 		errors = new MapBindingResult(new HashMap<String, String>(), TransactionDto.class.getName());
-		final long pendingTransactionCount = transactionDtos.stream()
-			.filter(transactionDto -> TransactionStatus.PENDING.getValue().equalsIgnoreCase(transactionDto.getTransactionStatus())).count();
+		final Predicate<TransactionDto> isPendingStatus = transactionDto -> transactionDto.getTransactionStatus().equals(TransactionStatus.PENDING.getValue());
 
-		if (pendingTransactionCount != transactionDtos.size()) {
+		if (transactionDtos.stream().filter(isPendingStatus.negate()).count() > 0) {
 			this.errors.reject("transaction.wrong.transaction.status", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}

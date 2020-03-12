@@ -176,7 +176,7 @@ public class TransactionResource {
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CONFIRM_TRANSACTIONS')")
 	public ResponseEntity<Void> confirmPendingTransaction(
 		@PathVariable final String cropName, //
-		@ApiParam("Inventory to be reserved per unit")
+		@ApiParam("List of transactions to be confirmed, use a searchId or a list of transaction ids")
 		@RequestBody final SearchCompositeDto searchCompositeDto){
 
 		this.transactionService.confirmPendingTransactions(searchCompositeDto);
