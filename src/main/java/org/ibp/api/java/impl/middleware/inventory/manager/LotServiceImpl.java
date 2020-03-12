@@ -74,8 +74,14 @@ public class LotServiceImpl implements LotService {
 		return lotService.saveLot(this.contextUtil.getProjectInContext().getCropType(), loggedInUser.getUserid(), lotGeneratorInputDto);
 	}
 
+	/**
+	 * TODO Extract
+	 *  {@link org.ibp.api.java.impl.middleware.inventory.manager.TransactionServiceImpl#lock}
+	 *  somewhere and lock update logic
+	 */
 	@Override
 	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
+		this.lotInputValidator.validate(lotDtos, lotRequest);
 		this.lotService.updateLots(lotDtos, lotRequest);
 	}
 
