@@ -168,4 +168,24 @@ public class TransactionResource {
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
+
+	@ApiOperation(value = "It will retrieve transactions that affects the available balance of the lot", notes = "It will retrieve transactions that "
+		+ "affects the available balance of the lot")
+	@RequestMapping(value = "/crops/{cropName}/lots/{lotId}/available-balance-transactions", method = RequestMethod.GET)
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
+	@ResponseBody
+	@JsonView(InventoryView.TransactionView.class)
+	public ResponseEntity<List<TransactionDto>> getTransactions(
+		@PathVariable final String cropName, //
+		@PathVariable final Integer lotId) {
+
+		final List<TransactionDto> transactionDtos = this.transactionService.getAvailableBalanceTransactions(lotId);
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(transactionDtos.size()));
+
+		return new ResponseEntity<>(transactionDtos, headers, HttpStatus.OK);
+
+	}
+
 }

@@ -22,4 +22,6 @@ public interface TransactionService {
 	List<TransactionType>  getAllTransactionTypes();
 
 	void saveWithdrawals(LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus);
+
+	List<TransactionDto> getAvailableBalanceTransactions(Integer lotId);
 }
