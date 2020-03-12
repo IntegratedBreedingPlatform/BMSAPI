@@ -38,6 +38,9 @@ public class LotInputValidator {
 	private GermplasmValidator germplasmValidator;
 
 	@Autowired
+	private ExtendedLotListValidator extendedLotListValidator;
+
+	@Autowired
 	private LotService lotService;
 
 	@Autowired
@@ -67,6 +70,8 @@ public class LotInputValidator {
 
 	public void validate(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto updateRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
+
+		this.extendedLotListValidator.validateClosedLots(lotDtos);
 
 		final Integer locationId = updateRequestDto.getLocationId();
 		if (locationId != null) {
