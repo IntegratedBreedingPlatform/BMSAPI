@@ -163,8 +163,8 @@ public class LotResource {
 		Set<Integer> lotIds = null;
 		final SearchCompositeDto searchCompositeDto = lotRequest.getSearchComposite();
 		if (searchCompositeDto != null) {
-			searchRequestId = searchCompositeDto.getSearchId();
-			lotIds = searchCompositeDto.getListIds();
+			searchRequestId = searchCompositeDto.getSearchRequestId();
+			lotIds = searchCompositeDto.getItemIds();
 		}
 		final LotsSearchDto searchDTO = validateSearchComposite(searchRequestId, lotIds, errors);
 
