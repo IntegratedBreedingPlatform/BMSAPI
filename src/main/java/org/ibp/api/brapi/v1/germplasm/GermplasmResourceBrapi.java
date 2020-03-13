@@ -132,7 +132,7 @@ public class GermplasmResourceBrapi {
 		@PathVariable final String crop,
 		@PathVariable final String germplasmDbId) {
 
-		final Integer gid;
+		final int gid;
 		try {
 			gid = Integer.parseInt(germplasmDbId);
 		} catch (final NumberFormatException e) {
@@ -175,9 +175,9 @@ public class GermplasmResourceBrapi {
 				new SingleEntityResponse<PedigreeDTO>().withMessage("Search by pedigree not implemented"), HttpStatus.NOT_IMPLEMENTED);
 		}
 
-		final Integer gid;
+		final int gid;
 		try {
-			gid = Integer.valueOf(germplasmDbId);
+			gid = Integer.parseInt(germplasmDbId);
 		} catch (final NumberFormatException e) {
 			return new ResponseEntity<>(new SingleEntityResponse<PedigreeDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
@@ -199,9 +199,9 @@ public class GermplasmResourceBrapi {
 		@PathVariable(value = "germplasmDbId") final String germplasmDbId
 	) {
 
-		final Integer gid;
+		final int gid;
 		try {
-			gid = Integer.valueOf(germplasmDbId);
+			gid = Integer.parseInt(germplasmDbId);
 		} catch (final NumberFormatException e) {
 			return new ResponseEntity<>(new SingleEntityResponse<ProgenyDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
@@ -361,7 +361,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get germplasm attributes", notes = "Get the attributes of a Germplasm")
-	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm/{germplasmDbId}/attributes", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/attributes", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<GermplasmAttributes>> getAttributesByGid(
 		@PathVariable final String crop, @PathVariable final String germplasmDbId,
