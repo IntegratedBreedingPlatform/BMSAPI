@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
+import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -169,6 +170,19 @@ public class TransactionResource {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
+	@ApiOperation(value = "Confirm pending Transactions", notes = "Confirm any transaction with pending status")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmation", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CONFIRM_TRANSACTIONS')")
+	public ResponseEntity<Void> confirmPendingTransaction(
+		@PathVariable final String cropName, //
+		@ApiParam("List of transactions to be confirmed, use a searchId or a list of transaction ids")
+		@RequestBody final SearchCompositeDto searchCompositeDto){
+
+		this.transactionService.confirmPendingTransactions(searchCompositeDto);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "It will retrieve transactions that affects the available balance of the lot", notes = "It will retrieve transactions that "
 		+ "affects the available balance of the lot")
 	@RequestMapping(value = "/crops/{cropName}/lots/{lotId}/available-balance-transactions", method = RequestMethod.GET)
@@ -187,5 +201,4 @@ public class TransactionResource {
 		return new ResponseEntity<>(transactionDtos, headers, HttpStatus.OK);
 
 	}
-
 }
