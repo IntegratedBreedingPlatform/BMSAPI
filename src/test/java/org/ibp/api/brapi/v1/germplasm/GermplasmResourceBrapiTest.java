@@ -161,7 +161,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 	public void testGetGermplasmAttributes() throws Exception {
 		final int gid = nextInt();
 		final String germplasmDbId = String.valueOf(gid);
-		final List<AttributeDTO> attributeDTOS = createAttributes(germplasmDbId);
+		final List<AttributeDTO> attributeDTOS = this.createAttributes(germplasmDbId);
 
 		doReturn(attributeDTOS).when(this.germplasmService)
 				.getAttributesByGid(germplasmDbId, null, BrapiPagedResult.DEFAULT_PAGE_SIZE, 1);
