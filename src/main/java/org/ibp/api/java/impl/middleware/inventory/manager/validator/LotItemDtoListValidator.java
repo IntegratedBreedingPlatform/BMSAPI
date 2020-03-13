@@ -60,7 +60,8 @@ public class LotItemDtoListValidator {
 		}
 
 		if (lotList.isEmpty()) {
-			return;
+			errors.reject("lot.input.list.no.item", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		//Validate that none of the elements in the list is null
