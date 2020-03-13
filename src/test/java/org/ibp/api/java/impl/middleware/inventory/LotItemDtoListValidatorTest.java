@@ -68,7 +68,7 @@ public class LotItemDtoListValidatorTest {
 		try {
 			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.no.item"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.no.items"));
 		}
 	}
 
