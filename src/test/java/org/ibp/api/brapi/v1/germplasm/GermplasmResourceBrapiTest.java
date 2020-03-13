@@ -152,8 +152,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(list.size())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmDbId",
-				Matchers.is(germplasmDbId)))
-		;
+				Matchers.is(germplasmDbId)));
 
 	}
 
