@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
@@ -19,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -93,5 +95,15 @@ public class TransactionInputValidatorTest {
 
 		Mockito.when(this.lotService.searchLots(lotsSearchDto, null)).thenReturn(Lists.newArrayList());
 		this.transactionInputValidator.validate(this.transactionDto);
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void ValidatePendingStatus(){
+		this.transactionDto.setAmount(10.0);
+		this.transactionDto.setTransactionType(DEPOSIT);
+		this.transactionDto.setNotes(RandomStringUtils.randomAlphabetic(255));
+		this.transactionDto.setTransactionStatus(TransactionStatus.CONFIRMED.getValue());
+		List<TransactionDto> transactionDtoList = Arrays.asList(this.transactionDto);
+		this.transactionInputValidator.validatePendingStatus(transactionDtoList);
 	}
 }
