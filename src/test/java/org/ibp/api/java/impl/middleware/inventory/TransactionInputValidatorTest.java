@@ -101,7 +101,7 @@ public class TransactionInputValidatorTest {
 	public void ValidatePendingStatus(){
 		this.transactionDto.setAmount(10.0);
 		this.transactionDto.setTransactionType(DEPOSIT);
-		this.transactionDto.setNotes(RandomStringUtils.randomAlphabetic(256));
+		this.transactionDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 		this.transactionDto.setTransactionStatus(TransactionStatus.CONFIRMED.getValue());
 		List<TransactionDto> transactionDtoList = Arrays.asList(this.transactionDto);
 		this.transactionInputValidator.validatePendingStatus(transactionDtoList);
