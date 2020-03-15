@@ -336,8 +336,8 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<StudyDto> studyDtos = StudyTestDataProvider.getListStudyDto();
 		final StudyDto studyDto = studyDtos.get(0);
 
-		Mockito.when(this.studyServiceMW.getStudyDTOs(Mockito.any(StudySearchFilter.class))).thenReturn(studyDtos);
-		Mockito.when(this.studyServiceMW.countStudyDTOs(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
+		Mockito.when(this.studyServiceMW.getStudies(Mockito.any(StudySearchFilter.class))).thenReturn(studyDtos);
+		Mockito.when(this.studyServiceMW.countStudies(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies")
 			.build().encode();

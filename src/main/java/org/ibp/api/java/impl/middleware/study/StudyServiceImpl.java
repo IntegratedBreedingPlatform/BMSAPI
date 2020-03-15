@@ -22,7 +22,6 @@ import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.study.FieldMap;
@@ -386,12 +385,12 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public long countStudyDTOs(final StudySearchFilter studySearchFilter) {
-		return this.middlewareStudyService.countStudyDTOs(studySearchFilter);
+	public long countStudies(final StudySearchFilter studySearchFilter) {
+		return this.middlewareStudyService.countStudies(studySearchFilter);
 	}
 
 	@Override
-	public List<StudyDto> getStudyDTOs(final StudySearchFilter studySearchFilter) {
-		return this.middlewareStudyService.getStudyDTOs(studySearchFilter);
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
+		return this.middlewareStudyService.getStudies(studySearchFilter);
 	}
 }

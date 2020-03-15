@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
@@ -135,32 +136,24 @@ public class StudyResourceBrapi {
 		final boolean isSortOrderValid = "ASC".equals(sortOrder) || "DESC".equals(sortOrder) || StringUtils.isEmpty(sortOrder);
 		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
 
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage + 1;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
-		studySearchFilter.setCommonCropName(crop);
-		studySearchFilter.setStudyTypeDbId(studyTypeDbId);
-		studySearchFilter.setProgramDbId(programDbId);
-		studySearchFilter.setLocationDbId(locationDbId);
-		studySearchFilter.setSeasonDbId(seasonDbId);
-		studySearchFilter.setTrialDbId(trialDbId);
-		studySearchFilter.setActive(active);
-		studySearchFilter.getSortedRequest().setPageNumber(finalPageNumber);
-		studySearchFilter.getSortedRequest().setPageSize(finalPageSize);
-		studySearchFilter.getSortedRequest().setSortBy(sortBy);
-		studySearchFilter.getSortedRequest().setSortOrder(sortOrder);
+
+		final SortedPageRequest sortedPageRequest = new SortedPageRequest(finalPageNumber, finalPageSize, sortBy, sortOrder);
+		final StudySearchFilter studySearchFilter =
+			new StudySearchFilter(studyTypeDbId, programDbId, locationDbId, seasonDbId, trialDbId, studyDbId, active, sortedPageRequest);
 
 		final PagedResult<StudyDto> resultPage =
 			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudyDto>() {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyService.countStudyDTOs(studySearchFilter);
+					return StudyResourceBrapi.this.studyService.countStudies(studySearchFilter);
 				}
 
 				@Override
 				public List<StudyDto> getResults(final PagedResult<StudyDto> pagedResult) {
-					return StudyResourceBrapi.this.studyService.getStudyDTOs(studySearchFilter);
+					return StudyResourceBrapi.this.studyService.getStudies(studySearchFilter);
 				}
 			});
 

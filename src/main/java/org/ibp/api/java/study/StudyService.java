@@ -66,7 +66,7 @@ public interface StudyService {
 
 	void updateStudy(final Study study);
 
-	long countStudyDTOs(StudySearchFilter studySearchFilter);
+	long countStudies(StudySearchFilter studySearchFilter);
 
-	List<StudyDto> getStudyDTOs(StudySearchFilter studySearchFilter);
+	List<StudyDto> getStudies(StudySearchFilter studySearchFilter);
 }
