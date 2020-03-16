@@ -114,7 +114,7 @@ public class StudyResourceBrapi {
 	public ResponseEntity<EntityListResponse<StudyDto>> listStudies(@PathVariable final String crop,
 		@ApiParam(value = "Common name for the crop associated with this study.") @RequestParam(value = "commonCropName", required = false)
 		final String commonCropName,
-		@ApiParam(value = "Filter based on study type unique identifier") @RequestParam(value = "studyTypeDbId.", required = false)
+		@ApiParam(value = "Filter based on study type unique identifier") @RequestParam(value = "studyTypeDbId", required = false)
 		final String studyTypeDbId,
 		@ApiParam(value = "Program filter to only return studies associated with given program id.")
 		@RequestParam(value = "programDbId", required = false) final String programDbId,
