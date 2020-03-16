@@ -201,7 +201,7 @@ public class TransactionResource {
 	@ApiOperation(value = "Update Pending Withdrawals", notes = "Update Amount and Notes for pending withdrawals, Modify the lot available balance through the pending transaction")
 	@RequestMapping(value = "/crops/{cropName}/pending-transactions", method = RequestMethod.PATCH)
 	@ResponseBody
-	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('')")
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('UPDATE_PENDING_TRANSACTIONS')")
 	public ResponseEntity<Void> updatePendingTransactions(
 		@PathVariable final String cropName,
 		@ApiParam("New amount or New Available Balance and Notes to be updated per transaction")
