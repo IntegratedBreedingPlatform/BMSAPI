@@ -60,11 +60,11 @@ public class FieldMapService {
 	}
 
 	public String getBlockId(final int datasetId, final Integer trialInstance) {
-		return studyDataManager.getBlockId(datasetId, trialInstance);
+		return this.studyDataManager.getBlockId(datasetId, trialInstance);
 	}
 
-	public FieldmapBlockInfo getBlockInformation(int blockId) {
-		return studyDataManager.getBlockInformation(blockId);
+	public FieldmapBlockInfo getBlockInformation(final int blockId) {
+		return this.studyDataManager.getBlockInformation(blockId);
 	}
 
 	private void extractRangesFromPlotData(final Map<Integer, FieldMap> fieldMaps) {
@@ -222,7 +222,7 @@ public class FieldMapService {
 	}
 
 	private Map<Integer, FieldMap> getDefaultFieldMap() {
-		final Map<Integer, FieldMap> fieldMaps = new HashMap<Integer, FieldMap>();
+		final Map<Integer, FieldMap> fieldMaps = new HashMap<>();
 		return DefaultedMap.defaultedMap(fieldMaps, new Transformer<Integer, FieldMap>() {
 
 			@Override
@@ -242,7 +242,7 @@ public class FieldMapService {
 
 			final List<FieldMapInfo> fieldMapInfoOfStudy =
 					this.studyDataManager.getFieldMapInfoOfStudy(Lists.newArrayList(studyIdentifier),
-							crossExpansionProperties);
+						this.crossExpansionProperties);
 			return new StudyFieldMap(studyType, fieldMapInfoOfStudy);
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException(String.format("There was an error retriving infomration for studyId %s was found.", studyId), e);
@@ -259,7 +259,7 @@ public class FieldMapService {
 		 * @param studyType
 		 * @param middlewareFieldMapInfo
 		 */
-		public StudyFieldMap(final StudyTypeDto studyType, final List<FieldMapInfo> middlewareFieldMapInfo) {
+		StudyFieldMap(final StudyTypeDto studyType, final List<FieldMapInfo> middlewareFieldMapInfo) {
 			super();
 			this.studyType = studyType;
 			this.middlewareFieldMapInfo = middlewareFieldMapInfo;
@@ -269,22 +269,22 @@ public class FieldMapService {
 		/**
 		 * @return the studyType
 		 */
-		public StudyTypeDto getStudyType() {
+		StudyTypeDto getStudyType() {
 			return this.studyType;
 		}
 
 		/**
 		 * @return the middlewareFieldMapInfo
 		 */
-		public FieldMapInfo getMiddlewareFieldMapInfo() {
+		FieldMapInfo getMiddlewareFieldMapInfo() {
 			return this.middlewareFieldMapInfo.get(0);
 		}
 
-		public List<FieldMapTrialInstanceInfo> getMiddlewareTiralInstances() {
+		List<FieldMapTrialInstanceInfo> getMiddlewareTiralInstances() {
 			return this.getFieldmapDataset().getTrialInstances();
 		}
 
-		public FieldMapDatasetInfo getFieldmapDataset() {
+		FieldMapDatasetInfo getFieldmapDataset() {
 			return this.getMiddlewareFieldMapInfo().getDatasets().get(0);
 		}
 

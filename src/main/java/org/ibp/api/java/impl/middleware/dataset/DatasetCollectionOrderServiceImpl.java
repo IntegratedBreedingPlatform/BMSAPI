@@ -56,14 +56,14 @@ public class DatasetCollectionOrderServiceImpl implements DatasetCollectionOrder
 		SERPENTINE_ALONG_ROWS(2),
 		SERPENTINE_ALONG_COLUMNS(3);
 
-		private int id;
+		private final int id;
 
-		CollectionOrder(int id) {
+		CollectionOrder(final int id) {
 			this.id = id;
 		}
 
-		public static CollectionOrder findById(int id) {
-			for (CollectionOrder order : CollectionOrder.values()) {
+		public static CollectionOrder findById(final int id) {
+			for (final CollectionOrder order : CollectionOrder.values()) {
 				if (order.getId() == id) {
 					return order;
 				}

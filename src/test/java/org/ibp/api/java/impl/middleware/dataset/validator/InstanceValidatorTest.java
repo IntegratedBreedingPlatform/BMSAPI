@@ -40,8 +40,8 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Before
 	public void init() {
-		this.datasetId = random.nextInt();
-		Mockito.doReturn(datasetId).when(this.middlewareStudyService).getEnvironmentDatasetId(ArgumentMatchers.anyInt());
+		this.datasetId = this.random.nextInt();
+		Mockito.doReturn(this.datasetId).when(this.middlewareStudyService).getEnvironmentDatasetId(ArgumentMatchers.anyInt());
 		when(this.studyDataManager.areAllInstancesExistInDataset(ArgumentMatchers.eq(this.datasetId), ArgumentMatchers.anySet()))
 			.thenReturn(true);
 		when(this.studyDataManager.areAllInstancesExistInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anySet())).thenReturn(true);
@@ -49,13 +49,13 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceIds_Success() {
-		final int instanceId = random.nextInt();
+		final int instanceId = this.random.nextInt();
 		this.instanceValidator.validate(this.datasetId, Sets.newHashSet(instanceId));
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateInstanceIds_Fail() {
-		final int instanceId = random.nextInt();
+		final int instanceId = this.random.nextInt();
 
 		when(this.studyDataManager.areAllInstancesExistInDataset(this.datasetId, Sets.newHashSet(instanceId))).thenReturn(false);
 		this.instanceValidator.validate(this.datasetId, Sets.newHashSet(instanceId));
@@ -64,7 +64,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 	@Test
 	public void testValidateInstanceDeletionFail_EmptyInstanceNumbers() {
 		try {
-			this.instanceValidator.validateStudyInstance(random.nextInt(), null, random.nextBoolean());
+			this.instanceValidator.validateStudyInstance(this.random.nextInt(), null, this.random.nextBoolean());
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -74,10 +74,10 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceDeletionFail_StudyHasNoInstances() {
-		final HashSet<Integer> instanceIds = new HashSet<>(Arrays.asList(random.nextInt(), random.nextInt()));
+		final HashSet<Integer> instanceIds = new HashSet<>(Arrays.asList(this.random.nextInt(), this.random.nextInt()));
 		when(this.studyDataManager.areAllInstancesExistInDataset(this.datasetId, instanceIds)).thenReturn(false);
 		try {
-			this.instanceValidator.validateStudyInstance(this.datasetId, instanceIds, random.nextBoolean());
+			this.instanceValidator.validateStudyInstance(this.datasetId, instanceIds, this.random.nextBoolean());
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -89,7 +89,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 	public void testValidateInstanceNumbersFail_StudyHasNoInstances() {
 		Mockito.doReturn(Collections.emptyList()).when(this.studyInstanceService).getStudyInstances(ArgumentMatchers.anyInt());
 		try {
-			this.instanceValidator.validateInstanceNumbers(random.nextInt(), Collections.singleton(random.nextInt()));
+			this.instanceValidator.validateInstanceNumbers(this.random.nextInt(), Collections.singleton(this.random.nextInt()));
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -105,7 +105,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		instances.add(new StudyInstance(303, 3, false, false, false, true));
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(ArgumentMatchers.anyInt());
 		try {
-			this.instanceValidator.validateInstanceNumbers(random.nextInt(), new HashSet<>(Arrays.asList(1, 102)));
+			this.instanceValidator.validateInstanceNumbers(this.random.nextInt(), new HashSet<>(Arrays.asList(1, 102)));
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -115,7 +115,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceNumbersFail_AllSelectedInstancesCantBeDeleted() {
-		final int studyId = random.nextInt();
+		final int studyId = this.random.nextInt();
 		final List<StudyInstance> instances = this.createTestInstances();
 		instances.get(0).setCanBeDeleted(Boolean.FALSE);
 		instances.get(1).setCanBeDeleted(Boolean.FALSE);
@@ -132,7 +132,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceNumbersSuccess_SomeSelectedInstancesCantBeDeleted() {
-		final int studyId = random.nextInt();
+		final int studyId = this.random.nextInt();
 		final List<StudyInstance> instances = this.createTestInstances(3);
 		instances.get(0).setCanBeDeleted(Boolean.FALSE);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
@@ -142,7 +142,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceNumbersSuccess_AllInstancesCanBeDeleted() {
-		final int studyId = random.nextInt();
+		final int studyId = this.random.nextInt();
 		final List<StudyInstance> instances = this.createTestInstances(2);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
 
@@ -151,7 +151,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceNumbersSuccess_StudyHasOneInstance() {
-		final int studyId = random.nextInt();
+		final int studyId = this.random.nextInt();
 		final List<StudyInstance> instances = this.createTestInstances(1);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
 
@@ -160,8 +160,8 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceDeletionFail_AllSelectedInstancesCantBeDeleted() {
-		final int studyId = random.nextInt();
-		final List<StudyInstance> instances = createTestInstances();
+		final int studyId = this.random.nextInt();
+		final List<StudyInstance> instances = this.createTestInstances();
 		instances.get(0).setCanBeDeleted(Boolean.FALSE);
 		instances.get(1).setCanBeDeleted(Boolean.FALSE);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
@@ -177,8 +177,8 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceDeletionFail_OnlyOneStudyInstanceRemaining() {
-		final int studyId = random.nextInt();
-		final List<StudyInstance> instances = createTestInstances(1);
+		final int studyId = this.random.nextInt();
+		final List<StudyInstance> instances = this.createTestInstances(1);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
 
 		try {
@@ -209,8 +209,8 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceDeletionFail_AllInstancesShouldBeDeletableButOneIsNot() {
-		final int studyId = random.nextInt();
-		final List<StudyInstance> instances = createTestInstances();
+		final int studyId = this.random.nextInt();
+		final List<StudyInstance> instances = this.createTestInstances();
 		instances.get(0).setCanBeDeleted(Boolean.FALSE);
 		instances.get(1).setCanBeDeleted(Boolean.FALSE);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
@@ -227,8 +227,8 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 	@Test
 	public void testValidateInstanceDeletionSuccess_AllSelectedInstancesShouldBeDeletable() {
 
-		final int studyId = random.nextInt();
-		final List<StudyInstance> instances = createTestInstances();
+		final int studyId = this.random.nextInt();
+		final List<StudyInstance> instances = this.createTestInstances();
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
 
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(101), true);
@@ -237,8 +237,8 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceDeletionSuccess_SomeSelectedInstancesCantBeDeleted() {
-		final int studyId = random.nextInt();
-		final List<StudyInstance> instances = createTestInstances();
+		final int studyId = this.random.nextInt();
+		final List<StudyInstance> instances = this.createTestInstances();
 		instances.get(0).setCanBeDeleted(Boolean.FALSE);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
 
@@ -247,11 +247,11 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceDeletionSuccess_AllInstancesCanBeDeleted() {
-		final int studyId = random.nextInt();
-		final List<StudyInstance> instances = createTestInstances();
+		final int studyId = this.random.nextInt();
+		final List<StudyInstance> instances = this.createTestInstances();
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
 
-		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(Arrays.asList(101, 102, 1033)), random.nextBoolean());
+		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(Arrays.asList(101, 102, 1033)), this.random.nextBoolean());
 	}
 
 }

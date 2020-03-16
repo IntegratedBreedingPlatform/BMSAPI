@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class StudyInstanceResourceTest extends ApiUnitTestBase {
 
-	public static final int BOUND = 10;
+	private static final int BOUND = 10;
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;

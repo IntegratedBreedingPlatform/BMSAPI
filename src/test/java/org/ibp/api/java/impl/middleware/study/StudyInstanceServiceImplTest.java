@@ -35,7 +35,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class StudyInstanceServiceImplTest {
 
-	public static final int BOUND = 10;
+	private static final int BOUND = 10;
+
 	@Mock
 	private org.generationcp.middleware.service.api.study.StudyInstanceService studyInstanceMiddlewareService;
 

@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
 
-	public static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
+	private static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
 
 	@Autowired
 	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
@@ -95,7 +95,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private DatasetTypeService datasetTypeService;
 
-	public static final String PLOT_DATASET_NAME = "Observations";
+	static final String PLOT_DATASET_NAME = "Observations";
 
 	@Override
 	public List<MeasurementVariable> getObservationSetColumns(

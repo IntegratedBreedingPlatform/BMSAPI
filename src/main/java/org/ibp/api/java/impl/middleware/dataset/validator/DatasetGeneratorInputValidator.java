@@ -48,9 +48,9 @@ public class DatasetGeneratorInputValidator {
 
 	private final VariableType observationUnitVariableType;
 
-	static final String DATASET_NAME_REGEX = "^[a-zA-Z0-9\\s(\\\\/:*?\\\"\"<>|.)]*$";
+	private static final String DATASET_NAME_REGEX = "^[a-zA-Z0-9\\s(\\\\/:*?\\\"\"<>|.)]*$";
 
-	static final Pattern DATASET_NAME_PATTERN = Pattern.compile(DatasetGeneratorInputValidator.DATASET_NAME_REGEX);
+	private static final Pattern DATASET_NAME_PATTERN = Pattern.compile(DatasetGeneratorInputValidator.DATASET_NAME_REGEX);
 
 	DatasetGeneratorInputValidator() {
 		this.observationUnitVariableType =

@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DatasetExcelExportServiceImplTest {
 
-	public static final int RANDOM_STRING_LENGTH = 10;
+	private static final int RANDOM_STRING_LENGTH = 10;
 
 	@Mock
 	private StudyValidator studyValidator;
@@ -90,12 +90,12 @@ public class DatasetExcelExportServiceImplTest {
 
 	private final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
-	final Random random = new Random();
-	final Study study = new Study();
-	final DataSet trialDataSet = new DataSet();
-	final DatasetDTO dataSetDTO = new DatasetDTO();
-	final int instanceId1 = this.random.nextInt();
-	final int instanceId2 = this.random.nextInt();
+	private final Random random = new Random();
+	private final Study study = new Study();
+	private final DataSet trialDataSet = new DataSet();
+	private final DatasetDTO dataSetDTO = new DatasetDTO();
+	private final int instanceId1 = this.random.nextInt();
+	private final int instanceId2 = this.random.nextInt();
 
 	@Before
 	public void setUp() {
@@ -154,12 +154,12 @@ public class DatasetExcelExportServiceImplTest {
 		final Map<Integer, StudyInstance> studyInstanceMap = this.datasetExportService
 			.getSelectedDatasetInstancesMap(this.createStudyInstances(), new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2)));
 		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
-		instanceObservationUnitRowsMap.put(this.instanceId1, new ArrayList<ObservationUnitRow>());
-		instanceObservationUnitRowsMap.put(this.instanceId2, new ArrayList<ObservationUnitRow>());
+		instanceObservationUnitRowsMap.put(this.instanceId1, new ArrayList<>());
+		instanceObservationUnitRowsMap.put(this.instanceId2, new ArrayList<>());
 
 		final File result = this.datasetExportService
 			.generateFiles(
-				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<MeasurementVariable>(),
+				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<>(),
 				this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
 		verify(this.datasetExcelGenerator, Mockito.times(studyInstanceMap.size()))
 			.generateSingleInstanceFile(
@@ -175,8 +175,8 @@ public class DatasetExcelExportServiceImplTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final File excelFile = new File("");
 		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
-		instanceObservationUnitRowsMap.put(1, new ArrayList<ObservationUnitRow>());
-		instanceObservationUnitRowsMap.put(2, new ArrayList<ObservationUnitRow>());
+		instanceObservationUnitRowsMap.put(1, new ArrayList<>());
+		instanceObservationUnitRowsMap.put(2, new ArrayList<>());
 
 		when(
 			this.datasetExcelGenerator.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), eq(measurementVariables), anyString()))
@@ -203,13 +203,13 @@ public class DatasetExcelExportServiceImplTest {
 			.thenReturn(excelFile);
 
 		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
-		instanceObservationUnitRowsMap.put(1, new ArrayList<ObservationUnitRow>());
+		instanceObservationUnitRowsMap.put(1, new ArrayList<>());
 
 		final StudyInstance studyInstance = this.createStudyInstance(1);
 		final Map<Integer, StudyInstance> studyInstanceMap = new HashMap<>();
 		studyInstanceMap.put(1, studyInstance);
 		final File result = this.datasetExportService.generateFiles(
-				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<MeasurementVariable>(),
+				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<>(),
 				this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
 
 		verify(this.datasetExcelGenerator)
@@ -226,11 +226,11 @@ public class DatasetExcelExportServiceImplTest {
 	public void testGetSelectedDatasetInstancesMap() {
 		final List<StudyInstance> studyInstances = this.createStudyInstances();
 		Map<Integer, StudyInstance> selectedDatasetInstanceMap =
-			this.datasetExportService.getSelectedDatasetInstancesMap(studyInstances, new HashSet<Integer>(Arrays.asList(this.instanceId2)));
+			this.datasetExportService.getSelectedDatasetInstancesMap(studyInstances, new HashSet<>(Arrays.asList(this.instanceId2)));
 		Assert.assertEquals(1, selectedDatasetInstanceMap.size());
 
 		selectedDatasetInstanceMap = this.datasetExportService
-			.getSelectedDatasetInstancesMap(studyInstances, new HashSet<Integer>(Arrays.asList(this.instanceId1, this.instanceId2)));
+			.getSelectedDatasetInstancesMap(studyInstances, new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2)));
 		Assert.assertEquals(2, selectedDatasetInstanceMap.size());
 	}
 

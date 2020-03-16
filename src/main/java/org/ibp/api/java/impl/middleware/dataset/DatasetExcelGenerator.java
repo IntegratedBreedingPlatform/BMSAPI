@@ -645,7 +645,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return sb.toString();
 	}
 
-	protected String concatenateMinMaxValueIfAvailable(final MeasurementVariable measurementVariable) {
+	private String concatenateMinMaxValueIfAvailable(final MeasurementVariable measurementVariable) {
 
 		if (measurementVariable.getMinRange() == null && measurementVariable.getMaxRange() == null) {
 			return NO_RANGE;
