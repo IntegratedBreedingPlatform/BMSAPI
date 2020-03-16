@@ -59,6 +59,20 @@ public class TransactionResource {
 	@Autowired
 	private SecurityService securityService;
 
+	@ApiOperation(value = "Get Transaction types")
+	@RequestMapping(value = "/crops/{cropName}/transaction-types", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<TransactionType>> getTransactionTypes(@PathVariable final String cropName) {
+		return new ResponseEntity<>(this.transactionService.getAllTransactionTypes(), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get Transaction status types")
+	@RequestMapping(value = "/crops/{cropName}/transaction-status-types", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<TransactionStatus>> getTransactionStatusTypes(@PathVariable final String cropName) {
+		return new ResponseEntity<>(this.transactionService.getAllTransactionStatus(), HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Post transaction search", notes = "Post transaction search")
 	@RequestMapping(value = "/crops/{cropName}/transactions/search", method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")

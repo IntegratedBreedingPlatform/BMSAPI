@@ -8,6 +8,8 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
+import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
@@ -64,4 +66,7 @@ public interface StudyService {
 
 	void updateStudy(final Study study);
 
+	long countStudies(StudySearchFilter studySearchFilter);
+
+	List<StudyDto> getStudies(StudySearchFilter studySearchFilter);
 }

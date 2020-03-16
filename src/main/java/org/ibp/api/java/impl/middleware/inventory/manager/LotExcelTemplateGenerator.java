@@ -136,7 +136,6 @@ public class LotExcelTemplateGenerator {
 		int currentRowNum = 0;
 
 		this.writeLotsHeader(xlsBook, xlsSheet, currentRowNum++);
-		xlsSheet.createRow(currentRowNum++);
 	}
 
 	private void writeLotsHeader(

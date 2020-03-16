@@ -47,8 +47,6 @@ public class LotItemDtoListValidatorTest {
 	@Mock
 	private LotService lotService;
 
-	final List<LotItemDto> lotList = new ArrayList<>();
-
 	@Before
 	public void setup() {
 
@@ -65,10 +63,21 @@ public class LotItemDtoListValidatorTest {
 	}
 
 	@Test
-	public void testValidateListEmpty() {
-		this.lotList.add(null);
+	public void testValidateEmptyList() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		try {
-			this.lotItemDtoListValidator.validate(this.lotList);
+			this.lotItemDtoListValidator.validate(lotList);
+		} catch (ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.no.items"));
+		}
+	}
+
+	@Test
+	public void testValidateListWithNullItem() {
+		final List<LotItemDto> lotList = new ArrayList<>();
+		lotList.add(null);
+		try {
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.item.null"));
 		}
@@ -76,12 +85,13 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateGermplasmListEmpty() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		try {
 			lotItemDto.setGid(null);
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.gid.null"));
 		}
@@ -89,13 +99,15 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateGermplasmListInvalid() {
+		final List<LotItemDto> lotList = new ArrayList<>();
+
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList());
 
 		try {
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.invalid.gids"));
 
@@ -104,14 +116,15 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateStorageLocationsNull() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
 
 		try {
 			lotItemDto.setStorageLocationAbbr("");
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.location.abbreviation.null.or.empty"));
 		}
@@ -119,14 +132,15 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateStorageLocationsInvalid() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
 
 		try {
 			lotItemDto.setStorageLocationAbbr("");
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.location.abbreviation.null.or.empty"));
 		}
@@ -134,6 +148,7 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateScaleNamesNull() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
@@ -147,8 +162,8 @@ public class LotItemDtoListValidatorTest {
 
 		try {
 			lotItemDto.setScaleName(null);
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.units.null.or.empty"));
 		}
@@ -156,6 +171,7 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateScaleNamesInvalid() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
@@ -175,8 +191,8 @@ public class LotItemDtoListValidatorTest {
 
 		try {
 			lotItemDto.setScaleName("Amount");
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.invalid.units"));
 		}
@@ -184,6 +200,7 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateStockIdsNull() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
@@ -203,8 +220,8 @@ public class LotItemDtoListValidatorTest {
 
 		try {
 			lotItemDto.setStockId(null);
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.stock.ids.null.or.empty"));
 		}
@@ -212,6 +229,7 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateStockIdsMaxLength() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
@@ -231,15 +249,16 @@ public class LotItemDtoListValidatorTest {
 
 		try {
 			lotItemDto.setStockId(RandomStringUtils.randomAlphabetic(256));
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.stock.id.length.higher.than.maximum"));
 		}
 	}
 
 	@Test
-	public void testValidateStockIdsDuplicated() {
+	public void testValidateStockIdsDuplicated() {	
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 		final LotItemDto lotItemDto1 = createLotItemDto();
 
@@ -261,9 +280,9 @@ public class LotItemDtoListValidatorTest {
 
 		try {
 			lotItemDto1.setGid(2);
-			this.lotList.add(lotItemDto);
-			this.lotList.add(lotItemDto1);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			lotList.add(lotItemDto1);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.stock.ids.duplicated"));
 		}
@@ -271,6 +290,7 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateStockIdsInvalid() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
@@ -289,8 +309,8 @@ public class LotItemDtoListValidatorTest {
 		Mockito.when(this.variableService.getVariablesByFilter(Mockito.any())).thenReturn(existingInventoryScales);
 
 		try {
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.stock.ids.invalid"));
 		}
@@ -298,6 +318,7 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateInitialBalancesNull() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
@@ -317,8 +338,8 @@ public class LotItemDtoListValidatorTest {
 
 		try {
 			lotItemDto.setInitialBalance(null);
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.initial.balances.null"));
 
@@ -327,6 +348,7 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateInitialBalancesNegative() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
@@ -346,8 +368,8 @@ public class LotItemDtoListValidatorTest {
 
 		try {
 			lotItemDto.setInitialBalance((double) -11);
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.initial.balances.negative.values"));
 
@@ -356,6 +378,7 @@ public class LotItemDtoListValidatorTest {
 
 	@Test
 	public void testValidateComments() {
+		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
 		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
@@ -375,8 +398,8 @@ public class LotItemDtoListValidatorTest {
 
 		try {
 			lotItemDto.setNotes(RandomStringUtils.randomAlphabetic(256));
-			this.lotList.add(lotItemDto);
-			this.lotItemDtoListValidator.validate(this.lotList);
+			lotList.add(lotItemDto);
+			this.lotItemDtoListValidator.validate(lotList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.notes.length"));
 		}
