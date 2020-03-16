@@ -198,7 +198,8 @@ public class TransactionResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Update Pending Withdrawals", notes = "Update Amount and Notes for pending withdrawals, Modify the lot available balance through the pending transaction")
+	@ApiOperation(value = "Update Pending Transactions", notes = "Update Amount and Notes for pending transactions, Modify the lot available balance through the pending transaction. "
+		+ "Important: The operations are executed in sequential order. Supported types: Withdrawals, Deposits ")
 	@RequestMapping(value = "/crops/{cropName}/pending-transactions", method = RequestMethod.PATCH)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('UPDATE_PENDING_TRANSACTIONS')")
