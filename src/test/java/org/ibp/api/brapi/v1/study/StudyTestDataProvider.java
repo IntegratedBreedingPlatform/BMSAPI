@@ -101,9 +101,7 @@ public class StudyTestDataProvider {
 		studyDto.setStartDate(new Date());
 		studyDto.setEndDate(new Date());
 
-		final SeasonDto seasonDto = new SeasonDto();
-		seasonDto.setSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId()));
-		seasonDto.setSeason("Dry Season");
+		final SeasonDto seasonDto = new SeasonDto("Dry Season", String.valueOf(TermId.SEASON_DRY.getId()));
 		studyDto.setSeasons(Arrays.asList(seasonDto));
 
 		studyDto.setStudyDbId("1");
