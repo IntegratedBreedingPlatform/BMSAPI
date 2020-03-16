@@ -5,7 +5,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudyEnvironmentService;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
@@ -31,7 +31,7 @@ public class StudyValidator {
 	private StudyDataManager studyDataManager;
 
 	@Resource
-	private StudyEnvironmentService studyEnvironmentService;
+	private StudyInstanceService studyInstanceService;
 
 	private BindingResult errors;
 
@@ -77,7 +77,7 @@ public class StudyValidator {
 		this.validate(studyId, shouldBeUnlocked);
 
 		if (allInstancesShouldBeDeletable) {
-			final List<StudyInstance> studyInstances = this.studyEnvironmentService.getStudyEnvironments(studyId);
+			final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 			final List<Integer> restrictedInstances =
 				studyInstances.stream().filter(instance -> BooleanUtils.isFalse(instance.getCanBeDeleted()))
 					.map(instance -> instance.getInstanceNumber()).collect(Collectors.toList());

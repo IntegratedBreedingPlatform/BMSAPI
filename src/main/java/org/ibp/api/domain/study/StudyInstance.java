@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class StudyInstance {
 
-	private int experimentId;
+	private int instanceId;
 	private String locationName;
 	private String locationAbbreviation;
 	private String customLocationAbbreviation;
@@ -22,9 +22,9 @@ public class StudyInstance {
 
 	}
 
-	public StudyInstance(final int experimentId, final String locationName, final String locationAbbreviation,
+	public StudyInstance(final int instanceId, final String locationName, final String locationAbbreviation,
 		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldmap) {
-		this.experimentId = experimentId;
+		this.instanceId = instanceId;
 		this.locationName = locationName;
 		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
@@ -96,12 +96,12 @@ public class StudyInstance {
 		this.canBeDeleted = canBeDeleted;
 	}
 
-	public int getExperimentId() {
-		return this.experimentId;
+	public int getInstanceId() {
+		return this.instanceId;
 	}
 
-	public void setExperimentId(final int experimentId) {
-		this.experimentId = experimentId;
+	public void setInstanceId(final int instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	@Override
@@ -110,12 +110,12 @@ public class StudyInstance {
 			return false;
 		}
 		final StudyInstance castOther = (StudyInstance) other;
-		return new EqualsBuilder().append(this.experimentId, castOther.experimentId).isEquals();
+		return new EqualsBuilder().append(this.instanceId, castOther.instanceId).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.experimentId).toHashCode();
+		return new HashCodeBuilder().append(this.instanceId).toHashCode();
 	}
 
 	@Override

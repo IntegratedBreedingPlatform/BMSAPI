@@ -206,7 +206,7 @@ public class DatasetExcelGeneratorTest {
 	public void testGenerateSingleInstanceFile() throws IOException {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setExperimentId(INSTANCE_DB_ID);
+		studyInstance.setInstanceId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
@@ -239,7 +239,7 @@ public class DatasetExcelGeneratorTest {
 	public void testGenerateMultiInstanceFile() {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setExperimentId(INSTANCE_DB_ID);
+		studyInstance.setInstanceId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
@@ -252,7 +252,7 @@ public class DatasetExcelGeneratorTest {
 	public void testDescriptionSheet() throws IOException {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setExperimentId(INSTANCE_DB_ID);
+		studyInstance.setInstanceId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
@@ -287,7 +287,7 @@ public class DatasetExcelGeneratorTest {
 		final Random random = new Random();
 		final int environmentDatasetId = random.nextInt(10);
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setExperimentId(random.nextInt(10));
+		studyInstance.setInstanceId(random.nextInt(10));
 		final int studyConditionTermid = 100;
 		final String studyConditionValue = "99";
 
@@ -305,7 +305,7 @@ public class DatasetExcelGeneratorTest {
 		final Map<Integer, String> environmentConditionMap = new HashMap<>();
 		environmentConditionMap.put(studyConditionVariable.getTermId(), studyConditionValue);
 
-		when(this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, studyInstance.getExperimentId()))
+		when(this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, studyInstance.getInstanceId()))
 			.thenReturn(environmentConditionMap);
 		final List<MeasurementVariable> environmentVariables = Arrays.asList(studyConditionVariable, environmentDetailVariable);
 
@@ -329,7 +329,7 @@ public class DatasetExcelGeneratorTest {
 		studyInstance.setLocationId(locationId);
 		studyInstance.setLocationName(locationName);
 		studyInstance.setInstanceNumber(instanceNumber);
-		studyInstance.setExperimentId(instanceDbId);
+		studyInstance.setInstanceId(instanceDbId);
 
 		final MeasurementVariable trialInstanceVariable = new MeasurementVariable();
 		trialInstanceVariable.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
@@ -355,7 +355,7 @@ public class DatasetExcelGeneratorTest {
 			.thenReturn(standardVariable);
 		final Map<Integer, String> geoLocationMap = new HashMap<>();
 		geoLocationMap.put(someVariableTermId, someVariableValue);
-		when(this.studyDataManager.getEnvironmentVariableIdValuesMap(environmentDatasetId, studyInstance.getExperimentId()))
+		when(this.studyDataManager.getEnvironmentVariableIdValuesMap(environmentDatasetId, studyInstance.getInstanceId()))
 			.thenReturn(geoLocationMap);
 
 		final List<MeasurementVariable> result =

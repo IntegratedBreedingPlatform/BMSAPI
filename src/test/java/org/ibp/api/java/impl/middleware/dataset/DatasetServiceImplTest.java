@@ -30,7 +30,6 @@ import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
@@ -546,13 +545,13 @@ public class DatasetServiceImplTest {
 		datasetDTO.setVariables(Lists.newArrayList(measurementVariable));
 
 		final StudyInstance studyInstance1 = new StudyInstance();
-		studyInstance1.setExperimentId(1);
+		studyInstance1.setInstanceId(1);
 
 		final StudyInstance studyInstance2 = new StudyInstance();
-		studyInstance2.setExperimentId(2);
+		studyInstance2.setInstanceId(2);
 
 		final StudyInstance studyInstance3 = new StudyInstance();
-		studyInstance3.setExperimentId(3);
+		studyInstance3.setInstanceId(3);
 
 		datasetDTO.setInstances(Lists.newArrayList(studyInstance1, studyInstance2, studyInstance3));
 		Mockito.doReturn(datasetDTO).when(this.middlewareDatasetService).generateSubObservationDataset(TEST_STUDY_IDENTIFIER, DATASET_NAME,

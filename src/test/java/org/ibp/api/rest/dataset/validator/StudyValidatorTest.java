@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudyEnvironmentService;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
@@ -41,7 +41,7 @@ public class StudyValidatorTest {
 	private StudyDataManager studyDataManager;
 
 	@Mock
-	private StudyEnvironmentService studyEnvironmentService;
+	private StudyInstanceService studyInstanceService;
 
 	@InjectMocks
 	private StudyValidator studyValidator;
@@ -129,7 +129,7 @@ public class StudyValidatorTest {
 			1,
 			RandomStringUtils.randomAlphabetic(10), false);
 		studyInstance2.setCanBeDeleted(true);
-		Mockito.when(this.studyEnvironmentService.getStudyEnvironments(studyId))
+		Mockito.when(this.studyInstanceService.getStudyInstances(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 		try {
 			this.studyValidator.validate(studyId, ran.nextBoolean(), true);
@@ -163,7 +163,7 @@ public class StudyValidatorTest {
 			1,
 			RandomStringUtils.randomAlphabetic(10), false);
 		studyInstance2.setCanBeDeleted(true);
-		Mockito.when(this.studyEnvironmentService.getStudyEnvironments(studyId))
+		Mockito.when(this.studyInstanceService.getStudyInstances(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 
 		this.studyValidator.validate(studyId, ran.nextBoolean(), true);
@@ -181,7 +181,7 @@ public class StudyValidatorTest {
 
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		this.studyValidator.validate(studyId, ran.nextBoolean(), false);
-		Mockito.verifyZeroInteractions(this.studyEnvironmentService);
+		Mockito.verifyZeroInteractions(this.studyInstanceService);
 	}
 
 

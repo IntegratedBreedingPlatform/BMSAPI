@@ -953,7 +953,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		datasetDTO.setVariables(variables);
 
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setExperimentId(67);
+		studyInstance.setInstanceId(67);
 		studyInstance.setLocationName("CENTER FOR INTERNATIONAL FORESTRY RESEARCH");
 		studyInstance.setLocationAbbreviation("CIFOR");
 		studyInstance.setInstanceNumber(1);

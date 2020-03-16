@@ -4,7 +4,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.BooleanUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.study.StudyEnvironmentService;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class InstanceValidator {
 	private StudyDataManager studyDataManager;
 
 	@Autowired
-	private StudyEnvironmentService studyEnvironmentService;
+	private StudyInstanceService studyInstanceService;
 
 	private BindingResult errors;
 
@@ -62,10 +62,10 @@ public class InstanceValidator {
 	public void validateInstanceNumbers(final Integer studyId, final Set<Integer> instanceNumbers) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		final List<StudyInstance> studyInstances = this.studyEnvironmentService.getStudyEnvironments(studyId);
+		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 		final Set<Integer> selectedInstanceIds =
 			studyInstances.stream().filter(instance -> instanceNumbers.contains(instance.getInstanceNumber()))
-				.map(StudyInstance::getExperimentId).collect(Collectors.toSet());
+				.map(StudyInstance::getInstanceId).collect(Collectors.toSet());
 
 		if (instanceNumbers.size() != selectedInstanceIds.size()) {
 			this.errors.reject("dataset.non.existent.instances");
@@ -87,7 +87,7 @@ public class InstanceValidator {
 
 	private void validateInstancesDeletability(final Integer studyId, final Set<Integer> instanceIds,
 		final Boolean enforceAllInstancesDeletable) {
-		final List<StudyInstance> studyInstances = this.studyEnvironmentService.getStudyEnvironments(studyId);
+		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 
 		// Raise error if the environment/s to be deleted will cause study to have no remaining environment
 		if (enforceAllInstancesDeletable && (studyInstances.size() - instanceIds.size()) < 1) {
@@ -97,7 +97,7 @@ public class InstanceValidator {
 
 		final List<Integer> restrictedInstances =
 			studyInstances.stream().filter(instance -> BooleanUtils.isFalse(instance.getCanBeDeleted()))
-				.map(StudyInstance::getExperimentId).collect(Collectors.toList());
+				.map(StudyInstance::getInstanceId).collect(Collectors.toList());
 
 		// Raise error if any of the instances are not deletable when enforceAllInstancesDeletable = true
 		if (enforceAllInstancesDeletable && !instanceIds.stream()

@@ -81,7 +81,7 @@ import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
-import org.generationcp.middleware.service.api.study.StudyEnvironmentService;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -97,7 +97,7 @@ import org.generationcp.middleware.service.impl.rpackage.RPackageServiceImpl;
 import org.generationcp.middleware.service.impl.study.MeasurementVariableServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
-import org.generationcp.middleware.service.impl.study.StudyEnvironmentServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
@@ -478,8 +478,8 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public StudyEnvironmentService studyEnvironmentMiddlewareService() {
-		return new StudyEnvironmentServiceImpl(this.getCropDatabaseSessionProvider());
+	public StudyInstanceService studyEnvironmentMiddlewareService() {
+		return new StudyInstanceServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

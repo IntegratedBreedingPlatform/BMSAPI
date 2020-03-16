@@ -93,7 +93,7 @@ public class DatasetCollectionOrderServiceImplTest {
 
 	private StudyInstance createStudyInstance(final Integer instanceId) {
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setExperimentId(instanceId);
+		studyInstance.setInstanceId(instanceId);
 		studyInstance.setInstanceNumber(instanceId);
 		studyInstance.setLocationName("LOC - " + instanceId);
 		return studyInstance;
