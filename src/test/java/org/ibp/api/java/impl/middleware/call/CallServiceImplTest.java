@@ -44,7 +44,7 @@ public class CallServiceImplTest {
 		resetInputStream();
 
 		final List<Map<String, Object>> result3 = this.callService.getAllCalls(null, null, null);
-		Assert.assertEquals("Should return all records if pageSize and pageNumber are not specified", 21, result3.size());
+		Assert.assertEquals("Should return all records if pageSize and pageNumber are not specified", 22, result3.size());
 		resetInputStream();
 
 		// Search by BrAPI v1.2 where CSV data type = csv
