@@ -37,7 +37,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 	private List<TransactionDto> transactionDtos = new ArrayList<>();
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
 		transactionsSearchDto.setTransactionIds(Arrays.asList(1, 2));
 		Mockito.when(transactionService.searchTransactions(transactionsSearchDto, null)).thenReturn(transactionDtos);
