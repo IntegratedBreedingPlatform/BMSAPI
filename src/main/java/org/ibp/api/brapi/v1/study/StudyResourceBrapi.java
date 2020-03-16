@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import liquibase.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -19,12 +19,15 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -105,39 +108,65 @@ public class StudyResourceBrapi {
 	@Autowired
 	InstanceValidator instanceValidator;
 
-	@ApiOperation(value = "List of study summaries", notes = "Get a list of study summaries.")
-	// TODO implement
-	// @RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
+	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
+	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<StudySummariesDto> listStudySummaries(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<StudyDto>> listStudies(@PathVariable final String crop,
+		@ApiParam(value = "Common name for the crop associated with this study.") @RequestParam(value = "commonCropName", required = false)
+		final String commonCropName,
+		@ApiParam(value = "Filter based on study type unique identifier") @RequestParam(value = "studyTypeDbId.", required = false)
+		final String studyTypeDbId,
+		@ApiParam(value = "Program filter to only return studies associated with given program id.")
+		@RequestParam(value = "programDbId", required = false) final String programDbId,
+		@ApiParam(value = "Filter by location.") @RequestParam(value = "locationDbId", required = false) final String locationDbId,
+		@ApiParam(value = "Filter by season.") @RequestParam(value = "seasonDbId", required = false) final String seasonDbId,
 		@ApiParam(
-			value = "Studies are contained within a trial.  Provide the db id of the trial to list summary of studies within the trial. "
-				+ "Use <code>GET /{crop}/brapi/v1/trials</code> service to retrieve trial summaries first to obtain trialDbIds to supply here. ",
-			required = true) @RequestParam(value = "trialDbId", required = false) final String trialDbId,
+			value =
+				"Filter by trial.") @RequestParam(value = "trialDbId", required = false) final String trialDbId,
+		@ApiParam(value = "Filter by study DbId") @RequestParam(value = "studyDbId", required = false) final String studyDbId,
+		@ApiParam(value = "Filter active status true/false.") @RequestParam(value = "active", required = false) final Boolean active,
+		@ApiParam(value = "Name of the field to sort by.") @RequestParam(value = "sortBy", required = false) final String sortBy,
+		@ApiParam(value = "Sort order direction. Ascending/Descending.") @RequestParam(value = "sortOrder", required = false)
+		final String sortOrder,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
 
-		/***
-		 * Study in BrAPI land = Environment/Instance in BMS/Middleware land. We need to build services in Middleware to list all
-		 * Environment/Instance metadata for a given trialDbId (required parameter). BrAPI does not yet have the trialDbId parameters but we
-		 * need it here so we are going to add it and implement anyway. In future we may support taking array of trial Ids to list studies
-		 * for. There is no point listing all instance/environment summaries across all trials.
-		 *
-		 * studyDbId in BrAPI will map to nd_geolocation_id in Middleware.
-		 *
-		 * For now, just returning an empty place holder message with status. For posterity, keep in mind that BRAPI paging starts at index
-		 * 0.
-		 */
+		final boolean isSortOrderValid = "ASC".equals(sortOrder) || "DESC".equals(sortOrder) || StringUtils.isEmpty(sortOrder);
+		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
 
-		final Result<org.ibp.api.brapi.v1.study.StudySummaryDto> results = new Result<>();
-		final Pagination pagination = new Pagination();
-		final Metadata metadata = new Metadata().withPagination(pagination)
-			.withStatus(Collections.singletonList(Maps.newHashMap(ImmutableMap.of("message", "This call is not yet implemented."))));
-		final StudySummariesDto studiesList = new StudySummariesDto().setMetadata(metadata).setResult(results);
+		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage + 1;
+		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 
-		return new ResponseEntity<>(studiesList, HttpStatus.OK);
+		final SortedPageRequest sortedPageRequest = new SortedPageRequest(finalPageNumber, finalPageSize, sortBy, sortOrder);
+		final StudySearchFilter studySearchFilter =
+			new StudySearchFilter(studyTypeDbId, programDbId, locationDbId, seasonDbId, trialDbId, studyDbId, active, sortedPageRequest);
+
+		final PagedResult<StudyDto> resultPage =
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudyDto>() {
+
+				@Override
+				public long getCount() {
+					return StudyResourceBrapi.this.studyService.countStudies(studySearchFilter);
+				}
+
+				@Override
+				public List<StudyDto> getResults(final PagedResult<StudyDto> pagedResult) {
+					return StudyResourceBrapi.this.studyService.getStudies(studySearchFilter);
+				}
+			});
+
+		final List<StudyDto> summaryDtoList = resultPage.getPageResults();
+
+		final Result<StudyDto> result = new Result<StudyDto>().withData(summaryDtoList);
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+		final EntityListResponse<StudyDto> entityListResponse = new EntityListResponse<>(metadata, result);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get study observation details as table", notes = "Get study observation details as table")
@@ -425,9 +454,8 @@ public class StudyResourceBrapi {
 		this.studyDatasetService.importObservations(studyDbId, input);
 
 		final Result<ObservationDTO> results = new Result<ObservationDTO>().withData(input);
-		@SuppressWarnings("unchecked")
-		final Metadata metadata = new Metadata().withStatus(
-				Lists.newArrayList(Collections.singletonMap("ignored-fields", "collector, observationDbId, observationTimeStamp")));
+		@SuppressWarnings("unchecked") final Metadata metadata = new Metadata().withStatus(
+			Lists.newArrayList(Collections.singletonMap("ignored-fields", "collector, observationDbId, observationTimeStamp")));
 		final EntityListResponse<ObservationDTO> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);

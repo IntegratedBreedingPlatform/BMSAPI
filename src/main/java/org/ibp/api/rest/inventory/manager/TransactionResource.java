@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
+import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -56,6 +57,20 @@ public class TransactionResource {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@ApiOperation(value = "Get Transaction types")
+	@RequestMapping(value = "/crops/{cropName}/transaction-types", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<TransactionType>> getTransactionTypes(@PathVariable final String cropName) {
+		return new ResponseEntity<>(this.transactionService.getAllTransactionTypes(), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get Transaction status types")
+	@RequestMapping(value = "/crops/{cropName}/transaction-status-types", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<TransactionStatus>> getTransactionStatusTypes(@PathVariable final String cropName) {
+		return new ResponseEntity<>(this.transactionService.getAllTransactionStatus(), HttpStatus.OK);
+	}
 
 	@ApiOperation(value = "Post transaction search", notes = "Post transaction search")
 	@RequestMapping(value = "/crops/{cropName}/transactions/search", method = RequestMethod.POST)
@@ -167,5 +182,18 @@ public class TransactionResource {
 		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Confirm pending Transactions", notes = "Confirm any transaction with pending status")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmation", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CONFIRM_TRANSACTIONS')")
+	public ResponseEntity<Void> confirmPendingTransaction(
+		@PathVariable final String cropName, //
+		@ApiParam("List of transactions to be confirmed, use a searchId or a list of transaction ids")
+		@RequestBody final SearchCompositeDto searchCompositeDto){
+
+		this.transactionService.confirmPendingTransactions(searchCompositeDto);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
