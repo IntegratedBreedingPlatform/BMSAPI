@@ -57,15 +57,15 @@ import static org.mockito.ArgumentMatchers.anyListOf;
 public class DatasetServiceImplTest {
 
 	private static final int TEST_STUDY_IDENTIFIER = 2013;
-	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
-	public static final String ENTRY_CODE = "ENTRY_CODE";
+	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	private static final String ENTRY_CODE = "ENTRY_CODE";
 	public static final String ENTRY_NO = "ENTRY_NO";
-	public static final String ENTRY_TYPE = "ENTRY_TYPE";
-	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
-	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
-	public static final String COL = "COL";
-	public static final String ROW = "ROW";
+	private static final String ENTRY_TYPE = "ENTRY_TYPE";
+	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	private static final String FIELD_MAP_COLUMN = "FieldMapColumn";
+	private static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
+	private static final String COL = "COL";
+	private static final String ROW = "ROW";
 	public static final String BLOCK_NO = "BLOCK_NO";
 	public static final String PLOT_NO = "PLOT_NO";
 	public static final String REP_NO = "REP_NO";
@@ -305,7 +305,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testImportDatasetFails_DatasetWithNoVariables() throws Exception {
+	public void testImportDatasetFails_DatasetWithNoVariables() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
@@ -328,7 +328,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testImportDatasetFails_NoObsUnitIdMatches() throws Exception {
+	public void testImportDatasetFails_NoObsUnitIdMatches() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
@@ -393,7 +393,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = PreconditionFailedException.class)
-	public void testImportDatasetFails_WarningsOverwrittingDataFound() throws Exception {
+	public void testImportDatasetFails_WarningsOverwrittingDataFound() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
@@ -433,7 +433,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = PreconditionFailedException.class)
-	public void testImportDatasetFails_WarningsDuplicatedObsUnitId() throws Exception {
+	public void testImportDatasetFails_WarningsDuplicatedObsUnitId() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
@@ -474,7 +474,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = PreconditionFailedException.class)
-	public void testImportDatasetFails_WarningsObsUnitIdNotBelongToDataset() throws Exception {
+	public void testImportDatasetFails_WarningsObsUnitIdNotBelongToDataset() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
@@ -564,9 +564,9 @@ public class DatasetServiceImplTest {
 
 		Assert.assertNotNull(dto);
 		Assert.assertTrue(dto.getName().equalsIgnoreCase(datasetDTO.getName()));
-		Assert.assertTrue(dto.getParentDatasetId().equals(datasetDTO.getParentDatasetId()));
-		Assert.assertTrue(dto.getInstances().size() == 3);
-		Assert.assertTrue(dto.getVariables().size() == 1);
+		Assert.assertEquals(dto.getParentDatasetId(), datasetDTO.getParentDatasetId());
+		Assert.assertEquals(dto.getInstances().size(), 3);
+		Assert.assertEquals(dto.getVariables().size(), 1);
 		Assert.assertTrue(CollectionUtils.isEqualCollection(dto.getInstances(), datasetDTO.getInstances()));
 		Assert.assertTrue(CollectionUtils.isEqualCollection(dto.getVariables(), datasetDTO.getVariables()));
 	}

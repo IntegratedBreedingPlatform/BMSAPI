@@ -85,10 +85,10 @@ import java.util.stream.Collectors;
 public class StudyResourceBrapi {
 
 	public static final String CSV = "csv";
-	public static final String TSV = "tsv";
+	private static final String TSV = "tsv";
 
-	public static final String CONTENT_TYPE = "Content-Type";
-	public static final String CONTENT_DISPOSITION = "Content-Disposition";
+	private static final String CONTENT_TYPE = "Content-Type";
+	private static final String CONTENT_DISPOSITION = "Content-Disposition";
 
 	@Autowired
 	private StudyDataManager studyDataManager;
@@ -114,7 +114,7 @@ public class StudyResourceBrapi {
 	public ResponseEntity<EntityListResponse<StudyDto>> listStudies(@PathVariable final String crop,
 		@ApiParam(value = "Common name for the crop associated with this study.") @RequestParam(value = "commonCropName", required = false)
 		final String commonCropName,
-		@ApiParam(value = "Filter based on study type unique identifier") @RequestParam(value = "studyTypeDbId.", required = false)
+		@ApiParam(value = "Filter based on study type unique identifier") @RequestParam(value = "studyTypeDbId", required = false)
 		final String studyTypeDbId,
 		@ApiParam(value = "Program filter to only return studies associated with given program id.")
 		@RequestParam(value = "programDbId", required = false) final String programDbId,
@@ -233,7 +233,7 @@ public class StudyResourceBrapi {
 
 		if (mwStudyDetails != null) {
 			//Add environment parameters to addtionalInfo
-			Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
+			final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
 				Collectors.toMap(MeasurementVariable::getDescription, MeasurementVariable::getValue));
 			mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
 
@@ -292,11 +292,7 @@ public class StudyResourceBrapi {
 		// output writer
 		final ObjectWriter myObjectWriter = mapper.writer(schema);
 		final File resultFile = new File(pathname);
-		final List<String> header = new ArrayList<>();
-
-		for (final String headerName : table.getHeaderRow()) {
-			header.add(headerName);
-		}
+		final List<String> header = new ArrayList<>(table.getHeaderRow());
 
 		final Object[] variableIds = table.getObservationVariableDbIds().toArray();
 		final Object[] variableNames = table.getObservationVariableNames().toArray();
@@ -323,8 +319,7 @@ public class StudyResourceBrapi {
 	 * @param file - file to be downloaded
 	 * @return
 	 */
-	private static ResponseEntity<FileSystemResource> createResponseEntityForFileDownload(final File file)
-		throws UnsupportedEncodingException {
+	private static ResponseEntity<FileSystemResource> createResponseEntityForFileDownload(final File file) {
 
 		final String filename = file.getName();
 		final String fileWithFullPath = file.getAbsolutePath();
@@ -421,12 +416,12 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return studyService.countPhenotypes(phenotypeSearchDTO);
+					return StudyResourceBrapi.this.studyService.countPhenotypes(phenotypeSearchDTO);
 				}
 
 				@Override
 				public List<PhenotypeSearchDTO> getResults(final PagedResult<PhenotypeSearchDTO> pagedResult) {
-					return studyService.searchPhenotypes(finalPageSize, finalPageNumber, phenotypeSearchDTO);
+					return StudyResourceBrapi.this.studyService.searchPhenotypes(finalPageSize, finalPageNumber, phenotypeSearchDTO);
 				}
 			});
 

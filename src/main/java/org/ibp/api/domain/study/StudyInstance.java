@@ -57,7 +57,7 @@ public class StudyInstance {
 	}
 
 	public String getCustomLocationAbbreviation() {
-		return customLocationAbbreviation;
+		return this.customLocationAbbreviation;
 	}
 
 	public void setCustomLocationAbbreviation(final String customLocationAbbreviation) {
@@ -65,15 +65,15 @@ public class StudyInstance {
 	}
 
 	public boolean getHasFieldmap() {
-		return hasFieldmap;
+		return this.hasFieldmap;
 	}
 
-	public void setHasFieldmap(boolean hasFieldmap) {
+	public void setHasFieldmap(final boolean hasFieldmap) {
 		this.hasFieldmap = hasFieldmap;
 	}
 
 	public Boolean isHasExperimentalDesign() {
-		return hasExperimentalDesign;
+		return this.hasExperimentalDesign;
 	}
 
 	public void setHasExperimentalDesign(final Boolean hasExperimentalDesign) {
@@ -81,7 +81,7 @@ public class StudyInstance {
 	}
 
 	public Boolean isHasMeasurements() {
-		return hasMeasurements;
+		return this.hasMeasurements;
 	}
 
 	public void setHasMeasurements(final Boolean hasMeasurements) {
@@ -89,7 +89,7 @@ public class StudyInstance {
 	}
 
 	public Boolean getCanBeDeleted() {
-		return canBeDeleted;
+		return this.canBeDeleted;
 	}
 
 	public void setCanBeDeleted(final Boolean canBeDeleted) {

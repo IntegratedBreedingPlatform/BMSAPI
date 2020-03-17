@@ -101,8 +101,8 @@ public class DatasetCollectionOrderServiceImplTest {
 
 	private Map<Integer, List<ObservationUnitRow>> createObservationUnitRowMap() {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
-		observationUnitRowMap.put(1, new ArrayList<ObservationUnitRow>());
-		observationUnitRowMap.put(2, new ArrayList<ObservationUnitRow>());
+		observationUnitRowMap.put(1, new ArrayList<>());
+		observationUnitRowMap.put(2, new ArrayList<>());
 		return  observationUnitRowMap;
 	}
 }
