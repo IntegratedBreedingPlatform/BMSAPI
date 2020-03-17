@@ -73,7 +73,7 @@ public class TransactionInputValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void validateCloseLot() {
+	public void testValidateCloseLot() {
 		this.transactionDto.setAmount(TEN);
 		this.transactionDto.setTransactionType(DEPOSIT);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
@@ -87,7 +87,7 @@ public class TransactionInputValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void validateEmptyLot() {
+	public void testValidateEmptyLot() {
 		this.transactionDto.setAmount(10.0);
 		this.transactionDto.setTransactionType(DEPOSIT);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
@@ -98,7 +98,7 @@ public class TransactionInputValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void validatePendingStatus() {
+	public void testValidatePendingStatus() {
 		this.transactionDto.setAmount(10.0);
 		this.transactionDto.setTransactionType(DEPOSIT);
 		this.transactionDto.setNotes(RandomStringUtils.randomAlphabetic(255));
