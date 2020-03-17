@@ -98,11 +98,12 @@ public class TransactionInputValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void ValidatePendingStatus(){
+	public void validatePendingStatus() {
 		this.transactionDto.setAmount(10.0);
 		this.transactionDto.setTransactionType(DEPOSIT);
 		this.transactionDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 		this.transactionDto.setTransactionStatus(TransactionStatus.CONFIRMED.getValue());
+		this.transactionDto.setTransactionId(1);
 		List<TransactionDto> transactionDtoList = Arrays.asList(this.transactionDto);
 		this.transactionInputValidator.validatePendingStatus(transactionDtoList);
 	}
