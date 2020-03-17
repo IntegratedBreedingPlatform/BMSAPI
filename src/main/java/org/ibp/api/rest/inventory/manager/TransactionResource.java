@@ -203,7 +203,7 @@ public class TransactionResource {
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
 	@JsonView(InventoryView.TransactionView.class)
-	public ResponseEntity<List<TransactionDto>> getTransactions(
+	public ResponseEntity<List<TransactionDto>> getAvailableBalanceTransactions(
 		@PathVariable final String cropName, //
 		@PathVariable final Integer lotId) {
 
