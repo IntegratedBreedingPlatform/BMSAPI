@@ -23,7 +23,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -162,4 +164,14 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 	}
 
+	@Override
+	public List<TransactionDto> getAvailableBalanceTransactions(final Integer lotId) {
+		final LotsSearchDto searchDTO = new LotsSearchDto();
+		final Set<Integer> lotIds = new HashSet<>(Arrays.asList(lotId));
+		searchDTO.setLotIds(Arrays.asList(lotId));
+
+		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
+		extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotIds);
+		return this.transactionService.getAvailableBalanceTransactions(lotId);
+	}
 }
