@@ -79,7 +79,7 @@ public class TransactionUpdateRequestDtoValidator {
 		}
 
 		final List<TransactionDto> transactionsWithClosedLots =
-			transactionDtos.stream().filter(t -> t.getLot().getStatus().equals(LotStatus.CLOSED.name())).collect(
+			transactionDtos.stream().filter(t -> t.getLot().getStatus().toUpperCase().equals(LotStatus.CLOSED.name())).collect(
 				Collectors.toList());
 		if (!transactionsWithClosedLots.isEmpty()) {
 			errors.reject("transaction.update.closed.lots", new String[] {

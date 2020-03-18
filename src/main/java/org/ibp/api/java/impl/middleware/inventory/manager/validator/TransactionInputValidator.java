@@ -63,7 +63,7 @@ public class TransactionInputValidator {
 			final ExtendedLotDto lot = result.get(0);
 			final Integer unitId = lot.getUnitId();
 			this.inventoryUnitValidator.validateNotNullInventoryScaleId(this.errors, unitId);
-			if (lot.getStatus().equalsIgnoreCase(LotStatus.CLOSED.name())) {
+			if (lot.getStatus().toUpperCase().equalsIgnoreCase(LotStatus.CLOSED.name())) {
 				this.errors.reject("transaction.closed.lot", "");
 			}
 		} else {
