@@ -36,7 +36,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 
 	private static final String FILE_NAME = "export transactions template.xls";
 
-	private static final int TRANSACTIONS_SHEET_DESIGANTION_COLUMN_INDEX = 0;
+	private static final int TRANSACTIONS_SHEET_DESIGNATION_COLUMN_INDEX = 0;
 	private static final int TRANSACTIONS_SHEET_GID_COLUMN_INDEX = 1;
 	private static final int TRANSACTIONS_SHEET_CROSS_COLUMN_INDEX = 2;
 	private static final int TRANSACTIONS_SHEET_LOT_ID_COLUMN_INDEX = 3;
@@ -102,7 +102,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		this.setCustomColorAtIndex(xlsBook, IndexedColors.AQUA, 218, 238, 243);
 		this.setCustomColorAtIndex(xlsBook, IndexedColors.OLIVE_GREEN, 235, 241, 222);
 
-		HSSFCell cell = row.createCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_DESIGANTION_COLUMN_INDEX, CellType.STRING);
+		HSSFCell cell = row.createCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_DESIGNATION_COLUMN_INDEX, CellType.STRING);
 		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.YELLOW.getIndex()));
 		cell.setCellValue(
 			this.messageSource.getMessage("export.inventory.manager.transaction.template.sheet.designation.column", null, locale));
@@ -183,7 +183,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		cell.setCellValue(
 			this.messageSource.getMessage("export.inventory.manager.transaction.template.sheet.new.notes.column", null, locale));
 
-		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_DESIGANTION_COLUMN_INDEX, 16 * 250);
+		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_DESIGNATION_COLUMN_INDEX, 16 * 250);
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_GID_COLUMN_INDEX, 8 * 250);
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_CROSS_COLUMN_INDEX, 10 * 250);
 
