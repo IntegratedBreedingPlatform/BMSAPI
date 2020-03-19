@@ -265,15 +265,15 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_USERNAME_COLUMN_INDEX, 13 * 250);
 
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_STATUS_COLUMN_INDEX, 15 * 250);
-		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_TYPE_COLUMN_INDEX, 9 * 250);
-		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_UNITS_COLUMN_INDEX, 10 * 250);
+		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_TYPE_COLUMN_INDEX, 12 * 250);
+		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_UNITS_COLUMN_INDEX, 18 * 250);
 
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_AMOUNT_COLUMN_INDEX, 10 * 250);
-		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_NOTES_COLUMN_INDEX, 10 * 250);
+		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_NOTES_COLUMN_INDEX, 20 * 250);
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_NEW_AMOUNT_COLUMN_INDEX, 15 * 250);
 
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_NEW_BALANCE_COLUMN_INDEX, 16 * 250);
-		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_NEW_NOTES_COLUMN_INDEX, 14 * 250);
+		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_NEW_NOTES_COLUMN_INDEX, 20 * 250);
 
 	}
 
