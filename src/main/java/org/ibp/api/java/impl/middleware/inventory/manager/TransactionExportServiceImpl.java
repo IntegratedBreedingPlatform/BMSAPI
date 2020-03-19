@@ -91,6 +91,74 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		int currentRowNum = 0;
 
 		this.writeTransactionsHeader(xlsBook, xlsSheet, currentRowNum++);
+		this.writeTransactions(currentRowNum, xlsBook, xlsSheet, transactionDtoList);
+	}
+
+	private void writeTransactions(
+		final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final List<TransactionDto> transactionDtoList) {
+		final CellStyle backgroundStyle = xlsBook.createCellStyle();
+		final HSSFFont blackFont = xlsBook.createFont();
+		blackFont.setFontName("Arial");
+		blackFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+		blackFont.setFontHeightInPoints((short) 10);
+		backgroundStyle.setFont(blackFont);
+
+		int rowNumIndex = currentRowNum;
+		for (final TransactionDto transactionDto : transactionDtoList) {
+			final HSSFRow row = xlsSheet.createRow(rowNumIndex++);
+			row.setHeightInPoints(16);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_DESIGNATION_COLUMN_INDEX, transactionDto.getLot().getDesignation(),
+				CellType.STRING, row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_GID_COLUMN_INDEX, transactionDto.getLot().getGid().toString(),
+				CellType.STRING, row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_CROSS_COLUMN_INDEX, transactionDto.getLot().getPedigree(), CellType.STRING,
+				row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_ID_COLUMN_INDEX, transactionDto.getLot().getLotId().toString(),
+				CellType.NUMERIC, row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX,
+				transactionDto.getLot().getLocationAbbr(), CellType.STRING, row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_STORAGE_LOCATION_COLUMN_INDEX, transactionDto.getLot().getLocationName(),
+				CellType.STRING, row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_STOCK_ID_COLUMN_INDEX, transactionDto.getLot().getStockId(),
+				CellType.STRING, row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_TRN_ID_COLUMN_INDEX, transactionDto.getTransactionId().toString(),
+				CellType.NUMERIC, row);
+			this.writeCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_CREATED_COLUMN_INDEX,
+				transactionDto.getTransactionDate() == null ? "" : transactionDto.getTransactionDate().toString(), CellType.STRING, row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_USERNAME_COLUMN_INDEX, transactionDto.getCreatedByUsername(),
+				CellType.STRING, row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_STATUS_COLUMN_INDEX, transactionDto.getTransactionStatus(), CellType.STRING,
+				row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_TYPE_COLUMN_INDEX, transactionDto.getTransactionType(), CellType.STRING,
+				row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_UNITS_COLUMN_INDEX, transactionDto.getLot().getUnitName(), CellType.STRING,
+				row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_AMOUNT_COLUMN_INDEX, transactionDto.getAmount().toString(),
+				CellType.NUMERIC, row);
+			this.writeCell(
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_NOTES_COLUMN_INDEX, transactionDto.getNotes(), CellType.STRING, row);
+			this.writeCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_NEW_AMOUNT_COLUMN_INDEX, null, CellType.NUMERIC, row);
+			this.writeCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_NEW_BALANCE_COLUMN_INDEX, null, CellType.NUMERIC, row);
+			this.writeCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_NEW_NOTES_COLUMN_INDEX, null, CellType.STRING, row);
+		}
+	}
+
+	private void writeCell(final int codesSheetFirstColumnIndex, final String value, final CellType type, final HSSFRow row) {
+		HSSFCell cell = row.createCell(codesSheetFirstColumnIndex, type);
+		cell.setCellValue(value);
 	}
 
 	private void writeTransactionsHeader(final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum) {
