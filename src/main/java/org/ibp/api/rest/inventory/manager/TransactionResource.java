@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
@@ -21,10 +22,12 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.inventory.manager.TransactionExportService;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -39,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.io.File;
 import java.util.List;
 
 @Api(value = "Transaction Services")
@@ -58,6 +62,9 @@ public class TransactionResource {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private TransactionExportService transactionExportServiceImpl;
 
 	@ApiOperation(value = "Get Transaction types")
 	@RequestMapping(value = "/crops/{cropName}/transaction-types", method = RequestMethod.GET)
@@ -216,6 +223,26 @@ public class TransactionResource {
 
 		return new ResponseEntity<>(transactionDtos, headers, HttpStatus.OK);
 
+	}
+
+	@ApiOperation(value = "Download Template as excel file", notes = "Download Template as excel file")
+	@RequestMapping(
+		value = "/crops/{cropName}/transactions/xls",
+		method = RequestMethod.GET)
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
+	public ResponseEntity<FileSystemResource> getTransactionsTemplate(
+		@PathVariable final String cropName, @RequestParam final Integer searchRequestId) {
+		final TransactionsSearchDto searchDTO = (TransactionsSearchDto) this.searchRequestService
+			.getSearchRequest(searchRequestId, TransactionsSearchDto.class);
+
+		final List<TransactionDto> transactionDtoList = TransactionResource.this.transactionService.searchTransactions(searchDTO, null);
+
+		final File file = this.transactionExportServiceImpl.export(transactionDtoList);
+		final HttpHeaders headers = new HttpHeaders();
+		headers
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+		final FileSystemResource fileSystemResource = new FileSystemResource(file);
+		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Pending Transactions", notes = "Update Amount and Notes for pending transactions, Modify the lot available balance through the pending transaction. "
