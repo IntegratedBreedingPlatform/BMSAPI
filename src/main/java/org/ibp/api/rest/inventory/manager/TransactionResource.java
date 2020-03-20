@@ -227,7 +227,7 @@ public class TransactionResource {
 	@RequestMapping(
 		value = "/crops/{cropName}/transactions/xls",
 		method = RequestMethod.GET)
-	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('EXPORT_TRANSACTIONS')")
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	public ResponseEntity<FileSystemResource> getTransactionsTemplate(
 		@PathVariable final String cropName, @RequestParam final Integer searchRequestId) {
 		final TransactionsSearchDto searchDTO = (TransactionsSearchDto) this.searchRequestService
