@@ -157,7 +157,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 	}
 
 	private void writeCell(final int codesSheetFirstColumnIndex, final String value, final CellType type, final HSSFRow row) {
-		HSSFCell cell = row.createCell(codesSheetFirstColumnIndex, type);
+		final HSSFCell cell = row.createCell(codesSheetFirstColumnIndex, type);
 		cell.setCellValue(value);
 	}
 
