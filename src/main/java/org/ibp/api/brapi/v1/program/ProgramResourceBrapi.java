@@ -29,11 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Location services.
@@ -50,10 +46,11 @@ public class ProgramResourceBrapi {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+
 	@ApiOperation(value = "List Programs", notes = "Get a list of programs.")
-	@RequestMapping(value = "/{crop}/brapi/v1/programs", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/programs", "/brapi/v1/programs"}, method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Programs> listPrograms(@PathVariable final String crop,
+	public ResponseEntity<Programs> listPrograms(@PathVariable final Optional<String> crop,
 			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 					required = false) final Integer currentPage,
 			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
@@ -65,7 +62,11 @@ public class ProgramResourceBrapi {
 
 		final Map<ProgramFilters, Object> filters = new EnumMap<>(ProgramFilters.class);
 		PagedResult<ProgramDetailsDto> resultPage = null;
-		this.setFilters(filters, crop, programName);
+		if(crop.isPresent()){
+			this.setFilters(filters, crop.get(), programName);
+		}else {
+			this.setFilters(filters, this.getDefaultCrop(), programName);
+		}
 
 		if (filters.get(ProgramFilters.CROP_TYPE) == null) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "crop " + crop + " doesn't exist"));
@@ -119,7 +120,7 @@ public class ProgramResourceBrapi {
 	}
 
 	private void setFilters(final Map<ProgramFilters, Object> filters, final String crop, final String programName) {
-		List<CropType> cropTypeList;
+		final List<CropType> cropTypeList;
 		cropTypeList = this.workbenchDataManager.getInstalledCropDatabses();
 
 		for (final CropType cropType : cropTypeList) {
@@ -131,5 +132,14 @@ public class ProgramResourceBrapi {
 		if (!StringUtils.isBlank(programName)) {
 			filters.put(ProgramFilters.PROGRAM_NAME, programName);
 		}
+	}
+
+	private String getDefaultCrop() {
+		final List<CropType> cropTypeList = this.workbenchDataManager.getInstalledCropDatabses();
+		if(cropTypeList != null && !cropTypeList.isEmpty()) {
+			final String crop = cropTypeList.get(0).getCropName();
+			return crop;
+		}
+		return null;
 	}
 }

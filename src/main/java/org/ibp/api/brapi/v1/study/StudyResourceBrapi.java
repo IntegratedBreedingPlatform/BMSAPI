@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.sun.scenario.effect.Crop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -40,6 +41,7 @@ import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.BrapiNotFoundException;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.ontology.VariableService;
@@ -68,13 +70,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -106,12 +102,15 @@ public class StudyResourceBrapi {
 	private DatasetService studyDatasetService;
 
 	@Autowired
+	private CropService cropService;
+
+	@Autowired
 	InstanceValidator instanceValidator;
 
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
-	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/studies", "/brapi/v1/studies"}, method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<EntityListResponse<StudyDto>> listStudies(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<StudyDto>> listStudies(@PathVariable final Optional<String> crop,
 		@ApiParam(value = "Common name for the crop associated with this study.") @RequestParam(value = "commonCropName", required = false)
 		final String commonCropName,
 		@ApiParam(value = "Filter based on study type unique identifier") @RequestParam(value = "studyTypeDbId", required = false)
@@ -170,10 +169,10 @@ public class StudyResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get study observation details as table", notes = "Get study observation details as table")
-	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/studies/{studyDbId}/table", "/brapi/v1/studies/{studyDbId}/table"}, method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<StudyObservations> getStudyObservationsAsTable(final HttpServletResponse response,
-		@PathVariable final String crop, @PathVariable final int studyDbId,
+		@PathVariable final Optional<String> crop, @PathVariable final int studyDbId,
 		@ApiParam(value = "The format parameter will cause the data to be dumped to a file in the specified format",
 			required = false) @RequestParam(value = "format", required = false) final String format)
 		throws Exception {
@@ -345,10 +344,10 @@ public class StudyResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get studies observation variables by studyDbId", notes = "Get studies observation variables by studyDbId")
-	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationvariables", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/studies/{studyDbId}/observationvariables", "/brapi/v1/studies/{studyDbId}/observationvariables"}, method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<VariableDTO>> getObservationVariables(final HttpServletResponse response,
-		@PathVariable final String crop, @PathVariable final int studyDbId,
+		@PathVariable final Optional<String> crop, @PathVariable final int studyDbId,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
 			required = false) final Integer currentPage,
@@ -361,6 +360,9 @@ public class StudyResourceBrapi {
 		if (datasetId == null) {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
 		}
+
+		final String cropName = crop.isPresent() ? crop.get() : this.getDefaultCrop();
+
 
 		final PagedResult<VariableDTO> resultPage =
 			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
@@ -375,7 +377,7 @@ public class StudyResourceBrapi {
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return StudyResourceBrapi.this.variableService
-						.getVariablesByDatasetId(datasetId, crop, Collections.unmodifiableList(
+						.getVariablesByDatasetId(datasetId, cropName, Collections.unmodifiableList(
 							Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
 				}
 			});
@@ -459,6 +461,15 @@ public class StudyResourceBrapi {
 		final EntityListResponse<ObservationDTO> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+
+	private String getDefaultCrop() {
+		final List<String> crops = this.cropService.getInstalledCrops();
+		if(crops != null && !crops.isEmpty()){
+			return crops.get(0);
+		}
+		return null;
 	}
 
 }

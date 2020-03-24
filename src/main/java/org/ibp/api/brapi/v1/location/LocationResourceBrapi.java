@@ -26,12 +26,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Location services.
@@ -47,9 +46,11 @@ public class LocationResourceBrapi {
 	private LocationDataManager locationDataManager;
 
 	@ApiOperation(value = "List locations", notes = "Get a list of locations.")
-	@RequestMapping(value = "/{crop}/brapi/v1/locations", method = RequestMethod.GET)
+	@RequestMapping(value = "/brapi/v1/locations", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Locations> listLocations(@PathVariable final String crop,
+	public ResponseEntity<Locations> listLocations(
+			@ApiParam(value = "Crop Name", required = false) @RequestParam(value = "cropName",
+					required = false) final String cropName,
 			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 					required = false) final Integer currentPage,
 			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",

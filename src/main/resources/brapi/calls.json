@@ -1,404 +1,447 @@
 {"data": [
-      {
-        "call": "token",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "POST"
-        ],
-        "versions": [
-          "1.0",
-          "1.1",
-          "1.2",
-          "1.3",
-          "2.0"
-        ]
-      },
-      {
-        "call": "crops",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1"
-        ]
-      },
-      {
-        "call": "locations",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1"
-        ]
-      },
-      {
-        "call": "phenotypes-search",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "POST"
-        ],
-        "versions": [
-          "1.0",
-          "1.1",
-          "1.2"
-        ]
-      },
-      {
-        "call": "programs",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1",
-          "1.2"
-        ]
-      },
-      {
-        "call": "samples/{sampleId}",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1"
-        ]
-      },
-      {
-        "call": "studies",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.3"
-        ]
-      },
-      {
-        "call": "studies/{studyDbId}",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "versions": [
-          "1.0",
-          "1.1",
-          "2.0"
-        ]
-      },
-      {
-        "call": "studies/{studyDbId}/table",
-        "dataTypes": [
-          "application/json",
-          "text/tsv",
-          "text/csv"
-        ],
-        "datatypes": [
-          "json",
-          "tsv",
-          "csv"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.1"
-        ]
-      },
-      {
-        "call": "trials",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1"
-        ]
-      },
-      {
-        "call": "trials/{trialDbId}/table",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1"
-        ]
-      },
-      {
-        "call": "calls",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1",
-          "1.2",
-          "1.3"
-        ]
-      },
-      {
-        "call": "germplasm-search",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-         ],
-        "versions": [
-          "1.0",
-          "1.1",
-          "1.2"
-        ]
-      },
-      {
-        "call": "germplasm/{germplasmDbId}",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1",
-          "1.2"
-        ]
-      },
-      {
-        "call": "germplasm/{germplasmDbId}/pedigree",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1"
-        ]
-      },
-      {
-        "call": "germplasm/{germplasmDbId}/progeny",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0",
-          "1.1",
-          "1.2"
-        ]
-      },
-      {
-        "call": "search/germplasm",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "POST"
-        ],
-        "versions": [
-          "1.3"
-        ]
-      },
-      {
-        "call": "search/germplasm/{searchResultsDbid}",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "POST"
-        ],
-        "versions": [
-          "1.3"
-        ]
-      },
-      {
-        "call": "observationLevels",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.3"
-        ]
-      },
-      {
-        "call": "studies/{studyDbId}/germplasm",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.3"
-        ]
-      },
-      {
-        "call": "studies/{studyDbId}/observationvariables",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.3"
-        ]
-      },
-      {
-        "call": "search/observationunits",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "POST"
-        ],
-        "versions": [
-          "2.0"
-        ]
-      },
-      {
-        "call": "search/observationunits/{searchResultsDbid}",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "2.0"
-        ]
-      },
-    {
-      "call": "germplasm/{germplasmDbId}/attributes",
-      "dataTypes": [
-        "application/json"
-      ],
-      "datatypes": [
-        "json"
-      ],
-      "methods": [
-        "GET"
-      ],
-      "versions": [
-        "1.3"
-      ]
-    },
-    {
-      "call": "variables",
-      "dataTypes": [
-        "application/json"
-      ],
-      "datatypes": [
-        "json"
-      ],
-      "methods": [
-        "GET"
-      ],
-      "versions": [
-        "1.3"
-      ]
-    }
+  {
+    "call": "token",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2",
+      "1.3"
     ]
+  },
+  {
+    "call": "crops",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2",
+      "1.3"
+    ]
+  },
+  {
+    "call": "locations",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2",
+      "1.3"
+    ]
+  },
+  {
+    "call": "phenotypes-search",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2"
+    ]
+  },
+  {
+    "call": "programs",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2",
+      "1.3"
+    ]
+  },
+  {
+    "call": "samples/{sampleId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2",
+      "1.3"
+    ]
+  },
+  {
+    "call": "studies",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.3"
+    ]
+  },
+  {
+    "call": "studies/{studyDbId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2",
+      "1.3"
+    ]
+  },
+  {
+    "call": "studies/{studyDbId}/table",
+    "dataTypes": [
+      "application/json",
+      "text/tsv",
+      "text/csv"
+    ],
+    "datatypes": [
+      "json",
+      "tsv",
+      "csv"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.1"
+    ]
+  },
+  {
+    "call": "trials",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1"
+    ]
+  },
+  {
+    "call": "trials/{trialDbId}/table",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1"
+    ]
+  },
+  {
+    "call": "calls",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2",
+      "1.3"
+    ]
+  },
+  {
+    "call": "germplasm-search",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2"
+    ]
+  },
+  {
+    "call": "germplasm/{germplasmDbId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2"
+    ]
+  },
+  {
+    "call": "germplasm/{germplasmDbId}/pedigree",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1"
+    ]
+  },
+  {
+    "call": "germplasm/{germplasmDbId}/progeny",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2"
+    ]
+  },
+  {
+    "call": "search/germplasm",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "1.3"
+    ]
+  },
+  {
+    "call": "search/germplasm/{searchResultsDbid}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "1.3"
+    ]
+  },
+  {
+    "call": "observationLevels",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.3"
+    ]
+  },
+  {
+    "call": "studies/{studyDbId}/germplasm",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.3"
+    ]
+  },
+  {
+    "call": "studies/{studyDbId}/observationvariables",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.3"
+    ]
+  },
+  {
+    "call": "search/observationunits",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "1.2"
+    ]
+  },
+  {
+    "call": "search/observationunits/{searchResultsDbid}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.2"
+    ]
+  },
+  {
+    "call": "germplasm/{germplasmDbId}/attributes",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.3"
+    ]
+  },
+  {
+    "call": "variables",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "1.3"
+    ]
+  },
+  {
+    "call": "phenotypes",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "1.3"
+    ]
+  },
+  {
+    "call": "phenotypes-search",
+    "dataTypes": [
+      "application/json"
+    ],
+    "datatypes": [
+      "json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "1.0",
+      "1.1",
+      "1.2",
+      "1.3"
+    ]
+  }
+  ]
 }

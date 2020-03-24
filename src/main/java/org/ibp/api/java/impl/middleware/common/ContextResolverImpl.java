@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.common;
 
 import liquibase.util.StringUtils;
+import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.ContextHolder;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.program.ProgramService;
@@ -22,6 +23,7 @@ public class ContextResolverImpl implements ContextResolver {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ContextResolverImpl.class);
 	public static final String BRAPI = "brapi";
+	public static final String LOCATIONS = "locations";
 
 	@Autowired
 	private CropService cropService;
@@ -59,6 +61,15 @@ public class ContextResolverImpl implements ContextResolver {
 			// BrAPI calls put crop name as first path parameter after context path e.g. /bmsapi/maize/brapi/v1/locations
 			instanceLevelAPI = BRAPI.equals(parts[1]);
 			cropName = instanceLevelAPI? "" : parts[1];
+
+			//Check cropName in request parameter for instance-level BrAPI calls
+			if(instanceLevelAPI && StringUtil.isEmpty(cropName)) {
+				if(request.getParameterMap().containsKey("cropName")){
+					cropName = request.getParameter("cropName");
+				} else if(StringUtil.isEmpty(cropName)){
+					cropName = "maize";
+				}
+			}
 
 		} else if ("crops".equals(parts[1])){
 			// internal BMSAPI crop/program services start with "crops" (eg. /bmsapi/crops/maize/locations

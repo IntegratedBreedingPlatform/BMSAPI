@@ -33,10 +33,9 @@ public class PhenotypeSearchResource {
 	private StudyService studyService;
 
 	@ApiOperation(value = "Phenotype search", notes = "Returns a list of observationUnit with the observed Phenotypes")
-	@RequestMapping(value = "/{crop}/brapi/v1/phenotypes-search", method = RequestMethod.POST)
+	@RequestMapping(value = "/brapi/v1/phenotypes-search", method = RequestMethod.POST)
 	@ResponseBody
-	@JsonView(BrapiView.BrapiV1_2.class)
-	public ResponseEntity<PhenotypeSearchSummariesDto> searchPhenotypes(@PathVariable final String crop,
+	public ResponseEntity<PhenotypeSearchSummariesDto> searchPhenotypes(
 		@RequestBody final PhenotypeSearchRequestDTO requestDTO) {
 
 
