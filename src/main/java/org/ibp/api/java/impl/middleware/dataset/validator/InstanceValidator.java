@@ -40,12 +40,13 @@ public class InstanceValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (!this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
+		final boolean allInstancesExistInDataset = this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds);
+		if (!allInstancesExistInDataset) {
 			this.errors.reject("dataset.non.existent.instances", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (datasetId != null && !this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
+		if (datasetId != null && !allInstancesExistInDataset) {
 			this.errors.reject("dataset.invalid.instances", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
