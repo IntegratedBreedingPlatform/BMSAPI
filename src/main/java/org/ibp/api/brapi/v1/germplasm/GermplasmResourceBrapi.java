@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -131,10 +132,10 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Germplasm search by germplasmDbId", notes = "Germplasm search by germplasmDbId")
-	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/germplasm/{germplasmDbId}", "/brapi/v1/germplasm/{germplasmDbId}"}, method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<Germplasm>> searchGermplasm(
-		@PathVariable final String crop,
+		@PathVariable final Optional<String> crop,
 		@PathVariable final String germplasmDbId) {
 
 		final int gid;
@@ -150,7 +151,11 @@ public class GermplasmResourceBrapi {
 		if (germplasmDTO != null) {
 			final ModelMapper mapper = new ModelMapper();
 			final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-			germplasm.setCommonCropName(crop);
+			if(crop.isPresent()) {
+				germplasm.setCommonCropName(crop.get());
+			}else{
+				germplasm.setCommonCropName(this.getDefaultCrop());
+			}
 
 			final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
 
@@ -162,10 +167,10 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Germplasm pedigree by id", notes = "")
-	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/pedigree", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/germplasm/{germplasmDbId}/pedigree", "/brapi/v1/germplasm/{germplasmDbId}/pedigree"}, method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<PedigreeDTO>> getPedigree(
-		@PathVariable final String crop,
+		@PathVariable final Optional<String> crop,
 		@ApiParam(value = "the internal id of the germplasm", required = true)
 		@PathVariable(value = "germplasmDbId") final String germplasmDbId,
 		@ApiParam(value = "text representation of the pedigree <strong style='color: red'>(Not Implemented)</strong>", required = false)
@@ -196,10 +201,10 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Germplasm progeny by id", notes = "")
-	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/progeny", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/germplasm/{germplasmDbId}/progeny", "/brapi/v1/germplasm/{germplasmDbId}/progeny"}, method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<ProgenyDTO>> getProgeny(
-		@PathVariable final String crop,
+		@PathVariable final Optional<String> crop,
 		@ApiParam(value = "the internal id of the germplasm", required = true)
 		@PathVariable(value = "germplasmDbId") final String germplasmDbId
 	) {
@@ -220,10 +225,10 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Post germplasm search", notes = "Post germplasm search")
-	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm", method = RequestMethod.POST)
+	@RequestMapping(value = {"/{crop}/brapi/v1/search/germplasm", "/brapi/v1/search/germplasm"}, method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasm(
-		@PathVariable final String crop, @RequestBody final GermplasmSearchRequestDto germplasmSearchRequestDto) {
+		@PathVariable final Optional<String> crop, @RequestBody final GermplasmSearchRequestDto germplasmSearchRequestDto) {
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(germplasmSearchRequestDto, GermplasmSearchRequestDto.class).toString();
 

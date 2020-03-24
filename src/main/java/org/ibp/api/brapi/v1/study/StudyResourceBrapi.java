@@ -169,7 +169,7 @@ public class StudyResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get study observation details as table", notes = "Get study observation details as table")
-	@RequestMapping(value = {"/{crop}/brapi/v1/studies/{studyDbId}/table", "/brapi/v1/studies/{studyDbId}/table"}, method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/studies/{studyDbId}/table", "/brapi/v1/studies/{studyDbId}/table"}, method = {RequestMethod.GET, RequestMethod.POST})
 	@ResponseBody
 	public ResponseEntity<StudyObservations> getStudyObservationsAsTable(final HttpServletResponse response,
 		@PathVariable final Optional<String> crop, @PathVariable final int studyDbId,
