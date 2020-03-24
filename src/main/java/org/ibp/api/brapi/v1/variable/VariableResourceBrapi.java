@@ -11,6 +11,7 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Api(value = "BrAPI Variable Services")
 @Controller
@@ -37,17 +39,22 @@ public class VariableResourceBrapi {
 	@Autowired
 	private VariableService variableService;
 
+	@Autowired
+	private CropService cropService;
+
 	@ApiOperation(value = "Call to retrieve a list of observation variables available in the system.")
-	@RequestMapping(value = "/{crop}/brapi/v1/variables", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/variables", "/brapi/v1/variables"}, method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<VariableDTO>> getAllVariables(final HttpServletResponse response,
-		@PathVariable final String crop,
+		@PathVariable final Optional<String> crop,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
+
+		final String cropName = crop.isPresent() ? crop.get() : this.getDefaultCrop();
 
 		final PagedResult<VariableDTO> resultPage =
 			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
@@ -62,7 +69,7 @@ public class VariableResourceBrapi {
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return VariableResourceBrapi.this.variableService
-						.getAllVariables(crop, Collections.unmodifiableList(
+						.getAllVariables(cropName, Collections.unmodifiableList(
 							Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
 				}
 			});
@@ -80,4 +87,11 @@ public class VariableResourceBrapi {
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
+	private String getDefaultCrop() {
+		final List<String> crops = this.cropService.getInstalledCrops();
+		if(crops != null && !crops.isEmpty()){
+			return crops.get(0);
+		}
+		return null;
+	}
 }

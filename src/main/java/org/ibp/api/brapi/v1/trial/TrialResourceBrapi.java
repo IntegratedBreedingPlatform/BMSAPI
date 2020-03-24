@@ -31,12 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/#reference/trials">BrAPI Trial services</a>.
@@ -52,9 +47,9 @@ public class TrialResourceBrapi {
 	private static final String ORDER_BY_DESCENDING = "desc";
 
 	@ApiOperation(value = "List of trial summaries", notes = "Get a list of trial summaries.")
-	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/trials", "/brapi/v1/trials"}, method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<TrialSummaries> listTrialSummaries(@PathVariable final String crop,
+	public ResponseEntity<TrialSummaries> listTrialSummaries(@PathVariable final Optional<String> crop,
 			@ApiParam(value = "Program filter to only return studies associated with given program id.",
 					required = false) @RequestParam(value = "programDbId", required = false) final String programDbId,
 			@ApiParam(value = "Location filter to only return studies associated with given location id.",

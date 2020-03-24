@@ -224,9 +224,9 @@ public class StudyResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get study details", notes = "Get study details")
-	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/studies/{studyDbId}", "/brapi/v1/studies/{studyDbId}"}, method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV1_3.class)
-	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
+	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final Optional<String> crop, @PathVariable final Integer studyDbId) {
 
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
 

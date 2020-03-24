@@ -23,6 +23,7 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Api(value = "BrAPI Germplasm Services")
 @Controller
@@ -53,6 +55,9 @@ public class GermplasmResourceBrapi {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private CropService cropService;
 
 	@Deprecated
 	@ApiOperation(value = "Search germplasms", notes = "Search germplasms. <p>DEPRECATED: use /search/germplasm</p> ")
@@ -301,11 +306,11 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Search germplasms by study", notes = "Search germplasms by study")
-	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/germplasm", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/studies/{studyDbId}/germplasm", "/brapi/v1/studies/{studyDbId}/germplasm"}, method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<GermplasmSummaryList>> searchGermplasmsByStudy(
-		@PathVariable final String crop,
+		@PathVariable final Optional<String> crop,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
 			required = false) final Integer currentPage,
@@ -337,7 +342,12 @@ public class GermplasmResourceBrapi {
 			final ModelMapper mapper = new ModelMapper();
 			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
 				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasm.setCommonCropName(crop);
+				if(crop.isPresent()){
+					germplasm.setCommonCropName(crop.get());
+				}else{
+					germplasm.setCommonCropName(this.getDefaultCrop());
+				}
+
 				germplasmList.add(germplasm);
 			}
 		}
@@ -407,6 +417,14 @@ public class GermplasmResourceBrapi {
 		singleEntityResponse.setResult(germplasmAttributes);
 
 		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+	}
+
+	private String getDefaultCrop() {
+		final List<String> crops = this.cropService.getInstalledCrops();
+		if(crops != null && !crops.isEmpty()){
+			return crops.get(0);
+		}
+		return null;
 	}
 
 }
