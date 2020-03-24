@@ -236,7 +236,6 @@ public class TransactionResource {
 			.getSearchRequest(searchRequestId, TransactionsSearchDto.class);
 
 		final List<TransactionDto> transactionDtoList = TransactionResource.this.transactionService.searchTransactions(searchDTO, null);
-		this.transactionService.loadPedigreeString(transactionDtoList);
 
 		final File file = this.transactionExportServiceImpl.export(transactionDtoList);
 		final HttpHeaders headers = new HttpHeaders();
