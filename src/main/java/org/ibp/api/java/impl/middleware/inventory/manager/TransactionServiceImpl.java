@@ -191,4 +191,8 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 	}
 
+	@Override
+	public void loadPedigreeString(final List<TransactionDto> transactionDtos) {
+		this.transactionService.loadPedigreeString(transactionDtos);
+	}
 }
