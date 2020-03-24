@@ -21,8 +21,8 @@ import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -52,19 +52,13 @@ public class DatasetValidator {
 			this.errors.reject("dataset.required", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
-		this.validateDataset(studyId, dataSet);
-	}
-
-	private void validateDataset(
-		final Integer studyId, final DatasetDTO dataSet) {
-
-		if (dataSet == null) {
+		final boolean isValidDatasetId = this.middlewareDatasetService.isValidDatasetId(datasetId);
+		if (!isValidDatasetId) {
 			this.errors.reject("dataset.does.not.exist", "");
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 
-		this.validateDatasetBelongsToStudy(studyId, dataSet.getDatasetId());
+		this.validateDatasetBelongsToStudy(studyId, datasetId);
 	}
 
 	public void validateObservationDatasetType(final Integer datasetId) {
@@ -80,8 +74,7 @@ public class DatasetValidator {
 		final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable, final Boolean shouldBeDatasetVariable) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
-		this.validateDataset(studyId, dataSet);
+		this.validateDataset(studyId, datasetId);
 
 		// Validate if variable exists and of supported variable type
 		final VariableType variableType = this.validateVariableType(datasetVariable.getVariableTypeId());
@@ -90,6 +83,7 @@ public class DatasetValidator {
 			this.ontologyDataManager.getStandardVariable(variableId, ContextHolder.getCurrentProgram());
 		this.validateVariable(standardVariable, variableType);
 
+		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
 		this.validateIfDatasetVariableAlreadyExists(variableId, shouldBeDatasetVariable, dataSet);
 
 		return standardVariable;
@@ -99,9 +93,9 @@ public class DatasetValidator {
 		final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
-		this.validateDataset(studyId, dataSet);
+		this.validateDataset(studyId, datasetId);
 
+		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
 		for (final Integer variableId : variableIds) {
 			// If the variable does not exist, MiddlewareQueryException will be thrown
 			this.ontologyDataManager.getStandardVariable(variableId, ContextHolder.getCurrentProgram());
@@ -171,15 +165,8 @@ public class DatasetValidator {
 
 	public void validateDatasetBelongsToStudy(final Integer studyId, final Integer datasetId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final List<DatasetDTO> allChildren = this.middlewareDatasetService.getDatasets(studyId, new HashSet<Integer>());
-		boolean found = false;
-		for (final DatasetDTO datasetDTO : allChildren) {
-			if (datasetDTO.getDatasetId().equals(datasetId)) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
+		final boolean datasetIdsBelongToStudy = this.middlewareDatasetService.allDatasetIdsBelongToStudy(studyId, Collections.singletonList(datasetId));
+		if (!datasetIdsBelongToStudy) {
 			this.errors.reject("dataset.do.not.belong.to.study", new String[] {String.valueOf(datasetId), String.valueOf(studyId)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
