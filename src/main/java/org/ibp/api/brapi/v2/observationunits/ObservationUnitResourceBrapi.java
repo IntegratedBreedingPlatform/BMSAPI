@@ -57,7 +57,7 @@ public class ObservationUnitResourceBrapi {
 	private ObservationUnitService observationUnitService;
 
 	@ApiOperation(value = "Post observation units search", notes = "Post observation units search")
-	@RequestMapping(value = {"/{crop}/brapi/v1/observationunits", "/brapi/v1/observationunits"}, method = RequestMethod.POST)
+	@RequestMapping(value = {"/{crop}/brapi/v1/search/observationunits", "/brapi/v1/search/observationunits"}, method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postObservationUnits(
 			@PathVariable final Optional<String> crop,
