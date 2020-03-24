@@ -8,6 +8,7 @@ import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
@@ -19,6 +20,7 @@ import org.springframework.validation.MapBindingResult;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Component
 public class TransactionInputValidator {
@@ -94,7 +96,10 @@ public class TransactionInputValidator {
 		final Predicate<TransactionDto> isPendingStatus = transactionDto -> transactionDto.getTransactionStatus().equals(TransactionStatus.PENDING.getValue());
 
 		if (transactionDtos.stream().filter(isPendingStatus.negate()).count() > 0) {
-			this.errors.reject("transaction.wrong.transaction.status", "");
+			errors.reject("transaction.wrong.transaction.status", new String[] {
+				Util.buildErrorMessageFromList(
+					transactionDtos.stream().filter(isPendingStatus.negate()).map(TransactionDto::getTransactionId).collect(
+						Collectors.toList()), 3)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}

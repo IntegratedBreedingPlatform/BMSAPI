@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -24,7 +23,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,7 +63,7 @@ public class LotItemDtoListValidator {
 		}
 
 		//Validate that none of the elements in the list is null
-		if (countNullElements(lotList) > 0) {
+		if (Util.countNullElements(lotList) > 0) {
 			errors.reject("lot.input.list.item.null", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -80,7 +78,7 @@ public class LotItemDtoListValidator {
 
 	private void validateGermplasmList(final List<LotItemDto> lotList) {
 		final List<Integer> gids = lotList.stream().map(LotItemDto::getGid).distinct().collect(Collectors.toList());
-		if (countNullElements(gids) > 0) {
+		if (Util.countNullElements(gids) > 0) {
 			errors.reject("lot.input.list.gid.null", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -98,7 +96,7 @@ public class LotItemDtoListValidator {
 	private void validateStorageLocations(final List<LotItemDto> lotList) {
 		final List<String> locationAbbreviations =
 				lotList.stream().map(LotItemDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
-		if (countNullOrEmptyStrings(locationAbbreviations)>0) {
+		if (Util.countNullOrEmptyStrings(locationAbbreviations)>0) {
 			errors.reject("lot.input.list.location.abbreviation.null.or.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -116,7 +114,7 @@ public class LotItemDtoListValidator {
 
 	private void validateScaleNames(final List<LotItemDto> lotList){
 		final List<String> scaleNames = lotList.stream().map(LotItemDto::getScaleName).distinct().collect(Collectors.toList());
-		if (countNullOrEmptyStrings(scaleNames) > 0) {
+		if (Util.countNullOrEmptyStrings(scaleNames) > 0) {
 			errors.reject("lot.input.list.units.null.or.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -135,7 +133,7 @@ public class LotItemDtoListValidator {
 
 	private void validateStockIds(final List<LotItemDto> lotList) {
 		final List<String> uniqueStockIds = lotList.stream().map(LotItemDto::getStockId).distinct().collect(Collectors.toList());
-		if (countNullOrEmptyStrings(uniqueStockIds) > 0) {
+		if (Util.countNullOrEmptyStrings(uniqueStockIds) > 0) {
 			errors.reject("lot.input.list.stock.ids.null.or.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -158,7 +156,7 @@ public class LotItemDtoListValidator {
 
 	private void validateInitialBalances(final List<LotItemDto> lotList) {
 		final List<Double> initialBalances = lotList.stream().map(LotItemDto::getInitialBalance).collect(Collectors.toList());
-		if (countNullElements(initialBalances) > 0) {
+		if (Util.countNullElements(initialBalances) > 0) {
 			errors.reject("lot.input.list.initial.balances.null", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -175,15 +173,6 @@ public class LotItemDtoListValidator {
 			errors.reject("lot.input.list.notes.length", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-	}
-
-
-	private <T> long countNullElements(final List<T> list) {
-		return list.stream().filter(Objects::isNull).count();
-	}
-
-	private long countNullOrEmptyStrings(final List<String> list) {
-		return list.stream().filter(s -> StringUtils.isEmpty(s)).count();
 	}
 
 }

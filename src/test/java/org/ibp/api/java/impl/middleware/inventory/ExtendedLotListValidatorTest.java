@@ -47,7 +47,7 @@ public class ExtendedLotListValidatorTest {
 	public void testValidateClosedLots() {
 		try {
 			final ExtendedLotDto extendedLotDto = new ExtendedLotDto();
-			extendedLotDto.setStatus(LotStatus.CLOSED.toString());
+			extendedLotDto.setStatus(LotStatus.CLOSED.name());
 			final List<ExtendedLotDto> lotDtoList = Arrays.asList(extendedLotDto);
 			this.extendedLotListValidator.validateClosedLots(lotDtoList);
 		} catch (ApiRequestValidationException e) {
