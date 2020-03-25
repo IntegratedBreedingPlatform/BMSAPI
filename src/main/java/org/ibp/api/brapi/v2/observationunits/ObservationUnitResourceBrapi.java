@@ -57,10 +57,19 @@ public class ObservationUnitResourceBrapi {
 	private ObservationUnitService observationUnitService;
 
 	@ApiOperation(value = "Post observation units search", notes = "Post observation units search")
-	@RequestMapping(value = {"/{crop}/brapi/v1/search/observationunits", "/brapi/v1/search/observationunits"}, method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/brapi/v1/search/observationunits", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postObservationUnits(
-			@PathVariable final Optional<String> crop,
+			@PathVariable final String crop,
+			@RequestBody final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto) {
+
+		return getSingleEntityResponseResponseEntity(observationUnitsSearchRequestDto);
+
+	}
+
+	@RequestMapping(value = "/brapi/v1/search/observationunits", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<SearchDto>> postObservationUnits(
 			@RequestBody final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto) {
 
 		return getSingleEntityResponseResponseEntity(observationUnitsSearchRequestDto);
@@ -118,6 +127,11 @@ public class ObservationUnitResourceBrapi {
 
 		final PagedResult<PhenotypeSearchDTO> resultPage = this.getObservationUnitDtoPagedResult(phenotypeSearchRequestDTO, currentPage, pageSize);
 
+		return getEntityListResponseResponseEntity(resultPage);
+
+	}
+
+	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> getEntityListResponseResponseEntity(PagedResult<PhenotypeSearchDTO> resultPage) {
 		final Result<PhenotypeSearchDTO> results = new Result<PhenotypeSearchDTO>().withData(resultPage.getPageResults());
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
@@ -127,7 +141,6 @@ public class ObservationUnitResourceBrapi {
 		final EntityListResponse<PhenotypeSearchDTO> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
-
 	}
 
 	private PagedResult<PhenotypeSearchDTO> getObservationUnitDtoPagedResult(

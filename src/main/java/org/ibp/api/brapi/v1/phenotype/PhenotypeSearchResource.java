@@ -46,12 +46,10 @@ public class PhenotypeSearchResource {
 		return getPhenotypeSearchSummariesDtoResponseEntity(requestDTO);
 	}
 
-	@ApiOperation(value = "Phenotype search", notes = "Returns a list of observationUnit with the observed Phenotypes")
 	@RequestMapping(value = "/brapi/v1/phenotypes", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
-	public ResponseEntity<PhenotypeSearchSummariesDto> phenoTypes(@PathVariable final Optional<String> crop,
-																		@RequestBody final PhenotypeSearchRequestDTO requestDTO) {
+	public ResponseEntity<PhenotypeSearchSummariesDto> phenoTypes(@RequestBody final PhenotypeSearchRequestDTO requestDTO) {
 
 
 		return getPhenotypeSearchSummariesDtoResponseEntity(requestDTO);

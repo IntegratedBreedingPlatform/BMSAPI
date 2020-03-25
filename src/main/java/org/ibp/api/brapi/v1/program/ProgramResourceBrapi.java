@@ -48,9 +48,9 @@ public class ProgramResourceBrapi {
 
 
 	@ApiOperation(value = "List Programs", notes = "Get a list of programs.")
-	@RequestMapping(value = {"/{crop}/brapi/v1/programs", "/brapi/v1/programs"}, method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v1/programs", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Programs> listPrograms(@PathVariable final Optional<String> crop,
+	public ResponseEntity<Programs> listPrograms(@PathVariable final String crop,
 			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 					required = false) final Integer currentPage,
 			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
@@ -59,18 +59,22 @@ public class ProgramResourceBrapi {
 					required = false) final String programName,
 			@ApiParam(value = "Filter by program abbreviation. Exact match.", required = false) @RequestParam(value = "abbreviation",
 					required = false) final String abbreviation) {
+		return  getReponseEntityPrograms(crop, currentPage, pageSize, programName, abbreviation);
+	}
+
+
+	private ResponseEntity<Programs> getReponseEntityPrograms(final String cropName,
+															  @RequestParam(value = "page",
+																	  required = false) final Integer currentPage,
+															  @RequestParam(value = "pageSize",
+																	  required = false) final Integer pageSize,
+															  @RequestParam(value = "programName",
+																	  required = false) final String programName,
+															  @RequestParam(value = "abbreviation",
+																	  required = false) final String abbreviation){
 
 		final Map<ProgramFilters, Object> filters = new EnumMap<>(ProgramFilters.class);
 		PagedResult<ProgramDetailsDto> resultPage = null;
-		final String cropName;
-		if(crop.isPresent()){
-			this.setFilters(filters, crop.get(), programName);
-			cropName = crop.get();
-		}else {
-			this.setFilters(filters, this.getDefaultCrop(), programName);
-			cropName = this.getDefaultCrop();
-		}
-
 		if (filters.get(ProgramFilters.CROP_TYPE) == null) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "crop " + cropName + " doesn't exist"));
 			final Metadata metadata = new Metadata(null, status);
@@ -120,6 +124,22 @@ public class ProgramResourceBrapi {
 		final Metadata metadata = new Metadata(null, status);
 		final Programs programList = new Programs().withMetadata(metadata);
 		return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);
+
+
+	}
+
+	@RequestMapping(value = "/brapi/v1/programs", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Programs> listPrograms(@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
+														 required = false) final Integer currentPage,
+												 @ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
+														 required = false) final Integer pageSize,
+												 @ApiParam(value = "Filter by program name. Exact match.", required = false) @RequestParam(value = "programName",
+														 required = false) final String programName,
+												 @ApiParam(value = "Filter by program abbreviation. Exact match.", required = false) @RequestParam(value = "abbreviation",
+														 required = false) final String abbreviation) {
+
+		return  getReponseEntityPrograms(this.getDefaultCrop(), currentPage, pageSize, programName, abbreviation);
 	}
 
 	private void setFilters(final Map<ProgramFilters, Object> filters, final String crop, final String programName) {

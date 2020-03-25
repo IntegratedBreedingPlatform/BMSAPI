@@ -43,10 +43,10 @@ public class VariableResourceBrapi {
 	private CropService cropService;
 
 	@ApiOperation(value = "Call to retrieve a list of observation variables available in the system.")
-	@RequestMapping(value = {"/{crop}/brapi/v1/variables", "/brapi/v1/variables"}, method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v1/variables", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<VariableDTO>> getAllVariables(final HttpServletResponse response,
-		@PathVariable final Optional<String> crop,
+		@PathVariable final String crop,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
 			required = false) final Integer currentPage,
@@ -54,31 +54,48 @@ public class VariableResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
 
-		final String cropName = crop.isPresent() ? crop.get() : this.getDefaultCrop();
+		return getEntityListResponseResponseEntity(currentPage, pageSize, crop);
+	}
 
+	@RequestMapping(value = "/brapi/v1/variables", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<EntityListResponse<VariableDTO>> getAllVariables(final HttpServletResponse response,
+																		   @ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+																		   @RequestParam(value = "page",
+																				   required = false) final Integer currentPage,
+																		   @ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+																		   @RequestParam(value = "pageSize",
+																				   required = false) final Integer pageSize) {
+
+		final String cropName = this.getDefaultCrop();
+
+		return getEntityListResponseResponseEntity(currentPage, pageSize, cropName);
+	}
+
+	private ResponseEntity<EntityListResponse<VariableDTO>> getEntityListResponseResponseEntity(@RequestParam(value = "page", required = false) @ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) Integer currentPage, @RequestParam(value = "pageSize", required = false) @ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) Integer pageSize, String cropName) {
 		final PagedResult<VariableDTO> resultPage =
-			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
+				new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
 
-				@Override
-				public long getCount() {
-					return VariableResourceBrapi.this.variableService.countAllVariables(Collections.unmodifiableList(
-						Arrays.asList(VariableType.TRAIT.getId())));
-				}
+					@Override
+					public long getCount() {
+						return VariableResourceBrapi.this.variableService.countAllVariables(Collections.unmodifiableList(
+								Arrays.asList(VariableType.TRAIT.getId())));
+					}
 
-				@Override
-				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
-					final int pageNumber = pagedResult.getPageNumber() + 1;
-					return VariableResourceBrapi.this.variableService
-						.getAllVariables(cropName, Collections.unmodifiableList(
-							Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
-				}
-			});
+					@Override
+					public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
+						final int pageNumber = pagedResult.getPageNumber() + 1;
+						return VariableResourceBrapi.this.variableService
+								.getAllVariables(cropName, Collections.unmodifiableList(
+										Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
+					}
+				});
 
 		final List<VariableDTO> observationVariables = resultPage.getPageResults();
 
 		final Result<VariableDTO> result = new Result<VariableDTO>().withData(observationVariables);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
