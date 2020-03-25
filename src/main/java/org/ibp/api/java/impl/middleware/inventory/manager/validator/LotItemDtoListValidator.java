@@ -84,8 +84,9 @@ public class LotItemDtoListValidator {
 		}
 
 		final List<Germplasm> existingGermplasms = germplasmDataManager.getGermplasms(gids);
-		if (existingGermplasms.size() != gids.size()) {
-			final List<Integer> existingGids = existingGermplasms.stream().map(Germplasm::getGid).collect(Collectors.toList());
+		if (existingGermplasms.size() != gids.size() || existingGermplasms.stream().filter(g -> g.getDeleted()).count() > 0) {
+			final List<Integer> existingGids =
+				existingGermplasms.stream().filter(g -> !g.getDeleted()).map(Germplasm::getGid).collect(Collectors.toList());
 			final List<Integer> invalidGids = new ArrayList<>(gids);
 			invalidGids.removeAll(existingGids);
 			errors.reject("lot.input.invalid.gids", new String[] {Util.buildErrorMessageFromList(invalidGids, 3)}, "");
