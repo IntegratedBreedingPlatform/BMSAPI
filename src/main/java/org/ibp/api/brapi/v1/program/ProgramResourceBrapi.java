@@ -74,6 +74,7 @@ public class ProgramResourceBrapi {
 																	  required = false) final String abbreviation){
 
 		final Map<ProgramFilters, Object> filters = new EnumMap<>(ProgramFilters.class);
+		this.setFilters(filters, cropName, programName);
 		PagedResult<ProgramDetailsDto> resultPage = null;
 		if (filters.get(ProgramFilters.CROP_TYPE) == null) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "crop " + cropName + " doesn't exist"));
