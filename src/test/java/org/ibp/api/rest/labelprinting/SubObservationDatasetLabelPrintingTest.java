@@ -1,6 +1,7 @@
 package org.ibp.api.rest.labelprinting;
 
 import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -63,15 +64,15 @@ public class SubObservationDatasetLabelPrintingTest {
 
 		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT");
 
-		final DatasetDTO datasetDTO = new DatasetDTO();
+		final DatasetBasicDTO datasetDTO = new DatasetBasicDTO();
 		datasetDTO.setParentDatasetId(2);
 		datasetDTO.setDatasetTypeId(datasetType.getDatasetTypeId());
 
-		Mockito.when(this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
+		Mockito.when(this.middlewareDatasetService.getDatasetBasicDTO(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
 		Mockito.when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 
 		final List<LabelType> labelTypes = this.subObservationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
-		Mockito.verify(this.middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
+		Mockito.verify(this.middlewareDatasetService).getDatasetBasicDTO(labelsInfoInput.getDatasetId());
 		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(dataset.getId(),
