@@ -46,11 +46,10 @@ public class LocationResourceBrapi {
 	private LocationDataManager locationDataManager;
 
 	@ApiOperation(value = "List locations", notes = "Get a list of locations.")
-	@RequestMapping(value = "/brapi/v1/locations", method = RequestMethod.GET)
+	@RequestMapping(value = {"/{crop}/brapi/v1/locations","/brapi/v1/locations"}, method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Locations> listLocations(
-			@ApiParam(value = "Crop Name", required = false) @RequestParam(value = "cropName",
-					required = false) final String cropName,
+			@PathVariable final Optional<String> crop,
 			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 					required = false) final Integer currentPage,
 			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",

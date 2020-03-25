@@ -113,7 +113,7 @@ public class ContextResolverImplTest {
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
 		final String crop = this.contextResolverImpl.resolveCropNameFromUrl();
-		Assert.assertTrue(StringUtils.isEmpty(crop));
+		Assert.assertFalse(StringUtils.isEmpty(crop));
 	}
 
 

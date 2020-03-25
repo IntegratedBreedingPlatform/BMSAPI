@@ -62,14 +62,17 @@ public class ProgramResourceBrapi {
 
 		final Map<ProgramFilters, Object> filters = new EnumMap<>(ProgramFilters.class);
 		PagedResult<ProgramDetailsDto> resultPage = null;
+		final String cropName;
 		if(crop.isPresent()){
 			this.setFilters(filters, crop.get(), programName);
+			cropName = crop.get();
 		}else {
 			this.setFilters(filters, this.getDefaultCrop(), programName);
+			cropName = this.getDefaultCrop();
 		}
 
 		if (filters.get(ProgramFilters.CROP_TYPE) == null) {
-			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "crop " + crop + " doesn't exist"));
+			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "crop " + cropName + " doesn't exist"));
 			final Metadata metadata = new Metadata(null, status);
 			final Programs programList = new Programs().withMetadata(metadata);
 			return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);

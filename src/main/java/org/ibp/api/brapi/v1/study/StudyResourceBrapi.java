@@ -177,13 +177,15 @@ public class StudyResourceBrapi {
 			required = false) @RequestParam(value = "format", required = false) final String format)
 		throws Exception {
 
+		final String cropName = crop.isPresent() ? crop.get() : this.getDefaultCrop();
+
 		if (!StringUtils.isEmpty(format)) {
 			if (StudyResourceBrapi.CSV.equalsIgnoreCase(format.trim())) {
-				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/studies/" + studyDbId + "/table/csv");
+				response.sendRedirect("/bmsapi/" + cropName + "/brapi/v1/studies/" + studyDbId + "/table/csv");
 				return new ResponseEntity<>(HttpStatus.OK);
 			} else if (StudyResourceBrapi.TSV.equalsIgnoreCase(format.trim())) {
 
-				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/studies/" + studyDbId + "/table/tsv");
+				response.sendRedirect("/bmsapi/" + cropName + "/brapi/v1/studies/" + studyDbId + "/table/tsv");
 
 				return new ResponseEntity<>(HttpStatus.OK);
 			} else {
@@ -362,7 +364,6 @@ public class StudyResourceBrapi {
 		}
 
 		final String cropName = crop.isPresent() ? crop.get() : this.getDefaultCrop();
-
 
 		final PagedResult<VariableDTO> resultPage =
 			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
