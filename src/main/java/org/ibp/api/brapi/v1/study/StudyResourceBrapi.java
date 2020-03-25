@@ -8,7 +8,6 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.sun.scenario.effect.Crop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
