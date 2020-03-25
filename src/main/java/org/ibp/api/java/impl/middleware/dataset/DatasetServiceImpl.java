@@ -131,7 +131,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public long countObservationsByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
-		this.validateStudyDatasetAndInstances(studyId, datasetId, Arrays.asList(instanceId), false);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, Arrays.asList(instanceId));
 		return this.middlewareDatasetService.countObservationsByInstance(datasetId, instanceId);
 	}
 
@@ -271,7 +271,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(
 		final int studyId, final int datasetId, final List<Integer> instanceIds) {
-		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, false);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
 		final Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> observationUnitRowsMap =
 			this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, instanceIds);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
@@ -290,7 +290,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	void validateStudyDatasetAndInstances(
-		final int studyId, final int datasetId, final List<Integer> instanceIds, final boolean shouldBeSubObservation) {
+		final int studyId, final int datasetId, final List<Integer> instanceIds) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		if (instanceIds != null) {
@@ -306,7 +306,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (searchDTO.getInstanceId() != null) {
 			instanceIds = Arrays.asList(searchDTO.getInstanceId());
 		}
-		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, false);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
 
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO);
@@ -327,7 +327,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (searchDTO.getInstanceId() != null) {
 			instanceIds = Arrays.asList(searchDTO.getInstanceId());
 		}
-		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, false);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
 
 		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO);
 	}
