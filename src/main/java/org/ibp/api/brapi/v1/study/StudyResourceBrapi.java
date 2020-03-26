@@ -30,11 +30,7 @@ import org.generationcp.middleware.service.api.study.StudyDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
-import org.ibp.api.brapi.v1.common.BrapiPagedResult;
-import org.ibp.api.brapi.v1.common.EntityListResponse;
-import org.ibp.api.brapi.v1.common.Metadata;
-import org.ibp.api.brapi.v1.common.Pagination;
-import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.common.*;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
@@ -282,9 +278,9 @@ public class StudyResourceBrapi {
             mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
 
             final StudyDetails studyDetails = this.getStudyDetailsEntity(mwStudyDetails);
-            return ResponseEntity.ok(studyDetails);
+            return new ResponseEntity(new SingleEntityResponse<StudyDetails>(studyDetails), HttpStatus.OK);
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity(new SingleEntityResponse<StudyDetails>().withMessage("no study found."), HttpStatus.NOT_FOUND);
         }
     }
 
