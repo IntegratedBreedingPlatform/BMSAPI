@@ -1,15 +1,14 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.study.StudyInstanceService;
-import org.ibp.api.rest.dataset.DatasetDTO;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -32,13 +31,13 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Resource
-	private DatasetService datasetService;
-
-	@Resource
 	private StudyValidator studyValidator;
 
 	@Resource
 	private InstanceValidator instanceValidator;
+
+	@Resource
+	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
 
 	@Override
 	public StudyInstance createStudyInstance(final String cropName, final int studyId) {
@@ -47,7 +46,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
-		final List<DatasetDTO> datasets = this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
+		final List<DatasetBasicDTO> datasets = this.middlewareDatasetService.getDatasetBasicDTOs(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
 		if (!datasets.isEmpty()) {
 			// Add Study Instance in Environment (Summary Data) Dataset
 			final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance =
