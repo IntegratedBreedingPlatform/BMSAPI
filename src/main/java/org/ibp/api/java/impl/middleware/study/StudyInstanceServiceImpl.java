@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
 import org.generationcp.middleware.domain.dms.InstanceData;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -14,7 +15,6 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.study.StudyInstanceService;
-import org.ibp.api.rest.dataset.DatasetDTO;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +45,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Resource
 	private DatasetService datasetService;
+
+	@Resource
+	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
 
 	@Resource
 	private StudyValidator studyValidator;
@@ -79,7 +82,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		}
 		return studyInstances;
 
-
 	}
 
 	@Override
@@ -109,7 +111,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-		return studyInstance.isPresent()? Optional.of(mapper.map(studyInstance.get(), StudyInstance.class)) : Optional.empty();
+		return studyInstance.isPresent() ? Optional.of(mapper.map(studyInstance.get(), StudyInstance.class)) : Optional.empty();
 	}
 
 	@Override
@@ -166,8 +168,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	private Integer getEnvironmentDatasetId(final Integer studyId) {
-		final List<DatasetDTO> datasets =
-			this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
+		final List<DatasetBasicDTO> datasets =
+			this.middlewareDatasetService.getDatasetBasicDTOs(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
 		if (!CollectionUtils.isEmpty(datasets)) {
 			return datasets.get(0).getDatasetId();
 		} else {

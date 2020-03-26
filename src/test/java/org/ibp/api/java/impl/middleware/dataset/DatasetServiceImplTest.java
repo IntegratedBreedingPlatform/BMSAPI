@@ -241,7 +241,7 @@ public class DatasetServiceImplTest {
 
 	@Test
 	public void testValidateStudyDatasetAndInstances() {
-		this.studyDatasetService.validateStudyDatasetAndInstances(1, 1, Arrays.asList(1), true);
+		this.studyDatasetService.validateStudyDatasetAndInstances(1, 1, Arrays.asList(1));
 		Mockito.verify(this.studyValidator).validate(1, false);
 		Mockito.verify(this.datasetValidator).validateDataset(1, 1);
 		Mockito.verify(this.instanceValidator).validate(1, new HashSet<>(Arrays.asList(1)));
