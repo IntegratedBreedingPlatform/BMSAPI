@@ -278,9 +278,10 @@ public class StudyResourceBrapi {
             mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
 
             final StudyDetails studyDetails = this.getStudyDetailsEntity(mwStudyDetails);
-            return new ResponseEntity(new SingleEntityResponse<StudyDetails>(studyDetails), HttpStatus.OK);
+            return new ResponseEntity(studyDetails, HttpStatus.OK);
         } else {
-            return new ResponseEntity(new SingleEntityResponse<StudyDetails>().withMessage("no study found."), HttpStatus.NOT_FOUND);
+            StudyDetails studyDetails = new StudyDetails();
+            return new ResponseEntity(studyDetails, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -290,7 +291,7 @@ public class StudyResourceBrapi {
         final Metadata metadata = new Metadata();
         final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
         metadata.setPagination(pagination);
-        metadata.setStatus(Collections.singletonList(new HashMap<>()));
+//        metadata.setStatus(Collections.singletonList(new HashMap<>()));
         studyDetails.setMetadata(metadata);
         final ModelMapper studyMapper = StudyMapper.getInstance();
         final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
