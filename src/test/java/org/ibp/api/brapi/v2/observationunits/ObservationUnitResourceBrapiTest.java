@@ -1,7 +1,7 @@
 package org.ibp.api.brapi.v2.observationunits;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPatchRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.manager.api.SearchRequestService;

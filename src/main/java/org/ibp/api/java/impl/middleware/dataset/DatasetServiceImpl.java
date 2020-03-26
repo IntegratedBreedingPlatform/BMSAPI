@@ -517,12 +517,30 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final Map<Integer, MeasurementVariable> varMap =
 			datasetMeasurementVariables.stream().collect(Collectors.toMap(MeasurementVariable::getTermId, Function.identity()));
-		final Set<Integer> variableIds = new TreeSet(
-			observations.stream().map(ObservationDTO::getObservationVariableDbId).collect(Collectors.toSet()));
-		final Map<String, Map<Integer, List<ObservationDTO>>> tree = observations.stream().collect(Collectors
-			.groupingBy(ObservationDTO::getObservationUnitDbId, Collectors.groupingBy(ObservationDTO::getObservationVariableDbId)));
+		final Set<Integer> variableIds =
+			new TreeSet(observations.stream().map(ObservationDTO::getObservationVariableDbId).collect(Collectors.toSet()));
 		final List<String> variableNames =
 			variableIds.stream().map(termId -> varMap.get(termId).getName()).collect(Collectors.toList());
+
+		/* tree -> {
+		 *     obsUnit1 -> {
+		 *         var1 -> [obs1],
+		 *         var2 -> [obs2]
+		 *         var3 -> null,
+		 *     },
+		 *     obsUnit2 -> {
+		 *         var1 -> null,
+		 *         var2 -> [obs3],
+		 *         var3 -> [obs4],
+		 *     }
+		 * }
+		 */
+		final Map<String, Map<Integer, List<ObservationDTO>>> tree = observations.stream().collect(Collectors
+			.groupingBy(ObservationDTO::getObservationUnitDbId,
+				LinkedHashMap::new,
+				Collectors.groupingBy(ObservationDTO::getObservationVariableDbId,
+					LinkedHashMap::new,
+					Collectors.toList())));
 
 		final ObservationsPutRequestInput input = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();

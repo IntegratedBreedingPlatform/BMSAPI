@@ -20,15 +20,15 @@ import java.util.List;
 /**
  * Created by clarysabel on 10/28/19.
  */
-@Api(value = "Inventory Scale Services")
+@Api(value = "Inventory Unit Services")
 @RestController
-public class InventoryScaleResource {
+public class InventoryUnitResource {
 
 	@Autowired
 	private VariableService variableService;
 
-	@ApiOperation(value = "It will retrieve all inventory scales", notes = "It will retrieve all inventory scales")
-	@RequestMapping(value = "/crops/{cropName}/inventory-scales", method = RequestMethod.GET)
+	@ApiOperation(value = "It will retrieve all inventory units", notes = "It will retrieve all inventory units")
+	@RequestMapping(value = "/crops/{cropName}/inventory-units", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<VariableDetails>> getLots(
 			@PathVariable
