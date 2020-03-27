@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDt
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -14,6 +15,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawalInputDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionUpdateRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +59,9 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private TransactionUpdateRequestDtoValidator transactionUpdateRequestDtoValidator;
 
 
 	@Override
@@ -174,4 +179,16 @@ public class TransactionServiceImpl implements TransactionService {
 		extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotIds);
 		return this.transactionService.getAvailableBalanceTransactions(lotId);
 	}
+
+	@Override
+	public void updatePendingTransactions(final List<TransactionUpdateRequestDto> transactionUpdateInputDtos) {
+		try {
+			lock.lock();
+			transactionUpdateRequestDtoValidator.validate(transactionUpdateInputDtos);
+			this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
+		} finally {
+			lock.unlock();
+		}
+	}
+
 }
