@@ -40,7 +40,8 @@ public class ExtendedLotListValidator {
 	public void validateClosedLots(final List<ExtendedLotDto> extendedLotDtos) {
 		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
 		//Validate that none of them are closed
-		final long closedLotsCount = extendedLotDtos.stream().filter(lot -> lot.getStatus().equals(LotStatus.CLOSED.toString())).count();
+		final long closedLotsCount =
+			extendedLotDtos.stream().filter(lot -> lot.getStatus().equalsIgnoreCase(LotStatus.CLOSED.name())).count();
 		if (closedLotsCount != 0) {
 			errors.reject("selected.lots.closed", new String[] {String.valueOf(closedLotsCount)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());

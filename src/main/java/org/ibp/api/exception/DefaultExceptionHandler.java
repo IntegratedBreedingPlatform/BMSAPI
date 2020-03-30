@@ -169,7 +169,7 @@ public class DefaultExceptionHandler {
 	public ErrorResponse handleMiddlewareRequestException(MiddlewareRequestException ex) {
 		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
-		String message = this.getMessage(ex.getErrorCode(), null);
+		String message = this.getMessage(ex.getErrorCode(), ex.getParams());
 		response.addError(message);
 		return response;
 	}

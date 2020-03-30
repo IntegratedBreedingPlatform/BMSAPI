@@ -4,8 +4,10 @@ import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Util {
@@ -33,4 +35,17 @@ public class Util {
 
 		return stringBuilder.toString();
 	}
+
+	public static <T> long countNullElements(final List<T> list) {
+		return list.stream().filter(Objects::isNull).count();
+	}
+
+	public static long countNullOrEmptyStrings(final List<String> list) {
+		return list.stream().filter(s -> StringUtils.isEmpty(s)).count();
+	}
+
+	public static <T> boolean areAllUnique(final List<T> list) {
+		return list.stream().allMatch(new HashSet<>()::add);
+	}
+
 }

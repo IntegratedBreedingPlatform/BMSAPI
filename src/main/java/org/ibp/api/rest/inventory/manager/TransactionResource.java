@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -204,8 +205,9 @@ public class TransactionResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "It will retrieve transactions that affects the available balance of the lot", notes = "It will retrieve transactions that "
-		+ "affects the available balance of the lot")
+	@ApiOperation(value = "It will retrieve transactions that affects the available balance of the lot", notes =
+		"It will retrieve transactions that "
+			+ "affects the available balance of the lot")
 	@RequestMapping(value = "/crops/{cropName}/lots/{lotId}/available-balance-transactions", method = RequestMethod.GET)
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
@@ -242,4 +244,20 @@ public class TransactionResource {
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Update Pending Transactions", notes = "Update Amount and Notes for pending transactions, Modify the lot available balance through the pending transaction. "
+		+ "Important: The operations are executed in sequential order. Supported types: Withdrawals, Deposits ")
+	@RequestMapping(value = "/crops/{cropName}/pending-transactions", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('UPDATE_PENDING_TRANSACTIONS')")
+	public ResponseEntity<Void> updatePendingTransactions(
+		@PathVariable final String cropName,
+		@ApiParam("New amount or New Available Balance and Notes to be updated per transaction")
+		@RequestBody final List<TransactionUpdateRequestDto> transactionUpdateInputDtos) {
+
+		this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 }
