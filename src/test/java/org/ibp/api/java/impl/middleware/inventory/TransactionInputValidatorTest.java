@@ -6,10 +6,11 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
-import org.ibp.api.java.impl.middleware.common.validator.InventoryScaleValidator;
+import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -33,7 +35,7 @@ public class TransactionInputValidatorTest {
 	private TransactionInputValidator transactionInputValidator;
 
 	@Mock
-	private InventoryScaleValidator inventoryScaleValidator;
+	private InventoryUnitValidator inventoryUnitValidator;
 
 	@Mock
 	private LotService lotService;
@@ -71,13 +73,13 @@ public class TransactionInputValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void validateCloseLot() {
+	public void testValidateCloseLot() {
 		this.transactionDto.setAmount(TEN);
 		this.transactionDto.setTransactionType(DEPOSIT);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(Lists.newArrayList(this.transactionDto.getLot().getLotId()));
 		final ExtendedLotDto lot = new ExtendedLotDto();
-		lot.setScaleId(1);
+		lot.setUnitId(1);
 		lot.setStatus(LotStatus.CLOSED.name());
 		final List<ExtendedLotDto> result = Lists.newArrayList(lot);
 		Mockito.when(this.lotService.searchLots(lotsSearchDto, null)).thenReturn(result);
@@ -85,7 +87,7 @@ public class TransactionInputValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void validateEmptyLot() {
+	public void testValidateEmptyLot() {
 		this.transactionDto.setAmount(10.0);
 		this.transactionDto.setTransactionType(DEPOSIT);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
@@ -93,5 +95,16 @@ public class TransactionInputValidatorTest {
 
 		Mockito.when(this.lotService.searchLots(lotsSearchDto, null)).thenReturn(Lists.newArrayList());
 		this.transactionInputValidator.validate(this.transactionDto);
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidatePendingStatus() {
+		this.transactionDto.setAmount(10.0);
+		this.transactionDto.setTransactionType(DEPOSIT);
+		this.transactionDto.setNotes(RandomStringUtils.randomAlphabetic(255));
+		this.transactionDto.setTransactionStatus(TransactionStatus.CONFIRMED.getValue());
+		this.transactionDto.setTransactionId(1);
+		List<TransactionDto> transactionDtoList = Arrays.asList(this.transactionDto);
+		this.transactionInputValidator.validatePendingStatus(transactionDtoList);
 	}
 }

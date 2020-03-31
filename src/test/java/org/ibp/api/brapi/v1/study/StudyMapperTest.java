@@ -7,10 +7,12 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
 
+import java.text.ParseException;
+
 public class StudyMapperTest {
 
 	@Test
-	public void studyDetailsMapperTest() {
+	public void studyDetailsMapperTest() throws ParseException {
 
 		final ModelMapper mapper = StudyMapper.getInstance();
 		final StudyDetailsDto studyDetailsDto = StudyTestDataProvider.getStudyDetailsDto();

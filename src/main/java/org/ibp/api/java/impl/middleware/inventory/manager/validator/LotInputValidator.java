@@ -1,12 +1,19 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.impl.middleware.common.validator.InventoryScaleValidator;
+import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,6 +21,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class LotInputValidator {
@@ -23,13 +32,19 @@ public class LotInputValidator {
 	private LocationValidator locationValidator;
 
 	@Autowired
-	private InventoryScaleValidator inventoryScaleValidator;
+	private InventoryUnitValidator inventoryUnitValidator;
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
 
 	@Autowired
+	private ExtendedLotListValidator extendedLotListValidator;
+
+	@Autowired
 	private LotService lotService;
+
+	@Autowired
+	private TransactionService transactionService;
 
 	private BindingResult errors;
 
@@ -44,19 +59,64 @@ public class LotInputValidator {
 	public void validate(final LotGeneratorInputDto lotGeneratorInputDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.locationValidator.validateSeedLocationId(this.errors, lotGeneratorInputDto.getLocationId());
-		this.inventoryScaleValidator.validateInventoryScaleId(this.errors, lotGeneratorInputDto.getScaleId());
+		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
-		this.validateComments(lotGeneratorInputDto.getComments());
+		this.validateNotes(lotGeneratorInputDto.getNotes());
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateComments(final String comments) {
-		if (comments != null) {
-			if (comments.length() > 255) {
-				this.errors.reject("lot.comments.length");
+	public void validate(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto updateRequestDto) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
+
+		this.extendedLotListValidator.validateClosedLots(lotDtos);
+
+		final Integer locationId = updateRequestDto.getLocationId();
+		if (locationId != null) {
+			this.locationValidator.validateSeedLocationId(this.errors, locationId);
+		}
+
+		final Integer unitId = updateRequestDto.getUnitId();
+		if (unitId != null) {
+			this.inventoryUnitValidator.validateInventoryUnitId(this.errors, unitId);
+		}
+
+		final Integer gid = updateRequestDto.getGid();
+		if (gid != null) {
+			this.germplasmValidator.validateGermplasmId(this.errors, gid);
+		}
+
+		this.validateNotes(updateRequestDto.getNotes());
+		this.validateTransactionStatus(lotDtos, updateRequestDto);
+
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateTransactionStatus(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto updateRequestDto) {
+		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+		transactionsSearchDto.setLotIds(lotDtos.stream().map(LotDto::getLotId).collect(Collectors.toList()));
+		final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
+
+		if (transactionDtos == null || transactionDtos.isEmpty()) {
+			return;
+		}
+
+		if (transactionDtos.stream().map(TransactionDto::getTransactionStatus)
+			.anyMatch(s -> s.equals(TransactionStatus.CONFIRMED.getValue()))
+			&& (updateRequestDto.getUnitId() != null)) {
+
+			this.errors.reject("lots.transactions.status.confirmed.cannot.change.unit");
+		}
+	}
+
+	public void validateNotes(final String notes) {
+		if (notes != null) {
+			if (notes.length() > 255) {
+				this.errors.reject("lot.notes.length");
 			}
 		}
 	}
