@@ -11,7 +11,6 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -30,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Api(value = "BrAPI Variable Services")
 @Controller
@@ -38,9 +36,6 @@ public class VariableResourceBrapi {
 
 	@Autowired
 	private VariableService variableService;
-
-	@Autowired
-	private CropService cropService;
 
 	@ApiOperation(value = "Call to retrieve a list of observation variables available in the system.")
 	@RequestMapping(value = "/{crop}/brapi/v1/variables", method = RequestMethod.GET)
@@ -54,42 +49,23 @@ public class VariableResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
 
-		return getEntityListResponseResponseEntity(currentPage, pageSize, crop);
-	}
-
-	@RequestMapping(value = "/brapi/v1/variables", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<EntityListResponse<VariableDTO>> getAllVariables(final HttpServletResponse response,
-																		   @ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
-																		   @RequestParam(value = "page",
-																				   required = false) final Integer currentPage,
-																		   @ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
-																		   @RequestParam(value = "pageSize",
-																				   required = false) final Integer pageSize) {
-
-		final String cropName = this.getDefaultCrop();
-
-		return getEntityListResponseResponseEntity(currentPage, pageSize, cropName);
-	}
-
-	private ResponseEntity<EntityListResponse<VariableDTO>> getEntityListResponseResponseEntity(@RequestParam(value = "page", required = false) @ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) Integer currentPage, @RequestParam(value = "pageSize", required = false) @ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) Integer pageSize, String cropName) {
 		final PagedResult<VariableDTO> resultPage =
-				new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
 
-					@Override
-					public long getCount() {
-						return VariableResourceBrapi.this.variableService.countAllVariables(Collections.unmodifiableList(
-								Arrays.asList(VariableType.TRAIT.getId())));
-					}
+				@Override
+				public long getCount() {
+					return VariableResourceBrapi.this.variableService.countAllVariables(Collections.unmodifiableList(
+						Arrays.asList(VariableType.TRAIT.getId())));
+				}
 
-					@Override
-					public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
-						final int pageNumber = pagedResult.getPageNumber() + 1;
-						return VariableResourceBrapi.this.variableService
-								.getAllVariables(cropName, Collections.unmodifiableList(
-										Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
-					}
-				});
+				@Override
+				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
+					final int pageNumber = pagedResult.getPageNumber() + 1;
+					return VariableResourceBrapi.this.variableService
+						.getAllVariables(crop, Collections.unmodifiableList(
+							Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
+				}
+			});
 
 		final List<VariableDTO> observationVariables = resultPage.getPageResults();
 
@@ -104,11 +80,4 @@ public class VariableResourceBrapi {
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
-	private String getDefaultCrop() {
-		final List<String> crops = this.cropService.getInstalledCrops();
-		if(crops != null && !crops.isEmpty()){
-			return crops.get(0);
-		}
-		return null;
-	}
 }

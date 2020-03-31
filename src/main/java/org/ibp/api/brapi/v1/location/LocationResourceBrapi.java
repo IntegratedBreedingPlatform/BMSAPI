@@ -26,11 +26,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Location services.
@@ -48,8 +49,7 @@ public class LocationResourceBrapi {
 	@ApiOperation(value = "List locations", notes = "Get a list of locations.")
 	@RequestMapping(value = "/{crop}/brapi/v1/locations", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Locations> listLocations(
-			@PathVariable final String crop,
+	public ResponseEntity<Locations> listLocations(@PathVariable final String crop,
 			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 					required = false) final Integer currentPage,
 			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
@@ -57,10 +57,6 @@ public class LocationResourceBrapi {
 			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
 					required = false) final String locationType) {
 
-		return getLocationsResponseEntity(currentPage, pageSize, locationType);
-	}
-
-	private ResponseEntity<Locations> getLocationsResponseEntity(@RequestParam(value = "page", required = false) @ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) Integer currentPage, @RequestParam(value = "pageSize", required = false) @ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) Integer pageSize, @RequestParam(value = "locationType", required = false) @ApiParam(value = "name of location type", required = false) String locationType) {
 		final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
 		PagedResult<LocationDetailsDto> resultPage = null;
 		final boolean validation = this.validateParameter(locationType, filters);
@@ -108,19 +104,6 @@ public class LocationResourceBrapi {
 			final Locations locationList = new Locations().withMetadata(metadata);
 			return new ResponseEntity<>(locationList, HttpStatus.NOT_FOUND);
 		}
-	}
-
-	@RequestMapping(value = "/brapi/v1/locations", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<Locations> listLocations(
-			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
-					required = false) final Integer currentPage,
-			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
-					required = false) final Integer pageSize,
-			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
-					required = false) final String locationType) {
-
-		return getLocationsResponseEntity(currentPage, pageSize, locationType);
 	}
 
 	private boolean validateParameter(final String locationType, final Map<LocationFilters, Object> filters) {

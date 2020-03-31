@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,9 +34,9 @@ public class CallResourceBrapi {
 	private CallService callService;
 
 	@ApiOperation(value = "List of available calls", notes = "Get a list of available calls.")
-	@RequestMapping(value = "/brapi/v1/calls", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v1/calls", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<BrapiCalls> listAvailableCalls(
+	public ResponseEntity<BrapiCalls> listAvailableCalls(@PathVariable final String crop,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
