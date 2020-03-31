@@ -25,10 +25,13 @@ public class StudyDetailsData {
 
 	private String studyName;
 
-	@JsonView(BrapiView.BrapiV2.class)
 	private String studyDescription;
 
 	private String studyType;
+
+	private String studyTypeDbId;
+
+	private String studyTypeName;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String lastUpdate;
@@ -454,6 +457,22 @@ public class StudyDetailsData {
 	public StudyDetailsData setObservationUnitsDescription(final String observationUnitsDescription) {
 		this.observationUnitsDescription = observationUnitsDescription;
 		return this;
+	}
+
+	public String getStudyTypeDbId() {
+		return this.studyTypeDbId;
+	}
+
+	public void setStudyTypeDbId(final String studyTypeDbId) {
+		this.studyTypeDbId = studyTypeDbId;
+	}
+
+	public String getStudyTypeName() {
+		return this.studyTypeName;
+	}
+
+	public void setStudyTypeName(final String studyTypeName) {
+		this.studyTypeName = studyTypeName;
 	}
 
 	public void addContact(final Contact contact) {

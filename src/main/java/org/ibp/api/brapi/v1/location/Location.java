@@ -30,6 +30,8 @@ public class Location {
 
 	private String name;
 
+	private String locationName;
+
 	private String abbreviation;
 
 	private String countryCode;
@@ -397,6 +399,14 @@ public class Location {
 	public Location setTopography(final String topography) {
 		this.topography = topography;
 		return this;
+	}
+
+	public String getLocationName() {
+		return this.locationName;
+	}
+
+	public void setLocationName(final String locationName) {
+		this.locationName = locationName;
 	}
 
 	public Map<String, String> getAdditionalInfo() {

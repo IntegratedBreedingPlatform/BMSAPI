@@ -81,6 +81,8 @@ public class StudyMapper {
 				this.map().setStudyDbId(this.source.getMetadata().getStudyDbId());
 				this.map().setStudyName(this.source.getMetadata().getStudyName());
 				this.map().setStudyType(this.source.getMetadata().getStudyType());
+				this.map().setStudyTypeName(this.source.getMetadata().getStudyTypeName());
+				this.map().setStudyTypeDbId(this.source.getMetadata().getStudyType());
 				this.map().setTrialName(this.source.getMetadata().getTrialName());
 				this.map().setTrialDbId(this.source.getMetadata().getTrialDbId());
 				this.map().setStudyDescription(this.source.getMetadata().getStudyDescription());
