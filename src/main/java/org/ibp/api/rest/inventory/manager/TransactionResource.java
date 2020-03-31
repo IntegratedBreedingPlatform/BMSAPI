@@ -6,10 +6,13 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
+import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -19,10 +22,12 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.inventory.manager.TransactionExportService;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.io.File;
 import java.util.List;
 
 @Api(value = "Transaction Services")
@@ -56,6 +62,23 @@ public class TransactionResource {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private TransactionExportService transactionExportServiceImpl;
+
+	@ApiOperation(value = "Get Transaction types")
+	@RequestMapping(value = "/crops/{cropName}/transaction-types", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<TransactionType>> getTransactionTypes(@PathVariable final String cropName) {
+		return new ResponseEntity<>(this.transactionService.getAllTransactionTypes(), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get Transaction status types")
+	@RequestMapping(value = "/crops/{cropName}/transaction-status-types", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<TransactionStatus>> getTransactionStatusTypes(@PathVariable final String cropName) {
+		return new ResponseEntity<>(this.transactionService.getAllTransactionStatus(), HttpStatus.OK);
+	}
 
 	@ApiOperation(value = "Post transaction search", notes = "Post transaction search")
 	@RequestMapping(value = "/crops/{cropName}/transactions/search", method = RequestMethod.POST)
@@ -168,4 +191,73 @@ public class TransactionResource {
 
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
+
+	@ApiOperation(value = "Confirm pending Transactions", notes = "Confirm any transaction with pending status")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmation", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CONFIRM_TRANSACTIONS')")
+	public ResponseEntity<Void> confirmPendingTransaction(
+		@PathVariable final String cropName, //
+		@ApiParam("List of transactions to be confirmed, use a searchId or a list of transaction ids")
+		@RequestBody final SearchCompositeDto searchCompositeDto){
+
+		this.transactionService.confirmPendingTransactions(searchCompositeDto);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "It will retrieve transactions that affects the available balance of the lot", notes =
+		"It will retrieve transactions that "
+			+ "affects the available balance of the lot")
+	@RequestMapping(value = "/crops/{cropName}/lots/{lotId}/available-balance-transactions", method = RequestMethod.GET)
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
+	@ResponseBody
+	@JsonView(InventoryView.TransactionView.class)
+	public ResponseEntity<List<TransactionDto>> getAvailableBalanceTransactions(
+		@PathVariable final String cropName, //
+		@PathVariable final Integer lotId) {
+
+		final List<TransactionDto> transactionDtos = this.transactionService.getAvailableBalanceTransactions(lotId);
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(transactionDtos.size()));
+
+		return new ResponseEntity<>(transactionDtos, headers, HttpStatus.OK);
+
+	}
+
+	@ApiOperation(value = "Download Template as excel file", notes = "Download Template as excel file")
+	@RequestMapping(
+		value = "/crops/{cropName}/transactions/xls",
+		method = RequestMethod.GET)
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
+	public ResponseEntity<FileSystemResource> getTransactionsTemplate(
+		@PathVariable final String cropName, @RequestParam final Integer searchRequestId) {
+		final TransactionsSearchDto searchDTO = (TransactionsSearchDto) this.searchRequestService
+			.getSearchRequest(searchRequestId, TransactionsSearchDto.class);
+
+		final List<TransactionDto> transactionDtoList = TransactionResource.this.transactionService.searchTransactions(searchDTO, null);
+
+		final File file = this.transactionExportServiceImpl.export(transactionDtoList);
+		final HttpHeaders headers = new HttpHeaders();
+		headers
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+		final FileSystemResource fileSystemResource = new FileSystemResource(file);
+		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Update Pending Transactions", notes = "Update Amount and Notes for pending transactions, Modify the lot available balance through the pending transaction. "
+		+ "Important: The operations are executed in sequential order. Supported types: Withdrawals, Deposits ")
+	@RequestMapping(value = "/crops/{cropName}/pending-transactions", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('UPDATE_PENDING_TRANSACTIONS')")
+	public ResponseEntity<Void> updatePendingTransactions(
+		@PathVariable final String cropName,
+		@ApiParam("New amount or New Available Balance and Notes to be updated per transaction")
+		@RequestBody final List<TransactionUpdateRequestDto> transactionUpdateInputDtos) {
+
+		this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 }

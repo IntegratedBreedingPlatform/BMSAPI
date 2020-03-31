@@ -2,6 +2,7 @@ package org.ibp.api.brapi.v1.germplasm;
 
 import com.google.common.collect.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -27,7 +28,9 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.apache.commons.lang.math.RandomUtils.nextInt;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -151,4 +154,45 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 				Matchers.is(germplasmDbId)));
 
 	}
+
+	@Test
+	public void testGetGermplasmAttributes() throws Exception {
+		final int gid = nextInt();
+		final String germplasmDbId = String.valueOf(gid);
+		final List<AttributeDTO> attributeDTOS = this.createAttributes(germplasmDbId);
+
+		doReturn(attributeDTOS).when(this.germplasmService)
+				.getAttributesByGid(germplasmDbId, null, BrapiPagedResult.DEFAULT_PAGE_SIZE, 1);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/attributes")
+				.contentType(this.contentType)
+				.locale(locale))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(jsonPath("$.result.germplasmDbId", is(germplasmDbId)))
+				.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(attributeDTOS.size())))
+				.andExpect(jsonPath("$.result.data[0].attributeDbId", is(attributeDTOS.get(0).getAttributeDbId())))
+				.andExpect(jsonPath("$.result.data[0].attributeCode", is(attributeDTOS.get(0).getAttributeCode())))
+				.andExpect(jsonPath("$.result.data[0].attributeName", is(attributeDTOS.get(0).getAttributeName())))
+				.andExpect(jsonPath("$.result.data[0].determinedDate", is(attributeDTOS.get(0).getDeterminedDate())))
+				.andExpect(jsonPath("$.result.data[0].value", is(attributeDTOS.get(0).getValue())))
+
+		;
+	}
+
+	private List<AttributeDTO> createAttributes( final String germplasmDbId){
+		final AttributeDTO attributeDTO = new AttributeDTO();
+		attributeDTO.setAttributeCode(randomAlphabetic(3));
+		attributeDTO.setAttributeDbId(Integer.parseInt(randomNumeric(3)));
+		attributeDTO.setAttributeName(randomAlphabetic(5));
+		attributeDTO.setDeterminedDate(1);
+		attributeDTO.setValue("3");
+
+		final ArrayList<AttributeDTO> list = new ArrayList<>();
+		list.add(attributeDTO);
+		return list;
+
+	}
+
+
+
 }

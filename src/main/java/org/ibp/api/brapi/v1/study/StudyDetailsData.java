@@ -1,5 +1,6 @@
 package org.ibp.api.brapi.v1.study;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -11,6 +12,7 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +45,11 @@ public class StudyDetailsData {
 
 	private String trialName;
 
-	private String startDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date startDate;
 
-	private String endDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date endDate;
 
 	private Boolean active;
 
@@ -105,7 +109,7 @@ public class StudyDetailsData {
 	 * @param additionalInfo
 	 */
 	public StudyDetailsData(final Integer studyDbId, final String studyName, final String studyDescription, final String studyType, final String studyPUI,
-		final List<String> seasons,	final Integer trialDbId, final String trialName, final String startDate, final String endDate,
+		final List<String> seasons,	final Integer trialDbId, final String trialName, final Date startDate, final Date endDate,
 		final Boolean active, final Location location, final String culturalPractices, final List<String> dataLinks,
 		final String documentationURL, final List<EnvironmentParameter> environmentParameters, final ExperimentalDesign experimentalDesign,
 		final List<String> externalReferences, final String growthFacility, final String lastUpdate, final String license,
@@ -299,7 +303,7 @@ public class StudyDetailsData {
 	/**
 	 * @return the end date
 	 */
-	public String getEndDate() {
+	public Date getEndDate() {
 		return endDate;
 	}
 
@@ -307,7 +311,7 @@ public class StudyDetailsData {
 	 * @param endDate
 	 * @return StudyDetailsData
 	 */
-	public StudyDetailsData setEndDate(final String endDate) {
+	public StudyDetailsData setEndDate(final Date endDate) {
 		this.endDate = endDate;
 		return this;
 	}
@@ -315,7 +319,7 @@ public class StudyDetailsData {
 	/**
 	 * @return the start date
 	 */
-	public String getStartDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
 
@@ -323,7 +327,7 @@ public class StudyDetailsData {
 	 * @param startDate
 	 * @return StudyDetailsData
 	 */
-	public StudyDetailsData setStartDate(final String startDate) {
+	public StudyDetailsData setStartDate(final Date startDate) {
 		this.startDate = startDate;
 		return this;
 	}

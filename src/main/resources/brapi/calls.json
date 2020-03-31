@@ -101,6 +101,21 @@
         ]
       },
       {
+        "call": "studies",
+        "dataTypes": [
+          "application/json"
+        ],
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.3"
+        ]
+      },
+      {
         "call": "studies/{studyDbId}",
         "dataTypes": [
           "application/json"
@@ -296,7 +311,7 @@
         ]
       },
       {
-        "call": "/studies/{studyDbId}/germplasm",
+        "call": "studies/{studyDbId}/germplasm",
         "dataTypes": [
           "application/json"
         ],
@@ -311,7 +326,7 @@
         ]
       },
       {
-        "call": "/studies/{studyDbId}/observationvariables",
+        "call": "studies/{studyDbId}/observationvariables",
         "dataTypes": [
           "application/json"
         ],
@@ -341,7 +356,7 @@
         ]
       },
       {
-        "call": "/search/observationunits/{searchResultsDbid}",
+        "call": "search/observationunits/{searchResultsDbid}",
         "dataTypes": [
           "application/json"
         ],
@@ -356,7 +371,7 @@
         ]
       },
     {
-      "call": "/germplasm/{germplasmDbId}/attributes",
+      "call": "germplasm/{germplasmDbId}/attributes",
       "dataTypes": [
         "application/json"
       ],
@@ -371,7 +386,7 @@
       ]
     },
     {
-      "call": "/variables",
+      "call": "variables",
       "dataTypes": [
         "application/json"
       ],
