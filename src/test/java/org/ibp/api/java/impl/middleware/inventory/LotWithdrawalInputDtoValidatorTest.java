@@ -128,7 +128,7 @@ public class LotWithdrawalInputDtoValidatorTest {
 
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.withdraw.amount.invalid"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.amount.invalid"));
 		}
 	}
 

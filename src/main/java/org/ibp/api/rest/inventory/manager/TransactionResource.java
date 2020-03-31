@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -258,6 +259,34 @@ public class TransactionResource {
 		this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
 
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a set os filtered lots")
+	@RequestMapping(value = "/crops/{cropName}/transactions/pending-deposits-lists", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_PENDING_DEPOSITS')")
+	public ResponseEntity<Void> createPendingDeposits(
+		@PathVariable final String cropName,
+		@ApiParam("Deposit amount per unit")
+		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
+
+		this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.PENDING);
+
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a set os filtered lots")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-deposits-lists", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_CONFIRMED_DEPOSITS')")
+	public ResponseEntity<Void> createConfirmedDeposits(
+		@PathVariable final String cropName,
+		@ApiParam("Deposit amount per unit")
+		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
+
+		this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED);
+
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 }
