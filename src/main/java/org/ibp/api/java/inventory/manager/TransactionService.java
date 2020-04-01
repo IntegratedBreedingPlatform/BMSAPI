@@ -18,8 +18,6 @@ public interface TransactionService {
 
 	long countSearchTransactions(TransactionsSearchDto lotsSearchDto);
 
-	Integer saveTransaction(TransactionDto transactionDto);
-
 	List<TransactionStatus> getAllTransactionStatus();
 
 	List<TransactionType> getAllTransactionTypes();

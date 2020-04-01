@@ -81,17 +81,6 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Integer saveTransaction(final TransactionDto transactionDto) {
-		lock.lock();
-		try {
-			this.transactionInputValidator.validate(transactionDto);
-			return this.transactionService.saveTransaction(transactionDto);
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@Override
 	public List<TransactionStatus> getAllTransactionStatus() {
 		return TransactionStatus.getAll();
 	}
