@@ -113,16 +113,16 @@ public class TransactionServiceImpl implements TransactionService {
 			lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 
 			LotsSearchDto searchDTO;
-			if (lotWithdrawalInputDto.getLotsSearchId() != null) {
+			if (lotWithdrawalInputDto.getSelectedLots().getSearchRequestId() != null) {
 				searchDTO = (LotsSearchDto) this.searchRequestService
-					.getSearchRequest(lotWithdrawalInputDto.getLotsSearchId(), LotsSearchDto.class);
+					.getSearchRequest(lotWithdrawalInputDto.getSelectedLots().getSearchRequestId(), LotsSearchDto.class);
 			} else {
 				searchDTO = new LotsSearchDto();
-				searchDTO.setLotIds(new ArrayList<>(lotWithdrawalInputDto.getLotIds()));
+				searchDTO.setLotIds(new ArrayList<>(lotWithdrawalInputDto.getSelectedLots().getItemIds()));
 			}
 			final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-			extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotWithdrawalInputDto.getLotIds());
+			extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotWithdrawalInputDto.getSelectedLots().getItemIds());
 			extendedLotListValidator.validateEmptyList(lotDtos);
 			extendedLotListValidator.validateEmptyUnits(lotDtos);
 			extendedLotListValidator.validateClosedLots(lotDtos);

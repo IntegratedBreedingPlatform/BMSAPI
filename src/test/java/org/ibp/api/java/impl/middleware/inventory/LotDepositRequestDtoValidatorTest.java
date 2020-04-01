@@ -20,6 +20,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +66,7 @@ public class LotDepositRequestDtoValidatorTest {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
 			searchCompositeDto.setSearchRequestId(1);
-			searchCompositeDto.setItemIds(new HashSet<>(Arrays.asList(1)));
+			searchCompositeDto.setItemIds(new HashSet<>(Collections.singleton(1)));
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
 		} catch (ApiRequestValidationException e) {

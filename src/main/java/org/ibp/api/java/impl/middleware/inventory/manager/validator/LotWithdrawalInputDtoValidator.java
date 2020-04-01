@@ -43,9 +43,7 @@ public class LotWithdrawalInputDtoValidator {
 		}
 
 		//Validate that searchId or list of lots are provided
-		if (lotWithdrawalInputDto.getLotsSearchId() == null && (lotWithdrawalInputDto.getLotIds() == null || lotWithdrawalInputDto
-			.getLotIds().isEmpty()) ||
-			lotWithdrawalInputDto.getLotsSearchId() != null && (lotWithdrawalInputDto.getLotIds() != null)) {
+		if (lotWithdrawalInputDto.getSelectedLots() == null || !lotWithdrawalInputDto.getSelectedLots().isValid()) {
 			errors.reject("lot.selection.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
