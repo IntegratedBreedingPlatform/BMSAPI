@@ -454,7 +454,7 @@ public class StudyResourceBrapi {
 
 		this.studyDatasetService.importObservations(studyDbId, newObservationRequest.observations);
 
-		final Result<ObservationDTO> results = new Result<ObservationDTO>().withData(newObservationRequest.observations);
+		final Result<ObservationDTO> results = new Result<ObservationDTO>().withObservations(newObservationRequest.observations);
 		@SuppressWarnings("unchecked") final Metadata metadata = new Metadata().withStatus(
 			Lists.newArrayList(Collections.singletonMap("ignored-fields", "collector, observationDbId, observationTimeStamp")));
 		final EntityListResponse<ObservationDTO> entityListResponse = new EntityListResponse<>(metadata, results);
