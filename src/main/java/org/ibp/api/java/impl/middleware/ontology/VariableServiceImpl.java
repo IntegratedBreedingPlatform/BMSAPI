@@ -20,7 +20,6 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
@@ -35,6 +34,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -482,49 +482,49 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		middlewareVariableFilter.setProgramUuid(variableFilter.getProgramUuid());
 
-		if (!Util.isNullOrEmpty(variableFilter.getPropertyIds())) {
+		if (!ObjectUtils.isEmpty(variableFilter.getPropertyIds())) {
 			for (Integer i : variableFilter.getPropertyIds()) {
 				middlewareVariableFilter.addPropertyId(i);
 			}
 		}
 
-		if (!Util.isNullOrEmpty(variableFilter.getMethodIds())) {
+		if (!ObjectUtils.isEmpty(variableFilter.getMethodIds())) {
 			for (Integer i : variableFilter.getMethodIds()) {
 				middlewareVariableFilter.addMethodId(i);
 			}
 		}
 
-		if (!Util.isNullOrEmpty(variableFilter.getScaleIds())) {
+		if (!ObjectUtils.isEmpty(variableFilter.getScaleIds())) {
 			for (Integer i : variableFilter.getScaleIds()) {
 				middlewareVariableFilter.addScaleId(i);
 			}
 		}
 
-		if (!Util.isNullOrEmpty(variableFilter.getVariableIds())) {
+		if (!ObjectUtils.isEmpty(variableFilter.getVariableIds())) {
 			for (Integer i : variableFilter.getVariableIds()) {
 				middlewareVariableFilter.addVariableId(i);
 			}
 		}
 
-		if (!Util.isNullOrEmpty(variableFilter.getExcludedVariableIds())) {
+		if (!ObjectUtils.isEmpty(variableFilter.getExcludedVariableIds())) {
 			for (Integer i : variableFilter.getExcludedVariableIds()) {
 				middlewareVariableFilter.addExcludedVariableId(i);
 			}
 		}
 
-		if (!Util.isNullOrEmpty(variableFilter.getDataTypes())) {
+		if (!ObjectUtils.isEmpty(variableFilter.getDataTypes())) {
 			for (Integer i : variableFilter.getDataTypes()) {
 				middlewareVariableFilter.addDataType(DataType.getById(i));
 			}
 		}
 
-		if (!Util.isNullOrEmpty(variableFilter.getVariableTypes())) {
+		if (!ObjectUtils.isEmpty(variableFilter.getVariableTypes())) {
 			for (Integer i : variableFilter.getVariableTypes()) {
 				middlewareVariableFilter.addVariableType(VariableType.getById(i));
 			}
 		}
 
-		if (!Util.isNullOrEmpty(variableFilter.getPropertyClasses())) {
+		if (!ObjectUtils.isEmpty(variableFilter.getPropertyClasses())) {
 			for (String s : variableFilter.getPropertyClasses()) {
 				middlewareVariableFilter.addPropertyClass(s);
 			}

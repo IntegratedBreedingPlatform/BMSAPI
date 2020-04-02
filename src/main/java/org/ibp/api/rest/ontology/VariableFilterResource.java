@@ -1,26 +1,25 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.List;
-import java.util.Set;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
+import java.util.Set;
 
 
 // TODO move to VariableResource class once work to refactor URLs there (ie. to start with crops) is worked on
@@ -79,49 +78,49 @@ public class VariableFilterResource {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(programUUID);
 
-		if(!Util.isNullOrEmpty(propertyIds)){
+		if (!ObjectUtils.isEmpty(propertyIds)) {
 			for(final Integer i : propertyIds){
 				variableFilter.addPropertyId(i);
 			}
 		}
 
-		if(!Util.isNullOrEmpty(methodIds)){
+		if (!ObjectUtils.isEmpty(methodIds)) {
 			for(final Integer i : methodIds){
 				variableFilter.addMethodId(i);
 			}
 		}
 
-		if(!Util.isNullOrEmpty(scaleIds)){
+		if (!ObjectUtils.isEmpty(scaleIds)) {
 			for(final Integer i : scaleIds){
 				variableFilter.addScaleId(i);
 			}
 		}
 
-		if(!Util.isNullOrEmpty(variableIds)){
+		if (!ObjectUtils.isEmpty(variableIds)) {
 			for(final Integer i : variableIds){
 				variableFilter.addVariableId(i);
 			}
 		}
 
-		if(!Util.isNullOrEmpty(exclusionVariableIds)){
+		if (!ObjectUtils.isEmpty(exclusionVariableIds)) {
 			for(final Integer i : exclusionVariableIds){
 				variableFilter.addExcludedVariableId(i);
 			}
 		}
 
-		if(!Util.isNullOrEmpty(dataTypeIds)){
+		if (!ObjectUtils.isEmpty(dataTypeIds)) {
 			for(final Integer i : dataTypeIds){
 				variableFilter.addDataType(i);
 			}
 		}
 
-		if(!Util.isNullOrEmpty(variableTypeIds)){
+		if (!ObjectUtils.isEmpty(variableTypeIds)) {
 			for(final Integer i : variableTypeIds){
 				variableFilter.addVariableType(i);
 			}
 		}
 
-		if(!Util.isNullOrEmpty(propertyClasses)){
+		if (!ObjectUtils.isEmpty(propertyClasses)) {
 			for(final String s : propertyClasses){
 				variableFilter.addPropertyClass(s);
 			}
