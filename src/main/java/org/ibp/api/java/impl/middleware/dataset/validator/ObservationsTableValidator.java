@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -83,7 +84,10 @@ public class ObservationsTableValidator {
 	}
 
 	private static boolean isInvalidDate(final MeasurementVariable var, final String value) {
-		return var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId() && !Util.isValidDate(value);
+		// Allow date in yyyy-MM-dd and yyyyDDmm format
+		final Date parsedDate = Util.tryParseDate(value, Util.FRONTEND_DATE_FORMAT);
+		final boolean isDateParseable = parsedDate != null;
+		return var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId() && !Util.isValidDate(value) && !isDateParseable;
 	}
 
 	private static boolean isInvalidNumber(final MeasurementVariable var, final String value) {
