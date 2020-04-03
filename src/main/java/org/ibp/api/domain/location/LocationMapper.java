@@ -34,7 +34,6 @@ public class LocationMapper {
 				this.map().setLatitude(this.source.getLatitude());
 				this.map().setLongitude(this.source.getLongitude());
 				this.map().setAltitude(this.source.getAltitude());
-				this.map().setDefaultLocation(this.source.getLdefault());
 			}
 
 		});
