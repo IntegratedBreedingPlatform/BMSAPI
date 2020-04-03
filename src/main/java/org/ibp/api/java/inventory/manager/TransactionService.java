@@ -31,4 +31,6 @@ public interface TransactionService {
 
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
 
+	void cancelPendingTransactions(SearchCompositeDto searchCompositeDto);
+
 }

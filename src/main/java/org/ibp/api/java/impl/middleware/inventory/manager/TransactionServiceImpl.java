@@ -191,4 +191,41 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 	}
 
+	@Override
+	public void cancelPendingTransactions(final SearchCompositeDto searchCompositeDto) {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
+
+		try {
+			lock.lock();
+
+			//Validate that searchId or list of lots are provided
+			if (searchCompositeDto.getSearchRequestId() == null && (searchCompositeDto.getItemIds() == null || searchCompositeDto
+				.getItemIds().isEmpty()) ||
+				(searchCompositeDto.getSearchRequestId() != null && searchCompositeDto.getItemIds() != null)) {
+				errors.reject("transaction.selection.invalid", "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+
+			TransactionsSearchDto transactionsSearchDto;
+			if (searchCompositeDto.getSearchRequestId() != null) {
+				transactionsSearchDto =
+					(TransactionsSearchDto) this.searchRequestService
+						.getSearchRequest(searchCompositeDto.getSearchRequestId(), TransactionsSearchDto.class);
+			} else {
+				transactionsSearchDto = new TransactionsSearchDto();
+				transactionsSearchDto.setTransactionIds(new ArrayList<>(searchCompositeDto.getItemIds()));
+			}
+
+			final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
+			final Set<ExtendedLotDto> lotDtos = transactionDtos.stream().map(TransactionDto::getLot).collect(
+				Collectors.toSet());
+
+			transactionInputValidator.validatePendingStatus(transactionDtos);
+			extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
+
+			this.transactionService.cancelPendingTransactions(transactionDtos);
+		} finally {
+			lock.unlock();
+		}
+	}
 }
