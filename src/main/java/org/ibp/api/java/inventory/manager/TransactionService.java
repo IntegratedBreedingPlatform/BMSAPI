@@ -1,5 +1,6 @@
 package org.ibp.api.java.inventory.manager;
 
+import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -17,8 +18,6 @@ public interface TransactionService {
 
 	long countSearchTransactions(TransactionsSearchDto lotsSearchDto);
 
-	Integer saveTransaction(TransactionDto transactionDto);
-
 	List<TransactionStatus> getAllTransactionStatus();
 
 	List<TransactionType> getAllTransactionTypes();
@@ -30,6 +29,8 @@ public interface TransactionService {
 	List<TransactionDto> getAvailableBalanceTransactions(Integer lotId);
 
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
+
+	void saveDeposits(LotDepositRequestDto lotDepositRequestDto, TransactionStatus transactionStatus);
 
 	void cancelPendingTransactions(SearchCompositeDto searchCompositeDto);
 

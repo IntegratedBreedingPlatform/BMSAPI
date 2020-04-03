@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotDepositRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawalInputDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionUpdateRequestDtoValidator;
@@ -55,6 +57,9 @@ public class TransactionServiceImpl implements TransactionService {
 	private ExtendedLotListValidator extendedLotListValidator;
 
 	@Autowired
+	private LotDepositRequestDtoValidator lotDepositRequestDtoValidator;
+
+	@Autowired
 	private SecurityService securityService;
 
 	@Autowired
@@ -73,17 +78,6 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
 		return this.transactionService.countSearchTransactions(transactionsSearchDto);
-	}
-
-	@Override
-	public Integer saveTransaction(final TransactionDto transactionDto) {
-		lock.lock();
-		try {
-			this.transactionInputValidator.validate(transactionDto);
-			return this.transactionService.saveTransaction(transactionDto);
-		} finally {
-			lock.unlock();
-		}
 	}
 
 	@Override
@@ -108,16 +102,16 @@ public class TransactionServiceImpl implements TransactionService {
 			lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 
 			LotsSearchDto searchDTO;
-			if (lotWithdrawalInputDto.getLotsSearchId() != null) {
+			if (lotWithdrawalInputDto.getSelectedLots().getSearchRequestId() != null) {
 				searchDTO = (LotsSearchDto) this.searchRequestService
-					.getSearchRequest(lotWithdrawalInputDto.getLotsSearchId(), LotsSearchDto.class);
+					.getSearchRequest(lotWithdrawalInputDto.getSelectedLots().getSearchRequestId(), LotsSearchDto.class);
 			} else {
 				searchDTO = new LotsSearchDto();
-				searchDTO.setLotIds(new ArrayList<>(lotWithdrawalInputDto.getLotIds()));
+				searchDTO.setLotIds(new ArrayList<>(lotWithdrawalInputDto.getSelectedLots().getItemIds()));
 			}
 			final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-			extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotWithdrawalInputDto.getLotIds());
+			extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotWithdrawalInputDto.getSelectedLots().getItemIds());
 			extendedLotListValidator.validateEmptyList(lotDtos);
 			extendedLotListValidator.validateEmptyUnits(lotDtos);
 			extendedLotListValidator.validateClosedLots(lotDtos);
@@ -186,6 +180,42 @@ public class TransactionServiceImpl implements TransactionService {
 			lock.lock();
 			transactionUpdateRequestDtoValidator.validate(transactionUpdateInputDtos);
 			this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public void saveDeposits(final LotDepositRequestDto lotDepositRequestDto, final TransactionStatus transactionStatus) {
+		try {
+			//FIXME we should only locking the affected lots
+			lock.lock();
+
+			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+
+			lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
+
+			LotsSearchDto searchDTO;
+			if (lotDepositRequestDto.getSelectedLots().getSearchRequestId() != null) {
+				searchDTO = (LotsSearchDto) this.searchRequestService
+					.getSearchRequest(lotDepositRequestDto.getSelectedLots().getSearchRequestId(), LotsSearchDto.class);
+			} else {
+				searchDTO = new LotsSearchDto();
+				searchDTO.setLotIds(new ArrayList<>(lotDepositRequestDto.getSelectedLots().getItemIds()));
+			}
+			final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
+
+			extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
+			extendedLotListValidator.validateEmptyList(lotDtos);
+			extendedLotListValidator.validateEmptyUnits(lotDtos);
+			extendedLotListValidator.validateClosedLots(lotDtos);
+			lotDepositRequestDtoValidator.validateDepositInstructionsUnits(lotDepositRequestDto, lotDtos);
+
+			this.transactionService
+				.depositLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
+					lotDepositRequestDto,
+					transactionStatus);
+
 		} finally {
 			lock.unlock();
 		}
