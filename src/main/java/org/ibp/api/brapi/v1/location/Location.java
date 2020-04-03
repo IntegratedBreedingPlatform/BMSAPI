@@ -24,7 +24,7 @@ import org.ibp.api.brapi.v2.location.Coordinate;
 	"instituteName", "siteStatus", "slope", "topography", "attributes", "additionalInfo"})
 public class Location {
 
-	private Integer locationDbId;
+	private String locationDbId;
 
 	private String locationType;
 
@@ -91,7 +91,7 @@ public class Location {
 	public Location() {
 	}
 
-	public Location(final Integer locationDbId, final String locationType, final String name, final String abbreviation,
+	public Location(final String locationDbId, final String locationType, final String name, final String abbreviation,
 		final String countryCode, final String countryName, final Double latitude, final Double longitude, final Double altitude,
 		final List<Object> attributes, final Map<String, String> additionalInfo) {
 		this.locationDbId = locationDbId;
@@ -111,7 +111,7 @@ public class Location {
 	 *
 	 * @return The locationDbId
 	 */
-	public Integer getLocationDbId() {
+	public String getLocationDbId() {
 		return this.locationDbId;
 	}
 
@@ -119,11 +119,11 @@ public class Location {
 	 *
 	 * @param locationDbId The locationDbId
 	 */
-	public void setLocationDbId(final Integer locationDbId) {
+	public void setLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
 	}
 
-	public Location withLocationDbId(final Integer locationDbId) {
+	public Location withLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
 		return this;
 	}

@@ -242,7 +242,6 @@ public class StudyResourceBrapi {
 			final Metadata metadata = new Metadata();
 			final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 			metadata.setPagination(pagination);
-			metadata.setStatus(Collections.singletonList(new HashMap<>()));
 			studyDetails.setMetadata(metadata);
 			final ModelMapper studyMapper = StudyMapper.getInstance();
 			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
@@ -385,7 +384,7 @@ public class StudyResourceBrapi {
 
 		final String trialName = this.studyDataManager.getProject(datasetId).getStudy().getName();
 
-		final ObservationVariableResult result = new ObservationVariableResult().withData(observationVariables).withStudyDbId(studyDbId)
+		final ObservationVariableResult result = new ObservationVariableResult().withData(observationVariables).withStudyDbId(String.valueOf(studyDbId))
 			.withTrialName(trialName);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
