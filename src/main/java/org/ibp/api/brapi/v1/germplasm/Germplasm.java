@@ -44,10 +44,8 @@ public class Germplasm {
 
 	private List<String> typeOfGermplasmStorageCode = new ArrayList<>();
 
-	@JsonView(BrapiView.BrapiV1_2.class)
 	private String genus;
 
-	@JsonView(BrapiView.BrapiV1_2.class)
 	private String species;
 
 	private List<Taxon> taxonIds = new ArrayList<>();
@@ -80,15 +78,6 @@ public class Germplasm {
 
 	@JsonView(BrapiView.BrapiV1_3.class)
 	private String entryNumber;
-
-	@JsonView(BrapiView.BrapiV1_3.class)
-	private String donorAccessionNumber;
-
-	@JsonView(BrapiView.BrapiV1_3.class)
-	private String donorInstituteCode;
-
-	@JsonView(BrapiView.BrapiV1_3.class)
-	private String sourceName;
 
 	public Germplasm() {
 	}
