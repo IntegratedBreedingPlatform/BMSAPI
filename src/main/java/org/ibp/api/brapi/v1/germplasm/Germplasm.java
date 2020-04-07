@@ -44,8 +44,10 @@ public class Germplasm {
 
 	private List<String> typeOfGermplasmStorageCode = new ArrayList<>();
 
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String genus;
 
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String species;
 
 	private List<Taxon> taxonIds = new ArrayList<>();
@@ -78,6 +80,15 @@ public class Germplasm {
 
 	@JsonView(BrapiView.BrapiV1_3.class)
 	private String entryNumber;
+
+	@JsonView(BrapiView.BrapiV1_3.class)
+	private String donorAccessionNumber;
+
+	@JsonView(BrapiView.BrapiV1_3.class)
+	private String donorInstituteCode;
+
+	@JsonView(BrapiView.BrapiV1_3.class)
+	private String sourceName;
 
 	public Germplasm() {
 	}
@@ -300,6 +311,30 @@ public class Germplasm {
 
 	public void setEntryNumber(final String entryNumber) {
 		this.entryNumber = entryNumber;
+	}
+
+	public String getDonorAccessionNumber() {
+		return this.donorAccessionNumber;
+	}
+
+	public void setDonorAccessionNumber(final String donorAccessionNumber) {
+		this.donorAccessionNumber = donorAccessionNumber;
+	}
+
+	public String getDonorInstituteCode() {
+		return this.donorInstituteCode;
+	}
+
+	public void setDonorInstituteCode(final String donorInstituteCode) {
+		this.donorInstituteCode = donorInstituteCode;
+	}
+
+	public String getSourceName() {
+		return this.sourceName;
+	}
+
+	public void setSourceName(final String sourceName) {
+		this.sourceName = sourceName;
 	}
 
 	@Override
