@@ -73,7 +73,7 @@ public class TransactionUpdateRequestDtoValidator {
 				transactionDtos.stream().map(TransactionDto::getTransactionId).collect(Collectors.toList());
 			final List<Integer> invalidTransactionIds = new ArrayList<>(transactionIds);
 			invalidTransactionIds.removeAll(existentTransactionIds);
-			errors.reject("transaction.update.not.found.transactions",
+			errors.reject("transactions.not.found",
 				new String[] {Util.buildErrorMessageFromList(invalidTransactionIds, 3)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
