@@ -84,10 +84,7 @@ public class ObservationsTableValidator {
 	}
 
 	private static boolean isInvalidDate(final MeasurementVariable var, final String value) {
-		// Allow date in yyyy-MM-dd and yyyyDDmm format
-		final Date parsedDate = Util.tryParseDate(value, Util.FRONTEND_DATE_FORMAT);
-		final boolean isDateParseable = parsedDate != null;
-		return var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId() && !Util.isValidDate(value) && !isDateParseable;
+		return var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId() && !Util.isValidDate(value);
 	}
 
 	private static boolean isInvalidNumber(final MeasurementVariable var, final String value) {
