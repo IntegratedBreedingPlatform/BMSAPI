@@ -40,7 +40,7 @@ public class TransactionInputValidator {
 			final List<Integer> existentTransactionIds =
 				transactionDtos.stream().map(TransactionDto::getTransactionId).collect(Collectors.toList());
 			final List<Integer> invalidTransactionIds = new ArrayList<>(transactionIds);
-			invalidTransactionIds.removeAll(existentTransactionIds); // "transactions.does.not.exist"
+			invalidTransactionIds.removeAll(existentTransactionIds);
 			errors.reject("transactions.not.found",
 				new String[] {Util.buildErrorMessageFromList(invalidTransactionIds, 3)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
