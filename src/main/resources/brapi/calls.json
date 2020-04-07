@@ -67,21 +67,6 @@
         ]
       },
       {
-        "call": "observationunits",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "POST"
-        ],
-        "versions": [
-          "1.3"
-        ]
-      },
-      {
         "call": "programs",
         "dataTypes": [
           "application/json"
@@ -133,6 +118,9 @@
         "call": "studies/{studyDbId}",
         "dataTypes": [
           "application/json"
+        ],
+        "methods": [
+          "GET"
         ],
         "datatypes": [
           "json"
