@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -35,8 +36,13 @@ public class TransactionInputValidator {
 
 	public void validateAllProvidedTransactionsExists(final List<TransactionDto> transactionDtos, final Set<Integer> transactionIds) {
 		errors = new MapBindingResult(new HashMap<String, String>(), TransactionDto.class.getName());
-		if (transactionIds != null && !transactionIds.isEmpty() && transactionIds.size() != transactionDtos.size()) {
-			errors.reject("transactions.does.not.exist", "");
+		if (transactionDtos.size() != transactionIds.size()) {
+			final List<Integer> existentTransactionIds =
+				transactionDtos.stream().map(TransactionDto::getTransactionId).collect(Collectors.toList());
+			final List<Integer> invalidTransactionIds = new ArrayList<>(transactionIds);
+			invalidTransactionIds.removeAll(existentTransactionIds); // "transactions.does.not.exist"
+			errors.reject("transactions.not.found",
+				new String[] {Util.buildErrorMessageFromList(invalidTransactionIds, 3)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
