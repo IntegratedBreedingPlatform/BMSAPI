@@ -155,8 +155,8 @@ public class TransactionServiceImpl implements TransactionService {
 			final Set<ExtendedLotDto> lotDtos = transactionDtos.stream().map(TransactionDto::getLot).collect(
 				Collectors.toSet());
 
-			transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, searchCompositeDto.getItemIds());
 			transactionInputValidator.validateEmptyList(transactionDtos);
+			transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, searchCompositeDto.getItemIds());
 			transactionInputValidator.validatePendingStatus(transactionDtos);
 			extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
 
@@ -253,8 +253,8 @@ public class TransactionServiceImpl implements TransactionService {
 			final Set<ExtendedLotDto> lotDtos = transactionDtos.stream().map(TransactionDto::getLot).collect(
 				Collectors.toSet());
 
-			transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, searchCompositeDto.getItemIds());
 			transactionInputValidator.validateEmptyList(transactionDtos);
+			transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, searchCompositeDto.getItemIds());
 			transactionInputValidator.validatePendingStatus(transactionDtos);
 			extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
 
