@@ -266,4 +266,16 @@ public class TransactionResource {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
+	@ApiOperation(value = "Cancel pending Transactions", notes = "Cancel any transaction with pending status")
+	@RequestMapping(value = "/crops/{cropName}/transactions/cancellation", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CANCEL_PENDING_TRANSACTIONS')")
+	public ResponseEntity<Void> cancelPendingTransaction(
+		@PathVariable final String cropName, //
+		@ApiParam("List of transactions to be cancelled, use a searchId or a list of transaction ids")
+		@RequestBody final SearchCompositeDto searchCompositeDto) {
+
+		this.transactionService.cancelPendingTransactions(searchCompositeDto);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }
