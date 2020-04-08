@@ -371,6 +371,21 @@
         ]
       },
     {
+      "call": "germplasm",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "versions": [
+        "1.3"
+      ]
+    },
+    {
       "call": "germplasm/{germplasmDbId}/attributes",
       "dataTypes": [
         "application/json"
