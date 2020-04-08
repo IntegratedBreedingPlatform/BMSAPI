@@ -109,7 +109,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 			transactionUpdateRequestDtoList.add(new TransactionUpdateRequestDto(2, null, 2d, ""));
 			this.transactionUpdateRequestDtoValidator.validate(transactionUpdateRequestDtoList);
 		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("transaction.update.not.found.transactions"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("transactions.not.found"));
 		}
 	}
 
