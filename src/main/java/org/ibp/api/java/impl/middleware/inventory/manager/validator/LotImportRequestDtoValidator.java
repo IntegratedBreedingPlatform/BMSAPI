@@ -69,7 +69,8 @@ public class LotImportRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (lotImportRequestDto.getStockIdPrefix() != null && !lotImportRequestDto.getStockIdPrefix().matches(STOCK_ID_PREFIX_REGEXP)) {
+		if (!StringUtils.isEmpty(lotImportRequestDto.getStockIdPrefix()) && !lotImportRequestDto.getStockIdPrefix()
+			.matches(STOCK_ID_PREFIX_REGEXP)) {
 			this.errors.reject("lot.stock.prefix.invalid.pattern", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
