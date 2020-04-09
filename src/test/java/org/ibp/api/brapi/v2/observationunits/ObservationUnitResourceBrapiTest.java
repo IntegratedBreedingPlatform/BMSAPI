@@ -62,7 +62,7 @@ public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(
 			MockMvcRequestBuilders.patch("/{crop}/brapi/v2/observationunits/{observationUnitDbId}", this.cropName, observationUnitDbId)
 				.content(this.convertObjectToByte(request))
-				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isNoContent()).andReturn();
+				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
 		final ArgumentCaptor<String> observationUnitDbIdCaptor = ArgumentCaptor.forClass(String.class);
 		final ArgumentCaptor<ObservationUnitPatchRequestDTO> mappedDTOCaptor =
