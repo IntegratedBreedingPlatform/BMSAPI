@@ -42,6 +42,9 @@ public class LabelPrintingResource {
 	private LabelPrintingStrategy subObservationDatasetLabelPrinting;
 
 	@Autowired
+	private LabelPrintingStrategy lotLabelPrinting;
+
+	@Autowired
 	private CSVLabelsFileGenerator csvLabelsFileGenerator;
 
 	@Autowired
@@ -145,6 +148,9 @@ public class LabelPrintingResource {
 		switch (labelPrintingTypeEnum) {
 			case SUBOBSERVATION_DATASET:
 				labelPrintingStrategy = this.subObservationDatasetLabelPrinting;
+				break;
+			case LOT:
+				labelPrintingStrategy = this.lotLabelPrinting;
 				break;
 			default:
 				labelPrintingStrategy = null;

@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting.domain;
 
+import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -7,8 +8,8 @@ import org.pojomatic.annotations.AutoProperty;
 public class LabelsInfoInput {
 
 	private Integer studyId;
-
 	private Integer datasetId;
+	private Integer searchRequestId;
 
 	public Integer getStudyId() {
 		return studyId;
@@ -25,6 +26,15 @@ public class LabelsInfoInput {
 	public void setDatasetId(final Integer datasetId) {
 		this.datasetId = datasetId;
 	}
+
+	public Integer getSearchRequestId() {
+		return this.searchRequestId;
+	}
+
+	public void setSearchRequestId(final Integer searchRequestId) {
+		this.searchRequestId = searchRequestId;
+	}
+
 
 	@Override
 	public int hashCode() {

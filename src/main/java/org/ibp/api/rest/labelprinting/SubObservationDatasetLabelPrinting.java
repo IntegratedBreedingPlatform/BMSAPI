@@ -319,7 +319,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 				.thenComparing(o -> Integer.valueOf(o.getVariables().get(ENTRY_NO).getValue())));
 
 		final List<Map<Integer, String>> results = new LinkedList<>();
-		// TODO: IBP-2907
+
 		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {
 			final Map<Integer, String> row = new HashMap<>();
 			for (final Integer requiredField : allRequiredKeys) {

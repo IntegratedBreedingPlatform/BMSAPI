@@ -230,7 +230,7 @@ public class LotResource {
 		return new ResponseEntity<>(lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
 	}
 
-	// TODO Move elsewhere, accept SearchCompositeDto
+	// TODO Use SearchComposito.isValid
 	private LotsSearchDto validateSearchComposite(
 		final Integer searchRequestId,
 		final Set<Integer> lotIds,
