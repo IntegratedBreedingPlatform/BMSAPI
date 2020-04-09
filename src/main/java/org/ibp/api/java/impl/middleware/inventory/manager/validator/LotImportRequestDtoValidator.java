@@ -164,7 +164,8 @@ public class LotImportRequestDtoValidator {
 			errors.reject("lot.stock.id.length.higher.than.maximum", new String[]{String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		final List<String> allStockIds = lotList.stream().map(LotItemDto::getStockId).collect(Collectors.toList());
+		final List<String> allStockIds =
+			lotList.stream().map(LotItemDto::getStockId).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
 		if (allStockIds.size() != uniqueNotNullStockIds.size()) {
 			errors.reject("lot.input.list.stock.ids.duplicated","");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
