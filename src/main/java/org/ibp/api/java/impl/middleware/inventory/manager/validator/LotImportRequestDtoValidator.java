@@ -35,8 +35,6 @@ public class LotImportRequestDtoValidator {
 
 	private static Integer STOCK_ID_MAX_LENGTH = 35;
 
-	private static final Integer PREFIX_MAX_LENGTH = 15;
-
 	private BindingResult errors;
 
 	@Autowired
@@ -51,9 +49,10 @@ public class LotImportRequestDtoValidator {
 	@Autowired
 	private LotService lotService;
 
-	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
 
-	private static final String STOCK_ID_PREFIX_REGEXP = "[a-zA-Z0-9]{1,14}[a-zA-Z]";
+	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 
 	public void validate(final LotImportRequestDto lotImportRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
@@ -64,16 +63,7 @@ public class LotImportRequestDtoValidator {
 		}
 
 		//Validate Stock Prefix
-		if (lotImportRequestDto.getStockIdPrefix() != null && lotImportRequestDto.getStockIdPrefix().length() > PREFIX_MAX_LENGTH) {
-			this.errors.reject("lot.stock.prefix.invalid.length", new String[] {String.valueOf(PREFIX_MAX_LENGTH)}, "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-		if (!StringUtils.isEmpty(lotImportRequestDto.getStockIdPrefix()) && !lotImportRequestDto.getStockIdPrefix()
-			.matches(STOCK_ID_PREFIX_REGEXP)) {
-			this.errors.reject("lot.stock.prefix.invalid.pattern", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
+		inventoryCommonValidator.validateStockIdPrefix(lotImportRequestDto.getStockIdPrefix(), errors);
 
 		final List<LotItemDto> lotList = lotImportRequestDto.getLotList();
 
