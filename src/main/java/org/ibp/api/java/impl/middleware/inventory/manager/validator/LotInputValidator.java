@@ -146,8 +146,9 @@ public class LotInputValidator {
 				this.errors.reject("lot.stock.prefix.not.empty", "");
 			}
 		} else {
-			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && !lotGeneratorInputDto.getStockPrefix().matches("[a-zA-Z]+")) {
-				this.errors.reject("lot.stock.prefix.invalid.characters", "");
+			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && !lotGeneratorInputDto.getStockPrefix()
+				.matches("[a-zA-Z0-9]{1,14}[a-zA-Z]")) {
+				this.errors.reject("lot.stock.prefix.invalid.pattern", "");
 				return;
 			}
 			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && lotGeneratorInputDto.getStockPrefix().length() > PREFIX_MAX_LENGTH) {

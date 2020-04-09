@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -27,11 +29,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class LotItemDtoListValidator {
+public class LotImportRequestDtoValidator {
 
 	private static Integer NOTES_MAX_LENGTH = 255;
 
 	private static Integer STOCK_ID_MAX_LENGTH = 35;
+
+	private static final Integer PREFIX_MAX_LENGTH = 15;
 
 	private BindingResult errors;
 
@@ -49,8 +53,28 @@ public class LotItemDtoListValidator {
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 
-	public void validate(final List<LotItemDto> lotList) {
+	private static final String STOCK_ID_PREFIX_REGEXP = "[a-zA-Z0-9]{1,14}[a-zA-Z]";
+
+	public void validate(final LotImportRequestDto lotImportRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+
+		if (lotImportRequestDto == null) {
+			errors.reject("lot.import.request.null", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		//Validate Stock Prefix
+		if (lotImportRequestDto.getStockIdPrefix() != null && lotImportRequestDto.getStockIdPrefix().length() > PREFIX_MAX_LENGTH) {
+			this.errors.reject("lot.stock.prefix.invalid.length", new String[] {String.valueOf(PREFIX_MAX_LENGTH)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (lotImportRequestDto.getStockIdPrefix() != null && !lotImportRequestDto.getStockIdPrefix().matches(STOCK_ID_PREFIX_REGEXP)) {
+			this.errors.reject("lot.stock.prefix.invalid.pattern", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		final List<LotItemDto> lotList = lotImportRequestDto.getLotList();
 
 		if (lotList == null) {
 			errors.reject("lot.input.list.null", "");
@@ -133,21 +157,19 @@ public class LotItemDtoListValidator {
 	}
 
 	private void validateStockIds(final List<LotItemDto> lotList) {
-		final List<String> uniqueStockIds = lotList.stream().map(LotItemDto::getStockId).distinct().collect(Collectors.toList());
-		if (Util.countNullOrEmptyStrings(uniqueStockIds) > 0) {
-			errors.reject("lot.input.list.stock.ids.null.or.empty", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-		if (uniqueStockIds.stream().filter(c -> c.length() > STOCK_ID_MAX_LENGTH).count()>0) {
+		final List<String> uniqueNotNullStockIds =
+			lotList.stream().map(LotItemDto::getStockId).filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
+
+		if (uniqueNotNullStockIds.stream().filter(c -> c.length() > STOCK_ID_MAX_LENGTH).count() > 0) {
 			errors.reject("lot.stock.id.length.higher.than.maximum", new String[]{String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		final List<String> allStockIds = lotList.stream().map(LotItemDto::getStockId).collect(Collectors.toList());
-		if (allStockIds.size() != uniqueStockIds.size()) {
+		if (allStockIds.size() != uniqueNotNullStockIds.size()) {
 			errors.reject("lot.input.list.stock.ids.duplicated","");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		final List<LotDto> existingLotDtos = this.lotService.getLotsByStockIds(uniqueStockIds);
+		final List<LotDto> existingLotDtos = this.lotService.getLotsByStockIds(uniqueNotNullStockIds);
 		if (!existingLotDtos.isEmpty()){
 			final List<String> existingStockIds = existingLotDtos.stream().map(LotDto::getStockId).collect(Collectors.toList());
 			errors.reject("lot.input.list.stock.ids.invalid", new String[] {Util.buildErrorMessageFromList(existingStockIds, 3)}, "");
