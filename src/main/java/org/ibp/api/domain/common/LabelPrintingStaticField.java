@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * This enum is needed for hardcoded labels in printing label module (those that are not variable in the ontology)
- * Please refer to appconstants.properties in Fieldbook for new static fields, so we keep simple old preset migration
+ * Please refer to appconstants.properties for new static fields, so we keep simple old preset migration
  */
 public enum LabelPrintingStaticField {
 
