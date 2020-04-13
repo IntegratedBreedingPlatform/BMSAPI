@@ -2,6 +2,8 @@
 package org.ibp.api.domain.common;
 
 import com.google.common.base.Preconditions;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
  *
  * @param <T> the type of list the page contains.
  */
+@Component
 public class PagedResult<T> {
 
 	private final List<T> pageResults = new ArrayList<T>();
@@ -27,14 +30,13 @@ public class PagedResult<T> {
 	private String sortBy;
 	private String sortOrder;
 
-	public static final int MAX_PAGE_SIZE = 10000;
-	public static final int DEFAULT_PAGE_SIZE = 1000;
+	public static int MAX_PAGE_SIZE;
+	public static int DEFAULT_PAGE_SIZE;
 	public static final int DEFAULT_PAGE_NUMBER = 1;
 
 	public static final String CURRENT_PAGE_DESCRIPTION = "Page number to retrieve in case of multi paged results. Defaults to "
 			+ PagedResult.DEFAULT_PAGE_NUMBER + " (first page) if not supplied.";
-	public static final String PAGE_SIZE_DESCRIPTION = "Number of results to retrieve per page. Defaults to "
-			+ PagedResult.DEFAULT_PAGE_SIZE + " if not supplied. Max page size allowed is " + PagedResult.MAX_PAGE_SIZE + ".";
+	public static final String PAGE_SIZE_DESCRIPTION = "Number of results to retrieve per page. Max page size allowed is " + PagedResult.MAX_PAGE_SIZE + ".";
 
 	protected PagedResult() {
 		// Empty constructor needed for subclass constructor
@@ -125,4 +127,19 @@ public class PagedResult<T> {
 	public boolean isHasPreviousPage() {
 		return !this.isFirstPage();
 	}
+
+	@Value("${pagedresult.max.page.size}")
+	public void setMaxPageSize(final String maxPageSize) {
+		if(maxPageSize!=null){
+			MAX_PAGE_SIZE = Integer.parseInt(maxPageSize);
+		}
+	}
+
+	@Value("${pagedresult.default.page.size}")
+	public void setDEfaultPageSize(final String defaultPageSize) {
+		if(defaultPageSize!=null){
+			DEFAULT_PAGE_SIZE = Integer.parseInt(defaultPageSize);
+		}
+	}
+
 }
