@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.brapi.v1.observation.NewObservationRequest;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -241,7 +242,6 @@ public class StudyResourceBrapi {
 			final Metadata metadata = new Metadata();
 			final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 			metadata.setPagination(pagination);
-			metadata.setStatus(Collections.singletonList(new HashMap<>()));
 			studyDetails.setMetadata(metadata);
 			final ModelMapper studyMapper = StudyMapper.getInstance();
 			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
@@ -384,7 +384,7 @@ public class StudyResourceBrapi {
 
 		final String trialName = this.studyDataManager.getProject(datasetId).getStudy().getName();
 
-		final ObservationVariableResult result = new ObservationVariableResult().withData(observationVariables).withStudyDbId(studyDbId)
+		final ObservationVariableResult result = new ObservationVariableResult().withData(observationVariables).withStudyDbId(String.valueOf(studyDbId))
 			.withTrialName(trialName);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
@@ -449,11 +449,11 @@ public class StudyResourceBrapi {
 	public ResponseEntity<EntityListResponse<ObservationDTO>> putObservations(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyDbId,
-		@RequestBody final List<ObservationDTO> input) {
+		@RequestBody final NewObservationRequest newObservationRequest) {
 
-		this.studyDatasetService.importObservations(studyDbId, input);
+		this.studyDatasetService.importObservations(studyDbId, newObservationRequest.observations);
 
-		final Result<ObservationDTO> results = new Result<ObservationDTO>().withData(input);
+		final Result<ObservationDTO> results = new Result<ObservationDTO>().withObservations(newObservationRequest.observations);
 		@SuppressWarnings("unchecked") final Metadata metadata = new Metadata().withStatus(
 			Lists.newArrayList(Collections.singletonMap("ignored-fields", "collector, observationDbId, observationTimeStamp")));
 		final EntityListResponse<ObservationDTO> entityListResponse = new EntityListResponse<>(metadata, results);
