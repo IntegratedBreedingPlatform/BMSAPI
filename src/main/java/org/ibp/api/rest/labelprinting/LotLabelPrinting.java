@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -243,7 +244,15 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final List<Map<Integer, String>> data = new ArrayList<>();
 
 		final Map<String, String> pedigreeByGID = new HashMap<>();
-		final List<Integer> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toList());
+		final Set<Integer> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+
+		if (labelsGeneratorInput.isBarcodeRequired()) {
+			if (labelsGeneratorInput.isAutomaticBarcode()) {
+				keys.add(LOT_FIELD.LOT_UID.getId());
+			} else {
+				keys.addAll(labelsGeneratorInput.getBarcodeFields());
+			}
+		}
 
 		for (final ExtendedLotDto extendedLotDto : extendedLotDtos) {
 			data.add(this.getDataRow(keys, extendedLotDto, attributeValues, pedigreeByGID));
@@ -253,7 +262,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	private Map<Integer, String> getDataRow(
-		final List<Integer> keys,
+		final Set<Integer> keys,
 		final ExtendedLotDto extendedLotDto,
 		final Map<Integer, Map<Integer, String>> attributeValues,
 		final Map<String, String> pedigreeByGID) {
