@@ -105,7 +105,7 @@ public class PagedResult<T> {
 	}
 
 	public long getFilteredResults() {
-		return filteredResults;
+		return this.filteredResults;
 	}
 
 	public int getTotalPages() {
