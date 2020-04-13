@@ -72,12 +72,6 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	private StudyValidator studyValidator;
 
 	@Autowired
-	private PedigreeService pedigreeService;
-
-	@Autowired
-	private CrossExpansionProperties crossExpansionProperties;
-
-	@Autowired
 	private DatasetTypeService datasetTypeService;
 
 	private static Field STUDY_NAME_FIELD;
@@ -404,17 +398,6 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	String getMessage(final String code) {
 		return this.messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
-	}
-
-	private String getPedigree(final String gid, final Map<String, String> gidPedigreeMap) {
-		final String pedigree;
-		if (gidPedigreeMap.containsKey(gid)) {
-			pedigree = gidPedigreeMap.get(gid);
-		} else {
-			pedigree = this.pedigreeService.getCrossExpansion(Integer.valueOf(gid), this.crossExpansionProperties);
-			gidPedigreeMap.put(gid, pedigree);
-		}
-		return pedigree;
 	}
 
 	private String getSeason(final String seasonStr) {

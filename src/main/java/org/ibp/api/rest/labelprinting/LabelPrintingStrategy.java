@@ -1,5 +1,7 @@
 package org.ibp.api.rest.labelprinting;
 
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
@@ -9,12 +11,20 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class LabelPrintingStrategy {
+
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
 	/**
 	 * Validate LabelsInfoInput
@@ -88,4 +98,15 @@ public abstract class LabelPrintingStrategy {
 		return availableFields;
 	}
 
+
+	String getPedigree(final String gid, final Map<String, String> gidPedigreeMap) {
+		final String pedigree;
+		if (gidPedigreeMap.containsKey(gid)) {
+			pedigree = gidPedigreeMap.get(gid);
+		} else {
+			pedigree = this.pedigreeService.getCrossExpansion(Integer.valueOf(gid), this.crossExpansionProperties);
+			gidPedigreeMap.put(gid, pedigree);
+		}
+		return pedigree;
+	}
 }

@@ -242,10 +242,11 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		// Data to be exported
 		final List<Map<Integer, String>> data = new ArrayList<>();
 
+		final Map<String, String> pedigreeByGID = new HashMap<>();
 		final List<Integer> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toList());
 
 		for (final ExtendedLotDto extendedLotDto : extendedLotDtos) {
-			data.add(this.getDataRow(keys, extendedLotDto, attributeValues));
+			data.add(this.getDataRow(keys, extendedLotDto, attributeValues, pedigreeByGID));
 		}
 
 		return new LabelsData(LOT_FIELD.LOT_UID.getId(), data);
@@ -254,7 +255,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	private Map<Integer, String> getDataRow(
 		final List<Integer> keys,
 		final ExtendedLotDto extendedLotDto,
-		final Map<Integer, Map<Integer, String>> attributeValues) {
+		final Map<Integer, Map<Integer, String>> attributeValues,
+		final Map<String, String> pedigreeByGID) {
 
 		final Map<Integer, String> columns = new HashMap<>();
 
@@ -330,8 +332,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 						columns.put(key, Objects.toString(extendedLotDto.getGermplasmLocation(), ""));
 						break;
 					case CROSS:
-						// TODO
-						columns.put(key, null);
+						columns.put(key, this.getPedigree(Objects.toString(extendedLotDto.getGid(), null), pedigreeByGID));
 						break;
 					default:
 						break;
