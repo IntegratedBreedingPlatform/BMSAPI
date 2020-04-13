@@ -231,6 +231,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 		final List<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toList());
+		final Map<Integer, Map<Integer, String>> attributeValues = this.germplasmDataManager.getAttributeValuesGIDList(gids);
 
 		// Data to be exported
 		final List<Map<Integer, String>> data = new ArrayList<>();
@@ -238,13 +239,17 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final List<Integer> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toList());
 
 		for (final ExtendedLotDto extendedLotDto : extendedLotDtos) {
-			data.add(this.getDataRow(extendedLotDto, keys));
+			data.add(this.getDataRow(keys, extendedLotDto, attributeValues));
 		}
 
 		return new LabelsData(null, data);
 	}
 
-	private Map<Integer, String> getDataRow(final ExtendedLotDto extendedLotDto, final List<Integer> keys) {
+	private Map<Integer, String> getDataRow(
+		final List<Integer> keys,
+		final ExtendedLotDto extendedLotDto,
+		final Map<Integer, Map<Integer, String>> attributeValues) {
+
 		final Map<Integer, String> columns = new HashMap<>();
 
 		// Select columns
@@ -264,7 +269,14 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 				// TODO complete
 			} else {
 				// Not part of the fixed columns
-				// TODO complete
+				// Attributes
+				final Map<Integer, String> attributesByType = attributeValues.get(extendedLotDto.getGid());
+				if (attributesByType != null) {
+					final String attributeValue = attributesByType.get(id);
+					if (attributeValue != null) {
+						columns.put(key, attributeValue);
+					}
+				}
 
 			}
 		}
