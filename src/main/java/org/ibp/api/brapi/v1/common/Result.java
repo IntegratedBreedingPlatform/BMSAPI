@@ -22,6 +22,8 @@ public class Result<T> {
 
 	private List<T> data = new ArrayList<T>();
 
+	private List<T> observations = new ArrayList<T>();
+
 	/**
 	 * No args constructor for use in serialization
 	 *
@@ -53,8 +55,21 @@ public class Result<T> {
 		this.data = data;
 	}
 
+	public List<T> getObservations() {
+		return this.observations;
+	}
+
+	public void setObservations(final List<T> observations) {
+		this.observations = observations;
+	}
+
 	public Result<T> withData(final List<T> data) {
 		this.data = data;
+		return this;
+	}
+
+	public Result<T> withObservations(final List<T> observations) {
+		this.observations = observations;
 		return this;
 	}
 }

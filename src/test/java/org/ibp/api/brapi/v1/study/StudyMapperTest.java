@@ -18,14 +18,14 @@ public class StudyMapperTest {
 		final StudyDetailsDto studyDetailsDto = StudyTestDataProvider.getStudyDetailsDto();
 		final StudyDetailsData studyDetailsData = mapper.map(studyDetailsDto, StudyDetailsData.class);
 
-		assertThat(studyDetailsData.getStudyDbId(), equalTo(studyDetailsDto.getMetadata().getStudyDbId()));
+		assertThat(studyDetailsData.getStudyDbId(), equalTo(studyDetailsDto.getMetadata().getStudyDbId().toString()));
 		assertThat(studyDetailsData.getStudyName(), equalTo(studyDetailsDto.getMetadata().getStudyName()));
 		assertThat(studyDetailsData.getSeasons().get(0), equalTo(studyDetailsDto.getMetadata().getSeasons().get(0)));
-		assertThat(studyDetailsData.getTrialDbId(), equalTo(studyDetailsDto.getMetadata().getTrialDbId()));
+		assertThat(studyDetailsData.getTrialDbId(), equalTo(studyDetailsDto.getMetadata().getTrialDbId().toString()));
 		assertThat(studyDetailsData.getTrialName(), equalTo(studyDetailsDto.getMetadata().getTrialName()));
 		assertThat(studyDetailsData.getStartDate(), equalTo(studyDetailsDto.getMetadata().getStartDate()));
 		assertThat(studyDetailsData.getEndDate(), equalTo(studyDetailsDto.getMetadata().getEndDate()));
-		assertThat(studyDetailsData.getActive(), equalTo(studyDetailsDto.getMetadata().getActive()));
+		assertThat(studyDetailsData.getActive(), equalTo(studyDetailsDto.getMetadata().getActive().toString()));
 		assertThat(studyDetailsData.getContacts().size(), equalTo(studyDetailsDto.getContacts().size()));
 
 	}
