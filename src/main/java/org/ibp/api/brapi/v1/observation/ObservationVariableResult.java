@@ -14,7 +14,7 @@ public class ObservationVariableResult extends Result<VariableDTO> {
 		return this.studyDbId;
 	}
 
-	public void setStudyDbId(final int String) {
+	public void setStudyDbId(final String studyDbId) {
 		this.studyDbId = studyDbId;
 	}
 
