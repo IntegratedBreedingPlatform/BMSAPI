@@ -6,6 +6,8 @@ import org.ibp.api.domain.common.PagedResult;
 
 public class BrapiPagedResult<T> extends PagedResult<T> {
 
+	public static final int DEFAULT_PAGE_NUMBER = 0;
+
 	public static final String CURRENT_PAGE_DESCRIPTION = "Page number to retrieve in case of multi paged results. Defaults to "
 			+ BrapiPagedResult.DEFAULT_PAGE_NUMBER + " (first page) if not supplied.";
 	public static final String PAGE_SIZE_DESCRIPTION = "Number of results to retrieve per page.";
