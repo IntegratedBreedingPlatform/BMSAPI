@@ -214,7 +214,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 		// Germplasm labels
 		final LabelType germplasmLabelTypes = new LabelType(GERMPLASM_FIXED_LABEL_TYPES.getTitle(), GERMPLASM_FIXED_LABEL_TYPES.getKey());
-		germplasmLabelTypes.setFields(GERMPLASM_FIXED_LABEL_TYPES.getFields());
+		germplasmLabelTypes.setFields(new ArrayList<>(GERMPLASM_FIXED_LABEL_TYPES.getFields()));
 		germplasmLabelTypes.getFields().addAll(attributes.stream()
 			.map(attr -> new Field(toKey(attr.getFldno()), attr.getFname()))
 			.collect(Collectors.toList()));
