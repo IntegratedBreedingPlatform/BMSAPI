@@ -1,5 +1,7 @@
 package org.ibp.api.rest.labelprinting;
 
+import org.generationcp.commons.util.DateUtil;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -32,6 +34,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,8 +57,9 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF);
 
 
-	// (Keeping it TERM_ID agnostic for now)
 	// Lot IDs
+	// (Keeping it TERM_ID agnostic for now)
+	// TODO generic lot variable columns query
 	private enum LOT_FIELD {
 		LOT_UID(1, "Lot UID"),
 		STOCK_ID(2, "Stock id"),
@@ -106,6 +110,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 
 	// Germplasm ids
+	// (Keeping it TERM_ID agnostic for now)
 	private enum GERMPLASM_FIELD {
 		GID(16, "GID"),
 		GROUP_ID(17, "Group ID"),
@@ -193,7 +198,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput) {
-		return new OriginResourceMetadata();
+		final String fileName = "lot-labels-".concat(DateUtil.getCurrentDateAsStringValue());
+		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
 	}
 
 	@Override
@@ -242,7 +248,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			data.add(this.getDataRow(keys, extendedLotDto, attributeValues));
 		}
 
-		return new LabelsData(null, data);
+		return new LabelsData(LOT_FIELD.LOT_UID.getId(), data);
 	}
 
 	private Map<Integer, String> getDataRow(
@@ -257,16 +263,79 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			final int id = toId(key);
 
 			if (LOT_FIELD.getById(id) != null) {
-				// TODO complete
 				switch (LOT_FIELD.getById(id)) {
 					case LOT_UID:
 						columns.put(key, extendedLotDto.getLotUUID());
+						break;
+					case STOCK_ID:
+						columns.put(key, extendedLotDto.getStockId());
+						break;
+					case STATUS:
+						columns.put(key, extendedLotDto.getStatus());
+						break;
+					case STORAGE_LOCATION:
+						columns.put(key, extendedLotDto.getLocationName());
+						break;
+					case UNITS:
+						columns.put(key, extendedLotDto.getUnitName());
+						break;
+					case ACTUAL_BALANCE:
+						columns.put(key, Objects.toString(extendedLotDto.getActualBalance(), ""));
+						break;
+					case AVAILABLE:
+						columns.put(key, Objects.toString(extendedLotDto.getAvailableBalance(), ""));
+						break;
+					case RESERVED:
+						columns.put(key, Objects.toString(extendedLotDto.getReservedTotal(), ""));
+						break;
+					case TOTAL_WITHDRAWALS:
+						columns.put(key, Objects.toString(extendedLotDto.getWithdrawalTotal(), ""));
+						break;
+					case PENDING_DEPOSITS:
+						columns.put(key, Objects.toString(extendedLotDto.getPendingDepositsTotal(), ""));
+						break;
+					case NOTES:
+						columns.put(key, extendedLotDto.getNotes());
+						break;
+					case USERNAME:
+						columns.put(key, extendedLotDto.getCreatedByUsername());
+						break;
+					case CREATION_DATE:
+						columns.put(key, Objects.toString(extendedLotDto.getCreatedDate(), ""));
+						break;
+					case LAST_DEPOSIT_DATE:
+						columns.put(key, Objects.toString(extendedLotDto.getLastDepositDate(), ""));
+						break;
+					case LAST_WITHDRAWAL_DATE:
+						columns.put(key, Objects.toString(extendedLotDto.getLastWithdrawalDate(), ""));
 						break;
 					default:
 						break;
 				}
 			} else if (GERMPLASM_FIELD.getById(id) != null) {
-				// TODO complete
+				switch (GERMPLASM_FIELD.getById(id)) {
+					case GID:
+						columns.put(key, Objects.toString(extendedLotDto.getGid(), ""));
+						break;
+					case GROUP_ID:
+						columns.put(key, Objects.toString(extendedLotDto.getMgid(), ""));
+						break;
+					case DESIGNATION:
+						columns.put(key, Objects.toString(extendedLotDto.getDesignation(), ""));
+						break;
+					case BREEDING_METHOD:
+						columns.put(key, Objects.toString(extendedLotDto.getGermplasmMethodName(), ""));
+						break;
+					case LOCATION:
+						columns.put(key, Objects.toString(extendedLotDto.getGermplasmLocation(), ""));
+						break;
+					case CROSS:
+						// TODO
+						columns.put(key, null);
+						break;
+					default:
+						break;
+				}
 			} else {
 				// Not part of the fixed columns
 				// Attributes
