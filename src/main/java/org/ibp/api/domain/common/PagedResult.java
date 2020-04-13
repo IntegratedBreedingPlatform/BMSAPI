@@ -136,7 +136,7 @@ public class PagedResult<T> {
 	}
 
 	@Value("${pagedresult.default.page.size}")
-	public void setDEfaultPageSize(final String defaultPageSize) {
+	public void setDefaultPageSize(final String defaultPageSize) {
 		if(defaultPageSize!=null){
 			DEFAULT_PAGE_SIZE = Integer.parseInt(defaultPageSize);
 		}
