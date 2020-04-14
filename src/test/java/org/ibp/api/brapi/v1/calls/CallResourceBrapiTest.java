@@ -96,7 +96,7 @@ public class CallResourceBrapiTest extends ApiUnitTestBase {
 	public void testListAvailableCalls() throws Exception {
 		// TODO user test/resources/brapi/calls.json
 		Mockito.when(this.callService.getAllCalls(null, null, null)).thenReturn(this.calls);
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/calls").build();
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/calls").build();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
@@ -117,7 +117,7 @@ public class CallResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testListAvailableCallsWithDatatype() throws Exception {
 		Mockito.when(this.callService.getAllCalls("csv", null, null)).thenReturn(this.calls);
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/calls").queryParam("datatype", "csv").build().encode();
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/calls").queryParam("datatype", "csv").build().encode();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andExpect(MockMvcResultMatchers.status().isOk())

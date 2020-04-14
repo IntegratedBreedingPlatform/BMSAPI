@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,6 +49,31 @@ public class CallResourceBrapi {
 		@RequestParam(value = "dataType",
 			required = false) final String dataType) {
 
+		return getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
+	}
+	@ApiOperation(value = "List of available calls", notes = "Get a list of available calls with crop name.")
+	@RequestMapping(value = "/{crop}/brapi/v1/calls", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<BrapiCalls> listAvailableCallsWithCrop(@PathVariable final String crop,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
+			required = false) final Integer pageSize,
+		@ApiParam(value = "data format supported by call", required = false, allowableValues = "csv, text/csv, tsv, text/tsv, json, application/json, application/flapjack")
+		@RequestParam(value = "dataType",
+			required = false) final String dataType) {
+
+		return getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
+	}
+
+	private ResponseEntity<BrapiCalls> getBrapiCallsResponseEntity(
+		@RequestParam(value = "page", required = false)
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) final Integer currentPage,
+		@RequestParam(value = "pageSize", required = false)
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) final Integer pageSize,
+		@RequestParam(value = "dataType", required = false)
+		@ApiParam(value = "data format supported by call", required = false, allowableValues = "csv, text/csv, tsv, text/tsv, json, application/json, application/flapjack")
+		final String dataType) {
 		PagedResult<Map<String, Object>> resultPage = null;
 
 		resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<Map<String, Object>>() {

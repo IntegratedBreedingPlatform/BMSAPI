@@ -31,4 +31,7 @@ public interface TransactionService {
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
 
 	void saveDeposits(LotDepositRequestDto lotDepositRequestDto, TransactionStatus transactionStatus);
+
+	void cancelPendingTransactions(SearchCompositeDto searchCompositeDto);
+
 }

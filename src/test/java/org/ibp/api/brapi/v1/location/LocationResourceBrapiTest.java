@@ -75,7 +75,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
 				.andDo(MockMvcResultHandlers.print()) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwLocations.size()))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].locationDbId", Matchers.is(location1.getLocationDbId()))) //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].locationDbId", Matchers.is(location1.getLocationDbId().toString()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].locationType", Matchers.is(locTypeUDFLD.getFname()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].name", Matchers.is(location1.getName()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].abbreviation", Matchers.is(location1.getAbbreviation()))) //
@@ -153,7 +153,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
 				.andDo(MockMvcResultHandlers.print()) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwLocations.size()))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].locationDbId", Matchers.is(location1.getLocationDbId()))) //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].locationDbId", Matchers.is(location1.getLocationDbId().toString()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].locationType", Matchers.is(location1.getLocationType()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].name", Matchers.is(location1.getName()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].abbreviation", Matchers.is(location1.getAbbreviation()))) //
@@ -162,7 +162,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].latitude", Matchers.is(location1.getLatitude()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].longitude", Matchers.is(location1.getLongitude()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].altitude", Matchers.is(location1.getAltitude()))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].locationDbId", Matchers.is(location2.getLocationDbId()))) //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].locationDbId", Matchers.is(location2.getLocationDbId().toString()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].locationType", Matchers.is(location2.getLocationType()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].name", Matchers.is(location2.getName()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].abbreviation", Matchers.is(location2.getAbbreviation()))) //

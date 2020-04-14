@@ -17,7 +17,7 @@ public class LocationMapperTest {
 		Location location = mapper.map(locationDetailsDto, Location.class);
 		System.out.println(location);
 
-		assertThat(locationDetailsDto.getLocationDbId(), equalTo(location.getLocationDbId()));
+		assertThat(locationDetailsDto.getLocationDbId().toString(), equalTo(location.getLocationDbId()));
 		assertThat(location.getLocationType(), equalTo("Country"));
 		assertThat(location.getName(), equalTo(null));
 		assertThat(location.getAbbreviation(), equalTo(locationDetailsDto.getAbbreviation()));

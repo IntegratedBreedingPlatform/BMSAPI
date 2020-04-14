@@ -2,7 +2,6 @@ package org.ibp.api.brapi.v1.study;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.location.Location;
@@ -21,14 +20,17 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StudyDetailsData {
 
-	private Integer studyDbId;
+	private String studyDbId;
 
 	private String studyName;
 
-	@JsonView(BrapiView.BrapiV2.class)
 	private String studyDescription;
 
 	private String studyType;
+
+	private String studyTypeDbId;
+
+	private String studyTypeName;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String lastUpdate;
@@ -41,7 +43,7 @@ public class StudyDetailsData {
 
 	private List<String> seasons;
 
-	private Integer trialDbId;
+	private String trialDbId;
 
 	private String trialName;
 
@@ -51,7 +53,7 @@ public class StudyDetailsData {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date endDate;
 
-	private Boolean active;
+	private String active;
 
 	private Location location;
 
@@ -108,9 +110,10 @@ public class StudyDetailsData {
 	 * @param contacts
 	 * @param additionalInfo
 	 */
-	public StudyDetailsData(final Integer studyDbId, final String studyName, final String studyDescription, final String studyType, final String studyPUI,
-		final List<String> seasons,	final Integer trialDbId, final String trialName, final Date startDate, final Date endDate,
-		final Boolean active, final Location location, final String culturalPractices, final List<String> dataLinks,
+	public StudyDetailsData(final String studyDbId, final String studyName, final String studyDescription, final String studyType,
+		final String studyPUI,
+		final List<String> seasons, final String trialDbId, final String trialName, final Date startDate, final Date endDate,
+		final String active, final Location location, final String culturalPractices, final List<String> dataLinks,
 		final String documentationURL, final List<EnvironmentParameter> environmentParameters, final ExperimentalDesign experimentalDesign,
 		final List<String> externalReferences, final String growthFacility, final String lastUpdate, final String license,
 		final String observationUnitsDescription, final List<Contact> contacts, final Map<String, String> additionalInfo) {
@@ -143,7 +146,7 @@ public class StudyDetailsData {
 	/**
 	 * @return the studyDdId
 	 */
-	public Integer getStudyDbId() {
+	public String getStudyDbId() {
 		return studyDbId;
 	}
 
@@ -151,7 +154,7 @@ public class StudyDetailsData {
 	 * @param studyDbId
 	 * @return StudyDetailsData
 	 */
-	public StudyDetailsData setStudyDbId(final Integer studyDbId) {
+	public StudyDetailsData setStudyDbId(final String studyDbId) {
 		this.studyDbId = studyDbId;
 		return this;
 	}
@@ -223,7 +226,7 @@ public class StudyDetailsData {
 	/**
 	 * @return the TrialDbId
 	 */
-	public Integer getTrialDbId() {
+	public String getTrialDbId() {
 		return trialDbId;
 	}
 
@@ -231,7 +234,7 @@ public class StudyDetailsData {
 	 * @param trialDbId
 	 * @return StudyDetailsData
 	 */
-	public StudyDetailsData setTrialDbId(final Integer trialDbId) {
+	public StudyDetailsData setTrialDbId(final String trialDbId) {
 		this.trialDbId = trialDbId;
 		return this;
 	}
@@ -271,7 +274,7 @@ public class StudyDetailsData {
 	/**
 	 * @return active status
 	 */
-	public Boolean getActive() {
+	public String getActive() {
 		return active;
 	}
 
@@ -279,7 +282,7 @@ public class StudyDetailsData {
 	 * @param active
 	 * @return StudyDetailsData
 	 */
-	public StudyDetailsData setActive(final Boolean active) {
+	public StudyDetailsData setActive(final String active) {
 		this.active = active;
 		return this;
 	}
@@ -456,19 +459,38 @@ public class StudyDetailsData {
 		return this;
 	}
 
+	public String getStudyTypeDbId() {
+		return this.studyTypeDbId;
+	}
+
+	public void setStudyTypeDbId(final String studyTypeDbId) {
+		this.studyTypeDbId = studyTypeDbId;
+	}
+
+	public String getStudyTypeName() {
+		return this.studyTypeName;
+	}
+
+	public void setStudyTypeName(final String studyTypeName) {
+		this.studyTypeName = studyTypeName;
+	}
+
 	public void addContact(final Contact contact) {
 		this.contacts.add(contact);
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 		return Pojomatic.hashCode(this);
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		return Pojomatic.toString(this);
 	}
 
-	@Override public boolean equals(Object o) {
+	@Override
+	public boolean equals(Object o) {
 		return Pojomatic.equals(this, o);
 	}
 
