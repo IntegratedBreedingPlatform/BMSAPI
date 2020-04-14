@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.preset;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
@@ -47,9 +48,7 @@ public class PresetDTOValidator {
 			this.errors.reject("preset.invalid.tool", "");
 		}
 
-		//Validate toolSection
-		//As of now, this will only support DATASET_LABEL_PRINTING_PRESET
-		if (!ToolSection.DATASET_LABEL_PRINTING_PRESET.name().equals(presetDTO.getToolSection())) {
+		if (!isValidToolSection(presetDTO.getToolSection())) {
 			this.errors.reject("preset.invalid.tool.section", "");
 		}
 
@@ -92,6 +91,14 @@ public class PresetDTOValidator {
 			final LabelPrintingPresetDTO labelPrintingPresetDTO = (LabelPrintingPresetDTO) presetDTO;
 			this.validateLabelPrintingPreset(crop, labelPrintingPresetDTO);
 		}
+	}
+
+	/**
+	 * Validates supported tool sections
+	 */
+	private static boolean isValidToolSection(final String toolSection) {
+		return ToolSection.DATASET_LABEL_PRINTING_PRESET.name().equals(toolSection)
+			|| ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(toolSection);
 	}
 
 	private void validateLabelPrintingPreset(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO) {
@@ -162,9 +169,14 @@ public class PresetDTOValidator {
 	}
 
 	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final Integer fieldId) {
-		return !LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
+		return this.isValidateFieldId(labelPrintingPresetDTO)
+			&& !LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
 			&& this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId))
 			== null;
+	}
+
+	private boolean isValidateFieldId(final LabelPrintingPresetDTO labelPrintingPresetDTO) {
+		return !ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection());
 	}
 
 }
