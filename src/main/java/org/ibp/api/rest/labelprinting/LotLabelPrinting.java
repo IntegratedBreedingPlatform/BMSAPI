@@ -154,13 +154,9 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	/**
 	 * Identify non-fixed columns with id = MAX_FIXED_TYPE_INDEX + column-id
 	 * Requires no collision between non-fixed columns id
+	 * Allocates some space for future fixed-columns
 	 */
-	private static final Integer MAX_FIXED_TYPE_INDEX = Arrays.asList(LOT_FIXED_LABEL_TYPES, GERMPLASM_FIXED_LABEL_TYPES) //
-		.stream() //
-		.flatMap(labelType -> labelType.getFields().stream()) //
-		.max(Comparator.comparing(Field::getId)) //
-		.orElseThrow(RuntimeException::new) //
-		.getId();
+	private static final Integer MAX_FIXED_TYPE_INDEX = 1000;
 
 	private static int toKey(final int id) {
 		return id + MAX_FIXED_TYPE_INDEX;
