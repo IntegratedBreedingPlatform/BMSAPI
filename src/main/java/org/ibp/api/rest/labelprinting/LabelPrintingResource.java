@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.rest.common.FileType;
@@ -19,7 +20,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,13 +30,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
 @Api(value = "Label Printing Services")
-@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 @RestController
 public class LabelPrintingResource {
 	@Autowired
@@ -49,6 +50,9 @@ public class LabelPrintingResource {
 
 	@Autowired
 	private PDFLabelsFileGenerator pdfLabelsFileGenerator;
+
+	@Autowired
+	private HttpServletRequest request;
 
 
 	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/labels/summary", method = RequestMethod.POST)
@@ -137,6 +141,10 @@ public class LabelPrintingResource {
 	private LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {
 		final LabelPrintingType labelPrintingTypeEnum = LabelPrintingType.getEnumByCode(labelPrintingType);
 
+		if (!this.hasAuthority(labelPrintingTypeEnum)) {
+			throw new AccessDeniedException("");
+		}
+
 		if (labelPrintingTypeEnum == null) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("label.printing.type.not.supported", "");
@@ -157,6 +165,22 @@ public class LabelPrintingResource {
 		}
 
 		return labelPrintingStrategy;
+	}
+
+	private boolean hasAuthority(final LabelPrintingType labelPrintingTypeEnum) {
+		switch (labelPrintingTypeEnum) {
+			case SUBOBSERVATION_DATASET:
+				return request.isUserInRole(PermissionsEnum.ADMIN.name())
+					|| request.isUserInRole(PermissionsEnum.BREEDING_ACTIVITIES.name())
+					|| request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name());
+			case LOT:
+				return request.isUserInRole(PermissionsEnum.ADMIN.name())
+					|| request.isUserInRole(PermissionsEnum.MANAGE_INVENTORY.name())
+					|| request.isUserInRole(PermissionsEnum.MANAGE_LOTS.name())
+					|| request.isUserInRole(PermissionsEnum.LOT_LABEL_PRINTING.name());
+			default:
+				return false;
+		}
 	}
 
 	LabelsFileGenerator getLabelsFileGenerator(final String fileExtension, final LabelPrintingStrategy labelPrintingStrategy) {
