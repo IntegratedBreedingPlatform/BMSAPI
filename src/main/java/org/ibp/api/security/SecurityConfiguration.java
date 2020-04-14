@@ -67,7 +67,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.and()
 		.authorizeRequests()
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.antMatchers("/", "/v2/api-docs/**", "/authenticate", "/brapi/**/token", "/breeding_view/**", "/brapi/authorize").permitAll()
+				.antMatchers("/",
+					"/v2/api-docs/**",
+					"/authenticate",
+					"/brapi/**/token",
+					"/breeding_view/**",
+					"/**/brapi/authorize"
+				).permitAll()
 			.anyRequest()
 			.authenticated()
 		.and()

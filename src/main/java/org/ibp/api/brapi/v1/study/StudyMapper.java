@@ -75,14 +75,16 @@ public class StudyMapper {
 			@Override protected void configure() {
 				this.map().setAdditionalInfo(this.source.getAdditionalInfo());
 				this.map().setSeasons(this.source.getMetadata().getSeasons());
-				this.map().setActive(this.source.getMetadata().getActive());
+				this.map().setActive(String.valueOf(this.source.getMetadata().getActive()));
 				this.map().setEndDate(this.source.getMetadata().getEndDate());
 				this.map().setStartDate(this.source.getMetadata().getStartDate());
-				this.map().setStudyDbId(this.source.getMetadata().getStudyDbId());
+				this.map().setStudyDbId(String.valueOf(this.source.getMetadata().getStudyDbId()));
 				this.map().setStudyName(this.source.getMetadata().getStudyName());
 				this.map().setStudyType(this.source.getMetadata().getStudyType());
+				this.map().setStudyTypeName(this.source.getMetadata().getStudyTypeName());
+				this.map().setStudyTypeDbId(this.source.getMetadata().getStudyType());
 				this.map().setTrialName(this.source.getMetadata().getTrialName());
-				this.map().setTrialDbId(this.source.getMetadata().getTrialDbId());
+				this.map().setTrialDbId(String.valueOf(this.source.getMetadata().getTrialDbId()));
 				this.map().setStudyDescription(this.source.getMetadata().getStudyDescription());
 				this.map().setLastUpdate(this.source.getMetadata().getLastUpdate());
 				this.using(new ExperimentalDesignConverted()).map(this.source.getMetadata().getExperimentalDesign()).setExperimentalDesign(null);
