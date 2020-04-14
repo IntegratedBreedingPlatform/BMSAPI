@@ -184,10 +184,18 @@ public class LotImportRequestDtoValidator {
 
 	private void validateNotes(final List<LotItemDto> lotList) {
 		final List<String> notes = lotList.stream().map(LotItemDto::getNotes).distinct().collect(Collectors.toList());
-		if (notes.stream().filter(c -> c != null && c.length() > NOTES_MAX_LENGTH).count()>0) {
+		if (notes.stream().filter(c -> c != null && c.length() > NOTES_MAX_LENGTH).count() > 0) {
 			errors.reject("lot.input.list.notes.length", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
+	public InventoryCommonValidator getInventoryCommonValidator() {
+		return inventoryCommonValidator;
+	}
+
+	public void setInventoryCommonValidator(
+		InventoryCommonValidator inventoryCommonValidator) {
+		this.inventoryCommonValidator = inventoryCommonValidator;
+	}
 }

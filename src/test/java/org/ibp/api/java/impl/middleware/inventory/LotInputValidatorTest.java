@@ -10,6 +10,7 @@ import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +51,9 @@ public class LotInputValidatorTest {
 
 	@Mock
 	private GermplasmValidator germplasmValidator;
+
+	@Mock
+	private InventoryCommonValidator inventoryCommonValidator;
 
 	@Before
 	public void setup() {
