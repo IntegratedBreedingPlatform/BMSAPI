@@ -36,7 +36,7 @@ public class TransactionInputValidator {
 
 	public void validateAllProvidedTransactionsExists(final List<TransactionDto> transactionDtos, final Set<Integer> transactionIds) {
 		errors = new MapBindingResult(new HashMap<String, String>(), TransactionDto.class.getName());
-		if (transactionDtos.size() != transactionIds.size()) {
+		if (transactionIds != null && !transactionIds.isEmpty() && transactionDtos.size() != transactionIds.size()) {
 			final List<Integer> existentTransactionIds =
 				transactionDtos.stream().map(TransactionDto::getTransactionId).collect(Collectors.toList());
 			final List<Integer> invalidTransactionIds = new ArrayList<>(transactionIds);
