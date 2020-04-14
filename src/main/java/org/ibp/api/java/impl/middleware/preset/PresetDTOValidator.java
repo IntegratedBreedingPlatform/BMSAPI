@@ -98,7 +98,10 @@ public class PresetDTOValidator {
 		if (labelPrintingPresetDTO.getFileConfiguration() == null) {
 			this.errors.reject("label.printing.preset.file.configuration.required", "");
 		}
-		if (labelPrintingPresetDTO.getBarcodeSetting() == null) {
+
+		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting = labelPrintingPresetDTO.getBarcodeSetting();
+
+		if (barcodeSetting == null) {
 			this.errors.reject("label.printing.preset.barcode.setting.required", "");
 		}
 		if (labelPrintingPresetDTO.getSelectedFields() == null) {
@@ -110,42 +113,36 @@ public class PresetDTOValidator {
 
 		labelPrintingPresetDTO.getSelectedFields().forEach(list -> {
 			list.forEach(fieldId -> {
-				if (!LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
-						&& this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId))
-						== null) {
+				if (this.isInvalidField(crop, labelPrintingPresetDTO, fieldId)) {
 					this.errors.reject("label.printing.preset.invalid.field.in.selected.field", "");
 					throw new ApiRequestValidationException(this.errors.getAllErrors());
 				}
 			});
 		});
 
-		if (labelPrintingPresetDTO.getBarcodeSetting().isBarcodeNeeded()) {
-			if (labelPrintingPresetDTO.getBarcodeSetting().isAutomaticBarcode()) {
-					if (labelPrintingPresetDTO.getBarcodeSetting()
-					.getBarcodeFields() != null && !labelPrintingPresetDTO.getBarcodeSetting()
-					.getBarcodeFields().isEmpty()) {
-						this.errors.reject("label.printing.preset.inconsistent.barcode.setting", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-					}
-			} else {
-				if (labelPrintingPresetDTO.getBarcodeSetting().getBarcodeFields() == null || labelPrintingPresetDTO.getBarcodeSetting()
-						.getBarcodeFields().isEmpty()) {
+		final List<Integer> barcodeFields = barcodeSetting.getBarcodeFields();
+
+		if (barcodeSetting.isBarcodeNeeded()) {
+			if (barcodeSetting.isAutomaticBarcode()) {
+				if (barcodeFields != null && !barcodeFields.isEmpty()) {
 					this.errors.reject("label.printing.preset.inconsistent.barcode.setting", "");
 					throw new ApiRequestValidationException(this.errors.getAllErrors());
 				}
-				labelPrintingPresetDTO.getBarcodeSetting().getBarcodeFields().forEach(fieldId -> {
-					if (!LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
-							&& this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId))
-							== null) {
+			} else {
+				if (barcodeFields == null || barcodeFields.isEmpty()) {
+					this.errors.reject("label.printing.preset.inconsistent.barcode.setting", "");
+					throw new ApiRequestValidationException(this.errors.getAllErrors());
+				}
+				barcodeFields.forEach(fieldId -> {
+					if (this.isInvalidField(crop, labelPrintingPresetDTO, fieldId)) {
 						this.errors.reject("label.printing.preset.invalid.field.in.barcode.field", "");
 						throw new ApiRequestValidationException(this.errors.getAllErrors());
 					}
 				});
 			}
 		} else {
-			if (labelPrintingPresetDTO.getBarcodeSetting().isAutomaticBarcode()
-					|| (labelPrintingPresetDTO.getBarcodeSetting().getBarcodeFields() != null && !labelPrintingPresetDTO.getBarcodeSetting()
-					.getBarcodeFields().isEmpty())) {
+			if (barcodeSetting.isAutomaticBarcode()
+				|| (barcodeFields != null && !barcodeFields.isEmpty())) {
 				this.errors.reject("label.printing.preset.inconsistent.barcode.setting", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
@@ -162,6 +159,12 @@ public class PresetDTOValidator {
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));
 		}
 
+	}
+
+	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final Integer fieldId) {
+		return !LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
+			&& this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId))
+			== null;
 	}
 
 }
