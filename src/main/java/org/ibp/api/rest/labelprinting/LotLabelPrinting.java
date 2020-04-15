@@ -180,7 +180,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput) {
-
+		super.validateLabelsGeneratorInputData(labelsGeneratorInput);
 	}
 
 	@Override

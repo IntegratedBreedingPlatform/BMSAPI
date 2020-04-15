@@ -120,58 +120,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	public void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput) {
-		this.validateLabelsInfoInputData(labelsGeneratorInput);
-		final Set<Integer> availableKeys = new HashSet<>();
-		this.getAvailableLabelTypes(labelsGeneratorInput)
-			.forEach(labelType -> labelType.getFields().forEach(field -> availableKeys.add(field.getId())));
-		final Set<Integer> requestedFields = new HashSet<>();
-		int totalRequestedFields = 0;
-		for (final List<Integer> list : labelsGeneratorInput.getFields()) {
-			for (final Integer key : list) {
-				requestedFields.add(key);
-				totalRequestedFields++;
-			}
-		}
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		if (requestedFields.isEmpty()) {
-			//Error, at least one requested field is needed
-			errors.reject("label.fields.selection.empty", StringUtils.EMPTY);
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-		if (!availableKeys.containsAll(requestedFields)) {
-			//Error, some of the requested fields are not available to use
-			errors.reject("label.fields.invalid", StringUtils.EMPTY);
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-		if (totalRequestedFields != requestedFields.size()) {
-			// Error, duplicated requested field
-			errors.reject("label.fields.duplicated", StringUtils.EMPTY);
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-		if (labelsGeneratorInput.isBarcodeRequired() && !labelsGeneratorInput.isAutomaticBarcode()) {
-			//Validate that at least one is selected
-			if (labelsGeneratorInput.getBarcodeFields().isEmpty()) {
-				errors.reject("barcode.fields.empty", StringUtils.EMPTY
-				);
-				throw new ApiRequestValidationException(errors.getAllErrors());
-			}
-			//Validate that selected are availableFields
-			if (!availableKeys.containsAll(labelsGeneratorInput.getBarcodeFields())) {
-				//Error, some of the requested fields are not available to use
-				errors.reject("barcode.fields.invalid", StringUtils.EMPTY);
-				throw new ApiRequestValidationException(errors.getAllErrors());
-			}
-		}
-		// Validation for the file name
-		if (StringUtils.isEmpty(labelsGeneratorInput.getFileName())) {
-			errors.reject("common.error.filename.required", StringUtils.EMPTY);
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
-		if (!FileUtils.isFilenameValid(labelsGeneratorInput.getFileName())) {
-			errors.reject("common.error.invalid.filename.windows", StringUtils.EMPTY);
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		super.validateLabelsGeneratorInputData(labelsGeneratorInput);
 	}
 
 	@Override
