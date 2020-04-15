@@ -1,4 +1,4 @@
-package org.ibp.api.rest.labelprinting;
+package org.ibp.api.rest.labelprinting.filegenerator;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.Maps;

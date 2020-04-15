@@ -2,6 +2,9 @@ package org.ibp.api.rest.labelprinting;
 
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.rest.common.FileType;
+import org.ibp.api.rest.labelprinting.filegenerator.CSVLabelsFileGenerator;
+import org.ibp.api.rest.labelprinting.filegenerator.LabelsFileGenerator;
+import org.ibp.api.rest.labelprinting.filegenerator.PDFLabelsFileGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
