@@ -47,7 +47,7 @@ public class LotImportRequestDtoValidatorTest {
 	@Mock
 	private LocationDataManager locationDataManager;
 
-	@Autowired
+	@Mock
 	private LotService lotService;
 
 	@Before
