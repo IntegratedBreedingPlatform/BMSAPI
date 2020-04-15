@@ -55,7 +55,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	@Autowired
 	private LotService lotService;
 
-	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF);
+	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
 
 	// Lot IDs

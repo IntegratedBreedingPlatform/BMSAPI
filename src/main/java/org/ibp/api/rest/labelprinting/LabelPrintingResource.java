@@ -16,6 +16,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.filegenerator.CSVLabelsFileGenerator;
+import org.ibp.api.rest.labelprinting.filegenerator.ExcelLabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.LabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.PDFLabelsFileGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,9 @@ public class LabelPrintingResource {
 
 	@Autowired
 	private PDFLabelsFileGenerator pdfLabelsFileGenerator;
+
+	@Autowired
+	private ExcelLabelsFileGenerator excelLabelsFileGenerator;
 
 	@Autowired
 	private HttpServletRequest request;
@@ -200,6 +204,11 @@ public class LabelPrintingResource {
 				break;
 			case PDF:
 				labelsFileGenerator = this.pdfLabelsFileGenerator;
+				break;
+			case XLS:
+				// Generic Excel generator
+				// It's possible to switch again here by strategy to return a specific generator
+				labelsFileGenerator = this.excelLabelsFileGenerator;
 				break;
 			default:
 				labelsFileGenerator = null;

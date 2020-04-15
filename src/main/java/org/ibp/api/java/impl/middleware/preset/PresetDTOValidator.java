@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.preset;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
@@ -12,7 +11,6 @@ import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.FileType;
-import org.ibp.api.rest.labelprinting.SubObservationDatasetLabelPrinting;
 import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.ibp.api.rest.preset.domain.PresetDTO;
 import org.ibp.api.rest.preset.domain.PresetType;
@@ -160,12 +158,6 @@ public class PresetDTOValidator {
 			this.errors.reject("preset.invalid.file.type", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-
-		if (!SubObservationDatasetLabelPrinting.SUPPORTED_FILE_TYPES.contains(fileType)) {
-			this.errors.reject("preset.not.supported.file.type", "");
-			throw new NotSupportedException(this.errors.getAllErrors().get(0));
-		}
-
 	}
 
 	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final Integer fieldId) {
