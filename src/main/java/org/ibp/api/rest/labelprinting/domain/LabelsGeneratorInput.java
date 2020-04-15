@@ -73,6 +73,10 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 		return allAvailablefields;
 	}
 
+	public void setAllAvailablefields(final Set<Field> allAvailablefields) {
+		this.allAvailablefields = allAvailablefields;
+	}
+
 	public String getSizeOfLabelSheet() {
 		return this.sizeOfLabelSheet;
 	}
@@ -87,10 +91,6 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 
 	public void setNumberOfRowsPerPageOfLabel(final String numberOfRowsPerPageOfLabel) {
 		this.numberOfRowsPerPageOfLabel = numberOfRowsPerPageOfLabel;
-	}
-
-	public void setAllAvailablefields(final Set<Field> allAvailablefields) {
-		this.allAvailablefields = allAvailablefields;
 	}
 
 	@Override
