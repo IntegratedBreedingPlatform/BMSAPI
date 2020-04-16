@@ -44,7 +44,9 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 			// feed in your array (or convert your data to an array)
 			final List<String[]> rowValues = new ArrayList<>();
 
-			rowValues.add(this.getHeaderNames(labelsGeneratorInput, keyFieldMap).toArray(new String[] {}));
+			if (labelsGeneratorInput.isIncludeHeadings()) {
+				rowValues.add(this.getHeaderNames(labelsGeneratorInput, keyFieldMap).toArray(new String[] {}));
+			}
 
 			labelsData.getData().forEach(
 					labels -> rowValues.add(this.getColumnValues(labels, labelsGeneratorInput, labelsData.getDefaultBarcodeKey())));

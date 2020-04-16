@@ -49,12 +49,15 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 			.collect(Collectors.toList());
 
 		int rowIndex = 0;
-		final HSSFRow headerRow = sheet.createRow(rowIndex++);
-		int headerIndex = 0;
-		for (final Field header : headers) {
-			final HSSFCell cell = headerRow.createCell(headerIndex);
-			cell.setCellValue(header.getName());
-			headerIndex++;
+
+		if (labelsGeneratorInput.isIncludeHeadings()) {
+			final HSSFRow headerRow = sheet.createRow(rowIndex++);
+			int headerIndex = 0;
+			for (final Field header : headers) {
+				final HSSFCell cell = headerRow.createCell(headerIndex);
+				cell.setCellValue(header.getName());
+				headerIndex++;
+			}
 		}
 
 		// values

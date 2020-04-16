@@ -21,6 +21,8 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 
 	private boolean automaticBarcode;
 
+	private boolean includeHeadings;
+
 	private List<Integer> barcodeFields;
 
 	private String sizeOfLabelSheet;
@@ -51,6 +53,14 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 
 	public void setAutomaticBarcode(final boolean automaticBarcode) {
 		this.automaticBarcode = automaticBarcode;
+	}
+
+	public boolean isIncludeHeadings() {
+		return this.includeHeadings;
+	}
+
+	public void setIncludeHeadings(final boolean includeHeadings) {
+		this.includeHeadings = includeHeadings;
 	}
 
 	public List<Integer> getBarcodeFields() {

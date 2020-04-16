@@ -84,6 +84,9 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 	private BarcodeSetting barcodeSetting;
 
 	@JsonView(PresetDTO.View.Configuration.class)
+	private boolean includeHeadings = true;
+
+	@JsonView(PresetDTO.View.Configuration.class)
 	private FilePresetConfigurationDTO fileConfiguration;
 
 	public FilePresetConfigurationDTO getFileConfiguration() {
@@ -108,6 +111,14 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 
 	public void setBarcodeSetting(final BarcodeSetting barcodeSetting) {
 		this.barcodeSetting = barcodeSetting;
+	}
+
+	public Boolean isIncludeHeadings() {
+		return this.includeHeadings;
+	}
+
+	public void setIncludeHeadings(final boolean includeHeadings) {
+		this.includeHeadings = includeHeadings;
 	}
 
 	@Override
