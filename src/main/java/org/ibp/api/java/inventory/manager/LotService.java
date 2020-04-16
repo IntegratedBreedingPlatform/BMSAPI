@@ -2,9 +2,9 @@ package org.ibp.api.java.inventory.manager;
 
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
-import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.springframework.data.domain.Pageable;
 
@@ -20,7 +20,7 @@ public interface LotService {
 
 	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest);
 
-	void importLotsWithInitialTransaction(List<LotItemDto> lotList);
+	void importLotsWithInitialTransaction(LotImportRequestDto lotImportRequestDto);
 
 	LotSearchMetadata getLotsSearchMetadata(LotsSearchDto lotsSearchDto);
 

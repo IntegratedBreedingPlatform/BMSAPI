@@ -10,9 +10,9 @@ import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
-import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -184,8 +184,9 @@ public class LotResource {
 		value = "/crops/{crop}/lot-lists",
 		method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
-	public ResponseEntity<Void> importLotsWithInitialBalance(@PathVariable final String crop, @RequestBody final List<LotItemDto> lotList) {
-		this.lotService.importLotsWithInitialTransaction(lotList);
+	public ResponseEntity<Void> importLotsWithInitialBalance(@PathVariable final String crop,
+		@RequestBody final LotImportRequestDto lotImportRequestDto) {
+		this.lotService.importLotsWithInitialTransaction(lotImportRequestDto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

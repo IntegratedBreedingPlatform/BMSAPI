@@ -46,11 +46,12 @@ public class LotInputValidator {
 	@Autowired
 	private TransactionService transactionService;
 
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
+
 	private BindingResult errors;
 
 	private static final Integer STOCK_ID_MAX_LENGTH = 35;
-
-	private static final Integer PREFIX_MAX_LENGTH = 15;
 
 
 	public LotInputValidator() {
@@ -146,14 +147,7 @@ public class LotInputValidator {
 				this.errors.reject("lot.stock.prefix.not.empty", "");
 			}
 		} else {
-			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && !lotGeneratorInputDto.getStockPrefix().matches("[a-zA-Z]+")) {
-				this.errors.reject("lot.stock.prefix.invalid.characters", "");
-				return;
-			}
-			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && lotGeneratorInputDto.getStockPrefix().length() > PREFIX_MAX_LENGTH) {
-				this.errors.reject("lot.stock.prefix.invalid.length", new String[] {String.valueOf(PREFIX_MAX_LENGTH)}, "");
-				return;
-			}
+			inventoryCommonValidator.validateStockIdPrefix(lotGeneratorInputDto.getStockPrefix(), errors);
 			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockId())){
 				this.errors.reject("lot.stock.id.not.empty", "");
 				return;

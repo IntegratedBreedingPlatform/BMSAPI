@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -27,7 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class LotItemDtoListValidator {
+public class LotImportRequestDtoValidator {
 
 	private static Integer NOTES_MAX_LENGTH = 255;
 
@@ -47,10 +49,23 @@ public class LotItemDtoListValidator {
 	@Autowired
 	private LotService lotService;
 
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
+
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 
-	public void validate(final List<LotItemDto> lotList) {
+	public void validate(final LotImportRequestDto lotImportRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
+
+		if (lotImportRequestDto == null) {
+			errors.reject("lot.import.request.null", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		//Validate Stock Prefix
+		inventoryCommonValidator.validateStockIdPrefix(lotImportRequestDto.getStockIdPrefix(), errors);
+
+		final List<LotItemDto> lotList = lotImportRequestDto.getLotList();
 
 		if (lotList == null) {
 			errors.reject("lot.input.list.null", "");
@@ -133,21 +148,20 @@ public class LotItemDtoListValidator {
 	}
 
 	private void validateStockIds(final List<LotItemDto> lotList) {
-		final List<String> uniqueStockIds = lotList.stream().map(LotItemDto::getStockId).distinct().collect(Collectors.toList());
-		if (Util.countNullOrEmptyStrings(uniqueStockIds) > 0) {
-			errors.reject("lot.input.list.stock.ids.null.or.empty", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-		if (uniqueStockIds.stream().filter(c -> c.length() > STOCK_ID_MAX_LENGTH).count()>0) {
+		final List<String> uniqueNotNullStockIds =
+			lotList.stream().map(LotItemDto::getStockId).filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
+
+		if (uniqueNotNullStockIds.stream().filter(c -> c.length() > STOCK_ID_MAX_LENGTH).count() > 0) {
 			errors.reject("lot.stock.id.length.higher.than.maximum", new String[]{String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		final List<String> allStockIds = lotList.stream().map(LotItemDto::getStockId).collect(Collectors.toList());
-		if (allStockIds.size() != uniqueStockIds.size()) {
+		final List<String> allStockIds =
+			lotList.stream().map(LotItemDto::getStockId).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+		if (allStockIds.size() != uniqueNotNullStockIds.size()) {
 			errors.reject("lot.input.list.stock.ids.duplicated","");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		final List<LotDto> existingLotDtos = this.lotService.getLotsByStockIds(uniqueStockIds);
+		final List<LotDto> existingLotDtos = this.lotService.getLotsByStockIds(uniqueNotNullStockIds);
 		if (!existingLotDtos.isEmpty()){
 			final List<String> existingStockIds = existingLotDtos.stream().map(LotDto::getStockId).collect(Collectors.toList());
 			errors.reject("lot.input.list.stock.ids.invalid", new String[] {Util.buildErrorMessageFromList(existingStockIds, 3)}, "");
@@ -170,10 +184,18 @@ public class LotItemDtoListValidator {
 
 	private void validateNotes(final List<LotItemDto> lotList) {
 		final List<String> notes = lotList.stream().map(LotItemDto::getNotes).distinct().collect(Collectors.toList());
-		if (notes.stream().filter(c -> c != null && c.length() > NOTES_MAX_LENGTH).count()>0) {
+		if (notes.stream().filter(c -> c != null && c.length() > NOTES_MAX_LENGTH).count() > 0) {
 			errors.reject("lot.input.list.notes.length", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
+	public InventoryCommonValidator getInventoryCommonValidator() {
+		return inventoryCommonValidator;
+	}
+
+	public void setInventoryCommonValidator(
+		InventoryCommonValidator inventoryCommonValidator) {
+		this.inventoryCommonValidator = inventoryCommonValidator;
+	}
 }
