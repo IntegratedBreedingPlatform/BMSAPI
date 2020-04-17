@@ -14,7 +14,6 @@ import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.program.ProgramService;
-import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.preset.domain.FilePresetConfigurationDTO;
 import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.ibp.api.rest.preset.domain.PresetDTO;
@@ -442,7 +441,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		this.presetDTOValidator.validate(CROP_NAME, presetDTO);
 	}
 
-	@Test(expected = NotSupportedException.class)
+	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfFileTypeIsNotSupported() {
 		final LabelPrintingPresetDTO presetDTO = new LabelPrintingPresetDTO();
 		presetDTO.setToolSection(this.toolSection);
@@ -451,7 +450,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setToolId(this.toolId);
 		presetDTO.setProgramUUID(this.programUUID);
 		final FilePresetConfigurationDTO filePresetConfigurationDTO = new FilePresetConfigurationDTO();
-		filePresetConfigurationDTO.setOutputType(FileType.XLS.getExtension());
+		filePresetConfigurationDTO.setOutputType("txt");
 		presetDTO.setFileConfiguration(filePresetConfigurationDTO);
 		presetDTO.setBarcodeSetting(this.barcodeSetting);
 
