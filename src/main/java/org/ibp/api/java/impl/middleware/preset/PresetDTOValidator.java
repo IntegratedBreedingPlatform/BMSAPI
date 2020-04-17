@@ -67,10 +67,8 @@ public class PresetDTOValidator {
 		final String presetName = presetDTO.getName();
 		if (StringUtils.isEmpty(presetName)) {
 			this.errors.reject("preset.name.required", "");
-		}
-
-		if (presetName.length() > NAME_MAX_LENGTH) {
-			errors.reject("preset.name.length.invalid", new String[] {String.valueOf(NAME_MAX_LENGTH)}, "");
+		} else if (presetName.length() > NAME_MAX_LENGTH) {
+			this.errors.reject("preset.name.length.invalid", new String[] {String.valueOf(NAME_MAX_LENGTH)}, "");
 		}
 
 		if (this.errors.hasErrors()) {
