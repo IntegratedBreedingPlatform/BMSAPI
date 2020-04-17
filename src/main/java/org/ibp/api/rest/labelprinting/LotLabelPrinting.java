@@ -62,6 +62,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	// (Keeping it TERM_ID agnostic for now)
 	// TODO generic lot variable columns query
 	private enum LOT_FIELD {
+		LOT_ID(22, "Lot ID"), // Added later
 		LOT_UID(1, "Lot UID"),
 		STOCK_ID(2, "Stock id"),
 		STATUS(3, "Status"),
@@ -118,7 +119,9 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		DESIGNATION(18, "Designation"),
 		BREEDING_METHOD(19, "Breeding method"),
 		LOCATION(20, "Location"),
-		CROSS(21, "Cross");
+		CROSS(21, "Cross")
+		// LOT_ID(22) in lot group
+		;
 
 		private static Map<Integer, GERMPLASM_FIELD> byId =
 			Arrays.stream(GERMPLASM_FIELD.values()).collect(Collectors.toMap(GERMPLASM_FIELD::getId, Function.identity()));
@@ -273,6 +276,9 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 				switch (LOT_FIELD.getById(id)) {
 					case LOT_UID:
 						columns.put(key, extendedLotDto.getLotUUID());
+						break;
+					case LOT_ID:
+						columns.put(key, Objects.toString(extendedLotDto.getLotId(), ""));
 						break;
 					case STOCK_ID:
 						columns.put(key, extendedLotDto.getStockId());
