@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 
 public abstract class LabelPrintingStrategy {
 
+	private static final int FILENAME_MAX_LENGTH = 100;
+
 	@Autowired
 	private PedigreeService pedigreeService;
 
@@ -140,14 +142,22 @@ public abstract class LabelPrintingStrategy {
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 		}
+
 		// Validation for the file name
-		if (StringUtils.isEmpty(labelsGeneratorInput.getFileName())) {
+		final String fileName = labelsGeneratorInput.getFileName();
+
+		if (StringUtils.isEmpty(fileName)) {
 			errors.reject("common.error.filename.required");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		if (!FileUtils.isFilenameValid(labelsGeneratorInput.getFileName())) {
+		if (!FileUtils.isFilenameValid(fileName)) {
 			errors.reject("common.error.invalid.filename.windows");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (fileName.length() > FILENAME_MAX_LENGTH) {
+			errors.reject("common.error.invalid.filename.size", new String[] {String.valueOf(FILENAME_MAX_LENGTH)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	};

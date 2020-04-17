@@ -29,6 +29,7 @@ import java.util.List;
 public class PresetDTOValidator {
 
 	private static final Integer FIELDBOOK_TOOL_ID = 23;
+	private static final int NAME_MAX_LENGTH = 50;
 
 	@Autowired
 	private PresetService presetService;
@@ -63,8 +64,13 @@ public class PresetDTOValidator {
 			this.errors.reject("preset.invalid.program.uuid", "");
 		}
 
-		if (StringUtils.isEmpty(presetDTO.getName())) {
+		final String presetName = presetDTO.getName();
+		if (StringUtils.isEmpty(presetName)) {
 			this.errors.reject("preset.name.required", "");
+		}
+
+		if (presetName.length() > NAME_MAX_LENGTH) {
+			errors.reject("preset.name.length.invalid", new String[] {String.valueOf(NAME_MAX_LENGTH)}, "");
 		}
 
 		if (this.errors.hasErrors()) {
@@ -72,7 +78,7 @@ public class PresetDTOValidator {
 		}
 
 		final List<ProgramPreset> presets = this.presetService
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), programUUID, presetDTO.getToolId(),
+				.getProgramPresetFromProgramAndToolByName(presetName, programUUID, presetDTO.getToolId(),
 						presetDTO.getToolSection());
 		if (!presets.isEmpty()) {
 			this.errors.reject("preset.name.invalid", "");
