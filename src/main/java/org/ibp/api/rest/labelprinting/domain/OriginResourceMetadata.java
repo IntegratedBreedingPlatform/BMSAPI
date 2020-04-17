@@ -3,14 +3,14 @@ package org.ibp.api.rest.labelprinting.domain;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @AutoProperty
 public class OriginResourceMetadata {
 
-	private String defaultFileName;
-
-	private Map<String, String> metadata;
+	private String defaultFileName = "";
+	private Map<String, String> metadata = new HashMap<>();
 
 	public OriginResourceMetadata() {
 	}

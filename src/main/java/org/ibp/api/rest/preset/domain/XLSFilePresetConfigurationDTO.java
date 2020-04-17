@@ -4,7 +4,7 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class CSVXLSFilePresetConfigurationDTO extends FilePresetConfigurationDTO {
+public class XLSFilePresetConfigurationDTO extends FilePresetConfigurationDTO {
 
 	@Override
 	public int hashCode() {

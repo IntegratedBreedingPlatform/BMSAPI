@@ -1,5 +1,10 @@
 package org.ibp.api.rest.labelprinting;
 
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
@@ -9,12 +14,26 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class LabelPrintingStrategy {
+
+	private static final int FILENAME_MAX_LENGTH = 100;
+
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
 	/**
 	 * Validate LabelsInfoInput
@@ -23,16 +42,6 @@ public abstract class LabelPrintingStrategy {
 	 * @param labelsInfoInput
 	 */
 	abstract void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput);
-
-	//This function could end being generic for all the strategies, so re-review for next implementation and make
-	//this interface an abstract class if needed.
-
-	/**
-	 * Validate LabelsGeneratorInput
-	 * Throws an exception when a validation problem is found
-	 * @param labelsGeneratorInput
-	 */
-	abstract void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput);
 
 	/**
 	 * Given a labelInfoInput, it retrieves a summarized info of the labels needed in a more readable object
@@ -82,10 +91,92 @@ public abstract class LabelPrintingStrategy {
 	 */
 	abstract List<FileType> getSupportedFileTypes();
 
+	/**
+	 * Validate LabelsGeneratorInput
+	 * Throws an exception when a validation problem is found
+	 * @param labelsGeneratorInput
+	 */
+	void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput) {
+		this.validateLabelsInfoInputData(labelsGeneratorInput);
+
+		final Set<Integer> availableKeys = this.getAvailableLabelTypes(labelsGeneratorInput)
+			.stream().flatMap(labelType -> labelType.getFields().stream())
+			.map(field -> field.getId())
+			.collect(Collectors.toSet());
+
+		final Set<Integer> requestedFields = new HashSet<>();
+		int totalRequestedFields = 0;
+
+		for (final List<Integer> list : labelsGeneratorInput.getFields()) {
+			for (final Integer key : list) {
+				requestedFields.add(key);
+				totalRequestedFields++;
+			}
+		}
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		if (requestedFields.isEmpty()) {
+			// Error, at least one requested field is needed
+			errors.reject("label.fields.selection.empty");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		if (!availableKeys.containsAll(requestedFields)) {
+			// Error, some of the requested fields are not available to use
+			errors.reject("label.fields.invalid");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		if (totalRequestedFields != requestedFields.size()) {
+			// Error, duplicated requested field
+			errors.reject("label.fields.duplicated");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		if (labelsGeneratorInput.isBarcodeRequired() && !labelsGeneratorInput.isAutomaticBarcode()) {
+			// Validate that at least one is selected
+			if (labelsGeneratorInput.getBarcodeFields().isEmpty()) {
+				errors.reject("barcode.fields.empty");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+			// Validate that selected are availableFields
+			if (!availableKeys.containsAll(labelsGeneratorInput.getBarcodeFields())) {
+				// Error, some of the requested fields are not available to use
+				errors.reject("barcode.fields.invalid");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+		}
+
+		// Validation for the file name
+		final String fileName = labelsGeneratorInput.getFileName();
+
+		if (StringUtils.isEmpty(fileName)) {
+			errors.reject("common.error.filename.required");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (!FileUtils.isFilenameValid(fileName)) {
+			errors.reject("common.error.invalid.filename.windows");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (fileName.length() > FILENAME_MAX_LENGTH) {
+			errors.reject("common.error.invalid.filename.size", new String[] {String.valueOf(FILENAME_MAX_LENGTH)}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	};
+
 	Set<Field> getAllAvailableFields(final LabelsInfoInput labelsInfoInput) {
 		final Set<Field> availableFields = new HashSet<>();
 		this.getAvailableLabelTypes(labelsInfoInput).forEach(labelType -> availableFields.addAll(labelType.getFields()));
 		return availableFields;
 	}
 
+
+	String getPedigree(final String gid, final Map<String, String> gidPedigreeMap) {
+		final String pedigree;
+		if (gidPedigreeMap.containsKey(gid)) {
+			pedigree = gidPedigreeMap.get(gid);
+		} else {
+			pedigree = this.pedigreeService.getCrossExpansion(Integer.valueOf(gid), this.crossExpansionProperties);
+			gidPedigreeMap.put(gid, pedigree);
+		}
+		return pedigree;
+	}
 }

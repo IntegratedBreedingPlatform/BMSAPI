@@ -20,7 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @Api(value = "Preset Services")
-@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'CROP_MANAGEMENT')")
+@PreAuthorize("hasAnyAuthority("
+	+ "'ADMIN',"
+	+ "'BREEDING_ACTIVITIES',"
+	+ "'MANAGE_STUDIES',"
+	+ "'CROP_MANAGEMENT',"
+	+ "'MANAGE_INVENTORY',"
+	+ "'MANAGE_LOTS',"
+	+ "'LOT_LABEL_PRINTING'"
+	+ ")")
 @RestController
 public class PresetResource {
 
