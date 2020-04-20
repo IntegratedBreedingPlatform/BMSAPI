@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
+import com.google.common.collect.Lists;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
@@ -210,8 +211,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final LotsSearchDto searchDto =
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
-		final List<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toList());
-		final List<UserDefinedField> attributes = this.germplasmDataManager.getAttributeTypesByGIDList(gids);
+		final Set<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet());
+		final List<UserDefinedField> attributes = this.germplasmDataManager.getAttributeTypesByGIDList(Lists.newArrayList(gids));
 
 		// Build label list
 
@@ -236,8 +237,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final LotsSearchDto searchDto =
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
-		final List<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toList());
-		final Map<Integer, Map<Integer, String>> attributeValues = this.germplasmDataManager.getAttributeValuesGIDList(gids);
+		final Set<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet());
+		final Map<Integer, Map<Integer, String>> attributeValues = this.germplasmDataManager.getAttributeValuesGIDList(new ArrayList<>(gids));
 
 		// Data to be exported
 		final List<Map<Integer, String>> data = new ArrayList<>();
