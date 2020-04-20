@@ -143,10 +143,10 @@ public class TransactionResource {
 	}
 
 	@ApiOperation(value = "Create Pending Withdrawals", notes = "Create new withdrawals with pending status for a set os filtered lots")
-		 @RequestMapping(value = "/crops/{cropName}/transactions/pending-withdrawals-lists", method = RequestMethod.POST)
-		 @ResponseBody
-		 @PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_PENDING_WITHDRAWALS')")
-		 public ResponseEntity<Void> createPendingWithdrawals(
+	@RequestMapping(value = "/crops/{cropName}/transactions/pending-withdrawals/generation", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_PENDING_WITHDRAWALS')")
+	public ResponseEntity<Void> createPendingWithdrawals(
 			@PathVariable final String cropName,
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
@@ -157,7 +157,7 @@ public class TransactionResource {
 	}
 
 	@ApiOperation(value = "Create Confirmed Withdrawals", notes = "Create new withdrawals with confirmed status for a set os filtered lots")
-	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-withdrawals-lists", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-withdrawals/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_CONFIRMED_WITHDRAWALS')")
 	public ResponseEntity<Void> createConfirmedWithdrawals(
