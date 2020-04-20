@@ -78,7 +78,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	private Collection<? extends GrantedAuthority> getAuthorities(final WorkbenchUser workbenchUser) throws AccessDeniedException {
 		final String cropName = this.contextResolver.resolveCropNameFromUrl();
 		if(!StringUtils.isEmpty(cropName)) {
-			List<String> crops = this.cropService.getAvailableCropsForUser(workbenchUser.getUserid());
+			final List<String> crops = this.cropService.getAvailableCropsForUser(workbenchUser.getUserid());
 			crops.replaceAll(String::toUpperCase);
 			if(!crops.contains(cropName.trim().toUpperCase())) {
 				throw new AccessDeniedException("");
