@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.common.ContextResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -20,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,6 +47,9 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	private CropService cropService;
+
 	public WorkbenchUserDetailsService() {
 
 	}
@@ -65,21 +70,30 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			throw new UsernameNotFoundException("Invalid username/password.");
 		} catch (final MiddlewareQueryException e) {
 			throw new AuthenticationServiceException("Data access error while authenticating user against Workbench.", e);
+		} catch (final AccessDeniedException e) {
+			throw new AuthenticationServiceException("Access denied.", e);
 		}
 	}
 
-	private Collection<? extends GrantedAuthority> getAuthorities(final WorkbenchUser workbenchUser) {
+	private Collection<? extends GrantedAuthority> getAuthorities(final WorkbenchUser workbenchUser) throws AccessDeniedException {
 		final String cropName = this.contextResolver.resolveCropNameFromUrl();
+		if(!StringUtils.isEmpty(cropName)) {
+			List<String> crops = this.cropService.getAvailableCropsForUser(workbenchUser.getUserid());
+			crops.replaceAll(String::toUpperCase);
+			if(!crops.contains(cropName.trim().toUpperCase())) {
+				throw new AccessDeniedException("");
+			}
+		}
+
 		final String programUUID = this.contextResolver.resolveProgramUuidFromRequest();
-		final Integer programId = StringUtils.isEmpty(programUUID)? null : this.getProgramId(programUUID);
+		final Integer programId = StringUtils.isEmpty(programUUID) ? null : this.getProgramId(programUUID);
 
 		final List<PermissionDto> permissions = this.permissionService.getPermissions( //
 			workbenchUser.getUserid(), //
-				StringUtils.isEmpty(cropName) ? null : cropName, //
-				programId);
-		final List<GrantedAuthority> authorities = permissions.stream().map(permissionDto -> new SimpleGrantedAuthority(permissionDto.getName())).collect(
+			StringUtils.isEmpty(cropName) ? null : cropName, //
+			programId);
+		return permissions.stream().map(permissionDto -> new SimpleGrantedAuthority(permissionDto.getName())).collect(
 				Collectors.toCollection(ArrayList::new));
-		return authorities;
 	}
 
 	private Integer getProgramId(final String programUUID) {
