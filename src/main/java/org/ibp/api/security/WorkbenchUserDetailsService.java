@@ -71,7 +71,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 		} catch (final MiddlewareQueryException e) {
 			throw new AuthenticationServiceException("Data access error while authenticating user against Workbench.", e);
 		} catch (final AccessDeniedException e) {
-			throw new AuthenticationServiceException("Access denied.", e);
+			throw new AuthenticationServiceException("Access Denied: User is not authorized for crop.", e);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			final List<String> crops = this.cropService.getAvailableCropsForUser(workbenchUser.getUserid());
 			crops.replaceAll(String::toUpperCase);
 			if(!crops.contains(cropName.trim().toUpperCase())) {
-				throw new AccessDeniedException("");
+				throw new AccessDeniedException("User is not authorized for crop.");
 			}
 		}
 
