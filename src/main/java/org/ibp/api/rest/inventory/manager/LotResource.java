@@ -231,6 +231,19 @@ public class LotResource {
 		return new ResponseEntity<>(lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Close Lots", notes = "Close any lot")
+	@RequestMapping(value = "/crops/{cropName}/lots/close", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('UPDATE_LOTS')")
+	public ResponseEntity<Void> cancelPendingTransaction(
+		@PathVariable final String cropName, //
+		@ApiParam("List of lots to be close, use a searchId or a list of transaction ids")
+		@RequestBody final SearchCompositeDto searchCompositeDto) {
+
+		this.lotService.closeLots(searchCompositeDto);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	// TODO Use SearchComposito.isValid
 	private LotsSearchDto validateSearchComposite(
 		final Integer searchRequestId,
