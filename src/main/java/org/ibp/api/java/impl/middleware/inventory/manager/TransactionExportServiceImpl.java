@@ -128,7 +128,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 				TransactionExportServiceImpl.TRANSACTIONS_SHEET_TRN_ID_COLUMN_INDEX, transactionDto.getTransactionId().toString(),
 				CellType.NUMERIC, row);
 			this.writeCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_CREATED_COLUMN_INDEX,
-				transactionDto.getTransactionDate() == null ? "" : transactionDto.getTransactionDate().toString(), CellType.STRING, row);
+				transactionDto.getCreatedDate() == null ? "" : transactionDto.getCreatedDate().toString(), CellType.STRING, row);
 			this.writeCell(
 				TransactionExportServiceImpl.TRANSACTIONS_SHEET_USERNAME_COLUMN_INDEX, transactionDto.getCreatedByUsername(),
 				CellType.STRING, row);
