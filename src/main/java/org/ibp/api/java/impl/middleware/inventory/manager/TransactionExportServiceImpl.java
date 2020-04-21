@@ -163,7 +163,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		row.setHeightInPoints(16);
 
 		this.setCustomColorAtIndex(xlsBook, IndexedColors.YELLOW, 255, 255, 204);
-		this.setCustomColorAtIndex(xlsBook, IndexedColors.AQUA, 218, 238, 243);
+		this.setCustomColorAtIndex(xlsBook, IndexedColors.AQUA, 218, 227, 243);
 		this.setCustomColorAtIndex(xlsBook, IndexedColors.OLIVE_GREEN, 235, 241, 222);
 
 		HSSFCell cell = row.createCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_DESIGNATION_COLUMN_INDEX, CellType.STRING);
