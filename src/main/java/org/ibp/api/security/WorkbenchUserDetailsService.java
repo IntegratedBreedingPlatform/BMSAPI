@@ -71,7 +71,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 		} catch (final MiddlewareQueryException e) {
 			throw new AuthenticationServiceException("Data access error while authenticating user against Workbench.", e);
 		} catch (final AccessDeniedException e) {
-			throw new AuthenticationServiceException("Access Denied: User is not authorized for crop.", e);
+			throw new AuthenticationServiceException("Access Denied: " + e.getMessage(), e);
 		}
 	}
 
