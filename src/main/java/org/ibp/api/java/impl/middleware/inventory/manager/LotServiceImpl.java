@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotImportRequestDtoValidator;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,6 +59,16 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		return lotService.countSearchLots(lotsSearchDto);
+	}
+
+	@Override
+	public List<UserDefinedField> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
+		return this.lotService.getGermplasmAttributeTypes(searchDto);
+	}
+
+	@Override
+	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final LotsSearchDto searchDto) {
+		return this.lotService.getGermplasmAttributeValues(searchDto);
 	}
 
 	@Override
