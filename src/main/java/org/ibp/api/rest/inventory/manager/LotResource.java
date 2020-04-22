@@ -23,7 +23,8 @@ import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
-import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.InventoryCommonValidator;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
@@ -77,6 +78,12 @@ public class LotResource {
 
 	@Autowired
 	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private ExtendedLotListValidator extendedLotListValidator;
+
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
@@ -159,19 +166,12 @@ public class LotResource {
 		@ApiParam("Request with fields to update and criteria to update") @RequestBody final LotUpdateRequestDto lotRequest) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		Integer searchRequestId = null;
-		Set<Integer> lotIds = null;
-		final SearchCompositeDto searchCompositeDto = lotRequest.getSearchComposite();
-		if (searchCompositeDto != null) {
-			searchRequestId = searchCompositeDto.getSearchRequestId();
-			lotIds = searchCompositeDto.getItemIds();
-		}
-		final LotsSearchDto searchDTO = validateSearchComposite(searchRequestId, lotIds, errors);
+		this.inventoryCommonValidator.validateLotsSearchDto(lotRequest.getSearchComposite(), errors);
+		final LotsSearchDto searchDTO = getLotsSearchDto(lotRequest.getSearchComposite());
 
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-		if (extendedLotDtos == null || (searchRequestId == null && lotIds != null && extendedLotDtos.size() != lotIds.size())) {
-			errors.reject("lots.does.not.exist", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+		if (lotRequest.getSearchComposite().getSearchRequestId() == null) {
+			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, lotRequest.getSearchComposite().getItemIds());
 		}
 
 		this.lotService.updateLots(extendedLotDtos, lotRequest);
@@ -211,21 +211,20 @@ public class LotResource {
 	}
 
 	@ApiOperation(value = "It will retrieve metadata for a lot search", notes = "It will retrieve metadata for a lot search")
-	@RequestMapping(value = "/crops/{cropName}/lots/metadata", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/lots/metadata", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(@PathVariable final String cropName, //
-		@RequestParam(required = false) final Integer searchRequestId, @RequestParam(required = false) final Set<Integer> lotIds) {
+		@ApiParam("List of lots to get metadata, use a searchId or a list of lot ids")
+		@RequestBody final SearchCompositeDto searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final LotsSearchDto searchDTO = validateSearchComposite(searchRequestId, lotIds, errors);
+		this.inventoryCommonValidator.validateLotsSearchDto(searchCompositeDto, errors);
+		final LotsSearchDto searchDTO = getLotsSearchDto(searchCompositeDto);
 
-		if (searchRequestId == null) {
+		if (searchCompositeDto.getSearchRequestId() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-			if (extendedLotDtos.size() != lotIds.size()) {
-				errors.reject("lots.does.not.exist", "");
-				throw new ApiRequestValidationException(errors.getAllErrors());
-			}
+			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
 
 		return new ResponseEntity<>(lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
@@ -240,29 +239,29 @@ public class LotResource {
 		@ApiParam("List of lots to be closed, use a searchId or a list of lot ids")
 		@RequestBody final SearchCompositeDto searchCompositeDto) {
 
-		this.lotService.closeLots(searchCompositeDto);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
+		this.inventoryCommonValidator.validateLotsSearchDto(searchCompositeDto, errors);
+		final LotsSearchDto searchDTO = getLotsSearchDto(searchCompositeDto);
+
+		if (searchCompositeDto.getSearchRequestId() == null) {
+			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
+			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
+		}
+
+		this.lotService.closeLots(searchDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	// TODO Use SearchComposito.isValid
-	private LotsSearchDto validateSearchComposite(
-		final Integer searchRequestId,
-		final Set<Integer> lotIds,
-		final BindingResult errors) {
-
-		// Validate that searchId or list of lots are provided
-		if (searchRequestId == null && (lotIds == null || lotIds.isEmpty()) ||
-			searchRequestId != null && (lotIds != null)) {
-			errors.reject("lot.selection.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+	private LotsSearchDto getLotsSearchDto(
+		final SearchCompositeDto searchCompositeDto) {
 
 		final LotsSearchDto searchDTO;
-		if (searchRequestId != null) {
-			searchDTO = (LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
+		if (searchCompositeDto.getSearchRequestId() != null) {
+			searchDTO =
+				(LotsSearchDto) this.searchRequestService.getSearchRequest(searchCompositeDto.getSearchRequestId(), LotsSearchDto.class);
 		} else {
 			searchDTO = new LotsSearchDto();
-			searchDTO.setLotIds(new ArrayList<>(lotIds));
+			searchDTO.setLotIds(new ArrayList<>(searchCompositeDto.getItemIds()));
 		}
 		return searchDTO;
 	}

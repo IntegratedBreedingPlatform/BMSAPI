@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -24,4 +25,15 @@ public class InventoryCommonValidator {
 		}
 	}
 
+	public void validateLotsSearchDto(
+		final SearchCompositeDto searchCompositeDto,
+		final BindingResult errors) {
+
+		// Validate that searchId or list of lots are provided
+		if (!searchCompositeDto.isValid()) {
+			errors.reject("lot.selection.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+	}
 }

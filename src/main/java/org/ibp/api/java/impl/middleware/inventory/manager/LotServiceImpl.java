@@ -10,8 +10,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
-import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,9 +47,6 @@ public class LotServiceImpl implements LotService {
 
 	@Resource
 	private ContextUtil contextUtil;
-
-	@Autowired
-	private SearchRequestService searchRequestService;
 
 	@Autowired
 	private ExtendedLotListValidator extendedLotListValidator;
@@ -129,22 +123,16 @@ public class LotServiceImpl implements LotService {
 	 * somewhere and lock update logic
 	 */
 	@Override
-	public void closeLots(final SearchCompositeDto searchCompositeDto) {
-		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+	public void closeLots(final LotsSearchDto searchDTO) {
 
-		LotsSearchDto searchDTO;
-		if (searchCompositeDto.getSearchRequestId() != null) {
-			searchDTO = (LotsSearchDto) this.searchRequestService
-				.getSearchRequest(searchCompositeDto.getSearchRequestId(), LotsSearchDto.class);
-		} else {
-			searchDTO = new LotsSearchDto();
-			searchDTO.setLotIds(new ArrayList<>(searchCompositeDto.getItemIds()));
-		}
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
 		extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
 
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+
 		lotService.closeLots(loggedInUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toList()));
 
 	}
+
 }

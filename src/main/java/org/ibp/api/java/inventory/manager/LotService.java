@@ -6,7 +6,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -25,6 +24,6 @@ public interface LotService {
 
 	LotSearchMetadata getLotsSearchMetadata(LotsSearchDto lotsSearchDto);
 
-	void closeLots(SearchCompositeDto searchCompositeDto);
+	void closeLots(LotsSearchDto lotsSearchDto);
 
 }
