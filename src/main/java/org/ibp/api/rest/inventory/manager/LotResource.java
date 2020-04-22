@@ -234,8 +234,8 @@ public class LotResource {
 	@ApiOperation(value = "Close Lots", notes = "Close any lot")
 	@RequestMapping(value = "/crops/{cropName}/lots/close", method = RequestMethod.PATCH)
 	@ResponseBody
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('UPDATE_LOTS')")
-	public ResponseEntity<Void> cancelPendingTransaction(
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('CLOSE_LOTS')")
+	public ResponseEntity<Void> closeLots(
 		@PathVariable final String cropName, //
 		@ApiParam("List of lots to be close, use a searchId or a list of transaction ids")
 		@RequestBody final SearchCompositeDto searchCompositeDto) {
