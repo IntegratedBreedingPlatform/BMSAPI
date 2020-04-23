@@ -44,7 +44,7 @@ public class LotWithdrawalInputDtoValidator {
 
 		//Validate that searchId or list of lots are provided
 		if (lotWithdrawalInputDto.getSelectedLots() == null || !lotWithdrawalInputDto.getSelectedLots().isValid()) {
-			errors.reject("lot.selection.invalid", "");
+			errors.reject("search.composite.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 

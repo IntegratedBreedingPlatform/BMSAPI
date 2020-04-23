@@ -31,7 +31,7 @@ public class InventoryCommonValidator {
 
 		// Validate that searchId or list of lots are provided
 		if (!searchCompositeDto.isValid()) {
-			errors.reject("lot.selection.invalid", "");
+			errors.reject("search.composite.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 

@@ -70,7 +70,7 @@ public class LotDepositRequestDtoValidatorTest {
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
 		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.selection.invalid"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("search.composite.invalid"));
 		}
 	}
 

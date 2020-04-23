@@ -144,7 +144,7 @@ public class TransactionServiceImpl implements TransactionService {
 			if (searchCompositeDto.getSearchRequestId() == null && (searchCompositeDto.getItemIds() == null || searchCompositeDto
 				.getItemIds().isEmpty()) ||
 				(searchCompositeDto.getSearchRequestId() != null && searchCompositeDto.getItemIds() != null)) {
-				errors.reject("transaction.selection.invalid", "");
+				errors.reject("search.composite.invalid", "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 
@@ -239,7 +239,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 			//Validate searchCompositeDto
 			if (!searchCompositeDto.isValid()) {
-				errors.reject("transaction.selection.invalid", "");
+				errors.reject("search.composite.invalid", "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 

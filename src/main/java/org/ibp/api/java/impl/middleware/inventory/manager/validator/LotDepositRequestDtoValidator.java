@@ -40,7 +40,7 @@ public class LotDepositRequestDtoValidator {
 
 		//Validate that searchId or list of lots are provided
 		if (lotDepositRequestDto.getSelectedLots() == null || !lotDepositRequestDto.getSelectedLots().isValid()) {
-			errors.reject("lot.selection.invalid", "");
+			errors.reject("search.composite.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
