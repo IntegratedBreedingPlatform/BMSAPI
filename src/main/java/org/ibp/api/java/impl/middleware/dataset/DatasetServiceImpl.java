@@ -64,6 +64,8 @@ import java.util.stream.Collectors;
 public class DatasetServiceImpl implements DatasetService {
 
 	public static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
+	public static final String MISSING_VALUE = "missing";
+	public static final String NOT_AVAILABLE_VALUE = "NA";
 
 	@Autowired
 	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
@@ -555,7 +557,13 @@ public class DatasetServiceImpl implements DatasetService {
 			row.add(obsUnit.getKey());
 			for (final Integer variableId : variableIds) {
 				final List<ObservationDTO> dtos = obsUnit.getValue().get(variableId);
-				row.add(dtos != null ? dtos.get(0).getValue() : "");
+				String value = dtos != null ? dtos.get(0).getValue() : "";
+				// NA (Not Available) in statistics is synonymous to "missing" value in BMS.
+				// So we need to convert NA value to "missing"
+				if (NOT_AVAILABLE_VALUE.equals(value)) {
+					value = MISSING_VALUE;
+				}
+				row.add(value);
 			}
 			data.add(row);
 		}

@@ -26,6 +26,7 @@ import java.util.Map;
 public class ObservationsTableValidator {
 
 	private static final String DATA_TYPE_NUMERIC = "Numeric";
+	public static final String NOT_AVAILABLE_VALUE = "NA";
 
 	public void validateList(final List<List<String>> inputData) throws ApiRequestValidationException {
 
@@ -70,7 +71,7 @@ public class ObservationsTableValidator {
 	}
 
 	private static boolean validateValue(final MeasurementVariable var, final String value, final BindingResult errors) {
-		if (StringUtils.isBlank(value)) {
+		if (StringUtils.isBlank(value) || NOT_AVAILABLE_VALUE.equals(value)) {
 			return true;
 		}
 		if (isInvalidNumber(var, value)) {
