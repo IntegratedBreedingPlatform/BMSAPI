@@ -675,6 +675,11 @@ public class DatasetServiceImplTest {
 		obs3.setObservationVariableDbId(27);
 		obs3.setValue("280");
 		list.add(obs3);
+		final ObservationDTO obs4 = new ObservationDTO();
+		obs4.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs4.setObservationVariableDbId(28);
+		obs4.setValue("NA");
+		list.add(obs4);
 
 		final List<MeasurementVariable> variables = new ArrayList<>();
 		final MeasurementVariable var1 = new MeasurementVariable();
@@ -689,6 +694,10 @@ public class DatasetServiceImplTest {
 		var3.setName("Var 3");
 		var3.setTermId(27);
 		variables.add(var3);
+		final MeasurementVariable var4 = new MeasurementVariable();
+		var4.setName("Var 4");
+		var4.setTermId(28);
+		variables.add(var4);
 
 		final ObservationsPutRequestInput t = DatasetServiceImpl.transformObservations(list, variables);
 
@@ -698,6 +707,7 @@ public class DatasetServiceImplTest {
 		Assert.assertThat(data.get(2).get(0), is(obs2.getObservationUnitDbId()));
 		Assert.assertThat(data.get(2).get(2), is("200"));
 		Assert.assertThat(data.get(2).get(3), is("280"));
+		Assert.assertThat(data.get(2).get(4), is("missing"));
 	}
 
 }
