@@ -60,10 +60,10 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		try {
-			inventoryLock.getLock().readLock().lock();
+			inventoryLock.lockRead();
 			return lotService.searchLots(lotsSearchDto, pageable);
 		} finally {
-			inventoryLock.getLock().readLock().unlock();
+			inventoryLock.unlockRead();
 		}
 	}
 
@@ -94,11 +94,11 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
 		try {
-			inventoryLock.getLock().writeLock().lock();
+			inventoryLock.lockWrite();
 			this.lotInputValidator.validate(lotDtos, lotRequest);
 			this.lotService.updateLots(lotDtos, lotRequest);
 		} finally {
-			inventoryLock.getLock().writeLock().unlock();
+			inventoryLock.unlockWrite();
 		}
 	}
 
@@ -125,23 +125,23 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public LotSearchMetadata getLotsSearchMetadata(final LotsSearchDto lotsSearchDto) {
 		try {
-			inventoryLock.getLock().readLock().lock();
+			inventoryLock.lockRead();
 			return lotService.getLotSearchMetadata(lotsSearchDto);
 		} finally {
-			inventoryLock.getLock().readLock().unlock();
+			inventoryLock.unlockRead();
 		}
 	}
 
 	@Override
 	public void closeLots(final LotsSearchDto searchDTO) {
 		try {
-			inventoryLock.getLock().writeLock().lock();
+			inventoryLock.lockWrite();
 			final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 			extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
 			final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 			lotService.closeLots(loggedInUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toList()));
 		} finally {
-			inventoryLock.getLock().writeLock().unlock();
+			inventoryLock.unlockWrite();
 		}
 	}
 

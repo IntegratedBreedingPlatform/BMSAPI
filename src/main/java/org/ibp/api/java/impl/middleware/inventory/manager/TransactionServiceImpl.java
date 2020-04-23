@@ -75,10 +75,10 @@ public class TransactionServiceImpl implements TransactionService {
 	public List<TransactionDto> searchTransactions(
 		final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
 		try {
-			inventoryLock.getLock().readLock().lock();
+			inventoryLock.lockRead();
 			return this.transactionService.searchTransactions(transactionsSearchDto, pageable);
 		} finally {
-			inventoryLock.getLock().readLock().unlock();
+			inventoryLock.unlockRead();
 		}
 	}
 
@@ -102,7 +102,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final TransactionStatus transactionStatus) {
 		try {
 
-			inventoryLock.getLock().writeLock().lock();
+			inventoryLock.lockWrite();
 
 			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
@@ -129,7 +129,7 @@ public class TransactionServiceImpl implements TransactionService {
 					transactionStatus);
 
 		} finally {
-			inventoryLock.getLock().writeLock().unlock();
+			inventoryLock.unlockWrite();
 		}
 	}
 
@@ -138,7 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
 		try{
-			inventoryLock.getLock().writeLock().lock();
+			inventoryLock.lockWrite();
 
 			//Validate that searchId or list of lots are provided
 			if (searchCompositeDto.getSearchRequestId() == null && (searchCompositeDto.getItemIds() == null || searchCompositeDto
@@ -169,7 +169,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 			this.transactionService.confirmPendingTransactions(transactionDtos);
 		} finally {
-			inventoryLock.getLock().writeLock().unlock();
+			inventoryLock.unlockWrite();
 		}
 	}
 
@@ -187,18 +187,18 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public void updatePendingTransactions(final List<TransactionUpdateRequestDto> transactionUpdateInputDtos) {
 		try {
-			inventoryLock.getLock().writeLock().lock();
+			inventoryLock.lockWrite();
 			transactionUpdateRequestDtoValidator.validate(transactionUpdateInputDtos);
 			this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
 		} finally {
-			inventoryLock.getLock().writeLock().unlock();
+			inventoryLock.unlockWrite();
 		}
 	}
 
 	@Override
 	public void saveDeposits(final LotDepositRequestDto lotDepositRequestDto, final TransactionStatus transactionStatus) {
 		try {
-			inventoryLock.getLock().writeLock().lock();
+			inventoryLock.lockWrite();
 
 			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
@@ -226,7 +226,7 @@ public class TransactionServiceImpl implements TransactionService {
 					transactionStatus);
 
 		} finally {
-			inventoryLock.getLock().writeLock().unlock();
+			inventoryLock.unlockWrite();
 		}
 	}
 
@@ -235,7 +235,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
 		try {
-			inventoryLock.getLock().writeLock().lock();
+			inventoryLock.lockWrite();
 
 			//Validate searchCompositeDto
 			if (!searchCompositeDto.isValid()) {
@@ -264,7 +264,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 			this.transactionService.cancelPendingTransactions(transactionDtos);
 		} finally {
-			inventoryLock.getLock().writeLock().unlock();
+			inventoryLock.unlockWrite();
 		}
 	}
 }
