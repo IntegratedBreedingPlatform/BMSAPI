@@ -22,7 +22,7 @@ public class ProgramResource {
     @Autowired
     private ProgramService programService;
 
-    @RequestMapping(value = "/crops/{cropName}/program", method = RequestMethod.GET)
+    @RequestMapping(value = "/crops/{cropName}/programs", method = RequestMethod.GET)
     public ResponseEntity<List<ProgramSummary>> listPrograms(@PathVariable final String cropName) {
         return new ResponseEntity<>(this.programService.listProgramsByCropName(cropName), HttpStatus.OK);
     }
