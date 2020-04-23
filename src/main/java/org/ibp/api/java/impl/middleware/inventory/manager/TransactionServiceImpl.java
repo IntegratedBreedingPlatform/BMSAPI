@@ -8,13 +8,13 @@ import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
-import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.InventoryLock;
+import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotDepositRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawalInputDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,11 +64,13 @@ public class TransactionServiceImpl implements TransactionService {
 	private SecurityService securityService;
 
 	@Autowired
-	private SearchRequestService searchRequestService;
+	private SearchRequestDtoResolver searchRequestDtoResolver;
 
 	@Autowired
 	private TransactionUpdateRequestDtoValidator transactionUpdateRequestDtoValidator;
 
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
 
 	@Override
 	public List<TransactionDto> searchTransactions(
@@ -108,14 +109,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 			lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 
-			LotsSearchDto searchDTO;
-			if (lotWithdrawalInputDto.getSelectedLots().getSearchRequestId() != null) {
-				searchDTO = (LotsSearchDto) this.searchRequestService
-					.getSearchRequest(lotWithdrawalInputDto.getSelectedLots().getSearchRequestId(), LotsSearchDto.class);
-			} else {
-				searchDTO = new LotsSearchDto();
-				searchDTO.setLotIds(new ArrayList<>(lotWithdrawalInputDto.getSelectedLots().getItemIds()));
-			}
+			final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(lotWithdrawalInputDto.getSelectedLots());
 			final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
 			extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotWithdrawalInputDto.getSelectedLots().getItemIds());
@@ -140,23 +134,9 @@ public class TransactionServiceImpl implements TransactionService {
 		try{
 			inventoryLock.lockWrite();
 
-			//Validate that searchId or list of lots are provided
-			if (searchCompositeDto.getSearchRequestId() == null && (searchCompositeDto.getItemIds() == null || searchCompositeDto
-				.getItemIds().isEmpty()) ||
-				(searchCompositeDto.getSearchRequestId() != null && searchCompositeDto.getItemIds() != null)) {
-				errors.reject("search.composite.invalid", "");
-				throw new ApiRequestValidationException(errors.getAllErrors());
-			}
+			inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 
-			TransactionsSearchDto transactionsSearchDto;
-			if (searchCompositeDto.getSearchRequestId() != null) {
-				transactionsSearchDto =
-					(TransactionsSearchDto) this.searchRequestService
-						.getSearchRequest(searchCompositeDto.getSearchRequestId(), TransactionsSearchDto.class);
-			} else {
-				transactionsSearchDto = new TransactionsSearchDto();
-				transactionsSearchDto.setTransactionIds(new ArrayList<>(searchCompositeDto.getItemIds()));
-			}
+			final TransactionsSearchDto transactionsSearchDto = searchRequestDtoResolver.getTransactionsSearchDto(searchCompositeDto);
 
 			final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
 			final Set<ExtendedLotDto> lotDtos = transactionDtos.stream().map(TransactionDto::getLot).collect(
@@ -204,14 +184,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 			lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
 
-			LotsSearchDto searchDTO;
-			if (lotDepositRequestDto.getSelectedLots().getSearchRequestId() != null) {
-				searchDTO = (LotsSearchDto) this.searchRequestService
-					.getSearchRequest(lotDepositRequestDto.getSelectedLots().getSearchRequestId(), LotsSearchDto.class);
-			} else {
-				searchDTO = new LotsSearchDto();
-				searchDTO.setLotIds(new ArrayList<>(lotDepositRequestDto.getSelectedLots().getItemIds()));
-			}
+			final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(lotDepositRequestDto.getSelectedLots());
 			final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
 			extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
@@ -237,21 +210,10 @@ public class TransactionServiceImpl implements TransactionService {
 		try {
 			inventoryLock.lockWrite();
 
-			//Validate searchCompositeDto
-			if (!searchCompositeDto.isValid()) {
-				errors.reject("search.composite.invalid", "");
-				throw new ApiRequestValidationException(errors.getAllErrors());
-			}
+			inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 
-			TransactionsSearchDto transactionsSearchDto;
-			if (searchCompositeDto.getSearchRequestId() != null) {
-				transactionsSearchDto =
-					(TransactionsSearchDto) this.searchRequestService
-						.getSearchRequest(searchCompositeDto.getSearchRequestId(), TransactionsSearchDto.class);
-			} else {
-				transactionsSearchDto = new TransactionsSearchDto();
-				transactionsSearchDto.setTransactionIds(new ArrayList<>(searchCompositeDto.getItemIds()));
-			}
+			final TransactionsSearchDto transactionsSearchDto = searchRequestDtoResolver.getTransactionsSearchDto(searchCompositeDto);
+
 
 			final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
 			final Set<ExtendedLotDto> lotDtos = transactionDtos.stream().map(TransactionDto::getLot).collect(
@@ -267,4 +229,5 @@ public class TransactionServiceImpl implements TransactionService {
 			inventoryLock.unlockWrite();
 		}
 	}
+
 }

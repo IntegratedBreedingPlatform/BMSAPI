@@ -33,6 +33,9 @@ public class LotWithdrawalInputDtoValidator {
 	@Autowired
 	private VariableService variableService;
 
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
+
 	public void validate(final LotWithdrawalInputDto lotWithdrawalInputDto) {
 		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
@@ -42,11 +45,7 @@ public class LotWithdrawalInputDtoValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		//Validate that searchId or list of lots are provided
-		if (lotWithdrawalInputDto.getSelectedLots() == null || !lotWithdrawalInputDto.getSelectedLots().isValid()) {
-			errors.reject("search.composite.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		inventoryCommonValidator.validateSearchCompositeDto(lotWithdrawalInputDto.getSelectedLots(), errors);
 
 		if (lotWithdrawalInputDto.getNotes() != null && lotWithdrawalInputDto.getNotes().length() > NOTES_MAX_LENGTH) {
 			errors.reject("transaction.notes.length", "");
@@ -105,5 +104,10 @@ public class LotWithdrawalInputDtoValidator {
 			errors.reject("lot.input.instructions.for.non.present.units", new String[] {Util.buildErrorMessageFromList(extraUnits, 3)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+	}
+
+	public void setInventoryCommonValidator(
+		final InventoryCommonValidator inventoryCommonValidator) {
+		this.inventoryCommonValidator = inventoryCommonValidator;
 	}
 }

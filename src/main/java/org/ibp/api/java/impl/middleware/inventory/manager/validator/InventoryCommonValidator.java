@@ -25,12 +25,12 @@ public class InventoryCommonValidator {
 		}
 	}
 
-	public void validateLotsSearchDto(
+	public void validateSearchCompositeDto(
 		final SearchCompositeDto searchCompositeDto,
 		final BindingResult errors) {
 
-		// Validate that searchId or list of lots are provided
-		if (!searchCompositeDto.isValid()) {
+		// Validate that searchId or list of elements are provided
+		if (searchCompositeDto == null || !searchCompositeDto.isValid()) {
 			errors.reject("search.composite.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
