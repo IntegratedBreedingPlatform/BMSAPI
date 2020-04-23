@@ -47,7 +47,7 @@ public class ContextResolverImplTest {
 
 		// Non-null request but bad URL.Expect exception.
 		final MockHttpServletRequest request = new MockHttpServletRequest();
-		request.setRequestURI("/locations");
+		request.setRequestURI("/lots/search");
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
 		this.contextResolverImpl.resolveDatabaseFromUrl();
@@ -57,7 +57,7 @@ public class ContextResolverImplTest {
 	public void testResolveDatabaseFromUrl_ValidURLBMSAPI() {
 
 		final MockHttpServletRequest request = new MockHttpServletRequest();
-		request.setRequestURI("/crops/maize/locations");
+		request.setRequestURI("/crops/maize/lots/search");
 
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 

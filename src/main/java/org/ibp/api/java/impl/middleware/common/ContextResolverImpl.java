@@ -61,7 +61,7 @@ public class ContextResolverImpl implements ContextResolver {
 			cropName = instanceLevelAPI? "" : parts[1];
 
 		} else if ("crops".equals(parts[1])){
-			// internal BMSAPI crop/program services start with "crops" (eg. /bmsapi/crops/maize/locations
+			// internal BMSAPI crop/program services start with "crops" (eg. /bmsapi/crops/maize/lots/search
 			cropName = parts[2];
 			instanceLevelAPI = false;
 
