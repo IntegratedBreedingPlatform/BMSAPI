@@ -231,7 +231,7 @@ public class LotResource {
 	}
 
 	@ApiOperation(value = "Close Lots", notes = "Close a collection of lots")
-	@RequestMapping(value = "/crops/{cropName}/lots/close", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/crops/{cropName}/lots/close", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('CLOSE_LOTS')")
 	public ResponseEntity<Void> closeLots(
