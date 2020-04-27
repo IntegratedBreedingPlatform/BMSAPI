@@ -24,4 +24,6 @@ public interface LotService {
 
 	LotSearchMetadata getLotsSearchMetadata(LotsSearchDto lotsSearchDto);
 
+	void closeLots(LotsSearchDto lotsSearchDto);
+
 }
