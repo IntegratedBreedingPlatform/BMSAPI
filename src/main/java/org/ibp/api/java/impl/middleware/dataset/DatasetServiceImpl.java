@@ -3,12 +3,14 @@ package org.ibp.api.java.impl.middleware.dataset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -105,7 +107,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.studyValidator.validate(studyId, false);
 
-
 		this.datasetValidator.validateDataset(studyId, datasetId);
 
 		return this.middlewareDatasetService.getObservationSetColumns(datasetId, draftMode);
@@ -116,7 +117,6 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer studyId, final Integer datasetId) {
 
 		this.studyValidator.validate(studyId, false);
-
 
 		this.datasetValidator.validateDataset(studyId, datasetId);
 
@@ -508,7 +508,8 @@ public class DatasetServiceImpl implements DatasetService {
 		if (!errors.hasErrors()) {
 			final Table observationDbIdsTable = this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode());
 			// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
-			observations.stream().forEach(o -> o.setObservationDbId((Integer) observationDbIdsTable.get(o.getObservationUnitDbId(), o.getObservationVariableDbId())));
+			observations.stream().forEach(
+				o -> o.setObservationDbId((Integer) observationDbIdsTable.get(o.getObservationUnitDbId(), o.getObservationVariableDbId())));
 		} else {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
@@ -558,10 +559,13 @@ public class DatasetServiceImpl implements DatasetService {
 			for (final Integer variableId : variableIds) {
 				final List<ObservationDTO> dtos = obsUnit.getValue().get(variableId);
 				String value = dtos != null ? dtos.get(0).getValue() : "";
+
 				// NA (Not Available) in statistics is synonymous to "missing" value in BMS.
 				// So we need to convert NA value to "missing"
 				if (NOT_AVAILABLE_VALUE.equals(value)) {
-					value = MISSING_VALUE;
+					// Only categorical and numeric type variables support "missing" value,
+					// so for other data types, NA (Not Available) should be treated as empty string.
+					value = isNumericOrCategorical(varMap.get(variableId)) ? MISSING_VALUE : StringUtils.EMPTY;
 				}
 				row.add(value);
 			}
@@ -569,6 +573,11 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		input.setData(data);
 		return input;
+	}
+
+	private static boolean isNumericOrCategorical(final MeasurementVariable measurementVariable) {
+		return measurementVariable.getDataTypeId().equals(DataType.NUMERIC_VARIABLE.getId())
+			|| measurementVariable.getDataTypeId().equals(DataType.CATEGORICAL_VARIABLE.getId());
 	}
 
 	@Override

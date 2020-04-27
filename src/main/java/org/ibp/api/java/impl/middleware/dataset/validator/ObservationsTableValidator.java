@@ -71,7 +71,7 @@ public class ObservationsTableValidator {
 	}
 
 	private static boolean validateValue(final MeasurementVariable var, final String value, final BindingResult errors) {
-		if (StringUtils.isBlank(value) || MISSING_VALUE.equals(value)) {
+		if (StringUtils.isBlank(value)) {
 			return true;
 		}
 		if (isInvalidNumber(var, value)) {
