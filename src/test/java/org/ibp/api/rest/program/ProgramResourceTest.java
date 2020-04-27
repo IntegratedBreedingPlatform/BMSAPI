@@ -93,7 +93,7 @@ public class ProgramResourceTest extends ApiUnitTestBase {
                 .thenReturn(Lists.newArrayList(this.me));
         Mockito.when(this.userService.getUsersByProjectId(program2.getProjectId())).thenReturn(
                 Lists.newArrayList(this.me, this.myBreedingBuddy));
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/program", cropName).contentType(this.contentType))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/programs", cropName).contentType(this.contentType))
                 .andDo(MockMvcResultHandlers.print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$", IsCollectionWithSize.hasSize(2))) //
                 .andExpect(jsonPath("$[0].id", Matchers.is(String.valueOf(program1.getProjectId()))))
