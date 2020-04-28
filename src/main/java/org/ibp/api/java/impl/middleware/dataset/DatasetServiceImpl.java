@@ -444,7 +444,7 @@ public class DatasetServiceImpl implements DatasetService {
 				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
 		}
 		if (!errors.hasErrors()) {
-			this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode());
+			this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode(), false);
 		} else {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
@@ -506,7 +506,7 @@ public class DatasetServiceImpl implements DatasetService {
 				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
 		}
 		if (!errors.hasErrors()) {
-			final Table observationDbIdsTable = this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode());
+			final Table observationDbIdsTable = this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode(), true);
 			// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
 			observations.stream().forEach(
 				o -> o.setObservationDbId((Integer) observationDbIdsTable.get(o.getObservationUnitDbId(), o.getObservationVariableDbId())));
