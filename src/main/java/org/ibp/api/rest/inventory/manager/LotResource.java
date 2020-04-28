@@ -147,7 +147,7 @@ public class LotResource {
 		@PathVariable final String cropName,
 		@ApiParam("Lot to be created")
 		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
-		return new ResponseEntity<>(lotService.saveLot(lotGeneratorInputDto), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.lotService.saveLot(lotGeneratorInputDto), HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Update Lots", notes = "Update one or more Lots")
@@ -166,7 +166,7 @@ public class LotResource {
 			searchRequestId = searchCompositeDto.getSearchRequestId();
 			lotIds = searchCompositeDto.getItemIds();
 		}
-		final LotsSearchDto searchDTO = validateSearchComposite(searchRequestId, lotIds, errors);
+		final LotsSearchDto searchDTO = this.validateSearchComposite(searchRequestId, lotIds, errors);
 
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 		if (extendedLotDtos == null || (searchRequestId == null && lotIds != null && extendedLotDtos.size() != lotIds.size())) {
@@ -200,7 +200,7 @@ public class LotResource {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
-		final List<LocationDto> locations = locationService.getLocations(LotResource.STORAGE_LOCATION_TYPE, null, false, null);
+		final List<LocationDto> locations = this.locationService.getLocations(LotResource.STORAGE_LOCATION_TYPE, null, false, null);
 
 		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
 		final HttpHeaders headers = new HttpHeaders();
@@ -218,7 +218,7 @@ public class LotResource {
 		@RequestParam(required = false) final Integer searchRequestId, @RequestParam(required = false) final Set<Integer> lotIds) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final LotsSearchDto searchDTO = validateSearchComposite(searchRequestId, lotIds, errors);
+		final LotsSearchDto searchDTO = this.validateSearchComposite(searchRequestId, lotIds, errors);
 
 		if (searchRequestId == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
@@ -228,7 +228,7 @@ public class LotResource {
 			}
 		}
 
-		return new ResponseEntity<>(lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
+		return new ResponseEntity<>(this.lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
 	}
 
 	// TODO Use SearchComposito.isValid
