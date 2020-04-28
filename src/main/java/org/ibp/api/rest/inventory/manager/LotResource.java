@@ -181,10 +181,10 @@ public class LotResource {
 
 	@ApiOperation(value = "Create list of lots with an initial balance", notes = "Create list of lots with an initial balance")
 	@RequestMapping(
-		value = "/crops/{crop}/lot-lists",
+		value = "/crops/{cropName}/lot-lists",
 		method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
-	public ResponseEntity<Void> importLotsWithInitialBalance(@PathVariable final String crop,
+	public ResponseEntity<Void> importLotsWithInitialBalance(@PathVariable final String cropName,
 		@RequestBody final LotImportRequestDto lotImportRequestDto) {
 		this.lotService.importLotsWithInitialTransaction(lotImportRequestDto);
 		return new ResponseEntity<>(HttpStatus.OK);
