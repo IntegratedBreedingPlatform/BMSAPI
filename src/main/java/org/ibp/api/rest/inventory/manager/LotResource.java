@@ -157,7 +157,7 @@ public class LotResource {
 		@PathVariable final String cropName,
 		@ApiParam("Lot to be created")
 		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
-		return new ResponseEntity<>(lotService.saveLot(lotGeneratorInputDto), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.lotService.saveLot(lotGeneratorInputDto), HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Update Lots", notes = "Update one or more Lots")
@@ -170,7 +170,7 @@ public class LotResource {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(lotRequest.getSearchComposite(), errors);
-		final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(lotRequest.getSearchComposite());
+		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotRequest.getSearchComposite());
 
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 		if (lotRequest.getSearchComposite().getSearchRequestId() == null) {
@@ -203,7 +203,7 @@ public class LotResource {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
-		final List<LocationDto> locations = locationService.getLocations(LotResource.STORAGE_LOCATION_TYPE, null, false, null);
+		final List<LocationDto> locations = this.locationService.getLocations(LotResource.STORAGE_LOCATION_TYPE, null, false, null);
 
 		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
 		final HttpHeaders headers = new HttpHeaders();
@@ -223,14 +223,14 @@ public class LotResource {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
-		final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
+		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
 
 		if (searchCompositeDto.getSearchRequestId() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
 
-		return new ResponseEntity<>(lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
+		return new ResponseEntity<>(this.lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Close Lots", notes = "Close a collection of lots")
@@ -244,7 +244,7 @@ public class LotResource {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
-		final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
+		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
 
 		if (searchCompositeDto.getSearchRequestId() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
