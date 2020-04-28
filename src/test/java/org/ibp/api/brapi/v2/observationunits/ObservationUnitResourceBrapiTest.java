@@ -95,7 +95,7 @@ public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testSearchObservationUnits() throws Exception {
 
-		PhenotypeSearchDTO phenotypeSearchDTO = new PhenotypeSearchDTO();
+		final PhenotypeSearchDTO phenotypeSearchDTO = new PhenotypeSearchDTO();
 		phenotypeSearchDTO.setProgramDbId("04136e3f-55f9-4a80-9c24-5066a253ce6f");
 		phenotypeSearchDTO.setTrialDbId("25008");
 		phenotypeSearchDTO.setTrialName("Trial Name");

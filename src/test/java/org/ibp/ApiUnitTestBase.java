@@ -226,7 +226,7 @@ public abstract class ApiUnitTestBase {
 	public void loadPreAuthorizedRole() {
 		final List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority("ADMIN"));
-		UsernamePasswordAuthenticationToken loggedInUser =
+		final UsernamePasswordAuthenticationToken loggedInUser =
 			new UsernamePasswordAuthenticationToken("User", "Password@##@$@%$%$#^", authorities);
 		SecurityContextHolder.getContext().setAuthentication(loggedInUser);
 	}
