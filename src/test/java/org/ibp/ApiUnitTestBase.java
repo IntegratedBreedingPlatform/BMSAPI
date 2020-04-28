@@ -23,6 +23,7 @@ import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.ibp.api.java.rpackage.RPackageService;
 import org.ibp.api.java.study.StudyInstanceService;
+import org.ibp.api.java.study.StudyService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -191,6 +192,12 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public ObservationUnitService observationUnitService() {
 			return Mockito.mock(ObservationUnitService.class);
+		}
+
+		@Bean
+		@Primary
+		public StudyService studyService() {
+			return Mockito.mock(StudyService.class);
 		}
 	}
 

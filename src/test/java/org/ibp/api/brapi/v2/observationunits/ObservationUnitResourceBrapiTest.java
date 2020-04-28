@@ -4,9 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPatchRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
+import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.study.StudyService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -15,12 +20,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang.math.RandomUtils.nextInt;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 
@@ -33,11 +45,15 @@ public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 	@Autowired
 	private ObservationUnitService observationUnitService;
 
+	@Autowired
+	private StudyService studyService;
+
 	@Before
 	public void setup() {
 		Mockito.reset(this.datasetService);
 		Mockito.reset(this.searchRequestService);
 		Mockito.reset(this.observationUnitService);
+		Mockito.reset(this.studyService);
 	}
 
 	@Test
@@ -75,5 +91,25 @@ public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 			(HashMap<String, Object>) mappedDTOCaptor.getValue().getObservationUnitPosition().getGeoCoordinates().get("geometry");
 		final List<Double> coordinates = (List<Double>) geometry.get("coordinates");
 		assertThat(coordinates.get(0), is(-76.506042));
+	}
+	@Test
+	public void testSearchObservationUnits() throws Exception {
+
+		PhenotypeSearchDTO phenotypeSearchDTO = new PhenotypeSearchDTO();
+		phenotypeSearchDTO.setProgramDbId("04136e3f-55f9-4a80-9c24-5066a253ce6f");
+		phenotypeSearchDTO.setTrialDbId("25008");
+		phenotypeSearchDTO.setTrialName("Trial Name");
+		final int searchResultsDbid = nextInt();
+		doReturn(new ObservationUnitsSearchRequestDto()).when(this.searchRequestService).getSearchRequest(searchResultsDbid, ObservationUnitsSearchRequestDto.class);
+		when(this.studyService.searchPhenotypes(Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE), Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER), any(
+			PhenotypeSearchRequestDTO.class))).thenReturn(Arrays.asList(phenotypeSearchDTO));
+		this.mockMvc.perform(
+			MockMvcRequestBuilders.get("/{crop}/brapi/v2/search/observationunits/{searchResultsDbid}", this.cropName, searchResultsDbid)
+				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].observationUnitXRef", nullValue()))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId", is("04136e3f-55f9-4a80-9c24-5066a253ce6f")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].treatments", empty()))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", is("25008")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialName", is("Trial Name")));
 	}
 }
