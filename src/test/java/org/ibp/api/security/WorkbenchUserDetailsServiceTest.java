@@ -12,6 +12,7 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.common.ContextResolver;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,7 +36,7 @@ import java.util.List;
 public class WorkbenchUserDetailsServiceTest {
 
 	private static final String TEST_USER = "testUser";
-	public static final String CROP_NAME = "Maize";
+	private static final String CROP_NAME = "Maize";
 
 	@Mock
 	private UserService userService;
@@ -49,9 +50,14 @@ public class WorkbenchUserDetailsServiceTest {
 	@Mock
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Mock
+	private CropService cropService;
+
 	@InjectMocks
 	private final WorkbenchUserDetailsService service = new WorkbenchUserDetailsService();
+
 	public static final String PROGRAM_UUID = "1234567";
+	private static final Integer USER_ID = 1;
 
 	@Before
 	public void setUp() {
@@ -61,6 +67,7 @@ public class WorkbenchUserDetailsServiceTest {
 		final Project project = new Project();
 		project.setProjectId(new Long(1));
 		Mockito.when(this.workbenchDataManager.getProjectByUuid(PROGRAM_UUID)).thenReturn(project);
+		Mockito.when(this.cropService.getAvailableCropsForUser(WorkbenchUserDetailsServiceTest.USER_ID)).thenReturn(Arrays.asList(CROP_NAME));
 	}
 
 	@Test
@@ -70,8 +77,9 @@ public class WorkbenchUserDetailsServiceTest {
 			final WorkbenchUser testUserWorkbench = new WorkbenchUser();
 			testUserWorkbench.setName(WorkbenchUserDetailsServiceTest.TEST_USER);
 			testUserWorkbench.setPassword("password");
+			testUserWorkbench.setUserid(WorkbenchUserDetailsServiceTest.USER_ID);
 			final UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
-			testUserWorkbench.setRoles(Arrays.asList(testUserRole));
+			testUserWorkbench.setRoles(Collections.singletonList(testUserRole));
 			matchingUsers.add(testUserWorkbench);
 
 			Mockito.when(this.userService.getUserByName(WorkbenchUserDetailsServiceTest.TEST_USER, 0, 1, Operation.EQUAL))
@@ -98,12 +106,13 @@ public class WorkbenchUserDetailsServiceTest {
 		final String htmlEscaptedUTF8Username = "&#28900;&#29482;";
 		final String rawUTF8Username = "烤猪";
 
-		final List<WorkbenchUser> matchingUsers = new ArrayList<WorkbenchUser>();
+		final List<WorkbenchUser> matchingUsers = new ArrayList<>();
 		final WorkbenchUser testUserWorkbench = new WorkbenchUser();
 		testUserWorkbench.setName(rawUTF8Username);
 		testUserWorkbench.setPassword("password");
+		testUserWorkbench.setUserid(WorkbenchUserDetailsServiceTest.USER_ID);
 		final UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
-		testUserWorkbench.setRoles(Arrays.asList(testUserRole));
+		testUserWorkbench.setRoles(Collections.singletonList(testUserRole));
 		matchingUsers.add(testUserWorkbench);
 
 		Mockito.when(this.userService.getUserByName(rawUTF8Username, 0, 1, Operation.EQUAL)).thenReturn(matchingUsers);
@@ -123,6 +132,24 @@ public class WorkbenchUserDetailsServiceTest {
 	public void testLoadUserDataAccessError() throws MiddlewareQueryException {
 		Mockito.when(this.userService.getUserByName(WorkbenchUserDetailsServiceTest.TEST_USER, 0, 1, Operation.EQUAL)).thenThrow(
 				new MiddlewareQueryException("Boom!"));
+		this.service.loadUserByUsername(WorkbenchUserDetailsServiceTest.TEST_USER);
+	}
+
+	@Test(expected = AuthenticationServiceException.class)
+	public void testLoadUserAccessDeniedError() throws MiddlewareQueryException {
+		final List<WorkbenchUser> matchingUsers = new ArrayList<>();
+		final WorkbenchUser testUserWorkbench = new WorkbenchUser();
+		testUserWorkbench.setName(WorkbenchUserDetailsServiceTest.TEST_USER);
+		testUserWorkbench.setPassword("password");
+		testUserWorkbench.setUserid(WorkbenchUserDetailsServiceTest.USER_ID);
+		final UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
+		testUserWorkbench.setRoles(Collections.singletonList(testUserRole));
+		matchingUsers.add(testUserWorkbench);
+
+		Mockito.when(this.userService.getUserByName(WorkbenchUserDetailsServiceTest.TEST_USER, 0, 1, Operation.EQUAL))
+			.thenReturn(matchingUsers);
+		Mockito.when(this.cropService.getAvailableCropsForUser(WorkbenchUserDetailsServiceTest.USER_ID)).thenReturn(new ArrayList<>());
+
 		this.service.loadUserByUsername(WorkbenchUserDetailsServiceTest.TEST_USER);
 	}
 }

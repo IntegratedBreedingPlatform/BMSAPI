@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -24,4 +25,15 @@ public class InventoryCommonValidator {
 		}
 	}
 
+	public void validateSearchCompositeDto(
+		final SearchCompositeDto searchCompositeDto,
+		final BindingResult errors) {
+
+		// Validate that searchId or list of elements are provided
+		if (searchCompositeDto == null || !searchCompositeDto.isValid()) {
+			errors.reject("search.composite.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+	}
 }

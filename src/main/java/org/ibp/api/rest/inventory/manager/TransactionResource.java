@@ -171,7 +171,7 @@ public class TransactionResource {
 	}
 
 	@ApiOperation(value = "Confirm pending Transactions", notes = "Confirm any transaction with pending status")
-	@RequestMapping(value = "/crops/{cropName}/transactions/confirmation", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CONFIRM_TRANSACTIONS')")
 	public ResponseEntity<Void> confirmPendingTransaction(
@@ -267,7 +267,7 @@ public class TransactionResource {
 	}
 
 	@ApiOperation(value = "Cancel pending Transactions", notes = "Cancel any transaction with pending status")
-	@RequestMapping(value = "/crops/{cropName}/transactions/cancellation", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/crops/{cropName}/transactions/cancellation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CANCEL_PENDING_TRANSACTIONS')")
 	public ResponseEntity<Void> cancelPendingTransaction(
