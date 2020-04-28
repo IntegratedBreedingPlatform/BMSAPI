@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawalInputDtoValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BindingResult;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,6 +35,9 @@ public class LotWithdrawalInputDtoValidatorTest {
 	@Mock
 	private VariableService variableService;
 
+	@Mock
+	private InventoryCommonValidator inventoryCommonValidator;
+
 	@InjectMocks
 	private LotWithdrawalInputDtoValidator lotWithdrawalInputDtoValidator;
 
@@ -46,6 +51,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 		variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		Mockito.when(variableService.getVariablesByFilter(variableFilter)).thenReturn(variableDetails);
+		Mockito.doCallRealMethod().when(inventoryCommonValidator)
+			.validateSearchCompositeDto(Mockito.any(SearchCompositeDto.class), Mockito.any(BindingResult.class));
 	}
 
 	@Test
@@ -68,7 +75,7 @@ public class LotWithdrawalInputDtoValidatorTest {
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.selection.invalid"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("search.composite.invalid"));
 		}
 	}
 
