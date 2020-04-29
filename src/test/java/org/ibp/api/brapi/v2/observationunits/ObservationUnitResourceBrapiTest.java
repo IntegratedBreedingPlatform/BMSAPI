@@ -8,13 +8,14 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUni
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.java.dataset.DatasetService;
-import org.ibp.api.java.study.StudyService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -54,6 +55,7 @@ public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 		Mockito.reset(this.searchRequestService);
 		Mockito.reset(this.observationUnitService);
 		Mockito.reset(this.studyService);
+
 	}
 
 	@Test

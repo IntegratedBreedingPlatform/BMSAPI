@@ -23,7 +23,6 @@ import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.ibp.api.java.rpackage.RPackageService;
 import org.ibp.api.java.study.StudyInstanceService;
-import org.ibp.api.java.study.StudyService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -193,12 +192,6 @@ public abstract class ApiUnitTestBase {
 		public ObservationUnitService observationUnitService() {
 			return Mockito.mock(ObservationUnitService.class);
 		}
-
-		@Bean
-		@Primary
-		public StudyService studyService() {
-			return Mockito.mock(StudyService.class);
-		}
 	}
 
 	@Before
@@ -226,7 +219,7 @@ public abstract class ApiUnitTestBase {
 	public void loadPreAuthorizedRole() {
 		final List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority("ADMIN"));
-		final UsernamePasswordAuthenticationToken loggedInUser =
+		UsernamePasswordAuthenticationToken loggedInUser =
 			new UsernamePasswordAuthenticationToken("User", "Password@##@$@%$%$#^", authorities);
 		SecurityContextHolder.getContext().setAuthentication(loggedInUser);
 	}
