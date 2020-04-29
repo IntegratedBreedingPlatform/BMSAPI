@@ -28,7 +28,7 @@ public class GermplasmListResource {
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getGermplasmListByParentFolderId(
-		@ApiParam("The crop type") @PathVariable final String crop,
+		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId,
 		@ApiParam(value = "Only folders") @RequestParam(required = true) final Boolean onlyFolders) {
