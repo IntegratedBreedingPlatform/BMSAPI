@@ -3,12 +3,14 @@ package org.ibp.api.java.impl.middleware.dataset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -64,6 +66,8 @@ import java.util.stream.Collectors;
 public class DatasetServiceImpl implements DatasetService {
 
 	public static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
+	public static final String MISSING_VALUE = "missing";
+	public static final String NOT_AVAILABLE_VALUE = "NA";
 
 	@Autowired
 	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
@@ -103,7 +107,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.studyValidator.validate(studyId, false);
 
-
 		this.datasetValidator.validateDataset(studyId, datasetId);
 
 		return this.middlewareDatasetService.getObservationSetColumns(datasetId, draftMode);
@@ -114,7 +117,6 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer studyId, final Integer datasetId) {
 
 		this.studyValidator.validate(studyId, false);
-
 
 		this.datasetValidator.validateDataset(studyId, datasetId);
 
@@ -442,7 +444,7 @@ public class DatasetServiceImpl implements DatasetService {
 				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
 		}
 		if (!errors.hasErrors()) {
-			this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode());
+			this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode(), false);
 		} else {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
@@ -504,9 +506,10 @@ public class DatasetServiceImpl implements DatasetService {
 				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
 		}
 		if (!errors.hasErrors()) {
-			final Table observationDbIdsTable = this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode());
+			final Table observationDbIdsTable = this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode(), true);
 			// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
-			observations.stream().forEach(o -> o.setObservationDbId((Integer) observationDbIdsTable.get(o.getObservationUnitDbId(), o.getObservationVariableDbId())));
+			observations.stream().forEach(
+				o -> o.setObservationDbId((Integer) observationDbIdsTable.get(o.getObservationUnitDbId(), o.getObservationVariableDbId())));
 		} else {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
@@ -555,12 +558,26 @@ public class DatasetServiceImpl implements DatasetService {
 			row.add(obsUnit.getKey());
 			for (final Integer variableId : variableIds) {
 				final List<ObservationDTO> dtos = obsUnit.getValue().get(variableId);
-				row.add(dtos != null ? dtos.get(0).getValue() : "");
+				String value = dtos != null ? dtos.get(0).getValue() : "";
+
+				// NA (Not Available) in statistics is synonymous to "missing" value in BMS.
+				// So we need to convert NA value to "missing"
+				if (NOT_AVAILABLE_VALUE.equals(value)) {
+					// Only categorical and numeric type variables support "missing" value,
+					// so for other data types, NA (Not Available) should be treated as empty string.
+					value = isNumericOrCategorical(varMap.get(variableId)) ? MISSING_VALUE : StringUtils.EMPTY;
+				}
+				row.add(value);
 			}
 			data.add(row);
 		}
 		input.setData(data);
 		return input;
+	}
+
+	private static boolean isNumericOrCategorical(final MeasurementVariable measurementVariable) {
+		return measurementVariable.getDataTypeId().equals(DataType.NUMERIC_VARIABLE.getId())
+			|| measurementVariable.getDataTypeId().equals(DataType.CATEGORICAL_VARIABLE.getId());
 	}
 
 	@Override
