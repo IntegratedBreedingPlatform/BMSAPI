@@ -461,6 +461,10 @@ public class DatasetServiceImpl implements DatasetService {
 			dataset = this.middlewareDatasetService.getDatasetByObsUnitDbId(observations.get(0).getObservationUnitDbId());
 		final int datasetId = dataset.getDatasetId();
 
+		// Study should be unlocked before importing the observation
+		final Integer studyId = this.studyDataManager.getProjectIdByStudyDbId(studyDbId);
+		this.studyValidator.checkIfStudyIsLockedForCurrentUser(studyId);
+
 		final List<MeasurementVariable> datasetMeasurementVariables =
 			this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
 

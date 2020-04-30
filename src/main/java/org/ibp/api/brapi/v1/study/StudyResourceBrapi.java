@@ -73,7 +73,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -107,7 +106,7 @@ public class StudyResourceBrapi {
 	private DatasetService studyDatasetService;
 
 	@Autowired
-	InstanceValidator instanceValidator;
+	private InstanceValidator instanceValidator;
 
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
@@ -125,7 +124,8 @@ public class StudyResourceBrapi {
 			value =
 				"Filter by trial.") @RequestParam(value = "trialDbId", required = false) final String trialDbId,
 		@ApiParam(value = "Filter by study DbId") @RequestParam(value = "studyDbId", required = false) final String studyDbId,
-		@ApiParam(value = "Filter active status true/false.") @RequestParam(value = "active", required = false, defaultValue = "true") final Boolean active,
+		@ApiParam(value = "Filter active status true/false.") @RequestParam(value = "active", required = false, defaultValue = "true")
+		final Boolean active,
 		@ApiParam(value = "Name of the field to sort by.") @RequestParam(value = "sortBy", required = false) final String sortBy,
 		@ApiParam(value = "Sort order direction. Ascending/Descending.") @RequestParam(value = "sortOrder", required = false)
 		final String sortOrder,
@@ -384,8 +384,9 @@ public class StudyResourceBrapi {
 
 		final String trialName = this.studyDataManager.getProject(datasetId).getStudy().getName();
 
-		final ObservationVariableResult result = new ObservationVariableResult().withData(observationVariables).withStudyDbId(String.valueOf(studyDbId))
-			.withTrialName(trialName);
+		final ObservationVariableResult result =
+			new ObservationVariableResult().withData(observationVariables).withStudyDbId(String.valueOf(studyDbId))
+				.withTrialName(trialName);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 

@@ -50,14 +50,8 @@ public class StudyValidator {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 
-		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-
-		if (shouldBeUnlocked
-			&& study.isLocked()
-			&& !study.getCreatedBy().equals(loggedInUser.getUserid().toString())
-			&& !loggedInUser.isSuperAdmin()) {
-			this.errors.reject("study.is.locked", "");
-			throw new ForbiddenException(this.errors.getAllErrors().get(0));
+		if (shouldBeUnlocked) {
+			this.checkIfStudyIsLockedForCurrentUser(study);
 		}
 
 		// It is assumed that program UUID is always set in ContextHolder beforehand
@@ -70,6 +64,25 @@ public class StudyValidator {
 			this.errors.reject("invalid.program.uuid.study", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+	}
+
+	public void checkIfStudyIsLockedForCurrentUser(final Integer studyId) {
+		final Study study = this.studyDataManager.getStudy(studyId);
+		this.checkIfStudyIsLockedForCurrentUser(study);
+	}
+
+	private void checkIfStudyIsLockedForCurrentUser(final Study study) {
+
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+
+		if (study.isLocked()
+			&& !study.getCreatedBy().equals(loggedInUser.getUserid().toString())
+			&& !loggedInUser.isSuperAdmin()) {
+			this.errors.reject("study.is.locked", "");
+			throw new ForbiddenException(this.errors.getAllErrors().get(0));
+		}
+
 	}
 
 	public void validate(final Integer studyId, final Boolean shouldBeUnlocked, final Boolean allInstancesShouldBeDeletable) {
