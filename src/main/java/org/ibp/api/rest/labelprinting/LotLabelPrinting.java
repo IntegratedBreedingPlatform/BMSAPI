@@ -1,6 +1,5 @@
 package org.ibp.api.rest.labelprinting;
 
-import com.google.common.collect.Lists;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
@@ -30,7 +29,6 @@ import org.springframework.validation.ObjectError;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -211,8 +209,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final LotsSearchDto searchDto =
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
-		final Set<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet());
-		final List<UserDefinedField> attributes = this.germplasmDataManager.getAttributeTypesByGIDList(Lists.newArrayList(gids));
+		final List<UserDefinedField> attributes = this.lotService.getGermplasmAttributeTypes(searchDto);
 
 		// Build label list
 
@@ -223,7 +220,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final LabelType germplasmLabelTypes = new LabelType(GERMPLASM_FIXED_LABEL_TYPES.getTitle(), GERMPLASM_FIXED_LABEL_TYPES.getKey());
 		germplasmLabelTypes.setFields(new ArrayList<>(GERMPLASM_FIXED_LABEL_TYPES.getFields()));
 		germplasmLabelTypes.getFields().addAll(attributes.stream()
-			.map(attr -> new Field(toKey(attr.getFldno()), attr.getFname()))
+			.map(attr -> new Field(toKey(attr.getFldno()), attr.getFcode()))
 			.collect(Collectors.toList()));
 		labelTypes.add(germplasmLabelTypes);
 
@@ -237,8 +234,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final LotsSearchDto searchDto =
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
-		final Set<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet());
-		final Map<Integer, Map<Integer, String>> attributeValues = this.germplasmDataManager.getAttributeValuesGIDList(new ArrayList<>(gids));
+		final Map<Integer, Map<Integer, String>> attributeValues = this.lotService.getGermplasmAttributeValues(searchDto);
 
 		// Data to be exported
 		final List<Map<Integer, String>> data = new ArrayList<>();
