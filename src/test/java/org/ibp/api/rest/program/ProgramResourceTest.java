@@ -3,6 +3,7 @@ package org.ibp.api.rest.program;
 
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -13,11 +14,13 @@ import org.ibp.api.java.impl.middleware.program.ProgramServiceImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +32,15 @@ public class ProgramResourceTest extends ApiUnitTestBase {
     private WorkbenchUser me;
     private WorkbenchUser myBreedingBuddy;
 
+    private static String CROP_NAME ="MAIZE";
     @Autowired
     private SecurityServiceImpl securityService;
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @Before
     public void beforeEachTest() {
@@ -59,9 +66,8 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 
     @Test
     public void listProgramsByCropName() throws Exception {
-        final String cropName ="MAIZE";
         final CropType cropType = new CropType();
-        cropType.setCropName(cropName);
+        cropType.setCropName(ProgramResourceTest.CROP_NAME);
 
         final List<Project> programList = new ArrayList<>();
         final Project program1 =
@@ -78,23 +84,30 @@ public class ProgramResourceTest extends ApiUnitTestBase {
         final String program2Date = "2015-12-12";
         program2.setStartDate(ProgramServiceImpl.DATE_FORMAT.parse(program2Date));
 
-        final String cropName2 ="WHEAT";
-        final CropType cropType2 = new CropType();
-        cropType2.setCropName(cropName2);
-
         programList.add(program1);
         programList.add(program2);
 
-        Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByCropName(Mockito.eq(cropName));
+        Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByCropName(Mockito.eq(ProgramResourceTest.CROP_NAME));
         Mockito.doReturn(this.me).when(this.userService).getUserById(program1.getProjectId().intValue());
         Mockito.doReturn(this.myBreedingBuddy).when(this.userService).getUserById(program2.getProjectId().intValue());
 
+        Mockito.when(this.request.isUserInRole(PermissionsEnum.ADMIN.name())).thenReturn(true);
         Mockito.when(this.userService.getUsersByProjectId(program1.getProjectId()))
                 .thenReturn(Lists.newArrayList(this.me));
+
         Mockito.when(this.userService.getUsersByProjectId(program2.getProjectId())).thenReturn(
                 Lists.newArrayList(this.me, this.myBreedingBuddy));
+        verifyReturnValues(program1, program1Date, program2, program2Date);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/program").param("cropName",cropName).contentType(this.contentType))
+        Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByUser(Mockito.eq(me), Mockito.eq(ProgramResourceTest.CROP_NAME));
+        Mockito.when(this.request.isUserInRole(ArgumentMatchers.anyString())).thenReturn(false);
+        verifyReturnValues(program1, program1Date, program2, program2Date);
+    }
+
+    void verifyReturnValues(final Project program1, final String program1Date, final Project program2, final String program2Date)
+        throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/programs", ProgramResourceTest.CROP_NAME)
+            .contentType(this.contentType))
                 .andDo(MockMvcResultHandlers.print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$", IsCollectionWithSize.hasSize(2))) //
                 .andExpect(jsonPath("$[0].id", Matchers.is(String.valueOf(program1.getProjectId()))))
