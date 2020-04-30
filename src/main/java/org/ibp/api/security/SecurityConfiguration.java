@@ -70,6 +70,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/",
 					"/v2/api-docs/**",
 					"/authenticate",
+					"/token",
 					"/brapi/**/token",
 					"/breeding_view/**",
 					"/**/brapi/authorize"
