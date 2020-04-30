@@ -109,9 +109,6 @@ public class StudyResourceBrapi {
 	@Autowired
 	private InstanceValidator instanceValidator;
 
-	@Autowired
-	private StudyValidator studyValidator;
-
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
 	@ResponseBody
