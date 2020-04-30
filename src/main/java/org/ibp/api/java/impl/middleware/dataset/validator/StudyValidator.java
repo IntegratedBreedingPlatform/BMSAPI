@@ -51,7 +51,7 @@ public class StudyValidator {
 		}
 
 		if (shouldBeUnlocked) {
-			this.checkIfStudyIsUnlocked(study);
+			this.checkIfStudyIsLockedForCurrentUser(study);
 		}
 
 		// It is assumed that program UUID is always set in ContextHolder beforehand
@@ -66,12 +66,12 @@ public class StudyValidator {
 		}
 	}
 
-	public void checkIfStudyIsUnlocked(final Integer studyId) {
+	public void checkIfStudyIsLockedForCurrentUser(final Integer studyId) {
 		final Study study = this.studyDataManager.getStudy(studyId);
-		this.checkIfStudyIsUnlocked(study);
+		this.checkIfStudyIsLockedForCurrentUser(study);
 	}
 
-	private void checkIfStudyIsUnlocked(final Study study) {
+	private void checkIfStudyIsLockedForCurrentUser(final Study study) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();

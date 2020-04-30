@@ -234,10 +234,6 @@ public class StudyResourceBrapi {
 	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
-		// Study should be unlocked before retrieving the study details
-		final Integer studyId = this.studyDataManager.getProjectIdByStudyDbId(studyDbId);
-		this.studyValidator.checkIfStudyIsUnlocked(studyId);
-
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
 
 		if (mwStudyDetails != null) {
@@ -370,10 +366,6 @@ public class StudyResourceBrapi {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
 		}
 
-		// Study should be unlocked before retrieving the observation variables
-		final Integer studyId = this.studyDataManager.getProjectIdByStudyDbId(studyDbId);
-		this.studyValidator.checkIfStudyIsUnlocked(studyId);
-
 		final PagedResult<VariableDTO> resultPage =
 			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
 
@@ -421,9 +413,6 @@ public class StudyResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(required = false) final Integer pageSize) {
 
 		this.instanceValidator.validateStudyDbId(studyDbId);
-		// Study should be unlocked before retrieving the observation units
-		final Integer studyId = this.studyDataManager.getProjectIdByStudyDbId(studyDbId);
-		this.studyValidator.checkIfStudyIsUnlocked(studyId);
 
 		final Integer finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final Integer finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
