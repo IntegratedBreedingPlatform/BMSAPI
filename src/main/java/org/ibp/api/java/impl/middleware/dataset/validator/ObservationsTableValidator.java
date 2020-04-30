@@ -26,6 +26,7 @@ import java.util.Map;
 public class ObservationsTableValidator {
 
 	private static final String DATA_TYPE_NUMERIC = "Numeric";
+	public static final String MISSING_VALUE = "missing";
 
 	public void validateList(final List<List<String>> inputData) throws ApiRequestValidationException {
 

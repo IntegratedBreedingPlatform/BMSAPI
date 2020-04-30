@@ -128,7 +128,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 				TransactionExportServiceImpl.TRANSACTIONS_SHEET_TRN_ID_COLUMN_INDEX, transactionDto.getTransactionId().toString(),
 				CellType.NUMERIC, row);
 			this.writeCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_CREATED_COLUMN_INDEX,
-				transactionDto.getTransactionDate() == null ? "" : transactionDto.getTransactionDate().toString(), CellType.STRING, row);
+				transactionDto.getCreatedDate() == null ? "" : transactionDto.getCreatedDate().toString(), CellType.STRING, row);
 			this.writeCell(
 				TransactionExportServiceImpl.TRANSACTIONS_SHEET_USERNAME_COLUMN_INDEX, transactionDto.getCreatedByUsername(),
 				CellType.STRING, row);
@@ -163,7 +163,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		row.setHeightInPoints(16);
 
 		this.setCustomColorAtIndex(xlsBook, IndexedColors.YELLOW, 255, 255, 204);
-		this.setCustomColorAtIndex(xlsBook, IndexedColors.AQUA, 218, 238, 243);
+		this.setCustomColorAtIndex(xlsBook, IndexedColors.AQUA, 218, 227, 243);
 		this.setCustomColorAtIndex(xlsBook, IndexedColors.OLIVE_GREEN, 235, 241, 222);
 
 		HSSFCell cell = row.createCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_DESIGNATION_COLUMN_INDEX, CellType.STRING);
