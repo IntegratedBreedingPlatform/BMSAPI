@@ -49,12 +49,6 @@ public class TransactionUpdateRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final Predicate<TransactionUpdateRequestDto> isValid = i -> i.isValid();
-		if (transactionUpdateRequestDtos.stream().filter(isValid.negate()).count() > 0) {
-			errors.reject("transaction.update.invalid.data", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
 		final List<Integer> transactionIds =
 			transactionUpdateRequestDtos.stream().map(TransactionUpdateRequestDto::getTransactionId).collect(
 				Collectors.toList());
@@ -106,6 +100,12 @@ public class TransactionUpdateRequestDtoValidator {
 					transactionDtos.stream().filter(isWithdrawalOrDepositType.negate()).map(TransactionDto::getTransactionId).collect(
 						Collectors.toList()), 3)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final Predicate<TransactionUpdateRequestDto> isValid = i -> i.isValid();
+		if (transactionUpdateRequestDtos.stream().filter(isValid.negate()).count() > 0) {
+			errors.reject("transaction.update.invalid.data", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		final long invalidAmountCount =
