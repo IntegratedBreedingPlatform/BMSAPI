@@ -1,9 +1,9 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
@@ -69,8 +69,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorLotsAreNotProperlySet() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			searchCompositeDto.setItemIds(Collections.singleton(1));
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
@@ -83,8 +83,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorInvalidNotes() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(256));
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
@@ -98,8 +98,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorNullWithdrawalInstructions() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
@@ -111,8 +111,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorUnsupportedUnitName() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final LotWithdrawalInputDto.WithdrawalAmountInstruction withdrawalAmountInstruction =
@@ -130,8 +130,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorInvalidAmount() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final LotWithdrawalInputDto.WithdrawalAmountInstruction withdrawalAmountInstruction =
@@ -153,8 +153,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorMissingWithdrawalsInstructionsForUnit() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final LotWithdrawalInputDto.WithdrawalAmountInstruction withdrawalAmountInstruction =

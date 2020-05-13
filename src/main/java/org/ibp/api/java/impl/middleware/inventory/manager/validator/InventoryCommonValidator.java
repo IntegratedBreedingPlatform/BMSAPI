@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;

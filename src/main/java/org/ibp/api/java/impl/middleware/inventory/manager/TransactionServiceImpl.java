@@ -1,10 +1,10 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
@@ -128,7 +128,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void confirmPendingTransactions(final SearchCompositeDto searchCompositeDto) {
+	public void confirmPendingTransactions(final SearchCompositeDto<Integer> searchCompositeDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
 		try{
@@ -204,7 +204,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void cancelPendingTransactions(final SearchCompositeDto searchCompositeDto) {
+	public void cancelPendingTransactions(final SearchCompositeDto<Integer> searchCompositeDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
 		try {

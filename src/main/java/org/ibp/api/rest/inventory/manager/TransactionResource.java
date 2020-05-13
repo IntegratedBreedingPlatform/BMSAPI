@@ -7,10 +7,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
@@ -177,7 +177,7 @@ public class TransactionResource {
 	public ResponseEntity<Void> confirmPendingTransaction(
 		@PathVariable final String cropName, //
 		@ApiParam("List of transactions to be confirmed, use a searchId or a list of transaction ids")
-		@RequestBody final SearchCompositeDto searchCompositeDto){
+		@RequestBody final SearchCompositeDto<Integer> searchCompositeDto) {
 
 		this.transactionService.confirmPendingTransactions(searchCompositeDto);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -273,7 +273,7 @@ public class TransactionResource {
 	public ResponseEntity<Void> cancelPendingTransaction(
 		@PathVariable final String cropName, //
 		@ApiParam("List of transactions to be cancelled, use a searchId or a list of transaction ids")
-		@RequestBody final SearchCompositeDto searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer> searchCompositeDto) {
 
 		this.transactionService.cancelPendingTransactions(searchCompositeDto);
 		return new ResponseEntity<>(HttpStatus.OK);

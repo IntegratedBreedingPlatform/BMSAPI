@@ -1,6 +1,5 @@
 package org.ibp.api.rest.labelprinting.domain;
 
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 

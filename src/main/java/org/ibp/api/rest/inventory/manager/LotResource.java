@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
@@ -14,7 +15,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
@@ -173,7 +173,7 @@ public class LotResource {
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotRequest.getSearchComposite());
 
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-		if (lotRequest.getSearchComposite().getSearchRequestId() == null) {
+		if (lotRequest.getSearchComposite().getSearchRequest() == null) {
 			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, lotRequest.getSearchComposite().getItemIds());
 		}
 
@@ -219,13 +219,13 @@ public class LotResource {
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(@PathVariable final String cropName, //
 		@ApiParam("List of lots to get metadata, use a searchId or a list of lot ids")
-		@RequestBody final SearchCompositeDto searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer> searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
 
-		if (searchCompositeDto.getSearchRequestId() == null) {
+		if (searchCompositeDto.getSearchRequest() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
@@ -240,13 +240,13 @@ public class LotResource {
 	public ResponseEntity<Void> closeLots(
 		@PathVariable final String cropName, //
 		@ApiParam("List of lots to be closed, use a searchId or a list of lot ids")
-		@RequestBody final SearchCompositeDto searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer> searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
 
-		if (searchCompositeDto.getSearchRequestId() == null) {
+		if (searchCompositeDto.getSearchRequest() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
