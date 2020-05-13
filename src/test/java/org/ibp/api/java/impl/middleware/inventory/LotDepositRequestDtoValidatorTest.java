@@ -8,7 +8,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.inventory.manager.validator.InventoryCommonValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotDepositRequestDtoValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.junit.Before;
