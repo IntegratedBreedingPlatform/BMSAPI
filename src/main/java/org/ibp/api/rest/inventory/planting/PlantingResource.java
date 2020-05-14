@@ -39,7 +39,7 @@ public class PlantingResource {
 		return new ResponseEntity<>(plantingService.getPlantingMetadata(plantingRequestDto), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Generate planting for the selected observation units", notes = "Generate planting for the selected observation units")
+	@ApiOperation(value = "Generate pending planting for the selected observation units", notes = "Generate pending planting for the selected observation units")
 	@RequestMapping(value = "/crops/{cropName}/planting/pending-generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_PLANTING_PERMISSIONS + " or hasAnyAuthority('MS_CREATE_PENDING_WITHDRAWALS')")
@@ -51,7 +51,7 @@ public class PlantingResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Generate planting for the selected observation units", notes = "Generate planting for the selected observation units")
+	@ApiOperation(value = "Generate confirmed planting for the selected observation units", notes = "Generate confirmed planting for the selected observation units")
 	@RequestMapping(value = "/crops/{cropName}/planting/confirmed-generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_PLANTING_PERMISSIONS + " or hasAnyAuthority('MS_CREATE_CONFIRMED_WITHDRAWALS')")
