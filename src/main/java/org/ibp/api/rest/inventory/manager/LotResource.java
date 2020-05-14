@@ -219,7 +219,7 @@ public class LotResource {
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(@PathVariable final String cropName, //
 		@ApiParam("List of lots to get metadata, use a searchId or a list of lot ids")
-		@RequestBody final SearchCompositeDto<Integer> searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
@@ -240,7 +240,7 @@ public class LotResource {
 	public ResponseEntity<Void> closeLots(
 		@PathVariable final String cropName, //
 		@ApiParam("List of lots to be closed, use a searchId or a list of lot ids")
-		@RequestBody final SearchCompositeDto<Integer> searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);

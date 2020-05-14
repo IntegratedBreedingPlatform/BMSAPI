@@ -24,7 +24,7 @@ public interface TransactionService {
 
 	void saveWithdrawals(LotWithdrawalInputDto lotWithdrawalInputDto, TransactionStatus transactionStatus);
 
-	void confirmPendingTransactions(SearchCompositeDto<Integer> searchCompositeDto);
+	void confirmPendingTransactions(SearchCompositeDto<Integer, Integer> searchCompositeDto);
 
 	List<TransactionDto> getAvailableBalanceTransactions(Integer lotId);
 
@@ -32,6 +32,6 @@ public interface TransactionService {
 
 	void saveDeposits(LotDepositRequestDto lotDepositRequestDto, TransactionStatus transactionStatus);
 
-	void cancelPendingTransactions(SearchCompositeDto<Integer> searchCompositeDto);
+	void cancelPendingTransactions(SearchCompositeDto<Integer, Integer> searchCompositeDto);
 
 }

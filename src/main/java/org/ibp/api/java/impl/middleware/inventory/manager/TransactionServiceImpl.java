@@ -128,7 +128,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void confirmPendingTransactions(final SearchCompositeDto<Integer> searchCompositeDto) {
+	public void confirmPendingTransactions(final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
 		try{
@@ -204,7 +204,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void cancelPendingTransactions(final SearchCompositeDto<Integer> searchCompositeDto) {
+	public void cancelPendingTransactions(final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
 		try {

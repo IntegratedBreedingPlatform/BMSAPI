@@ -73,7 +73,7 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorLotsAreNotProperlySet() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
 			searchCompositeDto.setSearchRequest(1);
 			searchCompositeDto.setItemIds(new HashSet<>(Collections.singleton(1)));
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
@@ -87,7 +87,7 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorInvalidNotes() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
 			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(256));
@@ -102,7 +102,7 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorNullWithdrawalInstructions() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
 			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(255));
@@ -116,7 +116,7 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorUnsupportedUnitName() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
 			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(255));
@@ -133,7 +133,7 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorInvalidAmount() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
 			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(255));
@@ -150,7 +150,7 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateDepositInstructionsUnitsMissingUnits() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
 			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(255));
@@ -177,7 +177,7 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorExtraUnits() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto<Integer> searchCompositeDto = new SearchCompositeDto();
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
 			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(255));

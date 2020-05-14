@@ -16,7 +16,7 @@ public class SearchRequestDtoResolver {
 	private SearchRequestService searchRequestService;
 
 	public LotsSearchDto getLotsSearchDto(
-		final SearchCompositeDto<Integer> searchCompositeDto) {
+		final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 
 		final LotsSearchDto searchDTO;
 		if (searchCompositeDto.getSearchRequest() != null) {
@@ -29,7 +29,7 @@ public class SearchRequestDtoResolver {
 		return searchDTO;
 	}
 
-	public TransactionsSearchDto getTransactionsSearchDto(final SearchCompositeDto<Integer> searchCompositeDto) {
+	public TransactionsSearchDto getTransactionsSearchDto(final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		TransactionsSearchDto transactionsSearchDto;
 		if (searchCompositeDto.getSearchRequest() != null) {
 			transactionsSearchDto =

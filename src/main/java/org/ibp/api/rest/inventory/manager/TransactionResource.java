@@ -177,7 +177,7 @@ public class TransactionResource {
 	public ResponseEntity<Void> confirmPendingTransaction(
 		@PathVariable final String cropName, //
 		@ApiParam("List of transactions to be confirmed, use a searchId or a list of transaction ids")
-		@RequestBody final SearchCompositeDto<Integer> searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 
 		this.transactionService.confirmPendingTransactions(searchCompositeDto);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -273,7 +273,7 @@ public class TransactionResource {
 	public ResponseEntity<Void> cancelPendingTransaction(
 		@PathVariable final String cropName, //
 		@ApiParam("List of transactions to be cancelled, use a searchId or a list of transaction ids")
-		@RequestBody final SearchCompositeDto<Integer> searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 
 		this.transactionService.cancelPendingTransactions(searchCompositeDto);
 		return new ResponseEntity<>(HttpStatus.OK);
