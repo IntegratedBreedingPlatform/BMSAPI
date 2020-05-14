@@ -1,8 +1,11 @@
 package org.ibp.api.java.impl.middleware.inventory.planting;
 
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.planting.PlantingMetadata;
 import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.impl.inventory.PlantingPreparationDTO;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -26,6 +29,15 @@ public class PlantingServiceImpl implements PlantingService {
 
 	@Autowired
 	private org.generationcp.middleware.service.api.inventory.PlantingService plantingService;
+
+	@Override
+	public PlantingPreparationDTO searchPlantingPreparation(
+		final Integer studyId,
+		final Integer datasetId,
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto) {
+
+		return this.plantingService.searchPlantingPreparation(studyId, datasetId, searchCompositeDto);
+	}
 
 	@Override
 	public PlantingMetadata getPlantingMetadata(final PlantingRequestDto plantingRequestDto) {

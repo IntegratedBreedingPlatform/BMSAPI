@@ -3,9 +3,13 @@ package org.ibp.api.rest.inventory.planting;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.planting.PlantingMetadata;
 import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.impl.inventory.PlantingPreparationDTO;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.java.inventory.planting.PlantingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +31,25 @@ public class PlantingResource {
 
 	private static final String HAS_PLANTING_PERMISSIONS =
 		"hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS' , 'MS_WITHDRAW_INVENTORY')";
+
+	@ApiOperation(value = "Planting preparation search", notes = "Planting search returns data necessary to prepare planting")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/preparation/search", method = RequestMethod.POST)
+	@PreAuthorize(HAS_PLANTING_PERMISSIONS)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<PlantingPreparationDTO>> searchPlanting(
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
+		@RequestBody final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto
+	) {
+		final PlantingPreparationDTO plantingPreparationDTO =
+			plantingService.searchPlantingPreparation(studyId, datasetId, searchCompositeDto);
+		final SingleEntityResponse<PlantingPreparationDTO> singleEntityResponse =
+			new SingleEntityResponse<PlantingPreparationDTO>(plantingPreparationDTO);
+
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+	}
 
 	@ApiOperation(value = "Get existing planting information for selected observation units", notes = "Get existing planting information for selected observation units")
 	@RequestMapping(value = "/crops/{cropName}/planting/metadata", method = RequestMethod.POST)
