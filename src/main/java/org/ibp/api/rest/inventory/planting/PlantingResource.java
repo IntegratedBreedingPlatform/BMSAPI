@@ -3,6 +3,7 @@ package org.ibp.api.rest.inventory.planting;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.domain.inventory.planting.PlantingMetadata;
 import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +25,7 @@ public class PlantingResource {
 	@RequestMapping(value = "/crops/{cropName}/planting/metadata", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_PLANTING_PERMISSIONS + " or hasAnyAuthority('MS_CREATE_PENDING_WITHDRAWALS', 'MS_CREATE_CONFIRMED_WITHDRAWALS')")
-	public ResponseEntity<Void> getPlantingMetadata(
+	public ResponseEntity<PlantingMetadata> getPlantingMetadata(
 		@PathVariable final String cropName, //
 		@ApiParam("Planting Instructions")
 		@RequestBody final PlantingRequestDto plantingRequestDto) {
