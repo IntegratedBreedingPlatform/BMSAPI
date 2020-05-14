@@ -5,6 +5,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.planting.PlantingMetadata;
 import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.ibp.api.java.inventory.planting.PlantingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PlantingResource {
 
+	@Autowired
+	private PlantingService plantingService;
+
 	private static final String HAS_PLANTING_PERMISSIONS =
 		"hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS' , 'MS_WITHDRAW_INVENTORY')";
 
@@ -29,8 +36,7 @@ public class PlantingResource {
 		@PathVariable final String cropName, //
 		@ApiParam("Planting Instructions")
 		@RequestBody final PlantingRequestDto plantingRequestDto) {
-		return null;
-
+		return new ResponseEntity<>(plantingService.getPlantingMetadata(plantingRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Generate planting for the selected observation units", notes = "Generate planting for the selected observation units")
@@ -41,7 +47,8 @@ public class PlantingResource {
 		@PathVariable final String cropName, //
 		@ApiParam("Planting Instructions")
 		@RequestBody final PlantingRequestDto plantingRequestDto) {
-		return null;
+		plantingService.generatePlanting(plantingRequestDto, TransactionStatus.PENDING);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Generate planting for the selected observation units", notes = "Generate planting for the selected observation units")
@@ -52,6 +59,7 @@ public class PlantingResource {
 		@PathVariable final String cropName, //
 		@ApiParam("Planting Instructions")
 		@RequestBody final PlantingRequestDto plantingRequestDto) {
-		return null;
+		plantingService.generatePlanting(plantingRequestDto, TransactionStatus.CONFIRMED);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
