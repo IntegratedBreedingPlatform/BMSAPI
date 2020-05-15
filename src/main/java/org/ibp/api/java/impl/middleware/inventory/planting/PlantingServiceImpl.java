@@ -29,12 +29,11 @@ public class PlantingServiceImpl implements PlantingService {
 
 	@Override
 	public PlantingMetadata getPlantingMetadata(final PlantingRequestDto plantingRequestDto) {
-		return null;
+		return plantingService.getPlantingMetadata(plantingRequestDto);
 	}
 
 	@Override
 	public void generatePlanting(final PlantingRequestDto plantingRequestDto, final TransactionStatus transactionStatus) {
-
 	}
 
 }
