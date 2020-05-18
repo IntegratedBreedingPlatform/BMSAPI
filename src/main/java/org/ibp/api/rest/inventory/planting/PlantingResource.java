@@ -52,37 +52,46 @@ public class PlantingResource {
 	}
 
 	@ApiOperation(value = "Get existing planting information for selected observation units", notes = "Get existing planting information for selected observation units")
-	@RequestMapping(value = "/crops/{cropName}/planting/metadata", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/metadata", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_PLANTING_PERMISSIONS + " or hasAnyAuthority('MS_CREATE_PENDING_WITHDRAWALS', 'MS_CREATE_CONFIRMED_WITHDRAWALS')")
 	public ResponseEntity<PlantingMetadata> getPlantingMetadata(
 		@PathVariable final String cropName, //
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
 		@ApiParam("Planting Instructions")
 		@RequestBody final PlantingRequestDto plantingRequestDto) {
-		return new ResponseEntity<>(plantingService.getPlantingMetadata(plantingRequestDto), HttpStatus.OK);
+		return new ResponseEntity<>(plantingService.getPlantingMetadata(studyId, datasetId, plantingRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Generate pending planting for the selected observation units", notes = "Generate pending planting for the selected observation units")
-	@RequestMapping(value = "/crops/{cropName}/planting/pending-generation", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/pending-generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_PLANTING_PERMISSIONS + " or hasAnyAuthority('MS_CREATE_PENDING_WITHDRAWALS')")
 	public ResponseEntity<Void> postPendingPlanting(
 		@PathVariable final String cropName, //
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
 		@ApiParam("Planting Instructions")
 		@RequestBody final PlantingRequestDto plantingRequestDto) {
-		plantingService.generatePlanting(plantingRequestDto, TransactionStatus.PENDING);
+		plantingService.generatePlanting(studyId, datasetId, plantingRequestDto, TransactionStatus.PENDING);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Generate confirmed planting for the selected observation units", notes = "Generate confirmed planting for the selected observation units")
-	@RequestMapping(value = "/crops/{cropName}/planting/confirmed-generation", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/confirmed-generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_PLANTING_PERMISSIONS + " or hasAnyAuthority('MS_CREATE_CONFIRMED_WITHDRAWALS')")
 	public ResponseEntity<Void> postConfirmedPlanting(
 		@PathVariable final String cropName, //
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
 		@ApiParam("Planting Instructions")
 		@RequestBody final PlantingRequestDto plantingRequestDto) {
-		plantingService.generatePlanting(plantingRequestDto, TransactionStatus.CONFIRMED);
+		plantingService.generatePlanting(studyId, datasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

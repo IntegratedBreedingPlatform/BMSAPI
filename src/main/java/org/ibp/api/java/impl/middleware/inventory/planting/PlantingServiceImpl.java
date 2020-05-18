@@ -40,12 +40,14 @@ public class PlantingServiceImpl implements PlantingService {
 	}
 
 	@Override
-	public PlantingMetadata getPlantingMetadata(final PlantingRequestDto plantingRequestDto) {
-		return plantingService.getPlantingMetadata(plantingRequestDto);
+	public PlantingMetadata getPlantingMetadata(final Integer studyId, final Integer datasetId,
+		final PlantingRequestDto plantingRequestDto) {
+		return plantingService.getPlantingMetadata(studyId, datasetId, plantingRequestDto);
 	}
 
 	@Override
-	public void generatePlanting(final PlantingRequestDto plantingRequestDto, final TransactionStatus transactionStatus) {
+	public void generatePlanting(final Integer studyId, final Integer datasetId,
+		final PlantingRequestDto plantingRequestDto, final TransactionStatus transactionStatus) {
 	}
 
 }
