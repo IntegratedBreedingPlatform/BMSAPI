@@ -9,7 +9,6 @@ import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.impl.inventory.PlantingPreparationDTO;
-import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.java.inventory.planting.PlantingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,7 +35,7 @@ public class PlantingResource {
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/preparation/search", method = RequestMethod.POST)
 	@PreAuthorize(HAS_PLANTING_PERMISSIONS)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<PlantingPreparationDTO>> searchPlanting(
+	public ResponseEntity<PlantingPreparationDTO> searchPlanting(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
@@ -45,10 +44,8 @@ public class PlantingResource {
 	) {
 		final PlantingPreparationDTO plantingPreparationDTO =
 			plantingService.searchPlantingPreparation(studyId, datasetId, searchCompositeDto);
-		final SingleEntityResponse<PlantingPreparationDTO> singleEntityResponse =
-			new SingleEntityResponse<PlantingPreparationDTO>(plantingPreparationDTO);
 
-		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+		return new ResponseEntity<>(plantingPreparationDTO, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get existing planting information for selected observation units", notes = "Get existing planting information for selected observation units")
