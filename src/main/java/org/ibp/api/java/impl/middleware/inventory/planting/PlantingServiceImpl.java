@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.planting.PlantingMetadata;
 import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.impl.inventory.PlantingPreparationDTO;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
@@ -48,6 +49,13 @@ public class PlantingServiceImpl implements PlantingService {
 	@Override
 	public void generatePlanting(final Integer studyId, final Integer datasetId,
 		final PlantingRequestDto plantingRequestDto, final TransactionStatus transactionStatus) {
+		try {
+			inventoryLock.lockWrite();
+			final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+			plantingService.savePlanting(loggedInUser.getUserid(), studyId, datasetId, plantingRequestDto, transactionStatus);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 }
