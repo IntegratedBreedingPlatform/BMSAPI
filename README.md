@@ -48,7 +48,7 @@ Authorization: bearer:username:1522184720103:1c9293bcf819a05309c82d769d51b59f
 Cache-Control: no-cache
 ```
 
-Header for non BrAPI Standarized calls): 
+Header for non BrAPI BMSAPI calls: 
 
 ```
 GET /bmsapi/v1/crops HTTP/1.1 
