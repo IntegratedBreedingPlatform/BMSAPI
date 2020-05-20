@@ -44,7 +44,8 @@ Header (for BrAPI Standarized calls):
 ```
 GET /bmsapi/v1/crops HTTP/1.1 
 Host: xx.xx.xx.xx:48080 
-Authorization: bearer:username:1522184720103:1c9293bcf819a05309c82d769d51b59f Cache-Control: no-cache
+Authorization: bearer:username:1522184720103:1c9293bcf819a05309c82d769d51b59f 
+Cache-Control: no-cache
 ```
 
 Header for non BrAPI Standarized calls): 
@@ -52,7 +53,8 @@ Header for non BrAPI Standarized calls):
 ```
 GET /bmsapi/v1/crops HTTP/1.1 
 Host: xx.xx.xx.xx:48080 
-X-Auth-Token: username:1522184720103:1c9293bcf819a05309c82d769d51b59f Cache-Control: no-cache
+X-Auth-Token: username:1522184720103:1c9293bcf819a05309c82d769d51b59f 
+Cache-Control: no-cache
 ```
 
 Additionaly there are some nomenclature differences in BrAPI that must be noted when refering to studies entities. The mapping between the BrAPI entity names and the BMS equivalent is offered below:
