@@ -40,7 +40,6 @@ public class LotWithdrawalInputDtoValidator {
 	public void validate(final LotWithdrawalInputDto lotWithdrawalInputDto) {
 		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
-		//Validate notes length
 		if (lotWithdrawalInputDto == null) {
 			errors.reject("lot.withdrawal.input.null", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
