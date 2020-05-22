@@ -33,7 +33,7 @@ public class PlantingResource {
 
 	@ApiOperation(value = "Planting preparation search", notes = "Planting search returns data necessary to prepare planting")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/preparation/search", method = RequestMethod.POST)
-	@PreAuthorize(HAS_PLANTING_PERMISSIONS)
+	@PreAuthorize(HAS_PLANTING_PERMISSIONS + " or hasAnyAuthority('MS_CREATE_PENDING_WITHDRAWALS', 'MS_CREATE_CONFIRMED_WITHDRAWALS')")
 	@ResponseBody
 	public ResponseEntity<PlantingPreparationDTO> searchPlanting(
 		@PathVariable final String cropName,
