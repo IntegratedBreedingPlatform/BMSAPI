@@ -3,7 +3,9 @@ package org.ibp.api.java.impl.middleware.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
@@ -50,6 +52,9 @@ public class StudyInstanceServiceImplTest {
 
 	@Mock
 	private InstanceValidator instanceValidator;
+
+	@Mock
+	private PlantingServiceImpl plantingService;
 
 	@InjectMocks
 	private final StudyInstanceService studyInstanceService = new StudyInstanceServiceImpl();
@@ -227,7 +232,10 @@ public class StudyInstanceServiceImplTest {
 	public void testDeleteStudyInstance() {
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
-
+		Mockito.when(plantingService.getPlantingTransactionsByInstanceId(instanceId, TransactionStatus.PENDING))
+			.thenReturn(new ArrayList<>());
+		Mockito.when(plantingService.getPlantingTransactionsByInstanceId(instanceId, TransactionStatus.CONFIRMED))
+			.thenReturn(new ArrayList<>());
 		this.studyInstanceService.deleteStudyInstance(studyId, instanceId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId), true);
