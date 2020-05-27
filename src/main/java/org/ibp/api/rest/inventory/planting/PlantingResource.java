@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.impl.inventory.PlantingPreparationDTO;
+import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.inventory.planting.PlantingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,9 @@ public class PlantingResource {
 
 	@Autowired
 	private PlantingService plantingService;
+
+	@Autowired
+	private InventoryLock inventoryLock;
 
 	private static final String HAS_PLANTING_PERMISSIONS =
 		"hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS' , 'MS_WITHDRAW_INVENTORY')";
@@ -73,8 +77,13 @@ public class PlantingResource {
 		@PathVariable final Integer datasetId,
 		@ApiParam("Planting Instructions")
 		@RequestBody final PlantingRequestDto plantingRequestDto) {
-		plantingService.generatePlanting(studyId, datasetId, plantingRequestDto, TransactionStatus.PENDING);
-		return new ResponseEntity<>(HttpStatus.OK);
+		try {
+			inventoryLock.lockWrite();
+			plantingService.generatePlanting(studyId, datasetId, plantingRequestDto, TransactionStatus.PENDING);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Generate confirmed planting for the selected observation units", notes = "Generate confirmed planting for the selected observation units")
@@ -88,7 +97,12 @@ public class PlantingResource {
 		@PathVariable final Integer datasetId,
 		@ApiParam("Planting Instructions")
 		@RequestBody final PlantingRequestDto plantingRequestDto) {
-		plantingService.generatePlanting(studyId, datasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
-		return new ResponseEntity<>(HttpStatus.OK);
+		try {
+			inventoryLock.lockWrite();
+			plantingService.generatePlanting(studyId, datasetId, plantingRequestDto, TransactionStatus.CONFIRMED);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 }

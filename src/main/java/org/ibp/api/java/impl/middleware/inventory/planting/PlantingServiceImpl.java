@@ -9,7 +9,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.impl.inventory.PlantingPreparationDTO;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
-import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.planting.validator.PlantingRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.inventory.planting.PlantingService;
@@ -20,9 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class PlantingServiceImpl implements PlantingService {
-
-	@Autowired
-	private InventoryLock inventoryLock;
 
 	@Autowired
 	private SecurityService securityService;
@@ -63,17 +59,12 @@ public class PlantingServiceImpl implements PlantingService {
 	@Override
 	public void generatePlanting(final Integer studyId, final Integer datasetId,
 		final PlantingRequestDto plantingRequestDto, final TransactionStatus transactionStatus) {
-		try {
-			inventoryLock.lockWrite();
-			this.studyValidator.validate(studyId, false);
-			this.datasetValidator.validateDataset(studyId, datasetId);
-			this.datasetValidator.validatePlotDatasetType(datasetId);
-			this.plantingRequestDtoValidator.validatePlantingRequestDto(studyId, datasetId, plantingRequestDto);
-			final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-			plantingService.savePlanting(loggedInUser.getUserid(), studyId, datasetId, plantingRequestDto, transactionStatus);
-		} finally {
-			inventoryLock.unlockWrite();
-		}
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		this.datasetValidator.validatePlotDatasetType(datasetId);
+		this.plantingRequestDtoValidator.validatePlantingRequestDto(studyId, datasetId, plantingRequestDto);
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+		plantingService.savePlanting(loggedInUser.getUserid(), studyId, datasetId, plantingRequestDto, transactionStatus);
 	}
 
 }

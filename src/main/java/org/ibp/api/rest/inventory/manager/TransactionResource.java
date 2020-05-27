@@ -20,7 +20,7 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.inventory.manager.TransactionExportService;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -60,7 +60,7 @@ public class TransactionResource {
 	private SearchRequestService searchRequestService;
 
 	@Autowired
-	private SecurityService securityService;
+	private InventoryLock inventoryLock;
 
 	@Autowired
 	private TransactionExportService transactionExportServiceImpl;
@@ -129,7 +129,12 @@ public class TransactionResource {
 
 				@Override
 				public List<TransactionDto> getResults(final PagedResult<TransactionDto> pagedResult) {
-					return TransactionResource.this.transactionService.searchTransactions(searchDTO, pageable);
+					try {
+						inventoryLock.lockRead();
+						return TransactionResource.this.transactionService.searchTransactions(searchDTO, pageable);
+					} finally {
+						inventoryLock.unlockRead();
+					}
 				}
 			});
 
@@ -150,10 +155,13 @@ public class TransactionResource {
 			@PathVariable final String cropName,
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
-
-		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.PENDING);
-
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.PENDING);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Create Confirmed Withdrawals", notes = "Create new withdrawals with confirmed status for a set os filtered lots")
@@ -164,10 +172,13 @@ public class TransactionResource {
 			@PathVariable final String cropName,
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
-
-		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
-
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Confirm pending Transactions", notes = "Confirm any transaction with pending status")
@@ -178,9 +189,13 @@ public class TransactionResource {
 		@PathVariable final String cropName, //
 		@ApiParam("List of transactions to be confirmed, use a searchId or a list of transaction ids")
 		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
-
-		this.transactionService.confirmPendingTransactions(searchCompositeDto);
-		return new ResponseEntity<>(HttpStatus.OK);
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.confirmPendingTransactions(searchCompositeDto);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "It will retrieve transactions that affects the available balance of the lot", notes =
@@ -232,10 +247,14 @@ public class TransactionResource {
 		@PathVariable final String cropName,
 		@ApiParam("New amount or New Available Balance and Notes to be updated per transaction")
 		@RequestBody final List<TransactionUpdateRequestDto> transactionUpdateInputDtos) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
 
-		this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
-
-		return new ResponseEntity<>(HttpStatus.OK);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a set os filtered lots")
@@ -246,10 +265,13 @@ public class TransactionResource {
 		@PathVariable final String cropName,
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
-
-		this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.PENDING);
-
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.PENDING);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a set os filtered lots")
@@ -260,10 +282,14 @@ public class TransactionResource {
 		@PathVariable final String cropName,
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED);
 
-		this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED);
-
-		return new ResponseEntity<>(HttpStatus.CREATED);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Cancel pending Transactions", notes = "Cancel any transaction with pending status")
@@ -274,8 +300,12 @@ public class TransactionResource {
 		@PathVariable final String cropName, //
 		@ApiParam("List of transactions to be cancelled, use a searchId or a list of transaction ids")
 		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
-
-		this.transactionService.cancelPendingTransactions(searchCompositeDto);
-		return new ResponseEntity<>(HttpStatus.OK);
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.cancelPendingTransactions(searchCompositeDto);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 }

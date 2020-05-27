@@ -23,6 +23,7 @@ import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
@@ -88,6 +89,9 @@ public class LotResource {
 	@Autowired
 	private InventoryCommonValidator inventoryCommonValidator;
 
+	@Autowired
+	private InventoryLock inventoryLock;
+
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
@@ -136,7 +140,12 @@ public class LotResource {
 
 				@Override
 				public List<ExtendedLotDto> getResults(final PagedResult<ExtendedLotDto> pagedResult) {
-					return LotResource.this.lotService.searchLots(searchDTO, pageable);
+					try {
+						inventoryLock.lockRead();
+						return LotResource.this.lotService.searchLots(searchDTO, pageable);
+					} finally {
+						inventoryLock.unlockRead();
+					}
 				}
 			});
 
@@ -177,6 +186,11 @@ public class LotResource {
 			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, lotRequest.getSearchComposite().getItemIds());
 		}
 
+		try {
+			this.lotService.updateLots(extendedLotDtos, lotRequest);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 		this.lotService.updateLots(extendedLotDtos, lotRequest);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
@@ -229,8 +243,12 @@ public class LotResource {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
-
-		return new ResponseEntity<>(this.lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
+		try {
+			inventoryLock.lockRead();
+			return new ResponseEntity<>(this.lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockRead();
+		}
 	}
 
 	@ApiOperation(value = "Close Lots", notes = "Close a collection of lots")
@@ -250,8 +268,12 @@ public class LotResource {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
-
-		this.lotService.closeLots(searchDTO);
+		try {
+			inventoryLock.lockWrite();
+			this.lotService.closeLots(searchDTO);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
