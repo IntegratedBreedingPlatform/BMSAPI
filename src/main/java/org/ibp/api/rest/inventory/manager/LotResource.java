@@ -187,6 +187,7 @@ public class LotResource {
 		}
 
 		try {
+			inventoryLock.lockWrite();
 			this.lotService.updateLots(extendedLotDtos, lotRequest);
 		} finally {
 			inventoryLock.unlockWrite();
