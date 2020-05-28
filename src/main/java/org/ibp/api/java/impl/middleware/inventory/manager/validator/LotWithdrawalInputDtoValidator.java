@@ -8,6 +8,7 @@ import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,7 +40,6 @@ public class LotWithdrawalInputDtoValidator {
 	public void validate(final LotWithdrawalInputDto lotWithdrawalInputDto) {
 		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
-		//Validate notes length
 		if (lotWithdrawalInputDto == null) {
 			errors.reject("lot.withdrawal.input.null", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());

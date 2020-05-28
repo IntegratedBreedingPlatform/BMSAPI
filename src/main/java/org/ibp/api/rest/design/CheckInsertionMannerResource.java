@@ -3,6 +3,7 @@ package org.ibp.api.rest.design;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import java.util.List;
 
 @Api(value = "Check Insertion Manner Service")
 @Controller
-@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT')")
+@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT')" + PermissionsEnum.HAS_PREPARE_PLANTING)
 @RequestMapping("/crops")
 public class CheckInsertionMannerResource {
 

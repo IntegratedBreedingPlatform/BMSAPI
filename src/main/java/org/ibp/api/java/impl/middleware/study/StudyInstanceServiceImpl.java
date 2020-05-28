@@ -2,8 +2,11 @@ package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.domain.study.StudyInstance;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
@@ -14,9 +17,12 @@ import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +45,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Resource
 	private InstanceValidator instanceValidator;
+
+	@Resource
+	private PlantingServiceImpl plantingService;
 
 	@Override
 	public StudyInstance createStudyInstance(final String cropName, final int studyId) {
@@ -76,6 +85,15 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	public void deleteStudyInstance(final Integer studyId, final Integer instanceId) {
 		this.studyValidator.validate(studyId, true);
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId), true);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final Integer pendingTransactions =
+			this.plantingService.getPlantingTransactionsByInstanceId(instanceId, TransactionStatus.PENDING).size();
+		final Integer confirmedTransactions =
+			this.plantingService.getPlantingTransactionsByInstanceId(instanceId, TransactionStatus.CONFIRMED).size();
+		if (pendingTransactions > 0 || confirmedTransactions > 0) {
+			errors.reject("dataset.instance.has.pending.or.confirmed.transactions");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 		this.studyInstanceMiddlewareService.deleteStudyInstance(studyId, instanceId);
 	}
 

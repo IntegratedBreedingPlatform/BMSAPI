@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.common;
 
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +16,12 @@ public class SearchRequestDtoResolver {
 	private SearchRequestService searchRequestService;
 
 	public LotsSearchDto getLotsSearchDto(
-		final SearchCompositeDto searchCompositeDto) {
+		final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 
 		final LotsSearchDto searchDTO;
-		if (searchCompositeDto.getSearchRequestId() != null) {
+		if (searchCompositeDto.getSearchRequest() != null) {
 			searchDTO =
-				(LotsSearchDto) this.searchRequestService.getSearchRequest(searchCompositeDto.getSearchRequestId(), LotsSearchDto.class);
+				(LotsSearchDto) this.searchRequestService.getSearchRequest(searchCompositeDto.getSearchRequest(), LotsSearchDto.class);
 		} else {
 			searchDTO = new LotsSearchDto();
 			searchDTO.setLotIds(new ArrayList<>(searchCompositeDto.getItemIds()));
@@ -29,12 +29,12 @@ public class SearchRequestDtoResolver {
 		return searchDTO;
 	}
 
-	public TransactionsSearchDto getTransactionsSearchDto(final SearchCompositeDto searchCompositeDto) {
+	public TransactionsSearchDto getTransactionsSearchDto(final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		TransactionsSearchDto transactionsSearchDto;
-		if (searchCompositeDto.getSearchRequestId() != null) {
+		if (searchCompositeDto.getSearchRequest() != null) {
 			transactionsSearchDto =
 				(TransactionsSearchDto) this.searchRequestService
-					.getSearchRequest(searchCompositeDto.getSearchRequestId(), TransactionsSearchDto.class);
+					.getSearchRequest(searchCompositeDto.getSearchRequest(), TransactionsSearchDto.class);
 		} else {
 			transactionsSearchDto = new TransactionsSearchDto();
 			transactionsSearchDto.setTransactionIds(new ArrayList<>(searchCompositeDto.getItemIds()));

@@ -1,14 +1,14 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.inventory.manager.validator.InventoryCommonValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotDepositRequestDtoValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.junit.Before;
@@ -73,8 +73,8 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorLotsAreNotProperlySet() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			searchCompositeDto.setItemIds(new HashSet<>(Collections.singleton(1)));
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
@@ -87,8 +87,8 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorInvalidNotes() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(256));
 			this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
@@ -102,8 +102,8 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorNullWithdrawalInstructions() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
@@ -116,8 +116,8 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorUnsupportedUnitName() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final Map<String, Double> depositsPerUnit = new HashMap<>();
@@ -133,8 +133,8 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorInvalidAmount() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final Map<String, Double> depositsPerUnit = new HashMap<>();
@@ -150,8 +150,8 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateDepositInstructionsUnitsMissingUnits() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final Map<String, Double> depositsPerUnit = new HashMap<>();
@@ -177,8 +177,8 @@ public class LotDepositRequestDtoValidatorTest {
 	public void testValidateLotDepositRequestDtoValidatorExtraUnits() {
 		try {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			lotDepositRequestDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final Map<String, Double> depositsPerUnit = new HashMap<>();
