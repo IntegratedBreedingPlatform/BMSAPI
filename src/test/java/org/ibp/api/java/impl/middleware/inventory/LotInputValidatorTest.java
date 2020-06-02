@@ -17,7 +17,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BindingResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LotInputValidatorTest {
@@ -61,6 +63,7 @@ public class LotInputValidatorTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateDataComments() {
+		Mockito.doCallRealMethod().when(inventoryCommonValidator).validateLotNotes(Mockito.anyString(), Mockito.any(BindingResult.class));
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
