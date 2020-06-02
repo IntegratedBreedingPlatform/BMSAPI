@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -180,7 +181,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final String studyDetailsPropValue = this.getMessage("label.printing.study.details");
 		final String datasetDetailsPropValue = this.getMessage("label.printing.dataset.details");
 
-		final DatasetDTO dataSetDTO = this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
+		final DatasetBasicDTO dataSetDTO = this.middlewareDatasetService.getDatasetBasicDTO(labelsInfoInput.getDatasetId());
 		final int environmentDatasetId =
 			this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
 		final int plotDatasetId = dataSetDTO.getParentDatasetId();

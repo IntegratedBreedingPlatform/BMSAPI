@@ -5,7 +5,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -207,7 +206,7 @@ public class DatasetExcelGeneratorTest {
 	public void testGenerateSingleInstanceFile() throws IOException {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
+		studyInstance.setInstanceId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
@@ -233,14 +232,14 @@ public class DatasetExcelGeneratorTest {
 			.getMeasurementVariables(INSTANCE_DB_ID, Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 		Mockito.verify(this.studyDataManager).getPhenotypeByVariableId(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
-		Mockito.verify(this.studyDataManager).getGeolocationByVariableId(INSTANCE_DB_ID, INSTANCE_DB_ID);
+		Mockito.verify(this.studyDataManager).getEnvironmentVariableIdValuesMap(INSTANCE_DB_ID, INSTANCE_DB_ID);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testGenerateMultiInstanceFile() {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
+		studyInstance.setInstanceId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
@@ -253,7 +252,7 @@ public class DatasetExcelGeneratorTest {
 	public void testDescriptionSheet() throws IOException {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
+		studyInstance.setInstanceId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
@@ -288,7 +287,7 @@ public class DatasetExcelGeneratorTest {
 		final Random random = new Random();
 		final int environmentDatasetId = random.nextInt(10);
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(random.nextInt(10));
+		studyInstance.setInstanceId(random.nextInt(10));
 		final int studyConditionTermid = 100;
 		final String studyConditionValue = "99";
 
@@ -306,7 +305,7 @@ public class DatasetExcelGeneratorTest {
 		final Map<Integer, String> environmentConditionMap = new HashMap<>();
 		environmentConditionMap.put(studyConditionVariable.getTermId(), studyConditionValue);
 
-		when(this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, studyInstance.getInstanceDbId()))
+		when(this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, studyInstance.getInstanceId()))
 			.thenReturn(environmentConditionMap);
 		final List<MeasurementVariable> environmentVariables = Arrays.asList(studyConditionVariable, environmentDetailVariable);
 
@@ -330,7 +329,7 @@ public class DatasetExcelGeneratorTest {
 		studyInstance.setLocationId(locationId);
 		studyInstance.setLocationName(locationName);
 		studyInstance.setInstanceNumber(instanceNumber);
-		studyInstance.setInstanceDbId(instanceDbId);
+		studyInstance.setInstanceId(instanceDbId);
 
 		final MeasurementVariable trialInstanceVariable = new MeasurementVariable();
 		trialInstanceVariable.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
@@ -356,7 +355,7 @@ public class DatasetExcelGeneratorTest {
 			.thenReturn(standardVariable);
 		final Map<Integer, String> geoLocationMap = new HashMap<>();
 		geoLocationMap.put(someVariableTermId, someVariableValue);
-		when(this.studyDataManager.getGeolocationByVariableId(environmentDatasetId, studyInstance.getInstanceDbId()))
+		when(this.studyDataManager.getEnvironmentVariableIdValuesMap(environmentDatasetId, studyInstance.getInstanceId()))
 			.thenReturn(geoLocationMap);
 
 		final List<MeasurementVariable> result =

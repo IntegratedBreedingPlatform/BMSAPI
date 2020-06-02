@@ -412,10 +412,10 @@ public class GermplasmResourceBrapi {
 			}
 		}
 
-		final StudyMetadata studyMetadataForGeolocationId = this.studyDataManager.getStudyMetadataForGeolocationId(studyDbId);
+		final StudyMetadata studyMetadataForEnvironmentId = this.studyDataManager.getStudyMetadataForEnvironmentId(studyDbId);
 		final GermplasmSummaryList germplasmSummaryList = new GermplasmSummaryList();
 		germplasmSummaryList.setData(germplasmList);
-		germplasmSummaryList.setTrialName(studyMetadataForGeolocationId.getTrialName());
+		germplasmSummaryList.setTrialName(studyMetadataForEnvironmentId.getTrialName());
 		germplasmSummaryList.setStudyDbId(String.valueOf(studyDbId));
 
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())

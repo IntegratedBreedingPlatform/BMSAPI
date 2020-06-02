@@ -57,13 +57,12 @@ public class ObservationValidatorTest {
 		final int datasetId = random.nextInt();
 		final int observationUnitId = random.nextInt();
 		final int observationId = random.nextInt();
-		final Integer studyId = random.nextInt();
 
 		when(datasetService.isValidObservationUnit(datasetId, observationUnitId)).thenReturn(true);
 		when(datasetService.getPhenotype(observationUnitId, observationId)).thenReturn(new Phenotype());
 
 
-		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, null);
+		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId, null);
 	}
 
 	@Test (expected = ResourceNotFoundException.class)
@@ -73,11 +72,10 @@ public class ObservationValidatorTest {
 		final int datasetId = random.nextInt();
 		final int observationUnitId = random.nextInt();
 		final int observationId = random.nextInt();
-		final Integer studyId = random.nextInt();
 
 		when(datasetService.isValidObservationUnit(datasetId, observationUnitId)).thenReturn(false);
 
-		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, null);
+		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId, null);
 	}
 	
 	@Test (expected = ResourceNotFoundException.class)
@@ -87,12 +85,11 @@ public class ObservationValidatorTest {
 		final int datasetId = random.nextInt();
 		final int observationUnitId = random.nextInt();
 		final int observationId = random.nextInt();
-		final Integer studyId = random.nextInt();
 
 		when(datasetService.isValidObservationUnit(datasetId, observationUnitId)).thenReturn(true);
 		when(datasetService.getPhenotype(observationUnitId, observationId)).thenReturn(null);
 
-		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, null);
+		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId, null);
 	}
 
 }

@@ -317,7 +317,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
-		return this.middlewareStudyService.getStudyDetailsByGeolocation(geolocationId);
+		return this.middlewareStudyService.getStudyDetailsByEnvironment(geolocationId);
 	}
 
 	@Override
