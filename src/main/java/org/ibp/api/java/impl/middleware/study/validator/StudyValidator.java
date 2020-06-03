@@ -1,4 +1,4 @@
-package org.ibp.api.java.impl.middleware.dataset.validator;
+package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.generationcp.middleware.ContextHolder;
