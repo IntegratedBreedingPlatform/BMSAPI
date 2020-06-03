@@ -9,6 +9,7 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -23,9 +24,10 @@ import java.util.stream.Collectors;
 @Component
 public class TransactionUpdateRequestDtoValidator {
 
-	private static Integer NOTES_MAX_LENGTH = 255;
-
 	private BindingResult errors;
+
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
 
 	@Autowired
 	private TransactionService transactionService;
@@ -136,12 +138,8 @@ public class TransactionUpdateRequestDtoValidator {
 			}
 		}
 
-		final long invalidNotes =
-			transactionUpdateRequestDtos.stream().filter(i -> i.getNotes() != null && i.getNotes().length() > NOTES_MAX_LENGTH).count();
-		if (invalidNotes > 0) {
-			errors.reject("transaction.update.invalid.notes.length", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
+		transactionUpdateRequestDtos.stream().forEach(i -> inventoryCommonValidator.validateTransactionNotes(i.getNotes(), errors));
+
 	}
 
 }

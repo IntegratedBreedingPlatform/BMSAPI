@@ -3,13 +3,9 @@ package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.Util;
-import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
-import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -24,12 +20,7 @@ import java.util.stream.Collectors;
 @Component
 public class LotDepositRequestDtoValidator {
 
-	private static Integer NOTES_MAX_LENGTH = 255;
-
 	private BindingResult errors;
-
-	@Autowired
-	private VariableService variableService;
 
 	@Autowired
 	private InventoryCommonValidator inventoryCommonValidator;
@@ -44,31 +35,14 @@ public class LotDepositRequestDtoValidator {
 
 		inventoryCommonValidator.validateSearchCompositeDto(lotDepositRequestDto.getSelectedLots(), errors);
 
-		//Validate notes length
-		if (lotDepositRequestDto.getNotes() != null && lotDepositRequestDto.getNotes().length() > NOTES_MAX_LENGTH) {
-			errors.reject("transaction.notes.length", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		inventoryCommonValidator.validateTransactionNotes(lotDepositRequestDto.getNotes(), errors);
 
 		if (lotDepositRequestDto.getDepositsPerUnit() == null || lotDepositRequestDto.getDepositsPerUnit().isEmpty()) {
 			errors.reject("lot.deposit.instruction.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		// validate units
-		final Set<String> specifiedUnits = lotDepositRequestDto.getDepositsPerUnit().keySet();
-		final VariableFilter variableFilter = new VariableFilter();
-		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		final List<VariableDetails> existingInventoryUnits = this.variableService.getVariablesByFilter(variableFilter);
-		final List<String> supportedUnitNames = existingInventoryUnits.stream().map(VariableDetails::getName).collect(Collectors.toList());
-
-		if (!supportedUnitNames.containsAll(specifiedUnits)) {
-			final List<String> invalidUnitNames = new ArrayList<>(specifiedUnits);
-			invalidUnitNames.removeAll(supportedUnitNames);
-			errors.reject("lot.input.invalid.units", new String[] {Util.buildErrorMessageFromList(invalidUnitNames, 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-
-		}
+		this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(lotDepositRequestDto.getDepositsPerUnit().keySet()), errors);
 
 		lotDepositRequestDto.getDepositsPerUnit().forEach((k, v) -> {
 			if (v == null || v <= 0) {

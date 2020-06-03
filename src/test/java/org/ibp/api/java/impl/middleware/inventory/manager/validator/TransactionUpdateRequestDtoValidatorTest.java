@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +33,9 @@ public class TransactionUpdateRequestDtoValidatorTest {
 	@Mock
 	private TransactionService transactionService;
 
+	@Mock
+	private InventoryCommonValidator inventoryCommonValidator;
+
 	@InjectMocks
 	private TransactionUpdateRequestDtoValidator transactionUpdateRequestDtoValidator;
 
@@ -41,6 +46,8 @@ public class TransactionUpdateRequestDtoValidatorTest {
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
 		transactionsSearchDto.setTransactionIds(Arrays.asList(1, 2));
 		Mockito.when(transactionService.searchTransactions(transactionsSearchDto, null)).thenReturn(transactionDtos);
+		Mockito.doCallRealMethod().when(inventoryCommonValidator)
+			.validateTransactionNotes(Mockito.anyString(), Mockito.any(BindingResult.class));
 	}
 
 	@Test
@@ -366,7 +373,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 			transactionUpdateRequestDtoList.add(new TransactionUpdateRequestDto(2, null, 2d, ""));
 			this.transactionUpdateRequestDtoValidator.validate(transactionUpdateRequestDtoList);
 		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("transaction.update.invalid.notes.length"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("transaction.notes.length"));
 		}
 	}
 
