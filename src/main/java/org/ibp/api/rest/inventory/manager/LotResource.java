@@ -278,5 +278,29 @@ public class LotResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "It will retrieve a lot", notes = "It will retrieve lot by lotUUID")
+	@RequestMapping(value = "/crops/{cropName}/lots/{lotUUID}", method = RequestMethod.GET)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
+	@ResponseBody
+	@JsonView(InventoryView.LotView.class)
+	public ResponseEntity<ExtendedLotDto> getLot(
+		@PathVariable final String cropName, //
+		@PathVariable final String lotUUID) {
+
+		final LotsSearchDto searchDTO = new LotsSearchDto();
+		searchDTO.setLotUUIds(Arrays.asList(lotUUID));
+
+		try {
+			inventoryLock.lockRead();
+			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
+
+			if (!extendedLotDtos.isEmpty()) {
+				return new ResponseEntity<>(extendedLotDtos.get(0), HttpStatus.OK);
+			}
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+	}
 
 }
