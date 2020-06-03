@@ -3,13 +3,9 @@ package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.Util;
-import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
-import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -27,12 +23,7 @@ import java.util.stream.Collectors;
 @Component
 public class LotWithdrawalInputDtoValidator {
 
-	private static Integer NOTES_MAX_LENGTH = 255;
-
 	private BindingResult errors;
-
-	@Autowired
-	private VariableService variableService;
 
 	@Autowired
 	private InventoryCommonValidator inventoryCommonValidator;
@@ -47,30 +38,14 @@ public class LotWithdrawalInputDtoValidator {
 
 		inventoryCommonValidator.validateSearchCompositeDto(lotWithdrawalInputDto.getSelectedLots(), errors);
 
-		if (lotWithdrawalInputDto.getNotes() != null && lotWithdrawalInputDto.getNotes().length() > NOTES_MAX_LENGTH) {
-			errors.reject("transaction.notes.length", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		inventoryCommonValidator.validateTransactionNotes(lotWithdrawalInputDto.getNotes(), errors);
 
 		if (lotWithdrawalInputDto.getWithdrawalsPerUnit() == null || lotWithdrawalInputDto.getWithdrawalsPerUnit().isEmpty()) {
 			errors.reject("lot.withdrawal.input.null", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		// validate units
-		final Set<String> specifiedUnits = lotWithdrawalInputDto.getWithdrawalsPerUnit().keySet();
-		final VariableFilter variableFilter = new VariableFilter();
-		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		final List<VariableDetails> existingInventoryUnits = this.variableService.getVariablesByFilter(variableFilter);
-		final List<String> supportedUnitNames = existingInventoryUnits.stream().map(VariableDetails::getName).collect(Collectors.toList());
-
-		if (!supportedUnitNames.containsAll(specifiedUnits)) {
-			final List<String> invalidUnitNames = new ArrayList<>(specifiedUnits);
-			invalidUnitNames.removeAll(supportedUnitNames);
-			errors.reject("lot.input.invalid.units", new String[] {Util.buildErrorMessageFromList(invalidUnitNames, 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-
-		}
+		this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(lotWithdrawalInputDto.getWithdrawalsPerUnit().keySet()), errors);
 
 		lotWithdrawalInputDto.getWithdrawalsPerUnit().forEach((k, v) -> {
 			if (v.isReserveAllAvailableBalance() && v.getWithdrawalAmount() != null && !v.getWithdrawalAmount().equals(0D)) {
