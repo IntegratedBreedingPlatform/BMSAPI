@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.design;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
@@ -110,18 +109,10 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 
 	@Override
 	public void deleteDesign(final int studyId) {
+		//FIXME usage of many flags makes the code hard to read
 		this.studyValidator.validate(studyId, true, true);
 		this.experimentalDesignValidator.validateExperimentalDesignExistence(studyId, true);
-		//FIXME This service should be validating at least the NO existence of sub-obs. This validation is delegated to the frontend
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final Integer pendingTransactions =
-			this.plantingService.getPlantingTransactionsByStudyId(studyId, TransactionStatus.PENDING).size();
-		final Integer confirmedTransactions =
-			this.plantingService.getPlantingTransactionsByStudyId(studyId, TransactionStatus.CONFIRMED).size();
-		if (pendingTransactions > 0 || confirmedTransactions > 0) {
-			errors.reject("study.has.pending.or.confirmed.transactions");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
 		try {
 			this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 		} catch (final Exception e) {
