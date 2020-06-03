@@ -6,7 +6,6 @@ import com.google.common.io.Files;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
@@ -150,7 +149,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
-		final DatasetBasicDTO dataSetDTO = this.datasetService.getDatasetBasicDTO(datasetId);
+		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
 		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
 
 		final int plotDatasetId;

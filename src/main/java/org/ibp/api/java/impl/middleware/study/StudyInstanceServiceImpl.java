@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.study;
 
-import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.InstanceData;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -106,9 +106,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(instanceIds), true);
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final Integer pendingTransactions =
-			this.plantingService.getPlantingTransactionsByInstanceId(instanceId, TransactionStatus.PENDING).size();
+			this.plantingService.getPlantingTransactionsByInstanceIds(instanceIds, TransactionStatus.PENDING).size();
 		final Integer confirmedTransactions =
-			this.plantingService.getPlantingTransactionsByInstanceId(instanceId, TransactionStatus.CONFIRMED).size();
+			this.plantingService.getPlantingTransactionsByInstanceIds(instanceIds, TransactionStatus.CONFIRMED).size();
 		if (pendingTransactions > 0 || confirmedTransactions > 0) {
 			errors.reject("dataset.instance.has.pending.or.confirmed.transactions");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -182,8 +182,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	private Integer getEnvironmentDatasetId(final Integer studyId) {
-		final List<DatasetBasicDTO> datasets =
-			this.middlewareDatasetService.getDatasetBasicDTOs(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
+		final List<DatasetDTO> datasets =
+			this.middlewareDatasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
 		if (!CollectionUtils.isEmpty(datasets)) {
 			return datasets.get(0).getDatasetId();
 		} else {

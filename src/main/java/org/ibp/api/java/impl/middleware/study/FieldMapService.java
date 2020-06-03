@@ -158,7 +158,7 @@ public class FieldMapService {
 		fieldPlot.setPlotNumber(fieldMapLabel.getPlotNo());
 		fieldPlot.setRepetitionNumber(fieldMapLabel.getRep());
 		fieldPlot.setDatasetId(rawDataFromMiddleware.getFieldmapDataset().getDatasetId());
-		fieldPlot.setGeolocationId(middlewareFieldMapTrialInstanceInfo.getEnvironmentId());
+		fieldPlot.setGeolocationId(middlewareFieldMapTrialInstanceInfo.getInstanceId());
 		return fieldPlot;
 	}
 

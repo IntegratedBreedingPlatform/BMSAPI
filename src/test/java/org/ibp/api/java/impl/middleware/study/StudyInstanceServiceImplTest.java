@@ -229,16 +229,14 @@ public class StudyInstanceServiceImplTest {
 	public void testDeleteStudyInstance() {
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
-		Mockito.when(plantingService.getPlantingTransactionsByInstanceId(instanceId, TransactionStatus.PENDING))
+		Mockito.when(plantingService.getPlantingTransactionsByInstanceIds(Arrays.asList(instanceId), TransactionStatus.PENDING))
 			.thenReturn(new ArrayList<>());
-		Mockito.when(plantingService.getPlantingTransactionsByInstanceId(instanceId, TransactionStatus.CONFIRMED))
+		Mockito.when(plantingService.getPlantingTransactionsByInstanceIds(Arrays.asList(instanceId), TransactionStatus.CONFIRMED))
 			.thenReturn(new ArrayList<>());
 		this.middlewareStudyInstanceService.deleteStudyInstances(studyId, Collections.singletonList(instanceId));
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId), true);
 		Mockito.verify(this.middlewareStudyInstanceService).deleteStudyInstances(studyId, Collections.singletonList(instanceId));
 	}
-
-
 
 }

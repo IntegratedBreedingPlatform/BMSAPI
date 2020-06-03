@@ -2,7 +2,6 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.domain.dms.DatasetBasicDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -67,7 +66,7 @@ public class DatasetValidator {
 	}
 
 	public void validateObservationDatasetType(final Integer datasetId) {
-		final DatasetBasicDTO datasetBasicDTO = this.middlewareDatasetService.getDatasetBasicDTO(datasetId);
+		final DatasetDTO datasetBasicDTO = this.middlewareDatasetService.getDataset(datasetId);
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(datasetBasicDTO.getDatasetTypeId());
 		if (!datasetType.isObservationType() && !datasetType.isSubObservationType()) {
 			this.errors.reject("dataset.type.not.observation", "");

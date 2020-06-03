@@ -232,7 +232,7 @@ public class DatasetExcelGeneratorTest {
 			.getMeasurementVariables(INSTANCE_DB_ID, Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 		Mockito.verify(this.studyDataManager).getPhenotypeByVariableId(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
-		Mockito.verify(this.studyDataManager).getEnvironmentVariableIdValuesMap(INSTANCE_DB_ID, INSTANCE_DB_ID);
+		Mockito.verify(this.studyDataManager).getInstanceGeolocationIdsMap(INSTANCE_DB_ID);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
@@ -355,7 +355,7 @@ public class DatasetExcelGeneratorTest {
 			.thenReturn(standardVariable);
 		final Map<Integer, String> geoLocationMap = new HashMap<>();
 		geoLocationMap.put(someVariableTermId, someVariableValue);
-		when(this.studyDataManager.getEnvironmentVariableIdValuesMap(environmentDatasetId, studyInstance.getInstanceId()))
+		when(this.studyDataManager.getGeolocationByInstanceId(environmentDatasetId, studyInstance.getInstanceId()))
 			.thenReturn(geoLocationMap);
 
 		final List<MeasurementVariable> result =
