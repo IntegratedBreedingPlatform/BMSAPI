@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.study;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
@@ -40,9 +39,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Resource
 	private InstanceValidator instanceValidator;
-
-	@Resource
-	private PlantingServiceImpl plantingService;
 
 	@Override
 	public StudyInstance createStudyInstance(final String cropName, final int studyId) {
