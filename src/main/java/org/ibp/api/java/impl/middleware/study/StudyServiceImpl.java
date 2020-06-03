@@ -393,4 +393,14 @@ public class StudyServiceImpl implements StudyService {
 	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
 		return this.middlewareStudyService.getStudies(studySearchFilter);
 	}
+
+	@Override
+	public boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId) {
+		return this.middlewareStudyService.studyHasGivenDatasetType(studyId, datasetTypeId);
+	}
+
+	@Override
+	public boolean hasAdvancedOrCrossesList(int studyId) {
+		return this.middlewareStudyService.hasAdvancedOrCrossesList(studyId);
+	}
 }
