@@ -73,7 +73,7 @@ public class InstanceValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.validateInstancesDeletability(studyId, selectedInstanceIds, false);
+		this.validateInstancesCanBeDeleted(studyId, selectedInstanceIds, false);
 	}
 
 	public void validateStudyInstance(final Integer studyId, final Set<Integer> instanceIds) {
@@ -81,17 +81,18 @@ public class InstanceValidator {
 		this.validate(environmentDatasetId, instanceIds);
 	}
 
-	public void validateStudyInstance(final Integer studyId, final Set<Integer> instanceIds, final Boolean enforceAllInstancesDeletable) {
+	public void validateStudyInstance(final Integer studyId, final Set<Integer> instanceIds, final Boolean studyMustHaveSomeInstances) {
 		this.validateStudyInstance(studyId, instanceIds);
-		this.validateInstancesDeletability(studyId, instanceIds, enforceAllInstancesDeletable);
+		this.validateInstancesCanBeDeleted(studyId, instanceIds, studyMustHaveSomeInstances);
 	}
 
-	private void validateInstancesDeletability(final Integer studyId, final Set<Integer> instanceIds,
-		final Boolean enforceAllInstancesDeletable) {
+	//FIXME Try to avoid usage of studyMustHaveSomeInstances flag
+	private void validateInstancesCanBeDeleted(final Integer studyId, final Set<Integer> instanceIds,
+		final Boolean studyMustHaveSomeInstances) {
 		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 
 		// Raise error if the environment to be deleted is the only remaining environment for study
-		if (enforceAllInstancesDeletable && studyInstances.size() < 2) {
+		if (studyMustHaveSomeInstances && studyInstances.size() < 2) {
 			this.errors.reject("cannot.delete.last.instance");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -101,7 +102,7 @@ public class InstanceValidator {
 				.map(instance -> instance.getInstanceDbId()).collect(Collectors.toList());
 
 		// Raise error if any of the instances are not deletable when enforceAllInstancesDeletable = true
-		if (enforceAllInstancesDeletable && !instanceIds.stream()
+		if (studyMustHaveSomeInstances && !instanceIds.stream()
 			.distinct()
 			.filter(restrictedInstances::contains)
 			.collect(Collectors.toSet()).isEmpty()) {
