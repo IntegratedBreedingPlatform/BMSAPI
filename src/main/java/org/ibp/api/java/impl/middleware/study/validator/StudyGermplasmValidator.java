@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -12,6 +13,7 @@ import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Component
 public class StudyGermplasmValidator {
@@ -34,9 +36,9 @@ public class StudyGermplasmValidator {
     public void validate(final Integer studyId, final Integer entryId, final Integer newGid) {
 
         this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-        boolean isValidStudyGermplasm = this.middlewareStudyGermplasmService.isValidStudyGermplasm(studyId, entryId);
-        if (!isValidStudyGermplasm){
-            errors.reject("invalid.entryid.for.study");
+        final Optional<StudyGermplasmDto> entry = this.middlewareStudyGermplasmService.getStudyGermplasm(studyId, entryId);
+        if (!entry.isPresent()){
+            errors.reject("invalid.entryid");
         }
 
         this.germplasmValidator.validateGermplasmId(this.errors, newGid);
