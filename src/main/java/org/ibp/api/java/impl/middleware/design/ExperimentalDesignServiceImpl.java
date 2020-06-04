@@ -5,7 +5,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
@@ -69,9 +68,6 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 
 	@Resource
 	private DesignLicenseService designLicenseService;
-
-	@Resource
-	private PlantingServiceImpl plantingService;
 
 	@Override
 	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentalDesignInput experimentalDesignInput) {
