@@ -23,7 +23,9 @@ public class InventoryCommonValidator {
 
 	private static final String STOCK_ID_PREFIX_REGEXP = "[a-zA-Z0-9]{1,14}[a-zA-Z]";
 
-	private static Integer NOTES_MAX_LENGTH = 255;
+	private static Integer TRANSACTION_NOTES_MAX_LENGTH = 255;
+
+	private static Integer LOT_NOTES_MAX_LENGTH = 255;
 
 	@Autowired
 	private VariableService variableService;
@@ -66,9 +68,17 @@ public class InventoryCommonValidator {
 	}
 
 	public void validateTransactionNotes(final String notes, final BindingResult errors) {
-		if (notes != null && notes.length() > NOTES_MAX_LENGTH) {
+		if (notes != null && notes.length() > TRANSACTION_NOTES_MAX_LENGTH) {
 			errors.reject("transaction.notes.length", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
+
+	public void validateLotNotes(final String notes, final BindingResult errors) {
+		if (notes != null && notes.length() > LOT_NOTES_MAX_LENGTH) {
+			errors.reject("lot.notes.length", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
 }
