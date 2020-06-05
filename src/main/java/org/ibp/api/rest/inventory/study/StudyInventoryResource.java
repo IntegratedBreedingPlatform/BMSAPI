@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -24,6 +25,9 @@ import java.util.List;
 @Api(value = "Study Inventory Services")
 @RestController
 public class StudyInventoryResource {
+
+	@Autowired
+	private InventoryLock inventoryLock;
 
 	@Autowired
 	private StudyTransactionsService studyTransactionsService;
@@ -44,9 +48,11 @@ public class StudyInventoryResource {
 		final Integer pageNumber = sortedRequest.getPageNumber();
 		final Integer pageSize = sortedRequest.getPageSize();
 
-		final PagedResult<StudyTransactionsDto> pagedResult =
-			new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<StudyTransactionsDto>() {
+		PagedResult<StudyTransactionsDto> pagedResult;
 
+		try {
+			inventoryLock.lockRead();
+			pagedResult = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<StudyTransactionsDto>() {
 				@Override
 				public long getCount() {
 					return studyTransactionsService.countAllStudyTransactions(studyId, studyTransactionsRequest);
@@ -57,12 +63,14 @@ public class StudyInventoryResource {
 					return studyTransactionsService.countFilteredStudyTransactions(studyId, studyTransactionsRequest);
 				}
 
-
 				@Override
 				public List<StudyTransactionsDto> getResults(final PagedResult<StudyTransactionsDto> pagedResult) {
 					return studyTransactionsService.searchStudyTransactions(studyId, studyTransactionsRequest);
 				}
 			});
+		} finally {
+			inventoryLock.unlockRead();
+		}
 
 		final StudyInventoryTable studyInventoryTable = new StudyInventoryTable();
 		studyInventoryTable.setData(pagedResult.getPageResults());
