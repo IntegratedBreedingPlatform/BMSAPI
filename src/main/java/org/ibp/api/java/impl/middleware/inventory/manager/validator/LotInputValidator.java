@@ -64,7 +64,7 @@ public class LotInputValidator {
 		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
-		this.validateNotes(lotGeneratorInputDto.getNotes());
+		this.inventoryCommonValidator.validateLotNotes(lotGeneratorInputDto.getNotes(), errors);
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -90,7 +90,7 @@ public class LotInputValidator {
 			this.germplasmValidator.validateGermplasmId(this.errors, gid);
 		}
 
-		this.validateNotes(updateRequestDto.getNotes());
+		this.inventoryCommonValidator.validateLotNotes(updateRequestDto.getNotes(), errors);
 		this.validateTransactionStatus(lotDtos, updateRequestDto);
 
 		if (this.errors.hasErrors()) {
@@ -112,14 +112,6 @@ public class LotInputValidator {
 			&& (updateRequestDto.getUnitId() != null)) {
 
 			this.errors.reject("lots.transactions.status.confirmed.cannot.change.unit");
-		}
-	}
-
-	public void validateNotes(final String notes) {
-		if (notes != null) {
-			if (notes.length() > 255) {
-				this.errors.reject("lot.notes.length");
-			}
 		}
 	}
 

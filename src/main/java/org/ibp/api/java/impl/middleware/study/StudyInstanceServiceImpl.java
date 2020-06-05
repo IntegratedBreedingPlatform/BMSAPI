@@ -5,9 +5,7 @@ import org.generationcp.middleware.domain.dms.InstanceData;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -63,9 +61,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	@Autowired
 	private ObservationValidator observationValidator;
 
-	@Resource
-	private PlantingServiceImpl plantingService;
-
 	@Override
 	public List<StudyInstance> createStudyInstances(final String cropName, final int studyId, final Integer numberOfInstancesToGenerate) {
 		if (numberOfInstancesToGenerate < 1 || numberOfInstancesToGenerate > 999) {
@@ -104,15 +99,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	public void deleteStudyInstances(final Integer studyId, final List<Integer> instanceIds) {
 		this.studyValidator.validate(studyId, true);
 		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(instanceIds), true);
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final Integer pendingTransactions =
-			this.plantingService.getPlantingTransactionsByInstanceIds(instanceIds, TransactionStatus.PENDING).size();
-		final Integer confirmedTransactions =
-			this.plantingService.getPlantingTransactionsByInstanceIds(instanceIds, TransactionStatus.CONFIRMED).size();
-		if (pendingTransactions > 0 || confirmedTransactions > 0) {
-			errors.reject("dataset.instance.has.pending.or.confirmed.transactions");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
 		this.middlewareStudyInstanceService.deleteStudyInstances(studyId, instanceIds);
 	}
 
