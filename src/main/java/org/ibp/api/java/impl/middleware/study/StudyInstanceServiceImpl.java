@@ -150,7 +150,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 				.anyMatch(v -> v.getId().equals(variableId));
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final Optional<InstanceData> existingEnvironmentData =
-			this.middlewareStudyInstanceService.getInstanceData(instanceId, instanceDataId, isEnvironmentCondition);
+			this.middlewareStudyInstanceService.getInstanceData(instanceId, instanceDataId, variableId, isEnvironmentCondition);
 		if (!existingEnvironmentData.isPresent()) {
 			errors.reject("invalid.environment.data.id");
 		} else if (!existingEnvironmentData.get().getVariableId().equals(variableId)) {
