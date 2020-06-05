@@ -26,7 +26,7 @@ public interface TransactionService {
 
 	void confirmPendingTransactions(SearchCompositeDto<Integer, Integer> searchCompositeDto);
 
-	List<TransactionDto> getAvailableBalanceTransactions(Integer lotId);
+	List<TransactionDto> getAvailableBalanceTransactions(String lotUUID);
 
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
 

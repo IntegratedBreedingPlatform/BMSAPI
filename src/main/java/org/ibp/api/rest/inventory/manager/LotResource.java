@@ -185,7 +185,7 @@ public class LotResource {
 
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 		if (lotRequest.getSearchComposite().getSearchRequest() == null) {
-			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, lotRequest.getSearchComposite().getItemIds());
+			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, lotRequest.getSearchComposite().getItemIds());
 		}
 
 		try {
@@ -234,9 +234,10 @@ public class LotResource {
 	@RequestMapping(value = "/crops/{cropName}/lots/metadata", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
-	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(@PathVariable final String cropName, //
+	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(
+		@PathVariable final String cropName, //
 		@ApiParam("List of lots to get metadata, use a searchId or a list of lot ids")
-		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer, String> searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
@@ -244,7 +245,7 @@ public class LotResource {
 
 		if (searchCompositeDto.getSearchRequest() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
+			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
 		try {
 			inventoryLock.lockRead();
@@ -261,7 +262,7 @@ public class LotResource {
 	public ResponseEntity<Void> closeLots(
 		@PathVariable final String cropName, //
 		@ApiParam("List of lots to be closed, use a searchId or a list of lot ids")
-		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer, String> searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
@@ -269,7 +270,7 @@ public class LotResource {
 
 		if (searchCompositeDto.getSearchRequest() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
+			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
 		try {
 			inventoryLock.lockWrite();
@@ -285,12 +286,10 @@ public class LotResource {
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	@ResponseBody
 	@JsonView(InventoryView.LotView.class)
-	public ResponseEntity<ExtendedLotDto> getLot(
-		@PathVariable final String cropName, //
-		@PathVariable final String lotUUID) {
+	public ResponseEntity<ExtendedLotDto> getLot(@PathVariable final String cropName, @PathVariable final String lotUUID) {
 
 		final LotsSearchDto searchDTO = new LotsSearchDto();
-		searchDTO.setLotUUIds(Arrays.asList(lotUUID));
+		searchDTO.setLotUUIDs(Arrays.asList(lotUUID));
 
 		try {
 			inventoryLock.lockRead();

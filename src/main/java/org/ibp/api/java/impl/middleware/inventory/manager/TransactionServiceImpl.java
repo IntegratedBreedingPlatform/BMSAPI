@@ -100,7 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(lotWithdrawalInputDto.getSelectedLots());
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-		extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotWithdrawalInputDto.getSelectedLots().getItemIds());
+		extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotWithdrawalInputDto.getSelectedLots().getItemIds());
 		extendedLotListValidator.validateEmptyList(lotDtos);
 		extendedLotListValidator.validateEmptyUnits(lotDtos);
 		extendedLotListValidator.validateClosedLots(lotDtos);
@@ -133,14 +133,14 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public List<TransactionDto> getAvailableBalanceTransactions(final Integer lotId) {
+	public List<TransactionDto> getAvailableBalanceTransactions(final String lotUUID) {
 		final LotsSearchDto searchDTO = new LotsSearchDto();
-		final Set<Integer> lotIds = new HashSet<>(Arrays.asList(lotId));
-		searchDTO.setLotIds(Arrays.asList(lotId));
+		final Set<String> lotUUIDs = new HashSet<>(Arrays.asList(lotUUID));
+		searchDTO.setLotUUIDs(Arrays.asList(lotUUID));
 
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
-		extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotIds);
-		return this.transactionService.getAvailableBalanceTransactions(lotId);
+		extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotUUIDs);
+		return this.transactionService.getAvailableBalanceTransactions(lotDtos.get(0).getLotId());
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(lotDepositRequestDto.getSelectedLots());
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-		extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
+		extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
 		extendedLotListValidator.validateEmptyList(lotDtos);
 		extendedLotListValidator.validateEmptyUnits(lotDtos);
 		extendedLotListValidator.validateClosedLots(lotDtos);
