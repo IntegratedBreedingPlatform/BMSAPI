@@ -16,7 +16,7 @@ public interface TransactionService {
 
 	List<TransactionDto> searchTransactions(TransactionsSearchDto lotsSearchDto, Pageable pageable);
 
-	long countSearchTransactions(TransactionsSearchDto lotsSearchDto);
+	long countSearchTransactions(TransactionsSearchDto transactionsSearchDto);
 
 	List<TransactionStatus> getAllTransactionStatus();
 
