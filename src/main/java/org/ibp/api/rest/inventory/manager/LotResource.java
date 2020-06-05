@@ -162,11 +162,13 @@ public class LotResource {
 	@RequestMapping(value = "/crops/{cropName}/lots", method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('CREATE_LOTS')")
 	@ResponseBody
-	public ResponseEntity<Integer> createLot(
+	public ResponseEntity<SingleEntityResponse<String>> createLot(
 		@PathVariable final String cropName,
 		@ApiParam("Lot to be created")
 		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
-		return new ResponseEntity<>(this.lotService.saveLot(lotGeneratorInputDto), HttpStatus.CREATED);
+		final SingleEntityResponse<String> singleEntityResponse =
+			new SingleEntityResponse<String>(this.lotService.saveLot(lotGeneratorInputDto));
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Lots", notes = "Update one or more Lots")
