@@ -300,7 +300,7 @@ public class LotResource {
 			}
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} finally {
-			inventoryLock.unlockWrite();
+			inventoryLock.unlockRead();
 		}
 	}
 
