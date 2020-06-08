@@ -194,7 +194,6 @@ public class LotResource {
 		} finally {
 			inventoryLock.unlockWrite();
 		}
-		this.lotService.updateLots(extendedLotDtos, lotRequest);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
 	}
