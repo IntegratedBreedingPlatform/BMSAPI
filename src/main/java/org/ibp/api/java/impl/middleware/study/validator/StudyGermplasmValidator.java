@@ -2,11 +2,13 @@ package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.study.StudyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -26,6 +28,9 @@ public class StudyGermplasmValidator {
 
     @Resource
     private StudyService studyService;
+
+    @Autowired
+    private SampleService sampleService;
 
     @Resource
     private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
@@ -53,7 +58,10 @@ public class StudyGermplasmValidator {
             errors.reject("study.has.advance.or.cross.list");
         }
 
-        // TODO check that no samples for given entry
+        Boolean entryHasSamples = this.sampleService.studyEntryHasSamples(studyId, entryId);
+        if (entryHasSamples) {
+            errors.reject("study.entry.has.samples");
+        }
 
         // Check that study has no confirmed or pending transactions for given entry
         final Integer pendingTransactions =
