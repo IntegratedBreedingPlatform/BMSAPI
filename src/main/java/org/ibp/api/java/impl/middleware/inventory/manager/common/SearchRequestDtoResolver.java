@@ -16,7 +16,7 @@ public class SearchRequestDtoResolver {
 	private SearchRequestService searchRequestService;
 
 	public LotsSearchDto getLotsSearchDto(
-		final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
+		final SearchCompositeDto<Integer, String> searchCompositeDto) {
 
 		final LotsSearchDto searchDTO;
 		if (searchCompositeDto.getSearchRequest() != null) {
@@ -24,7 +24,7 @@ public class SearchRequestDtoResolver {
 				(LotsSearchDto) this.searchRequestService.getSearchRequest(searchCompositeDto.getSearchRequest(), LotsSearchDto.class);
 		} else {
 			searchDTO = new LotsSearchDto();
-			searchDTO.setLotIds(new ArrayList<>(searchCompositeDto.getItemIds()));
+			searchDTO.setLotUUIDs(new ArrayList<>(searchCompositeDto.getItemIds()));
 		}
 		return searchDTO;
 	}

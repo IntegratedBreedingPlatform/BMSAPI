@@ -16,7 +16,7 @@ public interface TransactionService {
 
 	List<TransactionDto> searchTransactions(TransactionsSearchDto lotsSearchDto, Pageable pageable);
 
-	long countSearchTransactions(TransactionsSearchDto lotsSearchDto);
+	long countSearchTransactions(TransactionsSearchDto transactionsSearchDto);
 
 	List<TransactionStatus> getAllTransactionStatus();
 
@@ -26,7 +26,7 @@ public interface TransactionService {
 
 	void confirmPendingTransactions(SearchCompositeDto<Integer, Integer> searchCompositeDto);
 
-	List<TransactionDto> getAvailableBalanceTransactions(Integer lotId);
+	List<TransactionDto> getAvailableBalanceTransactions(String lotUUID);
 
 	void updatePendingTransactions(List<TransactionUpdateRequestDto> transactionUpdateInputDtos);
 
