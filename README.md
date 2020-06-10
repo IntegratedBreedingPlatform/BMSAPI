@@ -17,10 +17,9 @@ POST /bmsapi/brapi/v1/token/
 Request 
 POST /bmsapi/brapi/v1/token/ HTTP/1.1 Host: 34.231.120.172:48080 
 Content-Type: application/json Cache-Control: no-cache 
-{ "username": username", 
+{ "username": "username", 
   "password": "user_password", 
-  "grant_type": 
-  "password", 
+  "grant_type": "password", 
   "client_id": "" 
 } 
 Response
@@ -56,6 +55,8 @@ Host: xx.xx.xx.xx:48080
 X-Auth-Token: username:1522184720103:1c9293bcf819a05309c82d769d51b59f 
 Cache-Control: no-cache
 ```
+
+**Note that these headers are discrepant in both the name and value of the authentication header.**
 
 Additionaly there are some nomenclature differences in BrAPI that must be noted when refering to studies entities. The mapping between the BrAPI entity names and the BMS equivalent is offered below:
 
