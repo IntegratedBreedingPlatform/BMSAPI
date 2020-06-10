@@ -1,20 +1,19 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.ibp.api.java.impl.middleware.inventory.manager.common.InventoryLock;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
-import org.ibp.api.java.impl.middleware.inventory.manager.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotDepositRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawalInputDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
@@ -38,9 +37,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class TransactionServiceImpl implements TransactionService {
-
-	@Autowired
-	private InventoryLock inventoryLock;
 
 	@Autowired
 	private TransactionInputValidator transactionInputValidator;
@@ -75,12 +71,7 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public List<TransactionDto> searchTransactions(
 		final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
-		try {
-			inventoryLock.lockRead();
-			return this.transactionService.searchTransactions(transactionsSearchDto, pageable);
-		} finally {
-			inventoryLock.unlockRead();
-		}
+		return this.transactionService.searchTransactions(transactionsSearchDto, pageable);
 	}
 
 	@Override
@@ -101,133 +92,103 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public void saveWithdrawals(final LotWithdrawalInputDto lotWithdrawalInputDto,
 		final TransactionStatus transactionStatus) {
-		try {
 
-			inventoryLock.lockWrite();
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
-			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 
-			lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
+		final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(lotWithdrawalInputDto.getSelectedLots());
+		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-			final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(lotWithdrawalInputDto.getSelectedLots());
-			final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
+		extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotWithdrawalInputDto.getSelectedLots().getItemIds());
+		extendedLotListValidator.validateEmptyList(lotDtos);
+		extendedLotListValidator.validateEmptyUnits(lotDtos);
+		extendedLotListValidator.validateClosedLots(lotDtos);
+		lotWithdrawalInputDtoValidator.validateWithdrawalInstructionsUnits(lotWithdrawalInputDto, lotDtos);
 
-			extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotWithdrawalInputDto.getSelectedLots().getItemIds());
-			extendedLotListValidator.validateEmptyList(lotDtos);
-			extendedLotListValidator.validateEmptyUnits(lotDtos);
-			extendedLotListValidator.validateClosedLots(lotDtos);
-			lotWithdrawalInputDtoValidator.validateWithdrawalInstructionsUnits(lotWithdrawalInputDto, lotDtos);
-
-			this.transactionService
-				.withdrawLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()), lotWithdrawalInputDto,
-					transactionStatus);
-
-		} finally {
-			inventoryLock.unlockWrite();
-		}
+		this.transactionService
+			.withdrawLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
+				lotWithdrawalInputDto,
+				transactionStatus);
 	}
 
 	@Override
-	public void confirmPendingTransactions(final SearchCompositeDto searchCompositeDto) {
+	public void confirmPendingTransactions(final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
-		try{
-			inventoryLock.lockWrite();
+		inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 
-			inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
+		final TransactionsSearchDto transactionsSearchDto = searchRequestDtoResolver.getTransactionsSearchDto(searchCompositeDto);
 
-			final TransactionsSearchDto transactionsSearchDto = searchRequestDtoResolver.getTransactionsSearchDto(searchCompositeDto);
+		final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
+		final Set<ExtendedLotDto> lotDtos = transactionDtos.stream().map(TransactionDto::getLot).collect(
+			Collectors.toSet());
 
-			final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
-			final Set<ExtendedLotDto> lotDtos = transactionDtos.stream().map(TransactionDto::getLot).collect(
-				Collectors.toSet());
+		transactionInputValidator.validateEmptyList(transactionDtos);
+		transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, searchCompositeDto.getItemIds());
+		transactionInputValidator.validatePendingStatus(transactionDtos);
+		extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
 
-			transactionInputValidator.validateEmptyList(transactionDtos);
-			transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, searchCompositeDto.getItemIds());
-			transactionInputValidator.validatePendingStatus(transactionDtos);
-			extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
-
-			this.transactionService.confirmPendingTransactions(transactionDtos);
-		} finally {
-			inventoryLock.unlockWrite();
-		}
+		this.transactionService.confirmPendingTransactions(transactionDtos);
 	}
 
 	@Override
-	public List<TransactionDto> getAvailableBalanceTransactions(final Integer lotId) {
+	public List<TransactionDto> getAvailableBalanceTransactions(final String lotUUID) {
 		final LotsSearchDto searchDTO = new LotsSearchDto();
-		final Set<Integer> lotIds = new HashSet<>(Arrays.asList(lotId));
-		searchDTO.setLotIds(Arrays.asList(lotId));
+		final Set<String> lotUUIDs = new HashSet<>(Arrays.asList(lotUUID));
+		searchDTO.setLotUUIDs(Arrays.asList(lotUUID));
 
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
-		extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotIds);
-		return this.transactionService.getAvailableBalanceTransactions(lotId);
+		extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotUUIDs);
+		return this.transactionService.getAvailableBalanceTransactions(lotDtos.get(0).getLotId());
 	}
 
 	@Override
 	public void updatePendingTransactions(final List<TransactionUpdateRequestDto> transactionUpdateInputDtos) {
-		try {
-			inventoryLock.lockWrite();
-			transactionUpdateRequestDtoValidator.validate(transactionUpdateInputDtos);
-			this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
-		} finally {
-			inventoryLock.unlockWrite();
-		}
+		transactionUpdateRequestDtoValidator.validate(transactionUpdateInputDtos);
+		this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
 	}
 
 	@Override
 	public void saveDeposits(final LotDepositRequestDto lotDepositRequestDto, final TransactionStatus transactionStatus) {
-		try {
-			inventoryLock.lockWrite();
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
-			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
 
-			lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
+		final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(lotDepositRequestDto.getSelectedLots());
+		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-			final LotsSearchDto searchDTO = searchRequestDtoResolver.getLotsSearchDto(lotDepositRequestDto.getSelectedLots());
-			final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
+		extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
+		extendedLotListValidator.validateEmptyList(lotDtos);
+		extendedLotListValidator.validateEmptyUnits(lotDtos);
+		extendedLotListValidator.validateClosedLots(lotDtos);
+		lotDepositRequestDtoValidator.validateDepositInstructionsUnits(lotDepositRequestDto, lotDtos);
 
-			extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
-			extendedLotListValidator.validateEmptyList(lotDtos);
-			extendedLotListValidator.validateEmptyUnits(lotDtos);
-			extendedLotListValidator.validateClosedLots(lotDtos);
-			lotDepositRequestDtoValidator.validateDepositInstructionsUnits(lotDepositRequestDto, lotDtos);
-
-			this.transactionService
-				.depositLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
-					lotDepositRequestDto,
-					transactionStatus);
-
-		} finally {
-			inventoryLock.unlockWrite();
-		}
+		this.transactionService
+			.depositLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
+				lotDepositRequestDto,
+				transactionStatus);
 	}
 
 	@Override
-	public void cancelPendingTransactions(final SearchCompositeDto searchCompositeDto) {
+	public void cancelPendingTransactions(final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
-		try {
-			inventoryLock.lockWrite();
+		inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 
-			inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
+		final TransactionsSearchDto transactionsSearchDto = searchRequestDtoResolver.getTransactionsSearchDto(searchCompositeDto);
 
-			final TransactionsSearchDto transactionsSearchDto = searchRequestDtoResolver.getTransactionsSearchDto(searchCompositeDto);
+		final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
+		final Set<ExtendedLotDto> lotDtos = transactionDtos.stream().map(TransactionDto::getLot).collect(
+			Collectors.toSet());
 
+		transactionInputValidator.validateEmptyList(transactionDtos);
+		transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, searchCompositeDto.getItemIds());
+		transactionInputValidator.validatePendingStatus(transactionDtos);
+		extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
 
-			final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
-			final Set<ExtendedLotDto> lotDtos = transactionDtos.stream().map(TransactionDto::getLot).collect(
-				Collectors.toSet());
+		this.transactionService.cancelPendingTransactions(transactionDtos);
 
-			transactionInputValidator.validateEmptyList(transactionDtos);
-			transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, searchCompositeDto.getItemIds());
-			transactionInputValidator.validatePendingStatus(transactionDtos);
-			extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
-
-			this.transactionService.cancelPendingTransactions(transactionDtos);
-		} finally {
-			inventoryLock.unlockWrite();
-		}
 	}
 
 }

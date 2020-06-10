@@ -4,17 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.Util;
-import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.ontology.VariableService;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -31,8 +28,6 @@ import java.util.stream.Collectors;
 @Component
 public class LotImportRequestDtoValidator {
 
-	private static Integer NOTES_MAX_LENGTH = 255;
-
 	private static Integer STOCK_ID_MAX_LENGTH = 35;
 
 	private BindingResult errors;
@@ -42,9 +37,6 @@ public class LotImportRequestDtoValidator {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
-
-	@Autowired
-	private VariableService variableService;
 
 	@Autowired
 	private LotService lotService;
@@ -134,17 +126,7 @@ public class LotImportRequestDtoValidator {
 			errors.reject("lot.input.list.units.null.or.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		final VariableFilter variableFilter = new VariableFilter();
-		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		final List<VariableDetails> existingInventoryScales = this.variableService.getVariablesByFilter(variableFilter);
-		final List<String> existingScaleNames = existingInventoryScales.stream().map(VariableDetails::getName).collect(Collectors.toList());
-
-		if (!existingScaleNames.containsAll(scaleNames)) {
-			final List<String> invalidScaleNames = new ArrayList<>(scaleNames);
-			invalidScaleNames.removeAll(existingScaleNames);
-			errors.reject("lot.input.invalid.units", new String[] {Util.buildErrorMessageFromList(invalidScaleNames, 3)}, "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
+		this.inventoryCommonValidator.validateUnitNames(scaleNames, errors);
 	}
 
 	private void validateStockIds(final List<LotItemDto> lotList) {
@@ -184,18 +166,7 @@ public class LotImportRequestDtoValidator {
 
 	private void validateNotes(final List<LotItemDto> lotList) {
 		final List<String> notes = lotList.stream().map(LotItemDto::getNotes).distinct().collect(Collectors.toList());
-		if (notes.stream().filter(c -> c != null && c.length() > NOTES_MAX_LENGTH).count() > 0) {
-			errors.reject("lot.input.list.notes.length", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
+		notes.stream().forEach(n -> inventoryCommonValidator.validateLotNotes(n, errors));
 	}
 
-	public InventoryCommonValidator getInventoryCommonValidator() {
-		return inventoryCommonValidator;
-	}
-
-	public void setInventoryCommonValidator(
-		InventoryCommonValidator inventoryCommonValidator) {
-		this.inventoryCommonValidator = inventoryCommonValidator;
-	}
 }

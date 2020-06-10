@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.ExperimentalDesignService;
@@ -22,7 +23,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -102,9 +105,16 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 
 	@Override
 	public void deleteDesign(final int studyId) {
+		//FIXME usage of many flags makes the code hard to read
 		this.studyValidator.validate(studyId, true, true);
 		this.experimentalDesignValidator.validateExperimentalDesignExistence(studyId, true);
-		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		try {
+			this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
+		} catch (final Exception e) {
+			errors.reject("experimental.design.general.error");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 	}
 
 	@Override

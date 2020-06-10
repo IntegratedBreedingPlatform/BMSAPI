@@ -13,7 +13,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.ibp.api.java.impl.middleware.inventory.manager.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotImportRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
@@ -54,19 +53,11 @@ public class LotServiceImpl implements LotService {
 	@Autowired
 	private ExtendedLotListValidator extendedLotListValidator;
 
-	@Autowired
-	private InventoryLock inventoryLock;
-
 	private static final String DEFAULT_STOCKID_PREFIX = "SID";
 
 	@Override
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
-		try {
-			inventoryLock.lockRead();
-			return lotService.searchLots(lotsSearchDto, pageable);
-		} finally {
-			inventoryLock.unlockRead();
-		}
+		return lotService.searchLots(lotsSearchDto, pageable);
 	}
 
 	@Override
@@ -85,7 +76,7 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public Integer saveLot(
+	public String saveLot(
 		final LotGeneratorInputDto lotGeneratorInputDto) {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		lotInputValidator.validate(lotGeneratorInputDto);
@@ -105,13 +96,8 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
-		try {
-			inventoryLock.lockWrite();
-			this.lotInputValidator.validate(lotDtos, lotRequest);
-			this.lotService.updateLots(lotDtos, lotRequest);
-		} finally {
-			inventoryLock.unlockWrite();
-		}
+		this.lotInputValidator.validate(lotDtos, lotRequest);
+		this.lotService.updateLots(lotDtos, lotRequest);
 	}
 
 	@Override
@@ -136,25 +122,15 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public LotSearchMetadata getLotsSearchMetadata(final LotsSearchDto lotsSearchDto) {
-		try {
-			inventoryLock.lockRead();
-			return lotService.getLotSearchMetadata(lotsSearchDto);
-		} finally {
-			inventoryLock.unlockRead();
-		}
+		return lotService.getLotSearchMetadata(lotsSearchDto);
 	}
 
 	@Override
 	public void closeLots(final LotsSearchDto searchDTO) {
-		try {
-			inventoryLock.lockWrite();
-			final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
-			extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
-			final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-			lotService.closeLots(loggedInUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toList()));
-		} finally {
-			inventoryLock.unlockWrite();
-		}
+		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
+		extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+		lotService.closeLots(loggedInUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toList()));
 	}
 
 }

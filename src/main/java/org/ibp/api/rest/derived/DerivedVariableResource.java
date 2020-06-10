@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.derived.DerivedVariableService;
 import org.ibp.api.java.impl.middleware.derived.DerivedVariableServiceImpl;
@@ -85,7 +86,7 @@ public class DerivedVariableResource {
 	}
 
 	@ApiOperation(value = "Count Calculated Traits", notes = "Count the calculated traits (derived traits) in a specified dataset(s)")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_PREPARE_PLANTING)
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/derived-variables", method = RequestMethod.HEAD)
 	public ResponseEntity<String> countCalculatedVariables(

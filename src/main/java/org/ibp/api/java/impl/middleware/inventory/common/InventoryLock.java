@@ -1,4 +1,4 @@
-package org.ibp.api.java.impl.middleware.inventory.manager.common;
+package org.ibp.api.java.impl.middleware.inventory.common;
 
 import org.springframework.stereotype.Component;
 

@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
@@ -14,7 +15,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
@@ -23,9 +23,10 @@ import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
-import org.ibp.api.java.impl.middleware.inventory.manager.validator.InventoryCommonValidator;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
@@ -88,6 +89,9 @@ public class LotResource {
 	@Autowired
 	private InventoryCommonValidator inventoryCommonValidator;
 
+	@Autowired
+	private InventoryLock inventoryLock;
+
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
@@ -136,7 +140,12 @@ public class LotResource {
 
 				@Override
 				public List<ExtendedLotDto> getResults(final PagedResult<ExtendedLotDto> pagedResult) {
-					return LotResource.this.lotService.searchLots(searchDTO, pageable);
+					try {
+						inventoryLock.lockRead();
+						return LotResource.this.lotService.searchLots(searchDTO, pageable);
+					} finally {
+						inventoryLock.unlockRead();
+					}
 				}
 			});
 
@@ -153,11 +162,13 @@ public class LotResource {
 	@RequestMapping(value = "/crops/{cropName}/lots", method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('CREATE_LOTS')")
 	@ResponseBody
-	public ResponseEntity<Integer> createLot(
+	public ResponseEntity<SingleEntityResponse<String>> createLot(
 		@PathVariable final String cropName,
 		@ApiParam("Lot to be created")
 		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
-		return new ResponseEntity<>(this.lotService.saveLot(lotGeneratorInputDto), HttpStatus.CREATED);
+		final SingleEntityResponse<String> singleEntityResponse =
+			new SingleEntityResponse<String>(this.lotService.saveLot(lotGeneratorInputDto));
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Lots", notes = "Update one or more Lots")
@@ -173,11 +184,16 @@ public class LotResource {
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotRequest.getSearchComposite());
 
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-		if (lotRequest.getSearchComposite().getSearchRequestId() == null) {
-			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, lotRequest.getSearchComposite().getItemIds());
+		if (lotRequest.getSearchComposite().getSearchRequest() == null) {
+			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, lotRequest.getSearchComposite().getItemIds());
 		}
 
-		this.lotService.updateLots(extendedLotDtos, lotRequest);
+		try {
+			inventoryLock.lockWrite();
+			this.lotService.updateLots(extendedLotDtos, lotRequest);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
 	}
@@ -217,20 +233,25 @@ public class LotResource {
 	@RequestMapping(value = "/crops/{cropName}/lots/metadata", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
-	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(@PathVariable final String cropName, //
+	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(
+		@PathVariable final String cropName, //
 		@ApiParam("List of lots to get metadata, use a searchId or a list of lot ids")
-		@RequestBody final SearchCompositeDto searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer, String> searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
 
-		if (searchCompositeDto.getSearchRequestId() == null) {
+		if (searchCompositeDto.getSearchRequest() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
+			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
-
-		return new ResponseEntity<>(this.lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
+		try {
+			inventoryLock.lockRead();
+			return new ResponseEntity<>(this.lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockRead();
+		}
 	}
 
 	@ApiOperation(value = "Close Lots", notes = "Close a collection of lots")
@@ -240,20 +261,46 @@ public class LotResource {
 	public ResponseEntity<Void> closeLots(
 		@PathVariable final String cropName, //
 		@ApiParam("List of lots to be closed, use a searchId or a list of lot ids")
-		@RequestBody final SearchCompositeDto searchCompositeDto) {
+		@RequestBody final SearchCompositeDto<Integer, String> searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
 
-		if (searchCompositeDto.getSearchRequestId() == null) {
+		if (searchCompositeDto.getSearchRequest() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-			this.extendedLotListValidator.validateAllProvidedLotIdsExist(extendedLotDtos, searchCompositeDto.getItemIds());
+			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
-
-		this.lotService.closeLots(searchDTO);
+		try {
+			inventoryLock.lockWrite();
+			this.lotService.closeLots(searchDTO);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "It will retrieve a lot", notes = "It will retrieve lot by lotUUID")
+	@RequestMapping(value = "/crops/{cropName}/lots/{lotUUID}", method = RequestMethod.GET)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
+	@ResponseBody
+	@JsonView(InventoryView.LotView.class)
+	public ResponseEntity<ExtendedLotDto> getLot(@PathVariable final String cropName, @PathVariable final String lotUUID) {
+
+		final LotsSearchDto searchDTO = new LotsSearchDto();
+		searchDTO.setLotUUIDs(Arrays.asList(lotUUID));
+
+		try {
+			inventoryLock.lockRead();
+			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
+
+			if (!extendedLotDtos.isEmpty()) {
+				return new ResponseEntity<>(extendedLotDtos.get(0), HttpStatus.OK);
+			}
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} finally {
+			inventoryLock.unlockRead();
+		}
+	}
 
 }

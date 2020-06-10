@@ -106,6 +106,10 @@ public class VariableFilter {
 		this.propertyClasses.add(className);
 	}
 
+	public void addVariableIds(List<Integer> variableIds) {
+		this.variableIds.addAll(variableIds);
+	}
+
 	@Override public String toString() {
 		return "VariableFilter{" +
 				"programUuid='" + programUuid + '\'' +

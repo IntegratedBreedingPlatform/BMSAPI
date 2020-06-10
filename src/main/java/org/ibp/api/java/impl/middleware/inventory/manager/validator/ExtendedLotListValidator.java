@@ -48,9 +48,9 @@ public class ExtendedLotListValidator {
 		}
 	}
 
-	public void validateAllProvidedLotIdsExist(final List<ExtendedLotDto> extendedLotDtos, final Set<Integer> lotIds) {
+	public void validateAllProvidedLotUUIDsExist(final List<ExtendedLotDto> extendedLotDtos, final Set<String> lotUUIDs) {
 		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
-		if (lotIds != null && !lotIds.isEmpty() && lotIds.size() != extendedLotDtos.size()) {
+		if (lotUUIDs != null && !lotUUIDs.isEmpty() && lotUUIDs.size() != extendedLotDtos.size()) {
 			errors.reject("lots.does.not.exist", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}

@@ -1,16 +1,13 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.inventory.manager.validator.InventoryCommonValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawalInputDtoValidator;
-import org.ibp.api.java.ontology.VariableService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,26 +31,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class LotWithdrawalInputDtoValidatorTest {
 
 	@Mock
-	private VariableService variableService;
-
-	@Mock
 	private InventoryCommonValidator inventoryCommonValidator;
 
 	@InjectMocks
 	private LotWithdrawalInputDtoValidator lotWithdrawalInputDtoValidator;
 
-	private List<VariableDetails> variableDetails;
-
-	private VariableFilter variableFilter;
-
 	@Before
 	public void setUp() {
-		variableDetails = this.buildVariableDetails();
-		variableFilter = new VariableFilter();
-		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		Mockito.when(variableService.getVariablesByFilter(variableFilter)).thenReturn(variableDetails);
 		Mockito.doCallRealMethod().when(inventoryCommonValidator)
 			.validateSearchCompositeDto(Mockito.any(SearchCompositeDto.class), Mockito.any(BindingResult.class));
+		Mockito.doCallRealMethod().when(inventoryCommonValidator)
+			.validateTransactionNotes(Mockito.anyString(), Mockito.any(BindingResult.class));
 	}
 
 	@Test
@@ -61,7 +50,6 @@ public class LotWithdrawalInputDtoValidatorTest {
 			this.lotWithdrawalInputDtoValidator.validate(null);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.withdrawal.input.null"));
-
 		}
 	}
 
@@ -69,9 +57,9 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorLotsAreNotProperlySet() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
-			searchCompositeDto.setItemIds(Collections.singleton(1));
+			final SearchCompositeDto<Integer, String> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
+			searchCompositeDto.setItemIds(Collections.singleton(RandomStringUtils.randomAlphabetic(38)));
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
@@ -83,8 +71,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorInvalidNotes() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, String> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(256));
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
@@ -98,9 +86,10 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorNullWithdrawalInstructions() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
-			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
+			final SearchCompositeDto<Integer, String> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
+			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
+			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.withdrawal.input.null"));
@@ -111,15 +100,19 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorUnsupportedUnitName() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, String> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final LotWithdrawalInputDto.WithdrawalAmountInstruction withdrawalAmountInstruction =
 				new LotWithdrawalInputDto.WithdrawalAmountInstruction();
 			final Map<String, LotWithdrawalInputDto.WithdrawalAmountInstruction> withdrawalsPerUnit = new HashMap<>();
-			withdrawalsPerUnit.put("pounds", withdrawalAmountInstruction);
+			withdrawalsPerUnit.put("kg", withdrawalAmountInstruction);
 			lotWithdrawalInputDto.setWithdrawalsPerUnit(withdrawalsPerUnit);
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
+			errors.reject("lot.input.invalid.units", "");
+			Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(inventoryCommonValidator)
+				.validateUnitNames(Mockito.any(List.class), Mockito.any(BindingResult.class));
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.invalid.units"));
@@ -130,8 +123,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorInvalidAmount() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, String> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final LotWithdrawalInputDto.WithdrawalAmountInstruction withdrawalAmountInstruction =
@@ -143,6 +136,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 			final ExtendedLotDto extendedLotDto1 = new ExtendedLotDto();
 			extendedLotDto1.setUnitName("kg");
 
+			Mockito.doNothing().when(inventoryCommonValidator)
+				.validateUnitNames(Mockito.any(List.class), Mockito.any(BindingResult.class));
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.amount.invalid"));
@@ -153,8 +148,8 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorMissingWithdrawalsInstructionsForUnit() {
 		try {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
-			final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-			searchCompositeDto.setSearchRequestId(1);
+			final SearchCompositeDto<Integer, String> searchCompositeDto = new SearchCompositeDto();
+			searchCompositeDto.setSearchRequest(1);
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			final LotWithdrawalInputDto.WithdrawalAmountInstruction withdrawalAmountInstruction =
@@ -174,15 +169,6 @@ public class LotWithdrawalInputDtoValidatorTest {
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.instructions.missing.for.units"));
 		}
-	}
-
-	private List<VariableDetails> buildVariableDetails() {
-		final VariableDetails unitKg = new VariableDetails();
-		unitKg.setName("kg");
-		final VariableDetails unitG = new VariableDetails();
-		unitG.setName("g");
-		final List<VariableDetails> variableDetails = Arrays.asList(unitKg, unitG);
-		return variableDetails;
 	}
 
 }
