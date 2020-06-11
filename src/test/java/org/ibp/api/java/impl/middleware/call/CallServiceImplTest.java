@@ -41,29 +41,29 @@ public class CallServiceImplTest {
 
 		final List<Map<String, Object>> result2 = this.callService.getAllCalls(null, 10, 1);
 		Assert.assertEquals("Second page should contain 10 records", 10, result2.size());
-		resetInputStream();
+		this.resetInputStream();
 
 		final List<Map<String, Object>> result3 = this.callService.getAllCalls(null, null, null);
 		Assert.assertEquals("Should return all records if pageSize and pageNumber are not specified", 22, result3.size());
-		resetInputStream();
+		this.resetInputStream();
 
 		// Search by BrAPI v1.2 where CSV data type = csv
 		final List<Map<String, Object>> result4 = this.callService.getAllCalls("csv", 10, 0);
 		Assert.assertEquals("There is only one call service with csv datatype", 1, result4.size());
-		resetInputStream();
+		this.resetInputStream();
 
 		// Search by BrAPI v1.2 where CSV data type = text/csv
 		final List<Map<String, Object>> result5 = this.callService.getAllCalls("text/csv", 10, 0);
 		Assert.assertEquals("There is only one call service with text/csv datatype", 1, result5.size());
-		resetInputStream();
+		this.resetInputStream();
 
 		final List<Map<String, Object>> result6 = this.callService.getAllCalls(null, 5, null);
 		Assert.assertEquals("Should return no. of records specified even if pageNumber is not specified", 5, result6.size());
-		resetInputStream();
+		this.resetInputStream();
 
 		final List<Map<String, Object>> result7 = this.callService.getAllCalls(null, null, 0);
 		Assert.assertEquals("Should return all records if pageSize is specified and pageNumber is zero", 22, result7.size());
-		resetInputStream();
+		this.resetInputStream();
 
 	}
 

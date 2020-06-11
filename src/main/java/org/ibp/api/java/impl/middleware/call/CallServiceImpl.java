@@ -41,8 +41,8 @@ public class CallServiceImpl implements CallService {
 
 			if (pageNumber != null || pageSize != null) {
 
-				int pNumber = pageNumber == null ? 0 : pageNumber;
-				int pSize = pageSize == null ? brapiCalls.size() : pageSize;
+				final int pNumber = pageNumber == null ? 0 : pageNumber;
+				final int pSize = pageSize == null ? brapiCalls.size() : pageSize;
 				int toIndex = pSize * (pNumber) + pSize;
 				if (toIndex > brapiCalls.size()) {
 					toIndex = brapiCalls.size();
