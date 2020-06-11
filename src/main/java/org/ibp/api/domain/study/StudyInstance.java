@@ -18,6 +18,7 @@ public class StudyInstance {
 	private Boolean hasGeoJSON;
 	/** has X/Y coordinates */
 	private Boolean hasFieldLayout;
+	private Boolean hasInventory;
 	private Boolean hasExperimentalDesign;
 	private Boolean hasMeasurements;
 	private Boolean canBeDeleted;
@@ -99,6 +100,14 @@ public class StudyInstance {
 
 	public void setHasFieldLayout(final Boolean hasFieldLayout) {
 		this.hasFieldLayout = hasFieldLayout;
+	}
+
+	public Boolean getHasInventory() {
+		return this.hasInventory;
+	}
+
+	public void setHasInventory(final Boolean hasInventory) {
+		this.hasInventory = hasInventory;
 	}
 
 	public Boolean isHasExperimentalDesign() {
