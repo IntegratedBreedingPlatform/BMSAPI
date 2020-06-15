@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DatasetExcelGeneratorTest {
 
-	private static final int INSTANCE_DB_ID = 1;
+	private static final int INSTANCE_ID = 1;
 	private static final Integer STUDY_ID = 1;
 	private static final Integer ENVIRONMENT_DATASET_ID = 1;
 	private static final Integer PLOT_DATASET_ID = 1;
@@ -183,7 +183,7 @@ public class DatasetExcelGeneratorTest {
 			.getMeasurementVariables(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, Lists
 				.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 					VariableType.STUDY_CONDITION.getId()))).thenReturn(environmentVariables);
-		when(this.studyDataManager.getPhenotypeByVariableId(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, INSTANCE_DB_ID))
+		when(this.studyDataManager.getPhenotypeByVariableId(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, INSTANCE_ID))
 			.thenReturn(environmentConditionMap);
 
 		when(this.datasetService.getMeasurementVariables(PLOT_DATASET_ID, Lists
@@ -206,44 +206,43 @@ public class DatasetExcelGeneratorTest {
 	public void testGenerateSingleInstanceFile() throws IOException {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceId(INSTANCE_DB_ID);
+		studyInstance.setInstanceId(INSTANCE_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
-		datasetDTO.setDatasetId(INSTANCE_DB_ID);
-		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
+		datasetDTO.setDatasetId(INSTANCE_ID);
+		datasetDTO.setParentDatasetId(INSTANCE_ID);
 		final File
 			file = this.datasetExcelGenerator
 			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new ArrayList<>(),
 				new ArrayList<>(), filename, studyInstance);
 		assertEquals(filename, file.getName());
-		Mockito.verify(this.studyDataManager).getStudyDetails(INSTANCE_DB_ID);
+		Mockito.verify(this.studyDataManager).getStudyDetails(INSTANCE_ID);
 		Mockito.verify(this.datasetService)
 			.getMeasurementVariables(DatasetExcelGeneratorTest.STUDY_ID, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.studyDataManager).getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.datasetService)
 			.getMeasurementVariables(
-				INSTANCE_DB_ID, Lists
+				INSTANCE_ID, Lists
 					.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 						VariableType.STUDY_CONDITION.getId()));
-		Mockito.verify(this.datasetService).getMeasurementVariables(INSTANCE_DB_ID, Lists
+		Mockito.verify(this.datasetService).getMeasurementVariables(INSTANCE_ID, Lists
 			.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
 				VariableType.GERMPLASM_DESCRIPTOR.getId()));
 		Mockito.verify(this.datasetService)
-			.getMeasurementVariables(INSTANCE_DB_ID, Lists
+			.getMeasurementVariables(INSTANCE_ID, Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 		Mockito.verify(this.studyDataManager).getPhenotypeByVariableId(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
-		Mockito.verify(this.studyDataManager).getInstanceGeolocationIdsMap(INSTANCE_DB_ID);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testGenerateMultiInstanceFile() {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceId(INSTANCE_DB_ID);
+		studyInstance.setInstanceId(INSTANCE_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
-		datasetDTO.setDatasetId(INSTANCE_DB_ID);
-		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
+		datasetDTO.setDatasetId(INSTANCE_ID);
+		datasetDTO.setParentDatasetId(INSTANCE_ID);
 		this.datasetExcelGenerator
 			.generateMultiInstanceFile(new HashMap<>(), new ArrayList<>(), filename);
 	}
@@ -252,11 +251,11 @@ public class DatasetExcelGeneratorTest {
 	public void testDescriptionSheet() throws IOException {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceId(INSTANCE_DB_ID);
+		studyInstance.setInstanceId(INSTANCE_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
-		datasetDTO.setDatasetId(INSTANCE_DB_ID);
-		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
+		datasetDTO.setDatasetId(INSTANCE_ID);
+		datasetDTO.setParentDatasetId(INSTANCE_ID);
 
 		final File
 			file = this.datasetExcelGenerator

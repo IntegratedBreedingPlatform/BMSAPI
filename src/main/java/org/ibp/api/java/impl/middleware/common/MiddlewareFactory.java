@@ -494,7 +494,7 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public StudyInstanceService studyEnvironmentMiddlewareService() {
+	public StudyInstanceService studyInstanceMiddlewareService() {
 		return new StudyInstanceServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 

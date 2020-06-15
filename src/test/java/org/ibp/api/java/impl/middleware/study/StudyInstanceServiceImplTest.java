@@ -4,13 +4,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.study.StudyInstanceService;
-import org.ibp.api.rest.dataset.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -216,8 +216,8 @@ public class StudyInstanceServiceImplTest {
 		assertEquals(result2.getHasFieldmap(), studyInstance2.isHasFieldmap());
 
 		Assert.assertFalse(this.middlewareStudyInstanceService.getStudyInstance(studyId, 103).isPresent());
-		Mockito.verify(this.studyValidator, Mockito.times(3)).validate(studyId, false);
-		Mockito.verify(this.instanceValidator, Mockito.times(3)).validateStudyInstance(ArgumentMatchers.eq(studyId), ArgumentMatchers.anySet());
+		Mockito.verify(this.studyValidator, Mockito.times(2)).validate(studyId, false);
+		Mockito.verify(this.instanceValidator, Mockito.times(2)).validateStudyInstance(ArgumentMatchers.eq(studyId), ArgumentMatchers.anySet());
 	}
 
 	@Test

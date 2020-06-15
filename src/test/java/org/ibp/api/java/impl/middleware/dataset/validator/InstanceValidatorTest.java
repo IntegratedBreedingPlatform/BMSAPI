@@ -81,7 +81,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("dataset.invalid.instances"));
+				hasItem("dataset.non.existent.instances"));
 		}
 	}
 
@@ -251,7 +251,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		final List<StudyInstance> instances = this.createTestInstances();
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
 
-		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(Arrays.asList(101, 102, 1033)), this.random.nextBoolean());
+		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(Arrays.asList(101, 102, 1033)), false);
 	}
 
 }

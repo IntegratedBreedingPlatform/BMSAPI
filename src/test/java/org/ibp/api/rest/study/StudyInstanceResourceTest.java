@@ -46,16 +46,17 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.thenReturn(Collections.singletonList(studyInstance));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments/generation", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/generation",
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId).param("numberOfInstancesToGenerate", "1")
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$.experimentId", Matchers.is(studyInstance.getInstanceId())))
-			.andExpect(jsonPath("$.instanceNumber", Matchers.is(studyInstance.getInstanceNumber())))
-			.andExpect(jsonPath("$.locationName", Matchers.is(studyInstance.getLocationName())))
-			.andExpect(jsonPath("$.locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
-			.andExpect(jsonPath("$.hasFieldmap", Matchers.is(studyInstance.getHasFieldmap())))
-			.andExpect(jsonPath("$.customLocationAbbreviation", Matchers.is(studyInstance.getCustomLocationAbbreviation())));
+			.andExpect(jsonPath("$[0].instanceId", Matchers.is(studyInstance.getInstanceId())))
+			.andExpect(jsonPath("$[0].instanceNumber", Matchers.is(studyInstance.getInstanceNumber())))
+			.andExpect(jsonPath("$[0].locationName", Matchers.is(studyInstance.getLocationName())))
+			.andExpect(jsonPath("$[0].locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
+			.andExpect(jsonPath("$[0].hasFieldmap", Matchers.is(studyInstance.getHasFieldmap())))
+			.andExpect(jsonPath("$[0].customLocationAbbreviation", Matchers.is(studyInstance.getCustomLocationAbbreviation())));
 
 	}
 
@@ -80,17 +81,18 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances", CropType.CropEnum.MAIZE.name().toLowerCase(),
+				this.programUuid, studyId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$[0].experimentId", Matchers.is(studyInstance.getInstanceId())))
+			.andExpect(jsonPath("$[0].instanceId", Matchers.is(studyInstance.getInstanceId())))
 			.andExpect(jsonPath("$[0].instanceNumber", Matchers.is(studyInstance.getInstanceNumber())))
 			.andExpect(jsonPath("$[0].locationName", Matchers.is(studyInstance.getLocationName())))
 			.andExpect(jsonPath("$[0].locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
 			.andExpect(jsonPath("$[0].hasFieldmap", Matchers.is(studyInstance.getHasFieldmap())))
 			.andExpect(jsonPath("$[0].customLocationAbbreviation", Matchers.is(studyInstance.getCustomLocationAbbreviation())))
-			.andExpect(jsonPath("$[1].experimentId", Matchers.is(studyInstance2.getInstanceId())))
+			.andExpect(jsonPath("$[1].instanceId", Matchers.is(studyInstance2.getInstanceId())))
 			.andExpect(jsonPath("$[1].instanceNumber", Matchers.is(studyInstance2.getInstanceNumber())))
 			.andExpect(jsonPath("$[1].locationName", Matchers.is(studyInstance2.getLocationName())))
 			.andExpect(jsonPath("$[1].locationAbbreviation", Matchers.is(studyInstance2.getLocationAbbreviation())))
@@ -98,7 +100,6 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$[1].customLocationAbbreviation", Matchers.is(studyInstance2.getCustomLocationAbbreviation())));
 
 	}
-
 
 	@Test
 	public void testGetStudyInstances_NoInstances() throws Exception {
@@ -108,7 +109,8 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.thenReturn(Collections.emptyList());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances", CropType.CropEnum.MAIZE.name().toLowerCase(),
+				this.programUuid, studyId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -130,11 +132,12 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.thenReturn(Optional.of(studyInstance));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments/{environmentId}", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
+			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}",
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$.experimentId", Matchers.is(studyInstance.getInstanceId())))
+			.andExpect(jsonPath("$.instanceId", Matchers.is(studyInstance.getInstanceId())))
 			.andExpect(jsonPath("$.instanceNumber", Matchers.is(studyInstance.getInstanceNumber())))
 			.andExpect(jsonPath("$.locationName", Matchers.is(studyInstance.getLocationName())))
 			.andExpect(jsonPath("$.locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
@@ -142,7 +145,6 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$.customLocationAbbreviation", Matchers.is(studyInstance.getCustomLocationAbbreviation())));
 
 	}
-
 
 	@Test
 	public void testGetStudyInstance_NotExisting() throws Exception {
@@ -154,7 +156,8 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.thenReturn(Optional.empty());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments/{environmentId}", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
+			.get("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}",
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -168,7 +171,8 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 		final int instanceId = random.nextInt();
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.delete("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/environments/{environmentId}", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
+			.delete("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances",
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId).param("instanceIds", String.valueOf(instanceId))
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());

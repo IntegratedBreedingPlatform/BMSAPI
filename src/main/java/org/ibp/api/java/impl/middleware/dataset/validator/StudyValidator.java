@@ -30,7 +30,7 @@ public class StudyValidator {
 	@Autowired
 	private StudyDataManager studyDataManager;
 
-	@Resource
+	@Autowired
 	private StudyInstanceService studyInstanceService;
 
 	private BindingResult errors;
