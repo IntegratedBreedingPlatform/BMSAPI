@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -61,8 +62,9 @@ public class ExtendedLotListValidatorTest {
 			final ExtendedLotDto extendedLotDto = new ExtendedLotDto();
 			extendedLotDto.setLotId(1);
 			final List<ExtendedLotDto> lotDtoList = Arrays.asList(extendedLotDto);
-			final Set<Integer> lotIds = new HashSet<>(Arrays.asList(1, 2));
-			this.extendedLotListValidator.validateAllProvidedLotIdsExist(lotDtoList, lotIds);
+			final Set<String> lotUUIDs =
+				new HashSet<>(Arrays.asList(RandomStringUtils.randomAlphabetic(38), RandomStringUtils.randomAlphabetic(38)));
+			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtoList, lotUUIDs);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lots.does.not.exist"));
 		}

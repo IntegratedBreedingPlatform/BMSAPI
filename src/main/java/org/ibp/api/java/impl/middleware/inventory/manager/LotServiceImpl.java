@@ -76,7 +76,7 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public Integer saveLot(
+	public String saveLot(
 		final LotGeneratorInputDto lotGeneratorInputDto) {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		lotInputValidator.validate(lotGeneratorInputDto);

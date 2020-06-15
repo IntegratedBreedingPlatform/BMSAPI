@@ -89,7 +89,7 @@ public class TransactionResource {
 			this.searchRequestService.saveSearchRequest(transactionsSearchDto, TransactionsSearchDto.class).toString();
 
 		final SearchDto searchDto = new SearchDto(searchRequestId);
-		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<SearchDto>(searchDto);
+		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<>(searchDto);
 
 		return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
 
@@ -207,9 +207,9 @@ public class TransactionResource {
 	@JsonView(InventoryView.TransactionView.class)
 	public ResponseEntity<List<TransactionDto>> getAvailableBalanceTransactions(
 		@PathVariable final String cropName, //
-		@PathVariable final Integer lotId) {
+		@PathVariable final String lotUUID) {
 
-		final List<TransactionDto> transactionDtos = this.transactionService.getAvailableBalanceTransactions(lotId);
+		final List<TransactionDto> transactionDtos = this.transactionService.getAvailableBalanceTransactions(lotUUID);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add("X-Total-Count", Long.toString(transactionDtos.size()));
