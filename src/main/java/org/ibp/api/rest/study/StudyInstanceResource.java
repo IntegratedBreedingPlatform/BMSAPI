@@ -53,7 +53,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "List all study instances with basic metadata.",
 		notes = "Returns list of all study instances with basic metadata.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudyInstance>> listStudyEnvironments(final @PathVariable String cropname, @PathVariable final String programUUID,
@@ -69,7 +69,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Get study instances with basic metadata.",
 		notes = "Get study instances with basic metadata.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<StudyInstance> getStudyInstance(final @PathVariable String cropname, @PathVariable final String programUUID,
