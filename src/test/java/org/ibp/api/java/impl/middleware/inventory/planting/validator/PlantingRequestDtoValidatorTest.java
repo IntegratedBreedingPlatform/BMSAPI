@@ -9,14 +9,12 @@ import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.ontology.VariableService;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,13 +43,6 @@ public class PlantingRequestDtoValidatorTest {
 	private static final Integer STUDY_ID = 1;
 
 	private static final Integer DATASET_ID = 1;
-
-	@Before
-	public void setup() {
-		Mockito.doNothing().when(inventoryCommonValidator)
-			.validateSearchCompositeDto(Mockito.any(SearchCompositeDto.class), Mockito.any(BindingResult.class));
-		Mockito.doNothing().when(inventoryCommonValidator).validateUnitNames(Mockito.anyList(), Mockito.any(BindingResult.class));
-	}
 
 	@Test
 	public void validatePlantingRequestDto_NullPlantingRequestDto_ExceptionThrown() {
