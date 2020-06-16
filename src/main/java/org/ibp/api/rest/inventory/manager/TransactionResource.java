@@ -7,10 +7,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
-import org.generationcp.middleware.domain.inventory.manager.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
@@ -20,7 +20,7 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.inventory.manager.TransactionExportService;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -60,7 +60,7 @@ public class TransactionResource {
 	private SearchRequestService searchRequestService;
 
 	@Autowired
-	private SecurityService securityService;
+	private InventoryLock inventoryLock;
 
 	@Autowired
 	private TransactionExportService transactionExportServiceImpl;
@@ -89,7 +89,7 @@ public class TransactionResource {
 			this.searchRequestService.saveSearchRequest(transactionsSearchDto, TransactionsSearchDto.class).toString();
 
 		final SearchDto searchDto = new SearchDto(searchRequestId);
-		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<SearchDto>(searchDto);
+		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<>(searchDto);
 
 		return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
 
@@ -129,7 +129,12 @@ public class TransactionResource {
 
 				@Override
 				public List<TransactionDto> getResults(final PagedResult<TransactionDto> pagedResult) {
-					return TransactionResource.this.transactionService.searchTransactions(searchDTO, pageable);
+					try {
+						inventoryLock.lockRead();
+						return TransactionResource.this.transactionService.searchTransactions(searchDTO, pageable);
+					} finally {
+						inventoryLock.unlockRead();
+					}
 				}
 			});
 
@@ -143,44 +148,54 @@ public class TransactionResource {
 	}
 
 	@ApiOperation(value = "Create Pending Withdrawals", notes = "Create new withdrawals with pending status for a set os filtered lots")
-		 @RequestMapping(value = "/crops/{cropName}/transactions/pending-withdrawals-lists", method = RequestMethod.POST)
-		 @ResponseBody
-		 @PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_PENDING_WITHDRAWALS')")
-		 public ResponseEntity<Void> createPendingWithdrawals(
+	@RequestMapping(value = "/crops/{cropName}/transactions/pending-withdrawals/generation", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_PENDING_WITHDRAWALS')")
+	public ResponseEntity<Void> createPendingWithdrawals(
 			@PathVariable final String cropName,
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
-
-		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.PENDING);
-
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.PENDING);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Create Confirmed Withdrawals", notes = "Create new withdrawals with confirmed status for a set os filtered lots")
-	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-withdrawals-lists", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-withdrawals/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_CONFIRMED_WITHDRAWALS')")
 	public ResponseEntity<Void> createConfirmedWithdrawals(
 			@PathVariable final String cropName,
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
-
-		this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
-
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Confirm pending Transactions", notes = "Confirm any transaction with pending status")
-	@RequestMapping(value = "/crops/{cropName}/transactions/confirmation", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CONFIRM_TRANSACTIONS')")
 	public ResponseEntity<Void> confirmPendingTransaction(
 		@PathVariable final String cropName, //
 		@ApiParam("List of transactions to be confirmed, use a searchId or a list of transaction ids")
-		@RequestBody final SearchCompositeDto searchCompositeDto){
-
-		this.transactionService.confirmPendingTransactions(searchCompositeDto);
-		return new ResponseEntity<>(HttpStatus.OK);
+		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.confirmPendingTransactions(searchCompositeDto);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "It will retrieve transactions that affects the available balance of the lot", notes =
@@ -192,9 +207,9 @@ public class TransactionResource {
 	@JsonView(InventoryView.TransactionView.class)
 	public ResponseEntity<List<TransactionDto>> getAvailableBalanceTransactions(
 		@PathVariable final String cropName, //
-		@PathVariable final Integer lotId) {
+		@PathVariable final String lotUUID) {
 
-		final List<TransactionDto> transactionDtos = this.transactionService.getAvailableBalanceTransactions(lotId);
+		final List<TransactionDto> transactionDtos = this.transactionService.getAvailableBalanceTransactions(lotUUID);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add("X-Total-Count", Long.toString(transactionDtos.size()));
@@ -232,10 +247,14 @@ public class TransactionResource {
 		@PathVariable final String cropName,
 		@ApiParam("New amount or New Available Balance and Notes to be updated per transaction")
 		@RequestBody final List<TransactionUpdateRequestDto> transactionUpdateInputDtos) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
 
-		this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
-
-		return new ResponseEntity<>(HttpStatus.OK);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a set os filtered lots")
@@ -246,10 +265,13 @@ public class TransactionResource {
 		@PathVariable final String cropName,
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
-
-		this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.PENDING);
-
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.PENDING);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a set os filtered lots")
@@ -260,22 +282,30 @@ public class TransactionResource {
 		@PathVariable final String cropName,
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED);
 
-		this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED);
-
-		return new ResponseEntity<>(HttpStatus.CREATED);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 
 	@ApiOperation(value = "Cancel pending Transactions", notes = "Cancel any transaction with pending status")
-	@RequestMapping(value = "/crops/{cropName}/transactions/cancellation", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/crops/{cropName}/transactions/cancellation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('CANCEL_PENDING_TRANSACTIONS')")
 	public ResponseEntity<Void> cancelPendingTransaction(
 		@PathVariable final String cropName, //
 		@ApiParam("List of transactions to be cancelled, use a searchId or a list of transaction ids")
-		@RequestBody final SearchCompositeDto searchCompositeDto) {
-
-		this.transactionService.cancelPendingTransactions(searchCompositeDto);
-		return new ResponseEntity<>(HttpStatus.OK);
+		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.cancelPendingTransactions(searchCompositeDto);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
 	}
 }

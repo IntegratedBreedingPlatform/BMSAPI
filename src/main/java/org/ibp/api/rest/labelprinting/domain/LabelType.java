@@ -43,6 +43,11 @@ public class LabelType {
 		this.fields = fields;
 	}
 
+	public LabelType withFields(final List<Field> fields) {
+		this.fields = fields;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);

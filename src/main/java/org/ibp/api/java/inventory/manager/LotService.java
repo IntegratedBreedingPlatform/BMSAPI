@@ -2,13 +2,15 @@ package org.ibp.api.java.inventory.manager;
 
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
-import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface LotService {
 
@@ -16,12 +18,18 @@ public interface LotService {
 
 	long countSearchLots(LotsSearchDto lotsSearchDto);
 
-	Integer saveLot(LotGeneratorInputDto lotGeneratorInputDto);
+	List<UserDefinedField> getGermplasmAttributeTypes(LotsSearchDto searchDto);
+
+	Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(LotsSearchDto searchDto);
+
+	String saveLot(LotGeneratorInputDto lotGeneratorInputDto);
 
 	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest);
 
-	void importLotsWithInitialTransaction(List<LotItemDto> lotList);
+	void importLotsWithInitialTransaction(LotImportRequestDto lotImportRequestDto);
 
 	LotSearchMetadata getLotsSearchMetadata(LotsSearchDto lotsSearchDto);
+
+	void closeLots(LotsSearchDto lotsSearchDto);
 
 }

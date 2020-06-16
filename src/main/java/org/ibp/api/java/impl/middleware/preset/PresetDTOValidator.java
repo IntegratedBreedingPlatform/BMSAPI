@@ -11,7 +11,6 @@ import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.FileType;
-import org.ibp.api.rest.labelprinting.SubObservationDatasetLabelPrinting;
 import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.ibp.api.rest.preset.domain.PresetDTO;
 import org.ibp.api.rest.preset.domain.PresetType;
@@ -30,6 +29,7 @@ import java.util.List;
 public class PresetDTOValidator {
 
 	private static final Integer FIELDBOOK_TOOL_ID = 23;
+	private static final int NAME_MAX_LENGTH = 50;
 
 	@Autowired
 	private PresetService presetService;
@@ -47,9 +47,7 @@ public class PresetDTOValidator {
 			this.errors.reject("preset.invalid.tool", "");
 		}
 
-		//Validate toolSection
-		//As of now, this will only support DATASET_LABEL_PRINTING_PRESET
-		if (!ToolSection.DATASET_LABEL_PRINTING_PRESET.name().equals(presetDTO.getToolSection())) {
+		if (!isValidToolSection(presetDTO.getToolSection())) {
 			this.errors.reject("preset.invalid.tool.section", "");
 		}
 
@@ -66,8 +64,11 @@ public class PresetDTOValidator {
 			this.errors.reject("preset.invalid.program.uuid", "");
 		}
 
-		if (StringUtils.isEmpty(presetDTO.getName())) {
+		final String presetName = presetDTO.getName();
+		if (StringUtils.isEmpty(presetName)) {
 			this.errors.reject("preset.name.required", "");
+		} else if (presetName.length() > NAME_MAX_LENGTH) {
+			this.errors.reject("preset.name.length.invalid", new String[] {String.valueOf(NAME_MAX_LENGTH)}, "");
 		}
 
 		if (this.errors.hasErrors()) {
@@ -75,7 +76,7 @@ public class PresetDTOValidator {
 		}
 
 		final List<ProgramPreset> presets = this.presetService
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), programUUID, presetDTO.getToolId(),
+				.getProgramPresetFromProgramAndToolByName(presetName, programUUID, presetDTO.getToolId(),
 						presetDTO.getToolSection());
 		if (!presets.isEmpty()) {
 			this.errors.reject("preset.name.invalid", "");
@@ -94,11 +95,22 @@ public class PresetDTOValidator {
 		}
 	}
 
+	/**
+	 * Validates supported tool sections
+	 */
+	private static boolean isValidToolSection(final String toolSection) {
+		return ToolSection.DATASET_LABEL_PRINTING_PRESET.name().equals(toolSection)
+			|| ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(toolSection);
+	}
+
 	private void validateLabelPrintingPreset(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO) {
 		if (labelPrintingPresetDTO.getFileConfiguration() == null) {
 			this.errors.reject("label.printing.preset.file.configuration.required", "");
 		}
-		if (labelPrintingPresetDTO.getBarcodeSetting() == null) {
+
+		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting = labelPrintingPresetDTO.getBarcodeSetting();
+
+		if (barcodeSetting == null) {
 			this.errors.reject("label.printing.preset.barcode.setting.required", "");
 		}
 		if (labelPrintingPresetDTO.getSelectedFields() == null) {
@@ -110,42 +122,36 @@ public class PresetDTOValidator {
 
 		labelPrintingPresetDTO.getSelectedFields().forEach(list -> {
 			list.forEach(fieldId -> {
-				if (!LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
-						&& this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId))
-						== null) {
+				if (this.isInvalidField(crop, labelPrintingPresetDTO, fieldId)) {
 					this.errors.reject("label.printing.preset.invalid.field.in.selected.field", "");
 					throw new ApiRequestValidationException(this.errors.getAllErrors());
 				}
 			});
 		});
 
-		if (labelPrintingPresetDTO.getBarcodeSetting().isBarcodeNeeded()) {
-			if (labelPrintingPresetDTO.getBarcodeSetting().isAutomaticBarcode()) {
-					if (labelPrintingPresetDTO.getBarcodeSetting()
-					.getBarcodeFields() != null && !labelPrintingPresetDTO.getBarcodeSetting()
-					.getBarcodeFields().isEmpty()) {
-						this.errors.reject("label.printing.preset.inconsistent.barcode.setting", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-					}
-			} else {
-				if (labelPrintingPresetDTO.getBarcodeSetting().getBarcodeFields() == null || labelPrintingPresetDTO.getBarcodeSetting()
-						.getBarcodeFields().isEmpty()) {
+		final List<Integer> barcodeFields = barcodeSetting.getBarcodeFields();
+
+		if (barcodeSetting.isBarcodeNeeded()) {
+			if (barcodeSetting.isAutomaticBarcode()) {
+				if (barcodeFields != null && !barcodeFields.isEmpty()) {
 					this.errors.reject("label.printing.preset.inconsistent.barcode.setting", "");
 					throw new ApiRequestValidationException(this.errors.getAllErrors());
 				}
-				labelPrintingPresetDTO.getBarcodeSetting().getBarcodeFields().forEach(fieldId -> {
-					if (!LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
-							&& this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId))
-							== null) {
+			} else {
+				if (barcodeFields == null || barcodeFields.isEmpty()) {
+					this.errors.reject("label.printing.preset.inconsistent.barcode.setting", "");
+					throw new ApiRequestValidationException(this.errors.getAllErrors());
+				}
+				barcodeFields.forEach(fieldId -> {
+					if (this.isInvalidField(crop, labelPrintingPresetDTO, fieldId)) {
 						this.errors.reject("label.printing.preset.invalid.field.in.barcode.field", "");
 						throw new ApiRequestValidationException(this.errors.getAllErrors());
 					}
 				});
 			}
 		} else {
-			if (labelPrintingPresetDTO.getBarcodeSetting().isAutomaticBarcode()
-					|| (labelPrintingPresetDTO.getBarcodeSetting().getBarcodeFields() != null && !labelPrintingPresetDTO.getBarcodeSetting()
-					.getBarcodeFields().isEmpty())) {
+			if (barcodeSetting.isAutomaticBarcode()
+				|| (barcodeFields != null && !barcodeFields.isEmpty())) {
 				this.errors.reject("label.printing.preset.inconsistent.barcode.setting", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
@@ -156,12 +162,17 @@ public class PresetDTOValidator {
 			this.errors.reject("preset.invalid.file.type", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+	}
 
-		if (!SubObservationDatasetLabelPrinting.SUPPORTED_FILE_TYPES.contains(fileType)) {
-			this.errors.reject("preset.not.supported.file.type", "");
-			throw new NotSupportedException(this.errors.getAllErrors().get(0));
-		}
+	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final Integer fieldId) {
+		return this.isValidateFieldId(labelPrintingPresetDTO)
+			&& !LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
+			&& this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId))
+			== null;
+	}
 
+	private boolean isValidateFieldId(final LabelPrintingPresetDTO labelPrintingPresetDTO) {
+		return !ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection());
 	}
 
 }

@@ -145,6 +145,15 @@ public class DatasetValidator {
 		}
 	}
 
+	public void validatePlotDatasetType(final Integer datasetId) {
+		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
+		if (!datasetType.isObservationType()) {
+			this.errors.reject("dataset.type.not.plot", "");
+			throw new NotSupportedException(this.errors.getAllErrors().get(0));
+		}
+	}
+
 	private VariableType validateVariableType(final Integer variableTypeId) {
 		final VariableType variableType = VariableType.getById(variableTypeId);
 		if (variableType == null) {

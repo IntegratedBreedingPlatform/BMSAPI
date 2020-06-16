@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
@@ -675,20 +676,53 @@ public class DatasetServiceImplTest {
 		obs3.setObservationVariableDbId(27);
 		obs3.setValue("280");
 		list.add(obs3);
+		final ObservationDTO obs4 = new ObservationDTO();
+		obs4.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs4.setObservationVariableDbId(28);
+		obs4.setValue("NA");
+		list.add(obs4);
+		final ObservationDTO obs5 = new ObservationDTO();
+		obs5.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs5.setObservationVariableDbId(29);
+		obs5.setValue("NA");
+		list.add(obs5);
+		final ObservationDTO obs6 = new ObservationDTO();
+		obs6.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs6.setObservationVariableDbId(30);
+		obs6.setValue("NA");
+		list.add(obs6);
 
 		final List<MeasurementVariable> variables = new ArrayList<>();
 		final MeasurementVariable var1 = new MeasurementVariable();
 		var1.setName("Var 1");
 		var1.setTermId(24);
+		var1.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
 		variables.add(var1);
 		final MeasurementVariable var2 = new MeasurementVariable();
 		var2.setName("Var 2");
 		var2.setTermId(25);
+		var2.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
 		variables.add(var2);
 		final MeasurementVariable var3 = new MeasurementVariable();
 		var3.setName("Var 3");
 		var3.setTermId(27);
+		var3.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
 		variables.add(var3);
+		final MeasurementVariable var4 = new MeasurementVariable();
+		var4.setName("Var 4");
+		var4.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
+		var4.setTermId(28);
+		variables.add(var4);
+		final MeasurementVariable var5 = new MeasurementVariable();
+		var5.setName("Var 5");
+		var5.setDataTypeId(DataType.DATE_TIME_VARIABLE.getId());
+		var5.setTermId(29);
+		variables.add(var5);
+		final MeasurementVariable var6 = new MeasurementVariable();
+		var6.setName("Var 6");
+		var6.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
+		var6.setTermId(30);
+		variables.add(var6);
 
 		final ObservationsPutRequestInput t = DatasetServiceImpl.transformObservations(list, variables);
 
@@ -698,6 +732,9 @@ public class DatasetServiceImplTest {
 		Assert.assertThat(data.get(2).get(0), is(obs2.getObservationUnitDbId()));
 		Assert.assertThat(data.get(2).get(2), is("200"));
 		Assert.assertThat(data.get(2).get(3), is("280"));
+		Assert.assertThat(data.get(2).get(4), is("missing"));
+		Assert.assertThat(data.get(2).get(5), is(""));
+		Assert.assertThat(data.get(2).get(6), is("missing"));
 	}
 
 }

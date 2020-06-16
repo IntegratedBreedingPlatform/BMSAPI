@@ -15,6 +15,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -46,11 +47,12 @@ public class LotInputValidator {
 	@Autowired
 	private TransactionService transactionService;
 
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
+
 	private BindingResult errors;
 
 	private static final Integer STOCK_ID_MAX_LENGTH = 35;
-
-	private static final Integer PREFIX_MAX_LENGTH = 15;
 
 
 	public LotInputValidator() {
@@ -62,7 +64,7 @@ public class LotInputValidator {
 		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
-		this.validateNotes(lotGeneratorInputDto.getNotes());
+		this.inventoryCommonValidator.validateLotNotes(lotGeneratorInputDto.getNotes(), errors);
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -88,7 +90,7 @@ public class LotInputValidator {
 			this.germplasmValidator.validateGermplasmId(this.errors, gid);
 		}
 
-		this.validateNotes(updateRequestDto.getNotes());
+		this.inventoryCommonValidator.validateLotNotes(updateRequestDto.getNotes(), errors);
 		this.validateTransactionStatus(lotDtos, updateRequestDto);
 
 		if (this.errors.hasErrors()) {
@@ -110,14 +112,6 @@ public class LotInputValidator {
 			&& (updateRequestDto.getUnitId() != null)) {
 
 			this.errors.reject("lots.transactions.status.confirmed.cannot.change.unit");
-		}
-	}
-
-	public void validateNotes(final String notes) {
-		if (notes != null) {
-			if (notes.length() > 255) {
-				this.errors.reject("lot.notes.length");
-			}
 		}
 	}
 
@@ -146,14 +140,7 @@ public class LotInputValidator {
 				this.errors.reject("lot.stock.prefix.not.empty", "");
 			}
 		} else {
-			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && !lotGeneratorInputDto.getStockPrefix().matches("[a-zA-Z]+")) {
-				this.errors.reject("lot.stock.prefix.invalid.characters", "");
-				return;
-			}
-			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && lotGeneratorInputDto.getStockPrefix().length() > PREFIX_MAX_LENGTH) {
-				this.errors.reject("lot.stock.prefix.invalid.length", new String[] {String.valueOf(PREFIX_MAX_LENGTH)}, "");
-				return;
-			}
+			inventoryCommonValidator.validateStockIdPrefix(lotGeneratorInputDto.getStockPrefix(), errors);
 			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockId())){
 				this.errors.reject("lot.stock.id.not.empty", "");
 				return;

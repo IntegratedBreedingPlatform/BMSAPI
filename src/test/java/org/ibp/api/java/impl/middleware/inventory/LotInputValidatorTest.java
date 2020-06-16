@@ -9,6 +9,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
 import org.junit.Before;
@@ -16,8 +17,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LotInputValidatorTest {
@@ -51,6 +53,9 @@ public class LotInputValidatorTest {
 	@Mock
 	private GermplasmValidator germplasmValidator;
 
+	@Mock
+	private InventoryCommonValidator inventoryCommonValidator;
+
 	@Before
 	public void setup() {
 		this.lotGeneratorInputDto = new LotGeneratorInputDto();
@@ -58,6 +63,7 @@ public class LotInputValidatorTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateDataComments() {
+		Mockito.doCallRealMethod().when(inventoryCommonValidator).validateLotNotes(Mockito.anyString(), Mockito.any(BindingResult.class));
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);

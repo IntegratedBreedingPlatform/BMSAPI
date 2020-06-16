@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +33,9 @@ public class TransactionUpdateRequestDtoValidatorTest {
 	@Mock
 	private TransactionService transactionService;
 
+	@Mock
+	private InventoryCommonValidator inventoryCommonValidator;
+
 	@InjectMocks
 	private TransactionUpdateRequestDtoValidator transactionUpdateRequestDtoValidator;
 
@@ -41,6 +46,8 @@ public class TransactionUpdateRequestDtoValidatorTest {
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
 		transactionsSearchDto.setTransactionIds(Arrays.asList(1, 2));
 		Mockito.when(transactionService.searchTransactions(transactionsSearchDto, null)).thenReturn(transactionDtos);
+		Mockito.doCallRealMethod().when(inventoryCommonValidator)
+			.validateTransactionNotes(Mockito.anyString(), Mockito.any(BindingResult.class));
 	}
 
 	@Test
@@ -77,8 +84,31 @@ public class TransactionUpdateRequestDtoValidatorTest {
 	@Test
 	public void testValidateTransactionUpdateRequestDtoValidatorHasInvalidData() {
 		try {
+			this.transactionDtos.clear();
+
+			final TransactionDto transaction1 = new TransactionDto();
+			transaction1.setTransactionId(1);
+			final ExtendedLotDto lotDto1 = new ExtendedLotDto();
+			lotDto1.setLotId(1);
+			lotDto1.setStatus(LotStatus.ACTIVE.name());
+			transaction1.setLot(lotDto1);
+			transaction1.setTransactionStatus(TransactionStatus.PENDING.getValue());
+			transaction1.setTransactionType(TransactionType.DEPOSIT.getValue());
+			this.transactionDtos.add(transaction1);
+
+			final TransactionDto transaction2 = new TransactionDto();
+			transaction2.setTransactionId(2);
+			final ExtendedLotDto lotDto2 = new ExtendedLotDto();
+			lotDto2.setLotId(1);
+			lotDto2.setStatus(LotStatus.ACTIVE.name());
+			transaction2.setLot(lotDto2);
+			transaction2.setTransactionStatus(TransactionStatus.PENDING.getValue());
+			transaction2.setTransactionType(TransactionType.DEPOSIT.getValue());
+			this.transactionDtos.add(transaction2);
+
 			final List<TransactionUpdateRequestDto> transactionUpdateRequestDtoList = new ArrayList<>();
 			transactionUpdateRequestDtoList.add(new TransactionUpdateRequestDto(1, 2d, 2d, ""));
+			transactionUpdateRequestDtoList.add(new TransactionUpdateRequestDto(2, null, 2d, ""));
 			this.transactionUpdateRequestDtoValidator.validate(transactionUpdateRequestDtoList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("transaction.update.invalid.data"));
@@ -127,7 +157,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 			this.transactionDtos.add(transaction1);
 
 			final TransactionDto transaction2 = new TransactionDto();
-			transaction2.setTransactionId(1);
+			transaction2.setTransactionId(2);
 			final ExtendedLotDto lotDto2 = new ExtendedLotDto();
 			lotDto2.setLotId(1);
 			lotDto2.setStatus(LotStatus.ACTIVE.name());
@@ -158,7 +188,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 			this.transactionDtos.add(transaction1);
 
 			final TransactionDto transaction2 = new TransactionDto();
-			transaction2.setTransactionId(1);
+			transaction2.setTransactionId(2);
 			final ExtendedLotDto lotDto2 = new ExtendedLotDto();
 			lotDto2.setLotId(1);
 			lotDto2.setStatus(LotStatus.ACTIVE.name());
@@ -191,7 +221,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 			this.transactionDtos.add(transaction1);
 
 			final TransactionDto transaction2 = new TransactionDto();
-			transaction2.setTransactionId(1);
+			transaction2.setTransactionId(2);
 			final ExtendedLotDto lotDto2 = new ExtendedLotDto();
 			lotDto2.setLotId(1);
 			lotDto2.setStatus(LotStatus.ACTIVE.name());
@@ -226,7 +256,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 			this.transactionDtos.add(transaction1);
 
 			final TransactionDto transaction2 = new TransactionDto();
-			transaction2.setTransactionId(1);
+			transaction2.setTransactionId(2);
 			final ExtendedLotDto lotDto2 = new ExtendedLotDto();
 			lotDto2.setLotId(1);
 			lotDto2.setStatus(LotStatus.ACTIVE.name());
@@ -261,7 +291,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 			this.transactionDtos.add(transaction1);
 
 			final TransactionDto transaction2 = new TransactionDto();
-			transaction2.setTransactionId(1);
+			transaction2.setTransactionId(2);
 			final ExtendedLotDto lotDto2 = new ExtendedLotDto();
 			lotDto2.setLotId(1);
 			lotDto2.setStatus(LotStatus.ACTIVE.name());
@@ -296,7 +326,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 			this.transactionDtos.add(transaction1);
 
 			final TransactionDto transaction2 = new TransactionDto();
-			transaction2.setTransactionId(1);
+			transaction2.setTransactionId(2);
 			transaction2.setLot(lotDto1);
 			transaction2.setTransactionStatus(TransactionStatus.PENDING.getValue());
 			transaction2.setTransactionType(TransactionType.DEPOSIT.getValue());
@@ -328,7 +358,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 			this.transactionDtos.add(transaction1);
 
 			final TransactionDto transaction2 = new TransactionDto();
-			transaction2.setTransactionId(1);
+			transaction2.setTransactionId(2);
 			final ExtendedLotDto lotDto2 = new ExtendedLotDto();
 			lotDto2.setLotId(1);
 			lotDto2.setStatus(LotStatus.ACTIVE.name());
@@ -343,7 +373,7 @@ public class TransactionUpdateRequestDtoValidatorTest {
 			transactionUpdateRequestDtoList.add(new TransactionUpdateRequestDto(2, null, 2d, ""));
 			this.transactionUpdateRequestDtoValidator.validate(transactionUpdateRequestDtoList);
 		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("transaction.update.invalid.notes.length"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("transaction.notes.length"));
 		}
 	}
 
