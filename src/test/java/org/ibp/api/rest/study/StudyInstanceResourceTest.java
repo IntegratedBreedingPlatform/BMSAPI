@@ -1,12 +1,16 @@
 package org.ibp.api.rest.study;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.dms.InstanceData;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -178,6 +182,75 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 		Mockito.verify(this.studyInstanceService).deleteStudyInstances(studyId, Collections.singletonList(instanceId));
 
+	}
+
+	@Test
+	public void testAddInstanceData() throws Exception {
+
+		final int studyId = this.random.nextInt(BOUND);
+		final int instanceId = this.random.nextInt(BOUND);
+
+		final InstanceData instanceData = new InstanceData();
+		instanceData.setVariableId(TermId.ALTITUDE.getId());
+		instanceData.setValue(String.valueOf(this.random.nextInt(BOUND)));
+		instanceData.setInstanceId(instanceId);
+		instanceData.setInstanceDataId(this.random.nextInt(BOUND));
+
+		when(this.studyInstanceService
+			.addInstanceData(ArgumentMatchers.eq(studyId), ArgumentMatchers.eq(instanceId), ArgumentMatchers.any(InstanceData.class)))
+			.thenReturn(instanceData);
+
+		this.mockMvc.perform(MockMvcRequestBuilders
+			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/instance-data",
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
+			.contentType(this.contentType).content(asJsonString(instanceData)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(jsonPath("$.instanceId", Matchers.is(instanceData.getInstanceId())))
+			.andExpect(jsonPath("$.instanceDataId", Matchers.is(instanceData.getInstanceDataId())))
+			.andExpect(jsonPath("$.variableId", Matchers.is(instanceData.getVariableId())))
+			.andExpect(jsonPath("$.value", Matchers.is(instanceData.getValue())))
+			.andExpect(jsonPath("$.categoricalValueId", Matchers.is(instanceData.getCategoricalValueId())));
+
+	}
+
+	@Test
+	public void testUpdateInstanceData() throws Exception {
+
+		final int studyId = this.random.nextInt(BOUND);
+		final int instanceId = this.random.nextInt(BOUND);
+
+		final InstanceData instanceData = new InstanceData();
+		instanceData.setVariableId(TermId.ALTITUDE.getId());
+		instanceData.setValue(String.valueOf(this.random.nextInt(BOUND)));
+		instanceData.setInstanceId(instanceId);
+		instanceData.setInstanceDataId(this.random.nextInt(BOUND));
+
+		when(this.studyInstanceService
+			.updateInstanceData(ArgumentMatchers.eq(studyId), ArgumentMatchers.eq(instanceId),
+				ArgumentMatchers.eq(instanceData.getInstanceDataId()), ArgumentMatchers.any(InstanceData.class)))
+			.thenReturn(instanceData);
+
+		this.mockMvc.perform(MockMvcRequestBuilders
+			.patch("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/instance-data/{instanceDataId}",
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId, instanceData.getInstanceDataId())
+			.contentType(this.contentType).content(asJsonString(instanceData)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(jsonPath("$.instanceId", Matchers.is(instanceData.getInstanceId())))
+			.andExpect(jsonPath("$.instanceDataId", Matchers.is(instanceData.getInstanceDataId())))
+			.andExpect(jsonPath("$.variableId", Matchers.is(instanceData.getVariableId())))
+			.andExpect(jsonPath("$.value", Matchers.is(instanceData.getValue())))
+			.andExpect(jsonPath("$.categoricalValueId", Matchers.is(instanceData.getCategoricalValueId())));
+
+	}
+
+	public static String asJsonString(final Object obj) {
+		try {
+			return new ObjectMapper().writeValueAsString(obj);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

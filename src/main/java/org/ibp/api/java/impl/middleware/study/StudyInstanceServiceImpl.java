@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class StudyInstanceServiceImpl implements StudyInstanceService {
 
+	public static final String INVALID_ENVIRONMENT_DATA_ID = "invalid.environment.data.id";
+	public static final String INVALID_VARIABLE_FOR_ENVIRONMENT_DATA = "invalid.variable.for.environment.data";
 	@Resource
 	private org.generationcp.middleware.service.api.study.StudyInstanceService middlewareStudyInstanceService;
 
@@ -152,9 +154,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final Optional<InstanceData> existingEnvironmentData =
 			this.middlewareStudyInstanceService.getInstanceData(instanceId, instanceDataId, variableId, isEnvironmentCondition);
 		if (!existingEnvironmentData.isPresent()) {
-			errors.reject("invalid.environment.data.id");
+			errors.reject(INVALID_ENVIRONMENT_DATA_ID);
 		} else if (!existingEnvironmentData.get().getVariableId().equals(variableId)) {
-			errors.reject("invalid.variable.for.environment.data");
+			errors.reject(INVALID_VARIABLE_FOR_ENVIRONMENT_DATA);
 		}
 
 		if (!errors.getAllErrors().isEmpty()) {

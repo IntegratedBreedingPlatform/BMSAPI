@@ -95,7 +95,7 @@ public class StudyInstanceResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/instance-data/{instanceDataId}", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<InstanceData> updateEnvironmentData(final @PathVariable String cropname,
+	public ResponseEntity<InstanceData> updateInstanceData(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer instanceId, @PathVariable final Integer instanceDataId,
 		@RequestBody final InstanceData instanceData) {
