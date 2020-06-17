@@ -39,14 +39,17 @@ public class CallServiceImpl implements CallService {
 			final String jsonTxt = IOUtils.toString( is );
 			brapiCalls = JsonPath.parse(jsonTxt).read(jsonPath);
 
-			if (pageNumber != null && pageSize != null) {
+			if (pageNumber != null || pageSize != null) {
 
-				int toIndex = pageSize * (pageNumber) + pageSize;
+				final int pNumber = pageNumber == null ? 0 : pageNumber;
+				final int pSize = pageSize == null ? brapiCalls.size() : pageSize;
+				int toIndex = pSize * (pNumber) + pSize;
 				if (toIndex > brapiCalls.size()) {
 					toIndex = brapiCalls.size();
 				}
 
-				int fromIndex = pageNumber * pageSize;
+
+				int fromIndex = pNumber * pSize;
 				if (fromIndex < 0) {
 					fromIndex = 0;
 				}

@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.design;
 
-import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -32,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class ExperimentalDesignServiceImplTest {
 
@@ -162,7 +162,7 @@ public class ExperimentalDesignServiceImplTest {
 
 	@Test
 	public void testGetStudyExperimentalDesignTypeTermId() {
-		Mockito.doReturn(Optional.absent()).when(this.middlewareExperimentDesignService).getStudyExperimentDesignTypeTermId(STUDY_ID);
+		Mockito.doReturn(Optional.empty()).when(this.middlewareExperimentDesignService).getStudyExperimentDesignTypeTermId(STUDY_ID);
 		Assert.assertFalse(this.experimentDesignService.getStudyExperimentalDesignTypeTermId(STUDY_ID).isPresent());
 
 		final Integer termId = ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId();

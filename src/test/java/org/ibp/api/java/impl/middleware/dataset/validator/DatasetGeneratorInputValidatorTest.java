@@ -109,7 +109,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
 		final int studyId = random.nextInt();
-		final String name = "Test";
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
@@ -120,7 +119,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		this.datasetGeneratorInputValidator.validateDataConflicts(studyId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.name.not.available"));
 	}
@@ -139,14 +138,13 @@ public class DatasetGeneratorInputValidatorTest {
 
 	@Test
 	public void testValidateDatasetTypeIsImplementedError() {
-		final Random random = new Random();
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
 		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLOT_DATA.getId(), "PLOT_DATA");
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(datasetType);
 
 		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(DatasetTypeEnum.PLOT_DATA.getId(), errors);
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.operation.not.implemented"));
 	}
@@ -172,7 +170,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
@@ -226,7 +224,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(random.nextInt());
@@ -247,7 +245,7 @@ public class DatasetGeneratorInputValidatorTest {
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.type.id.not.exist"));
 	}
@@ -273,7 +271,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		dataset.setDatasetTypeId(DatasetTypeEnum.MEANS_DATA.getId());
@@ -295,7 +293,7 @@ public class DatasetGeneratorInputValidatorTest {
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.parent.not.allowed"));
 	}
@@ -321,7 +319,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -343,7 +341,7 @@ public class DatasetGeneratorInputValidatorTest {
 		when(this.datasetService.getNumberOfChildren(parentId)).thenReturn(25);
 		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.creation.not.allowed"));
 	}
@@ -369,7 +367,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -396,7 +394,7 @@ public class DatasetGeneratorInputValidatorTest {
 		when(this.datasetService.getNumberOfChildren(parentId)).thenReturn(2);
 		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.name.exceed.length"));
 	}
@@ -422,7 +420,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -448,7 +446,7 @@ public class DatasetGeneratorInputValidatorTest {
 		when(this.datasetService.getNumberOfChildren(parentId)).thenReturn(2);
 		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.name.empty.name"));
 	}
@@ -474,7 +472,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -500,7 +498,7 @@ public class DatasetGeneratorInputValidatorTest {
 		when(this.datasetService.getNumberOfChildren(parentId)).thenReturn(2);
 		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.invalid.instances"));
@@ -527,7 +525,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -556,7 +554,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.invalid.number.subobs.units"));
@@ -583,7 +581,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
@@ -607,7 +605,7 @@ public class DatasetGeneratorInputValidatorTest {
 		when(this.datasetService.getNumberOfChildren(parentId)).thenReturn(2);
 		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.invalid.obs.unit.variable"));
@@ -634,7 +632,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setInstanceIds(instanceIds);
@@ -682,7 +680,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-		studyInstance.setInstanceDbId(1);
+		studyInstance.setInstanceId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
 		datasetInputGenerator.setInstanceIds(instanceIds);
@@ -707,7 +705,7 @@ public class DatasetGeneratorInputValidatorTest {
 			.thenReturn(variableDetails);
 		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		Assert.assertEquals(errors.getAllErrors().size(), 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.name.invalid"));
 	}

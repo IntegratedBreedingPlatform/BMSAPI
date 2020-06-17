@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.derived;
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -10,8 +11,6 @@ import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.dataset.DatasetService;
-import org.ibp.api.rest.dataset.DatasetDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -37,15 +36,13 @@ public class DerivedVariableValidator {
 	private FormulaService formulaService;
 
 	@Resource
-	private DatasetService datasetService;
-
-	@Resource
 	private DatasetTypeService datasetTypeService;
 
 	@Resource
 	private DerivedVariableService middlewareDerivedVariableService;
 
-
+	@Resource
+	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
 
 	public void validate(final Integer variableId, final List<Integer> geoLocationIds) {
 
@@ -95,10 +92,10 @@ public class DerivedVariableValidator {
 		if (formulaOptional.isPresent()) {
 			final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formulaOptional.get().getDefinition(), false);
 			final List<DatasetDTO> subobsDatasets =
-				this.datasetService.getDatasets(studyId, new HashSet<>(this.datasetTypeService.getSubObservationDatasetTypeIds()));
+				this.middlewareDatasetService.getDatasets(studyId, new HashSet<>(this.datasetTypeService.getSubObservationDatasetTypeIds()));
 			final List<Integer> subobservationIds = subobsDatasets.stream().map(DatasetDTO::getDatasetId).collect(Collectors.toList());
 			final Integer plotDatasetId =
-				this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
+				this.middlewareDatasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
 					.getDatasetId();
 			if(!aggregateInputVariables.isEmpty()) {
 				if (!plotDatasetId.equals(datasetId)) {
