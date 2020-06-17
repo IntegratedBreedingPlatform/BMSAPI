@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.derived;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
@@ -187,6 +188,8 @@ public class DerivedVariableServiceImplTest {
 		verify(this.middlewareDerivedVariableService).saveCalculatedResult(captureValue.capture(),
 			captureCategoricalId.capture(), captureObservationUnitId.capture(), captureObservationId.capture(),
 			captureTargetMeasurementVariable.capture());
+
+		verify(this.middlwareDatasetService).updateDependentPhenotypesAsOutOfSync(TARGET_VARIABLE_TERMID, Sets.newHashSet(OBSERVATION_UNIT_ID));
 
 		// TODO: When AVG and SUM functions are already implemented, verify the aggregate functions and sub-observation values are evaluated properly.
 		assertTrue(result.isEmpty());
