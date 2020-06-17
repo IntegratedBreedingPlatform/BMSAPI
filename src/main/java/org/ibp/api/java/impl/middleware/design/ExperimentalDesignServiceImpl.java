@@ -134,7 +134,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 
 	@Override
 	public Optional<Integer> getStudyExperimentalDesignTypeTermId(final int studyId) {
-		final com.google.common.base.Optional<Integer> termIdOptional =
+		final Optional<Integer> termIdOptional =
 			this.experimentDesignMiddlewareService.getStudyExperimentDesignTypeTermId(studyId);
 		if (termIdOptional.isPresent()) {
 			return Optional.of(termIdOptional.get());
