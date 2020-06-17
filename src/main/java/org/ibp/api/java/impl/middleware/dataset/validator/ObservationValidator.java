@@ -3,11 +3,11 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.validator.routines.DateValidator;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -29,9 +29,6 @@ public class ObservationValidator {
 	@Autowired
 	protected OntologyVariableDataManager ontologyVariableDataManager;
 
-	@Autowired
-	private StudyDataManager studyDataManager;
-
 	private BindingResult errors;
 	
 	public void validateObservationUnit(final Integer datasetId, final Integer observationUnitId) {
@@ -44,8 +41,7 @@ public class ObservationValidator {
 		}
 	}
 
-	public void validateObservation(
-		final Integer studyId, final Integer datasetId, final Integer observationUnitId,
+	public void validateObservation(final Integer datasetId, final Integer observationUnitId,
 		final Integer observationId, final ObservationDto observationDto) {
 
 		this.validateObservationUnit(datasetId, observationUnitId);
@@ -58,18 +54,17 @@ public class ObservationValidator {
 		}
 
 		if (observationDto != null) {
-			this.validateObservationValue(studyId, phenotype.getObservableId(), observationDto.getValue());
+			this.validateObservationValue(phenotype.getObservableId(), observationDto.getValue());
 			if (observationDto.getDraftValue() != null) {
-				this.validateObservationValue(studyId, phenotype.getObservableId(), observationDto.getDraftValue());
+				this.validateObservationValue(phenotype.getObservableId(), observationDto.getDraftValue());
 			}
 		}
 	}
 
-	public void validateObservationValue(final Integer studyId, final Integer variableId, final String value) {
+	public void validateObservationValue(final Integer variableId, final String value) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final String programUuid = this.studyDataManager.getStudy(studyId).getProgramUUID();
-		final Variable var = this.ontologyVariableDataManager.getVariable(programUuid, variableId, true);
+		final Variable var = this.ontologyVariableDataManager.getVariable(ContextHolder.getCurrentProgram(), variableId, true);
 
 		if (!isValidValue(var, value)) {
 			this.errors.reject("invalid.observation.value");
