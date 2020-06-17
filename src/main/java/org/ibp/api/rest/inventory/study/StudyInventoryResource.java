@@ -1,12 +1,12 @@
 package org.ibp.api.rest.inventory.study;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -41,9 +41,9 @@ public class StudyInventoryResource {
 		@RequestBody final StudyTransactionsRequest studyTransactionsRequest
 	) {
 
-		Preconditions.checkNotNull(studyTransactionsRequest, "params cannot be null");
+		BaseValidator.checkNotNull(studyTransactionsRequest, "param.null", new String[] {"studyTransactionsRequest"});
 		final SortedPageRequest sortedRequest = studyTransactionsRequest.getSortedPageRequest();
-		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
+		BaseValidator.checkNotNull(sortedRequest, "sortedrequest.empty");
 
 		final Integer pageNumber = sortedRequest.getPageNumber();
 		final Integer pageSize = sortedRequest.getPageSize();
@@ -55,12 +55,12 @@ public class StudyInventoryResource {
 			pagedResult = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<StudyTransactionsDto>() {
 				@Override
 				public long getCount() {
-					return studyTransactionsService.countAllStudyTransactions(studyId, studyTransactionsRequest);
+					return studyTransactionsService.countStudyTransactions(studyId, null);
 				}
 
 				@Override
 				public long getFilteredCount() {
-					return studyTransactionsService.countFilteredStudyTransactions(studyId, studyTransactionsRequest);
+					return studyTransactionsService.countStudyTransactions(studyId, studyTransactionsRequest);
 				}
 
 				@Override
