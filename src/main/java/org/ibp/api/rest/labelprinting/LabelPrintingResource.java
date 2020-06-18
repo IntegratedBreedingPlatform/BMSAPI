@@ -145,7 +145,7 @@ public class LabelPrintingResource {
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
 
-	private LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {
+	public LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {
 		final LabelPrintingType labelPrintingTypeEnum = LabelPrintingType.getEnumByCode(labelPrintingType);
 
 		if (!this.hasAuthority(labelPrintingTypeEnum)) {
@@ -215,6 +215,10 @@ public class LabelPrintingResource {
 				labelsFileGenerator = null;
 		}
 		return labelsFileGenerator;
+	}
+
+	public void setRequest(final HttpServletRequest request) {
+		this.request = request;
 	}
 
 }
