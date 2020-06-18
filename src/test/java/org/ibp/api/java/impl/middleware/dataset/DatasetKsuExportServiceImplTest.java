@@ -104,7 +104,7 @@ public class DatasetKsuExportServiceImplTest {
 	@InjectMocks
 	private DatasetKsuExcelExportServiceImpl datasetKSUExcelExportService;
 
-	private MeasurementVariable measurementVariable = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GENERAL_TRAIT_CLASS.getId(), "GW100", "2");
+	private final MeasurementVariable measurementVariable = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GENERAL_TRAIT_CLASS.getId(), "GW100", "2");
 
 	@Before
 	public void setUp() {
@@ -118,15 +118,18 @@ public class DatasetKsuExportServiceImplTest {
 
 	@Test
 	public void testGenerateForKSUExcel() throws IOException {
-		this.testGenerateDatasetKSUExportService(this.datasetKSUExcelExportService, AbstractDatasetExportService.XLS, datasetKSUExcelGenerator);
+		this.testGenerateDatasetKSUExportService(this.datasetKSUExcelExportService, AbstractDatasetExportService.XLS,
+			this.datasetKSUExcelGenerator);
 	}
 
 	@Test
 	public void testGenerateForKSUCSV() throws IOException {
-		this.testGenerateDatasetKSUExportService(this.datasetKSUCSVExportService, AbstractDatasetExportService.CSV, datasetKSUCSVGenerator);
+		this.testGenerateDatasetKSUExportService(this.datasetKSUCSVExportService, AbstractDatasetExportService.CSV,
+			this.datasetKSUCSVGenerator);
 	}
 
-	private void testGenerateDatasetKSUExportService(AbstractDatasetExportService datasetKSUExportService, final String fileExtension, final
+	private void testGenerateDatasetKSUExportService(
+		final AbstractDatasetExportService datasetKSUExportService, final String fileExtension, final
 		DatasetFileGenerator generator) throws IOException {
 		final Study study = new Study();
 		final DataSet trialDataSet = new DataSet();
@@ -148,15 +151,15 @@ public class DatasetKsuExportServiceImplTest {
 
 		datasetKSUExportService.setZipUtil(this.zipUtil);
 
-		when(datasetService.getDataset(anyInt())).thenReturn(dataSetDTO);
+		when(this.datasetService.getDataset(anyInt())).thenReturn(dataSetDTO);
 		dataSetDTO.setParentDatasetId(1);
 
 		final File zipFile = new File("");
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(instanceId1, instanceId2));
 		when(this.zipUtil.zipFiles(eq(study.getName()), anyListOf(File.class))).thenReturn(zipFile);
-		Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
-		instanceObservationUnitRowsMap.put(1, new ArrayList<ObservationUnitRow>());
-		instanceObservationUnitRowsMap.put(2, new ArrayList<ObservationUnitRow>());
+		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
+		instanceObservationUnitRowsMap.put(1, new ArrayList<>());
+		instanceObservationUnitRowsMap.put(2, new ArrayList<>());
 		when(this.studyDatasetService.getInstanceObservationUnitRowsMap(eq(study.getId()), eq(dataSetDTO.getDatasetId()), any(
 			ArrayList.class))).thenReturn(instanceObservationUnitRowsMap);
 
@@ -224,7 +227,7 @@ public class DatasetKsuExportServiceImplTest {
 
 	private StudyInstance createStudyInstance(final Integer instanceId) {
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(instanceId);
+		studyInstance.setInstanceId(instanceId);
 		studyInstance.setInstanceNumber(instanceId);
 		studyInstance.setLocationName("IRRI");
 		return studyInstance;

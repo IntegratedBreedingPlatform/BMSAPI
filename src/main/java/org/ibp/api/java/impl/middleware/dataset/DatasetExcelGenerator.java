@@ -373,7 +373,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> environmentDetails =
 			filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
 		final Map<Integer, String> geoLocationMap =
-			this.studyDataManager.getGeolocationByVariableId(environmentDatasetId, instance.getInstanceDbId());
+			this.studyDataManager.getGeolocationByInstanceId(environmentDatasetId, instance.getInstanceId());
 
 		final ListIterator<MeasurementVariable> iterator = environmentDetails.listIterator();
 		while (iterator.hasNext()) {
@@ -409,7 +409,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> environmentConditions =
 			filterByVariableType(environmentVariables, VariableType.STUDY_CONDITION);
 		final Map<Integer, String> environmentConditionMap =
-			this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, instance.getInstanceDbId());
+			this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, instance.getInstanceId());
 		for (final MeasurementVariable variable : environmentConditions) {
 			final String keyValue = environmentConditionMap.get(variable.getTermId());
 			if (variable.getValue() == null && StringUtils.isNotBlank(keyValue)) {
@@ -645,7 +645,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return sb.toString();
 	}
 
-	protected String concatenateMinMaxValueIfAvailable(final MeasurementVariable measurementVariable) {
+	private String concatenateMinMaxValueIfAvailable(final MeasurementVariable measurementVariable) {
 
 		if (measurementVariable.getMinRange() == null && measurementVariable.getMaxRange() == null) {
 			return NO_RANGE;

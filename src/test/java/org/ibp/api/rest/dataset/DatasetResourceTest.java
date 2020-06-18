@@ -26,7 +26,6 @@ import org.ibp.api.java.impl.middleware.dataset.DatasetCollectionOrderServiceImp
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -61,11 +60,11 @@ import static org.mockito.Mockito.verify;
 
 public class DatasetResourceTest extends ApiUnitTestBase {
 
-	public static final String DATASET_NAME = "TEST1234";
-	public static final int STUDY_ID = 12345;
-	public static final int PARENT_ID = 200;
-	public static final String DATASETS_GENERATION_URL = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{parentId}/generation";
-	protected final MediaType xlsContentType =
+	private static final String DATASET_NAME = "TEST1234";
+	private static final int STUDY_ID = 12345;
+	private static final int PARENT_ID = 200;
+	private static final String DATASETS_GENERATION_URL = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{parentId}/generation";
+	private final MediaType xlsContentType =
 		new MediaType(MediaType.APPLICATION_OCTET_STREAM.getType(), MediaType.APPLICATION_OCTET_STREAM.getSubtype(),
 			Charset.forName("utf8"));
 
@@ -193,8 +192,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
 		Mockito.verify(this.studyDatasetService)
-			.createObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationUnitId),
-				Matchers.any(ObservationDto.class));
+			.createObservation(ArgumentMatchers.eq(studyId), ArgumentMatchers.eq(datasetId), ArgumentMatchers.eq(observationUnitId),
+				ArgumentMatchers.any(ObservationDto.class));
 	}
 
 	@Test
@@ -218,8 +217,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
 		Mockito.verify(this.studyDatasetService)
-			.updateObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationId), Matchers.eq(observationUnitId),
-				Matchers.any(ObservationDto.class));
+			.updateObservation(ArgumentMatchers.eq(studyId), ArgumentMatchers.eq(datasetId), ArgumentMatchers.eq(observationId), ArgumentMatchers.eq(observationUnitId),
+				ArgumentMatchers.any(ObservationDto.class));
 	}
 
 	@Test
@@ -306,7 +305,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].dataType", is(dataset.getVariables().get(0).getDataType())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].dataTypeId", is(dataset.getVariables().get(0).getDataTypeId())))
 
-			.andExpect(MockMvcResultMatchers.jsonPath("$.instances[0].instanceDbId", is(dataset.getInstances().get(0).getInstanceDbId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.instances[0].locationName", is(dataset.getInstances().get(0).getLocationName())))
 			.andExpect(MockMvcResultMatchers
 				.jsonPath("$.instances[0].locationAbbreviation", is(dataset.getInstances().get(0).getLocationAbbreviation())))
@@ -425,7 +423,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		rowDataMap.put("TRAIT1", 1);
 		rowDataMap.put("TRAIT2", "ABC");
 
-		Mockito.when(this.studyDatasetService.getObservationUnitRowsAsMapList(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+		Mockito.when(this.studyDatasetService.getObservationUnitRowsAsMapList(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(),
 			ArgumentMatchers.any()))
 			.thenReturn(Lists.newArrayList(rowDataMap));
 		final Random random = new Random();
@@ -472,7 +470,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
 		Mockito.verify(this.studyDatasetService)
-			.deleteObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationUnitId), Matchers.eq(observationId));
+			.deleteObservation(ArgumentMatchers.eq(studyId), ArgumentMatchers.eq(datasetId), ArgumentMatchers.eq(observationUnitId), ArgumentMatchers.eq(observationId));
 	}
 
 	@Test
@@ -513,7 +511,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].dataType", is(dataset.getVariables().get(0).getDataType())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].dataTypeId", is(dataset.getVariables().get(0).getDataTypeId())))
 
-			.andExpect(MockMvcResultMatchers.jsonPath("$.instances[0].instanceDbId", is(dataset.getInstances().get(0).getInstanceDbId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.instances[0].locationName", is(dataset.getInstances().get(0).getLocationName())))
 			.andExpect(MockMvcResultMatchers
 				.jsonPath("$.instances[0].locationAbbreviation", is(dataset.getInstances().get(0).getLocationAbbreviation())))
@@ -704,8 +701,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int datasetId = random.nextInt(10000);
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		observationsPutRequestInput.setProcessWarnings(true);
-		observationsPutRequestInput.setData(new ArrayList<List<String>>());
-		final PreconditionFailedException exception = new PreconditionFailedException(new ArrayList<ObjectError>());
+		observationsPutRequestInput.setData(new ArrayList<>());
+		final PreconditionFailedException exception = new PreconditionFailedException(new ArrayList<>());
 		Mockito.doThrow(exception).when(this.studyDatasetService).importObservations(studyId, datasetId, observationsPutRequestInput);
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.put("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, this.programUuid, studyId,
@@ -721,7 +718,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int datasetId = random.nextInt(10000);
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		observationsPutRequestInput.setProcessWarnings(false);
-		observationsPutRequestInput.setData(new ArrayList<List<String>>());
+		observationsPutRequestInput.setData(new ArrayList<>());
 		Mockito.doAnswer(new Answer<Void>() {
 
 			@Override
@@ -743,8 +740,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int datasetId = random.nextInt(10000);
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		observationsPutRequestInput.setProcessWarnings(false);
-		observationsPutRequestInput.setData(new ArrayList<List<String>>());
-		final ApiRequestValidationException exception = new ApiRequestValidationException(new ArrayList<ObjectError>());
+		observationsPutRequestInput.setData(new ArrayList<>());
+		final ApiRequestValidationException exception = new ApiRequestValidationException(new ArrayList<>());
 		Mockito.doThrow(exception).when(this.studyDatasetService).importObservations(studyId, datasetId, observationsPutRequestInput);
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.put("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, this.programUuid, studyId,
@@ -955,7 +952,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		datasetDTO.setVariables(variables);
 
 		final StudyInstance studyInstance = new StudyInstance();
-		studyInstance.setInstanceDbId(67);
+		studyInstance.setInstanceId(67);
 		studyInstance.setLocationName("CENTER FOR INTERNATIONAL FORESTRY RESEARCH");
 		studyInstance.setLocationAbbreviation("CIFOR");
 		studyInstance.setInstanceNumber(1);

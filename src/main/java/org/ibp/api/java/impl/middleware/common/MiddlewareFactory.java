@@ -61,6 +61,7 @@ import org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl
 import org.generationcp.middleware.service.impl.rpackage.RPackageServiceImpl;
 import org.generationcp.middleware.service.impl.study.*;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
+import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -491,7 +492,11 @@ public class MiddlewareFactory {
 		return new StudyGermplasmServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
-
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public ExperimentModelGenerator getExperimentModelGenerator() {
+		return new ExperimentModelGenerator(this.getCropDatabaseSessionProvider());
+	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
 		return new HibernateSessionPerRequestProvider(this.WORKBENCH_SessionFactory);

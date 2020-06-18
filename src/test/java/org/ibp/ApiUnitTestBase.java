@@ -178,12 +178,6 @@ public abstract class ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public StudyInstanceService studyInstanceService() {
-			return Mockito.mock(StudyInstanceService.class);
-		}
-
-		@Bean
-		@Primary
 		public RPackageService rPackageService() {
 			return Mockito.mock(RPackageService.class);
 		}
@@ -198,6 +192,18 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public StudyGermplasmService studyGermplasmService() {
 			return Mockito.mock(StudyGermplasmService.class);
+		}
+
+		@Bean
+		@Primary
+		public StudyInstanceService studyInstanceService() {
+			return Mockito.mock(StudyInstanceService.class);
+		}
+
+		@Bean
+		@Primary
+		public org.generationcp.middleware.service.api.study.StudyInstanceService studyInstanceMiddlewareService() {
+			return Mockito.mock(org.generationcp.middleware.service.api.study.StudyInstanceService.class);
 		}
 	}
 

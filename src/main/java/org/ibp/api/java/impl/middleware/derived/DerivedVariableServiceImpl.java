@@ -112,6 +112,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		final FormulaDto formula = formulaOptional.get();
+		final MeasurementVariable targetMeasurementVariable = measurementVariablesMap.get(formula.getTarget().getId());
 		final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula.getDefinition());
 		final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formula.getDefinition(), true);
 
@@ -127,6 +128,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				.getValuesFromObservations(studyId, this.datasetTypeService.getSubObservationDatasetTypeIds(),
 					inputVariableDatasetMap);
 
+		final Set<Integer> observationUnitIds = new HashSet<>();
 		// Iterate through the observations for each instances
 		for (final List<ObservationUnitRow> observations : instanceIdObservationUnitRowsMap.values()) {
 			for (final ObservationUnitRow observation : observations) {
@@ -180,7 +182,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 				// Process calculation result
 				final ObservationUnitData target = observation.getVariables().get(formula.getTarget().getName());
-				final MeasurementVariable targetMeasurementVariable = measurementVariablesMap.get(formula.getTarget().getId());
 
 				// Check if the calculated value matches any of the possible categorical values and get its categorical id.
 				Integer categoricalId = null;
@@ -197,6 +198,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					value, categoricalId, observation.getObservationUnitId(),
 					target.getObservationId(),
 					targetMeasurementVariable);
+				observationUnitIds.add(observation.getObservationUnitId());
 
 				if (StringUtils.isNotEmpty(target.getValue()) && !target.getValue().equals(value)) {
 					if (!overwriteExistingData) {
@@ -214,6 +216,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 			}
 
 		}
+
+		// Update the dependent phenotypes as out of sync in batch
+		this.middlewareDatasetService.updateDependentPhenotypesAsOutOfSync(targetMeasurementVariable.getTermId(), observationUnitIds);
 
 		// Process response
 		if (!inputMissingData.isEmpty()) {

@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
@@ -40,7 +41,7 @@ public class StudyValidatorTest {
 	private StudyDataManager studyDataManager;
 
 	@Mock
-	private org.generationcp.middleware.service.api.study.StudyInstanceService studyInstanceMiddlewareService;
+	private StudyInstanceService studyInstanceService;
 
 	@InjectMocks
 	private StudyValidator studyValidator;
@@ -116,19 +117,19 @@ public class StudyValidatorTest {
 		study.setProgramUUID(PROGRAM_UUID);
 
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
-		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
 			RandomStringUtils.randomAlphabetic(10), false);
 		studyInstance.setCanBeDeleted(false);
-		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
 			RandomStringUtils.randomAlphabetic(10), false);
 		studyInstance2.setCanBeDeleted(true);
-		Mockito.when(this.studyInstanceMiddlewareService.getStudyInstances(studyId))
+		Mockito.when(this.studyInstanceService.getStudyInstances(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 		try {
 			this.studyValidator.validate(studyId, ran.nextBoolean(), true);
@@ -150,19 +151,19 @@ public class StudyValidatorTest {
 		study.setProgramUUID(PROGRAM_UUID);
 
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
-		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
 			RandomStringUtils.randomAlphabetic(10), false);
 		studyInstance.setCanBeDeleted(true);
-		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
 			RandomStringUtils.randomAlphabetic(10), false);
 		studyInstance2.setCanBeDeleted(true);
-		Mockito.when(this.studyInstanceMiddlewareService.getStudyInstances(studyId))
+		Mockito.when(this.studyInstanceService.getStudyInstances(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 
 		this.studyValidator.validate(studyId, ran.nextBoolean(), true);
@@ -180,7 +181,7 @@ public class StudyValidatorTest {
 
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		this.studyValidator.validate(studyId, ran.nextBoolean(), false);
-		Mockito.verifyZeroInteractions(this.studyInstanceMiddlewareService);
+		Mockito.verifyZeroInteractions(this.studyInstanceService);
 	}
 
 
