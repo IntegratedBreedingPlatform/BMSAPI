@@ -38,11 +38,11 @@ public class LabelPrintingResourceTest {
 
 	@Test
 	public void testGetLabelsFileGenerator() {
-		Mockito.when(subObservationDatasetLabelPrinting.getSupportedFileTypes()).thenReturn(SubObservationDatasetLabelPrinting.SUPPORTED_FILE_TYPES);
+		Mockito.when(this.subObservationDatasetLabelPrinting.getSupportedFileTypes()).thenReturn(SubObservationDatasetLabelPrinting.SUPPORTED_FILE_TYPES);
 		try {
 			this.labelPrintingResource.getLabelsFileGenerator(FileType.XLS.getExtension(), this.subObservationDatasetLabelPrinting);
 			Assert.fail("Should throw a NotSupportedException");
-		} catch (NotSupportedException ex) {
+		} catch (final NotSupportedException ex) {
 		}
 
 		LabelsFileGenerator fileGenerator = this.labelPrintingResource.getLabelsFileGenerator(FileType.CSV.getExtension(), this.subObservationDatasetLabelPrinting);
