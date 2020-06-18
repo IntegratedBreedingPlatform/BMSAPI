@@ -182,6 +182,7 @@ public class LabelPrintingResource {
 					|| request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name());
 			case LOT:
 				return request.isUserInRole(PermissionsEnum.ADMIN.name())
+					|| request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())
 					|| request.isUserInRole(PermissionsEnum.MANAGE_INVENTORY.name())
 					|| request.isUserInRole(PermissionsEnum.MANAGE_LOTS.name())
 					|| request.isUserInRole(PermissionsEnum.LOT_LABEL_PRINTING.name());
