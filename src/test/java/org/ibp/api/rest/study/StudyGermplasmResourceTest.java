@@ -33,6 +33,7 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
         final int newGid = random.nextInt();
         final int newEntryId = random.nextInt();
         final StudyGermplasmDto newDto = new StudyGermplasmDto();
+        newDto.setEntryId(random.nextInt());
         newDto.setGermplasmId(newGid);
 
         final StudyGermplasmDto dto = new StudyGermplasmDto(newEntryId, String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), newGid, RandomStringUtils.randomAlphabetic(20), 6, RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
