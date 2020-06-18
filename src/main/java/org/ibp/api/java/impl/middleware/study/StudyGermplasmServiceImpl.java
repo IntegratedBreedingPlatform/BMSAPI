@@ -33,7 +33,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
     private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
 
     @Override
-    public StudyGermplasmDto replaceStudyGermplasm(final Integer studyId, final Integer entryId, final Integer gid) {
+    public StudyGermplasmDto replaceStudyGermplasm(final Integer studyId, final Integer entryId, final StudyGermplasmDto studyGermplasmDto) {
+        final Integer gid = studyGermplasmDto.getGermplasmId();
         this.studyValidator.validate(studyId, true);
         this.studyGermplasmValidator.validate(studyId, entryId, gid);
 

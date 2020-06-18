@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.study;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
@@ -47,7 +48,9 @@ public class StudyGermplasmServiceImplTest {
         final Integer newGid = random.nextInt();
         final String crossExpansion = RandomStringUtils.randomAlphabetic(20);
         Mockito.doReturn(crossExpansion).when(this.pedigreeService).getCrossExpansion(newGid, this.crossExpansionProperties);
-        this.studyGermplasmService.replaceStudyGermplasm(studyId, entryId, newGid);
+        final StudyGermplasmDto dto = new StudyGermplasmDto();
+        dto.setGermplasmId(newGid);
+        this.studyGermplasmService.replaceStudyGermplasm(studyId, entryId, dto);
         Mockito.verify(this.studyValidator).validate(studyId, true);
         Mockito.verify(this.studyGermplasmValidator).validate(studyId, entryId, newGid);
         Mockito.verify(this.middlewareStudyGermplasmService).replaceStudyGermplasm(studyId, entryId, newGid, crossExpansion);

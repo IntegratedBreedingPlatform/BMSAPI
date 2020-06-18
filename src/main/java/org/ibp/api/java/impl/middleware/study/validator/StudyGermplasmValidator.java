@@ -41,6 +41,9 @@ public class StudyGermplasmValidator {
     public void validate(final Integer studyId, final Integer entryId, final Integer newGid) {
 
         this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+        if (newGid == null){
+            errors.reject("gid.is.required");
+        }
         final Optional<StudyGermplasmDto> entry = this.middlewareStudyGermplasmService.getStudyGermplasm(studyId, entryId);
         if (!entry.isPresent()){
             errors.reject("invalid.entryid");

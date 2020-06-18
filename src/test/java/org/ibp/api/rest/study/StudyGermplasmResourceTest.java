@@ -32,13 +32,15 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
         final int newEntryId = random.nextInt();
+        final StudyGermplasmDto newDto = new StudyGermplasmDto();
+        newDto.setGermplasmId(newGid);
 
         final StudyGermplasmDto dto = new StudyGermplasmDto(newEntryId, String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), newGid, RandomStringUtils.randomAlphabetic(20), 6, RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-        Mockito.doReturn(dto).when(this.studyGermplasmService).replaceStudyGermplasm(studyId, entryId, newGid);
+        Mockito.doReturn(dto).when(this.studyGermplasmService).replaceStudyGermplasm(studyId, entryId, newDto);
 
         this.mockMvc.perform(MockMvcRequestBuilders
                 .put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/germplasm/{entryId}", CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, entryId)
-                .param("gid", String.valueOf(newGid))
+                .content(this.convertObjectToByte(newDto))
                 .contentType(this.contentType))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
