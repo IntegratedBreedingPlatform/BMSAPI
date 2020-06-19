@@ -1,6 +1,8 @@
 
 package org.ibp.api.security.xauth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.java.impl.middleware.common.ContextResolutionException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -71,9 +73,19 @@ public class XAuthTokenFilter extends GenericFilterBean {
 			}
 			filterChain.doFilter(servletRequest, servletResponse);
 		} catch (final ContextResolutionException contextResolutionException) {
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, contextResolutionException.getMessage());
+			// Manually send error code and message, exception thrown here in at filter level can't be caught in ControllerAdvice (DefaultExceptionHandler).
+			this.sendError(HttpServletResponse.SC_BAD_REQUEST, contextResolutionException.getMessage(), httpServletResponse);
 		} catch (final Exception ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	void sendError(final int status, final String message, final HttpServletResponse response) throws IOException {
+		final ErrorResponse errorResponse = new ErrorResponse();
+		errorResponse.addError(message);
+		response.setStatus(status);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
 	}
 }
