@@ -4,8 +4,8 @@ BMS API is a set of RESTful web services that allow access to data in the BMS da
 
 Useful resources
 ==============
-BrAPI: https://brapi.org/
-BMSAPI Swaggerhub: https://app.swaggerhub.com/apis/ibp_bms/BMSAPI/
+- BrAPI: https://brapi.org/
+- BMSAPI Swaggerhub: https://app.swaggerhub.com/apis/ibp_bms/BMSAPI/
 
 Suscribe (!)
 ==============
