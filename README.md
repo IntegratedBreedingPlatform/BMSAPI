@@ -2,6 +2,11 @@ Breeding Management System API
 ==============================
 BMS API is a set of RESTful web services that allow access to data in the BMS database.
 
+Useful resources
+==============
+BrAPI: https://brapi.org/
+BMSAPI Swaggerhub: https://app.swaggerhub.com/apis/ibp_bms/BMSAPI/
+
 Suscribe (!)
 ==============
 
