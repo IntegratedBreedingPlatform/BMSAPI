@@ -6,7 +6,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -22,7 +21,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Collections;
 
 public class XAuthTokenFilterTest {
@@ -71,10 +69,9 @@ public class XAuthTokenFilterTest {
 	@Test
 	public void testDoFilterValidBrAPIRequest() throws IOException, ServletException {
 		final String testUser = "admin";
-		final User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
 
-		final ContextResolutionException contextResolutionException = new ContextResolutionException("");
-		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenThrow(contextResolutionException);
+		final User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
+		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenReturn(userDetails);
 
 		// Generate a valid token
 		final Token token = this.tokenProvider.createToken(userDetails);
