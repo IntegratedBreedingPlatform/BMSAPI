@@ -145,7 +145,7 @@ public class LabelPrintingResource {
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
 
-	private LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {
+	public LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {
 		final LabelPrintingType labelPrintingTypeEnum = LabelPrintingType.getEnumByCode(labelPrintingType);
 
 		if (!this.hasAuthority(labelPrintingTypeEnum)) {
@@ -177,14 +177,15 @@ public class LabelPrintingResource {
 	private boolean hasAuthority(final LabelPrintingType labelPrintingTypeEnum) {
 		switch (labelPrintingTypeEnum) {
 			case SUBOBSERVATION_DATASET:
-				return request.isUserInRole(PermissionsEnum.ADMIN.name())
-					|| request.isUserInRole(PermissionsEnum.BREEDING_ACTIVITIES.name())
-					|| request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name());
+				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
+					|| this.request.isUserInRole(PermissionsEnum.BREEDING_ACTIVITIES.name())
+					|| this.request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name());
 			case LOT:
-				return request.isUserInRole(PermissionsEnum.ADMIN.name())
-					|| request.isUserInRole(PermissionsEnum.MANAGE_INVENTORY.name())
-					|| request.isUserInRole(PermissionsEnum.MANAGE_LOTS.name())
-					|| request.isUserInRole(PermissionsEnum.LOT_LABEL_PRINTING.name());
+				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
+					|| this.request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())
+					|| this.request.isUserInRole(PermissionsEnum.MANAGE_INVENTORY.name())
+					|| this.request.isUserInRole(PermissionsEnum.MANAGE_LOTS.name())
+					|| this.request.isUserInRole(PermissionsEnum.LOT_LABEL_PRINTING.name());
 			default:
 				return false;
 		}
@@ -214,6 +215,10 @@ public class LabelPrintingResource {
 				labelsFileGenerator = null;
 		}
 		return labelsFileGenerator;
+	}
+
+	public void setRequest(final HttpServletRequest request) {
+		this.request = request;
 	}
 
 }
