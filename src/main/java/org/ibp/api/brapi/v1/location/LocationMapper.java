@@ -40,7 +40,7 @@ public class LocationMapper {
 
 			@Override protected void configure() {
 
-				this.map().setLocationDbId(this.source.getLocationDbId());
+				this.map().setLocationDbId(String.valueOf(this.source.getLocationDbId()));
 				this.map().setName(this.source.getName());
 				this.map().setAbbreviation(this.source.getAbbreviation());
 				this.map().setLatitude(this.source.getLatitude());

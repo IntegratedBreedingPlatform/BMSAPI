@@ -1,4 +1,4 @@
-package org.ibp.api.rest.labelprinting;
+package org.ibp.api.rest.labelprinting.filegenerator;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
+public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PDFLabelsFileGenerator.class);
 	private static final String UNSUPPORTED_CHARSET_IMG = "unsupported-char-set.png";

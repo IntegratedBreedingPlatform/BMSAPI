@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -14,18 +15,22 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
+import org.generationcp.middleware.service.api.BrapiView;
+import org.ibp.api.brapi.v2.location.Coordinate;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"locationDbId", "locationType", "name", "abbreviation", "countryCode", "countryName", "latitude", "longitude",
-		"altitude", "attributes", "additionalInfo"})
+	"altitude", "coordinateDescription", "coordinateUncertainty", "coordinates", "documentationURL", "environmentType", "exposure", "instituteAddress",
+	"instituteName", "siteStatus", "slope", "topography", "attributes", "additionalInfo"})
 public class Location {
 
-	private Integer locationDbId;
+	private String locationDbId;
 
 	private String locationType;
 
 	private String name;
+
+	private String locationName;
 
 	private String abbreviation;
 
@@ -39,6 +44,42 @@ public class Location {
 
 	private Double altitude;
 
+	@JsonView(BrapiView.BrapiV2.class)
+	private String coordinateDescription;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private Double coordinateUncertainty;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private Coordinate coordinates;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<String> externalReferences;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String documentationURL;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String environmentType;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String exposure;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String instituteAddress;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String instituteName;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String siteStatus;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private Double slope;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String topography;
+
 	@JsonInclude(Include.NON_EMPTY)
 	private List<Object> attributes = new ArrayList<>();
 
@@ -50,9 +91,9 @@ public class Location {
 	public Location() {
 	}
 
-	public Location(final Integer locationDbId, final String locationType, final String name, final String abbreviation,
-			final String countryCode, final String countryName, final Double latitude, final Double longitude, final Double altitude,
-			final List<Object> attributes, final Map<String, String> additionalInfo) {
+	public Location(final String locationDbId, final String locationType, final String name, final String abbreviation,
+		final String countryCode, final String countryName, final Double latitude, final Double longitude, final Double altitude,
+		final List<Object> attributes, final Map<String, String> additionalInfo) {
 		this.locationDbId = locationDbId;
 		this.locationType = locationType;
 		this.name = name;
@@ -70,7 +111,7 @@ public class Location {
 	 *
 	 * @return The locationDbId
 	 */
-	public Integer getLocationDbId() {
+	public String getLocationDbId() {
 		return this.locationDbId;
 	}
 
@@ -78,11 +119,11 @@ public class Location {
 	 *
 	 * @param locationDbId The locationDbId
 	 */
-	public void setLocationDbId(final Integer locationDbId) {
+	public void setLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
 	}
 
-	public Location withLocationDbId(final Integer locationDbId) {
+	public Location withLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
 		return this;
 	}
@@ -238,16 +279,134 @@ public class Location {
 		return this.locationType;
 	}
 
-	public void setLocationType(final String locationType) {
+	public Location setLocationType(final String locationType) {
 		this.locationType = locationType;
+		return this;
 	}
 
 	public String getAbbreviation() {
 		return this.abbreviation;
 	}
 
-	public void setAbbreviation(final String abbreviation) {
+	public Location setAbbreviation(final String abbreviation) {
 		this.abbreviation = abbreviation;
+		return this;
+	}
+
+	public String getCoordinateDescription() {
+		return coordinateDescription;
+	}
+
+	public Location setCoordinateDescription(final String coordinateDescription) {
+		this.coordinateDescription = coordinateDescription;
+		return this;
+	}
+
+	public Double getCoordinateUncertainty() {
+		return coordinateUncertainty;
+	}
+
+	public Location setCoordinateUncertainty(final Double coordinateUncertainty) {
+		this.coordinateUncertainty = coordinateUncertainty;
+		return this;
+	}
+
+	public Coordinate getCoordinates() {
+		return coordinates;
+	}
+
+	public Location setCoordinates(final Coordinate coordinates) {
+		this.coordinates = coordinates;
+		return this;
+	}
+
+	public List<String> getExternalReferences() {
+		return externalReferences;
+	}
+
+	public Location setExternalReferences(final List<String> externalReferences) {
+		this.externalReferences = externalReferences;
+		return this;
+	}
+
+	public String getDocumentationURL() {
+		return documentationURL;
+	}
+
+	public Location setDocumentationURL(final String documentationURL) {
+		this.documentationURL = documentationURL;
+		return this;
+	}
+
+	public String getEnvironmentType() {
+		return environmentType;
+	}
+
+	public Location setEnvironmentType(final String environmentType) {
+		this.environmentType = environmentType;
+		return this;
+	}
+
+	public String getExposure() {
+		return exposure;
+	}
+
+	public Location setExposure(final String exposure) {
+		this.exposure = exposure;
+		return this;
+	}
+
+	public String getInstituteAddress() {
+		return instituteAddress;
+	}
+
+	public Location setInstituteAddress(final String instituteAddress) {
+		this.instituteAddress = instituteAddress;
+		return this;
+	}
+
+	public String getInstituteName() {
+		return instituteName;
+	}
+
+	public Location setInstituteName(final String instituteName) {
+		this.instituteName = instituteName;
+		return this;
+	}
+
+	public String getSiteStatus() {
+		return siteStatus;
+	}
+
+	public Location setSiteStatus(final String siteStatus) {
+		this.siteStatus = siteStatus;
+		return this;
+	}
+
+	public Double getSlope() {
+		return slope;
+	}
+
+	public Location setSlope(final Double slope) {
+		this.slope = slope;
+		return this;
+	}
+
+	public String getTopography() {
+		return topography;
+	}
+
+	public Location setTopography(final String topography) {
+		this.topography = topography;
+		return this;
+	}
+
+	public String getLocationName() {
+		return this.locationName;
+	}
+
+	public void setLocationName(final String locationName) {
+		this.locationName = locationName;
 	}
 
 	public Map<String, String> getAdditionalInfo() {

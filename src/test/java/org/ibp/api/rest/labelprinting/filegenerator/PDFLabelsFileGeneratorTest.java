@@ -1,4 +1,4 @@
-package org.ibp.api.rest.labelprinting;
+package org.ibp.api.rest.labelprinting.filegenerator;
 
 import com.google.zxing.common.BitMatrix;
 import com.lowagie.text.BadElementException;
@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
+import org.ibp.api.rest.labelprinting.filegenerator.PDFLabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.template.LabelPaper;
 import org.junit.Assert;
 import org.junit.Test;

@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
@@ -24,7 +26,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
-import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.junit.Assert;
@@ -48,6 +50,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
@@ -55,15 +58,15 @@ import static org.mockito.ArgumentMatchers.anyListOf;
 public class DatasetServiceImplTest {
 
 	private static final int TEST_STUDY_IDENTIFIER = 2013;
-	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
-	public static final String ENTRY_CODE = "ENTRY_CODE";
+	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	private static final String ENTRY_CODE = "ENTRY_CODE";
 	public static final String ENTRY_NO = "ENTRY_NO";
-	public static final String ENTRY_TYPE = "ENTRY_TYPE";
-	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
-	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
-	public static final String COL = "COL";
-	public static final String ROW = "ROW";
+	private static final String ENTRY_TYPE = "ENTRY_TYPE";
+	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	private static final String FIELD_MAP_COLUMN = "FieldMapColumn";
+	private static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
+	private static final String COL = "COL";
+	private static final String ROW = "ROW";
 	public static final String BLOCK_NO = "BLOCK_NO";
 	public static final String PLOT_NO = "PLOT_NO";
 	public static final String REP_NO = "REP_NO";
@@ -201,7 +204,7 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationDto);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
-		Mockito.verify(this.observationValidator).validateObservation(studyId, datasetId, observationUnitId, observationId,
+		Mockito.verify(this.observationValidator).validateObservation(datasetId, observationUnitId, observationId,
 			observationDto);
 		Mockito.verify(this.middlewareDatasetService)
 			.updatePhenotype(observationId, observationDto);
@@ -217,7 +220,7 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
-		Mockito.verify(this.observationValidator).validateObservation(studyId, datasetId, observationUnitId, observationId, null);
+		Mockito.verify(this.observationValidator).validateObservation(datasetId, observationUnitId, observationId, null);
 		Mockito.verify(this.middlewareDatasetService).deletePhenotype(observationId);
 	}
 
@@ -239,7 +242,7 @@ public class DatasetServiceImplTest {
 
 	@Test
 	public void testValidateStudyDatasetAndInstances() {
-		this.studyDatasetService.validateStudyDatasetAndInstances(1, 1, Arrays.asList(1), true);
+		this.studyDatasetService.validateStudyDatasetAndInstances(1, 1, Arrays.asList(1));
 		Mockito.verify(this.studyValidator).validate(1, false);
 		Mockito.verify(this.datasetValidator).validateDataset(1, 1);
 		Mockito.verify(this.instanceValidator).validate(1, new HashSet<>(Arrays.asList(1)));
@@ -303,7 +306,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testImportDatasetFails_DatasetWithNoVariables() throws Exception {
+	public void testImportDatasetFails_DatasetWithNoVariables() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
@@ -326,7 +329,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testImportDatasetFails_NoObsUnitIdMatches() throws Exception {
+	public void testImportDatasetFails_NoObsUnitIdMatches() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
@@ -391,7 +394,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = PreconditionFailedException.class)
-	public void testImportDatasetFails_WarningsOverwrittingDataFound() throws Exception {
+	public void testImportDatasetFails_WarningsOverwrittingDataFound() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
@@ -431,7 +434,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = PreconditionFailedException.class)
-	public void testImportDatasetFails_WarningsDuplicatedObsUnitId() throws Exception {
+	public void testImportDatasetFails_WarningsDuplicatedObsUnitId() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
@@ -472,7 +475,7 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = PreconditionFailedException.class)
-	public void testImportDatasetFails_WarningsObsUnitIdNotBelongToDataset() throws Exception {
+	public void testImportDatasetFails_WarningsObsUnitIdNotBelongToDataset() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
@@ -543,13 +546,13 @@ public class DatasetServiceImplTest {
 		datasetDTO.setVariables(Lists.newArrayList(measurementVariable));
 
 		final StudyInstance studyInstance1 = new StudyInstance();
-		studyInstance1.setInstanceDbId(1);
+		studyInstance1.setInstanceId(1);
 
 		final StudyInstance studyInstance2 = new StudyInstance();
-		studyInstance2.setInstanceDbId(2);
+		studyInstance2.setInstanceId(2);
 
 		final StudyInstance studyInstance3 = new StudyInstance();
-		studyInstance3.setInstanceDbId(3);
+		studyInstance3.setInstanceId(3);
 
 		datasetDTO.setInstances(Lists.newArrayList(studyInstance1, studyInstance2, studyInstance3));
 		Mockito.doReturn(datasetDTO).when(this.middlewareDatasetService).generateSubObservationDataset(TEST_STUDY_IDENTIFIER, DATASET_NAME,
@@ -562,9 +565,9 @@ public class DatasetServiceImplTest {
 
 		Assert.assertNotNull(dto);
 		Assert.assertTrue(dto.getName().equalsIgnoreCase(datasetDTO.getName()));
-		Assert.assertTrue(dto.getParentDatasetId().equals(datasetDTO.getParentDatasetId()));
-		Assert.assertTrue(dto.getInstances().size() == 3);
-		Assert.assertTrue(dto.getVariables().size() == 1);
+		Assert.assertEquals(dto.getParentDatasetId(), datasetDTO.getParentDatasetId());
+		Assert.assertEquals(dto.getInstances().size(), 3);
+		Assert.assertEquals(dto.getVariables().size(), 1);
 		Assert.assertTrue(CollectionUtils.isEqualCollection(dto.getInstances(), datasetDTO.getInstances()));
 		Assert.assertTrue(CollectionUtils.isEqualCollection(dto.getVariables(), datasetDTO.getVariables()));
 	}
@@ -649,6 +652,88 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
+	}
+
+	@Test
+	public void testTransformObservations() {
+		final List<ObservationDTO> list = new ArrayList<>();
+		final ObservationDTO obs = new ObservationDTO();
+		obs.setObservationDbId(12);
+		obs.setObservationUnitDbId(RandomStringUtils.randomAlphanumeric(36));
+		obs.setObservationVariableDbId(24);
+		obs.setValue("356");
+		list.add(obs);
+		final ObservationDTO obs2 = new ObservationDTO();
+		obs2.setObservationDbId(13);
+		final String obs2ObsUnitDbId = RandomStringUtils.randomAlphanumeric(36);
+		obs2.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs2.setObservationVariableDbId(25);
+		obs2.setValue("200");
+		list.add(obs2);
+		final ObservationDTO obs3 = new ObservationDTO();
+		obs3.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs3.setObservationVariableDbId(27);
+		obs3.setValue("280");
+		list.add(obs3);
+		final ObservationDTO obs4 = new ObservationDTO();
+		obs4.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs4.setObservationVariableDbId(28);
+		obs4.setValue("NA");
+		list.add(obs4);
+		final ObservationDTO obs5 = new ObservationDTO();
+		obs5.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs5.setObservationVariableDbId(29);
+		obs5.setValue("NA");
+		list.add(obs5);
+		final ObservationDTO obs6 = new ObservationDTO();
+		obs6.setObservationUnitDbId(obs2ObsUnitDbId);
+		obs6.setObservationVariableDbId(30);
+		obs6.setValue("NA");
+		list.add(obs6);
+
+		final List<MeasurementVariable> variables = new ArrayList<>();
+		final MeasurementVariable var1 = new MeasurementVariable();
+		var1.setName("Var 1");
+		var1.setTermId(24);
+		var1.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
+		variables.add(var1);
+		final MeasurementVariable var2 = new MeasurementVariable();
+		var2.setName("Var 2");
+		var2.setTermId(25);
+		var2.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
+		variables.add(var2);
+		final MeasurementVariable var3 = new MeasurementVariable();
+		var3.setName("Var 3");
+		var3.setTermId(27);
+		var3.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
+		variables.add(var3);
+		final MeasurementVariable var4 = new MeasurementVariable();
+		var4.setName("Var 4");
+		var4.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
+		var4.setTermId(28);
+		variables.add(var4);
+		final MeasurementVariable var5 = new MeasurementVariable();
+		var5.setName("Var 5");
+		var5.setDataTypeId(DataType.DATE_TIME_VARIABLE.getId());
+		var5.setTermId(29);
+		variables.add(var5);
+		final MeasurementVariable var6 = new MeasurementVariable();
+		var6.setName("Var 6");
+		var6.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
+		var6.setTermId(30);
+		variables.add(var6);
+
+		final ObservationsPutRequestInput t = DatasetServiceImpl.transformObservations(list, variables);
+
+		final List<List<String>> data = t.getData();
+		Assert.assertThat(data.get(1).get(0), is(obs.getObservationUnitDbId()));
+		Assert.assertThat(data.get(1).get(1), is("356"));
+		Assert.assertThat(data.get(2).get(0), is(obs2.getObservationUnitDbId()));
+		Assert.assertThat(data.get(2).get(2), is("200"));
+		Assert.assertThat(data.get(2).get(3), is("280"));
+		Assert.assertThat(data.get(2).get(4), is("missing"));
+		Assert.assertThat(data.get(2).get(5), is(""));
+		Assert.assertThat(data.get(2).get(6), is("missing"));
 	}
 
 }

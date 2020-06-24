@@ -1,4 +1,4 @@
-package org.ibp.api.rest.labelprinting;
+package org.ibp.api.rest.labelprinting.filegenerator;
 
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;

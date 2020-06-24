@@ -38,34 +38,43 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public List<ProgramSummary> listProgramsByCropName(final String cropName) {
-		final List<Project> workbenchProgramList;
-		final List<ProgramSummary> programSummaries = new ArrayList<>();
 		try {
-			workbenchProgramList = this.workbenchDataManager.getProjectsByCropName(cropName);
-			if (!workbenchProgramList.isEmpty()) {
-				for (final Project workbenchProgram : workbenchProgramList) {
-					final ProgramSummary programSummary =
-						new ProgramSummary(workbenchProgram.getProjectId().toString(), workbenchProgram.getUniqueID(),
-							workbenchProgram.getProjectName(), workbenchProgram.getCropType().getCropName());
-
-					final WorkbenchUser workbenchUser = this.userService.getUserById(workbenchProgram.getUserId());
-					programSummary.setCreatedBy(workbenchUser.getName());
-
-					final List<WorkbenchUser> workbenchUsers = this.userService
-						.getUsersByProjectId(workbenchProgram.getProjectId());
-					final Set<String> members = new HashSet<>();
-					for (final WorkbenchUser member : workbenchUsers) {
-						members.add(member.getName());
-					}
-					programSummary.setMembers(members);
-					if (workbenchProgram.getStartDate() != null) {
-						programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
-					}
-					programSummaries.add(programSummary);
-				}
-			}
+			return convertToProgramSummaries(this.workbenchDataManager.getProjectsByCropName(cropName));
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
+		}
+	}
+
+	@Override
+	public List<ProgramSummary> listProgramsByCropNameAndUser(final WorkbenchUser user, final String cropName) {
+		try {
+			return convertToProgramSummaries(this.workbenchDataManager.getProjectsByUser(user, cropName));
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("Error!", e);
+		}
+	}
+
+	List<ProgramSummary> convertToProgramSummaries(final List<Project> workbenchProgramList) {
+		final List<ProgramSummary> programSummaries = new ArrayList<>();
+		for (final Project workbenchProgram : workbenchProgramList) {
+			final ProgramSummary programSummary =
+				new ProgramSummary(workbenchProgram.getProjectId().toString(), workbenchProgram.getUniqueID(),
+					workbenchProgram.getProjectName(), workbenchProgram.getCropType().getCropName());
+
+			final WorkbenchUser workbenchUser = this.userService.getUserById(workbenchProgram.getUserId());
+			programSummary.setCreatedBy(workbenchUser.getName());
+
+			final List<WorkbenchUser> workbenchUsers = this.userService
+				.getUsersByProjectId(workbenchProgram.getProjectId());
+			final Set<String> members = new HashSet<>();
+			for (final WorkbenchUser member : workbenchUsers) {
+				members.add(member.getName());
+			}
+			programSummary.setMembers(members);
+			if (workbenchProgram.getStartDate() != null) {
+				programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
+			}
+			programSummaries.add(programSummary);
 		}
 		return programSummaries;
 	}

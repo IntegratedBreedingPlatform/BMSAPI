@@ -125,6 +125,76 @@ public class GermplasmResourceBrapi {
 
 	}
 
+	@ApiOperation(value = "Search germplasms", notes = "Replacement for germplasm-search in v1.3")
+	@RequestMapping(value = "/{crop}/brapi/v1/germplasm", method = RequestMethod.GET)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV1_3.class)
+	public ResponseEntity<EntityListResponse<Germplasm>> getGermplasms(
+			@PathVariable final String crop,
+			@ApiParam(value = "Permanent unique identifier", required = false)
+			@RequestParam(value = "germplasmPUI",
+					required = false) final String germplasmPUI,
+			@ApiParam(value = "Internal database identifier", required = false)
+			@RequestParam(value = "germplasmDbId",
+					required = false) final String germplasmDbId,
+			@ApiParam(value = "Name of the germplasm", required = false)
+			@RequestParam(value = "germplasmName",
+					required = false) final String germplasmName,
+			@ApiParam(value = "The common crop name. This value is discarded, crop needs to be included as part of the URL", required = false)
+			@RequestParam(value = "commonCropName",
+					required = false) final String commonCropName,
+			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+			@RequestParam(value = "page",
+					required = false) final Integer currentPage,
+			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+			@RequestParam(value = "pageSize",
+					required = false) final Integer pageSize) {
+
+		final int gid;
+
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
+
+		germplasmSearchRequestDTO.setPreferredName(germplasmName);
+		if (germplasmPUI != null) {
+			germplasmSearchRequestDTO.setGermplasmPUIs(Lists.newArrayList(germplasmPUI));
+		}
+
+		try {
+			if (germplasmDbId != null) {
+				gid = Integer.parseInt(germplasmDbId);
+				germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(Integer.toString(gid)));
+			}
+		} catch (final NumberFormatException e) {
+			if (germplasmName == null && germplasmPUI == null) {
+				return new ResponseEntity<>(new EntityListResponse<>(new Result<>(new ArrayList<Germplasm>())), HttpStatus.OK);
+			}
+		}
+
+		final PagedResult<GermplasmDTO> resultPage = this.getGermplasmDTOPagedResult(germplasmSearchRequestDTO, currentPage, pageSize);
+
+		final List<Germplasm> germplasmList = new ArrayList<>();
+
+		if (resultPage.getPageResults() != null) {
+			final ModelMapper mapper = new ModelMapper();
+			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
+				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+				germplasm.setCommonCropName(crop);
+				germplasmList.add(germplasm);
+			}
+		}
+
+		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+
+		final EntityListResponse<Germplasm> entityListResponse = new EntityListResponse<>(metadata, results);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+
+	}
+
 	@ApiOperation(value = "Germplasm search by germplasmDbId", notes = "Germplasm search by germplasmDbId")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -132,7 +202,7 @@ public class GermplasmResourceBrapi {
 		@PathVariable final String crop,
 		@PathVariable final String germplasmDbId) {
 
-		final Integer gid;
+		final int gid;
 		try {
 			gid = Integer.parseInt(germplasmDbId);
 		} catch (final NumberFormatException e) {
@@ -175,9 +245,9 @@ public class GermplasmResourceBrapi {
 				new SingleEntityResponse<PedigreeDTO>().withMessage("Search by pedigree not implemented"), HttpStatus.NOT_IMPLEMENTED);
 		}
 
-		final Integer gid;
+		final int gid;
 		try {
-			gid = Integer.valueOf(germplasmDbId);
+			gid = Integer.parseInt(germplasmDbId);
 		} catch (final NumberFormatException e) {
 			return new ResponseEntity<>(new SingleEntityResponse<PedigreeDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
@@ -199,9 +269,9 @@ public class GermplasmResourceBrapi {
 		@PathVariable(value = "germplasmDbId") final String germplasmDbId
 	) {
 
-		final Integer gid;
+		final int gid;
 		try {
-			gid = Integer.valueOf(germplasmDbId);
+			gid = Integer.parseInt(germplasmDbId);
 		} catch (final NumberFormatException e) {
 			return new ResponseEntity<>(new SingleEntityResponse<ProgenyDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
@@ -342,10 +412,10 @@ public class GermplasmResourceBrapi {
 			}
 		}
 
-		final StudyMetadata studyMetadataForGeolocationId = this.studyDataManager.getStudyMetadataForGeolocationId(studyDbId);
+		final StudyMetadata studyMetadataForEnvironmentId = this.studyDataManager.getStudyMetadataForInstance(studyDbId);
 		final GermplasmSummaryList germplasmSummaryList = new GermplasmSummaryList();
 		germplasmSummaryList.setData(germplasmList);
-		germplasmSummaryList.setTrialName(studyMetadataForGeolocationId.getTrialName());
+		germplasmSummaryList.setTrialName(studyMetadataForEnvironmentId.getTrialName());
 		germplasmSummaryList.setStudyDbId(String.valueOf(studyDbId));
 
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
@@ -361,7 +431,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get germplasm attributes", notes = "Get the attributes of a Germplasm")
-	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm/{germplasmDbId}/attributes", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/attributes", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<GermplasmAttributes>> getAttributesByGid(
 		@PathVariable final String crop, @PathVariable final String germplasmDbId,

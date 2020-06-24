@@ -8,13 +8,17 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class StudyInstance {
 
-	private int instanceDbId;
-	private int experimentId;
+	private int instanceId;
 	private String locationName;
 	private String locationAbbreviation;
 	private String customLocationAbbreviation;
+	private Integer locationInstanceDataId;
 	private int instanceNumber;
 	private boolean hasFieldmap;
+	private Boolean hasGeoJSON;
+	/** has X/Y coordinates */
+	private Boolean hasFieldLayout;
+	private Boolean hasInventory;
 	private Boolean hasExperimentalDesign;
 	private Boolean hasMeasurements;
 	private Boolean canBeDeleted;
@@ -23,23 +27,14 @@ public class StudyInstance {
 
 	}
 
-	public StudyInstance(final int instanceDbId, final int experimentId, final String locationName, final String locationAbbreviation,
+	public StudyInstance(final int instanceId, final String locationName, final String locationAbbreviation,
 		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldmap) {
-		this.instanceDbId = instanceDbId;
-		this.experimentId = experimentId;
+		this.instanceId = instanceId;
 		this.locationName = locationName;
 		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
 		this.customLocationAbbreviation = customLocationAbbreviation;
 		this.hasFieldmap = hasFieldmap;
-	}
-
-	public int getInstanceDbId() {
-		return this.instanceDbId;
-	}
-
-	public void setInstanceDbId(final int instanceDbId) {
-		this.instanceDbId = instanceDbId;
 	}
 
 	public String getLocationName() {
@@ -67,7 +62,7 @@ public class StudyInstance {
 	}
 
 	public String getCustomLocationAbbreviation() {
-		return customLocationAbbreviation;
+		return this.customLocationAbbreviation;
 	}
 
 	public void setCustomLocationAbbreviation(final String customLocationAbbreviation) {
@@ -75,15 +70,39 @@ public class StudyInstance {
 	}
 
 	public boolean getHasFieldmap() {
-		return hasFieldmap;
+		return this.hasFieldmap;
 	}
 
-	public void setHasFieldmap(boolean hasFieldmap) {
+	public void setHasFieldmap(final boolean hasFieldmap) {
 		this.hasFieldmap = hasFieldmap;
 	}
 
+	public Boolean getHasGeoJSON() {
+		return this.hasGeoJSON;
+	}
+
+	public void setHasGeoJSON(final Boolean hasGeoJSON) {
+		this.hasGeoJSON = hasGeoJSON;
+	}
+
+	public Boolean getHasFieldLayout() {
+		return this.hasFieldLayout;
+	}
+
+	public void setHasFieldLayout(final Boolean hasFieldLayout) {
+		this.hasFieldLayout = hasFieldLayout;
+	}
+
+	public Boolean getHasInventory() {
+		return this.hasInventory;
+	}
+
+	public void setHasInventory(final Boolean hasInventory) {
+		this.hasInventory = hasInventory;
+	}
+
 	public Boolean isHasExperimentalDesign() {
-		return hasExperimentalDesign;
+		return this.hasExperimentalDesign;
 	}
 
 	public void setHasExperimentalDesign(final Boolean hasExperimentalDesign) {
@@ -91,7 +110,7 @@ public class StudyInstance {
 	}
 
 	public Boolean isHasMeasurements() {
-		return hasMeasurements;
+		return this.hasMeasurements;
 	}
 
 	public void setHasMeasurements(final Boolean hasMeasurements) {
@@ -99,19 +118,27 @@ public class StudyInstance {
 	}
 
 	public Boolean getCanBeDeleted() {
-		return canBeDeleted;
+		return this.canBeDeleted;
 	}
 
 	public void setCanBeDeleted(final Boolean canBeDeleted) {
 		this.canBeDeleted = canBeDeleted;
 	}
 
-	public int getExperimentId() {
-		return this.experimentId;
+	public int getInstanceId() {
+		return this.instanceId;
 	}
 
-	public void setExperimentId(final int experimentId) {
-		this.experimentId = experimentId;
+	public void setInstanceId(final int instanceId) {
+		this.instanceId = instanceId;
+	}
+
+	public Integer getLocationInstanceDataId() {
+		return this.locationInstanceDataId;
+	}
+
+	public void setLocationInstanceDataId(final Integer locationInstanceDataId) {
+		this.locationInstanceDataId = locationInstanceDataId;
 	}
 
 	@Override
@@ -120,12 +147,12 @@ public class StudyInstance {
 			return false;
 		}
 		final StudyInstance castOther = (StudyInstance) other;
-		return new EqualsBuilder().append(this.instanceDbId, castOther.instanceDbId).isEquals();
+		return new EqualsBuilder().append(this.instanceId, castOther.instanceId).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.instanceDbId).toHashCode();
+		return new HashCodeBuilder().append(this.instanceId).toHashCode();
 	}
 
 	@Override

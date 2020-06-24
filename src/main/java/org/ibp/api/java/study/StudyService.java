@@ -8,13 +8,12 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
+import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyDetails;
-import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public interface StudyService {
 	List<StudySummary> search(final String programUniqueId, String cropname, String principalInvestigator, String location, String season);
 
 	List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize,
-			final String sortBy, final String sortOrder);
+		final String sortBy, final String sortOrder);
 
 	Observation getSingleObservation(Integer studyId, Integer obeservationId);
 
@@ -38,9 +37,8 @@ public interface StudyService {
 	TrialObservationTable getTrialObservationTable(final int studyIdentifier);
 
 	/**
-	 *
 	 * @param studyIdentifier id for the study (Nursery / Trial)
-	 * @param instanceDbId id for a Trial instance of a Trial (Nursery has 1 instance). If present studyIdentifier will not be used
+	 * @param instanceDbId    id for a Trial instance of a Trial (Nursery has 1 instance). If present studyIdentifier will not be used
 	 * @return
 	 */
 	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
@@ -49,7 +47,7 @@ public interface StudyService {
 
 	String getProgramUUID(Integer studyIdentifier);
 
-	StudyDetailsDto getStudyDetailsForGeolocation (final Integer geolocationId);
+	StudyDetailsDto getStudyDetailsByGeolocation (final Integer geolocationId);
 
 	Long countStudies(final Map<StudyFilters, String> filters);
 
@@ -57,14 +55,22 @@ public interface StudyService {
 
 	long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO);
 
-	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber);
+	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters, Integer pageSize,
+		Integer pageNumber);
 
-	Boolean isSampled (final Integer studyId);
+	Boolean isSampled(final Integer studyId);
 
 	List<StudyTypeDto> getStudyTypes();
-	
+
 	StudyReference getStudyReference(final Integer studyId);
 
-	void updateStudy (final Study study);
+	void updateStudy(final Study study);
 
+	long countStudies(StudySearchFilter studySearchFilter);
+
+	List<StudyDto> getStudies(StudySearchFilter studySearchFilter);
+
+	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
+
+	boolean hasAdvancedOrCrossesList(final int studyId);
 }

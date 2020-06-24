@@ -1,12 +1,14 @@
 
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import java.util.Collection;
-import java.util.Map;
-
-import org.springframework.validation.Errors;
-
 import com.google.common.base.Strings;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Helper methods to manage message codes.
@@ -56,6 +58,36 @@ public abstract class BaseValidator {
 		this.addCustomError(errors, BaseValidator.INVALID_ID, null);
 	}
 
+	public static void checkNotNull(final Object reference, final String errorCode, final Object[] arguments) {
+		if (reference == null) {
+			throw new ApiRequestValidationException(Collections.singletonList(new ObjectError("", new String[]{errorCode}, arguments, "")));
+		}
+	}
+
+	public static void checkNotNull(final Object reference, final String errorCode) {
+		checkNotNull(reference, errorCode, null);
+	}
+
+	public static void checkArgument(final boolean expression, final String errorCode) {
+		checkArgument(expression, errorCode, null);
+	}
+
+	public static void checkArgument(final boolean expression, final String errorCode, final Object[] arguments) {
+		if (!expression) {
+			throw new ApiRequestValidationException(Collections.singletonList(new ObjectError("", new String[]{errorCode}, arguments, "")));
+		}
+	}
+
+	public static void checkNotEmpty(final Object reference, final String errorCode) {
+		checkNotEmpty(reference, errorCode, null);
+	}
+
+	public static void checkNotEmpty(final Object reference, final String errorCode, final Object[] arguments) {
+		if (isNullOrEmpty(reference)) {
+			throw new ApiRequestValidationException(Collections.singletonList(new ObjectError("", new String[]{errorCode}, arguments, "")));
+		}
+	}
+
 	/**
 	 * This function is useful to checking object value as null or empty with any plain object or from collection
 	 * 
@@ -63,7 +95,7 @@ public abstract class BaseValidator {
 	 * @return boolean
 	 */
 	@SuppressWarnings("rawtypes")
-	protected boolean isNullOrEmpty(Object value) {
+	protected static boolean isNullOrEmpty(Object value) {
 		return value instanceof String && Strings.isNullOrEmpty(((String) value).trim()) || value == null || value instanceof Collection
 				&& ((Collection) value).isEmpty() || value instanceof Map && ((Map) value).isEmpty();
 	}
@@ -92,7 +124,7 @@ public abstract class BaseValidator {
 	}
 
 	protected void shouldNotNullOrEmpty(String termName, String fieldName, Object value, Errors errors) {
-		if (!this.isNullOrEmpty(value)) {
+		if (!isNullOrEmpty(value)) {
 			return;
 		}
 		this.addCustomError(errors, fieldName, BaseValidator.FIELD_IS_REQUIRED, new Object[] {termName});

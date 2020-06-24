@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,7 +46,7 @@ public class AuthenticationControllerBrapi {
 	private UserDetailsService userDetailsService;
 
 	@ApiOperation(value = "Get token")
-	@RequestMapping(value = "/brapi/v1/token", method = RequestMethod.POST)
+	@RequestMapping(value = {"/brapi/v1/token", "/token"}, method = RequestMethod.POST)
 	@ResponseBody
 	public TokenResponse authenticate(@RequestBody final TokenRequest tokenRequest) {
 		final String username = tokenRequest.getUsername();
@@ -63,6 +64,22 @@ public class AuthenticationControllerBrapi {
 	@RequestMapping(value = "/brapi/authorize", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity authorize(@RequestParam(value = "display_name") final String display_name,@RequestParam(value = "return_url") final String return_url)
+		throws UnsupportedEncodingException {
+		final URI loginUrl = URI.create(
+			"/ibpworkbench/controller/auth/login?display_name=" + URLEncoder.encode(display_name,"UTF-8") + "&return_url=" + return_url);
+		return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(loginUrl).build();
+	}
+
+	/**
+	 * XXX workaround for systems that expect only one brapi base url (e.g. Field book)
+	 */
+	@ApiOperation(value = "Same as /authorize. crop is ignored")
+	@RequestMapping(value = "/{crop}/brapi/authorize", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity authorize2(
+		@PathVariable final String crop,
+		@RequestParam(value = "display_name") final String display_name,
+		@RequestParam(value = "return_url") final String return_url)
 		throws UnsupportedEncodingException {
 		final URI loginUrl = URI.create(
 			"/ibpworkbench/controller/auth/login?display_name=" + URLEncoder.encode(display_name,"UTF-8") + "&return_url=" + return_url);

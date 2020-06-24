@@ -19,6 +19,8 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
+import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
@@ -30,7 +32,7 @@ import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
@@ -65,10 +67,10 @@ public class StudyServiceImpl implements StudyService {
 	private SecurityService securityService;
 
 	@Autowired
-	private ObservationValidator observationValidator;
+	private StudyValidator studyValidator;
 
 	@Autowired
-	private StudyValidator studyValidator;
+	private ObservationValidator observationValidator;
 
 	@Autowired
 	private ValidationUtil validationUtil;
@@ -314,8 +316,8 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsForGeolocation(final Integer geolocationId) {
-		return this.middlewareStudyService.getStudyDetailsForGeolocation(geolocationId);
+	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
+		return this.middlewareStudyService.getStudyDetailsByInstance(geolocationId);
 	}
 
 	@Override
@@ -380,5 +382,25 @@ public class StudyServiceImpl implements StudyService {
 		final int studyId = study.getId();
 		this.studyValidator.validate(studyId, false);
 		this.studyDataManager.updateStudyLockedStatus(studyId, study.isLocked());
+	}
+
+	@Override
+	public long countStudies(final StudySearchFilter studySearchFilter) {
+		return this.middlewareStudyService.countStudies(studySearchFilter);
+	}
+
+	@Override
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
+		return this.middlewareStudyService.getStudies(studySearchFilter);
+	}
+
+	@Override
+	public boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId) {
+		return this.middlewareStudyService.studyHasGivenDatasetType(studyId, datasetTypeId);
+	}
+
+	@Override
+	public boolean hasAdvancedOrCrossesList(int studyId) {
+		return this.middlewareStudyService.hasAdvancedOrCrossesList(studyId);
 	}
 }

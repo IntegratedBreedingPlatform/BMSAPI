@@ -38,7 +38,7 @@ public class ExperimentalDesignResource {
 	@ApiOperation(value = "Delete experimental design of study", notes = "Delete experimental design of study")
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/experimental-designs", method = RequestMethod.DELETE)
-	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop, @PathVariable final String programUUID,
+	public ResponseEntity deleteStudyExperimentDesign(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
 		this.experimentalDesignService.deleteDesign(studyId);
 

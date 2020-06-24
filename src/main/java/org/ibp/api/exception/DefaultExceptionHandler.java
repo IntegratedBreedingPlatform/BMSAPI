@@ -13,6 +13,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -52,6 +54,17 @@ public class DefaultExceptionHandler {
 		} else {
 			response.addError(ex.getMessage());
 		}
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(AccessDeniedException.class)
+	@ResponseStatus(value = FORBIDDEN)
+	@ResponseBody
+	public ErrorResponse handleUncaughtException(AccessDeniedException ex) {
+		LOG.error("Access Denied", ex);
+		ErrorResponse response = new ErrorResponse();
+		response.addError(getMessage("access.denied", null));
 		return response;
 	}
 
@@ -156,7 +169,7 @@ public class DefaultExceptionHandler {
 	public ErrorResponse handleMiddlewareRequestException(MiddlewareRequestException ex) {
 		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
-		String message = this.getMessage(ex.getErrorCode(), null);
+		String message = this.getMessage(ex.getErrorCode(), ex.getParams());
 		response.addError(message);
 		return response;
 	}
@@ -196,6 +209,14 @@ public class DefaultExceptionHandler {
 		}
 		response.addError(sb.toString());
 		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.TEXT_PLAIN_VALUE})
+	@ExceptionHandler(BrapiNotFoundException.class)
+	@ResponseStatus(value = NOT_FOUND)
+	@ResponseBody
+	public String handleBrapiNotFoundException(final BrapiNotFoundException ex) {
+		return "ERROR - " + Instant.now().toString() + " - " + ex.getMessage();
 	}
 
 	private ErrorResponse buildErrorResponse(final List<ObjectError> objectErrors){

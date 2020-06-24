@@ -12,13 +12,13 @@ import org.springframework.validation.BindingResult;
 import java.util.List;
 
 @Component
-public class InventoryScaleValidator {
+public class InventoryUnitValidator {
 
 	@Autowired
 	private VariableService variableService;
 
-	public void validateInventoryScaleId(final BindingResult errors, final Integer inventoryScaleId) {
-		if (inventoryScaleId != null) {
+	public void validateInventoryUnitId(final BindingResult errors, final Integer inventoryUnitId) {
+		if (inventoryUnitId != null) {
 
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
@@ -27,20 +27,20 @@ public class InventoryScaleValidator {
 			VariableDetails selectedInventoryScale = null;
 			if (!variables.isEmpty()) {
 				selectedInventoryScale = variables.stream()
-					.filter(inventoryScale -> inventoryScale.getId().equals(String.valueOf(inventoryScaleId)))
+					.filter(inventoryScale -> inventoryScale.getId().equals(String.valueOf(inventoryUnitId)))
 					.findAny()
 					.orElse(null);
 			}
 
 			if (selectedInventoryScale == null) {
-				errors.reject("inventory.scale.invalid", "");
+				errors.reject("inventory.unit.invalid", "");
 			}
 		}
 	}
 
 	public void validateNotNullInventoryScaleId(final BindingResult errors, final Integer inventoryScaleId) {
 		if (inventoryScaleId == null) {
-			errors.reject("inventory.scale.required", "");
+			errors.reject("inventory.unit.required", "");
 			throw new ConflictException(errors.getAllErrors());
 		}
 	}

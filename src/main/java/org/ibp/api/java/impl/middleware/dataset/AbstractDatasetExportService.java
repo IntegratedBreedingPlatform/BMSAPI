@@ -17,7 +17,7 @@ import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
-import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -162,8 +162,8 @@ public abstract class AbstractDatasetExportService {
 	Map<Integer, StudyInstance> getSelectedDatasetInstancesMap(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
 		final Map<Integer, StudyInstance> studyInstanceMap = new LinkedHashMap<>();
 		for (final StudyInstance studyInstance : studyInstances) {
-			if (instanceIds.contains(studyInstance.getInstanceDbId())) {
-				studyInstanceMap.put(studyInstance.getInstanceDbId(), studyInstance);
+			if (instanceIds.contains(studyInstance.getInstanceId())) {
+				studyInstanceMap.put(studyInstance.getInstanceId(), studyInstance);
 			}
 		}
 		return studyInstanceMap;

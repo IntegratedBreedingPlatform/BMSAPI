@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.derived;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
@@ -19,7 +20,7 @@ import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
-import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,27 +58,27 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DerivedVariableServiceImplTest {
 
-	public static final String TARGET_VARIABLE_NAME = "TARGET_VARIABLE";
-	public static final String VARIABLE1_NAME = "VARIABLE1";
-	public static final String VARIABLE2_NAME = "VARIABLE2";
-	public static final String VARIABLE3_NAME = "VARIABLE3";
-	public static final String VARIABLE4_NAME = "VARIABLE4";
-	public static final String VARIABLE5_NAME = "VARIABLE5";
-	public static final String VARIABLE6_NAME = "VARIABLE6";
-	public static final String VARIABLE7_NAME = "VARIABLE7";
-	public static final String VARIABLE8_NAME = "VARIABLE8";
-	public static final String VARIABLE9_NAME = "VARIABLE9";
+	private static final String TARGET_VARIABLE_NAME = "TARGET_VARIABLE";
+	private static final String VARIABLE1_NAME = "VARIABLE1";
+	private static final String VARIABLE2_NAME = "VARIABLE2";
+	private static final String VARIABLE3_NAME = "VARIABLE3";
+	private static final String VARIABLE4_NAME = "VARIABLE4";
+	private static final String VARIABLE5_NAME = "VARIABLE5";
+	private static final String VARIABLE6_NAME = "VARIABLE6";
+	private static final String VARIABLE7_NAME = "VARIABLE7";
+	private static final String VARIABLE8_NAME = "VARIABLE8";
+	private static final String VARIABLE9_NAME = "VARIABLE9";
 
-	public static final int TARGET_VARIABLE_TERMID = 321;
-	public static final int VARIABLE1_TERMID = 123;
-	public static final int VARIABLE2_TERMID = 456;
-	public static final int VARIABLE3_TERMID = 789;
-	public static final int VARIABLE4_TERMID = 20439;
-	public static final int VARIABLE5_TERMID = 8630;
-	public static final int VARIABLE6_TERMID = 8830;
-	public static final int VARIABLE7_TERMID = 1111;
-	public static final int VARIABLE8_TERMID = 2222;
-	public static final int VARIABLE9_TERMID = 3333;
+	private static final int TARGET_VARIABLE_TERMID = 321;
+	private static final int VARIABLE1_TERMID = 123;
+	private static final int VARIABLE2_TERMID = 456;
+	private static final int VARIABLE3_TERMID = 789;
+	private static final int VARIABLE4_TERMID = 20439;
+	private static final int VARIABLE5_TERMID = 8630;
+	private static final int VARIABLE6_TERMID = 8830;
+	private static final int VARIABLE7_TERMID = 1111;
+	private static final int VARIABLE8_TERMID = 2222;
+	private static final int VARIABLE9_TERMID = 3333;
 
 	private static final String TERM_VALUE_1 = "1000";
 	private static final String TERM_VALUE_2 = "12.5";
@@ -92,11 +93,11 @@ public class DerivedVariableServiceImplTest {
 		+ "}}) + {{" + VARIABLE9_TERMID + "}}";
 	private static final String FORMULA_RESULT = "112";
 
-	public static final int STUDY_ID = RandomUtils.nextInt();
-	public static final int SUMMARY_DATASET_ID = RandomUtils.nextInt();
-	public static final int DATASET_ID = RandomUtils.nextInt();
-	public static final int OBSERVATION_UNIT_ID = RandomUtils.nextInt();
-	public static final List<Integer> GEO_LOCATION_IDS = new ArrayList<>();
+	private static final int STUDY_ID = RandomUtils.nextInt();
+	private static final int SUMMARY_DATASET_ID = RandomUtils.nextInt();
+	private static final int DATASET_ID = RandomUtils.nextInt();
+	private static final int OBSERVATION_UNIT_ID = RandomUtils.nextInt();
+	private static final List<Integer> GEO_LOCATION_IDS = new ArrayList<>();
 	private final Map<Integer, Integer> inputVariableDatasetMap = new HashMap<>();
 
 	@Mock
@@ -187,6 +188,8 @@ public class DerivedVariableServiceImplTest {
 		verify(this.middlewareDerivedVariableService).saveCalculatedResult(captureValue.capture(),
 			captureCategoricalId.capture(), captureObservationUnitId.capture(), captureObservationId.capture(),
 			captureTargetMeasurementVariable.capture());
+
+		verify(this.middlwareDatasetService).updateDependentPhenotypesAsOutOfSync(TARGET_VARIABLE_TERMID, Sets.newHashSet(OBSERVATION_UNIT_ID));
 
 		// TODO: When AVG and SUM functions are already implemented, verify the aggregate functions and sub-observation values are evaluated properly.
 		assertTrue(result.isEmpty());

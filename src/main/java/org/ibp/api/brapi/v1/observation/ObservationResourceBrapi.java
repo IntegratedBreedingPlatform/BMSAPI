@@ -64,7 +64,7 @@ public class ObservationResourceBrapi {
 
 		final Result<String> results = new Result<String>().withData(observationLevels);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 

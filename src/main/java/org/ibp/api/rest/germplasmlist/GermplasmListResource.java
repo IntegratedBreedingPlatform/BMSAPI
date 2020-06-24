@@ -8,6 +8,7 @@ import org.ibp.api.java.germplasm.GermplamListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 @Api(value = "Germplasm List Services")
+@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY','MANAGE_LOTS','MANAGE_TRANSACTIONS','VIEW_LOTS','VIEW_TRANSACTIONS')")
 @Controller
 public class GermplasmListResource {
 
@@ -28,7 +30,7 @@ public class GermplasmListResource {
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getGermplasmListByParentFolderId(
-		@ApiParam("The crop type") @PathVariable final String crop,
+		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId,
 		@ApiParam(value = "Only folders") @RequestParam(required = true) final Boolean onlyFolders) {

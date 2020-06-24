@@ -13,15 +13,12 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
-import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
@@ -36,8 +33,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
@@ -70,12 +65,6 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	@Autowired
 	private StudyValidator studyValidator;
-
-	@Autowired
-	private PedigreeService pedigreeService;
-
-	@Autowired
-	private CrossExpansionProperties crossExpansionProperties;
 
 	@Autowired
 	private DatasetTypeService datasetTypeService;
@@ -126,58 +115,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	public void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput) {
-		this.validateLabelsInfoInputData(labelsGeneratorInput);
-		final Set<Integer> availableKeys = new HashSet<>();
-		this.getAvailableLabelTypes(labelsGeneratorInput)
-			.forEach(labelType -> labelType.getFields().forEach(field -> availableKeys.add(field.getId())));
-		final Set<Integer> requestedFields = new HashSet<>();
-		int totalRequestedFields = 0;
-		for (final List<Integer> list : labelsGeneratorInput.getFields()) {
-			for (final Integer key : list) {
-				requestedFields.add(key);
-				totalRequestedFields++;
-			}
-		}
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		if (requestedFields.isEmpty()) {
-			//Error, at least one requested field is needed
-			errors.reject("label.fields.selection.empty", StringUtils.EMPTY);
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-		if (!availableKeys.containsAll(requestedFields)) {
-			//Error, some of the requested fields are not available to use
-			errors.reject("label.fields.invalid", StringUtils.EMPTY);
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-		if (totalRequestedFields != requestedFields.size()) {
-			// Error, duplicated requested field
-			errors.reject("label.fields.duplicated", StringUtils.EMPTY);
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-		if (labelsGeneratorInput.isBarcodeRequired() && !labelsGeneratorInput.isAutomaticBarcode()) {
-			//Validate that at least one is selected
-			if (labelsGeneratorInput.getBarcodeFields().isEmpty()) {
-				errors.reject("barcode.fields.empty", StringUtils.EMPTY
-				);
-				throw new ApiRequestValidationException(errors.getAllErrors());
-			}
-			//Validate that selected are availableFields
-			if (!availableKeys.containsAll(labelsGeneratorInput.getBarcodeFields())) {
-				//Error, some of the requested fields are not available to use
-				errors.reject("barcode.fields.invalid", StringUtils.EMPTY);
-				throw new ApiRequestValidationException(errors.getAllErrors());
-			}
-		}
-		// Validation for the file name
-		if (StringUtils.isEmpty(labelsGeneratorInput.getFileName())) {
-			errors.reject("common.error.filename.required", StringUtils.EMPTY);
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
-		if (!FileUtils.isFilenameValid(labelsGeneratorInput.getFileName())) {
-			errors.reject("common.error.invalid.filename.windows", StringUtils.EMPTY);
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		super.validateLabelsGeneratorInputData(labelsGeneratorInput);
 	}
 
 	@Override
@@ -319,7 +257,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 				.thenComparing(o -> Integer.valueOf(o.getVariables().get(ENTRY_NO).getValue())));
 
 		final List<Map<Integer, String>> results = new LinkedList<>();
-		// TODO: IBP-2907
+
 		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {
 			final Map<Integer, String> row = new HashMap<>();
 			for (final Integer requiredField : allRequiredKeys) {
@@ -404,17 +342,6 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	String getMessage(final String code) {
 		return this.messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
-	}
-
-	private String getPedigree(final String gid, final Map<String, String> gidPedigreeMap) {
-		final String pedigree;
-		if (gidPedigreeMap.containsKey(gid)) {
-			pedigree = gidPedigreeMap.get(gid);
-		} else {
-			pedigree = this.pedigreeService.getCrossExpansion(Integer.valueOf(gid), this.crossExpansionProperties);
-			gidPedigreeMap.put(gid, pedigree);
-		}
-		return pedigree;
 	}
 
 	private String getSeason(final String seasonStr) {

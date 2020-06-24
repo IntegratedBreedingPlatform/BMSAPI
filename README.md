@@ -2,10 +2,80 @@ Breeding Management System API
 ==============================
 BMS API is a set of RESTful web services that allow access to data in the BMS database.
 
+Useful resources
+==============
+- BrAPI: https://brapi.org/
+- BMSAPI Swaggerhub: https://app.swaggerhub.com/apis/ibp_bms/BMSAPI/
+
+Suscribe (!)
+==============
+
+If you plan to use BMSAPI in your dev project, please sign up here for updates: https://forms.gle/DezGg3K3iQ56fRsG6
+
+
 Authentication
 ==============
 
 All BMS API calls require authentication and valid access token provided. Please refer to the public Wiki documentation: [BMSAPI - Authentication](https://github.com/IntegratedBreedingPlatform/Documentation/wiki/BMSAPI---Authentication) for details.
+
+
+In exchange of valid users credentials (Workbench user name and password) BMS API issues a fixed time window (configurable per deployment) token which is then required to be provided for each and every BMS API service invocation as part of Authorization key in the request header
+Authenticate with credentials of a registered Workbench user:
+Call
+POST /bmsapi/brapi/v1/token/
+```
+{
+Request 
+POST /bmsapi/brapi/v1/token/ HTTP/1.1 Host: 34.231.120.172:48080 
+Content-Type: application/json Cache-Control: no-cache 
+{ "username": "username", 
+  "password": "user_password", 
+  "grant_type": "password", 
+  "client_id": "" 
+} 
+Response
+{
+   "metadata":{
+      "pagination":null,
+      "status":null,
+      "datafiles":[
+
+      ]
+   },
+   "userDisplayName":"username",
+   "access_token":"username:1522184720103:1c9293bcf819a05309c82d769d51b59f",
+   "expires_in":1522184720103
+}
+}
+```
+From now on the token must be included in the header of all further calls to the system to allow verification.  Unfortunately there is a discrepancy in the type of authorization header needed for BrAPI and non-BrAPI standard calls:
+
+Header (for BrAPI Standarized calls): 
+```
+GET /bmsapi/v1/crops HTTP/1.1 
+Host: xx.xx.xx.xx:48080 
+Authorization: bearer:username:1522184720103:1c9293bcf819a05309c82d769d51b59f 
+Cache-Control: no-cache
+```
+
+Header for non BrAPI BMSAPI calls: 
+
+```
+GET /bmsapi/v1/crops HTTP/1.1 
+Host: xx.xx.xx.xx:48080 
+X-Auth-Token: username:1522184720103:1c9293bcf819a05309c82d769d51b59f 
+Cache-Control: no-cache
+```
+
+**Note that these headers are discrepant in both the name and value of the authentication header.**
+
+Additionaly there are some nomenclature differences in BrAPI that must be noted when refering to studies entities. The mapping between the BrAPI entity names and the BMS equivalent is offered below:
+
+|BrAPI  | BMS |
+| ------------- | ------------- |
+| Trial  | Study  |
+| Study | Instance  |
+
 
 
 Using the BMSAPI Swagger UI

@@ -18,40 +18,14 @@ import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsService;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsServiceImpl;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
-import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
-import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
-import org.generationcp.middleware.manager.GermplasmListManagerImpl;
-import org.generationcp.middleware.manager.InventoryDataManagerImpl;
-import org.generationcp.middleware.manager.LocationDataManagerImpl;
-import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
-import org.generationcp.middleware.manager.PresetServiceImpl;
-import org.generationcp.middleware.manager.SearchRequestServiceImpl;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
-import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.manager.api.PresetService;
-import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.TermDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.manager.*;
+import org.generationcp.middleware.manager.api.*;
+import org.generationcp.middleware.manager.ontology.*;
+import org.generationcp.middleware.manager.ontology.api.*;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
@@ -64,15 +38,7 @@ import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.MethodServiceImpl;
-import org.generationcp.middleware.service.api.DataImportService;
-import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.service.api.GermplasmGroupingService;
-import org.generationcp.middleware.service.api.InventoryService;
-import org.generationcp.middleware.service.api.KeySequenceRegisterService;
-import org.generationcp.middleware.service.api.MethodService;
-import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.service.api.SampleListService;
-import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.*;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
@@ -80,7 +46,7 @@ import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
-import org.generationcp.middleware.service.api.study.MeasurementVariableService;
+import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
@@ -92,14 +58,12 @@ import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.LotServiceImpl;
+import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl;
 import org.generationcp.middleware.service.impl.rpackage.RPackageServiceImpl;
-import org.generationcp.middleware.service.impl.study.MeasurementVariableServiceImpl;
-import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
-import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
-import org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl;
-import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
+import org.generationcp.middleware.service.impl.study.*;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
+import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -107,17 +71,17 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableTransactionManagement
@@ -132,6 +96,9 @@ public class MiddlewareFactory {
 
 	@Autowired
 	private ApplicationContext applicationContext;
+
+	@Autowired
+	private Environment environment;
 
 	public MiddlewareFactory() {
 		super();
@@ -348,7 +315,16 @@ public class MiddlewareFactory {
 
 	@Bean
 	public CrossExpansionProperties getCrossExpansionProperties() {
-		return new CrossExpansionProperties();
+		final String defaultLevel = this.environment.getProperty("default.generation.level");
+		final String pedigreeProfile = this.environment.getProperty("pedigree.profile");
+		final List<String> list = Arrays.asList(this.environment.getProperty("hybrid.breeding.methods").split(","));
+
+		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
+		crossExpansionProperties.setDefaultLevel(Integer.parseInt(defaultLevel));
+		crossExpansionProperties.setProfile(pedigreeProfile);
+		crossExpansionProperties
+			.setHybridBreedingMethods(list.stream().map(Integer::valueOf).collect(Collectors.toSet()));
+		return crossExpansionProperties;
 	}
 
 	@Bean
@@ -390,12 +366,6 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public DerivedVariableService getDerivedVariableService() {
 		return new DerivedVariableServiceImpl(this.getCropDatabaseSessionProvider());
-	}
-
-	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public MeasurementVariableService getMeasurementVariableService() {
-		return new MeasurementVariableServiceImpl(this.getCropDatabaseSessionProvider().getSession());
 	}
 
 	@Bean
@@ -478,6 +448,18 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public PlantingServiceImpl getPlantingService() {
+		return new PlantingServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StudyTransactionsService getStudyTransactionsServiceImpl() {
+		return new StudyTransactionsServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyInstanceService studyInstanceMiddlewareService() {
 		return new StudyInstanceServiceImpl(this.getCropDatabaseSessionProvider());
 	}
@@ -510,6 +492,18 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public ObservationUnitService getObservationUnitService() {
 		return new ObservationUnitServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StudyGermplasmService getStudyGermplasmService() {
+		return new StudyGermplasmServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public ExperimentModelGenerator getExperimentModelGenerator() {
+		return new ExperimentModelGenerator(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

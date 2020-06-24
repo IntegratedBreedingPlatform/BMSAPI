@@ -1,17 +1,18 @@
 package org.ibp.api.java.impl.middleware.design;
 
-import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
-import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
@@ -30,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class ExperimentalDesignServiceImplTest {
 
@@ -51,6 +53,9 @@ public class ExperimentalDesignServiceImplTest {
 
 	@Mock
 	private StudyService studyService;
+
+	@Mock
+	private PlantingServiceImpl plantingService;
 
 	@Mock
 	private DesignLicenseService designLicenseService;
@@ -112,6 +117,8 @@ public class ExperimentalDesignServiceImplTest {
 
 	@Test
 	public void testDeleteDesign() {
+		Mockito.when(plantingService.getPlantingTransactionsByStudyId(STUDY_ID, TransactionStatus.PENDING)).thenReturn(new ArrayList<>());
+		Mockito.when(plantingService.getPlantingTransactionsByStudyId(STUDY_ID, TransactionStatus.CONFIRMED)).thenReturn(new ArrayList<>());
 		this.experimentDesignService.deleteDesign(STUDY_ID);
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true, true);
 		Mockito.verify(this.experimentalDesignValidator).validateExperimentalDesignExistence(STUDY_ID, true);
@@ -155,7 +162,7 @@ public class ExperimentalDesignServiceImplTest {
 
 	@Test
 	public void testGetStudyExperimentalDesignTypeTermId() {
-		Mockito.doReturn(Optional.absent()).when(this.middlewareExperimentDesignService).getStudyExperimentDesignTypeTermId(STUDY_ID);
+		Mockito.doReturn(Optional.empty()).when(this.middlewareExperimentDesignService).getStudyExperimentDesignTypeTermId(STUDY_ID);
 		Assert.assertFalse(this.experimentDesignService.getStudyExperimentalDesignTypeTermId(STUDY_ID).isPresent());
 
 		final Integer termId = ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId();

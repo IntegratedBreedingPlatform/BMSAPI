@@ -1,11 +1,7 @@
 
 package org.ibp.api.security.xauth;
 
-import java.io.IOException;
-import java.util.Collections;
-
-import javax.servlet.ServletException;
-
+import org.ibp.api.java.impl.middleware.common.ContextResolutionException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,12 +18,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+
 public class XAuthTokenFilterTest {
 
 	@Mock
 	private UserDetailsService userDetailsService;
 
-	private TokenProvider tokenProvider = new TokenProvider("bmsXAuthSecret", 3600);
+	private final TokenProvider tokenProvider = new TokenProvider("bmsXAuthSecret", 3600);
 
 	@Before
 	public void beforeEachTest() {
@@ -42,22 +43,22 @@ public class XAuthTokenFilterTest {
 
 	@Test
 	public void testDoFilterValidRequest() throws IOException, ServletException {
-		String testUser = "admin";
+		final String testUser = "admin";
 
-		User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
+		final User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
 		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenReturn(userDetails);
 
 		// Generate a valid token
-		Token token = this.tokenProvider.createToken(userDetails);
+		final Token token = this.tokenProvider.createToken(userDetails);
 
-		MockHttpServletRequest request = new MockHttpServletRequest();
-		MockHttpServletResponse response = new MockHttpServletResponse();
-		MockFilterChain filterChain = new MockFilterChain();
+		final MockHttpServletRequest request = new MockHttpServletRequest();
+		final MockHttpServletResponse response = new MockHttpServletResponse();
+		final MockFilterChain filterChain = new MockFilterChain();
 
 		// Add to x-auth-token header to the request
 		request.addHeader(XAuthTokenFilter.XAUTH_TOKEN_HEADER_NAME, token.getToken());
 
-		XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
+		final XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
 		filter.doFilter(request, response, filterChain);
 
 		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -67,22 +68,22 @@ public class XAuthTokenFilterTest {
 
 	@Test
 	public void testDoFilterValidBrAPIRequest() throws IOException, ServletException {
-		String testUser = "admin";
+		final String testUser = "admin";
 
-		User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
+		final User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
 		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenReturn(userDetails);
 
 		// Generate a valid token
-		Token token = this.tokenProvider.createToken(userDetails);
+		final Token token = this.tokenProvider.createToken(userDetails);
 
-		MockHttpServletRequest request = new MockHttpServletRequest();
-		MockHttpServletResponse response = new MockHttpServletResponse();
-		MockFilterChain filterChain = new MockFilterChain();
+		final MockHttpServletRequest request = new MockHttpServletRequest();
+		final MockHttpServletResponse response = new MockHttpServletResponse();
+		final MockFilterChain filterChain = new MockFilterChain();
 
 		request.setRequestURI("/brapi");
 		request.addHeader(XAuthTokenFilter.AUTH_TOKEN_HEADER_NAME, XAuthTokenFilter.BEARER_PREFIX + token.getToken());
 
-		XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
+		final XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
 		filter.doFilter(request, response, filterChain);
 
 		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -92,15 +93,43 @@ public class XAuthTokenFilterTest {
 
 	@Test
 	public void testDoFilterInValidRequest() throws IOException, ServletException {
-		MockHttpServletRequest request = new MockHttpServletRequest(); // No token added to request
-		MockHttpServletResponse response = new MockHttpServletResponse();
-		MockFilterChain filterChain = new MockFilterChain();
+		final MockHttpServletRequest request = new MockHttpServletRequest(); // No token added to request
+		final MockHttpServletResponse response = new MockHttpServletResponse();
+		final MockFilterChain filterChain = new MockFilterChain();
 
-		XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
+		final XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
 		filter.doFilter(request, response, filterChain);
 
 		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Assert.assertNull("Expected security context to not have set authenticated principal.", authentication);
+	}
+
+	@Test
+	public void testInvalidCropAndProgramUUID() throws IOException, ServletException {
+		final String testUser = "admin";
+		final User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
+		// Generate a valid token
+		final Token token = this.tokenProvider.createToken(userDetails);
+
+		final String errorMessage = "error message";
+		final ContextResolutionException contextResolutionException = new ContextResolutionException(errorMessage);
+		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenThrow(contextResolutionException);
+
+		final MockHttpServletRequest request = new MockHttpServletRequest();
+		final MockHttpServletResponse response = new MockHttpServletResponse();
+		final MockFilterChain filterChain = new MockFilterChain();
+
+		request.setRequestURI("/brapi");
+		request.addHeader(XAuthTokenFilter.AUTH_TOKEN_HEADER_NAME, XAuthTokenFilter.BEARER_PREFIX + token.getToken());
+
+		final XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
+		filter.doFilter(request, response, filterChain);
+
+		Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST, response.getStatus());
+		Assert.assertEquals("application/json", response.getContentType());
+		Assert.assertEquals("UTF-8", response.getCharacterEncoding());
+		Assert.assertEquals("{\"errors\":[{\"fieldNames\":[],\"message\":\"error message\"}]}", response.getContentAsString());
+
 	}
 
 }

@@ -57,7 +57,7 @@ public class PresetMapperTest extends ApiUnitTestBase {
 		filePresetConfigurationDTO = new FilePresetConfigurationDTO();
 		filePresetConfigurationDTO.setOutputType("csv");
 		configuration =
-			"{\"type\":\"LabelPrintingPreset\",\"selectedFields\":[[4,13]],\"barcodeSetting\":{\"barcodeNeeded\":true,\"automaticBarcode\":false,\"barcodeFields\":[2]},\"fileConfiguration\":{\"outputType\":\"csv\"}}";
+			"{\"type\":\"LabelPrintingPreset\",\"selectedFields\":[[4,13]],\"barcodeSetting\":{\"barcodeNeeded\":true,\"automaticBarcode\":false,\"barcodeFields\":[2]},\"includeHeadings\":true,\"fileConfiguration\":{\"outputType\":\"csv\"}}";
 	}
 
 	@Test

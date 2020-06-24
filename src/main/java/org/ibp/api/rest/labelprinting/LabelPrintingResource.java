@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.rest.common.FileType;
@@ -14,12 +15,16 @@ import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
+import org.ibp.api.rest.labelprinting.filegenerator.CSVLabelsFileGenerator;
+import org.ibp.api.rest.labelprinting.filegenerator.ExcelLabelsFileGenerator;
+import org.ibp.api.rest.labelprinting.filegenerator.LabelsFileGenerator;
+import org.ibp.api.rest.labelprinting.filegenerator.PDFLabelsFileGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,23 +34,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
 @Api(value = "Label Printing Services")
-@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 @RestController
 public class LabelPrintingResource {
 	@Autowired
 	private LabelPrintingStrategy subObservationDatasetLabelPrinting;
 
 	@Autowired
+	private LabelPrintingStrategy lotLabelPrinting;
+
+	@Autowired
 	private CSVLabelsFileGenerator csvLabelsFileGenerator;
 
 	@Autowired
 	private PDFLabelsFileGenerator pdfLabelsFileGenerator;
+
+	@Autowired
+	private ExcelLabelsFileGenerator excelLabelsFileGenerator;
+
+	@Autowired
+	private HttpServletRequest request;
 
 
 	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/labels/summary", method = RequestMethod.POST)
@@ -131,8 +145,12 @@ public class LabelPrintingResource {
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
 
-	private LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {
+	public LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {
 		final LabelPrintingType labelPrintingTypeEnum = LabelPrintingType.getEnumByCode(labelPrintingType);
+
+		if (!this.hasAuthority(labelPrintingTypeEnum)) {
+			throw new AccessDeniedException("");
+		}
 
 		if (labelPrintingTypeEnum == null) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
@@ -146,11 +164,31 @@ public class LabelPrintingResource {
 			case SUBOBSERVATION_DATASET:
 				labelPrintingStrategy = this.subObservationDatasetLabelPrinting;
 				break;
+			case LOT:
+				labelPrintingStrategy = this.lotLabelPrinting;
+				break;
 			default:
 				labelPrintingStrategy = null;
 		}
 
 		return labelPrintingStrategy;
+	}
+
+	private boolean hasAuthority(final LabelPrintingType labelPrintingTypeEnum) {
+		switch (labelPrintingTypeEnum) {
+			case SUBOBSERVATION_DATASET:
+				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
+					|| this.request.isUserInRole(PermissionsEnum.BREEDING_ACTIVITIES.name())
+					|| this.request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name());
+			case LOT:
+				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
+					|| this.request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())
+					|| this.request.isUserInRole(PermissionsEnum.MANAGE_INVENTORY.name())
+					|| this.request.isUserInRole(PermissionsEnum.MANAGE_LOTS.name())
+					|| this.request.isUserInRole(PermissionsEnum.LOT_LABEL_PRINTING.name());
+			default:
+				return false;
+		}
 	}
 
 	LabelsFileGenerator getLabelsFileGenerator(final String fileExtension, final LabelPrintingStrategy labelPrintingStrategy) {
@@ -168,10 +206,19 @@ public class LabelPrintingResource {
 			case PDF:
 				labelsFileGenerator = this.pdfLabelsFileGenerator;
 				break;
+			case XLS:
+				// Generic Excel generator
+				// It's possible to switch again here by strategy to return a specific generator
+				labelsFileGenerator = this.excelLabelsFileGenerator;
+				break;
 			default:
 				labelsFileGenerator = null;
 		}
 		return labelsFileGenerator;
+	}
+
+	public void setRequest(final HttpServletRequest request) {
+		this.request = request;
 	}
 
 }
