@@ -199,7 +199,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Get sample list", notes = "Get sample list")
-	@RequestMapping(value = "/{crop}/{sampleListId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/sample-lists/{sampleListId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SampleListDto> getSampleList(@PathVariable final String crop, @PathVariable final Integer sampleListId) {
 		return new ResponseEntity<>(sampleListService.getSampleListDTO(sampleListId), HttpStatus.OK);
