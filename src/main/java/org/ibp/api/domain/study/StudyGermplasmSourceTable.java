@@ -1,6 +1,6 @@
 package org.ibp.api.domain.study;
 
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 

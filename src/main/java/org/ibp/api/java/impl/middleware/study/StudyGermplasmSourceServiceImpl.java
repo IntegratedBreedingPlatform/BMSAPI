@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
 import org.ibp.api.java.study.StudyGermplasmSourceService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +14,7 @@ import java.util.List;
 public class StudyGermplasmSourceServiceImpl implements StudyGermplasmSourceService {
 
 	@Resource
-	private org.generationcp.middleware.service.api.study.StudyGermplasmSourceService studyGermplasmSourceMiddlewareService;
+	private org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceService studyGermplasmSourceMiddlewareService;
 
 	@Override
 	public List<StudyGermplasmSourceDto> getStudyGermplasmSourceList(final StudyGermplasmSourceRequest studyGermplasmSourceRequest) {

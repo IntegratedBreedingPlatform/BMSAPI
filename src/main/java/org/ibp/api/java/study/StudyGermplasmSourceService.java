@@ -1,7 +1,7 @@
 package org.ibp.api.java.study;
 
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmSourceRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
 
 import java.util.List;
 
