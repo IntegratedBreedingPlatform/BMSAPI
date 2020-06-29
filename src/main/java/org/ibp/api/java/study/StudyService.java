@@ -32,8 +32,6 @@ public interface StudyService {
 
 	List<Observation> updateObservations(final Integer studyIdentifier, List<Observation> observation);
 
-	List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer);
-
 	TrialObservationTable getTrialObservationTable(final int studyIdentifier);
 
 	/**

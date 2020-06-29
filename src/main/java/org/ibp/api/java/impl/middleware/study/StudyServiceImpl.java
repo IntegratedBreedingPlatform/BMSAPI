@@ -261,18 +261,6 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer) {
-		final ModelMapper modelMapper = StudyMapper.getInstance();
-		final List<StudyGermplasm> destination = new ArrayList<>();
-		final List<StudyGermplasmDto> studyGermplasmList = this.middlewareStudyService.getStudyGermplasmList(studyIdentifer);
-		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmList) {
-			final StudyGermplasm mappedValue = modelMapper.map(studyGermplasmDto, StudyGermplasm.class);
-			destination.add(mappedValue);
-		}
-		return destination;
-	}
-
-	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
 		return this.fieldMapService.getFieldMap(studyId);
 	}

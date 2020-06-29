@@ -127,35 +127,6 @@ public class StudyServiceImplTest {
 
 	}
 
-	@Test
-	public void testGetStudyGermplasmList() {
-
-		final List<StudyGermplasmDto> studyGermplasmTestData =
-				Lists.newArrayList(this.factory.manufacturePojo(StudyGermplasmDto.class),
-						this.factory.manufacturePojo(StudyGermplasmDto.class));
-		Mockito.when(this.mockMiddlewareStudyService.getStudyGermplasmList(StudyServiceImplTest.TEST_STUDY_IDENTIFIER)).thenReturn(
-				studyGermplasmTestData);
-
-		final Function<StudyGermplasmDto, StudyGermplasm> transformFunction = new Function<StudyGermplasmDto, StudyGermplasm>() {
-
-			@Override
-			public StudyGermplasm apply(final StudyGermplasmDto studyGermplasmDto) {
-				final StudyGermplasm studyGermplasm = new StudyGermplasm();
-				studyGermplasm.setEntryNumber(studyGermplasmDto.getEntryNumber());
-				studyGermplasm.setEntryType(studyGermplasmDto.getEntryType());
-				studyGermplasm.setPosition(studyGermplasmDto.getPosition());
-				studyGermplasm.setGermplasmListEntrySummary(new GermplasmListEntrySummary(studyGermplasmDto.getGermplasmId(),
-						studyGermplasmDto.getDesignation(), studyGermplasmDto.getSeedSource(), studyGermplasmDto.getEntryCode(),
-						studyGermplasmDto.getCross()));
-				return studyGermplasm;
-			}
-		};
-
-		final List<StudyGermplasm> studyGermplasmList = this.studyServiceImpl.getStudyGermplasmList(2013);
-
-		final List<StudyGermplasm> expectedResults = Lists.transform(studyGermplasmTestData, transformFunction);
-		Assert.assertEquals(expectedResults, studyGermplasmList);
-	}
 
 	@Test
 	public void testGetObservations() {
