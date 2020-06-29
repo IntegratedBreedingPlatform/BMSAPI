@@ -52,7 +52,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 	private StudyService studyService;
 
 	@Autowired
-	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
+	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
 
 	@Resource
 	private org.generationcp.middleware.service.api.study.generation.ExperimentDesignService experimentDesignMiddlewareService;
@@ -85,7 +85,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 		}
 
 		// Validate design type parameters based on study germplasm list
-		final List<StudyGermplasmDto> studyGermplasmDtoList = this.middlewareStudyService.getStudyGermplasmList(studyId);
+		final List<StudyGermplasmDto> studyGermplasmDtoList = this.middlewareStudyGermplasmService.getGermplasm(studyId);
 		this.experimentalDesignTypeValidator.validate(experimentalDesignInput, studyGermplasmDtoList);
 
 		// Generate observation unit rows
