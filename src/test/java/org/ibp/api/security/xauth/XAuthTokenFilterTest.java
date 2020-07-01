@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -129,6 +130,34 @@ public class XAuthTokenFilterTest {
 		Assert.assertEquals("application/json", response.getContentType());
 		Assert.assertEquals("UTF-8", response.getCharacterEncoding());
 		Assert.assertEquals("{\"errors\":[{\"fieldNames\":[],\"message\":\"error message\"}]}", response.getContentAsString());
+
+	}
+
+	@Test
+	public void testDoFilterUnauthorizedForCrop() throws IOException, ServletException {
+		final String testUser = "admin";
+		final User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
+		// Generate a valid token
+		final Token token = this.tokenProvider.createToken(userDetails);
+
+		final String errorMessage = "Access Denied: User is not authorized for crop";
+		final AuthenticationServiceException authenticationServiceException = new AuthenticationServiceException(errorMessage);
+		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenThrow(authenticationServiceException);
+
+		final MockHttpServletRequest request = new MockHttpServletRequest();
+		final MockHttpServletResponse response = new MockHttpServletResponse();
+		final MockFilterChain filterChain = new MockFilterChain();
+
+		request.setRequestURI("/brapi");
+		request.addHeader(XAuthTokenFilter.AUTH_TOKEN_HEADER_NAME, XAuthTokenFilter.BEARER_PREFIX + token.getToken());
+
+		final XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
+		filter.doFilter(request, response, filterChain);
+
+		Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
+		Assert.assertEquals("application/json", response.getContentType());
+		Assert.assertEquals("UTF-8", response.getCharacterEncoding());
+		Assert.assertEquals("{\"errors\":[{\"fieldNames\":[],\"message\":\"Access Denied: User is not authorized for crop\"}]}", response.getContentAsString());
 
 	}
 

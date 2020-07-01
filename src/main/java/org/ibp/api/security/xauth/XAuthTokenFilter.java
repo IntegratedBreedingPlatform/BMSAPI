@@ -4,6 +4,7 @@ package org.ibp.api.security.xauth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.java.impl.middleware.common.ContextResolutionException;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 
 /**
  * Filters incoming requests and installs a Spring Security principal if a header corresponding to a valid user is found.
@@ -73,14 +75,16 @@ public class XAuthTokenFilter extends GenericFilterBean {
 			}
 			filterChain.doFilter(servletRequest, servletResponse);
 		} catch (final ContextResolutionException contextResolutionException) {
-			// Manually send error code and message, exception thrown here in at filter level can't be caught in ControllerAdvice (DefaultExceptionHandler).
 			this.sendError(HttpServletResponse.SC_BAD_REQUEST, contextResolutionException.getMessage(), httpServletResponse);
+		} catch (final AuthenticationServiceException authenticationServiceException) {
+			this.sendError(HttpServletResponse.SC_FORBIDDEN, authenticationServiceException.getMessage(), httpServletResponse);
 		} catch (final Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
 	void sendError(final int status, final String message, final HttpServletResponse response) throws IOException {
+		// Manually send error code and message, exception thrown here in at filter level can't be caught in ControllerAdvice (DefaultExceptionHandler).
 		final ErrorResponse errorResponse = new ErrorResponse();
 		errorResponse.addError(message);
 		response.setStatus(status);
