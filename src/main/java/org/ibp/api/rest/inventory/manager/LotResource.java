@@ -6,7 +6,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
@@ -169,6 +171,18 @@ public class LotResource {
 		final SingleEntityResponse<String> singleEntityResponse =
 			new SingleEntityResponse<String>(this.lotService.saveLot(lotGeneratorInputDto));
 		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Create multiple lots")
+	@RequestMapping(value = "/crops/{cropName}/lots/generation", method = RequestMethod.POST)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('CREATE_LOTS')")
+	@ResponseBody
+	public ResponseEntity<List<String>> createLots(@PathVariable final String cropName,
+		@ApiParam("Lot template for batch generation. Some fields are ignored (gid, lotId, etc). "
+			+ "SearchComposite is a list of gids or a search id (internal usage) ")
+		@RequestBody final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
+
+		return new ResponseEntity<>(this.lotService.createLots(lotGeneratorBatchRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Lots", notes = "Update one or more Lots")

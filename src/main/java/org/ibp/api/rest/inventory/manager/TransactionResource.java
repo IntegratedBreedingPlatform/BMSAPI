@@ -274,7 +274,7 @@ public class TransactionResource {
 		}
 	}
 
-	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a set os filtered lots")
+	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a set of filtered lots")
 	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-deposits-lists", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_CONFIRMED_DEPOSITS')")

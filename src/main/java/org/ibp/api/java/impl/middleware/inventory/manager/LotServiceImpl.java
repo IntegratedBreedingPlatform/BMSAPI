@@ -3,6 +3,8 @@ package org.ibp.api.java.impl.middleware.inventory.manager;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
@@ -10,9 +12,13 @@ import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotImportRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
@@ -22,8 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,6 +44,9 @@ public class LotServiceImpl implements LotService {
 
 	@Autowired
 	private LotInputValidator lotInputValidator;
+
+	@Autowired
+	private GermplasmValidator germplasmValidator;
 
 	@Autowired
 	private LotImportRequestDtoValidator lotImportRequestDtoValidator;
@@ -52,6 +65,15 @@ public class LotServiceImpl implements LotService {
 
 	@Autowired
 	private ExtendedLotListValidator extendedLotListValidator;
+
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
+
+	@Autowired
+	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private SearchRequestDtoResolver searchRequestDtoResolver;
 
 	private static final String DEFAULT_STOCKID_PREFIX = "SID";
 
@@ -93,6 +115,49 @@ public class LotServiceImpl implements LotService {
 		return lotService.saveLot(this.contextUtil.getProjectInContext().getCropType(), loggedInUser.getUserid(), lotGeneratorInputDto);
 	}
 
+	@Override
+	public List<String> createLots(final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
+		// validations
+		final SearchCompositeDto<Integer, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), null);
+		this.inventoryCommonValidator.validateSearchCompositeDto(searchComposite, errors);
+		this.lotInputValidator.validate(lotGeneratorBatchRequestDto);
+
+		final LotGeneratorInputDto lotGeneratorInput = lotGeneratorBatchRequestDto.getLotGeneratorInput();
+
+		// resolve stock id prefix
+		String nextStockIdPrefix = null;
+		if (lotGeneratorInput.getGenerateStock()) {
+			final String stockPrefix = lotGeneratorInput.getStockPrefix();
+			if (stockPrefix == null || stockPrefix.isEmpty()) {
+				nextStockIdPrefix = this.stockService.calculateNextStockIDPrefix(DEFAULT_STOCKID_PREFIX, "-");
+			} else {
+				nextStockIdPrefix = this.stockService.calculateNextStockIDPrefix(stockPrefix, "-");
+			}
+		}
+
+		// generate lot lists
+		final List<LotItemDto> lotList = new ArrayList<>();
+		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
+		int stockIdSuffix = 1;
+
+		for (final Integer gid : gids) {
+			final LotItemDto lotItemDto = new LotItemDto();
+			lotItemDto.setGid(gid);
+			lotItemDto.setScaleId(lotGeneratorInput.getUnitId());
+			lotItemDto.setStorageLocationId(lotGeneratorInput.getLocationId());
+			lotItemDto.setNotes(lotGeneratorInput.getNotes());
+			if (lotGeneratorInput.getGenerateStock()) {
+				lotItemDto.setStockId(nextStockIdPrefix + stockIdSuffix++);
+			}
+			lotList.add(lotItemDto);
+		}
+
+		// save to db
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+		final CropType cropType = this.contextUtil.getProjectInContext().getCropType();
+		return this.lotService.saveLots(cropType, loggedInUser.getUserid(), lotList);
+	}
 
 	@Override
 	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
@@ -117,7 +182,7 @@ public class LotServiceImpl implements LotService {
 				lotItemDto.setStockId(nextStockIDPrefix + ++i);
 			}
 		}
-		this.lotService.saveLotsWithInitialTransaction(cropType, loggedInUser.getUserid(), lotImportRequestDto.getLotList());
+		this.lotService.saveLots(cropType, loggedInUser.getUserid(), lotImportRequestDto.getLotList());
 	}
 
 	@Override

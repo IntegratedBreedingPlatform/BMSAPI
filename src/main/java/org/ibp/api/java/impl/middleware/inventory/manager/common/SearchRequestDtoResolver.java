@@ -3,11 +3,18 @@ package org.ibp.api.java.impl.middleware.inventory.manager.common;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.search_request.GidSearchDto;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.ibp.api.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class SearchRequestDtoResolver {
@@ -40,6 +47,17 @@ public class SearchRequestDtoResolver {
 			transactionsSearchDto.setTransactionIds(new ArrayList<>(searchCompositeDto.getItemIds()));
 		}
 		return transactionsSearchDto;
+	}
+
+	public List<Integer> resolveGidSearchDto(final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
+		if (searchCompositeDto.getSearchRequest() != null) {
+			final GidSearchDto searchRequest =
+				(GidSearchDto) this.searchRequestService.getSearchRequest(searchCompositeDto.getSearchRequest(), GidSearchDto.class);
+			return searchRequest.getGids();
+		} else if (!Util.isNullOrEmpty(searchCompositeDto.getItemIds())) {
+			return new ArrayList<>(searchCompositeDto.getItemIds());
+		}
+		return Collections.EMPTY_LIST;
 	}
 
 }

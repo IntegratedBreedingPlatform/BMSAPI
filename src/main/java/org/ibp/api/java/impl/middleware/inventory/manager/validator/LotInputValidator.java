@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
@@ -12,6 +13,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
@@ -63,6 +65,20 @@ public class LotInputValidator {
 		this.locationValidator.validateSeedLocationId(this.errors, lotGeneratorInputDto.getLocationId());
 		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
+		this.validateStockId(lotGeneratorInputDto);
+		this.inventoryCommonValidator.validateLotNotes(lotGeneratorInputDto.getNotes(), errors);
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validate(final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
+		final LotGeneratorInputDto lotGeneratorInputDto = lotGeneratorBatchRequestDto.getLotGeneratorInput();
+		BaseValidator.checkNotNull(lotGeneratorInputDto, "param.null", new String[] {"lotGeneratorInputDto"});
+
+		this.locationValidator.validateSeedLocationId(this.errors, lotGeneratorInputDto.getLocationId());
+		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.validateStockId(lotGeneratorInputDto);
 		this.inventoryCommonValidator.validateLotNotes(lotGeneratorInputDto.getNotes(), errors);
 		if (this.errors.hasErrors()) {
@@ -148,5 +164,4 @@ public class LotInputValidator {
 		}
 
 	}
-
 }
