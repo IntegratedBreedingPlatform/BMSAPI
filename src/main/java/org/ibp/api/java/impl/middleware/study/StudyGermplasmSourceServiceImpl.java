@@ -1,7 +1,9 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceRequest;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.study.StudyGermplasmSourceService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +16,25 @@ import java.util.List;
 public class StudyGermplasmSourceServiceImpl implements StudyGermplasmSourceService {
 
 	@Resource
-	private org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceService studyGermplasmSourceMiddlewareService;
+	private PedigreeService pedigreeService;
+
+	@Resource
+	private CrossExpansionProperties crossExpansionProperties;
+
+	@Resource
+	private org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceService
+		studyGermplasmSourceMiddlewareService;
 
 	@Override
 	public List<StudyGermplasmSourceDto> getStudyGermplasmSourceList(final StudyGermplasmSourceRequest studyGermplasmSourceRequest) {
-		return this.studyGermplasmSourceMiddlewareService.getStudyGermplasmSourceList(studyGermplasmSourceRequest);
+
+		final List<StudyGermplasmSourceDto> studyGermplasmSourceDtoList = this.studyGermplasmSourceMiddlewareService
+			.getStudyGermplasmSourceList(studyGermplasmSourceRequest);
+
+		for (final StudyGermplasmSourceDto studyGermplasmSourceDto : studyGermplasmSourceDtoList) {
+			studyGermplasmSourceDto.setCross(this.pedigreeService.getCrossExpansion(studyGermplasmSourceDto.getGid(), this.crossExpansionProperties));
+		}
+		return studyGermplasmSourceDtoList;
 	}
 
 	@Override
