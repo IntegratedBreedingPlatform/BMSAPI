@@ -19,7 +19,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 
 /**
  * Filters incoming requests and installs a Spring Security principal if a header corresponding to a valid user is found.
