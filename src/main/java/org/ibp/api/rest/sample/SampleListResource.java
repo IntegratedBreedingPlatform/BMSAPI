@@ -206,7 +206,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Submit sample data to GOBii", notes = "Submit sample data to GOBii")
-	@RequestMapping(value = "/{crop}/{sampleListId}/submitToGOBii", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/sample-lists/{sampleListId}/submitToGOBii", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Integer> submitToGOBii(@PathVariable final String crop, @PathVariable final Integer sampleListId) {
 		final Integer projectId = sampleListService.submitToGOBii(sampleListId);
