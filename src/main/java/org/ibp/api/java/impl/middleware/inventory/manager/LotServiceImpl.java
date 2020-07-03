@@ -16,6 +16,7 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
@@ -119,9 +120,14 @@ public class LotServiceImpl implements LotService {
 	public List<String> createLots(final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
 		// validations
 		final SearchCompositeDto<Integer, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), null);
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchComposite, errors);
 		this.lotInputValidator.validate(lotGeneratorBatchRequestDto);
+		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
+		this.germplasmValidator.validateGids(errors, gids);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 
 		final LotGeneratorInputDto lotGeneratorInput = lotGeneratorBatchRequestDto.getLotGeneratorInput();
 
@@ -138,7 +144,6 @@ public class LotServiceImpl implements LotService {
 
 		// generate lot lists
 		final List<LotItemDto> lotList = new ArrayList<>();
-		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
 		int stockIdSuffix = 1;
 
 		for (final Integer gid : gids) {

@@ -4,12 +4,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotImportRequestDtoValidator;
 import org.junit.Before;
@@ -24,6 +24,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class LotImportRequestDtoValidatorTest {
 	private LotImportRequestDtoValidator lotImportRequestDtoValidator;
 
 	@Mock
-	private GermplasmDataManager germplasmDataManager;
+	private GermplasmValidator germplasmValidator;
 
 	@Mock
 	private LocationDataManager locationDataManager;
@@ -141,31 +142,10 @@ public class LotImportRequestDtoValidatorTest {
 	}
 
 	@Test
-	public void testValidateGermplasmListInvalid() {
-		final List<LotItemDto> lotList = new ArrayList<>();
-
-		final LotItemDto lotItemDto = createLotItemDto();
-
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList());
-		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
-		lotImportRequestDto.setLotList(lotList);
-
-
-		try {
-			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
-		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.invalid.gids"));
-
-		}
-	}
-
-	@Test
 	public void testValidateStorageLocationsNull() {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
 
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 		lotImportRequestDto.setLotList(lotList);
@@ -184,8 +164,6 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
-
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 		lotImportRequestDto.setLotList(lotList);
 
@@ -202,8 +180,6 @@ public class LotImportRequestDtoValidatorTest {
 	public void testValidateScaleNamesNull() {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
-
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
 
 		final List<Location> existingLocations = new ArrayList<>();
 		final Location seedStorageLocation = new Location();
@@ -228,8 +204,6 @@ public class LotImportRequestDtoValidatorTest {
 	public void testValidateScaleNamesInvalid() {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
-
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
 
 		final List<Location> existingLocations = new ArrayList<>();
 		final Location seedStorageLocation = new Location();
@@ -260,8 +234,6 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
-
 		final List<Location> existingLocations = new ArrayList<>();
 		final Location seedStorageLocation = new Location();
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
@@ -289,9 +261,6 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 		final LotItemDto lotItemDto1 = createLotItemDto();
-
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid(), 2)))
-			.thenReturn(Arrays.asList(new Germplasm(), new Germplasm()));
 
 		final List<Location> existingLocations = new ArrayList<>();
 		final Location seedStorageLocation = new Location();
@@ -321,8 +290,6 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
-
 		final List<Location> existingLocations = new ArrayList<>();
 		final Location seedStorageLocation = new Location();
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
@@ -348,8 +315,6 @@ public class LotImportRequestDtoValidatorTest {
 	public void testValidateInitialBalancesNull() {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
-
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
 
 		Mockito.doNothing().when(inventoryCommonValidator)
 			.validateUnitNames(Mockito.any(List.class), Mockito.any(BindingResult.class));
@@ -378,8 +343,6 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
-
 		Mockito.doNothing().when(inventoryCommonValidator)
 			.validateUnitNames(Mockito.any(List.class), Mockito.any(BindingResult.class));
 
@@ -407,8 +370,6 @@ public class LotImportRequestDtoValidatorTest {
 	public void testValidateComments() {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
-
-		Mockito.when(this.germplasmDataManager.getGermplasms(Arrays.asList(lotItemDto.getGid()))).thenReturn(Arrays.asList(new Germplasm()));
 
 		final List<Location> existingLocations = new ArrayList<>();
 		final Location seedStorageLocation = new Location();
