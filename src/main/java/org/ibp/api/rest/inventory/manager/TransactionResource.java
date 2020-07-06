@@ -201,7 +201,7 @@ public class TransactionResource {
 	@ApiOperation(value = "It will retrieve transactions that affects the available balance of the lot", notes =
 		"It will retrieve transactions that "
 			+ "affects the available balance of the lot")
-	@RequestMapping(value = "/crops/{cropName}/lots/{lotId}/available-balance-transactions", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/lots/{lotUUID}/available-balance-transactions", method = RequestMethod.GET)
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
 	@JsonView(InventoryView.TransactionView.class)

@@ -2,6 +2,8 @@ package org.ibp.api.rest.inventory.manager;
 
 import com.beust.jcommander.internal.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -10,6 +12,7 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -107,5 +110,17 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$[0].transactionType", is("Deposit")))
 			.andExpect(jsonPath("$[0].createdByUsername", is("admin")))
 		;
+	}
+
+	@Test
+	public void testGetAvailableBalanceTransactions() throws Exception {
+
+		final String lotUUID = RandomStringUtils.randomAlphanumeric(16);
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.get("/crops/{cropName}/lots/{lotUUID}/available-balance-transactions", this.cropName, lotUUID))
+			.andExpect(MockMvcResultMatchers.status().isOk());
+
+		Mockito.verify(this.transactionService).getAvailableBalanceTransactions(lotUUID);
 	}
 }
