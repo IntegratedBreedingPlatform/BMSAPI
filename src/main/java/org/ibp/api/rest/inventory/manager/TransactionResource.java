@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDt
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
@@ -277,7 +278,9 @@ public class TransactionResource {
 	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a set of filtered lots")
 	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-deposits-lists", method = RequestMethod.POST)
 	@ResponseBody
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_CONFIRMED_DEPOSITS')")
+	@PreAuthorize(HAS_MANAGE_LOTS
+		+ " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_CONFIRMED_DEPOSITS')"
+		+ PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	public ResponseEntity<Void> createConfirmedDeposits(
 		@PathVariable final String cropName,
 		@ApiParam("Deposit amount per unit")

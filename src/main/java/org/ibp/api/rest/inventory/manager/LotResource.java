@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.location.LocationDto;
@@ -175,7 +176,7 @@ public class LotResource {
 
 	@ApiOperation(value = "Create multiple lots")
 	@RequestMapping(value = "/crops/{cropName}/lots/generation", method = RequestMethod.POST)
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('CREATE_LOTS')")
+	@PreAuthorize(HAS_MANAGE_LOTS + PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	@ResponseBody
 	public ResponseEntity<List<String>> createLots(@PathVariable final String cropName,
 		@ApiParam("Lot template for batch generation. Some fields are ignored (gid, lotId, etc). "
