@@ -1,21 +1,21 @@
 package org.ibp.api.domain.study;
 
-import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.List;
 
 @AutoProperty
-public class StudyGermplasmSourceTable {
+public class GermplasmStudySourceTable {
 
 	private Integer recordsFiltered;
 
 	private Integer recordsTotal;
 
-	private List<StudyGermplasmSourceDto> data;
+	private List<GermplasmStudySourceDto> data;
 
-	public StudyGermplasmSourceTable() {
+	public GermplasmStudySourceTable() {
 
 	}
 
@@ -35,11 +35,11 @@ public class StudyGermplasmSourceTable {
 		this.recordsTotal = recordsTotal;
 	}
 
-	public List<StudyGermplasmSourceDto> getData() {
+	public List<GermplasmStudySourceDto> getData() {
 		return this.data;
 	}
 
-	public void setData(final List<StudyGermplasmSourceDto> data) {
+	public void setData(final List<GermplasmStudySourceDto> data) {
 		this.data = data;
 	}
 

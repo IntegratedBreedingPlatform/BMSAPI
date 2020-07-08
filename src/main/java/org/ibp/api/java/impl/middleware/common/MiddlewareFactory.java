@@ -83,7 +83,7 @@ import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
 import org.generationcp.middleware.service.api.study.StudyGermplasmService;
-import org.generationcp.middleware.service.api.study.germplasm.source.StudyGermplasmSourceService;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
@@ -101,7 +101,7 @@ import org.generationcp.middleware.service.impl.rpackage.RPackageServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyGermplasmServiceImpl;
-import org.generationcp.middleware.service.impl.study.germplasm.source.StudyGermplasmSourceServiceImpl;
+import org.generationcp.middleware.service.impl.study.germplasm.source.GermplasmStudySourceServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
@@ -548,8 +548,8 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public StudyGermplasmSourceService getStudyGermplasmSourceService() {
-		return new StudyGermplasmSourceServiceImpl(this.getCropDatabaseSessionProvider());
+	public GermplasmStudySourceService getGermplasmStudySourceService() {
+		return new GermplasmStudySourceServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
