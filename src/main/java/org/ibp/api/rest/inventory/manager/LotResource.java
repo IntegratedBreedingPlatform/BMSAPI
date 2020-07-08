@@ -179,6 +179,7 @@ public class LotResource {
 	@PreAuthorize(HAS_MANAGE_LOTS + PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	@ResponseBody
 	public ResponseEntity<List<String>> createLots(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@ApiParam("Lot template for batch generation. Some fields are ignored (gid, lotId, etc). "
 			+ "SearchComposite is a list of gids or a search id (internal usage) ")
 		@RequestBody final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {

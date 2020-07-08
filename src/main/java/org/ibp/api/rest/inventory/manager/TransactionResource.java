@@ -283,6 +283,7 @@ public class TransactionResource {
 		+ PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	public ResponseEntity<Void> createConfirmedDeposits(
 		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
 		try {
