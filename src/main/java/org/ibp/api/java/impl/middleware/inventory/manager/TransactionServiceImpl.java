@@ -197,14 +197,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public long countTransactions(final String transactionDbId, final String seedLotDbId, final String germplasmDbId) {
-		return this.transactionService.countTransactions(transactionDbId, seedLotDbId, germplasmDbId);
-	}
-
-	@Override
-	public List<org.ibp.api.brapi.v2.inventory.TransactionDto> getTransactions(final String transactionDbId, final String seedLotDbId, final String germplasmDbId,
-		final SortedPageRequest sortedPageRequest) {
-		final List<TransactionDto> transactions = this.transactionService.getTransactions(transactionDbId, seedLotDbId, germplasmDbId, sortedPageRequest);
+	public List<org.ibp.api.brapi.v2.inventory.TransactionDto> getTransactions(final TransactionsSearchDto transactionsSearchDto,
+		final Pageable pageable) {
+		final List<TransactionDto> transactions = this.transactionService.searchTransactions(transactionsSearchDto, pageable);
 		final List<org.ibp.api.brapi.v2.inventory.TransactionDto> transactionList = new ArrayList<>();
 		final ModelMapper transactionMapper = TransactionMapper.getInstance();
 		for(TransactionDto transactionDto: transactions) {

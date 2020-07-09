@@ -35,8 +35,6 @@ public interface TransactionService {
 
 	void cancelPendingTransactions(SearchCompositeDto<Integer, Integer> searchCompositeDto);
 
-	long countTransactions(String transactionDbId, String seedLotDbId, String germplasmDbId);
-
-	List<org.ibp.api.brapi.v2.inventory.TransactionDto> getTransactions(String transactionDbId, String seedLotDbId, String germplasmDbId, SortedPageRequest sortedPageRequest);
+	List<org.ibp.api.brapi.v2.inventory.TransactionDto> getTransactions(TransactionsSearchDto transactionsSearchDto, Pageable pageable);
 
 }
