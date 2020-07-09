@@ -8,9 +8,12 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.ibp.api.brapi.v1.study.StudyDetailsData;
+import org.ibp.api.brapi.v2.inventory.TransactionMapper;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
@@ -20,6 +23,7 @@ import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionI
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionUpdateRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.inventory.manager.TransactionService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -191,4 +196,20 @@ public class TransactionServiceImpl implements TransactionService {
 
 	}
 
+	@Override
+	public long countTransactions(final String transactionDbId, final String seedLotDbId, final String germplasmDbId) {
+		return this.transactionService.countTransactions(transactionDbId, seedLotDbId, germplasmDbId);
+	}
+
+	@Override
+	public List<org.ibp.api.brapi.v2.inventory.TransactionDto> getTransactions(final String transactionDbId, final String seedLotDbId, final String germplasmDbId,
+		final SortedPageRequest sortedPageRequest) {
+		final List<TransactionDto> transactions = this.transactionService.getTransactions(transactionDbId, seedLotDbId, germplasmDbId, sortedPageRequest);
+		final List<org.ibp.api.brapi.v2.inventory.TransactionDto> transactionList = new ArrayList<>();
+		final ModelMapper transactionMapper = TransactionMapper.getInstance();
+		for(TransactionDto transactionDto: transactions) {
+			transactionList.add(transactionMapper.map(transactionDto, org.ibp.api.brapi.v2.inventory.TransactionDto.class));
+		}
+		return transactionList;
+	}
 }
