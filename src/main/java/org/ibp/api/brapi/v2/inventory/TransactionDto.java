@@ -21,7 +21,7 @@ public class TransactionDto {
 	private String transactionDbId;
 
 	public Map<String, Object> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	public void setAdditionalInfo(final Map<String, Object> additionalInfo) {
@@ -29,7 +29,7 @@ public class TransactionDto {
 	}
 
 	public Double getAmount() {
-		return amount;
+		return this.amount;
 	}
 
 	public void setAmount(final Double amount) {
@@ -37,7 +37,7 @@ public class TransactionDto {
 	}
 
 	public String getTransactionDescription() {
-		return transactionDescription;
+		return this.transactionDescription;
 	}
 
 	public void setTransactionDescription(final String transactionDescription) {
@@ -45,7 +45,7 @@ public class TransactionDto {
 	}
 
 	public Date getTransactionTimestamp() {
-		return transactionTimestamp;
+		return this.transactionTimestamp;
 	}
 
 	public void setTransactionTimestamp(final Date transactionTimestamp) {
@@ -53,7 +53,7 @@ public class TransactionDto {
 	}
 
 	public String getUnits() {
-		return units;
+		return this.units;
 	}
 
 	public void setUnits(final String units) {
@@ -61,7 +61,7 @@ public class TransactionDto {
 	}
 
 	public String getTransactionDbId() {
-		return transactionDbId;
+		return this.transactionDbId;
 	}
 
 	public void setTransactionDbId(final String transactionDbId) {
