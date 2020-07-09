@@ -7,13 +7,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
+import org.ibp.api.brapi.v1.common.Metadata;
+import org.ibp.api.brapi.v1.common.Pagination;
+import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,7 +48,7 @@ public class TransactionResourceBrapi {
 	})
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_TRANSACTIONS', 'VIEW_TRANSACTIONS')")
 	@ResponseBody
-	public ResponseEntity<List<TransactionDto>> getTransaction(@PathVariable final String cropName,
+	public ResponseEntity<EntityListResponse<TransactionDto>> getTransaction(@PathVariable final String cropName,
 		@ApiParam(value = "Unique id for a transaction on this server") @RequestParam(value = "transactionDbId", required = false)
 		final String transactionDbId,
 		@ApiParam(value = "Unique id for a seed lot on this server") @RequestParam(value = "seedLotDbId", required = false)
@@ -71,12 +74,16 @@ public class TransactionResourceBrapi {
 				}
 			});
 
-		final List<TransactionDto> transactionDtos = resultPage.getPageResults();
+		final List<TransactionDto> transactionDtoList = resultPage.getPageResults();
 
-		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
+		final Result<TransactionDto> result = new Result<TransactionDto>().withData(transactionDtoList);
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
-		return new ResponseEntity<>(transactionDtos, headers, HttpStatus.OK);
+		final Metadata metadata = new Metadata().withPagination(pagination);
+		final EntityListResponse<TransactionDto> entityListResponse = new EntityListResponse<>(metadata, result);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
 	TransactionsSearchDto getTransactionsSearchDto(final String transactionDbId, final String seedLotDbId, final String germplasmDbId) {
