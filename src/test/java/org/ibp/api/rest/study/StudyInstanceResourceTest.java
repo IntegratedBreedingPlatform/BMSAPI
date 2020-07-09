@@ -60,7 +60,8 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$[0].locationName", Matchers.is(studyInstance.getLocationName())))
 			.andExpect(jsonPath("$[0].locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
 			.andExpect(jsonPath("$[0].hasFieldmap", Matchers.is(studyInstance.getHasFieldmap())))
-			.andExpect(jsonPath("$[0].customLocationAbbreviation", Matchers.is(studyInstance.getCustomLocationAbbreviation())));
+			.andExpect(jsonPath("$[0].customLocationAbbreviation", Matchers.is(studyInstance.getCustomLocationAbbreviation())))
+			.andExpect(jsonPath("$[0].experimentId", Matchers.is(studyInstance.getExperimentId())));
 
 	}
 
