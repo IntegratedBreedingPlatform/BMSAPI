@@ -46,7 +46,7 @@ public class GermplasmStudySourceResource {
 		final SortedPageRequest sortedRequest = germplasmStudySourceRequest.getSortedRequest();
 		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
 		final String sortOrder = germplasmStudySourceRequest.getSortedRequest().getSortOrder();
-		final boolean isSortOrderValid = "ASC".equals(sortOrder) || "DESC".equals(sortOrder) || StringUtils.isEmpty(sortOrder);
+		final boolean isSortOrderValid = "ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
 		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
 
 		final Integer pageNumber = sortedRequest.getPageNumber();
