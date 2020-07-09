@@ -28,11 +28,18 @@ public class LotMapper {
         public Map<String, Object> convert(final MappingContext<ExtendedLotDto, Map<String, Object>> context) {
             final Map<String, Object> additionalInfo = new HashMap<>();
             final ExtendedLotDto lotDto = context.getSource();
-            additionalInfo.put("User", lotDto.getCreatedByUsername());
+            additionalInfo.put("Username", lotDto.getCreatedByUsername());
             additionalInfo.put("Status", lotDto.getStatus());
-            additionalInfo.put("Notes", lotDto.getNotes());
-            additionalInfo.put("GermplasmName", lotDto.getDesignation());
-            additionalInfo.put("StockID", lotDto.getStockId());
+            additionalInfo.put("Designation", lotDto.getDesignation());
+            additionalInfo.put("Actual Balance", lotDto.getActualBalance());
+            additionalInfo.put("Reserved", lotDto.getReservedTotal());
+            additionalInfo.put("Total Withdrawals", lotDto.getWithdrawalTotal());
+            additionalInfo.put("Pending Deposits", lotDto.getPendingDepositsTotal());
+            additionalInfo.put("Last Deposit Date", lotDto.getLastDepositDate());
+            if (lotDto.getLastWithdrawalDate() != null) {
+                additionalInfo.put("Last Withdrawal Date", lotDto.getLastWithdrawalDate());
+            }
+            additionalInfo.put("Lot ID", lotDto.getLotId());
 
             return context.getMappingEngine().map(context.create(additionalInfo, context.getDestinationType()));
         }
@@ -44,10 +51,12 @@ public class LotMapper {
 
             @Override protected void configure() {
                 this.using(new AdditionalInfoConverter()).map(this.source).setAdditionalInfo(null);
-                this.map().setAmount(this.source.getActualBalance());
+                this.map().setAmount(this.source.getAvailableBalance());
                 this.map().setCreatedDate(this.source.getCreatedDate());
                 this.map().setGermplasmDbId(this.source.getGid());
                 this.map().setLocationDbId(this.source.getLocationId());
+                this.map().setSeedLotDescription(this.source.getNotes());
+                this.map().setSeedLotName(this.source.getStockId());
                 this.map().setStorageLocation(this.source.getLocationName());
                 this.map().setUnits(this.source.getUnitName());
                 this.map().setSeedLotDbId(this.source.getLotUUID());

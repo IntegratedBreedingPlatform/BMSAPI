@@ -34,12 +34,12 @@ public class LotResourceBrapi {
     @Resource
     private LotService lotService;
 
-    @ApiOperation(value = "Get Seed Lots", notes = "Get Seed Lots")
+    @ApiOperation(value = "Get a filtered list of Seed Lot descriptions", notes = "Get a filtered list of Seed Lot descriptions")
     @PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
     @RequestMapping(value = "/{crop}/brapi/v2/seedlots", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<EntityListResponse<LotDetails>> getSeedLots(@PathVariable final String crop, @RequestParam(value = "seedLotDbId", required = false)  final String seedLotDbId,
-                                                        @RequestParam(value = "germplasmDbId", required = false)  final Integer germplasmDbId,
+                                                        @RequestParam(value = "germplasmDbId", required = false)  final String germplasmDbId,
                                                         @ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)
                                                       @RequestParam(value = "page", required = false) final Integer currentPage,
                                                         @ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
@@ -54,7 +54,7 @@ public class LotResourceBrapi {
             lotsSearchDto.setLotUUIDs(Collections.singletonList(seedLotDbId));
         }
         if (germplasmDbId != null) {
-            lotsSearchDto.setGids(Collections.singletonList(germplasmDbId));
+            lotsSearchDto.setGids(Collections.singletonList(Integer.valueOf(germplasmDbId)));
         }
         // Only retrieve Active Lots
         lotsSearchDto.setStatus(LotStatus.ACTIVE.getIntValue());
@@ -85,7 +85,6 @@ public class LotResourceBrapi {
         final Result<LotDetails> result = new Result<LotDetails>().withData(lotList);
         final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
                 .withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
-
         final Metadata metadata = new Metadata().withPagination(pagination);
 
         final EntityListResponse<LotDetails> entityListResponse = new EntityListResponse<>(metadata, result);
