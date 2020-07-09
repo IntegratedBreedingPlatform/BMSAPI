@@ -35,7 +35,7 @@ public class TransactionMapper {
 			additionalInfo.put("createdByUsername", transactionDto.getCreatedByUsername());
 			additionalInfo.put("transactionType", transactionDto.getTransactionType());
 			additionalInfo.put("transactionStatus", transactionDto.getTransactionStatus());
-			additionalInfo.put("seedLotID ", transactionDto.getLot().getLotUUID());
+			additionalInfo.put("seedLotID", transactionDto.getLot().getLotUUID());
 			additionalInfo.put("germplasmDbId", transactionDto.getLot().getGid());
 			additionalInfo.put("locationId", transactionDto.getLot().getLocationId());
 			additionalInfo.put("locationName", transactionDto.getLot().getLocationName());

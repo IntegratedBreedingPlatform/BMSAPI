@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
@@ -102,7 +103,7 @@ public class TransactionResourceBrapi {
 		}
 
 		//Retrieve transactions with active lot only
-		searchDTO.setLotStatus(0);
+		searchDTO.setLotStatus(LotStatus.ACTIVE.getIntValue());
 		return searchDTO;
 	}
 }
