@@ -37,9 +37,15 @@ public class TransactionMapper {
 			additionalInfo.put("transactionStatus", transactionDto.getTransactionStatus());
 			additionalInfo.put("seedLotID", transactionDto.getLot().getLotUUID());
 			additionalInfo.put("germplasmDbId", transactionDto.getLot().getGid());
+			additionalInfo.put("designation", transactionDto.getLot().getDesignation());
 			additionalInfo.put("locationId", transactionDto.getLot().getLocationId());
 			additionalInfo.put("locationName", transactionDto.getLot().getLocationName());
 			additionalInfo.put("locationAbbr", transactionDto.getLot().getLocationAbbr());
+			additionalInfo.put("unitId", transactionDto.getLot().getUnitId());
+			additionalInfo.put("stockId", transactionDto.getLot().getStockId());
+			additionalInfo.put("lotId", transactionDto.getLot().getLotId());
+			additionalInfo.put("lotStatus", transactionDto.getLot().getStatus());
+			additionalInfo.put("lotNotes", transactionDto.getLot().getNotes());
 
 			return context.getMappingEngine().map(context.create(additionalInfo, context.getDestinationType()));
 		}
