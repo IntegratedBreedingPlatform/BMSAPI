@@ -3,6 +3,7 @@ package org.ibp.api.rest.study;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceRequest;
@@ -13,6 +14,7 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,6 +35,7 @@ public class GermplasmStudySourceResource {
 
 	@ApiOperation(value = "It will retrieve all generated germplasm in a study",
 		notes = "It will retrieve all generated germplasm in a study")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/germplasm-sources/table", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GermplasmStudySourceTable> getGermplasmStudySourceTable(final @PathVariable String cropname,
@@ -42,6 +45,9 @@ public class GermplasmStudySourceResource {
 		Preconditions.checkNotNull(germplasmStudySourceRequest, "params cannot be null");
 		final SortedPageRequest sortedRequest = germplasmStudySourceRequest.getSortedRequest();
 		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
+		final String sortOrder = germplasmStudySourceRequest.getSortedRequest().getSortOrder();
+		final boolean isSortOrderValid = "ASC".equals(sortOrder) || "DESC".equals(sortOrder) || StringUtils.isEmpty(sortOrder);
+		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
 
 		final Integer pageNumber = sortedRequest.getPageNumber();
 		final Integer pageSize = sortedRequest.getPageSize();

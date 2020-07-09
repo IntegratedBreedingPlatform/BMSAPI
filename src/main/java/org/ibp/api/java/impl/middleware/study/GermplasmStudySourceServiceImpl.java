@@ -4,6 +4,7 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceRequest;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.GermplasmStudySourceService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,9 @@ import java.util.List;
 @Service
 @Transactional
 public class GermplasmStudySourceServiceImpl implements GermplasmStudySourceService {
+
+	@Resource
+	private StudyValidator studyValidator;
 
 	@Resource
 	private PedigreeService pedigreeService;
@@ -27,6 +31,8 @@ public class GermplasmStudySourceServiceImpl implements GermplasmStudySourceServ
 
 	@Override
 	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(final GermplasmStudySourceRequest germplasmStudySourceRequest) {
+
+		this.studyValidator.validate(germplasmStudySourceRequest.getStudyId(), false);
 
 		final List<GermplasmStudySourceDto> germplasmStudySourceDtoList = this.germplasmStudySourceMiddlewareService
 			.getGermplasmStudySourceList(germplasmStudySourceRequest);
