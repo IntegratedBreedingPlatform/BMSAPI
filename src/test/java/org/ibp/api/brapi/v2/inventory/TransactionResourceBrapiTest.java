@@ -84,7 +84,7 @@ public class TransactionResourceBrapiTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.get("/crops/{cropName}/transactions", this.cropName).contentType(this.contentType))
+				.get("/{cropName}/brapi/v2/transactions", this.cropName).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$.result.data[0].amount", CoreMatchers.is(transactionDto.getAmount())))
