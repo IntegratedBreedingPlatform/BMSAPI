@@ -46,7 +46,7 @@ public class LotResourceBrapi {
                                                           @RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
 
-        final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage + 1;
+        final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
         final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 
         final LotsSearchDto lotsSearchDto = new LotsSearchDto();
