@@ -55,7 +55,7 @@ public class TransactionResourceBrapi {
 	) {
 		final TransactionsSearchDto searchDTO = this.getTransactionsSearchDto(transactionDbId, seedLotDbId, germplasmDbId);
 
-		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage + 1;
+		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 
 		final PagedResult<TransactionDto> resultPage =
