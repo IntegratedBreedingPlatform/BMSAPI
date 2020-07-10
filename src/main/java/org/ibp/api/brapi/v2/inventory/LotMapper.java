@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.spi.MappingContext;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,18 +29,19 @@ public class LotMapper {
         public Map<String, Object> convert(final MappingContext<ExtendedLotDto, Map<String, Object>> context) {
             final Map<String, Object> additionalInfo = new HashMap<>();
             final ExtendedLotDto lotDto = context.getSource();
-            additionalInfo.put("Username", lotDto.getCreatedByUsername());
-            additionalInfo.put("Status", lotDto.getStatus());
-            additionalInfo.put("Designation", lotDto.getDesignation());
-            additionalInfo.put("Actual Balance", lotDto.getActualBalance());
-            additionalInfo.put("Reserved", lotDto.getReservedTotal());
-            additionalInfo.put("Total Withdrawals", lotDto.getWithdrawalTotal());
-            additionalInfo.put("Pending Deposits", lotDto.getPendingDepositsTotal());
-            additionalInfo.put("Last Deposit Date", lotDto.getLastDepositDate());
+            additionalInfo.put("username", lotDto.getCreatedByUsername());
+            additionalInfo.put("status", lotDto.getStatus());
+            additionalInfo.put("germplasmName", lotDto.getDesignation());
+            additionalInfo.put("actualBalance", lotDto.getActualBalance());
+            additionalInfo.put("totalReserved", lotDto.getReservedTotal());
+            additionalInfo.put("totalWithdrawals", lotDto.getWithdrawalTotal());
+            additionalInfo.put("pendingDeposits", lotDto.getPendingDepositsTotal());
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            additionalInfo.put("lastDepositDate", dateFormat.format(lotDto.getLastDepositDate()));
             if (lotDto.getLastWithdrawalDate() != null) {
-                additionalInfo.put("Last Withdrawal Date", lotDto.getLastWithdrawalDate());
+                additionalInfo.put("lastWithdrawalDate", dateFormat.format(lotDto.getLastWithdrawalDate()));
             }
-            additionalInfo.put("Lot ID", lotDto.getLotId());
+            additionalInfo.put("lotInternalId", lotDto.getLotId());
 
             return context.getMappingEngine().map(context.create(additionalInfo, context.getDestinationType()));
         }
