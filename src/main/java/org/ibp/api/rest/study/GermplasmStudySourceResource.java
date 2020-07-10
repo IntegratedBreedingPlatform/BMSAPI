@@ -49,6 +49,7 @@ public class GermplasmStudySourceResource {
 		final boolean isSortOrderValid = "ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
 		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
 
+		germplasmStudySourceRequest.setStudyId(studyId);
 		final Integer pageNumber = sortedRequest.getPageNumber();
 		final Integer pageSize = sortedRequest.getPageSize();
 		final PagedResult<GermplasmStudySourceDto> pageResult =
