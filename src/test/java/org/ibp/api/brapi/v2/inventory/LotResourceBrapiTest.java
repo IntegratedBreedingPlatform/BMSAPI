@@ -1,6 +1,5 @@
 package org.ibp.api.brapi.v2.inventory;
 
-import freemarker.template.SimpleDate;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -22,7 +21,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -78,7 +76,7 @@ public class LotResourceBrapiTest extends ApiUnitTestBase {
                 Mockito.any(Pageable.class));
 
 
-        final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders
