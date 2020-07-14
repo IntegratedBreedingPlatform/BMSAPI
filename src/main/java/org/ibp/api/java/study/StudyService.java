@@ -70,5 +70,5 @@ public interface StudyService {
 
 	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
 
-	boolean hasAdvancedOrCrossesList(final int studyId);
+	boolean hasCrossesOrSelections(final int studyId);
 }

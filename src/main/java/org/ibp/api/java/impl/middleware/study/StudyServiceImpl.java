@@ -17,7 +17,6 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -27,7 +26,6 @@ import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -35,7 +33,6 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -388,7 +385,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public boolean hasAdvancedOrCrossesList(int studyId) {
-		return this.middlewareStudyService.hasAdvancedOrCrossesList(studyId);
+	public boolean hasCrossesOrSelections(int studyId) {
+		return this.middlewareStudyService.hasCrossesOrSelections(studyId);
 	}
 }

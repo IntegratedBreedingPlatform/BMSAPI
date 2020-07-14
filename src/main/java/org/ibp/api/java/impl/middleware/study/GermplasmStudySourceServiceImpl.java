@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
-import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.GermplasmStudySourceService;
@@ -30,9 +30,10 @@ public class GermplasmStudySourceServiceImpl implements GermplasmStudySourceServ
 		germplasmStudySourceMiddlewareService;
 
 	@Override
-	public List<GermplasmStudySourceDto> getGermplasmStudySourceList(final GermplasmStudySourceRequest germplasmStudySourceRequest) {
+	public List<GermplasmStudySourceDto> getGermplasmStudySources(
+		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
 
-		this.studyValidator.validate(germplasmStudySourceRequest.getStudyId(), false);
+		this.studyValidator.validate(germplasmStudySourceSearchRequest.getStudyId(), false);
 
 		final List<GermplasmStudySourceDto> germplasmStudySourceDtoList = this.germplasmStudySourceMiddlewareService
 			.getGermplasmStudySourceList(germplasmStudySourceRequest);
@@ -44,12 +45,12 @@ public class GermplasmStudySourceServiceImpl implements GermplasmStudySourceServ
 	}
 
 	@Override
-	public long countGermplasmStudySourceList(final GermplasmStudySourceRequest germplasmStudySourceRequest) {
-		return this.germplasmStudySourceMiddlewareService.countGermplasmStudySourceList(germplasmStudySourceRequest);
+	public long countGermplasmStudySources(final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
+		return this.germplasmStudySourceMiddlewareService.countGermplasmStudySources(germplasmStudySourceSearchRequest);
 	}
 
 	@Override
-	public long countFilteredGermplasmStudySourceList(final GermplasmStudySourceRequest germplasmStudySourceRequest) {
-		return this.germplasmStudySourceMiddlewareService.countFilteredGermplasmStudySourceList(germplasmStudySourceRequest);
+	public long countFilteredGermplasmStudySources(final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
+		return this.germplasmStudySourceMiddlewareService.countFilteredGermplasmStudySources(germplasmStudySourceSearchRequest);
 	}
 }

@@ -6,9 +6,10 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
-import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.study.GermplasmStudySourceTable;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.study.GermplasmStudySourceService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -40,16 +41,16 @@ public class GermplasmStudySourceResource {
 	@ResponseBody
 	public ResponseEntity<GermplasmStudySourceTable> getGermplasmStudySourceTable(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
-		@PathVariable final Integer studyId, @RequestBody final GermplasmStudySourceRequest germplasmStudySourceRequest) {
+		@PathVariable final Integer studyId, @RequestBody final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
 
-		Preconditions.checkNotNull(germplasmStudySourceRequest, "params cannot be null");
-		final SortedPageRequest sortedRequest = germplasmStudySourceRequest.getSortedRequest();
-		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
-		final String sortOrder = germplasmStudySourceRequest.getSortedRequest().getSortOrder();
+		BaseValidator.checkNotNull(germplasmStudySourceSearchRequest, "params cannot be null");
+		final SortedPageRequest sortedRequest = germplasmStudySourceSearchRequest.getSortedRequest();
+		BaseValidator.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
+		final String sortOrder = germplasmStudySourceSearchRequest.getSortedRequest().getSortOrder();
 		final boolean isSortOrderValid = "ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
-		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
+		BaseValidator.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
 
-		germplasmStudySourceRequest.setStudyId(studyId);
+		germplasmStudySourceSearchRequest.setStudyId(studyId);
 		final Integer pageNumber = sortedRequest.getPageNumber();
 		final Integer pageSize = sortedRequest.getPageSize();
 		final PagedResult<GermplasmStudySourceDto> pageResult =
@@ -58,19 +59,19 @@ public class GermplasmStudySourceResource {
 				@Override
 				public long getCount() {
 					return GermplasmStudySourceResource.this.germplasmStudySourceService
-						.countGermplasmStudySourceList(germplasmStudySourceRequest);
+						.countGermplasmStudySources(germplasmStudySourceSearchRequest);
 				}
 
 				@Override
 				public long getFilteredCount() {
 					return GermplasmStudySourceResource.this.germplasmStudySourceService
-						.countFilteredGermplasmStudySourceList(germplasmStudySourceRequest);
+						.countFilteredGermplasmStudySources(germplasmStudySourceSearchRequest);
 				}
 
 				@Override
 				public List<GermplasmStudySourceDto> getResults(final PagedResult<GermplasmStudySourceDto> pagedResult) {
 					return GermplasmStudySourceResource.this.germplasmStudySourceService
-						.getGermplasmStudySourceList(germplasmStudySourceRequest);
+						.getGermplasmStudySources(germplasmStudySourceSearchRequest);
 				}
 			});
 
