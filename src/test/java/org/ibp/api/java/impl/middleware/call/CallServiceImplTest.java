@@ -34,6 +34,7 @@ public class CallServiceImplTest {
 
 	@Test
 	public void testGetAllCalls() throws IOException {
+		final int totalCalls = 24;
 
 		final List<Map<String, Object>> result = this.callService.getAllCalls(null, 10, 0);
 		Assert.assertEquals("First page should contain 10 records", 10, result.size());
@@ -44,7 +45,7 @@ public class CallServiceImplTest {
 		this.resetInputStream();
 
 		final List<Map<String, Object>> result3 = this.callService.getAllCalls(null, null, null);
-		Assert.assertEquals("Should return all records if pageSize and pageNumber are not specified", 22, result3.size());
+		Assert.assertEquals("Should return all records if pageSize and pageNumber are not specified", totalCalls, result3.size());
 		this.resetInputStream();
 
 		// Search by BrAPI v1.2 where CSV data type = csv
@@ -62,7 +63,7 @@ public class CallServiceImplTest {
 		this.resetInputStream();
 
 		final List<Map<String, Object>> result7 = this.callService.getAllCalls(null, null, 0);
-		Assert.assertEquals("Should return all records if pageSize is specified and pageNumber is zero", 22, result7.size());
+		Assert.assertEquals("Should return all records if pageSize is specified and pageNumber is zero", totalCalls, result7.size());
 		this.resetInputStream();
 
 	}

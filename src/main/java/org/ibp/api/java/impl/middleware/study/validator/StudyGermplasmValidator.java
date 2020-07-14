@@ -56,9 +56,9 @@ public class StudyGermplasmValidator {
         if (hasMeansDataset) {
             errors.reject("study.has.means.dataset");
         }
-        boolean hasAdvancedOrCrossesList = this.studyService.hasAdvancedOrCrossesList(studyId);
-        if (hasAdvancedOrCrossesList) {
-            errors.reject("study.has.advance.or.cross.list");
+        boolean hasCrossesOrSelections = this.studyService.hasCrossesOrSelections(studyId);
+        if (hasCrossesOrSelections) {
+            errors.reject("study.has.crosses.or.selections");
         }
 
         Boolean entryHasSamples = this.sampleService.studyEntryHasSamples(studyId, entryId);

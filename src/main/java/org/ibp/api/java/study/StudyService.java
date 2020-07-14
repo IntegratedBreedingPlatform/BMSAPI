@@ -32,8 +32,6 @@ public interface StudyService {
 
 	List<Observation> updateObservations(final Integer studyIdentifier, List<Observation> observation);
 
-	List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer);
-
 	TrialObservationTable getTrialObservationTable(final int studyIdentifier);
 
 	/**
@@ -72,5 +70,5 @@ public interface StudyService {
 
 	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
 
-	boolean hasAdvancedOrCrossesList(final int studyId);
+	boolean hasCrossesOrSelections(final int studyId);
 }
