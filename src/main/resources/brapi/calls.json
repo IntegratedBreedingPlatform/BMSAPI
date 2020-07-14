@@ -416,6 +416,36 @@
       "versions": [
         "1.3"
       ]
+    },
+    {
+      "call": "seedlots",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "versions": [
+        "2.0"
+      ]
+    },
+    {
+      "call": "transactions",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "versions": [
+        "2.0"
+      ]
     }
-    ]
+  ]
 }

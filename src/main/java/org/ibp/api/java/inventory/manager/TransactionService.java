@@ -34,4 +34,6 @@ public interface TransactionService {
 
 	void cancelPendingTransactions(SearchCompositeDto<Integer, Integer> searchCompositeDto);
 
+	List<org.ibp.api.brapi.v2.inventory.TransactionDto> getTransactions(TransactionsSearchDto transactionsSearchDto, Pageable pageable);
+
 }
