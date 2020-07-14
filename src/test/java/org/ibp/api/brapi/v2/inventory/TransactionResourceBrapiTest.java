@@ -77,10 +77,7 @@ public class TransactionResourceBrapiTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(list).when(this.transactionService).getTransactions(Mockito.any(TransactionsSearchDto.class),
 			Mockito.any(Pageable.class));
-
-		final String pattern = "yyyyMMdd";
-		final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-		final String date = simpleDateFormat.format(new Date());
+		final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -88,7 +85,7 @@ public class TransactionResourceBrapiTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$.result.data[0].amount", CoreMatchers.is(transactionDto.getAmount())))
-			.andExpect(jsonPath("$.result.data[0].transactionTimestamp", CoreMatchers.is(date)))
+			.andExpect(jsonPath("$.result.data[0].transactionTimestamp", CoreMatchers.is(timestampFormat.format(transactionDto.getTransactionTimestamp()))))
 			.andExpect(jsonPath("$.result.data[0].transactionDescription", CoreMatchers.is(transactionDto.getTransactionDescription())))
 			.andExpect(jsonPath("$.result.data[0].units", CoreMatchers.is(transactionDto.getUnits())))
 			.andExpect(jsonPath("$.result.data[0].transactionDbId", CoreMatchers.is(transactionDto.getTransactionDbId())))

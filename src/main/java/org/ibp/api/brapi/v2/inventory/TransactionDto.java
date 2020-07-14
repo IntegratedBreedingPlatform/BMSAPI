@@ -14,7 +14,7 @@ public class TransactionDto {
 	private Map<String, Object> additionalInfo;
 	private Double amount;
 	private String transactionDescription;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
 	private Date transactionTimestamp;
 
 	private String units;
