@@ -37,7 +37,9 @@ public class LotMapper {
             additionalInfo.put("totalWithdrawals", lotDto.getWithdrawalTotal());
             additionalInfo.put("pendingDeposits", lotDto.getPendingDepositsTotal());
             final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            additionalInfo.put("lastDepositDate", dateFormat.format(lotDto.getLastDepositDate()));
+            if (lotDto.getLastDepositDate() != null) {
+                additionalInfo.put("lastDepositDate", dateFormat.format(lotDto.getLastDepositDate()));
+            }
             if (lotDto.getLastWithdrawalDate() != null) {
                 additionalInfo.put("lastWithdrawalDate", dateFormat.format(lotDto.getLastWithdrawalDate()));
             }
