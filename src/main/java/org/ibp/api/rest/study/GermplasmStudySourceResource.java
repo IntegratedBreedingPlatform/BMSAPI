@@ -1,6 +1,5 @@
 package org.ibp.api.rest.study;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +35,7 @@ public class GermplasmStudySourceResource {
 
 	@ApiOperation(value = "It will retrieve all generated germplasm in a study",
 		notes = "It will retrieve all generated germplasm in a study")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES','INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/germplasm-sources/table", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GermplasmStudySourceTable> getGermplasmStudySourceTable(final @PathVariable String cropname,
