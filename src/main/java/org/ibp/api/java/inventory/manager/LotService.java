@@ -1,5 +1,6 @@
 package org.ibp.api.java.inventory.manager;
 
+import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
@@ -24,6 +25,8 @@ public interface LotService {
 
 	String saveLot(LotGeneratorInputDto lotGeneratorInputDto);
 
+	List<String> createLots(LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto);
+
 	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest);
 
 	void importLotsWithInitialTransaction(LotImportRequestDto lotImportRequestDto);
@@ -31,5 +34,4 @@ public interface LotService {
 	LotSearchMetadata getLotsSearchMetadata(LotsSearchDto lotsSearchDto);
 
 	void closeLots(LotsSearchDto lotsSearchDto);
-
 }
