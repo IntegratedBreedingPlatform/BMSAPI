@@ -179,7 +179,7 @@ public class StudyServiceImpl implements StudyService {
 				observation.getEntryCode(), observation.getReplicationNumber(), observation.getPlotNumber(),
 				observation.getBlockNumber(), traits);
 
-		return this.mapObservationDtoToObservation(this.middlewareStudyService.updataObservation(studyIdentifier, middlewareMeasurement));
+		return this.mapObservationDtoToObservation(this.middlewareStudyService.updateObservation(studyIdentifier, middlewareMeasurement));
 	}
 
 	@Override
@@ -380,12 +380,12 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId) {
+	public boolean studyHasGivenDatasetType(final Integer studyId, final Integer datasetTypeId) {
 		return this.middlewareStudyService.studyHasGivenDatasetType(studyId, datasetTypeId);
 	}
 
 	@Override
-	public boolean hasCrossesOrSelections(int studyId) {
+	public boolean hasCrossesOrSelections(final int studyId) {
 		return this.middlewareStudyService.hasCrossesOrSelections(studyId);
 	}
 }

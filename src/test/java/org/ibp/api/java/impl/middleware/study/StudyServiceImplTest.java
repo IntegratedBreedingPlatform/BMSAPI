@@ -9,15 +9,12 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.domain.common.ValidationUtil;
-import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.domain.study.validators.ObservationValidator;
@@ -215,7 +212,7 @@ public class StudyServiceImplTest {
 		Mockito.when(
 				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
 						manufacturePojo.getMeasurementId())).thenReturn(observationDtoTestData);
-		Mockito.when(this.mockMiddlewareStudyService.updataObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, manufacturePojo))
+		Mockito.when(this.mockMiddlewareStudyService.updateObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, manufacturePojo))
 				.thenReturn(manufacturePojo);
 
 		final Observation observation = Lists.transform(observationDtoTestData, this.observationTransformFunction).get(0);
@@ -230,7 +227,7 @@ public class StudyServiceImplTest {
 		Mockito.when(
 				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
 						manufacturePojo.getMeasurementId())).thenReturn(Lists.newArrayList(manufacturePojo));
-		Mockito.when(this.mockMiddlewareStudyService.updataObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, manufacturePojo))
+		Mockito.when(this.mockMiddlewareStudyService.updateObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, manufacturePojo))
 				.thenReturn(manufacturePojo);
 		final List<Observation> observations =
 				Lists.transform(Lists.newArrayList(manufacturePojo, manufacturePojo), this.observationTransformFunction);
