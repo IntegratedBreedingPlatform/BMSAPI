@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -36,10 +38,14 @@ public class GermplasmStudySourceServiceImpl implements GermplasmStudySourceServ
 		this.studyValidator.validate(germplasmStudySourceSearchRequest.getStudyId(), false);
 
 		final List<GermplasmStudySourceDto> germplasmStudySourceDtoList = this.germplasmStudySourceMiddlewareService
-			.getGermplasmStudySourceList(germplasmStudySourceRequest);
+			.getGermplasmStudySources(germplasmStudySourceSearchRequest);
+
+		final Map<Integer, String> crossExpansionsMap = this.pedigreeService
+			.getCrossExpansions(germplasmStudySourceDtoList.stream().map(GermplasmStudySourceDto::getGid).collect(Collectors.toSet()), null,
+				this.crossExpansionProperties);
 
 		for (final GermplasmStudySourceDto germplasmStudySourceDto : germplasmStudySourceDtoList) {
-			germplasmStudySourceDto.setCross(this.pedigreeService.getCrossExpansion(germplasmStudySourceDto.getGid(), this.crossExpansionProperties));
+			germplasmStudySourceDto.setCross(crossExpansionsMap.get(germplasmStudySourceDto.getGid()));
 		}
 		return germplasmStudySourceDtoList;
 	}
