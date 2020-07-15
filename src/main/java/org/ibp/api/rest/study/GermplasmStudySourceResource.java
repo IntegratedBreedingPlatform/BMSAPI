@@ -42,12 +42,12 @@ public class GermplasmStudySourceResource {
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
 
-		BaseValidator.checkNotNull(germplasmStudySourceSearchRequest, "params cannot be null");
+		BaseValidator.checkNotNull(germplasmStudySourceSearchRequest, "parameters.cannot.be.null");
 		final SortedPageRequest sortedRequest = germplasmStudySourceSearchRequest.getSortedRequest();
-		BaseValidator.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
+		BaseValidator.checkNotNull(sortedRequest, "sortedrequest.empty");
 		final String sortOrder = germplasmStudySourceSearchRequest.getSortedRequest().getSortOrder();
 		final boolean isSortOrderValid = "ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
-		BaseValidator.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
+		BaseValidator.checkArgument(isSortOrderValid, "sort.order.invalid");
 
 		germplasmStudySourceSearchRequest.setStudyId(studyId);
 		final Integer pageNumber = sortedRequest.getPageNumber();
