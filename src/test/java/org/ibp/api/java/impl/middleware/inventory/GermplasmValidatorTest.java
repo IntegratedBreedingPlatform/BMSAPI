@@ -1,10 +1,15 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.ontology.VariableFilter;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.junit.Assert;
@@ -18,9 +23,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 public class GermplasmValidatorTest {
@@ -29,8 +38,12 @@ public class GermplasmValidatorTest {
 	public static final int LOCATION_ID = 6000;
 	public static final String STOCK_ID = "ABCD";
 	public static final String COMMENTS = "Comments";
+
 	@Mock
 	private GermplasmService germplasmService;
+
+	@Mock
+	private GermplasmDataManager germplasmDataManager;
 
 	@InjectMocks
 	private GermplasmValidator germplasmValidator;
@@ -105,5 +118,18 @@ public class GermplasmValidatorTest {
 		Assert.assertEquals(this.errors.getAllErrors().size(),  1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("germplasm.invalid"));
+	}
+
+	@Test
+	public void testValidateGermplasmListInvalid() {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
+		final List<Integer> gids = Collections.singletonList(GERMPLASM_ID);
+		Mockito.when(this.germplasmDataManager.getGermplasms(gids)).thenReturn(Collections.EMPTY_LIST);
+
+		try {
+			this.germplasmValidator.validateGids(this.errors, gids);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), CoreMatchers.hasItem("gids.invalid"));
+		}
 	}
 }

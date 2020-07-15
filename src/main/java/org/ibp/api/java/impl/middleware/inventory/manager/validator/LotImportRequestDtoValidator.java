@@ -4,13 +4,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,9 +33,6 @@ public class LotImportRequestDtoValidator {
 	private BindingResult errors;
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
 	private LocationDataManager locationDataManager;
 
 	@Autowired
@@ -43,6 +40,9 @@ public class LotImportRequestDtoValidator {
 
 	@Autowired
 	private InventoryCommonValidator inventoryCommonValidator;
+
+	@Autowired
+	public GermplasmValidator germplasmValidator;
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 
@@ -90,15 +90,7 @@ public class LotImportRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final List<Germplasm> existingGermplasms = germplasmDataManager.getGermplasms(gids);
-		if (existingGermplasms.size() != gids.size() || existingGermplasms.stream().filter(g -> g.getDeleted()).count() > 0) {
-			final List<Integer> existingGids =
-				existingGermplasms.stream().filter(g -> !g.getDeleted()).map(Germplasm::getGid).collect(Collectors.toList());
-			final List<Integer> invalidGids = new ArrayList<>(gids);
-			invalidGids.removeAll(existingGids);
-			errors.reject("lot.input.invalid.gids", new String[] {Util.buildErrorMessageFromList(invalidGids, 3)}, "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
+		this.germplasmValidator.validateGids(this.errors, gids);
 	}
 
 	private void validateStorageLocations(final List<LotItemDto> lotList) {

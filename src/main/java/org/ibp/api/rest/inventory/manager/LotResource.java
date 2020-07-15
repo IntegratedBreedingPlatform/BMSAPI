@@ -6,7 +6,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
@@ -17,6 +19,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.location.LocationDto;
@@ -169,6 +172,19 @@ public class LotResource {
 		final SingleEntityResponse<String> singleEntityResponse =
 			new SingleEntityResponse<String>(this.lotService.saveLot(lotGeneratorInputDto));
 		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Create multiple lots")
+	@RequestMapping(value = "/crops/{cropName}/lots/generation", method = RequestMethod.POST)
+	@PreAuthorize(HAS_MANAGE_LOTS + PermissionsEnum.HAS_CREATE_LOTS_BATCH)
+	@ResponseBody
+	public ResponseEntity<List<String>> createLots(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@ApiParam("Lot template for batch generation. Some fields are ignored (gid, lotId, etc). "
+			+ "SearchComposite is a list of gids or a search id (internal usage) ")
+		@RequestBody final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
+
+		return new ResponseEntity<>(this.lotService.createLots(lotGeneratorBatchRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Lots", notes = "Update one or more Lots")
