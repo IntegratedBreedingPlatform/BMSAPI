@@ -178,7 +178,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		cell = row.createCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_UUID_COLUMN_INDEX, CellType.STRING);
 		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
 		cell.setCellValue(
-			this.messageSource.getMessage("export.inventory.manager.transaction.template.sheet.lot.uid.column", null, locale));
+			this.messageSource.getMessage("export.inventory.manager.transaction.template.sheet.lot.uuid.column", null, locale));
 
 		cell = row.createCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX, CellType.STRING);
 		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
