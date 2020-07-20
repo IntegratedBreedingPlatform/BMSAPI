@@ -38,7 +38,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 
 	private static final int TRANSACTIONS_SHEET_DESIGNATION_COLUMN_INDEX = 0;
 	private static final int TRANSACTIONS_SHEET_GID_COLUMN_INDEX = 1;
-	private static final int TRANSACTIONS_SHEET_LOT_ID_COLUMN_INDEX = 2;
+	private static final int TRANSACTIONS_SHEET_LOT_UUID_COLUMN_INDEX = 2;
 	private static final int TRANSACTIONS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX = 3;
 	private static final int TRANSACTIONS_SHEET_STORAGE_LOCATION_COLUMN_INDEX = 4;
 	private static final int TRANSACTIONS_SHEET_STOCK_ID_COLUMN_INDEX = 5;
@@ -113,8 +113,8 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 				TransactionExportServiceImpl.TRANSACTIONS_SHEET_GID_COLUMN_INDEX, transactionDto.getLot().getGid().toString(),
 				CellType.STRING, row);
 			this.writeCell(
-				TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_ID_COLUMN_INDEX, transactionDto.getLot().getLotId().toString(),
-				CellType.NUMERIC, row);
+				TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_UUID_COLUMN_INDEX, transactionDto.getLot().getLotUUID(),
+				CellType.STRING, row);
 			this.writeCell(
 				TransactionExportServiceImpl.TRANSACTIONS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX,
 				transactionDto.getLot().getLocationAbbr(), CellType.STRING, row);
@@ -175,7 +175,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.YELLOW.getIndex()));
 		cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.transaction.template.sheet.gid.column", null, locale));
 
-		cell = row.createCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_ID_COLUMN_INDEX, CellType.STRING);
+		cell = row.createCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_UUID_COLUMN_INDEX, CellType.STRING);
 		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
 		cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.transaction.template.sheet.lot.id.column", null, locale));
 
@@ -246,7 +246,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_DESIGNATION_COLUMN_INDEX, 16 * 250);
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_GID_COLUMN_INDEX, 8 * 250);
 
-		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_ID_COLUMN_INDEX, 11 * 250);
+		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_UUID_COLUMN_INDEX, 36 * 250);
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX, 26 * 250);
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_STORAGE_LOCATION_COLUMN_INDEX, 21 * 250);
 
