@@ -243,7 +243,7 @@ public class TransactionResource {
 		+ "Important: The operations are executed in sequential order. Supported types: Withdrawals, Deposits ")
 	@RequestMapping(value = "/crops/{cropName}/pending-transactions", method = RequestMethod.PATCH)
 	@ResponseBody
-	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('UPDATE_PENDING_TRANSACTIONS')")
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('IMPORT_TRANSACTION_UPDATES')")
 	public ResponseEntity<Void> updatePendingTransactions(
 		@PathVariable final String cropName,
 		@ApiParam("New amount or New Available Balance and Notes to be updated per transaction")
