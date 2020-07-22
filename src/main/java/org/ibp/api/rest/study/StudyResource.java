@@ -3,7 +3,11 @@ package org.ibp.api.rest.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +18,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 @Api(value = "Study Services")
 @Controller
@@ -23,6 +31,9 @@ public class StudyResource {
 
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private StudyDataManager studyDataManager;
 
 	@ApiOperation(value = "Check if a study is sampled.",
 			notes = "Returns boolean indicating if there are samples associated to the study.")
@@ -46,5 +57,17 @@ public class StudyResource {
 		study.setId(studyId);
 		this.studyService.updateStudy(study);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get the study tree")
+	@RequestMapping(value = "/{cropName}/studies/tree", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')" + PermissionsEnum.HAS_INVENTORY_VIEW)
+	@ResponseBody
+	public ResponseEntity<List<TreeNode>> getStudyTree(final @PathVariable String cropName,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId) {
+
+		final List<TreeNode> studyTree = this.studyService.getStudyTree(parentFolderId, programUUID);
+		return new ResponseEntity<>(studyTree, HttpStatus.OK);
 	}
 }
