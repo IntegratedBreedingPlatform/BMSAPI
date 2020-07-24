@@ -259,10 +259,10 @@ public class TransactionResource {
 	}
 
 	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a set os filtered lots")
-	@RequestMapping(value = "/crops/{cropName}/transactions/pending-deposits-lists", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/transactions/pending-deposits/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_PENDING_DEPOSITS')")
-	public ResponseEntity<Void> createPendingDeposits(
+	public ResponseEntity<Void> generationPendingDeposits(
 		@PathVariable final String cropName,
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
@@ -276,12 +276,12 @@ public class TransactionResource {
 	}
 
 	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a set of filtered lots")
-	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-deposits-lists", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-deposits/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS
 		+ " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_CONFIRMED_DEPOSITS')"
 		+ PermissionsEnum.HAS_CREATE_LOTS_BATCH)
-	public ResponseEntity<Void> createConfirmedDeposits(
+	public ResponseEntity<Void> generationConfirmedDeposits(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@ApiParam("Deposit amount per unit")
