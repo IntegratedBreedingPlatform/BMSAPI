@@ -149,7 +149,7 @@ public class TransactionResource {
 
 	}
 
-	@ApiOperation(value = "Create Pending Withdrawals", notes = "Create new withdrawals with pending status for a set os filtered lots")
+	@ApiOperation(value = "Create Pending Withdrawals", notes = "Create new withdrawals with pending status for a set of filtered lots")
 	@RequestMapping(value = "/crops/{cropName}/transactions/pending-withdrawals/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_PENDING_WITHDRAWALS')")
@@ -166,7 +166,7 @@ public class TransactionResource {
 		}
 	}
 
-	@ApiOperation(value = "Create Confirmed Withdrawals", notes = "Create new withdrawals with confirmed status for a set os filtered lots")
+	@ApiOperation(value = "Create Confirmed Withdrawals", notes = "Create new withdrawals with confirmed status for a set of filtered lots")
 	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-withdrawals/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_CONFIRMED_WITHDRAWALS')")
@@ -259,7 +259,7 @@ public class TransactionResource {
 		}
 	}
 
-	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a set os filtered lots")
+	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a set of filtered lots")
 	@RequestMapping(value = "/crops/{cropName}/transactions/pending-deposits/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_PENDING_DEPOSITS')")
