@@ -3,6 +3,12 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.commons.constant.AppConstants;
+import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.commons.util.TreeViewUtil;
+import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -377,6 +383,22 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
 		return this.middlewareStudyService.getStudies(studySearchFilter);
+	}
+
+	@Override
+	public List<TreeNode> getStudyTree(final String parentKey, final String programUUID) {
+		List<TreeNode> nodes = new ArrayList<>();
+		if (StringUtils.isBlank(parentKey)) {
+			final TreeNode rootNode = new TreeNode(AppConstants.STUDIES.name(), AppConstants.STUDIES.getString(), true, null);
+			nodes.add(rootNode);
+		} else if (parentKey.equals(AppConstants.STUDIES.name())) {
+			final List<Reference> children = this.studyDataManager.getRootFolders(programUUID);
+			nodes = TreeViewUtil.convertStudyFolderReferencesToTreeView(children, true);
+		} else if (NumberUtils.isNumber(parentKey)) {
+			final List<Reference> folders = this.studyDataManager.getChildrenOfFolder(Integer.valueOf(parentKey), programUUID);
+			nodes = TreeViewUtil.convertStudyFolderReferencesToTreeView(folders, true);
+		}
+		return nodes;
 	}
 
 	@Override
