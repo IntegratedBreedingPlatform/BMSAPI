@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -275,7 +276,24 @@ public class TransactionResource {
 		}
 	}
 
-	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a set of filtered lots")
+	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a list of lots")
+	@RequestMapping(value = "/crops/{cropName}/transactions/pending-deposits-lists", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_PENDING_DEPOSITS')")
+	public ResponseEntity<Void> createPendingDeposits(
+		@PathVariable final String cropName,
+		@ApiParam("Deposit amount per Lot")
+		@RequestBody final List<LotDepositDto> lotDepositDtos) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveDeposits(lotDepositDtos, TransactionStatus.PENDING);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+	}
+
+	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a list of lots")
 	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-deposits/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS
@@ -289,6 +307,27 @@ public class TransactionResource {
 		try {
 			inventoryLock.lockWrite();
 			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED);
+
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+	}
+
+	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a set of filtered lots")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-deposits-lists", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS
+		+ " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_CONFIRMED_DEPOSITS')"
+		+ PermissionsEnum.HAS_CREATE_LOTS_BATCH)
+	public ResponseEntity<Void> createConfirmedDeposits(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@ApiParam("Deposit amount per Lot")
+		@RequestBody final List<LotDepositDto> lotDepositDtos) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveDeposits(lotDepositDtos, TransactionStatus.CONFIRMED);
 
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {

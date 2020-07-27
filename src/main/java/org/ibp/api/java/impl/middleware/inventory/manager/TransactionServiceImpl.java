@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.inventory.manager;
 
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -15,6 +16,7 @@ import org.ibp.api.brapi.v2.inventory.TransactionMapper;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotDepositDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotDepositRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawalInputDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
@@ -58,6 +60,9 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	private LotDepositRequestDtoValidator lotDepositRequestDtoValidator;
+
+	@Autowired
+	private LotDepositDtoValidator lotDepositDtoValidator;
 
 	@Autowired
 	private SecurityService securityService;
@@ -171,6 +176,30 @@ public class TransactionServiceImpl implements TransactionService {
 			.depositLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
 				lotDepositRequestDto,
 				transactionStatus);
+	}
+
+	@Override
+	public void saveDeposits(final List<LotDepositDto> lotDepositDtos, final TransactionStatus transactionStatus) {
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+
+		this.lotDepositDtoValidator.validate(lotDepositDtos);
+
+		final SearchCompositeDto<Integer, String> searchCompositeDto = new SearchCompositeDto<>();
+		searchCompositeDto.setItemIds(lotDepositDtos.stream().map(LotDepositDto::getLotUID).collect(Collectors.toSet()));
+
+		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
+		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
+
+		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, searchCompositeDto.getItemIds());
+		this.extendedLotListValidator.validateEmptyList(lotDtos);
+		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
+		this.extendedLotListValidator.validateClosedLots(lotDtos);
+
+		this.transactionService
+			.depositLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
+				lotDepositDtos,
+				transactionStatus);
+
 	}
 
 	@Override
