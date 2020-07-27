@@ -110,7 +110,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotWithdrawalInputDto.getSelectedLots().getItemIds());
 		this.extendedLotListValidator.validateEmptyList(lotDtos);
-		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
+		this.extendedLotListValidator.validateEmptyUnitsToWithdrawal(lotDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
 		this.lotWithdrawalInputDtoValidator.validateWithdrawalInstructionsUnits(lotWithdrawalInputDto, lotDtos);
 
@@ -168,7 +168,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
 		this.extendedLotListValidator.validateEmptyList(lotDtos);
-		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
+		this.extendedLotListValidator.validateEmptyUnitsToDeposit(lotDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
 		this.lotDepositRequestDtoValidator.validateDepositInstructionsUnits(lotDepositRequestDto, lotDtos);
 
@@ -192,7 +192,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, searchCompositeDto.getItemIds());
 		this.extendedLotListValidator.validateEmptyList(lotDtos);
-		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
+		this.extendedLotListValidator.validateEmptyUnitsToDeposit(lotDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
 
 		this.transactionService
