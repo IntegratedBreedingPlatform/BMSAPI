@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.inventory.manager;
 
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -204,5 +205,10 @@ public class TransactionServiceImpl implements TransactionService {
 			transactionList.add(transactionMapper.map(transactionDto, org.ibp.api.brapi.v2.inventory.TransactionDto.class));
 		}
 		return transactionList;
+	}
+
+	@Override
+	public void saveLotBalanceAdjustment(final LotAdjustmentRequestDto lotAdjustmentRequestDto) {
+
 	}
 }
