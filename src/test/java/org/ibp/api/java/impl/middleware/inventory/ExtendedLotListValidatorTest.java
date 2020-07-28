@@ -40,7 +40,7 @@ public class ExtendedLotListValidatorTest {
 			final List<ExtendedLotDto> lotDtoList = Arrays.asList(extendedLotDto);
 			this.extendedLotListValidator.validateEmptyUnits(lotDtoList);
 		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("selected.lots.with.no.unit"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lots.with.no.unit"));
 		}
 	}
 
@@ -52,7 +52,7 @@ public class ExtendedLotListValidatorTest {
 			final List<ExtendedLotDto> lotDtoList = Arrays.asList(extendedLotDto);
 			this.extendedLotListValidator.validateClosedLots(lotDtoList);
 		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("selected.lots.closed"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lots.closed"));
 		}
 	}
 
