@@ -34,22 +34,11 @@ public class ExtendedLotListValidatorTest {
 	}
 
 	@Test
-	public void validateEmptyUnitsToDeposit() {
+	public void testValidateEmptyUnits() {
 		try {
 			final ExtendedLotDto extendedLotDto = new ExtendedLotDto();
 			final List<ExtendedLotDto> lotDtoList = Arrays.asList(extendedLotDto);
-			this.extendedLotListValidator.validateEmptyUnitsToDeposit(lotDtoList);
-		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("selected.lots.with.no.unit"));
-		}
-	}
-
-	@Test
-	public void validateEmptyUnitsToWithdrawal() {
-		try {
-			final ExtendedLotDto extendedLotDto = new ExtendedLotDto();
-			final List<ExtendedLotDto> lotDtoList = Arrays.asList(extendedLotDto);
-			this.extendedLotListValidator.validateEmptyUnitsToWithdrawal(lotDtoList);
+			this.extendedLotListValidator.validateEmptyUnits(lotDtoList);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("selected.lots.with.no.unit"));
 		}
