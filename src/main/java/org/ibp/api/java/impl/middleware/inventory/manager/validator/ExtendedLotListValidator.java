@@ -27,20 +27,12 @@ public class ExtendedLotListValidator {
 		}
 	}
 
-	public void validateEmptyUnitsToDeposit(final List<ExtendedLotDto> extendedLotDtos) {
-		this.validateEmptyUnits(extendedLotDtos, "deposit");
-	}
-
-	public void validateEmptyUnitsToWithdrawal(final List<ExtendedLotDto> extendedLotDtos) {
-		this.validateEmptyUnits(extendedLotDtos, "withdrawal");
-	}
-
-	private void validateEmptyUnits(final List<ExtendedLotDto> extendedLotDtos, final String value) {
+	public void validateEmptyUnits(final List<ExtendedLotDto> extendedLotDtos) {
 		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
 		//Validate that none of them has null unit id
 		final long lotsWithoutUnitCount = extendedLotDtos.stream().filter(lot -> lot.getUnitId() == null).count();
 		if (lotsWithoutUnitCount != 0) {
-			errors.reject("selected.lots.with.no.unit", new String[] {String.valueOf(lotsWithoutUnitCount), value}, "");
+			errors.reject("selected.lots.with.no.unit", new String[] {String.valueOf(lotsWithoutUnitCount)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
