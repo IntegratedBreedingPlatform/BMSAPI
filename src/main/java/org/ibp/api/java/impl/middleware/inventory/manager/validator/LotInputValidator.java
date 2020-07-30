@@ -114,6 +114,13 @@ public class LotInputValidator {
 		}
 	}
 
+	public void validateLotBalance(final Double balance) {
+		if (balance == null || balance < 0) {
+			this.errors.reject("lot.balance.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
 	private void validateTransactionStatus(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto updateRequestDto) {
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
 		transactionsSearchDto.setLotIds(lotDtos.stream().map(LotDto::getLotId).collect(Collectors.toList()));
