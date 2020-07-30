@@ -2,23 +2,23 @@ package org.ibp.api.rest.inventory.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
+import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -80,5 +80,28 @@ public class StudyInventoryResource {
 
 		return new ResponseEntity<>(studyInventoryTable, HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Cancel pending Study Transactions", notes = "Cancel any transaction with pending status")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/transactions/cancellation", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> cancelPendingTransaction(
+			@PathVariable final String cropName,
+			@PathVariable final String programUUID,
+			@PathVariable final Integer studyId,
+			@ApiParam("List of transactions to be cancelled, use a searchId or a list of transaction ids")
+			@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
+		try {
+			this.
+			inventoryLock.lockWrite();
+			this.studyTransactionsService.cancelPendingTransactions(studyId, searchCompositeDto);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+	}
+
+
+
+
 
 }
