@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
+import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
@@ -346,6 +347,25 @@ public class TransactionResource {
 			inventoryLock.lockWrite();
 			this.transactionService.cancelPendingTransactions(searchCompositeDto);
 			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+	}
+
+	@ApiOperation(value = "Adjust lots balance", notes = "Create new adjust transaction with confirmed status for a set of filtered lots")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-adjustments", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS
+		+ " or hasAnyAuthority('UPDATE_LOT_BALANCE')")
+	public ResponseEntity<Void> adjustLotsBalance(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@ApiParam("New balance for lots and transaction notes")
+		@RequestBody final LotAdjustmentRequestDto lotAdjustmentRequestDto) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveLotBalanceAdjustment(lotAdjustmentRequestDto);
+			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
 			inventoryLock.unlockWrite();
 		}
