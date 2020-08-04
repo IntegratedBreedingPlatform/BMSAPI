@@ -160,8 +160,8 @@ public class TransactionServiceImpl implements TransactionService {
 	public void saveDeposits(final LotDepositRequestDto lotDepositRequestDto, final TransactionStatus transactionStatus) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
-		if (lotDepositRequestDto.getSourceStudy() != null) {
-			this.studyValidator.validate(lotDepositRequestDto.getSourceStudy(), true);
+		if (lotDepositRequestDto.getSourceStudyId() != null) {
+			this.studyValidator.validate(lotDepositRequestDto.getSourceStudyId(), true);
 		}
 		this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
 

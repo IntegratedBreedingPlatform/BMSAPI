@@ -18,11 +18,9 @@ import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotL
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotDepositRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
-import org.ibp.api.security.WorkbenchUserDetailsService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -139,11 +137,11 @@ public class TransactionServiceImplTest {
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(workbenchUser);
 
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-		lotDepositRequestDto.setSourceStudy(99);
+		lotDepositRequestDto.setSourceStudyId(99);
 		lotDepositRequestDto.setSelectedLots(new SearchCompositeDto<>());
 		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus);
 
-		Mockito.verify(this.studyValidator).validate(lotDepositRequestDto.getSourceStudy(), true);
+		Mockito.verify(this.studyValidator).validate(lotDepositRequestDto.getSourceStudyId(), true);
 		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
 		Mockito.verify(this.extendedLotListValidator)
 			.validateAllProvidedLotUUIDsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
