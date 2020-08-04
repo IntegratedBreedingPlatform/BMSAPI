@@ -1,9 +1,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
-import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.dms.InstanceData;
+import org.generationcp.middleware.domain.dms.ObservationData;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.domain.study.StudyInstance;
@@ -15,12 +13,12 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.study.StudyInstanceService;
+import org.ibp.api.java.study.StudyService;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -63,6 +61,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	@Autowired
 	private ObservationValidator observationValidator;
 
+	@Autowired
+	private StudyService studyService;
+
 	@Override
 	public List<StudyInstance> createStudyInstances(final String cropName, final int studyId, final Integer numberOfInstancesToGenerate) {
 		if (numberOfInstancesToGenerate < 1 || numberOfInstancesToGenerate > 999) {
@@ -71,7 +72,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		this.studyValidator.validate(studyId, true);
 
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
-		final Integer datasetId = this.getEnvironmentDatasetId(studyId);
+		final Integer datasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		// Add Study Instances in Environment (Summary Data) Dataset
 		final List<org.generationcp.middleware.service.impl.study.StudyInstance> instances =
 			this.middlewareStudyInstanceService
@@ -117,42 +118,42 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public InstanceData addInstanceData(final Integer studyId, final Integer instanceId, final InstanceData instanceData) {
+	public ObservationData addInstanceObservation(final Integer studyId, final Integer instanceId, final ObservationData observationData) {
 		this.studyValidator.validate(studyId, true);
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));
 
-		final Integer datasetId = this.getEnvironmentDatasetId(studyId);
-		final Integer variableId = instanceData.getVariableId();
+		final Integer datasetId = this.studyService.getEnvironmentDatasetId(studyId);
+		final Integer variableId = observationData.getVariableId();
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
-		this.observationValidator.validateObservationValue(variableId, instanceData.getValue());
+		this.observationValidator.validateObservationValue(variableId, observationData.getValue());
 
-		instanceData.setInstanceId(instanceId);
+		observationData.setInstanceId(instanceId);
 		final boolean isEnvironmentCondition =
 			this.datasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.STUDY_CONDITION).stream()
 				.anyMatch(v -> v.getId().equals(variableId));
-		this.middlewareStudyInstanceService.addInstanceData(instanceData, isEnvironmentCondition);
-		return instanceData;
+		this.middlewareStudyInstanceService.addInstanceObservation(observationData, isEnvironmentCondition);
+		return observationData;
 	}
 
 	@Override
-	public InstanceData updateInstanceData(final Integer studyId, final Integer instanceId, final Integer instanceDataId,
-		final InstanceData instanceData) {
+	public ObservationData updateInstanceObservation(final Integer studyId, final Integer instanceId, final Integer observationId,
+		final ObservationData observationData) {
 		this.studyValidator.validate(studyId, true);
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));
 
-		final Integer datasetId = this.getEnvironmentDatasetId(studyId);
-		final Integer variableId = instanceData.getVariableId();
+		final Integer datasetId = this.studyService.getEnvironmentDatasetId(studyId);
+		final Integer variableId = observationData.getVariableId();
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
-		this.observationValidator.validateObservationValue(variableId, instanceData.getValue());
+		this.observationValidator.validateObservationValue(variableId, observationData.getValue());
 
 		final boolean isEnvironmentCondition =
 			this.datasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.STUDY_CONDITION).stream()
 				.anyMatch(v -> v.getId().equals(variableId));
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final Optional<InstanceData> existingEnvironmentData =
-			this.middlewareStudyInstanceService.getInstanceData(instanceId, instanceDataId, variableId, isEnvironmentCondition);
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		final Optional<ObservationData> existingEnvironmentData =
+			this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationId, variableId, isEnvironmentCondition);
 		if (!existingEnvironmentData.isPresent()) {
 			errors.reject(INVALID_ENVIRONMENT_DATA_ID);
 		} else if (!existingEnvironmentData.get().getVariableId().equals(variableId)) {
@@ -163,20 +164,10 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		instanceData.setInstanceDataId(instanceDataId);
-		instanceData.setInstanceId(instanceId);
-		this.middlewareStudyInstanceService.updateInstanceData(instanceData, isEnvironmentCondition);
-		return instanceData;
-	}
-
-	private Integer getEnvironmentDatasetId(final Integer studyId) {
-		final List<DatasetDTO> datasets =
-			this.middlewareDatasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
-		if (!CollectionUtils.isEmpty(datasets)) {
-			return datasets.get(0).getDatasetId();
-		} else {
-			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
-		}
+		observationData.setObservationId(observationId);
+		observationData.setInstanceId(instanceId);
+		this.middlewareStudyInstanceService.updateInstanceObservation(observationData, isEnvironmentCondition);
+		return observationData;
 	}
 
 }

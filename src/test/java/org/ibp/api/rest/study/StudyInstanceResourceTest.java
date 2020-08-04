@@ -2,7 +2,7 @@ package org.ibp.api.rest.study;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.domain.dms.InstanceData;
+import org.generationcp.middleware.domain.dms.ObservationData;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
@@ -186,63 +186,63 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testAddInstanceData() throws Exception {
+	public void testAddInstanceObservation() throws Exception {
 
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
 
-		final InstanceData instanceData = new InstanceData();
-		instanceData.setVariableId(TermId.ALTITUDE.getId());
-		instanceData.setValue(String.valueOf(this.random.nextInt(BOUND)));
-		instanceData.setInstanceId(instanceId);
-		instanceData.setInstanceDataId(this.random.nextInt(BOUND));
+		final ObservationData observationData = new ObservationData();
+		observationData.setVariableId(TermId.ALTITUDE.getId());
+		observationData.setValue(String.valueOf(this.random.nextInt(BOUND)));
+		observationData.setInstanceId(instanceId);
+		observationData.setObservationId(this.random.nextInt(BOUND));
 
 		when(this.studyInstanceService
-			.addInstanceData(ArgumentMatchers.eq(studyId), ArgumentMatchers.eq(instanceId), ArgumentMatchers.any(InstanceData.class)))
-			.thenReturn(instanceData);
+			.addInstanceObservation(ArgumentMatchers.eq(studyId), ArgumentMatchers.eq(instanceId), ArgumentMatchers.any(ObservationData.class)))
+			.thenReturn(observationData);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/instance-data",
 				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
-			.contentType(this.contentType).content(asJsonString(instanceData)))
+			.contentType(this.contentType).content(asJsonString(observationData)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$.instanceId", Matchers.is(instanceData.getInstanceId())))
-			.andExpect(jsonPath("$.instanceDataId", Matchers.is(instanceData.getInstanceDataId())))
-			.andExpect(jsonPath("$.variableId", Matchers.is(instanceData.getVariableId())))
-			.andExpect(jsonPath("$.value", Matchers.is(instanceData.getValue())))
-			.andExpect(jsonPath("$.categoricalValueId", Matchers.is(instanceData.getCategoricalValueId())));
+			.andExpect(jsonPath("$.instanceId", Matchers.is(observationData.getInstanceId())))
+			.andExpect(jsonPath("$.instanceDataId", Matchers.is(observationData.getObservationId())))
+			.andExpect(jsonPath("$.variableId", Matchers.is(observationData.getVariableId())))
+			.andExpect(jsonPath("$.value", Matchers.is(observationData.getValue())))
+			.andExpect(jsonPath("$.categoricalValueId", Matchers.is(observationData.getCategoricalValueId())));
 
 	}
 
 	@Test
-	public void testUpdateInstanceData() throws Exception {
+	public void testUpdateInstanceObservation() throws Exception {
 
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
 
-		final InstanceData instanceData = new InstanceData();
-		instanceData.setVariableId(TermId.ALTITUDE.getId());
-		instanceData.setValue(String.valueOf(this.random.nextInt(BOUND)));
-		instanceData.setInstanceId(instanceId);
-		instanceData.setInstanceDataId(this.random.nextInt(BOUND));
+		final ObservationData observationData = new ObservationData();
+		observationData.setVariableId(TermId.ALTITUDE.getId());
+		observationData.setValue(String.valueOf(this.random.nextInt(BOUND)));
+		observationData.setInstanceId(instanceId);
+		observationData.setObservationId(this.random.nextInt(BOUND));
 
 		when(this.studyInstanceService
-			.updateInstanceData(ArgumentMatchers.eq(studyId), ArgumentMatchers.eq(instanceId),
-				ArgumentMatchers.eq(instanceData.getInstanceDataId()), ArgumentMatchers.any(InstanceData.class)))
-			.thenReturn(instanceData);
+			.updateInstanceObservation(ArgumentMatchers.eq(studyId), ArgumentMatchers.eq(instanceId),
+				ArgumentMatchers.eq(observationData.getObservationId()), ArgumentMatchers.any(ObservationData.class)))
+			.thenReturn(observationData);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.patch("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/instance-data/{instanceDataId}",
-				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId, instanceData.getInstanceDataId())
-			.contentType(this.contentType).content(asJsonString(instanceData)))
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId, observationData.getObservationId())
+			.contentType(this.contentType).content(asJsonString(observationData)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$.instanceId", Matchers.is(instanceData.getInstanceId())))
-			.andExpect(jsonPath("$.instanceDataId", Matchers.is(instanceData.getInstanceDataId())))
-			.andExpect(jsonPath("$.variableId", Matchers.is(instanceData.getVariableId())))
-			.andExpect(jsonPath("$.value", Matchers.is(instanceData.getValue())))
-			.andExpect(jsonPath("$.categoricalValueId", Matchers.is(instanceData.getCategoricalValueId())));
+			.andExpect(jsonPath("$.instanceId", Matchers.is(observationData.getInstanceId())))
+			.andExpect(jsonPath("$.instanceDataId", Matchers.is(observationData.getObservationId())))
+			.andExpect(jsonPath("$.variableId", Matchers.is(observationData.getVariableId())))
+			.andExpect(jsonPath("$.value", Matchers.is(observationData.getValue())))
+			.andExpect(jsonPath("$.categoricalValueId", Matchers.is(observationData.getCategoricalValueId())));
 
 	}
 

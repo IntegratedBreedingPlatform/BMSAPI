@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.study;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.dms.InstanceData;
+import org.generationcp.middleware.domain.dms.ObservationData;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -247,8 +247,8 @@ public class StudyInstanceServiceImplTest {
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
 		final int instanceDataId = this.random.nextInt(BOUND);
-		final InstanceData instanceData = new InstanceData();
-		instanceData.setVariableId(TermId.ALTITUDE.getId());
+		final ObservationData observationData = new ObservationData();
+		observationData.setVariableId(TermId.ALTITUDE.getId());
 
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetId(this.random.nextInt(BOUND));
@@ -256,19 +256,19 @@ public class StudyInstanceServiceImplTest {
 		when(this.middlewareDatasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId())))
 			.thenReturn(Arrays.asList(datasetDTO));
 
-		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(instanceData.getVariableId(), "ALTITUDE");
+		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(observationData.getVariableId(), "ALTITUDE");
 		when(this.datasetService.getDatasetVariablesByType(studyId, datasetDTO.getDatasetId(), VariableType.STUDY_CONDITION))
 			.thenReturn(Arrays.asList(measurementVariableDto));
 
-		this.studyInstanceService.addInstanceData(studyId, instanceId, instanceData);
+		this.studyInstanceService.addInstanceObservation(studyId, instanceId, observationData);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId));
 		Mockito.verify(this.datasetValidator)
 			.validateExistingDatasetVariables(studyId, datasetDTO.getDatasetId(), Collections.singletonList(
-				instanceData.getVariableId()));
-		Mockito.verify(this.observationValidator).validateObservationValue(instanceData.getVariableId(), instanceData.getValue());
-		Mockito.verify(this.middlewareStudyInstanceService).addInstanceData(instanceData, true);
+				observationData.getVariableId()));
+		Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
+		Mockito.verify(this.middlewareStudyInstanceService).addInstanceObservation(observationData, true);
 
 	}
 
@@ -278,8 +278,8 @@ public class StudyInstanceServiceImplTest {
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
 		final int instanceDataId = this.random.nextInt(BOUND);
-		final InstanceData instanceData = new InstanceData();
-		instanceData.setVariableId(TermId.ALTITUDE.getId());
+		final ObservationData observationData = new ObservationData();
+		observationData.setVariableId(TermId.ALTITUDE.getId());
 
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetId(this.random.nextInt(BOUND));
@@ -287,22 +287,22 @@ public class StudyInstanceServiceImplTest {
 		when(this.middlewareDatasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId())))
 			.thenReturn(Arrays.asList(datasetDTO));
 
-		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(instanceData.getVariableId(), "ALTITUDE");
+		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(observationData.getVariableId(), "ALTITUDE");
 		when(this.datasetService.getDatasetVariablesByType(studyId, datasetDTO.getDatasetId(), VariableType.STUDY_CONDITION))
 			.thenReturn(Arrays.asList(measurementVariableDto));
 
-		when(this.middlewareStudyInstanceService.getInstanceData(instanceId, instanceDataId, instanceData.getVariableId(), true))
-			.thenReturn(Optional.of(instanceData));
+		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, instanceDataId, observationData.getVariableId(), true))
+			.thenReturn(Optional.of(observationData));
 
-		this.studyInstanceService.updateInstanceData(studyId, instanceId, instanceDataId, instanceData);
+		this.studyInstanceService.updateInstanceObservation(studyId, instanceId, instanceDataId, observationData);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId));
 		Mockito.verify(this.datasetValidator)
 			.validateExistingDatasetVariables(studyId, datasetDTO.getDatasetId(), Collections.singletonList(
-				instanceData.getVariableId()));
-		Mockito.verify(this.observationValidator).validateObservationValue(instanceData.getVariableId(), instanceData.getValue());
-		Mockito.verify(this.middlewareStudyInstanceService).updateInstanceData(instanceData, true);
+				observationData.getVariableId()));
+		Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
+		Mockito.verify(this.middlewareStudyInstanceService).updateInstanceObservation(observationData, true);
 
 	}
 
@@ -312,8 +312,8 @@ public class StudyInstanceServiceImplTest {
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
 		final int instanceDataId = this.random.nextInt(BOUND);
-		final InstanceData instanceData = new InstanceData();
-		instanceData.setVariableId(TermId.ALTITUDE.getId());
+		final ObservationData observationData = new ObservationData();
+		observationData.setVariableId(TermId.ALTITUDE.getId());
 
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetId(this.random.nextInt(BOUND));
@@ -321,15 +321,15 @@ public class StudyInstanceServiceImplTest {
 		when(this.middlewareDatasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId())))
 			.thenReturn(Arrays.asList(datasetDTO));
 
-		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(instanceData.getVariableId(), "ALTITUDE");
+		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(observationData.getVariableId(), "ALTITUDE");
 		when(this.datasetService.getDatasetVariablesByType(studyId, datasetDTO.getDatasetId(), VariableType.STUDY_CONDITION))
 			.thenReturn(Arrays.asList(measurementVariableDto));
 
-		when(this.middlewareStudyInstanceService.getInstanceData(instanceId, instanceDataId, instanceData.getVariableId(), true))
+		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, instanceDataId, observationData.getVariableId(), true))
 			.thenReturn(Optional.empty());
 
 		try {
-			this.studyInstanceService.updateInstanceData(studyId, instanceId, instanceDataId, instanceData);
+			this.studyInstanceService.updateInstanceObservation(studyId, instanceId, instanceDataId, observationData);
 			fail("method should throw an error");
 		} catch (ApiRequestValidationException e) {
 			Assert
@@ -338,8 +338,8 @@ public class StudyInstanceServiceImplTest {
 			Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId));
 			Mockito.verify(this.datasetValidator)
 				.validateExistingDatasetVariables(studyId, datasetDTO.getDatasetId(), Collections.singletonList(
-					instanceData.getVariableId()));
-			Mockito.verify(this.observationValidator).validateObservationValue(instanceData.getVariableId(), instanceData.getValue());
+					observationData.getVariableId()));
+			Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
 		}
 
 	}
@@ -350,8 +350,8 @@ public class StudyInstanceServiceImplTest {
 		final int studyId = this.random.nextInt(BOUND);
 		final int instanceId = this.random.nextInt(BOUND);
 		final int instanceDataId = this.random.nextInt(BOUND);
-		final InstanceData instanceData = new InstanceData();
-		instanceData.setVariableId(TermId.ALTITUDE.getId());
+		final ObservationData observationData = new ObservationData();
+		observationData.setVariableId(TermId.ALTITUDE.getId());
 
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetId(this.random.nextInt(BOUND));
@@ -359,17 +359,17 @@ public class StudyInstanceServiceImplTest {
 		when(this.middlewareDatasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId())))
 			.thenReturn(Arrays.asList(datasetDTO));
 
-		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(instanceData.getVariableId(), "ALTITUDE");
+		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(observationData.getVariableId(), "ALTITUDE");
 		when(this.datasetService.getDatasetVariablesByType(studyId, datasetDTO.getDatasetId(), VariableType.STUDY_CONDITION))
 			.thenReturn(Arrays.asList(measurementVariableDto));
 
-		final InstanceData differentInstanceData = new InstanceData();
-		differentInstanceData.setVariableId(TermId.BLOCK_NAME.getId());
-		when(this.middlewareStudyInstanceService.getInstanceData(instanceId, instanceDataId, instanceData.getVariableId(), true))
-			.thenReturn(Optional.of(differentInstanceData));
+		final ObservationData differentObservationData = new ObservationData();
+		differentObservationData.setVariableId(TermId.BLOCK_NAME.getId());
+		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, instanceDataId, observationData.getVariableId(), true))
+			.thenReturn(Optional.of(differentObservationData));
 
 		try {
-			this.studyInstanceService.updateInstanceData(studyId, instanceId, instanceDataId, instanceData);
+			this.studyInstanceService.updateInstanceObservation(studyId, instanceId, instanceDataId, observationData);
 			fail("method should throw an error");
 		} catch (ApiRequestValidationException e) {
 			Assert.assertTrue(
@@ -378,8 +378,8 @@ public class StudyInstanceServiceImplTest {
 			Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId));
 			Mockito.verify(this.datasetValidator)
 				.validateExistingDatasetVariables(studyId, datasetDTO.getDatasetId(), Collections.singletonList(
-					instanceData.getVariableId()));
-			Mockito.verify(this.observationValidator).validateObservationValue(instanceData.getVariableId(), instanceData.getValue());
+					observationData.getVariableId()));
+			Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
 		}
 
 	}

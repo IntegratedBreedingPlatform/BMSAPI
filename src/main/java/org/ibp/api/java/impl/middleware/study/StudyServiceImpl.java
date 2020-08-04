@@ -8,14 +8,17 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
@@ -42,17 +45,22 @@ import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Service
 @Transactional
 public class StudyServiceImpl implements StudyService {
+
+	@Autowired
+	private DatasetService middlewareDatasetService;
 
 	@Autowired
 	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
@@ -410,4 +418,16 @@ public class StudyServiceImpl implements StudyService {
 	public boolean hasCrossesOrSelections(final int studyId) {
 		return this.middlewareStudyService.hasCrossesOrSelections(studyId);
 	}
+
+	@Override
+	public Integer getEnvironmentDatasetId(final Integer studyId) {
+		final List<DatasetDTO> datasets =
+			this.middlewareDatasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
+		if (!CollectionUtils.isEmpty(datasets)) {
+			return datasets.get(0).getDatasetId();
+		} else {
+			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
+		}
+	}
+
 }

@@ -1,6 +1,6 @@
 package org.ibp.api.java.study;
 
-import org.generationcp.middleware.domain.dms.InstanceData;
+import org.generationcp.middleware.domain.dms.ObservationData;
 import org.ibp.api.domain.study.StudyInstance;
 
 import java.util.List;
@@ -16,8 +16,8 @@ public interface StudyInstanceService {
 
 	Optional<StudyInstance> getStudyInstance(int studyId, final Integer instanceId);
 
-	InstanceData addInstanceData(Integer studyId, Integer instanceId, InstanceData instanceData);
+	ObservationData addInstanceObservation(Integer studyId, Integer instanceId, ObservationData observationData);
 
-	InstanceData updateInstanceData(Integer studyId, Integer instanceId, Integer instanceDataId, InstanceData instanceData);
+	ObservationData updateInstanceObservation(Integer studyId, Integer instanceId, Integer observationId, ObservationData observationData);
 
 }
