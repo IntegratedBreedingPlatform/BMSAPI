@@ -161,7 +161,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
 		if (lotDepositRequestDto.getSourceStudy() != null) {
-			this.studyValidator.validate(lotDepositRequestDto.getSourceStudy(), false);
+			this.studyValidator.validate(lotDepositRequestDto.getSourceStudy(), true);
 		}
 		this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
 
