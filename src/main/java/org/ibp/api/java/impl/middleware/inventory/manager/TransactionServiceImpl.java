@@ -22,6 +22,7 @@ import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawa
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionUpdateRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class TransactionServiceImpl implements TransactionService {
+
+	@Autowired
+	private StudyValidator studyValidator;
 
 	@Autowired
 	private TransactionInputValidator transactionInputValidator;
@@ -93,7 +97,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public List<TransactionType>  getAllTransactionTypes() {
+	public List<TransactionType> getAllTransactionTypes() {
 		return TransactionType.getAll();
 	}
 
@@ -161,6 +165,9 @@ public class TransactionServiceImpl implements TransactionService {
 	public void saveDeposits(final LotDepositRequestDto lotDepositRequestDto, final TransactionStatus transactionStatus) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
+		if (lotDepositRequestDto.getSourceStudyId() != null) {
+			this.studyValidator.validate(lotDepositRequestDto.getSourceStudyId(), true);
+		}
 		this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
 
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotDepositRequestDto.getSelectedLots());
@@ -205,7 +212,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final List<TransactionDto> transactions = this.transactionService.searchTransactions(transactionsSearchDto, pageable);
 		final List<org.ibp.api.brapi.v2.inventory.TransactionDto> transactionList = new ArrayList<>();
 		final ModelMapper transactionMapper = TransactionMapper.getInstance();
-		for(final TransactionDto transactionDto: transactions) {
+		for (final TransactionDto transactionDto : transactions) {
 			transactionList.add(transactionMapper.map(transactionDto, org.ibp.api.brapi.v2.inventory.TransactionDto.class));
 		}
 		return transactionList;
