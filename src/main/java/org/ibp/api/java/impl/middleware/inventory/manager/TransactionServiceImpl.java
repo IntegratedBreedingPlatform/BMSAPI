@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.inventory.manager;
 
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -16,6 +17,7 @@ import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryComm
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotDepositRequestDtoValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawalInputDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionInputValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.TransactionUpdateRequestDtoValidator;
@@ -74,6 +76,9 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	private InventoryCommonValidator inventoryCommonValidator;
+
+	@Autowired
+	private LotInputValidator lotInputValidator;
 
 	@Override
 	public List<TransactionDto> searchTransactions(
@@ -211,5 +216,29 @@ public class TransactionServiceImpl implements TransactionService {
 			transactionList.add(transactionMapper.map(transactionDto, org.ibp.api.brapi.v2.inventory.TransactionDto.class));
 		}
 		return transactionList;
+	}
+
+	@Override
+	public void saveLotBalanceAdjustment(final LotAdjustmentRequestDto lotAdjustmentRequestDto) {
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
+
+		this.inventoryCommonValidator.validateSearchCompositeDto(lotAdjustmentRequestDto.getSelectedLots(), errors);
+
+		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotAdjustmentRequestDto.getSelectedLots());
+		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
+
+		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotAdjustmentRequestDto.getSelectedLots().getItemIds());
+		this.extendedLotListValidator.validateEmptyList(lotDtos);
+		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
+		this.extendedLotListValidator.validateClosedLots(lotDtos);
+
+		this.lotInputValidator.validateLotBalance(lotAdjustmentRequestDto.getBalance());
+		this.inventoryCommonValidator.validateTransactionNotes(lotAdjustmentRequestDto.getNotes(), errors);
+
+		this.transactionService
+			.saveAdjustmentTransactions(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
+				lotAdjustmentRequestDto.getBalance(), lotAdjustmentRequestDto.getNotes());
 	}
 }
