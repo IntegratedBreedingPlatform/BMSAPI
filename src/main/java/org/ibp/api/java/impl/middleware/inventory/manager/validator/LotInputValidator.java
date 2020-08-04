@@ -116,7 +116,8 @@ public class LotInputValidator {
 
 	public void validateLotBalance(final Double balance) {
 		if (balance == null || balance < 0) {
-			this.errors.reject("lot.balance.invalid", "");
+			this.errors = new MapBindingResult(new HashMap<String, String>(), Double.class.getName());
+			this.errors.reject("lot.balance.invalid");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
