@@ -81,8 +81,7 @@ public class XAuthTokenFilterTest {
 		final MockHttpServletResponse response = new MockHttpServletResponse();
 		final MockFilterChain filterChain = new MockFilterChain();
 
-		request.setRequestURI("/brapi");
-		request.addHeader(XAuthTokenFilter.AUTH_TOKEN_HEADER_NAME, XAuthTokenFilter.BEARER_PREFIX + token.getToken());
+		request.addHeader(XAuthTokenFilter.OAUTH_TOKEN_HEADER_NAME, XAuthTokenFilter.OAUTH_TOKEN_PREFIX + token.getToken());
 
 		final XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
 		filter.doFilter(request, response, filterChain);
@@ -120,8 +119,7 @@ public class XAuthTokenFilterTest {
 		final MockHttpServletResponse response = new MockHttpServletResponse();
 		final MockFilterChain filterChain = new MockFilterChain();
 
-		request.setRequestURI("/brapi");
-		request.addHeader(XAuthTokenFilter.AUTH_TOKEN_HEADER_NAME, XAuthTokenFilter.BEARER_PREFIX + token.getToken());
+		request.addHeader(XAuthTokenFilter.OAUTH_TOKEN_HEADER_NAME, XAuthTokenFilter.OAUTH_TOKEN_PREFIX + token.getToken());
 
 		final XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
 		filter.doFilter(request, response, filterChain);
@@ -148,8 +146,7 @@ public class XAuthTokenFilterTest {
 		final MockHttpServletResponse response = new MockHttpServletResponse();
 		final MockFilterChain filterChain = new MockFilterChain();
 
-		request.setRequestURI("/brapi");
-		request.addHeader(XAuthTokenFilter.AUTH_TOKEN_HEADER_NAME, XAuthTokenFilter.BEARER_PREFIX + token.getToken());
+		request.addHeader(XAuthTokenFilter.OAUTH_TOKEN_HEADER_NAME, XAuthTokenFilter.OAUTH_TOKEN_PREFIX + token.getToken());
 
 		final XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
 		filter.doFilter(request, response, filterChain);
