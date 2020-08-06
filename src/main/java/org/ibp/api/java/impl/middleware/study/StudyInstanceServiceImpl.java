@@ -10,8 +10,8 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
-import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.Conditions;
@@ -45,9 +45,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Resource
 	private DatasetService datasetService;
-
-	@Resource
-	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
 
 	@Resource
 	private StudyValidator studyValidator;

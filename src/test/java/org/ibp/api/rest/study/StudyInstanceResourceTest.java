@@ -202,13 +202,13 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.thenReturn(observationData);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/instance-data",
+			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/observation",
 				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId)
 			.contentType(this.contentType).content(asJsonString(observationData)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$.instanceId", Matchers.is(observationData.getInstanceId())))
-			.andExpect(jsonPath("$.instanceDataId", Matchers.is(observationData.getObservationId())))
+			.andExpect(jsonPath("$.observationId", Matchers.is(observationData.getObservationId())))
 			.andExpect(jsonPath("$.variableId", Matchers.is(observationData.getVariableId())))
 			.andExpect(jsonPath("$.value", Matchers.is(observationData.getValue())))
 			.andExpect(jsonPath("$.categoricalValueId", Matchers.is(observationData.getCategoricalValueId())));
@@ -233,13 +233,13 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.thenReturn(observationData);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.patch("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/instance-data/{instanceDataId}",
+			.patch("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/observation/{observationId}",
 				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, instanceId, observationData.getObservationId())
 			.contentType(this.contentType).content(asJsonString(observationData)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$.instanceId", Matchers.is(observationData.getInstanceId())))
-			.andExpect(jsonPath("$.instanceDataId", Matchers.is(observationData.getObservationId())))
+			.andExpect(jsonPath("$.observationId", Matchers.is(observationData.getObservationId())))
 			.andExpect(jsonPath("$.variableId", Matchers.is(observationData.getVariableId())))
 			.andExpect(jsonPath("$.value", Matchers.is(observationData.getValue())))
 			.andExpect(jsonPath("$.categoricalValueId", Matchers.is(observationData.getCategoricalValueId())));
