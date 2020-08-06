@@ -43,6 +43,10 @@ import java.util.List;
 @Api(value = "Label Printing Services")
 @RestController
 public class LabelPrintingResource {
+
+	@Autowired
+	private LabelPrintingStrategy observationDatasetLabelPrinting;
+
 	@Autowired
 	private LabelPrintingStrategy subObservationDatasetLabelPrinting;
 
@@ -161,6 +165,9 @@ public class LabelPrintingResource {
 		final LabelPrintingStrategy labelPrintingStrategy;
 
 		switch (labelPrintingTypeEnum) {
+			case OBSERVATION_DATASET:
+				labelPrintingStrategy = this.observationDatasetLabelPrinting;
+				break;
 			case SUBOBSERVATION_DATASET:
 				labelPrintingStrategy = this.subObservationDatasetLabelPrinting;
 				break;
@@ -176,6 +183,7 @@ public class LabelPrintingResource {
 
 	private boolean hasAuthority(final LabelPrintingType labelPrintingTypeEnum) {
 		switch (labelPrintingTypeEnum) {
+			case OBSERVATION_DATASET:
 			case SUBOBSERVATION_DATASET:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.BREEDING_ACTIVITIES.name())
