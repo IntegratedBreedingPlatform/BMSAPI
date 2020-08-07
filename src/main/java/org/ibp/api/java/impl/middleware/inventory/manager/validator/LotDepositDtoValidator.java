@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,10 +24,7 @@ public class LotDepositDtoValidator {
 	public void validate(final List<LotDepositDto> lotDepositDtos){
 		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
-		if (lotDepositDtos == null) {
-			errors.reject("lot.deposit.input.null", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		BaseValidator.checkNotEmpty(lotDepositDtos,"lot.deposit.input.null");
 
 		lotDepositDtos.forEach((LotDepositDto lotDepositDto) ->{
 
