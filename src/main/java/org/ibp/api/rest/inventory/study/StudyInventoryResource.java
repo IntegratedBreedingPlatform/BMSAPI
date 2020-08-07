@@ -32,7 +32,7 @@ public class StudyInventoryResource {
 	@Autowired
 	private StudyTransactionsService studyTransactionsService;
 
-	@ApiOperation(value = "Get transactions asociated to the study")
+	@ApiOperation(value = "Get transactions associated to the study")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/transactions/search", method = RequestMethod.POST)
 	public ResponseEntity<StudyInventoryTable> searchStudyTransactions(
 		@PathVariable final String cropName,
