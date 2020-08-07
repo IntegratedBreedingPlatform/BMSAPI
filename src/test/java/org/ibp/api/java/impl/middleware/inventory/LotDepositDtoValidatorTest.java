@@ -11,9 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.validation.BindingResult;
 
 import java.util.Arrays;
 
@@ -31,9 +29,6 @@ public class LotDepositDtoValidatorTest {
 
 	@Before
 	public void setUp() {
-		Mockito.doCallRealMethod().when(inventoryCommonValidator)
-			.validateTransactionNotes(Mockito.anyString(), Mockito.any(
-				BindingResult.class));
 	}
 
 	@Test
@@ -59,7 +54,7 @@ public class LotDepositDtoValidatorTest {
 		}
 	}
 
-		@Test
+	@Test
 	public void testValidateLotDepositDtoValidatorInvalidAmount() {
 		try {
 			final LotDepositDto lotDepositDto = new LotDepositDto();
