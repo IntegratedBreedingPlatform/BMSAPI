@@ -311,7 +311,8 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
 		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
-			.getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
+			.getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId(),VariableType.SELECTION_METHOD
+				.getId(), VariableType.TRAIT.getId()));
 
 		final LabelType studyDetailsLabelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
 		final List<Field> studyDetailsFields = new LinkedList<>();
@@ -506,6 +507,35 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 					break;
 			}
 		}
+	}
+
+					// If it is not a number it is a hardcoded field
+					// Year, Study Name, Parentage, ObsDatasetUnitIdFieldKey
+					if (requiredField.equals(YEAR_FIELD.getId())) {
+						row.put(
+							requiredField,
+							(StringUtils.isNotEmpty(study.getStartDate())) ? study.getStartDate().substring(0, 4) : StringUtils.EMPTY);
+						continue;
+					}
+					if (requiredField.equals(STUDY_NAME_FIELD.getId())) {
+						row.put(requiredField, study.getStudyName());
+						continue;
+					}
+					if (requiredField.equals(PARENTAGE_FIELD.getId())) {
+						final String gid = observationUnitRow.getVariables().get(GID).getValue();
+						row.put(requiredField, this.getPedigree(gid, gidPedigreeMap));
+						continue;
+					}
+					if (requiredField.equals(ObsDatasetUnitIdFieldKey)) {
+						row.put(ObsDatasetUnitIdFieldKey, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
+						continue;
+					}
+				}
+			}
+			results.add(row);
+		}
+
+		return new LabelsData(ObsDatasetUnitIdFieldKey, results);
 	}
 
 	@Override
