@@ -12,7 +12,7 @@ public class StudyInstance {
 	private String locationName;
 	private String locationAbbreviation;
 	private String customLocationAbbreviation;
-	private Integer locationObservationId;
+	private Integer locationDescriptorDataId;
 	private int instanceNumber;
 	private boolean hasFieldmap;
 	private Boolean hasGeoJSON;
@@ -134,12 +134,12 @@ public class StudyInstance {
 		this.instanceId = instanceId;
 	}
 
-	public Integer getLocationObservationId() {
-		return this.locationObservationId;
+	public Integer getLocationDescriptorDataId() {
+		return this.locationDescriptorDataId;
 	}
 
-	public void setLocationObservationId(final Integer locationObservationId) {
-		this.locationObservationId = locationObservationId;
+	public void setLocationDescriptorDataId(final Integer locationDescriptorDataId) {
+		this.locationDescriptorDataId = locationDescriptorDataId;
 	}
 
 	@Override
