@@ -123,7 +123,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final Integer variableId = observationData.getVariableId();
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
-		this.observationValidator.validateObservationValue(variableId, observationData.getValue());
+		this.observationValidator.validateVariableValue(variableId, observationData.getValue());
 
 		observationData.setInstanceId(instanceId);
 		this.middlewareStudyInstanceService.addInstanceObservation(observationData);
@@ -140,14 +140,14 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final Integer variableId = observationData.getVariableId();
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
-		this.observationValidator.validateObservationValue(variableId, observationData.getValue());
+		this.observationValidator.validateVariableValue(variableId, observationData.getValue());
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
-		final Optional<ObservationData> existingEnvironmentData =
+		final Optional<ObservationData> existingObservationData =
 			this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationDataId, variableId);
-		if (!existingEnvironmentData.isPresent()) {
+		if (!existingObservationData.isPresent()) {
 			errors.reject(INVALID_ENVIRONMENT_DATA_ID);
-		} else if (!existingEnvironmentData.get().getVariableId().equals(variableId)) {
+		} else if (!existingObservationData.get().getVariableId().equals(variableId)) {
 			errors.reject(INVALID_VARIABLE_FOR_ENVIRONMENT_DATA);
 		}
 
@@ -170,7 +170,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final Integer variableId = descriptorData.getVariableId();
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
-		this.observationValidator.validateObservationValue(variableId, descriptorData.getValue());
+		this.observationValidator.validateVariableValue(variableId, descriptorData.getValue());
 
 		descriptorData.setInstanceId(instanceId);
 
@@ -188,14 +188,14 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final Integer variableId = descriptorData.getVariableId();
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
-		this.observationValidator.validateObservationValue(variableId, descriptorData.getValue());
+		this.observationValidator.validateVariableValue(variableId, descriptorData.getValue());
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
-		final Optional<DescriptorData> existingEnvironmentData =
+		final Optional<DescriptorData> existingDescriptorData =
 			this.middlewareStudyInstanceService.getInstanceDescriptor(instanceId, descriptorDataId, variableId);
-		if (!existingEnvironmentData.isPresent()) {
+		if (!existingDescriptorData.isPresent()) {
 			errors.reject(INVALID_ENVIRONMENT_DATA_ID);
-		} else if (!existingEnvironmentData.get().getVariableId().equals(variableId)) {
+		} else if (!existingDescriptorData.get().getVariableId().equals(variableId)) {
 			errors.reject(INVALID_VARIABLE_FOR_ENVIRONMENT_DATA);
 		}
 

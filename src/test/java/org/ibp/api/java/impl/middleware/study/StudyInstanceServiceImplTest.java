@@ -244,7 +244,7 @@ public class StudyInstanceServiceImplTest {
 		Mockito.verify(this.datasetValidator)
 			.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 				observationData.getVariableId()));
-		Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
+		Mockito.verify(this.observationValidator).validateVariableValue(observationData.getVariableId(), observationData.getValue());
 		Mockito.verify(this.middlewareStudyInstanceService).addInstanceObservation(observationData);
 
 	}
@@ -272,7 +272,7 @@ public class StudyInstanceServiceImplTest {
 		Mockito.verify(this.datasetValidator)
 			.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 				observationData.getVariableId()));
-		Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
+		Mockito.verify(this.observationValidator).validateVariableValue(observationData.getVariableId(), observationData.getValue());
 		Mockito.verify(this.middlewareStudyInstanceService).updateInstanceObservation(observationData);
 
 	}
@@ -304,7 +304,7 @@ public class StudyInstanceServiceImplTest {
 			Mockito.verify(this.datasetValidator)
 				.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 					observationData.getVariableId()));
-			Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
+			Mockito.verify(this.observationValidator).validateVariableValue(observationData.getVariableId(), observationData.getValue());
 		}
 
 	}
@@ -338,7 +338,7 @@ public class StudyInstanceServiceImplTest {
 			Mockito.verify(this.datasetValidator)
 				.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 					observationData.getVariableId()));
-			Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
+			Mockito.verify(this.observationValidator).validateVariableValue(observationData.getVariableId(), observationData.getValue());
 		}
 
 	}
@@ -366,7 +366,7 @@ public class StudyInstanceServiceImplTest {
 		Mockito.verify(this.datasetValidator)
 			.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 				descriptorData.getVariableId()));
-		Mockito.verify(this.observationValidator).validateObservationValue(descriptorData.getVariableId(), descriptorData.getValue());
+		Mockito.verify(this.observationValidator).validateVariableValue(descriptorData.getVariableId(), descriptorData.getValue());
 		Mockito.verify(this.middlewareStudyInstanceService).updateInstanceDescriptor(descriptorData);
 
 	}
@@ -398,7 +398,7 @@ public class StudyInstanceServiceImplTest {
 			Mockito.verify(this.datasetValidator)
 				.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 					descriptorData.getVariableId()));
-			Mockito.verify(this.observationValidator).validateObservationValue(descriptorData.getVariableId(), descriptorData.getValue());
+			Mockito.verify(this.observationValidator).validateVariableValue(descriptorData.getVariableId(), descriptorData.getValue());
 		}
 
 	}
@@ -432,7 +432,7 @@ public class StudyInstanceServiceImplTest {
 			Mockito.verify(this.datasetValidator)
 				.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 					descriptorData.getVariableId()));
-			Mockito.verify(this.observationValidator).validateObservationValue(descriptorData.getVariableId(), descriptorData.getValue());
+			Mockito.verify(this.observationValidator).validateVariableValue(descriptorData.getVariableId(), descriptorData.getValue());
 		}
 
 	}
