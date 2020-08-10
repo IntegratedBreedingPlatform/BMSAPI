@@ -1,6 +1,5 @@
 package org.ibp.api.rest.labelprinting;
 
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
@@ -40,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -228,14 +226,16 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	public LabelsNeededSummary getSummaryOfLabelsNeeded(final LabelsInfoInput labelsInfoInput) {
 		final LabelsNeededSummary labelsNeededSummary = new LabelsNeededSummary();
-		final Map<String, Long> observationsByInstance =
-			this.middlewareDatasetService.countObservationsGroupedByInstance(labelsInfoInput.getDatasetId());
+		final List<Map<String, Long>>  observationsByInstance =
+			this.middlewareDatasetService.getInformationInstance(labelsInfoInput.getDatasetId(), labelsInfoInput.getStudyId());
 		long totalNumberOfLabelsNeeded = 0;
-		for (final String key : observationsByInstance.keySet()) {
-			final Long observationsPerInstance = observationsByInstance.get(key);
-			final LabelsNeededSummary.Row row = new LabelsNeededSummary.Row(key, observationsPerInstance, observationsPerInstance);
+		for (Map<String, Long> map:observationsByInstance) {
+			final LabelsNeededSummary.Row row =
+				new LabelsNeededSummary.Row(map.get("environment").toString(), map.get("observations"),map.get("observations"),
+					map.get("repNumber"),
+					map.get("entries"));
 			labelsNeededSummary.addRow(row);
-			totalNumberOfLabelsNeeded += observationsPerInstance;
+			totalNumberOfLabelsNeeded += row.getLabelsNeeded();
 		}
 		labelsNeededSummary.setTotalNumberOfLabelsNeeded(totalNumberOfLabelsNeeded);
 		return labelsNeededSummary;
@@ -245,16 +245,19 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public LabelsNeededSummaryResponse transformLabelsNeededSummary(final LabelsNeededSummary labelsNeededSummary) {
 		final String labelsNeededText = this.getMessage("label.printing.labels.needed");
 		final String environmentText = this.getMessage("label.printing.environment");
-		final String numberOfObsNeededText = this.getMessage("label.printing.number.of.entries.needed");
+		final String numberOfEntriesText = this.getMessage("label.printing.number.of.entries.needed");
+		final String numberOfRepsText = this.getMessage("label.printing.number.of.reps.needed");
 		final List<String> headers = new LinkedList<>();
 		headers.add(environmentText);
-		headers.add(numberOfObsNeededText);
+		headers.add(numberOfEntriesText);
+		headers.add(numberOfRepsText);
 		headers.add(labelsNeededText);
 		final List<Map<String, String>> values = new LinkedList<>();
 		for (final LabelsNeededSummary.Row row : labelsNeededSummary.getRows()) {
 			final Map<String, String> valuesMap = new LinkedHashMap<>();
 			valuesMap.put(environmentText, row.getInstanceNumber());
-			valuesMap.put(numberOfObsNeededText, String.valueOf(row.getSubObservationNumber()));
+			valuesMap.put(numberOfEntriesText, String.valueOf(row.getEntries()));
+			valuesMap.put(numberOfRepsText, String.valueOf(row.getReps()));
 			valuesMap.put(labelsNeededText, String.valueOf(row.getLabelsNeeded()));
 			values.add(valuesMap);
 		}
