@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.domain.dms.DescriptorData;
 import org.generationcp.middleware.domain.dms.ObservationData;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.domain.study.StudyInstance;
@@ -124,6 +125,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
 		this.observationValidator.validateVariableValue(variableId, observationData.getValue());
+		this.datasetValidator.validateVariableBelongsToVariableType(datasetId, variableId, VariableType.STUDY_CONDITION.getId());
 
 		observationData.setInstanceId(instanceId);
 		this.middlewareStudyInstanceService.addInstanceObservation(observationData);
@@ -141,6 +143,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
 		this.observationValidator.validateVariableValue(variableId, observationData.getValue());
+		this.datasetValidator.validateVariableBelongsToVariableType(datasetId, variableId, VariableType.STUDY_CONDITION.getId());
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		final Optional<ObservationData> existingObservationData =
@@ -171,6 +174,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
 		this.observationValidator.validateVariableValue(variableId, descriptorData.getValue());
+		this.datasetValidator.validateVariableBelongsToVariableType(datasetId, variableId, VariableType.ENVIRONMENT_DETAIL.getId());
 
 		descriptorData.setInstanceId(instanceId);
 
@@ -189,6 +193,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 			variableId));
 		this.observationValidator.validateVariableValue(variableId, descriptorData.getValue());
+		this.datasetValidator.validateVariableBelongsToVariableType(datasetId, variableId, VariableType.ENVIRONMENT_DETAIL.getId());
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		final Optional<DescriptorData> existingDescriptorData =
