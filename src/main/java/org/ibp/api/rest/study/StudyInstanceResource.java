@@ -2,6 +2,8 @@ package org.ibp.api.rest.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javassist.runtime.Desc;
+import org.generationcp.middleware.domain.dms.DescriptorData;
 import org.generationcp.middleware.domain.dms.ObservationData;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.study.StudyInstanceService;
@@ -78,10 +80,10 @@ public class StudyInstanceResource {
 		return studyInstance.isPresent()? new ResponseEntity<>(studyInstance.get(), HttpStatus.OK) : new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	@ApiOperation(value = "Add study instance data",
-		notes = "Add study environment data")
+	@ApiOperation(value = "Add study instance observation (ENVIRONMENT CONDITION)",
+		notes = "Add study instance observation")
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/observation", method = RequestMethod.POST)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/observations", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<ObservationData> addInstanceObservation(final @PathVariable String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer instanceId,
@@ -90,17 +92,43 @@ public class StudyInstanceResource {
 			HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Update study instance data",
-		notes = "Update study instance data")
+	@ApiOperation(value = "Update study instance data (ENVIRONMENT CONDITION)",
+		notes = "Update study instance observation")
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/observation/{observationId}", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/observations/{observationDataId}", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity<ObservationData> updateInstanceObservation(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
-		@PathVariable final Integer studyId, @PathVariable final Integer instanceId, @PathVariable final Integer observationId,
+		@PathVariable final Integer studyId, @PathVariable final Integer instanceId, @PathVariable final Integer observationDataId,
 		@RequestBody final ObservationData observationData) {
 		return new ResponseEntity<>(this.studyInstanceService
-			.updateInstanceObservation(studyId, instanceId, observationId, observationData),
+			.updateInstanceObservation(studyId, instanceId, observationDataId, observationData),
+			HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Add study instance descriptor (ENVIRONMENT DETAIL)",
+		notes = "Add study instance descriptor")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/descriptors", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<DescriptorData> addInstanceDescriptor(final @PathVariable String cropname, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @PathVariable final Integer instanceId,
+		@RequestBody final DescriptorData descriptorData) {
+		return new ResponseEntity<>(this.studyInstanceService.addInstanceDescriptor(studyId, instanceId, descriptorData),
+			HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Update study instance descriptor (ENVIRONMENT DETAIL)",
+		notes = "Update study instance descriptor")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/descriptors/{descriptorId}", method = RequestMethod.PATCH)
+	@ResponseBody
+	public ResponseEntity<DescriptorData> updateInstanceDescriptor(final @PathVariable String cropname,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @PathVariable final Integer instanceId, @PathVariable final Integer descriptorId,
+		@RequestBody final DescriptorData descriptorData) {
+		return new ResponseEntity<>(this.studyInstanceService
+			.updateInstanceDescriptor(studyId, instanceId, descriptorId, descriptorData),
 			HttpStatus.OK);
 	}
 

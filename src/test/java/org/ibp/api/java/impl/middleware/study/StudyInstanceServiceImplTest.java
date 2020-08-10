@@ -1,15 +1,13 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.dms.DescriptorData;
 import org.generationcp.middleware.domain.dms.ObservationData;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
@@ -239,10 +237,6 @@ public class StudyInstanceServiceImplTest {
 		when(this.studyService.getEnvironmentDatasetId(studyId))
 			.thenReturn(datasetId);
 
-		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(observationData.getVariableId(), "ALTITUDE");
-		when(this.datasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.STUDY_CONDITION))
-			.thenReturn(Arrays.asList(measurementVariableDto));
-
 		this.studyInstanceService.addInstanceObservation(studyId, instanceId, observationData);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
@@ -251,7 +245,7 @@ public class StudyInstanceServiceImplTest {
 			.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 				observationData.getVariableId()));
 		Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
-		Mockito.verify(this.middlewareStudyInstanceService).addInstanceObservation(observationData, true);
+		Mockito.verify(this.middlewareStudyInstanceService).addInstanceObservation(observationData);
 
 	}
 
@@ -268,11 +262,7 @@ public class StudyInstanceServiceImplTest {
 		when(this.studyService.getEnvironmentDatasetId(studyId))
 			.thenReturn(datasetId);
 
-		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(observationData.getVariableId(), "ALTITUDE");
-		when(this.datasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.STUDY_CONDITION))
-			.thenReturn(Arrays.asList(measurementVariableDto));
-
-		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationId, observationData.getVariableId(), true))
+		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationId, observationData.getVariableId()))
 			.thenReturn(Optional.of(observationData));
 
 		this.studyInstanceService.updateInstanceObservation(studyId, instanceId, observationId, observationData);
@@ -283,7 +273,7 @@ public class StudyInstanceServiceImplTest {
 			.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 				observationData.getVariableId()));
 		Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
-		Mockito.verify(this.middlewareStudyInstanceService).updateInstanceObservation(observationData, true);
+		Mockito.verify(this.middlewareStudyInstanceService).updateInstanceObservation(observationData);
 
 	}
 
@@ -300,11 +290,7 @@ public class StudyInstanceServiceImplTest {
 		when(this.studyService.getEnvironmentDatasetId(studyId))
 			.thenReturn(datasetId);
 
-		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(observationData.getVariableId(), "ALTITUDE");
-		when(this.datasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.STUDY_CONDITION))
-			.thenReturn(Arrays.asList(measurementVariableDto));
-
-		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationId, observationData.getVariableId(), true))
+		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationId, observationData.getVariableId()))
 			.thenReturn(Optional.empty());
 
 		try {
@@ -336,13 +322,9 @@ public class StudyInstanceServiceImplTest {
 		when(this.studyService.getEnvironmentDatasetId(studyId))
 			.thenReturn(datasetId);
 
-		final MeasurementVariableDto measurementVariableDto = new MeasurementVariableDto(observationData.getVariableId(), "ALTITUDE");
-		when(this.datasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.STUDY_CONDITION))
-			.thenReturn(Arrays.asList(measurementVariableDto));
-
 		final ObservationData differentObservationData = new ObservationData();
 		differentObservationData.setVariableId(TermId.BLOCK_NAME.getId());
-		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationId, observationData.getVariableId(), true))
+		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationId, observationData.getVariableId()))
 			.thenReturn(Optional.of(differentObservationData));
 
 		try {
@@ -357,6 +339,100 @@ public class StudyInstanceServiceImplTest {
 				.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 					observationData.getVariableId()));
 			Mockito.verify(this.observationValidator).validateObservationValue(observationData.getVariableId(), observationData.getValue());
+		}
+
+	}
+
+	@Test
+	public void testUpdateInstanceDescriptor() {
+
+		final int studyId = this.random.nextInt(BOUND);
+		final int instanceId = this.random.nextInt(BOUND);
+		final int descriptorDataId = this.random.nextInt(BOUND);
+		final int datasetId = this.random.nextInt(BOUND);
+		final DescriptorData descriptorData = new DescriptorData();
+		descriptorData.setVariableId(TermId.ALTITUDE.getId());
+
+		when(this.studyService.getEnvironmentDatasetId(studyId))
+			.thenReturn(datasetId);
+
+		when(this.middlewareStudyInstanceService.getInstanceDescriptor(instanceId, descriptorDataId, descriptorData.getVariableId()))
+			.thenReturn(Optional.of(descriptorData));
+
+		this.studyInstanceService.updateInstanceDescriptor(studyId, instanceId, descriptorDataId, descriptorData);
+
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId));
+		Mockito.verify(this.datasetValidator)
+			.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
+				descriptorData.getVariableId()));
+		Mockito.verify(this.observationValidator).validateObservationValue(descriptorData.getVariableId(), descriptorData.getValue());
+		Mockito.verify(this.middlewareStudyInstanceService).updateInstanceDescriptor(descriptorData);
+
+	}
+
+	@Test
+	public void testUpdateInstanceDescriptor_InvalidDesciptorDataId() {
+
+		final int studyId = this.random.nextInt(BOUND);
+		final int instanceId = this.random.nextInt(BOUND);
+		final int observationDataId = this.random.nextInt(BOUND);
+		final int datasetId = this.random.nextInt(BOUND);
+		final DescriptorData descriptorData = new DescriptorData();
+		descriptorData.setVariableId(TermId.ALTITUDE.getId());
+
+		when(this.studyService.getEnvironmentDatasetId(studyId))
+			.thenReturn(datasetId);
+
+		when(this.middlewareStudyInstanceService.getInstanceDescriptor(instanceId, observationDataId, descriptorData.getVariableId()))
+			.thenReturn(Optional.empty());
+
+		try {
+			this.studyInstanceService.updateInstanceDescriptor(studyId, instanceId, observationDataId, descriptorData);
+			fail("method should throw an error");
+		} catch (ApiRequestValidationException e) {
+			Assert
+				.assertTrue(Arrays.asList(e.getErrors().get(0).getCodes()).contains(StudyInstanceServiceImpl.INVALID_ENVIRONMENT_DATA_ID));
+			Mockito.verify(this.studyValidator).validate(studyId, true);
+			Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId));
+			Mockito.verify(this.datasetValidator)
+				.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
+					descriptorData.getVariableId()));
+			Mockito.verify(this.observationValidator).validateObservationValue(descriptorData.getVariableId(), descriptorData.getValue());
+		}
+
+	}
+
+	@Test
+	public void testUpdateInstanceDescriptor_InvalidVariableForDescriptorData() {
+
+		final int studyId = this.random.nextInt(BOUND);
+		final int instanceId = this.random.nextInt(BOUND);
+		final int descriptorDataId = this.random.nextInt(BOUND);
+		final int datasetId = this.random.nextInt(BOUND);
+		final DescriptorData descriptorData = new DescriptorData();
+		descriptorData.setVariableId(TermId.ALTITUDE.getId());
+
+		when(this.studyService.getEnvironmentDatasetId(studyId))
+			.thenReturn(datasetId);
+
+		final DescriptorData differentDescriptorData = new DescriptorData();
+		differentDescriptorData.setVariableId(TermId.BLOCK_NAME.getId());
+		when(this.middlewareStudyInstanceService.getInstanceDescriptor(instanceId, descriptorDataId, descriptorData.getVariableId()))
+			.thenReturn(Optional.of(differentDescriptorData));
+
+		try {
+			this.studyInstanceService.updateInstanceDescriptor(studyId, instanceId, descriptorDataId, descriptorData);
+			fail("method should throw an error");
+		} catch (ApiRequestValidationException e) {
+			Assert.assertTrue(
+				Arrays.asList(e.getErrors().get(0).getCodes()).contains(StudyInstanceServiceImpl.INVALID_VARIABLE_FOR_ENVIRONMENT_DATA));
+			Mockito.verify(this.studyValidator).validate(studyId, true);
+			Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId));
+			Mockito.verify(this.datasetValidator)
+				.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
+					descriptorData.getVariableId()));
+			Mockito.verify(this.observationValidator).validateObservationValue(descriptorData.getVariableId(), descriptorData.getValue());
 		}
 
 	}

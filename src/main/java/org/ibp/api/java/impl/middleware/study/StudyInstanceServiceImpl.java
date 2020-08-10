@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.middleware.domain.dms.DescriptorData;
 import org.generationcp.middleware.domain.dms.ObservationData;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.domain.study.StudyInstance;
@@ -126,15 +126,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		this.observationValidator.validateObservationValue(variableId, observationData.getValue());
 
 		observationData.setInstanceId(instanceId);
-		final boolean isEnvironmentCondition =
-			this.datasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.STUDY_CONDITION).stream()
-				.anyMatch(v -> v.getId().equals(variableId));
-		this.middlewareStudyInstanceService.addInstanceObservation(observationData, isEnvironmentCondition);
+		this.middlewareStudyInstanceService.addInstanceObservation(observationData);
 		return observationData;
 	}
 
 	@Override
-	public ObservationData updateInstanceObservation(final Integer studyId, final Integer instanceId, final Integer observationId,
+	public ObservationData updateInstanceObservation(final Integer studyId, final Integer instanceId, final Integer observationDataId,
 		final ObservationData observationData) {
 		this.studyValidator.validate(studyId, true);
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));
@@ -145,12 +142,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			variableId));
 		this.observationValidator.validateObservationValue(variableId, observationData.getValue());
 
-		final boolean isEnvironmentCondition =
-			this.datasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.STUDY_CONDITION).stream()
-				.anyMatch(v -> v.getId().equals(variableId));
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		final Optional<ObservationData> existingEnvironmentData =
-			this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationId, variableId, isEnvironmentCondition);
+			this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationDataId, variableId);
 		if (!existingEnvironmentData.isPresent()) {
 			errors.reject(INVALID_ENVIRONMENT_DATA_ID);
 		} else if (!existingEnvironmentData.get().getVariableId().equals(variableId)) {
@@ -161,10 +155,58 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		observationData.setObservationId(observationId);
+		observationData.setObservationDataId(observationDataId);
 		observationData.setInstanceId(instanceId);
-		this.middlewareStudyInstanceService.updateInstanceObservation(observationData, isEnvironmentCondition);
+		this.middlewareStudyInstanceService.updateInstanceObservation(observationData);
 		return observationData;
+	}
+
+	@Override
+	public DescriptorData addInstanceDescriptor(final Integer studyId, final Integer instanceId, final DescriptorData descriptorData) {
+		this.studyValidator.validate(studyId, true);
+		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));
+
+		final Integer datasetId = this.studyService.getEnvironmentDatasetId(studyId);
+		final Integer variableId = descriptorData.getVariableId();
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
+			variableId));
+		this.observationValidator.validateObservationValue(variableId, descriptorData.getValue());
+
+		descriptorData.setInstanceId(instanceId);
+
+		this.middlewareStudyInstanceService.addInstanceDescriptor(descriptorData);
+		return descriptorData;
+	}
+
+	@Override
+	public DescriptorData updateInstanceDescriptor(final Integer studyId, final Integer instanceId, final Integer descriptorDataId,
+		final DescriptorData descriptorData) {
+		this.studyValidator.validate(studyId, true);
+		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));
+
+		final Integer datasetId = this.studyService.getEnvironmentDatasetId(studyId);
+		final Integer variableId = descriptorData.getVariableId();
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
+			variableId));
+		this.observationValidator.validateObservationValue(variableId, descriptorData.getValue());
+
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		final Optional<DescriptorData> existingEnvironmentData =
+			this.middlewareStudyInstanceService.getInstanceDescriptor(instanceId, descriptorDataId, variableId);
+		if (!existingEnvironmentData.isPresent()) {
+			errors.reject(INVALID_ENVIRONMENT_DATA_ID);
+		} else if (!existingEnvironmentData.get().getVariableId().equals(variableId)) {
+			errors.reject(INVALID_VARIABLE_FOR_ENVIRONMENT_DATA);
+		}
+
+		if (!errors.getAllErrors().isEmpty()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		descriptorData.setDescriptorDataId(descriptorDataId);
+		descriptorData.setInstanceId(instanceId);
+		this.middlewareStudyInstanceService.updateInstanceDescriptor(descriptorData);
+		return descriptorData;
 	}
 
 }
