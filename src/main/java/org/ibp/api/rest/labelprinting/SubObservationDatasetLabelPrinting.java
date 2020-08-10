@@ -1,6 +1,5 @@
 package org.ibp.api.rest.labelprinting;
 
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
@@ -41,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -348,6 +346,10 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final List<StudyTransactionsDto> studyTransactionsDtos =
 			studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest);
 
+		final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap = new HashMap<>();
+		studyTransactionsDtos.forEach(studyTransactionsDto -> observationUnitDtoTransactionDtoMap
+			.put(studyTransactionsDto.getObservationUnits().get(0).getObsUnitId(), studyTransactionsDto));
+
 		final Map<Integer, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
 
 		final Set<Integer> allRequiredKeys = new HashSet<>();
@@ -402,12 +404,63 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 				} else {
 					final String ObsUnitId = observationUnitRow.getVariables().get(PARENT_OBS_UNIT_ID).getValue();
 					if (LOT_FIXED_LABEL_TYPES.getFields().contains(field) || TRANSACTION_FIXED_LABEL_TYPES.getFields().contains(field)) {
-						for (final StudyTransactionsDto studyTransactionsDto : studyTransactionsDtos) {
-							final Collection<StudyTransactionsDto.ObservationUnitDto>
-								observationUnitDtos = Collections2.filter(studyTransactionsDto.getObservationUnits(),
-								observationUnitDto -> observationUnitDto.getObsUnitId().equals(ObsUnitId));
-							if (!observationUnitDtos.isEmpty()) {
-								this.getInventoryDataRow(requiredField, studyTransactionsDto, row);
+						final StudyTransactionsDto studyTransactionsDto = observationUnitDtoTransactionDtoMap.get(ObsUnitId);
+
+						if (studyTransactionsDto == null) {
+							continue;
+						}
+
+						if (SubObservationDatasetLabelPrinting.LOT_FIELD.getById(requiredField) != null) {
+							switch (SubObservationDatasetLabelPrinting.LOT_FIELD.getById(requiredField)) {
+								case LOT_UID:
+									row.put(requiredField, studyTransactionsDto.getLot().getLotUUID());
+									break;
+								case LOT_ID:
+									row.put(requiredField, Objects.toString(studyTransactionsDto.getLot().getLotId(), ""));
+									break;
+								case STOCK_ID:
+									row.put(requiredField, studyTransactionsDto.getLot().getStockId());
+									break;
+								case STORAGE_LOCATION_ABBR:
+									row.put(requiredField, studyTransactionsDto.getLot().getLocationAbbr());
+									break;
+								case STORAGE_LOCATION:
+									row.put(requiredField, studyTransactionsDto.getLot().getLocationName());
+									break;
+								case UNITS:
+									row.put(requiredField, studyTransactionsDto.getLot().getUnitName());
+									break;
+								case AVAILABLE_BALANCE:
+									row.put(requiredField, Objects.toString(studyTransactionsDto.getLot().getAvailableBalance(), ""));
+									break;
+								case NOTES:
+									row.put(requiredField, studyTransactionsDto.getLot().getNotes());
+									break;
+								default:
+									break;
+							}
+						} else if (SubObservationDatasetLabelPrinting.TRANSACTION_FIELD.getById(requiredField) != null) {
+							switch (SubObservationDatasetLabelPrinting.TRANSACTION_FIELD.getById(requiredField)) {
+								case TRN_ID:
+									row.put(requiredField, studyTransactionsDto.getTransactionId().toString());
+									break;
+								case STATUS:
+									row.put(requiredField, Objects.toString(studyTransactionsDto.getTransactionStatus(), ""));
+									break;
+								case TYPE:
+									row.put(requiredField, studyTransactionsDto.getTransactionType());
+									break;
+								case CREATED:
+									row.put(requiredField, studyTransactionsDto.getCreatedDate().toString());
+									break;
+								case NOTES:
+									row.put(requiredField, studyTransactionsDto.getNotes());
+									break;
+								case USERNAME:
+									row.put(requiredField, studyTransactionsDto.getCreatedByUsername());
+									break;
+								default:
+									break;
 							}
 						}
 					}
@@ -439,66 +492,6 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		}
 
 		return new LabelsData(subObsDatasetUnitIdFieldKey, results);
-	}
-
-	private void getInventoryDataRow(
-		final Integer key,
-		final StudyTransactionsDto studyTransactionsDto,final Map<Integer, String> row) {
-		final int id = key;
-
-		if (LOT_FIELD.getById(id) != null) {
-			switch (LOT_FIELD.getById(id)) {
-				case LOT_UID:
-					row.put(key, studyTransactionsDto.getLot().getLotUUID());
-					break;
-				case LOT_ID:
-					row.put(key, Objects.toString(studyTransactionsDto.getLot().getLotId(), ""));
-					break;
-				case STOCK_ID:
-					row.put(key, studyTransactionsDto.getLot().getStockId());
-					break;
-				case STORAGE_LOCATION_ABBR:
-					row.put(key, studyTransactionsDto.getLot().getLocationAbbr());
-				case STORAGE_LOCATION:
-					row.put(key, studyTransactionsDto.getLot().getLocationName());
-					break;
-				case UNITS:
-					row.put(key, studyTransactionsDto.getLot().getUnitName());
-					break;
-				case AVAILABLE_BALANCE:
-					row.put(key, Objects.toString(studyTransactionsDto.getLot().getAvailableBalance(), ""));
-					break;
-				case NOTES:
-					row.put(key, studyTransactionsDto.getLot().getNotes());
-					break;
-				default:
-					break;
-			}
-		}
-		else if (TRANSACTION_FIELD.getById(id) != null) {
-			switch (TRANSACTION_FIELD.getById(id)) {
-				case TRN_ID:
-					row.put(key, studyTransactionsDto.getTransactionId().toString());
-					break;
-				case STATUS:
-					row.put(key, Objects.toString(studyTransactionsDto.getTransactionStatus()));
-					break;
-				case TYPE:
-					row.put(key, studyTransactionsDto.getTransactionType());
-					break;
-				case CREATED:
-					row.put(key, studyTransactionsDto.getCreatedDate().toString());
-					break;
-				case NOTES:
-					row.put(key, studyTransactionsDto.getNotes());
-					break;
-				case USERNAME:
-					row.put(key, studyTransactionsDto.getCreatedByUsername());
-					break;
-				default:
-					break;
-			}
-		}
 	}
 
 	@Override
