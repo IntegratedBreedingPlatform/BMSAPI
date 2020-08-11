@@ -134,6 +134,7 @@ public class LabelPrintingResource {
 
 		final LabelsData labelsData = labelPrintingStrategy.getLabelsData(labelsGeneratorInput);
 
+		labelPrintingStrategy.validateBarcode(labelsGeneratorInput, labelsData);
 		final File file;
 		try {
 			file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
