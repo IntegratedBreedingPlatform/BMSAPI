@@ -19,7 +19,6 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
-import org.ibp.api.java.impl.middleware.germplasm.GermplamListServiceImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -195,16 +194,16 @@ public class SampleListServiceImpl implements SampleListService {
 			cropFolderNode.setNumOfChildren(this.sampleListServiceMW.getAllSampleTopLevelLists(null).size());
 			treeNodes.add(cropFolderNode);
 			if (programUUID != null) {
-				final TreeNode programFolderNode = new TreeNode(GermplamListServiceImpl.PROGRAM_LISTS, AppConstants.PROGRAM_LISTS.getString(), true, LEAD_CLASS,
+				final TreeNode programFolderNode = new TreeNode(SampleListServiceImpl.PROGRAM_LISTS, AppConstants.PROGRAM_LISTS.getString(), true, LEAD_CLASS,
 					AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
 				programFolderNode.setNumOfChildren(this.sampleListServiceMW.getAllSampleTopLevelLists(programUUID).size());
 				treeNodes.add(programFolderNode);
 			}
 		} else {
 			final List<SampleList> rootLists;
-			if (GermplamListServiceImpl.PROGRAM_LISTS.equals(parentId)) {
+			if (SampleListServiceImpl.PROGRAM_LISTS.equals(parentId)) {
 				rootLists = this.sampleListServiceMW.getAllSampleTopLevelLists(programUUID);
-			} else if (GermplamListServiceImpl.CROP_LISTS.equals(parentId)) {
+			} else if (SampleListServiceImpl.CROP_LISTS.equals(parentId)) {
 				rootLists = this.sampleListServiceMW.getAllSampleTopLevelLists(null);
 			} else {
 				rootLists = this.sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID, SampleListServiceImpl.BATCH_SIZE);
