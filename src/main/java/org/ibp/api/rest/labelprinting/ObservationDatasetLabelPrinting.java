@@ -196,7 +196,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD);
 
 		STATIC_FIELD_IDS = Arrays.asList(LabelPrintingStaticField.STUDY_NAME.getFieldId(), LabelPrintingStaticField.YEAR.getFieldId(),
-			LabelPrintingStaticField.PARENTAGE.getFieldId(), LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId(),
+			LabelPrintingStaticField.PARENTAGE.getFieldId(),
 			ObservationDatasetLabelPrinting.LOT_FIELD.LOT_ID.getId(),
 			ObservationDatasetLabelPrinting.LOT_FIELD.LOT_UID.getId(),
 			ObservationDatasetLabelPrinting.LOT_FIELD.STOCK_ID.getId(),
@@ -350,8 +350,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput) {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsGeneratorInput.getStudyId());
 
-		final Integer ObsDatasetUnitIdFieldKey = LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId();
-
+		final Integer ObsDatasetUnitIdFieldKey = TermId.OBS_UNIT_ID.getId();
 
 		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
 		final TransactionsSearchDto transactionsSearch = new TransactionsSearchDto();
