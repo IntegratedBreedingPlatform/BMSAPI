@@ -106,9 +106,9 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		LOT_ID(22, "Lot ID"), // Added later
 		LOT_UID(1, "Lot UID"),
 		STOCK_ID(2, "Stock id"),
-			AVAILABLE_BALANCE(26, "Available balance"),
+		AVAILABLE_BALANCE(26, "Available balance"),
 		UNITS(5, "Units"),
-			STORAGE_LOCATION_ABBR(27, "Storage location abb"),
+		STORAGE_LOCATION_ABBR(27, "Storage location abb"),
 		STORAGE_LOCATION(34, "Storage location"),
 		NOTES(11, "Notes");
 
@@ -292,15 +292,18 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final int plotDatasetId = dataSetDTO.getParentDatasetId();
 
 		final List<MeasurementVariable> studyDetailsVariables = this.middlewareDatasetService
-
 				.getObservationSetVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
+
 		final List<MeasurementVariable> environmentVariables = this.middlewareDatasetService.getObservationSetVariables(environmentDatasetId,
 				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 						VariableType.STUDY_CONDITION.getId()));
+
 		final List<MeasurementVariable> treatmentFactors =
 				this.middlewareDatasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
+
 		final List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getObservationSetVariables(plotDatasetId,
 				Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
+
 		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
 				.getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
 
