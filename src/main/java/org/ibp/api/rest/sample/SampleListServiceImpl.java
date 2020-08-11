@@ -190,7 +190,7 @@ public class SampleListServiceImpl implements SampleListService {
 			cropFolderNode.setNumOfChildren(this.sampleListServiceMW.getAllSampleTopLevelLists(null).size());
 			treeNodes.add(cropFolderNode);
 			if (programUUID != null) {
-				final TreeNode programFolderNode = new TreeNode(SampleListServiceImpl.PROGRAM_LISTS, AppConstants.PROGRAM_LISTS.getString(), true, LEAD_CLASS,
+				final TreeNode programFolderNode = new TreeNode(SampleListServiceImpl.PROGRAM_LISTS, AppConstants.SAMPLE_LISTS.getString(), true, LEAD_CLASS,
 					AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
 				programFolderNode.setNumOfChildren(this.sampleListServiceMW.getAllSampleTopLevelLists(programUUID).size());
 				treeNodes.add(programFolderNode);
