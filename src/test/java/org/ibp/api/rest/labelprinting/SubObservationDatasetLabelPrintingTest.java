@@ -125,6 +125,6 @@ public class SubObservationDatasetLabelPrintingTest {
 		final List<FileType> fileTypes = this.subObservationDatasetLabelPrinting.getSupportedFileTypes();
 		Assert.assertTrue(fileTypes.contains(FileType.CSV));
 		Assert.assertTrue(fileTypes.contains(FileType.PDF));
-		Assert.assertFalse(fileTypes.contains(FileType.XLS));
+		Assert.assertTrue(fileTypes.contains(FileType.XLS));
 	}
 }
