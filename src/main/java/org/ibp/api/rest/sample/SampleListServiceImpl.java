@@ -8,7 +8,6 @@ import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -59,9 +58,6 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Autowired
 	private ProgramValidator programValidator;
-
-	@Autowired
-	public GermplasmDataManager germplasmDataManager;
 
 	@Override
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
