@@ -5,15 +5,12 @@ import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.commons.util.TreeViewUtil;
-import org.generationcp.commons.workbook.generator.RowColumnType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.ibp.api.Util;
@@ -47,6 +44,7 @@ public class SampleListServiceImpl implements SampleListService {
 	protected static final String PROGRAM_LISTS = "LISTS";
 	protected static final String CROP_LISTS = "CROPLISTS";
 	private static final String LEAD_CLASS = "lead";
+	public static final int BATCH_SIZE = 500;
 
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
@@ -209,7 +207,7 @@ public class SampleListServiceImpl implements SampleListService {
 			} else if (GermplamListServiceImpl.CROP_LISTS.equals(parentId)) {
 				rootLists = this.sampleListServiceMW.getAllSampleTopLevelLists(null);
 			} else {
-				rootLists = this.sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID, GermplamListServiceImpl.BATCH_SIZE);
+				rootLists = this.sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID, SampleListServiceImpl.BATCH_SIZE);
 			}
 
 			final List<TreeNode> childNodes = TreeViewUtil.convertListToTreeView(rootLists, folderOnly);
