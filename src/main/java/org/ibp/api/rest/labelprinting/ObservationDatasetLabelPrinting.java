@@ -17,6 +17,7 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
@@ -81,6 +82,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	private static Field STUDY_NAME_FIELD;
 	private static Field YEAR_FIELD;
 	private static Field PARENTAGE_FIELD;
+	private static Field SEASON_FIELD;
 	private static List<Field> DEFAULT_STUDY_DETAILS_FIELDS;
 
 	static String PLOT = "PLOT";
@@ -185,11 +187,12 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final String studyNamePropValue = this.getMessage("label.printing.field.study.name");
 		final String yearPropValue = this.getMessage("label.printing.field.year");
 		final String parentagePropValue = this.getMessage("label.printing.field.parentage");
+		final String seasonPropValue = this.getMessage("label.printing.field.season");
 
 		STUDY_NAME_FIELD = new Field(LabelPrintingStaticField.STUDY_NAME.getFieldId(), studyNamePropValue);
 		YEAR_FIELD = new Field(LabelPrintingStaticField.YEAR.getFieldId(), yearPropValue);
 		PARENTAGE_FIELD = new Field(LabelPrintingStaticField.PARENTAGE.getFieldId(), parentagePropValue);
-
+		SEASON_FIELD = new Field(TermId.SEASON_VAR.getId(),seasonPropValue);
 		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD);
 
 		STATIC_FIELD_IDS = Arrays.asList(LabelPrintingStaticField.STUDY_NAME.getFieldId(), LabelPrintingStaticField.YEAR.getFieldId(),
@@ -329,6 +332,10 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		datasetDetailsFields.addAll(this.transform(plotVariables));
 		datasetDetailsFields.addAll(this.transform(datasetVariables));
 		datasetDetailsFields.add(PARENTAGE_FIELD);
+
+		if(studyDetailsFields.indexOf(SEASON_FIELD)== -1){
+			studyDetailsFields.add(SEASON_FIELD);
+		}
 		datasetDetailsLabelType.setFields(datasetDetailsFields);
 
 		labelTypes.add(studyDetailsLabelType);
@@ -401,7 +408,9 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 						continue;
 					}
 					if (TermId.getById(termId).equals(TermId.SEASON_VAR)) {
-						row.put(requiredField, this.getSeason(observationUnitRow.getVariables().get(field.getName()).getValue()));
+						final ObservationUnitData observationUnitData =
+							observationUnitRow.getEnvironmentVariables().get("Crop_season_Code");
+						row.put(requiredField, this.getSeason(observationUnitData != null ? observationUnitData.getValue() : null));
 						continue;
 					}
 					if (observationUnitRow.getVariables().containsKey(field.getName())) {
@@ -516,6 +525,9 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			//Which is in fact the only dataset that cointains this variable.
 			if (field.getId() == TermId.OBS_UNIT_ID.getId()) {
 				field.setName(PLOT.concat(" ").concat(field.getName()));
+			}
+			if (field.getId() == TermId.SEASON_VAR.getId()) {
+				field.setName(this.getMessage("label.printing.field.season"));
 			}
 			fields.add(field);
 		}
