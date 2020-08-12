@@ -389,7 +389,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 				} else {
 					final String ObsUnitId = observationUnitRow.getVariables().get(PARENT_OBS_UNIT_ID).getValue();
 					if (STATIC_LOT_FIELD_IDS.contains(field.getId()) || STATIC_TRANSACTION_FIELD_IDS.contains(field.getId())) {
-						final StudyTransactionsDto studyTransactionsDto = observationUnitDtoTransactionDtoMap.get(observationUnitRow.getObsUnitId());
+						final StudyTransactionsDto studyTransactionsDto = observationUnitDtoTransactionDtoMap.get(ObsUnitId);
 
 						if (studyTransactionsDto == null) {
 							continue;
