@@ -17,6 +17,7 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
+import org.generationcp.middleware.service.api.dataset.InstanceInfomationDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
@@ -229,14 +230,14 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	public LabelsNeededSummary getSummaryOfLabelsNeeded(final LabelsInfoInput labelsInfoInput) {
 		final LabelsNeededSummary labelsNeededSummary = new LabelsNeededSummary();
-		final List<Map<String, Long>>  observationsByInstance =
+		final List<InstanceInfomationDTO>  observationsByInstance =
 			this.middlewareDatasetService.getInformationInstance(labelsInfoInput.getDatasetId(), labelsInfoInput.getStudyId());
 		long totalNumberOfLabelsNeeded = 0;
-		for (Map<String, Long> map:observationsByInstance) {
+		for (InstanceInfomationDTO instanceInfomationDTO:observationsByInstance) {
 			final LabelsNeededSummary.Row row =
-				new LabelsNeededSummary.Row(map.get("environment").toString(), map.get("observations"),map.get("observations"),
-					map.get("repNumber"),
-					map.get("entries"));
+				new LabelsNeededSummary.Row(instanceInfomationDTO.getEnvironment().toString(), instanceInfomationDTO.getnOfObservations(),instanceInfomationDTO.getnOfObservations(),
+					instanceInfomationDTO.getnOfReps(),
+					instanceInfomationDTO.getnOfEntries());
 			labelsNeededSummary.addRow(row);
 			totalNumberOfLabelsNeeded += row.getLabelsNeeded();
 		}
