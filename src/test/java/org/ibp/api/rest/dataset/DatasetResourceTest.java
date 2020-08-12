@@ -368,7 +368,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean()))
 			.thenReturn(100);
 		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-			ArgumentMatchers.any()))
+			ArgumentMatchers.any(), ArgumentMatchers.any()))
 			.thenReturn(Lists.newArrayList(obsDto));
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);

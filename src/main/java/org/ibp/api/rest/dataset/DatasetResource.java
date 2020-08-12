@@ -24,6 +24,7 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -218,7 +219,7 @@ public class DatasetResource {
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
-					return DatasetResource.this.studyDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO);
+					return DatasetResource.this.studyDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO, new PageRequest(pageNumber, pageSize));
 				}
 			});
 

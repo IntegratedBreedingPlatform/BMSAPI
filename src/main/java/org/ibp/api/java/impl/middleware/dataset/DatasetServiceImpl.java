@@ -42,6 +42,7 @@ import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -311,7 +312,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final PageRequest pageRequest) {
 
 		List<Integer> instanceIds = null;
 		if (searchDTO.getInstanceId() != null) {
@@ -320,7 +321,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
 
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
-			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO);
+			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO, pageRequest);
 
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
@@ -340,7 +341,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
 
-		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO);
+		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO, null);
 	}
 
 	@Override

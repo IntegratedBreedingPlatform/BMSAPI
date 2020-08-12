@@ -16,6 +16,7 @@ import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,7 @@ public interface StudyService {
 
 	long countStudies(StudySearchFilter studySearchFilter);
 
-	List<StudyDto> getStudies(StudySearchFilter studySearchFilter);
+	List<StudyDto> getStudies(StudySearchFilter studySearchFilter, PageRequest pageRequest);
 
 	List<TreeNode> getStudyTree(String parentKey, String programUUID);
 

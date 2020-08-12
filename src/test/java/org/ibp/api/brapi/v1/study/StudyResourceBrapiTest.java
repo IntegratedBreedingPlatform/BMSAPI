@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -335,7 +336,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<StudyDto> studyDtos = StudyTestDataProvider.getListStudyDto();
 		final StudyDto studyDto = studyDtos.get(0);
 
-		Mockito.when(this.studyServiceMW.getStudies(Mockito.any(StudySearchFilter.class))).thenReturn(studyDtos);
+		Mockito.when(this.studyServiceMW.getStudies(Mockito.any(StudySearchFilter.class), Mockito.any(PageRequest.class))).thenReturn(studyDtos);
 		Mockito.when(this.studyServiceMW.countStudies(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies")

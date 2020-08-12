@@ -9,6 +9,7 @@ import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -55,12 +56,9 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		for(final Integer instanceDBID: selectedDatasetInstancesMap.keySet()) {
 			final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 			searchDTO.setInstanceId(selectedDatasetInstancesMap.get(instanceDBID).getInstanceId());
-			final SortedPageRequest sortedRequest = new SortedPageRequest();
-			sortedRequest.setPageNumber(1);
-			sortedRequest.setPageSize(Integer.MAX_VALUE);
-			searchDTO.setSortedRequest(sortedRequest);
+			final PageRequest pageRequest = new PageRequest(1, Integer.MAX_VALUE);
 			final List<ObservationUnitRow> observationUnitRows = this.studyDatasetService
-				.getObservationUnitRows(study.getId(), dataset.getDatasetId(), searchDTO);
+				.getObservationUnitRows(study.getId(), dataset.getDatasetId(), searchDTO, pageRequest);
 			observationUnitRowMap.put(instanceDBID, observationUnitRows);
 		}
 		return observationUnitRowMap;

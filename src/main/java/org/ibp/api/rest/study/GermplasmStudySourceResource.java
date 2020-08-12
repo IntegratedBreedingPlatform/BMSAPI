@@ -12,6 +12,8 @@ import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.study.GermplasmStudySourceService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,12 +48,21 @@ public class GermplasmStudySourceResource {
 		final SortedPageRequest sortedRequest = germplasmStudySourceSearchRequest.getSortedRequest();
 		BaseValidator.checkNotNull(sortedRequest, "sortedrequest.empty");
 		final String sortOrder = germplasmStudySourceSearchRequest.getSortedRequest().getSortOrder();
-		final boolean isSortOrderValid = "ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
+		final boolean isSortOrderValid =
+			"ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
 		BaseValidator.checkArgument(isSortOrderValid, "sort.order.invalid");
 
 		germplasmStudySourceSearchRequest.setStudyId(studyId);
 		final Integer pageNumber = sortedRequest.getPageNumber();
 		final Integer pageSize = sortedRequest.getPageSize();
+
+		final PageRequest pageRequest;
+		if (StringUtils.isNotEmpty(sortOrder) && StringUtils.isNotEmpty(sortedRequest.getSortBy())) {
+			pageRequest = new PageRequest(pageNumber, pageSize, new Sort(Sort.Direction.fromString(sortOrder), sortedRequest.getSortBy()));
+		} else {
+			pageRequest = new PageRequest(pageNumber, pageSize);
+		}
+
 		final PagedResult<GermplasmStudySourceDto> pageResult =
 			new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<GermplasmStudySourceDto>() {
 
@@ -70,7 +81,7 @@ public class GermplasmStudySourceResource {
 				@Override
 				public List<GermplasmStudySourceDto> getResults(final PagedResult<GermplasmStudySourceDto> pagedResult) {
 					return GermplasmStudySourceResource.this.germplasmStudySourceService
-						.getGermplasmStudySources(germplasmStudySourceSearchRequest);
+						.getGermplasmStudySources(germplasmStudySourceSearchRequest, pageRequest);
 				}
 			});
 

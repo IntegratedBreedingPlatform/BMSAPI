@@ -40,6 +40,7 @@ import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
@@ -381,8 +382,8 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
-		return this.middlewareStudyService.getStudies(studySearchFilter);
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter, final PageRequest pageRequest) {
+		return this.middlewareStudyService.getStudies(studySearchFilter, pageRequest);
 	}
 
 	@Override

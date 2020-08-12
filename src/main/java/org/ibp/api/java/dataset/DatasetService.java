@@ -14,6 +14,7 @@ import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -174,11 +175,12 @@ public interface DatasetService {
 	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 * @param searchDTO Search DTO
+	 * @param pageRequest Pagination parameters
 	 * @return List of ObservationUnitRow
 	 */
 	//TODO ObservationUnitsSearchDTO exposes a set of attributes that can not be used by the user to configure the search.
 	List<ObservationUnitRow> getObservationUnitRows(
-		int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
+		int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO, PageRequest pageRequest);
 
 	/**
 	 * Create a new observation for the specified dataset and observation unit id
