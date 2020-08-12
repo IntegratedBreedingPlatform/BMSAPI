@@ -122,7 +122,7 @@ public class WorkbenchUserDetailsServiceTest {
 	}
 
 	@Test(expected = UsernameNotFoundException.class)
-	public void testLoadUserByNonExistantUserName() throws MiddlewareQueryException {
+	public void testLoadUserByNonExistentUserName() throws MiddlewareQueryException {
 		Mockito.when(this.userService.getUserByName(WorkbenchUserDetailsServiceTest.TEST_USER, 0, 1, Operation.EQUAL)).thenReturn(
 				Collections.emptyList());
 		this.service.loadUserByUsername(WorkbenchUserDetailsServiceTest.TEST_USER);
