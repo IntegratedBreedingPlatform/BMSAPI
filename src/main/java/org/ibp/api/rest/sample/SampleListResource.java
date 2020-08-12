@@ -200,6 +200,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Get sample lists given a tree parent node folder", notes = "Get sample lists given a tree parent node folder")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
 	@RequestMapping(value = "/{crop}/sample-lists/tree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getSampleListByParentFolderId(
