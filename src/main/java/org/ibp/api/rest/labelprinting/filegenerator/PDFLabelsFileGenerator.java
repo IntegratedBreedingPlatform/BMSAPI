@@ -250,7 +250,8 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 
 	protected String generateLabelText(final Map<Integer, String> labels, final List<Integer> selectedFields, final Map<Integer, Field> keyFieldMap, final int row) {
 		if(row < selectedFields.size()) {
-			return keyFieldMap.get(selectedFields.get(row)).getName() + FIELDNAME_VALUE_SEPARATOR + labels.get(selectedFields.get(row));
+			final String value = labels.get(selectedFields.get(row)) != null ? labels.get(selectedFields.get(row)) : "";
+			return keyFieldMap.get(selectedFields.get(row)).getName() + FIELDNAME_VALUE_SEPARATOR + value;
 		}
 		return "";
 	}
