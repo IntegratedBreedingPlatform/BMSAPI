@@ -86,6 +86,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			StringUtils.isEmpty(cropName) ? null : cropName, //
 			programId);
 
+		// Skip crop authorization checking if the user has Site Admin Permission
 		if(!StringUtils.isEmpty(cropName) && !hasSiteAdminPermissions(permissions)) {
 			final List<String> crops = this.cropService.getAvailableCropsForUser(workbenchUser.getUserid());
 			crops.replaceAll(String::toUpperCase);
