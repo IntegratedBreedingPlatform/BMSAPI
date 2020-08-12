@@ -4,18 +4,16 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -23,25 +21,21 @@ import static org.mockito.Mockito.times;
 
 public class GermplasmListServiceImplTest {
 
-	@Autowired
-	private GermplamListServiceImpl germplamListService;
-
-	@Mock
-	private WorkbenchDataManager workbenchDataManager;
-
 	@Mock
 	private GermplasmListManager germplasmListManager;
 
 	@Mock
 	private GermplasmDataManager germplasmDataManager;
 
+	@Mock
+	private ProgramValidator programValidator;
+
+	@InjectMocks
+	private GermplamListServiceImpl germplamListService;
+
 	@Before
 	public void init() {
 		MockitoAnnotations.initMocks(this);
-		germplamListService = new GermplamListServiceImpl();
-		germplamListService.setWorkbenchDataManager(workbenchDataManager);
-		germplamListService.setGermplasmListManager(germplasmListManager);
-		germplamListService.setGermplasmDataManager(germplasmDataManager);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -67,17 +61,9 @@ public class GermplasmListServiceImplTest {
 		final String parentId = "1";
 		final GermplasmList germplasmList = new GermplasmList();
 		final String program = RandomStringUtils.randomAlphabetic(3);
-		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
 		Mockito.when(germplasmListManager.getGermplasmListById(Integer.parseInt(parentId))).thenReturn(germplasmList);
 		germplamListService.getGermplasmListChildrenNodes("maize", program, parentId, Boolean.FALSE);
 
-	}
-
-	@Test(expected = ResourceNotFoundException.class)
-	public void testGetGermplasmListChildrenNodes_ProgramInvalid_ThrowsException() throws ApiRequestValidationException {
-		final String program = RandomStringUtils.randomAlphabetic(3);
-		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(null);
-		germplamListService.getGermplasmListChildrenNodes("maize", program, GermplamListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
 	}
 
 	@Test
@@ -90,7 +76,6 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void testGetGermplasmListChildrenNodes_ProgramIsSpecified_ReturnCropAndProgramFolder() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
-		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
 
 		final List<TreeNode> result = germplamListService.getGermplasmListChildrenNodes("maize", program, null, Boolean.FALSE);
 		Assert.assertEquals(result.size(), 2);
@@ -102,7 +87,6 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void testGetGermplasmListChildrenNodes_ParentIsCropList_LoadCropGermplasmLists() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
-		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
 		germplamListService.getGermplasmListChildrenNodes("maize", program, GermplamListServiceImpl.CROP_LISTS, Boolean.FALSE);
 		Mockito.verify(germplasmListManager, times(1)).getAllTopLevelLists(null);
 	}
@@ -110,7 +94,6 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void testGetGermplasmListChildrenNodes_ParentIsProgramList_LoadProgramGermplasmLists() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
-		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
 		germplamListService.getGermplasmListChildrenNodes("maize", program, GermplamListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
 		Mockito.verify(germplasmListManager, times(1)).getAllTopLevelLists(program);
 	}
@@ -123,7 +106,6 @@ public class GermplasmListServiceImplTest {
 		final GermplasmList germplasmList = new GermplasmList();
 		germplasmList.setType(GermplasmList.FOLDER_TYPE);
 
-		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
 		Mockito.when(germplasmListManager.getGermplasmListById(Integer.parseInt(parentId))).thenReturn(germplasmList);
 
 		germplamListService.getGermplasmListChildrenNodes("maize", program, parentId, Boolean.FALSE);
