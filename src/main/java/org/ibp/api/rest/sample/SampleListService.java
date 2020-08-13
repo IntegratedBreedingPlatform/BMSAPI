@@ -1,5 +1,6 @@
 package org.ibp.api.rest.sample;
 
+import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.pojos.SampleList;
@@ -68,5 +69,7 @@ public interface SampleListService {
 	List<SampleDetailsDTO> getSampleDetailsDTOs(Integer listId);
 
 	void importSamplePlateInformation(final List<SampleDTO> sampleDTOs, final Integer listId);
+
+	List<TreeNode> getSampleListChildrenNodes(final String crop, final String programUUID, final String parentId, final Boolean folderOnly);
 
 }

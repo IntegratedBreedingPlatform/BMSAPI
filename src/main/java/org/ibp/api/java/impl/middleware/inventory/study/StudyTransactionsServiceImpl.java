@@ -2,7 +2,9 @@ package org.ibp.api.java.impl.middleware.inventory.study;
 
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.ibp.api.java.inventory.manager.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,9 @@ public class StudyTransactionsServiceImpl implements StudyTransactionsService {
 
 	@Autowired
 	private org.generationcp.middleware.api.inventory.study.StudyTransactionsService studyTransactionsService;
+
+	@Autowired
+	private TransactionService transactionService;
 
 	@Autowired
 	private StudyValidator studyValidator;
@@ -31,5 +36,11 @@ public class StudyTransactionsServiceImpl implements StudyTransactionsService {
 
 		this.studyValidator.validate(studyId, false);
 		return this.studyTransactionsService.searchStudyTransactions(studyId, studyTransactionsRequest);
+	}
+
+	@Override
+	public void cancelPendingTransactions(final Integer studyId, final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
+		this.studyValidator.validate(studyId, true);
+		this.transactionService.cancelPendingTransactions(searchCompositeDto);
 	}
 }

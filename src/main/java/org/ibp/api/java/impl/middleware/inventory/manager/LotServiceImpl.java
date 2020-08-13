@@ -149,7 +149,7 @@ public class LotServiceImpl implements LotService {
 		for (final Integer gid : gids) {
 			final LotItemDto lotItemDto = new LotItemDto();
 			lotItemDto.setGid(gid);
-			lotItemDto.setScaleId(lotGeneratorInput.getUnitId());
+			lotItemDto.setUnitId(lotGeneratorInput.getUnitId());
 			lotItemDto.setStorageLocationId(lotGeneratorInput.getLocationId());
 			lotItemDto.setNotes(lotGeneratorInput.getNotes());
 			if (lotGeneratorInput.getGenerateStock()) {

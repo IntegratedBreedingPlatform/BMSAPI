@@ -1,20 +1,34 @@
 package org.ibp.api.rest.sample;
 
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.constant.AppConstants;
+import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.DateUtil;
+import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
+import org.ibp.api.Util;
+import org.ibp.api.domain.program.ProgramSummary;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +39,10 @@ public class SampleListServiceImpl implements SampleListService {
 
 	protected static final String PARENT_ID = "parentId";
 	public static final String ID = "id";
+	protected static final String PROGRAM_LISTS = "LISTS";
+	protected static final String CROP_LISTS = "CROPLISTS";
+	private static final String LEAD_CLASS = "lead";
+	public static final int BATCH_SIZE = 500;
 
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
@@ -37,6 +55,9 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Autowired
 	private SampleValidator sampleValidator;
+
+	@Autowired
+	private ProgramValidator programValidator;
 
 	@Override
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
@@ -149,6 +170,63 @@ public class SampleListServiceImpl implements SampleListService {
 
 	}
 
+	@Override
+	public List<TreeNode> getSampleListChildrenNodes(final String crop, final String programUUID, final String parentId,
+		final Boolean folderOnly) {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		if (!StringUtils.isEmpty(programUUID)) {
+			this.programValidator.validate(new ProgramSummary(crop, programUUID), errors);
+			if (errors.hasErrors()) {
+				throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+			}
+		}
+		this.validateParentId(parentId, programUUID, errors);
+		BaseValidator.checkNotNull(folderOnly, "list.folder.only");
+
+		final List<TreeNode> treeNodes = new ArrayList<>();
+		if (parentId == null) {
+			final TreeNode cropFolderNode = new TreeNode(SampleListServiceImpl.CROP_LISTS, AppConstants.CROP_LISTS.getString(), true, LEAD_CLASS,
+				AppConstants.FOLDER_ICON_PNG.getString(), null);
+			cropFolderNode.setNumOfChildren(this.sampleListServiceMW.getAllSampleTopLevelLists(null).size());
+			treeNodes.add(cropFolderNode);
+			if (programUUID != null) {
+				final TreeNode programFolderNode = new TreeNode(SampleListServiceImpl.PROGRAM_LISTS, AppConstants.SAMPLE_LISTS.getString(), true, LEAD_CLASS,
+					AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
+				programFolderNode.setNumOfChildren(this.sampleListServiceMW.getAllSampleTopLevelLists(programUUID).size());
+				treeNodes.add(programFolderNode);
+			}
+		} else {
+			final List<SampleList> rootLists;
+			if (SampleListServiceImpl.PROGRAM_LISTS.equals(parentId)) {
+				rootLists = this.sampleListServiceMW.getAllSampleTopLevelLists(programUUID);
+			} else if (SampleListServiceImpl.CROP_LISTS.equals(parentId)) {
+				rootLists = this.sampleListServiceMW.getAllSampleTopLevelLists(null);
+			} else {
+				rootLists = this.sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID, SampleListServiceImpl.BATCH_SIZE);
+			}
+
+			final List<TreeNode> childNodes = TreeViewUtil.convertListToTreeView(rootLists, folderOnly);
+
+			final Map<Integer, ListMetadata> allListMetaData = this.sampleListServiceMW.getListMetadata(rootLists);
+
+			for (final TreeNode newNode : childNodes) {
+				final ListMetadata nodeMetaData = allListMetaData.get(Integer.parseInt(newNode.getKey()));
+				if (nodeMetaData != null) {
+					if (nodeMetaData.getNumberOfChildren() > 0) {
+						newNode.setIsLazy(true);
+						newNode.setNumOfChildren(nodeMetaData.getNumberOfChildren());
+					}
+					if (!newNode.getIsFolder()) {
+						newNode.setNoOfEntries(nodeMetaData.getNumberOfEntries());
+					}
+				}
+				newNode.setParentId(parentId);
+			}
+			return childNodes;
+		}
+		return treeNodes;
+	}
+
 	protected SampleListDTO translateToSampleListDto(final SampleListDto dto) {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
@@ -196,6 +274,26 @@ public class SampleListServiceImpl implements SampleListService {
 			map.put(sampleId, samplePlateInfo);
 		}
 		return map;
+	}
+
+	private void validateParentId(final String parentId, final String programUUID, final BindingResult errors) {
+		if (parentId != null && !PROGRAM_LISTS.equals(parentId) && !CROP_LISTS.equals(parentId) && !Util.isPositiveInteger(parentId)) {
+			errors.reject("list.parent.id.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if ((PROGRAM_LISTS.equals(parentId) || Util.isPositiveInteger(parentId)) && StringUtils.isEmpty(programUUID)) {
+			errors.reject("list.project.mandatory", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (Util.isPositiveInteger(parentId) && !StringUtils.isEmpty(programUUID)) {
+			final SampleList sampleList = this.sampleListServiceMW.getSampleList(Integer.parseInt(parentId));
+			if (sampleList == null || !sampleList.isFolder()) {
+				errors.reject("list.parent.id.not.exist", "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+		}
 	}
 
 }

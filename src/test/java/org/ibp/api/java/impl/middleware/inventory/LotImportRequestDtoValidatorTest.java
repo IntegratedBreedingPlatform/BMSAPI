@@ -5,7 +5,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -24,7 +23,6 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -192,7 +190,7 @@ public class LotImportRequestDtoValidatorTest {
 		lotImportRequestDto.setLotList(lotList);
 
 		try {
-			lotItemDto.setScaleName(null);
+			lotItemDto.setUnitName(null);
 			lotList.add(lotItemDto);
 			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
@@ -221,7 +219,7 @@ public class LotImportRequestDtoValidatorTest {
 		lotImportRequestDto.setLotList(lotList);
 
 		try {
-			lotItemDto.setScaleName("Amount");
+			lotItemDto.setUnitName("Amount");
 			lotList.add(lotItemDto);
 			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
@@ -398,7 +396,7 @@ public class LotImportRequestDtoValidatorTest {
 		lotItemDto.setGid(Integer.valueOf(RandomStringUtils.randomNumeric(9)));
 		lotItemDto.setStorageLocationAbbr(SEED_STORAGE_LOCATION);
 		lotItemDto.setInitialBalance((double) 30);
-		lotItemDto.setScaleName(LotImportRequestDtoValidatorTest.SEED_AMOUNT_g);
+		lotItemDto.setUnitName(LotImportRequestDtoValidatorTest.SEED_AMOUNT_g);
 		lotItemDto.setStockId(RandomStringUtils.randomAlphabetic(30));
 		lotItemDto.setNotes(RandomStringUtils.randomAlphabetic(200));
 		return lotItemDto;

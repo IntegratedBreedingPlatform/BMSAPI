@@ -1,7 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import com.google.common.collect.Sets;
 import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -13,24 +12,11 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.ibp.api.domain.germplasm.DescendantTree;
-import org.ibp.api.domain.germplasm.DescendantTreeTreeNode;
-import org.ibp.api.domain.germplasm.GermplasmName;
-import org.ibp.api.domain.germplasm.GermplasmSummary;
-import org.ibp.api.domain.germplasm.PedigreeTree;
-import org.ibp.api.domain.germplasm.PedigreeTreeNode;
-import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.domain.germplasm.*;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -40,14 +26,11 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,9 +62,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmGroupingService germplasmGroupingService;
-
-	@Autowired
-	private StudyDataManager studyDataManager;
 
 	@Autowired
 	private InstanceValidator instanceValidator;
@@ -284,13 +264,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
 				.searchGermplasmDTO(germplasmSearchRequestDTO, page, pageSize);
 			if (germplasmDTOList != null) {
-				final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
-					.collect(Collectors.toSet());
-				final Map<Integer, String> crossExpansionsMap =
-					this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
-				for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
-					germplasmDTO.setPedigree(crossExpansionsMap.get(Integer.valueOf(germplasmDTO.getGermplasmDbId())));
-				}
+				this.populateGermplasmPedigreeAndSynonyms(germplasmDTOList);
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
@@ -325,17 +299,29 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
 				.getGermplasmByStudy(studyDbId, pageNumber, pageSize);
 			if (germplasmDTOList != null) {
-				final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
-					.collect(Collectors.toSet());
-				final Map<Integer, String> crossExpansionsMap =
-					this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
-				for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
-					germplasmDTO.setPedigree(crossExpansionsMap.get(Integer.valueOf(germplasmDTO.getGermplasmDbId())));
-				}
+				this.populateGermplasmPedigreeAndSynonyms(germplasmDTOList);
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("An error has occurred when trying to search germplasms", e);
+		}
+	}
+
+	private void populateGermplasmPedigreeAndSynonyms(final List<GermplasmDTO> germplasmDTOList) {
+		final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
+				.collect(Collectors.toSet());
+		final Map<Integer, String> crossExpansionsMap =
+				this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
+		final Map<Integer, List<Name>> gidNamesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(new ArrayList<>(gids), Collections.emptyList());
+		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+			final Integer gid = Integer.valueOf(germplasmDTO.getGermplasmDbId());
+			// Set as synonyms other names, other than the preferred name, found for germplasm
+			final String defaultName = germplasmDTO.getGermplasmName();
+			final List<Name> names = gidNamesMap.get(gid);
+			if (!CollectionUtils.isEmpty(names)){
+				germplasmDTO.setSynonyms(names.stream().filter(n-> !defaultName.equalsIgnoreCase(n.getNval())).map(Name::getNval).collect(Collectors.toList()));
+			}
+			germplasmDTO.setPedigree(crossExpansionsMap.get(gid));
 		}
 	}
 
