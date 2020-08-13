@@ -1,11 +1,13 @@
 package org.ibp.api.security;
 
 import liquibase.util.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
@@ -33,10 +35,8 @@ import java.util.stream.Collectors;
 @Component
 public class WorkbenchUserDetailsService implements UserDetailsService {
 
-
 	@Autowired
 	private ContextResolver contextResolver;
-
 
 	@Autowired
 	private UserService userService;
@@ -77,13 +77,6 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 
 	private Collection<? extends GrantedAuthority> getAuthorities(final WorkbenchUser workbenchUser) throws AccessDeniedException {
 		final String cropName = this.contextResolver.resolveCropNameFromUrl();
-		if(!StringUtils.isEmpty(cropName)) {
-			final List<String> crops = this.cropService.getAvailableCropsForUser(workbenchUser.getUserid());
-			crops.replaceAll(String::toUpperCase);
-			if(!crops.contains(cropName.trim().toUpperCase())) {
-				throw new AccessDeniedException("User is not authorized for crop.");
-			}
-		}
 
 		final String programUUID = this.contextResolver.resolveProgramUuidFromRequest();
 		final Integer programId = StringUtils.isEmpty(programUUID) ? null : this.getProgramId(programUUID);
@@ -92,8 +85,23 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			workbenchUser.getUserid(), //
 			StringUtils.isEmpty(cropName) ? null : cropName, //
 			programId);
+
+		// Skip crop authorization checking if the user has Site Admin Permission
+		if(!StringUtils.isEmpty(cropName) && !hasSiteAdminPermissions(permissions)) {
+			final List<String> crops = this.cropService.getAvailableCropsForUser(workbenchUser.getUserid());
+			crops.replaceAll(String::toUpperCase);
+			if(!crops.contains(cropName.trim().toUpperCase())) {
+				throw new AccessDeniedException("User is not authorized for crop.");
+			}
+		}
+
 		return permissions.stream().map(permissionDto -> new SimpleGrantedAuthority(permissionDto.getName())).collect(
 				Collectors.toCollection(ArrayList::new));
+	}
+
+	private boolean hasSiteAdminPermissions(final List<PermissionDto> permissions) {
+		final List<String> permissionString = permissions.stream().map(permission -> permission.getName()).collect(Collectors.toList());
+		return CollectionUtils.containsAny(permissionString, PermissionsEnum.SITE_ADMIN_PERMISSIONS);
 	}
 
 	private Integer getProgramId(final String programUUID) {
