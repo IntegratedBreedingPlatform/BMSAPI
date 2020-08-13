@@ -13,7 +13,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -586,11 +585,6 @@ public class DatasetServiceImplTest {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
 
 		paramDTO.setObservationUnitsSearchDTO(searchDTO);
@@ -617,11 +611,6 @@ public class DatasetServiceImplTest {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
 
 		paramDTO.setObservationUnitsSearchDTO(searchDTO);

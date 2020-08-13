@@ -7,7 +7,6 @@ import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
@@ -16,6 +15,7 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,23 +44,13 @@ public class StudyInventoryResource {
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@RequestBody final StudyTransactionsRequest studyTransactionsRequest
+		@RequestBody final StudyTransactionsRequest studyTransactionsRequest, final Pageable pageable
 	) {
 
 		BaseValidator.checkNotNull(studyTransactionsRequest, "param.null", new String[] {"studyTransactionsRequest"});
-		final SortedPageRequest sortedRequest = studyTransactionsRequest.getSortedPageRequest();
-		BaseValidator.checkNotNull(sortedRequest, "sortedrequest.empty");
 
-		final Integer pageNumber = sortedRequest.getPageNumber();
-		final Integer pageSize = sortedRequest.getPageSize();
-
-		final PageRequest pageRequest;
-		if (StringUtils.isNotEmpty(sortedRequest.getSortBy()) && StringUtils.isNotEmpty(sortedRequest.getSortOrder())) {
-			pageRequest = new PageRequest(pageNumber, pageSize,
-				new Sort(Sort.Direction.fromString(sortedRequest.getSortOrder()), sortedRequest.getSortBy()));
-		} else {
-			pageRequest = new PageRequest(pageNumber, pageSize);
-		}
+		final Integer pageNumber = pageable.getPageNumber();
+		final Integer pageSize = pageable.getPageSize();
 
 		PagedResult<StudyTransactionsDto> pagedResult;
 
@@ -80,7 +70,7 @@ public class StudyInventoryResource {
 
 				@Override
 				public List<StudyTransactionsDto> getResults(final PagedResult<StudyTransactionsDto> pagedResult) {
-					return studyTransactionsService.searchStudyTransactions(studyId, studyTransactionsRequest, pageRequest);
+					return studyTransactionsService.searchStudyTransactions(studyId, studyTransactionsRequest, pageable);
 				}
 			});
 		} finally {

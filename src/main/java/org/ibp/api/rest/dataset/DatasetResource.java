@@ -9,7 +9,6 @@ import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -25,6 +24,7 @@ import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -188,23 +188,17 @@ public class DatasetResource {
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
-		@RequestBody final ObservationUnitsSearchDTO searchDTO) {
+		@RequestBody final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
 
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
-		final SortedPageRequest sortedRequest = searchDTO.getSortedRequest();
-		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
 		Preconditions
 			.checkArgument(Collections.isEmpty(searchDTO.getFilterColumns()), "filterColumns should be null or empty");
-		
-
-		final Integer pageNumber = sortedRequest.getPageNumber();
-		final Integer pageSize = sortedRequest.getPageSize();
 
 		final Integer instanceId = searchDTO.getInstanceId();
 		final Boolean draftMode = searchDTO.getDraftMode();
 
 		final PagedResult<ObservationUnitRow> pageResult =
-			new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<ObservationUnitRow>() {
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<ObservationUnitRow>() {
 
 				@Override
 				public long getCount() {
@@ -219,7 +213,7 @@ public class DatasetResource {
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
-					return DatasetResource.this.studyDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO, new PageRequest(pageNumber, pageSize));
+					return DatasetResource.this.studyDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO, pageable);
 				}
 			});
 

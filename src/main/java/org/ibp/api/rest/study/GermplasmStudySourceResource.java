@@ -2,18 +2,15 @@ package org.ibp.api.rest.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.study.GermplasmStudySourceTable;
-import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.study.GermplasmStudySourceService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,29 +39,13 @@ public class GermplasmStudySourceResource {
 	@ResponseBody
 	public ResponseEntity<GermplasmStudySourceTable> getGermplasmStudySourceTable(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
-		@PathVariable final Integer studyId, @RequestBody final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
-
-		BaseValidator.checkNotNull(germplasmStudySourceSearchRequest, "parameters.cannot.be.null");
-		final SortedPageRequest sortedRequest = germplasmStudySourceSearchRequest.getSortedRequest();
-		BaseValidator.checkNotNull(sortedRequest, "sortedrequest.empty");
-		final String sortOrder = germplasmStudySourceSearchRequest.getSortedRequest().getSortOrder();
-		final boolean isSortOrderValid =
-			"ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
-		BaseValidator.checkArgument(isSortOrderValid, "sort.order.invalid");
+		@PathVariable final Integer studyId, @RequestBody final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest,
+		final @PageableDefault(size = 50, page = 0) Pageable pageable) {
 
 		germplasmStudySourceSearchRequest.setStudyId(studyId);
-		final Integer pageNumber = sortedRequest.getPageNumber();
-		final Integer pageSize = sortedRequest.getPageSize();
-
-		final PageRequest pageRequest;
-		if (StringUtils.isNotEmpty(sortOrder) && StringUtils.isNotEmpty(sortedRequest.getSortBy())) {
-			pageRequest = new PageRequest(pageNumber, pageSize, new Sort(Sort.Direction.fromString(sortOrder), sortedRequest.getSortBy()));
-		} else {
-			pageRequest = new PageRequest(pageNumber, pageSize);
-		}
 
 		final PagedResult<GermplasmStudySourceDto> pageResult =
-			new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<GermplasmStudySourceDto>() {
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmStudySourceDto>() {
 
 				@Override
 				public long getCount() {
@@ -81,7 +62,7 @@ public class GermplasmStudySourceResource {
 				@Override
 				public List<GermplasmStudySourceDto> getResults(final PagedResult<GermplasmStudySourceDto> pagedResult) {
 					return GermplasmStudySourceResource.this.germplasmStudySourceService
-						.getGermplasmStudySources(germplasmStudySourceSearchRequest, pageRequest);
+						.getGermplasmStudySources(germplasmStudySourceSearchRequest, pageable);
 				}
 			});
 
