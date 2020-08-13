@@ -189,7 +189,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public LabelsNeededSummary getSummaryOfLabelsNeeded(final LabelsInfoInput labelsInfoInput) {
 		final LabelsNeededSummary labelsNeededSummary = new LabelsNeededSummary();
 		final List<InstanceDetailsDTO>  InstanceDetailsDTOs =
-			this.middlewareDatasetService.getInformationInstance(labelsInfoInput.getDatasetId(), labelsInfoInput.getStudyId());
+			this.middlewareDatasetService.getInstanceDetails(labelsInfoInput.getDatasetId(), labelsInfoInput.getStudyId());
 		long totalNumberOfLabelsNeeded = 0;
 		for (InstanceDetailsDTO instanceDetailsDTO :InstanceDetailsDTOs) {
 			final LabelsNeededSummary.Row row =
