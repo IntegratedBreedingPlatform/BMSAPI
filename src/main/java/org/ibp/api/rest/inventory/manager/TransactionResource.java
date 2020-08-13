@@ -9,6 +9,8 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
+import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -148,7 +150,7 @@ public class TransactionResource {
 
 	}
 
-	@ApiOperation(value = "Create Pending Withdrawals", notes = "Create new withdrawals with pending status for a set os filtered lots")
+	@ApiOperation(value = "Create Pending Withdrawals", notes = "Create new withdrawals with pending status for a set of filtered lots")
 	@RequestMapping(value = "/crops/{cropName}/transactions/pending-withdrawals/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_PENDING_WITHDRAWALS')")
@@ -165,7 +167,7 @@ public class TransactionResource {
 		}
 	}
 
-	@ApiOperation(value = "Create Confirmed Withdrawals", notes = "Create new withdrawals with confirmed status for a set os filtered lots")
+	@ApiOperation(value = "Create Confirmed Withdrawals", notes = "Create new withdrawals with confirmed status for a set of filtered lots")
 	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-withdrawals/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('WITHDRAW_INVENTORY', 'CREATE_CONFIRMED_WITHDRAWALS')")
@@ -243,7 +245,7 @@ public class TransactionResource {
 		+ "Important: The operations are executed in sequential order. Supported types: Withdrawals, Deposits ")
 	@RequestMapping(value = "/crops/{cropName}/pending-transactions", method = RequestMethod.PATCH)
 	@ResponseBody
-	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('UPDATE_PENDING_TRANSACTIONS')")
+	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('IMPORT_TRANSACTION_UPDATES')")
 	public ResponseEntity<Void> updatePendingTransactions(
 		@PathVariable final String cropName,
 		@ApiParam("New amount or New Available Balance and Notes to be updated per transaction")
@@ -258,17 +260,55 @@ public class TransactionResource {
 		}
 	}
 
-	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a set os filtered lots")
-	@RequestMapping(value = "/crops/{cropName}/transactions/pending-deposits-lists", method = RequestMethod.POST)
+	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a set of filtered lots")
+	@RequestMapping(value = "/crops/{cropName}/transactions/pending-deposits/generation", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_PENDING_DEPOSITS')")
-	public ResponseEntity<Void> createPendingDeposits(
+	public ResponseEntity<Void> generatePendingDeposits(
 		@PathVariable final String cropName,
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
 		try {
 			inventoryLock.lockWrite();
 			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.PENDING);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+	}
+
+	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a list of lots")
+	@RequestMapping(value = "/crops/{cropName}/transactions/pending-deposits-lists", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_PENDING_DEPOSITS')")
+	public ResponseEntity<Void> createPendingDeposits(
+		@PathVariable final String cropName,
+		@ApiParam("Deposit amount per Lot")
+		@RequestBody final List<LotDepositDto> lotDepositDtos) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveDeposits(lotDepositDtos, TransactionStatus.PENDING);
+			return new ResponseEntity<>(HttpStatus.CREATED);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+	}
+
+	@ApiOperation(value = "Create Confirmed Deposits", notes = "Create new deposits with confirmed status for a list of lots")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-deposits/generation", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS
+		+ " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_CONFIRMED_DEPOSITS')"
+		+ PermissionsEnum.HAS_CREATE_LOTS_BATCH)
+	public ResponseEntity<Void> generateConfirmedDeposits(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@ApiParam("Deposit amount per unit")
+		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED);
+
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
 			inventoryLock.unlockWrite();
@@ -283,12 +323,11 @@ public class TransactionResource {
 		+ PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	public ResponseEntity<Void> createConfirmedDeposits(
 		@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID,
-		@ApiParam("Deposit amount per unit")
-		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
+		@ApiParam("Deposit amount per Lot")
+		@RequestBody final List<LotDepositDto> lotDepositDtos) {
 		try {
 			inventoryLock.lockWrite();
-			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED);
+			this.transactionService.saveDeposits(lotDepositDtos, TransactionStatus.CONFIRMED);
 
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
@@ -308,6 +347,25 @@ public class TransactionResource {
 			inventoryLock.lockWrite();
 			this.transactionService.cancelPendingTransactions(searchCompositeDto);
 			return new ResponseEntity<>(HttpStatus.OK);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+	}
+
+	@ApiOperation(value = "Adjust lots balance", notes = "Create new adjust transaction with confirmed status for a set of filtered lots")
+	@RequestMapping(value = "/crops/{cropName}/transactions/confirmed-adjustments", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS
+		+ " or hasAnyAuthority('UPDATE_LOT_BALANCE')")
+	public ResponseEntity<Void> adjustLotsBalance(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@ApiParam("New balance for lots and transaction notes")
+		@RequestBody final LotAdjustmentRequestDto lotAdjustmentRequestDto) {
+		try {
+			inventoryLock.lockWrite();
+			this.transactionService.saveLotBalanceAdjustment(lotAdjustmentRequestDto);
+			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
 			inventoryLock.unlockWrite();
 		}

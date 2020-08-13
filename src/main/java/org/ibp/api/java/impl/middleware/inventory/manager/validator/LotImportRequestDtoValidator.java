@@ -5,7 +5,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.Util;
@@ -77,7 +76,7 @@ public class LotImportRequestDtoValidator {
 
 		this.validateGermplasmList(lotList);
 		this.validateStorageLocations(lotList);
-		this.validateScaleNames(lotList);
+		this.validateUnitNames(lotList);
 		this.validateStockIds(lotList);
 		this.validateInitialBalances(lotList);
 		this.validateNotes(lotList);
@@ -112,13 +111,13 @@ public class LotImportRequestDtoValidator {
 		
 	}
 
-	private void validateScaleNames(final List<LotItemDto> lotList){
-		final List<String> scaleNames = lotList.stream().map(LotItemDto::getScaleName).distinct().collect(Collectors.toList());
-		if (Util.countNullOrEmptyStrings(scaleNames) > 0) {
+	private void validateUnitNames(final List<LotItemDto> lotList){
+		final List<String> unitNames = lotList.stream().map(LotItemDto::getUnitName).distinct().collect(Collectors.toList());
+		if (Util.countNullOrEmptyStrings(unitNames) > 0) {
 			errors.reject("lot.input.list.units.null.or.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		this.inventoryCommonValidator.validateUnitNames(scaleNames, errors);
+		this.inventoryCommonValidator.validateUnitNames(unitNames, errors);
 	}
 
 	private void validateStockIds(final List<LotItemDto> lotList) {

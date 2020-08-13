@@ -61,7 +61,7 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(AccessDeniedException.class)
 	@ResponseStatus(value = FORBIDDEN)
 	@ResponseBody
-	public ErrorResponse handleUncaughtException(AccessDeniedException ex) {
+	public ErrorResponse handleAccessDeniedException(AccessDeniedException ex) {
 		LOG.error("Access Denied", ex);
 		ErrorResponse response = new ErrorResponse();
 		response.addError(getMessage("access.denied", null));

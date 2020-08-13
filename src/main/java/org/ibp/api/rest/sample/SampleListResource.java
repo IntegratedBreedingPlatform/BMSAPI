@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.FileExportInfo;
+import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.middleware.domain.sample.SampleDTO;
@@ -198,4 +199,16 @@ public class SampleListResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get sample lists given a tree parent node folder", notes = "Get sample lists given a tree parent node folder")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@RequestMapping(value = "/{crop}/sample-lists/tree", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<TreeNode>> getSampleListByParentFolderId(
+		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId,
+		@ApiParam(value = "Only folders") @RequestParam(required = true) final Boolean onlyFolders) {
+		final List<TreeNode> children = this.sampleListService.getSampleListChildrenNodes(crop, programUUID, parentFolderId, onlyFolders);
+		return new ResponseEntity<>(children, HttpStatus.OK);
+	}
 }

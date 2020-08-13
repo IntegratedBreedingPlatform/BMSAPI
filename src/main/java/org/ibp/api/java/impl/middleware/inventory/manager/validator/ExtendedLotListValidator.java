@@ -32,7 +32,7 @@ public class ExtendedLotListValidator {
 		//Validate that none of them has null unit id
 		final long lotsWithoutUnitCount = extendedLotDtos.stream().filter(lot -> lot.getUnitId() == null).count();
 		if (lotsWithoutUnitCount != 0) {
-			errors.reject("selected.lots.with.no.unit", new String[] {String.valueOf(lotsWithoutUnitCount)}, "");
+			errors.reject("lots.with.no.unit",null, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
@@ -43,7 +43,7 @@ public class ExtendedLotListValidator {
 		final long closedLotsCount =
 			extendedLotDtos.stream().filter(lot -> lot.getStatus().equalsIgnoreCase(LotStatus.CLOSED.name())).count();
 		if (closedLotsCount != 0) {
-			errors.reject("selected.lots.closed", new String[] {String.valueOf(closedLotsCount)}, "");
+			errors.reject("lots.closed", null, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}

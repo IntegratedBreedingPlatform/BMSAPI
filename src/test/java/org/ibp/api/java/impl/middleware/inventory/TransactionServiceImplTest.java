@@ -1,12 +1,23 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.ibp.api.java.impl.middleware.inventory.manager.TransactionServiceImpl;
+import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotDepositRequestDtoValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,16 +28,36 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionServiceImplTest {
 
 	@Mock
 	private TransactionService transactionService;
+
+	@Mock
+	private StudyValidator studyValidator;
+
+	@Mock
+	private SecurityService securityService;
+
+	@Mock
+	private LotDepositRequestDtoValidator lotDepositRequestDtoValidator;
+
+	@Mock
+	private ExtendedLotListValidator extendedLotListValidator;
+
+	@Mock
+	private SearchRequestDtoResolver searchRequestDtoResolver;
+
+	@Mock
+	private LotService lotService;
 
 	@InjectMocks
 	private TransactionServiceImpl transactionServiceImpl;
@@ -64,6 +95,65 @@ public class TransactionServiceImplTest {
 		Assert.assertEquals(transactionDto.getLot().getStatus(), additionalInfo.get("lotStatus"));
 		Assert.assertEquals(transactionDto.getLot().getNotes(), additionalInfo.get("lotNotes"));
 		Assert.assertEquals(transactionDto.getLot().getDesignation(), additionalInfo.get("designation"));
+	}
+
+	@Test
+	public void testSaveDeposits() {
+
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		final List<ExtendedLotDto> lotDtos = new ArrayList<>();
+		final TransactionStatus transactionStatus = TransactionStatus.CONFIRMED;
+		workbenchUser.setUserid(1);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(workbenchUser);
+
+		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
+		lotDepositRequestDto.setSelectedLots(new SearchCompositeDto<>());
+		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus);
+
+		Mockito.verify(this.studyValidator, Mockito.times(0)).validate(ArgumentMatchers.anyInt(), ArgumentMatchers.anyBoolean());
+		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
+		Mockito.verify(this.extendedLotListValidator)
+			.validateAllProvidedLotUUIDsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
+		Mockito.verify(this.extendedLotListValidator).validateEmptyList(lotDtos);
+		Mockito.verify(this.extendedLotListValidator).validateEmptyUnits(lotDtos);
+		Mockito.verify(this.extendedLotListValidator).validateClosedLots(lotDtos);
+		Mockito.verify(this.lotDepositRequestDtoValidator).validateDepositInstructionsUnits(lotDepositRequestDto, lotDtos);
+		Mockito.verify(this.transactionService)
+			.depositLots(workbenchUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
+				lotDepositRequestDto,
+				transactionStatus);
+
+	}
+
+	@Test
+	public void testSaveDepositsWithSourceStudy() {
+
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		final List<ExtendedLotDto> lotDtos = new ArrayList<>();
+		final TransactionStatus transactionStatus = TransactionStatus.CONFIRMED;
+		workbenchUser.setUserid(1);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(workbenchUser);
+
+		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
+		lotDepositRequestDto.setSourceStudyId(99);
+		lotDepositRequestDto.setSelectedLots(new SearchCompositeDto<>());
+		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus);
+
+		Mockito.verify(this.studyValidator).validate(lotDepositRequestDto.getSourceStudyId(), true);
+		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
+		Mockito.verify(this.extendedLotListValidator)
+			.validateAllProvidedLotUUIDsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
+		Mockito.verify(this.extendedLotListValidator).validateEmptyList(lotDtos);
+		Mockito.verify(this.extendedLotListValidator).validateEmptyUnits(lotDtos);
+		Mockito.verify(this.extendedLotListValidator).validateClosedLots(lotDtos);
+		Mockito.verify(this.lotDepositRequestDtoValidator).validateDepositInstructionsUnits(lotDepositRequestDto, lotDtos);
+		Mockito.verify(this.transactionService)
+			.depositLots(workbenchUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
+				lotDepositRequestDto,
+				transactionStatus);
+
 	}
 
 }

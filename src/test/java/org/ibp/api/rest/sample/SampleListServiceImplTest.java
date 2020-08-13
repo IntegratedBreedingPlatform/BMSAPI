@@ -2,13 +2,17 @@ package org.ibp.api.rest.sample;
 
 import junit.framework.Assert;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.enumeration.SampleListType;
+import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +26,7 @@ import org.springframework.validation.ObjectError;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -42,6 +47,9 @@ public class SampleListServiceImplTest {
 
 	@Mock
 	private SecurityService securityService;
+
+	@Mock
+	private ProgramValidator programValidator;
 
 	@InjectMocks
 	private SampleListServiceImpl sampleListService;
@@ -191,6 +199,137 @@ public class SampleListServiceImplTest {
 		sampleListDto.setParentId(this.random.nextInt());
 		sampleListDto.setListName(RandomStringUtils.randomAlphabetic(10));
 		return sampleListDto;
+	}
+
+	@Test
+	public void testGetSampleChildNodesForProgramLists() {
+
+		final SampleList sampleList = new SampleList();
+		final int id = 1234;
+		final String listName = "List Name";
+		sampleList.setId(id);
+		sampleList.setListName(listName);
+		sampleList.setType(SampleListType.SAMPLE_LIST);
+
+		final List<SampleList> sampleLists = Arrays.asList(sampleList);
+
+		final Map<Integer, ListMetadata> sampleListsMetaData = new HashMap<>();
+
+		Mockito.when(sampleListServiceMW.getAllSampleTopLevelLists(PROGRAM_UUID)).thenReturn(sampleLists);
+		Mockito.when(sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
+
+		List<TreeNode> treeNodes = sampleListService.getSampleListChildrenNodes( "maize", PROGRAM_UUID, SampleListServiceImpl.PROGRAM_LISTS, false);
+
+		Mockito.verify(sampleListServiceMW).getAllSampleTopLevelLists(PROGRAM_UUID);
+
+		TreeNode node = treeNodes.get(0);
+		Assert.assertEquals(String.valueOf(id), node.getKey());
+		Assert.assertEquals(listName, node.getTitle());
+		Assert.assertFalse(node.getIsLazy());
+		Assert.assertFalse(node.getIsFolder());
+
+	}
+
+	@Test
+	public void testGetSampleChildNodesForCropLists() {
+
+		final SampleList sampleList = new SampleList();
+		final int id = 1234;
+		final String listName = "List Name";
+		sampleList.setId(id);
+		sampleList.setListName(listName);
+		sampleList.setType(SampleListType.SAMPLE_LIST);
+
+		final List<SampleList> sampleLists = Arrays.asList(sampleList);
+
+		final Map<Integer, ListMetadata> sampleListsMetaData = new HashMap<>();
+
+		Mockito.when(sampleListServiceMW.getAllSampleTopLevelLists(null)).thenReturn(sampleLists);
+		Mockito.when(sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
+
+		List<TreeNode> treeNodes = sampleListService.getSampleListChildrenNodes("maize", PROGRAM_UUID, SampleListServiceImpl.CROP_LISTS, false);
+
+		Mockito.verify(sampleListServiceMW).getAllSampleTopLevelLists(null);
+
+		TreeNode node = treeNodes.get(0);
+		Assert.assertEquals(String.valueOf(id), node.getKey());
+		Assert.assertEquals(listName, node.getTitle());
+		Assert.assertFalse(node.getIsLazy());
+		Assert.assertFalse(node.getIsFolder());
+
+	}
+
+	@Test
+	public void testGetSampleChildNodesOfAFolder() {
+
+		final String parentFolderId = "1111";
+		final SampleList parentFolder = new SampleList();
+		parentFolder.setId(Integer.valueOf(parentFolderId));
+		parentFolder.setType(SampleListType.FOLDER);
+
+		final SampleList sampleList = new SampleList();
+		final int id = 1234;
+		final String listName = "List Name";
+		sampleList.setId(id);
+		sampleList.setListName(listName);
+		sampleList.setType(SampleListType.SAMPLE_LIST);
+
+		final List<SampleList> sampleLists = Arrays.asList(sampleList);
+
+		final Map<Integer, ListMetadata> sampleListsMetaData = new HashMap<>();
+
+		Mockito.when(sampleListServiceMW.getSampleList(Integer.valueOf(parentFolderId))).thenReturn(parentFolder);
+		Mockito.when(sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE)).thenReturn(sampleLists);
+		Mockito.when(sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
+
+		List<TreeNode> treeNodes = sampleListService.getSampleListChildrenNodes("maize", PROGRAM_UUID, parentFolderId, false);
+
+		Mockito.verify(sampleListServiceMW).getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE);
+
+		TreeNode node = treeNodes.get(0);
+		Assert.assertEquals(String.valueOf(id), node.getKey());
+		Assert.assertEquals(listName, node.getTitle());
+		Assert.assertFalse(node.getIsLazy());
+		Assert.assertFalse(node.getIsFolder());
+
+	}
+
+	@Test
+	public void testGetSampleChildNodesOfAFolderChildIsAFolder() {
+
+		final String parentFolderId = "1111";
+		final SampleList parentFolder = new SampleList();
+		parentFolder.setId(Integer.valueOf(parentFolderId));
+		parentFolder.setType(SampleListType.FOLDER);
+
+		final SampleList sampleList = new SampleList();
+		final int id = 1234;
+		final String listName = "List Name";
+		sampleList.setId(id);
+		sampleList.setListName(listName);
+		sampleList.setType(SampleListType.FOLDER);
+
+		final List<SampleList> sampleLists = Arrays.asList(sampleList);
+
+		final Map<Integer, ListMetadata> sampleListsMetaData = new HashMap<>();
+		ListMetadata listMetadata = new ListMetadata();
+		listMetadata.setNumberOfChildren(123);
+		sampleListsMetaData.put(id, listMetadata);
+
+		Mockito.when(sampleListServiceMW.getSampleList(Integer.valueOf(parentFolderId))).thenReturn(parentFolder);
+		Mockito.when(sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE)).thenReturn(sampleLists);
+		Mockito.when(sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
+
+		List<TreeNode> treeNodes = sampleListService.getSampleListChildrenNodes("maize", PROGRAM_UUID, parentFolderId, false);
+
+		Mockito.verify(sampleListServiceMW).getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE);
+
+		TreeNode node = treeNodes.get(0);
+		Assert.assertEquals(String.valueOf(id), node.getKey());
+		Assert.assertEquals(listName, node.getTitle());
+		Assert.assertTrue(node.getIsLazy());
+		Assert.assertTrue(node.getIsFolder());
+
 	}
 
 }

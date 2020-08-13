@@ -29,6 +29,11 @@ public class ProgramSummary {
 		this.crop = crop;
 	}
 
+	public ProgramSummary(final String crop, final String programUUID) {
+		this.crop = crop;
+		this.uniqueID = programUUID;
+	}
+
 	public String getId() {
 		return this.id;
 	}
