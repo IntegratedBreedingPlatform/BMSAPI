@@ -21,7 +21,7 @@ import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import liquibase.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
@@ -250,7 +250,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 
 	protected String generateLabelText(final Map<Integer, String> labels, final List<Integer> selectedFields, final Map<Integer, Field> keyFieldMap, final int row) {
 		if(row < selectedFields.size()) {
-			final String value = labels.get(selectedFields.get(row)) != null ? labels.get(selectedFields.get(row)) : "";
+			final String value = labels.get(selectedFields.get(row)) != null ? labels.get(selectedFields.get(row)) : StringUtils.EMPTY;
 			return keyFieldMap.get(selectedFields.get(row)).getName() + FIELDNAME_VALUE_SEPARATOR + value;
 		}
 		return "";

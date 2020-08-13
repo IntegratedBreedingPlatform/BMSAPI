@@ -111,6 +111,21 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final String parentagePropValue = this.getMessage("label.printing.field.parentage");
 		final String seasonPropValue = this.getMessage("label.printing.field.season");
 
+		final String transactionIdPropValue = this.getMessage("label.printing.field.transaction.id");
+		final String transactionStatusPropValue = this.getMessage("label.printing.field.transaction.status");
+		final String transactionTypePropValue = this.getMessage("label.printing.field.transaction.type");
+		final String transactionCreationDatePropValue = this.getMessage("label.printing.field.transaction.creation.date");
+		final String transactionNotesPropValue = this.getMessage("label.printing.field.transaction.notes");
+		final String transactionUsernamePropValue = this.getMessage("label.printing.field.transaction.username");
+		final String lotIDPropValue = this.getMessage("label.printing.field.lot.id");
+		final String lotUIDPropValue = this.getMessage("label.printing.field.lot.uid");
+		final String lotStockIdPropValue = this.getMessage("label.printing.field.lot.stock.id");
+		final String lotAvailableBalancePropValue = this.getMessage("label.printing.field.lot.available.balance");
+		final String lotUnitsPropValue = this.getMessage("label.printing.field.lot.units");
+		final String lotStorageLocationAbbrPropValue = this.getMessage("label.printing.field.lot.storage.location.abbr");
+		final String lotStorageLocationPropValue = this.getMessage("label.printing.field.lot.storage.location");
+		final String lotNotesPropValue = this.getMessage("label.printing.field.lot.notes");
+
 		STUDY_NAME_FIELD = new Field(LabelPrintingStaticField.STUDY_NAME.getFieldId(), studyNamePropValue);
 		YEAR_FIELD = new Field(LabelPrintingStaticField.YEAR.getFieldId(), yearPropValue);
 		PARENTAGE_FIELD = new Field(LabelPrintingStaticField.PARENTAGE.getFieldId(), parentagePropValue);
@@ -118,22 +133,22 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD);
 
 		DEFAULT_TRANSACTION_DETAILS_FIELDS = ImmutableList.<Field>builder()
-			.add(new Field(LabelPrintingStaticField.TRN_ID.getFieldId(), "Trn ID"))
-			.add(new Field(LabelPrintingStaticField.STATUS.getFieldId(), "Status"))
-			.add(new Field(LabelPrintingStaticField.TYPE.getFieldId(), "Type"))
-			.add(new Field(LabelPrintingStaticField.CREATED.getFieldId(), "Creation date"))
-			.add(new Field(LabelPrintingStaticField.NOTES.getFieldId(), "Notes"))
-			.add(new Field(LabelPrintingStaticField.USERNAME.getFieldId(), "Username")).build();
+			.add(new Field(LabelPrintingStaticField.TRN_ID.getFieldId(), transactionIdPropValue))
+			.add(new Field(LabelPrintingStaticField.STATUS.getFieldId(), transactionStatusPropValue))
+			.add(new Field(LabelPrintingStaticField.TYPE.getFieldId(), transactionTypePropValue))
+			.add(new Field(LabelPrintingStaticField.CREATED.getFieldId(), transactionCreationDatePropValue))
+			.add(new Field(LabelPrintingStaticField.TRN_NOTES.getFieldId(), transactionNotesPropValue))
+			.add(new Field(LabelPrintingStaticField.USERNAME.getFieldId(), transactionUsernamePropValue)).build();
 
 		DEFAULT_LOT_DETAILS_FIELDS = ImmutableList.<Field>builder()
-			.add(new Field(LabelPrintingStaticField.LOT_ID.getFieldId(), "Lot ID"))
-			.add(new Field(LabelPrintingStaticField.LOT_UID.getFieldId(), "Lot UID"))
-			.add(new Field(LabelPrintingStaticField.STOCK_ID.getFieldId(), "Stock id"))
-			.add(new Field(LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId(), "Available balance"))
-			.add(new Field(LabelPrintingStaticField.UNITS.getFieldId(), "Units"))
-			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId(), "Storage location"))
-			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION.getFieldId(), "Storage location"))
-			.add(new Field(LabelPrintingStaticField.TRN_NOTES.getFieldId(), "Notes")).build();
+			.add(new Field(LabelPrintingStaticField.LOT_ID.getFieldId(), lotIDPropValue))
+			.add(new Field(LabelPrintingStaticField.LOT_UID.getFieldId(), lotUIDPropValue))
+			.add(new Field(LabelPrintingStaticField.STOCK_ID.getFieldId(), lotStockIdPropValue))
+			.add(new Field(LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId(), lotAvailableBalancePropValue))
+			.add(new Field(LabelPrintingStaticField.UNITS.getFieldId(), lotUnitsPropValue))
+			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId(), lotStorageLocationAbbrPropValue))
+			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION.getFieldId(), lotStorageLocationPropValue))
+			.add(new Field(LabelPrintingStaticField.NOTES.getFieldId(), lotNotesPropValue)).build();
 
 		STATIC_FIELD_IDS = Arrays.asList(LabelPrintingStaticField.STUDY_NAME.getFieldId(), LabelPrintingStaticField.YEAR.getFieldId(),
 			LabelPrintingStaticField.PARENTAGE.getFieldId(),
@@ -191,7 +206,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final List<InstanceDetailsDTO>  InstanceDetailsDTOs =
 			this.middlewareDatasetService.getInstanceDetails(labelsInfoInput.getDatasetId(), labelsInfoInput.getStudyId());
 		long totalNumberOfLabelsNeeded = 0;
-		for (InstanceDetailsDTO instanceDetailsDTO :InstanceDetailsDTOs) {
+		for (final InstanceDetailsDTO instanceDetailsDTO :InstanceDetailsDTOs) {
 			final LabelsNeededSummary.Row row =
 				new LabelsNeededSummary.Row(instanceDetailsDTO.getEnvironment().toString(), instanceDetailsDTO.getnOfObservations(),
 					instanceDetailsDTO.getnOfObservations(),
@@ -383,93 +398,92 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 					}
 					if (observationUnitRow.getVariables().containsKey(field.getName())) {
 						row.put(requiredField, observationUnitRow.getVariables().get(field.getName()).getValue());
+						continue;
 					}
 					if (observationUnitRow.getEnvironmentVariables().containsKey(field.getName())) {
 						row.put(requiredField, observationUnitRow.getEnvironmentVariables().get(field.getName()).getValue());
+						continue;
 					}
 
 				} else {
-					if (STATIC_LOT_FIELD_IDS.contains(field.getId()) || STATIC_TRANSACTION_FIELD_IDS.contains(field.getId())) {
-						final StudyTransactionsDto studyTransactionsDto = observationUnitDtoTransactionDtoMap.get(observationUnitRow.getObsUnitId());
+					StudyTransactionsDto studyTransactionsDto = null;
+					if (STATIC_LOT_FIELD_IDS.contains(requiredField) || STATIC_TRANSACTION_FIELD_IDS.contains(requiredField)) {
+						studyTransactionsDto = observationUnitDtoTransactionDtoMap.get(observationUnitRow.getObsUnitId());
 
 						if (studyTransactionsDto == null) {
 							continue;
 						}
+					}
 
-						if (STATIC_LOT_FIELD_IDS.contains(requiredField)) {
-							if(LabelPrintingStaticField.LOT_UID.getFieldId().equals(requiredField)){
-								row.put(requiredField, studyTransactionsDto.getLot().getLotUUID());
-								continue;
+					if (LabelPrintingStaticField.LOT_UID.getFieldId().equals(requiredField)) {
+						row.put(requiredField, studyTransactionsDto.getLot().getLotUUID());
+						continue;
 
-							}
-							if(LabelPrintingStaticField.LOT_ID.getFieldId().equals(requiredField)){
-								row.put(requiredField, Objects.toString(studyTransactionsDto.getLot().getLotId(), ""));
-								continue;
+					}
+					if (LabelPrintingStaticField.LOT_ID.getFieldId().equals(requiredField)) {
+						row.put(requiredField, Objects.toString(studyTransactionsDto.getLot().getLotId(), ""));
+						continue;
 
-							}
-							if(LabelPrintingStaticField.STOCK_ID.getFieldId().equals(requiredField)){
-								row.put(requiredField, studyTransactionsDto.getLot().getStockId());
-								continue;
+					}
+					if (LabelPrintingStaticField.STOCK_ID.getFieldId().equals(requiredField)) {
+						row.put(requiredField, studyTransactionsDto.getLot().getStockId());
+						continue;
 
-							}
-							if(LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId().equals(requiredField)){
-								row.put(requiredField, studyTransactionsDto.getLot().getLocationAbbr());
-								continue;
+					}
+					if (LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId().equals(requiredField)) {
+						row.put(requiredField, studyTransactionsDto.getLot().getLocationAbbr());
+						continue;
 
-							}
-							if(LabelPrintingStaticField.STORAGE_LOCATION.getFieldId().equals(requiredField)){
-								row.put(requiredField, studyTransactionsDto.getLot().getLocationName());
-								continue;
+					}
+					if (LabelPrintingStaticField.STORAGE_LOCATION.getFieldId().equals(requiredField)) {
+						row.put(requiredField, studyTransactionsDto.getLot().getLocationName());
+						continue;
 
-							}
-							if(LabelPrintingStaticField.UNITS.getFieldId().equals(requiredField)){
-								row.put(requiredField, studyTransactionsDto.getLot().getUnitName());
-								continue;
+					}
+					if (LabelPrintingStaticField.UNITS.getFieldId().equals(requiredField)) {
+						row.put(requiredField, studyTransactionsDto.getLot().getUnitName());
+						continue;
 
-							}
-							if(LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId().equals(requiredField)){
-								row.put(requiredField, Objects.toString(studyTransactionsDto.getLot().getAvailableBalance(), ""));
-								continue;
+					}
+					if (LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId().equals(requiredField)) {
+						row.put(requiredField, Objects.toString(studyTransactionsDto.getLot().getAvailableBalance(), ""));
+						continue;
 
-							}
-							if(LabelPrintingStaticField.NOTES.getFieldId().equals(requiredField)){
-								row.put(requiredField, studyTransactionsDto.getLot().getNotes());
-								continue;
+					}
+					if (LabelPrintingStaticField.NOTES.getFieldId().equals(requiredField)) {
+						row.put(requiredField, studyTransactionsDto.getLot().getNotes());
+						continue;
 
-							}
+					}
 
-						} else if (STATIC_TRANSACTION_FIELD_IDS.contains(requiredField)) {
-							if(LabelPrintingStaticField.TRN_ID.getFieldId().equals(requiredField)){
-								row.put(requiredField, studyTransactionsDto.getTransactionId().toString());
-								continue;
+					if (LabelPrintingStaticField.TRN_ID.getFieldId().equals(requiredField)) {
+						row.put(requiredField, studyTransactionsDto.getTransactionId().toString());
+						continue;
 
-							}
-							if(LabelPrintingStaticField.STATUS.getFieldId().equals(requiredField)){
-								row.put(requiredField, Objects.toString(studyTransactionsDto.getTransactionStatus(), ""));
-								continue;
+					}
+					if (LabelPrintingStaticField.STATUS.getFieldId().equals(requiredField)) {
+						row.put(requiredField, Objects.toString(studyTransactionsDto.getTransactionStatus(), ""));
+						continue;
 
-							}
-							if(LabelPrintingStaticField.TYPE.getFieldId().equals(requiredField)){
-								row.put(requiredField, Objects.toString(studyTransactionsDto.getTransactionType(), ""));
-								continue;
+					}
+					if (LabelPrintingStaticField.TYPE.getFieldId().equals(requiredField)) {
+						row.put(requiredField, Objects.toString(studyTransactionsDto.getTransactionType(), ""));
+						continue;
 
-							}
-							if(LabelPrintingStaticField.CREATED.getFieldId().equals(requiredField)){
-								row.put(requiredField, studyTransactionsDto.getCreatedDate().toString());
-								continue;
+					}
+					if (LabelPrintingStaticField.CREATED.getFieldId().equals(requiredField)) {
+						row.put(requiredField, Objects.toString(studyTransactionsDto.getCreatedDate(),""));
 
-							}
-							if(LabelPrintingStaticField.TRN_NOTES.getFieldId().equals(requiredField)){
-								row.put(requiredField, studyTransactionsDto.getNotes());
-								continue;
+					}
+					if (LabelPrintingStaticField.TRN_NOTES.getFieldId().equals(requiredField)) {
+						row.put(requiredField, studyTransactionsDto.getNotes());
+						continue;
 
-							}
-							if(LabelPrintingStaticField.USERNAME.getFieldId().equals(requiredField)){
-								row.put(requiredField, studyTransactionsDto.getCreatedByUsername());
-								continue;
+					}
+					if (LabelPrintingStaticField.USERNAME.getFieldId().equals(requiredField)) {
+						row.put(requiredField, studyTransactionsDto.getCreatedByUsername());
+						continue;
 
-							}
-						}
 					}
 
 					// If it is not a number it is a hardcoded field
