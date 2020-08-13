@@ -2,8 +2,8 @@ package org.ibp.api.rest.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.domain.dms.DescriptorData;
-import org.generationcp.middleware.domain.dms.ObservationData;
+import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
+import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.springframework.http.HttpStatus;
@@ -55,7 +55,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "List all study instances with basic metadata.",
 		notes = "Returns list of all study instances with basic metadata.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES','INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
@@ -70,7 +70,7 @@ public class StudyInstanceResource {
 		return new ResponseEntity<>(studyInstances, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get study instances with basic metadata.",
+	@ApiOperation(value = "Get study instance with basic metadata.",
 		notes = "Get study instances with basic metadata.")
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}", method = RequestMethod.GET)
@@ -87,11 +87,11 @@ public class StudyInstanceResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/observations", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<ObservationData> addInstanceObservation(final @PathVariable String cropname,
+	public ResponseEntity<InstanceObservationData> addInstanceObservation(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer instanceId,
-		@RequestBody final ObservationData observationData) {
-		return new ResponseEntity<>(this.studyInstanceService.addInstanceObservation(studyId, instanceId, observationData),
+		@RequestBody final InstanceObservationData instanceObservationData) {
+		return new ResponseEntity<>(this.studyInstanceService.addInstanceObservation(studyId, instanceId, instanceObservationData),
 			HttpStatus.OK);
 	}
 
@@ -100,12 +100,12 @@ public class StudyInstanceResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/observations/{observationDataId}", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<ObservationData> updateInstanceObservation(final @PathVariable String cropname,
+	public ResponseEntity<InstanceObservationData> updateInstanceObservation(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer instanceId, @PathVariable final Integer observationDataId,
-		@RequestBody final ObservationData observationData) {
+		@RequestBody final InstanceObservationData instanceObservationData) {
 		return new ResponseEntity<>(this.studyInstanceService
-			.updateInstanceObservation(studyId, instanceId, observationDataId, observationData),
+			.updateInstanceObservation(studyId, instanceId, observationDataId, instanceObservationData),
 			HttpStatus.OK);
 	}
 
@@ -114,10 +114,10 @@ public class StudyInstanceResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/descriptors", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<DescriptorData> addInstanceDescriptor(final @PathVariable String cropname, @PathVariable final String programUUID,
+	public ResponseEntity<InstanceDescriptorData> addInstanceDescriptor(final @PathVariable String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer instanceId,
-		@RequestBody final DescriptorData descriptorData) {
-		return new ResponseEntity<>(this.studyInstanceService.addInstanceDescriptor(studyId, instanceId, descriptorData),
+		@RequestBody final InstanceDescriptorData instanceDescriptorData) {
+		return new ResponseEntity<>(this.studyInstanceService.addInstanceDescriptorData(studyId, instanceId, instanceDescriptorData),
 			HttpStatus.OK);
 	}
 
@@ -126,12 +126,12 @@ public class StudyInstanceResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/descriptors/{descriptorDataId}", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<DescriptorData> updateInstanceDescriptor(final @PathVariable String cropname,
+	public ResponseEntity<InstanceDescriptorData> updateInstanceDescriptor(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer instanceId, @PathVariable final Integer descriptorDataId,
-		@RequestBody final DescriptorData descriptorData) {
+		@RequestBody final InstanceDescriptorData instanceDescriptorData) {
 		return new ResponseEntity<>(this.studyInstanceService
-			.updateInstanceDescriptor(studyId, instanceId, descriptorDataId, descriptorData),
+			.updateInstanceDescriptorData(studyId, instanceId, descriptorDataId, instanceDescriptorData),
 			HttpStatus.OK);
 	}
 
