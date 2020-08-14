@@ -334,7 +334,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput) {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsGeneratorInput.getStudyId());
 
-		final Integer ObsDatasetUnitIdFieldKey = TermId.OBS_UNIT_ID.getId();
+		final Integer obsDatasetUnitIdFieldKey = TermId.OBS_UNIT_ID.getId();
 
 		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
 		final TransactionsSearchDto transactionsSearch = new TransactionsSearchDto();
@@ -354,7 +354,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final Set<Integer> allRequiredKeys = new HashSet<>();
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				allRequiredKeys.add(ObsDatasetUnitIdFieldKey);
+				allRequiredKeys.add(obsDatasetUnitIdFieldKey);
 			} else {
 				allRequiredKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
@@ -503,8 +503,8 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 						row.put(requiredField, this.getPedigree(gid, gidPedigreeMap));
 						continue;
 					}
-					if (requiredField.equals(ObsDatasetUnitIdFieldKey)) {
-						row.put(ObsDatasetUnitIdFieldKey, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
+					if (requiredField.equals(obsDatasetUnitIdFieldKey)) {
+						row.put(obsDatasetUnitIdFieldKey, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
 						continue;
 					}
 				}
@@ -512,7 +512,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			results.add(row);
 		}
 
-		return new LabelsData(ObsDatasetUnitIdFieldKey, results);
+		return new LabelsData(obsDatasetUnitIdFieldKey, results);
 	}
 
 	@Override
