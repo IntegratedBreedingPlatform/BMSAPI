@@ -527,7 +527,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			//Requirement to show PLOT OBS_UNIT_ID label when variable = OBS_UNIT_ID in Plot Dataset
 			//Which is in fact the only dataset that cointains this variable.
 			if (field.getId() == TermId.OBS_UNIT_ID.getId()) {
-				field.setName(PLOT.concat(" ").concat(field.getName()));
+				field.setName(PLOT.concat(StringUtils.SPACE).concat(field.getName()));
 			}
 			if (field.getId() == TermId.SEASON_VAR.getId()) {
 				field.setName(this.getMessage("label.printing.field.season"));
