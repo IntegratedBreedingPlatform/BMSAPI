@@ -179,4 +179,19 @@ public abstract class LabelPrintingStrategy {
 		}
 		return pedigree;
 	}
+
+	void validateBarcode(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		if(!labelsGeneratorInput.isAutomaticBarcode()){
+			for (final Map<Integer, String> data:labelsData.getData()){
+				List<Integer> barcodeIds =
+					labelsGeneratorInput.getBarcodeFields().stream().filter(labelId -> data.get(labelId) == null).collect(
+						Collectors.toList());
+					if(!barcodeIds.isEmpty()){
+						errors.reject("label.fields.barcodes.selected.empty.value","");
+						throw new ApiRequestValidationException(errors.getAllErrors());
+					}
+			}
+		}
+	}
 }
