@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
@@ -83,10 +84,16 @@ public class SubObservationDatasetLabelPrintingTest {
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
 		final String studyDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.study.details");
 		final String datasetDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.dataset.details");
+		final String lotDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.study.lot.list.details");
+		final String transactionDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.study.transaction.list.details");
 		Assert.assertEquals(studyDetailsPropValue, labelTypes.get(0).getKey());
 		Assert.assertEquals(studyDetailsPropValue, labelTypes.get(0).getTitle());
 		Assert.assertEquals(datasetDetailsPropValue, labelTypes.get(1).getKey());
 		Assert.assertEquals(datasetDetailsPropValue, labelTypes.get(1).getTitle());
+		Assert.assertEquals(lotDetailsPropValue, labelTypes.get(2).getKey());
+		Assert.assertEquals(lotDetailsPropValue, labelTypes.get(2).getTitle());
+		Assert.assertEquals(transactionDetailsPropValue, labelTypes.get(3).getKey());
+		Assert.assertEquals(transactionDetailsPropValue, labelTypes.get(3).getTitle());
 	}
 
 	@Test
@@ -110,7 +117,7 @@ public class SubObservationDatasetLabelPrintingTest {
 		measurementVariable.setTermId(TermId.OBS_UNIT_ID.getId());
 		List<Field> fields = this.subObservationDatasetLabelPrinting.transform(Arrays.asList(measurementVariable));
 		Assert.assertEquals(TermId.OBS_UNIT_ID.getId(), fields.get(0).getId().intValue());
-		Assert.assertEquals(SubObservationDatasetLabelPrinting.PLOT.concat(" ").concat(measurementVariable.getAlias()),
+		Assert.assertEquals(SubObservationDatasetLabelPrinting.PLOT.concat(StringUtils.SPACE).concat(measurementVariable.getAlias()),
 			fields.get(0).getName());
 
 		measurementVariable.setAlias(TermId.ENTRY_NO.name());
