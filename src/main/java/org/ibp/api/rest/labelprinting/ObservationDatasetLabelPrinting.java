@@ -526,10 +526,10 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			final Field field = new Field(measurementVariable);
 			//Requirement to show PLOT OBS_UNIT_ID label when variable = OBS_UNIT_ID in Plot Dataset
 			//Which is in fact the only dataset that cointains this variable.
-			if (field.getId() == TermId.OBS_UNIT_ID.getId()) {
-				field.setName(PLOT.concat(" ").concat(field.getName()));
+			if (field.getId().equals(TermId.OBS_UNIT_ID.getId())) {
+				field.setName(PLOT.concat(StringUtils.SPACE).concat(field.getName()));
 			}
-			if (field.getId() == TermId.SEASON_VAR.getId()) {
+			if (field.getId().equals(TermId.SEASON_VAR.getId())) {
 				field.setName(this.getMessage("label.printing.field.season"));
 			}
 			fields.add(field);
