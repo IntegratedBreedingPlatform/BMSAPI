@@ -13,9 +13,12 @@ import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.Util;
+import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplamListService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,9 @@ public class GermplamListServiceImpl implements GermplamListService {
 	@Autowired
 	public GermplasmDataManager germplasmDataManager;
 
+	@Autowired
+	public ProgramValidator programValidator;
+
 	private BindingResult errors;
 
 	@Override
@@ -53,9 +59,15 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
-		this.validateProgramUUID(crop, programUUID);
+		if (!StringUtils.isEmpty(programUUID)) {
+			this.programValidator.validate(new ProgramSummary(crop, programUUID), errors);
+			if (errors.hasErrors()) {
+				throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+			}
+		}
+
 		this.validateParentId(parentId, programUUID);
-		this.validateFolderOnly(folderOnly);
+		BaseValidator.checkNotNull(folderOnly, "list.folder.only");
 
 		final List<TreeNode> treeNodes = new ArrayList<>();
 		if (parentId == null) {
@@ -106,40 +118,23 @@ public class GermplamListServiceImpl implements GermplamListService {
 		return treeNodes;
 	}
 
-	private void validateProgramUUID(final String crop, final String programUUID) {
-		if (!StringUtils.isEmpty(programUUID)) {
-			final Project project = workbenchDataManager.getProjectByUuidAndCrop(programUUID, crop);
-			if (project == null) {
-				this.errors.reject("germplasm.list.project.invalid", "");
-				throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-			}
-		}
-	}
-
 	private void validateParentId(final String parentId, final String programUUID) {
 		if (parentId != null && !PROGRAM_LISTS.equals(parentId) && !CROP_LISTS.equals(parentId) && !Util.isPositiveInteger(parentId)) {
-			this.errors.reject("germplasm.list.parent.id.invalid", "");
+			this.errors.reject("list.parent.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if ((PROGRAM_LISTS.equals(parentId) || Util.isPositiveInteger(parentId)) && StringUtils.isEmpty(programUUID)) {
-			this.errors.reject("germplasm.list.project.mandatory", "");
+			this.errors.reject("list.project.mandatory", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (Util.isPositiveInteger(parentId) && !StringUtils.isEmpty(programUUID)) {
 			final GermplasmList germplasmList = this.germplasmListManager.getGermplasmListById(Integer.parseInt(parentId));
 			if (germplasmList == null || !germplasmList.isFolder()) {
-				this.errors.reject("germplasm.list.parent.id.not.exist", "");
+				this.errors.reject("list.parent.id.not.exist", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
-		}
-	}
-
-	private void validateFolderOnly(final Boolean folderOnly) {
-		if (folderOnly == null) {
-			this.errors.reject("germplasm.list.folder.only", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
