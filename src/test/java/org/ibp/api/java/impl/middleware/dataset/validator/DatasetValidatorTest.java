@@ -276,6 +276,28 @@ public class DatasetValidatorTest {
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Arrays.asList(variableId, nonDatasetVariableId));
 	}
 
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidateVariableBelongsToVariableType_Exception() {
+		final Random ran = new Random();
+		final int datasetId = ran.nextInt();
+		final int variableId = ran.nextInt();
+		when(this.studyDatasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.STUDY_CONDITION.getId())))
+			.thenReturn(new ArrayList<>());
+		this.datasetValidator.validateVariableBelongsToVariableType(datasetId, variableId, VariableType.STUDY_CONDITION.getId());
+	}
+
+	public void testValidateVariableBelongsToVariableType_VariableExistsInTheSpecifiedVariableType() {
+		final Random ran = new Random();
+		final int datasetId = ran.nextInt();
+		final int variableId = ran.nextInt();
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setTermId(variableId);
+		when(this.studyDatasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.STUDY_CONDITION.getId())))
+			.thenReturn(Arrays.asList(measurementVariable));
+		this.datasetValidator.validateVariableBelongsToVariableType(datasetId, variableId, VariableType.STUDY_CONDITION.getId());
+	}
+
 	private StandardVariable createStandardVariable(final Integer traitId) {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(traitId);

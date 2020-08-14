@@ -154,7 +154,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final HashSet<Integer> entryIdsOfChecks = new HashSet<>();
 
 		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())) {
+			if (!studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())) {
 				entryIdsOfChecks.add(studyGermplasmDto.getEntryNumber());
 			}
 		}
@@ -167,7 +167,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final HashSet<Integer> entryIdsOfTestEntries = new HashSet<>();
 
 		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (!studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())) {
+			if (studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())) {
 				entryIdsOfTestEntries.add(studyGermplasmDto.getEntryNumber());
 			}
 		}

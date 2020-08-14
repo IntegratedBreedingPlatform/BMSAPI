@@ -22,7 +22,7 @@ import java.util.HashMap;
 
 @Component("datasetObservationValidator")
 public class ObservationValidator {
-	
+
 	@Autowired
 	private DatasetService datasetService;
 
@@ -30,10 +30,10 @@ public class ObservationValidator {
 	protected OntologyVariableDataManager ontologyVariableDataManager;
 
 	private BindingResult errors;
-	
+
 	public void validateObservationUnit(final Integer datasetId, final Integer observationUnitId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		
+
 		final boolean isValid = this.datasetService.isValidObservationUnit(datasetId, observationUnitId);
 		if (!isValid) {
 			this.errors.reject("invalid.observation.unit.id", "");
@@ -54,16 +54,16 @@ public class ObservationValidator {
 		}
 
 		if (observationDto != null) {
-			this.validateObservationValue(phenotype.getObservableId(), observationDto.getValue());
+			this.validateVariableValue(phenotype.getObservableId(), observationDto.getValue());
 			if (observationDto.getDraftValue() != null) {
-				this.validateObservationValue(phenotype.getObservableId(), observationDto.getDraftValue());
+				this.validateVariableValue(phenotype.getObservableId(), observationDto.getDraftValue());
 			}
 		}
 	}
 
-	public void validateObservationValue(final Integer variableId, final String value) {
+	public void validateVariableValue(final Integer variableId, final String value) {
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		final Variable var = this.ontologyVariableDataManager.getVariable(ContextHolder.getCurrentProgram(), variableId, true);
 
 		if (!isValidValue(var, value)) {

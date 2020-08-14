@@ -346,9 +346,9 @@ public class ExperimentalDesignTypeValidator {
 
 	void validateIfCheckEntriesExistInstudyGermplasmDtoList(final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		final Integer checkEntryType = SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId();
+		final Integer testEntryType = SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId();
 		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (checkEntryType.equals(studyGermplasmDto.getCheckType())) {
+			if (!testEntryType.equals(studyGermplasmDto.getCheckType())) {
 				return;
 			}
 		}

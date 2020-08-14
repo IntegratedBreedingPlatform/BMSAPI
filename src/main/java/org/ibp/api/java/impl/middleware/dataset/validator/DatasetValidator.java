@@ -197,4 +197,16 @@ public class DatasetValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
+
+	public void validateVariableBelongsToVariableType(final int datasetId, final int variableId, final int variableTypeId) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		// Check if the variableId is included in the specified VariableType
+		final boolean variableExists =
+			this.middlewareDatasetService.getObservationSetVariables(datasetId, Arrays.asList(variableTypeId)).stream()
+				.anyMatch(v -> v.getTermId() == variableId);
+		if (!variableExists) {
+			this.errors.reject("variable.does.not.belong.to.specified.variable.type", new String[] {String.valueOf(variableId)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
 }

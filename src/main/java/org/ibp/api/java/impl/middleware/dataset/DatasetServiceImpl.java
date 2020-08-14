@@ -186,7 +186,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Arrays.asList(observation.getVariableId()));
 		this.observationValidator.validateObservationUnit(datasetId, observationUnitId);
-		this.observationValidator.validateObservationValue(observation.getVariableId(), observation.getValue());
+		this.observationValidator.validateVariableValue(observation.getVariableId(), observation.getValue());
 		return this.middlewareDatasetService.createObservation(observation);
 
 	}
@@ -634,7 +634,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator
 			.validateExistingDatasetVariables(
 				studyId, datasetId, Lists.newArrayList(variableId));
-		this.observationValidator.validateObservationValue(variableId, paramDTO.getNewValue());
+		this.observationValidator.validateVariableValue(variableId, paramDTO.getNewValue());
 		this.middlewareDatasetService.setValueToVariable(datasetId, paramDTO, studyId);
 	}
 

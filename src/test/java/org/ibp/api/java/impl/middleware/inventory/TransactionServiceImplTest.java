@@ -64,7 +64,7 @@ public class TransactionServiceImplTest {
 
 	@Test
 	public void testGetTransactions() {
-		final TransactionDto transactionDto = new TransactionDto(1, "admin", TransactionType.DEPOSIT.name(), new Double(1),
+		final TransactionDto transactionDto = new TransactionDto(1, "admin", TransactionType.DEPOSIT.name(), new Double(1),new Double(0),
 			"comments", new Date(), 1, "1de85e1c-b947-4ee2-9d19-31eee6da9ad5", 1, "desig", "STOCK-1", 8314, "SEED_AMOUNT_g",
 			LotStatus.ACTIVE.name(), TransactionStatus.CONFIRMED.getValue(), 0, "UNKNOWN", "UNKNOWN", "comments");
 		Mockito.when(this.transactionService.searchTransactions(ArgumentMatchers.any(TransactionsSearchDto.class), ArgumentMatchers.any(
