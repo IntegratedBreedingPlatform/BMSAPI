@@ -3,7 +3,6 @@ package org.ibp.api.rest.inventory.study;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -14,9 +13,8 @@ import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,35 +42,31 @@ public class StudyInventoryResource {
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@RequestBody final StudyTransactionsRequest studyTransactionsRequest, final Pageable pageable
+		@RequestBody final StudyTransactionsRequest studyTransactionsRequest, @PageableDefault(page = 1, size = 50) final Pageable pageable
 	) {
 
 		BaseValidator.checkNotNull(studyTransactionsRequest, "param.null", new String[] {"studyTransactionsRequest"});
-
-		final Integer pageNumber = pageable.getPageNumber();
-		final Integer pageSize = pageable.getPageSize();
-
 		PagedResult<StudyTransactionsDto> pagedResult;
-
 		try {
 			inventoryLock.lockRead();
-			pagedResult = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<StudyTransactionsDto>() {
+			pagedResult =
+				new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<StudyTransactionsDto>() {
 
-				@Override
-				public long getCount() {
-					return studyTransactionsService.countStudyTransactions(studyId, null);
-				}
+					@Override
+					public long getCount() {
+						return studyTransactionsService.countStudyTransactions(studyId, null);
+					}
 
-				@Override
-				public long getFilteredCount() {
-					return studyTransactionsService.countStudyTransactions(studyId, studyTransactionsRequest);
-				}
+					@Override
+					public long getFilteredCount() {
+						return studyTransactionsService.countStudyTransactions(studyId, studyTransactionsRequest);
+					}
 
-				@Override
-				public List<StudyTransactionsDto> getResults(final PagedResult<StudyTransactionsDto> pagedResult) {
-					return studyTransactionsService.searchStudyTransactions(studyId, studyTransactionsRequest, pageable);
-				}
-			});
+					@Override
+					public List<StudyTransactionsDto> getResults(final PagedResult<StudyTransactionsDto> pagedResult) {
+						return studyTransactionsService.searchStudyTransactions(studyId, studyTransactionsRequest, pageable);
+					}
+				});
 		} finally {
 			inventoryLock.unlockRead();
 		}

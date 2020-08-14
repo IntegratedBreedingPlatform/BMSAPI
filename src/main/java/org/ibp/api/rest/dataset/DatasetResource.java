@@ -23,8 +23,8 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -188,7 +188,7 @@ public class DatasetResource {
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
-		@RequestBody final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
+		@RequestBody final ObservationUnitsSearchDTO searchDTO, @PageableDefault(page = 1, size = 50) final Pageable pageable) {
 
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 		Preconditions
