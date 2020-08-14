@@ -1,6 +1,8 @@
 package org.ibp.api.rest.inventory.study;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -38,11 +41,20 @@ public class StudyInventoryResource {
 
 	@ApiOperation(value = "Get transactions associated to the study")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/transactions/search", method = RequestMethod.POST)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "Results page you want to retrieve (1..N)"),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. ")
+	})
 	public ResponseEntity<StudyInventoryTable> searchStudyTransactions(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@RequestBody final StudyTransactionsRequest studyTransactionsRequest, @PageableDefault(page = 1, size = 50) final Pageable pageable
+		@RequestBody final StudyTransactionsRequest studyTransactionsRequest,
+		@ApiIgnore @PageableDefault(page = 1, size = 50) final Pageable pageable
 	) {
 
 		BaseValidator.checkNotNull(studyTransactionsRequest, "param.null", new String[] {"studyTransactionsRequest"});
