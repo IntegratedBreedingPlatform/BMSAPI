@@ -473,7 +473,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 					}
 					if (LabelPrintingStaticField.CREATED.getFieldId().equals(requiredField)) {
 						row.put(requiredField, Objects.toString(studyTransactionsDto.getCreatedDate(),""));
-
+						continue;
 					}
 					if (LabelPrintingStaticField.TRN_NOTES.getFieldId().equals(requiredField)) {
 						row.put(requiredField, studyTransactionsDto.getNotes());
