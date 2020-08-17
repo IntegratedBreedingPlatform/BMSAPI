@@ -55,7 +55,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		for(final Integer instanceDBID: selectedDatasetInstancesMap.keySet()) {
 			final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 			searchDTO.setInstanceId(selectedDatasetInstancesMap.get(instanceDBID).getInstanceId());
-			final PageRequest pageRequest = new PageRequest(1, Integer.MAX_VALUE);
+			final PageRequest pageRequest = new PageRequest(0, Integer.MAX_VALUE);
 			final List<ObservationUnitRow> observationUnitRows = this.studyDatasetService
 				.getObservationUnitRows(study.getId(), dataset.getDatasetId(), searchDTO, pageRequest);
 			observationUnitRowMap.put(instanceDBID, observationUnitRows);
