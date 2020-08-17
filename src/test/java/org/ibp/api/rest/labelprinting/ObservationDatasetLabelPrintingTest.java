@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SubObservationDatasetLabelPrintingTest {
+public class ObservationDatasetLabelPrintingTest {
 
 	@Mock
 	private DatasetService middlewareDatasetService;
@@ -44,13 +44,13 @@ public class SubObservationDatasetLabelPrintingTest {
 	private final ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 
 	@InjectMocks
-	private SubObservationDatasetLabelPrinting subObservationDatasetLabelPrinting;
+	private ObservationDatasetLabelPrinting observationDatasetLabelPrinting;
 
 	@Before
 	public void setUp() {
 		this.messageSource.setUseCodeAsDefaultMessage(true);
-		this.subObservationDatasetLabelPrinting.setMessageSource(this.messageSource);
-		this.subObservationDatasetLabelPrinting.initStaticFields();
+		this.observationDatasetLabelPrinting.setMessageSource(this.messageSource);
+		this.observationDatasetLabelPrinting.initStaticFields();
 	}
 
 	@Test
@@ -62,30 +62,30 @@ public class SubObservationDatasetLabelPrintingTest {
 		Mockito.when(this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId())).thenReturn(
 			Arrays.asList(dataset));
 
-		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT");
+		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLOT_DATA.getId(), "STUDY");
 
 		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setParentDatasetId(2);
+		datasetDTO.setDatasetId(2);
 		datasetDTO.setDatasetTypeId(datasetType.getDatasetTypeId());
 
 		Mockito.when(this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
-		Mockito.when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 
-		final List<LabelType> labelTypes = this.subObservationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
+		final List<LabelType> labelTypes = this.observationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
 		Mockito.verify(this.middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
 		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(dataset.getId(),
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 				VariableType.STUDY_CONDITION.getId()));
-		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(datasetDTO.getParentDatasetId(), Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
-		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(datasetDTO.getParentDatasetId(),
+		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(datasetDTO.getDatasetId(), Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
+		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(datasetDTO.getDatasetId(),
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
-		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
-		final String studyDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.study.details");
-		final String datasetDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.dataset.details");
-		final String lotDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.study.lot.list.details");
-		final String transactionDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.study.transaction.list.details");
+		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId(),VariableType.SELECTION_METHOD
+			.getId(), VariableType.TRAIT.getId()));
+		final String studyDetailsPropValue = this.observationDatasetLabelPrinting.getMessage("label.printing.study.details");
+		final String datasetDetailsPropValue = this.observationDatasetLabelPrinting.getMessage("label.printing.dataset.details");
+		final String lotDetailsPropValue = this.observationDatasetLabelPrinting.getMessage("label.printing.study.lot.list.details");
+		final String transactionDetailsPropValue = this.observationDatasetLabelPrinting.getMessage("label.printing.study.transaction.list.details");
 		Assert.assertEquals(studyDetailsPropValue, labelTypes.get(0).getKey());
 		Assert.assertEquals(studyDetailsPropValue, labelTypes.get(0).getTitle());
 		Assert.assertEquals(datasetDetailsPropValue, labelTypes.get(1).getKey());
@@ -98,7 +98,7 @@ public class SubObservationDatasetLabelPrintingTest {
 
 	@Test
 	public void testRemovePairIdVariables() {
-		final String studyDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.study.details");
+		final String studyDetailsPropValue = this.observationDatasetLabelPrinting.getMessage("label.printing.study.details");
 		final LabelType labelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
 		final List<Field> fields = new ArrayList<>();
 		fields.add(new Field(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name()));
@@ -106,7 +106,7 @@ public class SubObservationDatasetLabelPrintingTest {
 		fields.add(new Field(SubObservationDatasetLabelPrinting.PAIR_ID_VARIABLES.get(1), "COOPERATOR_ID"));
 		labelType.setFields(fields);
 		Assert.assertEquals(3, labelType.getFields().size());
-		this.subObservationDatasetLabelPrinting.removePairIdVariables(Arrays.asList(labelType));
+		this.observationDatasetLabelPrinting.removePairIdVariables(Arrays.asList(labelType));
 		Assert.assertEquals(1, labelType.getFields().size());
 	}
 
@@ -115,21 +115,21 @@ public class SubObservationDatasetLabelPrintingTest {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setAlias(TermId.OBS_UNIT_ID.name());
 		measurementVariable.setTermId(TermId.OBS_UNIT_ID.getId());
-		List<Field> fields = this.subObservationDatasetLabelPrinting.transform(Arrays.asList(measurementVariable));
+		List<Field> fields = this.observationDatasetLabelPrinting.transform(Arrays.asList(measurementVariable));
 		Assert.assertEquals(TermId.OBS_UNIT_ID.getId(), fields.get(0).getId().intValue());
 		Assert.assertEquals(SubObservationDatasetLabelPrinting.PLOT.concat(StringUtils.SPACE).concat(measurementVariable.getAlias()),
 			fields.get(0).getName());
 
 		measurementVariable.setAlias(TermId.ENTRY_NO.name());
 		measurementVariable.setTermId(TermId.ENTRY_NO.getId());
-		fields = this.subObservationDatasetLabelPrinting.transform(Arrays.asList(measurementVariable));
+		fields = this.observationDatasetLabelPrinting.transform(Arrays.asList(measurementVariable));
 		Assert.assertEquals(TermId.ENTRY_NO.getId(), fields.get(0).getId().intValue());
 		Assert.assertEquals(TermId.ENTRY_NO.name(), fields.get(0).getName());
 	}
 
 	@Test
 	public void testGetSupportedFileTypes() {
-		final List<FileType> fileTypes = this.subObservationDatasetLabelPrinting.getSupportedFileTypes();
+		final List<FileType> fileTypes = this.observationDatasetLabelPrinting.getSupportedFileTypes();
 		Assert.assertTrue(fileTypes.contains(FileType.CSV));
 		Assert.assertTrue(fileTypes.contains(FileType.PDF));
 		Assert.assertTrue(fileTypes.contains(FileType.XLS));

@@ -87,7 +87,9 @@ public class TransactionResource {
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchTransactions(
-		@PathVariable final String cropName, @RequestBody final TransactionsSearchDto transactionsSearchDto) {
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final TransactionsSearchDto transactionsSearchDto) {
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(transactionsSearchDto, TransactionsSearchDto.class).toString();
 
@@ -116,6 +118,7 @@ public class TransactionResource {
 	@JsonView(InventoryView.TransactionView.class)
 	public ResponseEntity<List<TransactionDto>> getTransactions(
 		@PathVariable final String cropName, //
+		@RequestParam(required = false) final String programUUID,
 		@RequestParam final Integer searchRequestId, @ApiIgnore
 	final Pageable pageable) {
 
@@ -210,6 +213,7 @@ public class TransactionResource {
 	@JsonView(InventoryView.TransactionView.class)
 	public ResponseEntity<List<TransactionDto>> getAvailableBalanceTransactions(
 		@PathVariable final String cropName, //
+		@RequestParam(required = false) final String programUUID,
 		@PathVariable final String lotUUID) {
 
 		final List<TransactionDto> transactionDtos = this.transactionService.getAvailableBalanceTransactions(lotUUID);
@@ -227,7 +231,9 @@ public class TransactionResource {
 		method = RequestMethod.GET)
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	public ResponseEntity<FileSystemResource> getTransactionsTemplate(
-		@PathVariable final String cropName, @RequestParam final Integer searchRequestId) {
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam final Integer searchRequestId) {
 		final TransactionsSearchDto searchDTO = (TransactionsSearchDto) this.searchRequestService
 			.getSearchRequest(searchRequestId, TransactionsSearchDto.class);
 

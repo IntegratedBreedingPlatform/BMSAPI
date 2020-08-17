@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -100,7 +99,9 @@ public class LotResource {
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchLots(
-		@PathVariable final String cropName, @RequestBody final LotsSearchDto lotsSearchDto) {
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final LotsSearchDto lotsSearchDto) {
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(lotsSearchDto, LotsSearchDto.class).toString();
 
@@ -127,6 +128,7 @@ public class LotResource {
 	@ResponseBody
 	@JsonView(InventoryView.LotView.class)
 	public ResponseEntity<List<ExtendedLotDto>> getLots(@PathVariable final String cropName, //
+		@RequestParam(required = false) final String programUUID,//
 		@RequestParam final Integer searchRequestId, @ApiIgnore
 	final Pageable pageable) {
 
@@ -251,6 +253,7 @@ public class LotResource {
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	public ResponseEntity<LotSearchMetadata> getLotSearchMetadata(
 		@PathVariable final String cropName, //
+		@RequestParam(required = false) final String programUUID, //
 		@ApiParam("List of lots to get metadata, use a searchId or a list of lot ids")
 		@RequestBody final SearchCompositeDto<Integer, String> searchCompositeDto) {
 
@@ -301,7 +304,8 @@ public class LotResource {
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	@ResponseBody
 	@JsonView(InventoryView.LotView.class)
-	public ResponseEntity<ExtendedLotDto> getLot(@PathVariable final String cropName, @PathVariable final String lotUUID) {
+	public ResponseEntity<ExtendedLotDto> getLot(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
+		@PathVariable final String lotUUID) {
 
 		final LotsSearchDto searchDTO = new LotsSearchDto();
 		searchDTO.setLotUUIDs(Arrays.asList(lotUUID));
