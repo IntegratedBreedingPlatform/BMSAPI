@@ -190,7 +190,7 @@ public class DatasetResource {
 	@ResponseBody
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
-			value = "Results page you want to retrieve (1..N)"),
+			value = "Results page you want to retrieve (0..N)"),
 		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
 			value = "Number of records per page."),
 		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
@@ -200,7 +200,7 @@ public class DatasetResource {
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
 		@RequestBody final ObservationUnitsSearchDTO searchDTO,
-		@ApiIgnore @PageableDefault(page = 1, size = 50) final Pageable pageable) {
+		@ApiIgnore @PageableDefault(page = 0, size = 50) final Pageable pageable) {
 
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 		Preconditions

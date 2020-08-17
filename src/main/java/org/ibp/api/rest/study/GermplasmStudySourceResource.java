@@ -42,7 +42,7 @@ public class GermplasmStudySourceResource {
 	@ResponseBody
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
-			value = "Results page you want to retrieve (1..N)"),
+			value = "Results page you want to retrieve (0..N)"),
 		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
 			value = "Number of records per page."),
 		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
@@ -51,7 +51,7 @@ public class GermplasmStudySourceResource {
 	public ResponseEntity<GermplasmStudySourceTable> getGermplasmStudySourceTable(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest,
-		final @ApiIgnore @PageableDefault(page = 1, size = 50) Pageable pageable) {
+		final @ApiIgnore @PageableDefault(page = 0, size = 50) Pageable pageable) {
 
 		germplasmStudySourceSearchRequest.setStudyId(studyId);
 

@@ -54,7 +54,7 @@ public class StudyInventoryResource {
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
 		@RequestBody final StudyTransactionsRequest studyTransactionsRequest,
-		@ApiIgnore @PageableDefault(page = 1, size = 50) final Pageable pageable
+		@ApiIgnore @PageableDefault(page = 0, size = 50) final Pageable pageable
 	) {
 
 		BaseValidator.checkNotNull(studyTransactionsRequest, "param.null", new String[] {"studyTransactionsRequest"});
