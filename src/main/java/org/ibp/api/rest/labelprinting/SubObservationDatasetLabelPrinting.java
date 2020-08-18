@@ -346,8 +346,8 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest);
 
 		final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap = new HashMap<>();
-		studyTransactionsDtos.forEach(studyTransactionsDto -> observationUnitDtoTransactionDtoMap
-			.put(studyTransactionsDto.getObservationUnits().get(0).getObsUnitId(), studyTransactionsDto));
+		studyTransactionsDtos.forEach(studyTransactionsDto -> studyTransactionsDto.getObservationUnits().forEach(
+			observationUnitDto -> observationUnitDtoTransactionDtoMap.put(observationUnitDto.getObsUnitId(), studyTransactionsDto)));
 
 		final Map<Integer, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
 
