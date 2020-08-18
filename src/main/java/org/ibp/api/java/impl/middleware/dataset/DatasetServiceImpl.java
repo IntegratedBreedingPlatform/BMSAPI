@@ -538,7 +538,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Set<Integer> variableIds =
 			new TreeSet(observations.stream().map(ObservationDTO::getObservationVariableDbId).collect(Collectors.toSet()));
 		final List<String> variableNames =
-			variableIds.stream().map(termId -> varMap.get(termId).getName()).collect(Collectors.toList());
+			variableIds.stream().map(termId -> varMap.get(termId).getAlias()).collect(Collectors.toList());
 
 		/* tree -> {
 		 *     obsUnit1 -> {
