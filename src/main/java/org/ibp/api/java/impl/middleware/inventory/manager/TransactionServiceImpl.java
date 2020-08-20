@@ -92,6 +92,12 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
+	public List<TransactionDto> searchTransactionsWithLotAggregatedData(final TransactionsSearchDto transactionsSearchDto,
+		final Pageable pageable) {
+		return this.transactionService.searchTransactionsWithLotAggregatedData(transactionsSearchDto, pageable);
+	}
+
+	@Override
 	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
 		return this.transactionService.countSearchTransactions(transactionsSearchDto);
 	}

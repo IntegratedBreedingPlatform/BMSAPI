@@ -237,7 +237,7 @@ public class TransactionResource {
 		final TransactionsSearchDto searchDTO = (TransactionsSearchDto) this.searchRequestService
 			.getSearchRequest(searchRequestId, TransactionsSearchDto.class);
 
-		final List<TransactionDto> transactionDtoList = TransactionResource.this.transactionService.searchTransactions(searchDTO, null);
+		final List<TransactionDto> transactionDtoList = TransactionResource.this.transactionService.searchTransactionsWithLotAggregatedData(searchDTO, null);
 
 		final File file = this.transactionExportServiceImpl.export(transactionDtoList);
 		final HttpHeaders headers = new HttpHeaders();
