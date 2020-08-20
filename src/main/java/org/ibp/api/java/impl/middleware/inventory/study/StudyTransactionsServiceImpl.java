@@ -39,6 +39,13 @@ public class StudyTransactionsServiceImpl implements StudyTransactionsService {
 	}
 
 	@Override
+	public List<StudyTransactionsDto> searchStudyTransactionsWithLotAggregatedData(final Integer studyId,
+		final StudyTransactionsRequest studyTransactionsRequest) {
+		this.studyValidator.validate(studyId, false);
+		return this.studyTransactionsService.searchStudyTransactionsWithLotAggregatedData(studyId, studyTransactionsRequest);
+	}
+
+	@Override
 	public void cancelPendingTransactions(final Integer studyId, final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		this.studyValidator.validate(studyId, true);
 		this.transactionService.cancelPendingTransactions(searchCompositeDto);

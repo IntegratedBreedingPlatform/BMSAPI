@@ -343,7 +343,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		studyTransactionsRequest.setTransactionsSearch(transactionsSearch);
 
 		final List<StudyTransactionsDto> studyTransactionsDtos =
-			studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest);
+			studyTransactionsService.searchStudyTransactionsWithLotAggregatedData(labelsGeneratorInput.getStudyId(), studyTransactionsRequest);
 
 		final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap = new HashMap<>();
 		studyTransactionsDtos.forEach(studyTransactionsDto -> studyTransactionsDto.getObservationUnits().forEach(
