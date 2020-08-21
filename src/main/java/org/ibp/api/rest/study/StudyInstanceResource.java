@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,8 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "List all study instances with basic metadata.",
 		notes = "Returns list of all study instances with basic metadata.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES','INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES','INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')"
+		+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
