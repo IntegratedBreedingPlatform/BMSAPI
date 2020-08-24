@@ -52,21 +52,13 @@ public class DatasetGeneratorInputValidator {
 
 	private Integer maxAllowedDatasetsPerParent;
 
-	private final VariableType observationUnitVariableType;
+	private VariableType observationUnitVariableType;
 
 	private static final String DATASET_NAME_REGEX = "^[a-zA-Z0-9\\s(\\\\/:*?\\\"\"<>|.)]*$";
 
 	private static final Pattern DATASET_NAME_PATTERN = Pattern.compile(DatasetGeneratorInputValidator.DATASET_NAME_REGEX);
 
 	DatasetGeneratorInputValidator() {
-		final Term observationUnitTerm = this.ontologyDataManager.getAllTermsByCvId(CvId.VARIABLE_TYPE).stream()
-			.filter(f -> org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().equals(f.getId())).findFirst()
-			.get();
-		this.observationUnitVariableType =
-			new VariableType(
-				String.valueOf(observationUnitTerm.getId()),
-				observationUnitTerm.getName(),
-				observationUnitTerm.getDefinition());
 	}
 
 	@PostConstruct
@@ -129,6 +121,15 @@ public class DatasetGeneratorInputValidator {
 
 		final Study study = this.studyDataManager.getStudy(studyId);
 		try {
+			final Term observationUnitTerm = this.ontologyDataManager.getAllTermsByCvId(CvId.VARIABLE_TYPE).stream()
+				.filter(f -> org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().equals(f.getId())).findFirst()
+				.get();
+			this.observationUnitVariableType =
+				new VariableType(
+					String.valueOf(observationUnitTerm.getId()),
+					observationUnitTerm.getName(),
+					observationUnitTerm.getDefinition());
+
 			final VariableDetails variableDetails =
 				this.variableService
 					.getVariableById(crop, study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId()));
