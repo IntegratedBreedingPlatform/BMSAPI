@@ -5,6 +5,9 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
@@ -40,6 +43,9 @@ public class DatasetGeneratorInputValidator {
 	private DatasetService studyDatasetService;
 
 	@Autowired
+	private OntologyDataManager ontologyDataManager;
+
+	@Autowired
 	private Environment environment;
 
 	private Integer maxAllowedSubobservationUnits;
@@ -53,11 +59,14 @@ public class DatasetGeneratorInputValidator {
 	private static final Pattern DATASET_NAME_PATTERN = Pattern.compile(DatasetGeneratorInputValidator.DATASET_NAME_REGEX);
 
 	DatasetGeneratorInputValidator() {
+		final Term observationUnitTerm = this.ontologyDataManager.getAllTermsByCvId(CvId.VARIABLE_TYPE).stream()
+			.filter(f -> org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().equals(f.getId())).findFirst()
+			.get();
 		this.observationUnitVariableType =
 			new VariableType(
-				org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-				org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-				org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
+				String.valueOf(observationUnitTerm.getId()),
+				observationUnitTerm.getName(),
+				observationUnitTerm.getDefinition());
 	}
 
 	@PostConstruct

@@ -545,7 +545,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
             boolean found = false;
 
 			for (VariableType type : currentTypeList) {
-				if (type.getName().equals(variableType.getName())) {
+				if (type.getId().equals(variableType.getId())) {
                     found = true;
                 }
 			}
