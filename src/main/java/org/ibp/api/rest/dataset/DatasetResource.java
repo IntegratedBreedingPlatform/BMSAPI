@@ -69,7 +69,7 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_PREPARE_PLANTING)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/table/columns", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getObservationSetColumns(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
@@ -181,7 +181,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "It will retrieve all the observation units", notes = "It will retrieve all the observation units including observations and props values in a format that will be used by the Observations table.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_PREPARE_PLANTING)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/table", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname, @PathVariable final String programUUID,
@@ -250,7 +250,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_PREPARE_PLANTING)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets", method = RequestMethod.GET)
 	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@RequestParam(value = "datasetTypeIds", required = false) final Set<Integer> datasetTypeIds) {
@@ -259,7 +259,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "It will retrieve a dataset given the id", notes = "Retrieves a dataset given the id")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_PREPARE_PLANTING)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}", method = RequestMethod.GET)
 	public ResponseEntity<DatasetDTO> getDataset(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId,

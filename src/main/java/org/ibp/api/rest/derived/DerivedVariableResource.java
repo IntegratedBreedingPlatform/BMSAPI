@@ -86,7 +86,7 @@ public class DerivedVariableResource {
 	}
 
 	@ApiOperation(value = "Count Calculated Traits", notes = "Count the calculated traits (derived traits) in a specified dataset(s)")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_PREPARE_PLANTING)
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/derived-variables", method = RequestMethod.HEAD)
 	public ResponseEntity<String> countCalculatedVariables(
