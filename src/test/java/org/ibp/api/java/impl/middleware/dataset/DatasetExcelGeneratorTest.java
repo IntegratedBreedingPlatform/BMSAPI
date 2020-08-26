@@ -111,9 +111,9 @@ public class DatasetExcelGeneratorTest {
 		environmentDetailsVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
 
 		final MeasurementVariable environmentConditionsVariable = new MeasurementVariable();
-		environmentConditionsVariable.setDataTypeId(VariableType.STUDY_CONDITION.getId());
+		environmentConditionsVariable.setDataTypeId(VariableType.ENVIRONMENT_CONDITION.getId());
 		environmentConditionsVariable.setValue(ENVIRONMENTAL_CONDITIONS_TEST);
-		environmentConditionsVariable.setVariableType(VariableType.STUDY_CONDITION);
+		environmentConditionsVariable.setVariableType(VariableType.ENVIRONMENT_CONDITION);
 		environmentConditionsVariable.setTermId(1234);
 		final Map<Integer, String> environmentConditionMap = new HashMap<>();
 		environmentConditionMap.put(1234, ENVIRONMENTAL_CONDITIONS_TEST);
@@ -182,7 +182,7 @@ public class DatasetExcelGeneratorTest {
 		when(this.datasetService
 			.getMeasurementVariables(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, Lists
 				.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-					VariableType.STUDY_CONDITION.getId()))).thenReturn(environmentVariables);
+					VariableType.ENVIRONMENT_CONDITION.getId()))).thenReturn(environmentVariables);
 		when(this.studyDataManager.getPhenotypeByVariableId(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, INSTANCE_ID))
 			.thenReturn(environmentConditionMap);
 
@@ -224,7 +224,7 @@ public class DatasetExcelGeneratorTest {
 			.getMeasurementVariables(
 				INSTANCE_ID, Lists
 					.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-						VariableType.STUDY_CONDITION.getId()));
+						VariableType.ENVIRONMENT_CONDITION.getId()));
 		Mockito.verify(this.datasetService).getMeasurementVariables(INSTANCE_ID, Lists
 			.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
 				VariableType.GERMPLASM_DESCRIPTOR.getId()));
@@ -293,7 +293,7 @@ public class DatasetExcelGeneratorTest {
 		final MeasurementVariable studyConditionVariable = new MeasurementVariable();
 		final String variableName = "VariableName";
 		studyConditionVariable.setTermId(studyConditionTermid);
-		studyConditionVariable.setVariableType(VariableType.STUDY_CONDITION);
+		studyConditionVariable.setVariableType(VariableType.ENVIRONMENT_CONDITION);
 		studyConditionVariable.setName(variableName);
 
 		final MeasurementVariable environmentDetailVariable = new MeasurementVariable();
@@ -415,7 +415,7 @@ public class DatasetExcelGeneratorTest {
 
 		final MeasurementVariable studyConditionVariable = new MeasurementVariable();
 		studyConditionVariable.setTermId(1001);
-		studyConditionVariable.setVariableType(VariableType.STUDY_CONDITION);
+		studyConditionVariable.setVariableType(VariableType.ENVIRONMENT_CONDITION);
 		studyConditionVariable.setName("CONDITION");
 		columns.add(studyConditionVariable);
 
