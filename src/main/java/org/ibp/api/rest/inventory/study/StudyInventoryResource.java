@@ -11,7 +11,6 @@ import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
-import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +83,7 @@ public class StudyInventoryResource {
 	@ApiOperation(value = "Cancel pending Study Transactions", notes = "Cancel any transaction with pending status")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/transactions/cancellation", method = RequestMethod.POST)
 	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES','MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY','MS_CANCEL_PENDING_TRANSACTIONS')")
 	public ResponseEntity<Void> cancelPendingTransaction(
 			@PathVariable final String cropName,
 			@PathVariable final String programUUID,

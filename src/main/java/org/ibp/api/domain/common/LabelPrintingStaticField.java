@@ -22,7 +22,7 @@ public enum LabelPrintingStaticField {
 	UNITS(5),
 	STORAGE_LOCATION_ABBR(27),
 	STORAGE_LOCATION(34),
-	NOTES(11),
+	LOT_NOTES(11),
 	TRN_ID(28),
 	STATUS(29),
 	TYPE(30),
