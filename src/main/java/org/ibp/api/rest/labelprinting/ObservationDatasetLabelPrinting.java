@@ -335,13 +335,15 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 						continue;
 					}
 
-					final Optional<ObservationUnitData> observationVariables = ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(),field);
+					final Optional<ObservationUnitData> observationVariables =
+						ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(), field);
 					if (observationVariables.isPresent()) {
 						row.put(requiredField, observationVariables.get().getValue());
 						continue;
 					}
 
-					final Optional<ObservationUnitData> environmentVariables = ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getEnvironmentVariables(),field);
+					final Optional<ObservationUnitData> environmentVariables =
+						ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getEnvironmentVariables(), field);
 					if (environmentVariables.isPresent()) {
 						row.put(requiredField, environmentVariables.get().getValue());
 						continue;
