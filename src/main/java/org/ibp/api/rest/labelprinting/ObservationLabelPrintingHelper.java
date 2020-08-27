@@ -123,7 +123,7 @@ public abstract class ObservationLabelPrintingHelper {
 
 	public static Optional<ObservationUnitData> getObservationUnitData(final Map<String, ObservationUnitData> variableMap, final Field field) {
 		return variableMap.get(field.getName()) != null ?
-			Optional.of(variableMap.get(field.getName())): variableMap.values().stream() //
+			Optional.of(variableMap.get(field.getName())) : variableMap.values().stream() //
 			.filter(observationUnitData -> //
 				observationUnitData.getVariableId() != null && observationUnitData.getVariableId().equals(field.getId())).findAny();
 	}
