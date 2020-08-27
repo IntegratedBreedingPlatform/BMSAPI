@@ -77,7 +77,7 @@ public class SubObservationDatasetLabelPrintingTest {
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(dataset.getId(),
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-				VariableType.STUDY_CONDITION.getId()));
+				VariableType.ENVIRONMENT_CONDITION.getId()));
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(datasetDTO.getParentDatasetId(), Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(datasetDTO.getParentDatasetId(),
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
@@ -106,7 +106,7 @@ public class SubObservationDatasetLabelPrintingTest {
 		fields.add(new Field(SubObservationDatasetLabelPrinting.PAIR_ID_VARIABLES.get(1), "COOPERATOR_ID"));
 		labelType.setFields(fields);
 		Assert.assertEquals(3, labelType.getFields().size());
-		this.subObservationDatasetLabelPrinting.removePairIdVariables(Arrays.asList(labelType));
+		ObservationLabelPrintingHelper.removePairIdVariables(Arrays.asList(labelType));
 		Assert.assertEquals(1, labelType.getFields().size());
 	}
 
@@ -115,14 +115,14 @@ public class SubObservationDatasetLabelPrintingTest {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setAlias(TermId.OBS_UNIT_ID.name());
 		measurementVariable.setTermId(TermId.OBS_UNIT_ID.getId());
-		List<Field> fields = this.subObservationDatasetLabelPrinting.transform(Arrays.asList(measurementVariable));
+		List<Field> fields = ObservationLabelPrintingHelper.transform(Arrays.asList(measurementVariable));
 		Assert.assertEquals(TermId.OBS_UNIT_ID.getId(), fields.get(0).getId().intValue());
-		Assert.assertEquals(SubObservationDatasetLabelPrinting.PLOT.concat(StringUtils.SPACE).concat(measurementVariable.getAlias()),
+		Assert.assertEquals(ObservationLabelPrintingHelper.PLOT.concat(StringUtils.SPACE).concat(measurementVariable.getAlias()),
 			fields.get(0).getName());
 
 		measurementVariable.setAlias(TermId.ENTRY_NO.name());
 		measurementVariable.setTermId(TermId.ENTRY_NO.getId());
-		fields = this.subObservationDatasetLabelPrinting.transform(Arrays.asList(measurementVariable));
+		fields = ObservationLabelPrintingHelper.transform(Arrays.asList(measurementVariable));
 		Assert.assertEquals(TermId.ENTRY_NO.getId(), fields.get(0).getId().intValue());
 		Assert.assertEquals(TermId.ENTRY_NO.name(), fields.get(0).getName());
 	}

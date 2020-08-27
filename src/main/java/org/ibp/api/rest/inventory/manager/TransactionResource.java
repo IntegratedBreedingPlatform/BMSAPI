@@ -269,9 +269,11 @@ public class TransactionResource {
 	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a set of filtered lots")
 	@RequestMapping(value = "/crops/{cropName}/transactions/pending-deposits/generation", method = RequestMethod.POST)
 	@ResponseBody
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_PENDING_DEPOSITS')")
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_PENDING_DEPOSITS')"
+		+ PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	public ResponseEntity<Void> generatePendingDeposits(
 		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
 		try {
