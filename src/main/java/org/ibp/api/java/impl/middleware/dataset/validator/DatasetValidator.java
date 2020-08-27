@@ -33,7 +33,7 @@ public class DatasetValidator {
 		Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD);
 
 	private static final List<VariableType> ENVIRONMENT_DATASET_VALID_VAR_TYPES =
-		Arrays.asList(VariableType.STUDY_CONDITION, VariableType.ENVIRONMENT_DETAIL);
+		Arrays.asList(VariableType.ENVIRONMENT_CONDITION, VariableType.ENVIRONMENT_DETAIL);
 
 	@Autowired
 	private OntologyDataManager ontologyDataManager;

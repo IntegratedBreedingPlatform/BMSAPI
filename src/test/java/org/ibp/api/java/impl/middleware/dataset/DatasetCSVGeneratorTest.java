@@ -98,7 +98,7 @@ public class DatasetCSVGeneratorTest {
 		final MeasurementVariable measurementVariable4 = new MeasurementVariable();
 		measurementVariable4.setAlias(this.variableName4);
 		measurementVariable4.setName(this.variableName4);
-		measurementVariable4.setVariableType(VariableType.STUDY_CONDITION);
+		measurementVariable4.setVariableType(VariableType.ENVIRONMENT_CONDITION);
 
 		this.measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2, measurementVariable3, measurementVariable4);
 
