@@ -218,7 +218,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final List<MeasurementVariable> environmentVariables =
 			this.middlewareDatasetService.getObservationSetVariables(environmentDatasetId,
 				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-					VariableType.STUDY_CONDITION.getId()));
+						VariableType.ENVIRONMENT_CONDITION.getId()));
 
 		final List<MeasurementVariable> treatmentFactors =
 			this.middlewareDatasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));

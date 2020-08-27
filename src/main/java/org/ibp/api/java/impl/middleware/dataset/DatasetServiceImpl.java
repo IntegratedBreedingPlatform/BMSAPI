@@ -763,7 +763,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariable> environmentDetailAndConditionVariables = this.middlewareDatasetService
 			.getObservationSetVariables(environmentDatasetId, Lists.newArrayList(
 				VariableType.ENVIRONMENT_DETAIL.getId(),
-				VariableType.STUDY_CONDITION.getId()));
+				VariableType.ENVIRONMENT_CONDITION.getId()));
 		this.addLocationIdVariable(environmentDetailAndConditionVariables);
 		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
 		Collections.sort(environmentDetailAndConditionVariables, new Comparator<MeasurementVariable>() {

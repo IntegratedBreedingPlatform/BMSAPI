@@ -8,7 +8,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
-import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 public class DatasetCSVGenerator implements DatasetFileGenerator {
 
 	private final static List<VariableType> ENVIRONMENT_VARIABLES_VARIABLE_TYPES =
-		Arrays.asList(VariableType.ENVIRONMENT_DETAIL, VariableType.STUDY_CONDITION);
+		Arrays.asList(VariableType.ENVIRONMENT_DETAIL, VariableType.ENVIRONMENT_CONDITION);
 
 	@Override
 	public File generateSingleInstanceFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
