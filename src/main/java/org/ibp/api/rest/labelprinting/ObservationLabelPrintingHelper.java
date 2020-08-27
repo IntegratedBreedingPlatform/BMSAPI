@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Season;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
@@ -20,6 +21,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
 public abstract class ObservationLabelPrintingHelper {
 
@@ -116,5 +119,12 @@ public abstract class ObservationLabelPrintingHelper {
 		final String fileName = "Labels-for-".concat(studyDetails.getStudyName()).concat("-").concat(datasetDTO.getName())
 			.concat("-").concat(DateUtil.getCurrentDateAsStringValue());
 		return FileUtils.cleanFileName(fileName);
+	}
+
+	public static Optional<ObservationUnitData> getObservationUnitData(final Map<String, ObservationUnitData> variableMap, final Field field) {
+		return variableMap.get(field.getName()) != null ?
+			Optional.of(variableMap.get(field.getName())): variableMap.values().stream() //
+			.filter(observationUnitData -> //
+				observationUnitData.getVariableId() != null && observationUnitData.getVariableId().equals(field.getId())).findAny();
 	}
 }
