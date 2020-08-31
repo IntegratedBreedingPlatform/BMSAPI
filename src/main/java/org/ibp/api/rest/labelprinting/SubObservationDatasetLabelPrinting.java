@@ -48,6 +48,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -334,12 +335,18 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 						row.put(requiredField, ObservationLabelPrintingHelper.getSeason(observationUnitData != null ? observationUnitData.getValue() : null));
 						continue;
 					}
-					if (observationUnitRow.getVariables().containsKey(field.getName())) {
-						row.put(requiredField, observationUnitRow.getVariables().get(field.getName()).getValue());
+
+					final Optional<ObservationUnitData>
+						observationVariables = ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(),field);
+					if (observationVariables.isPresent()) {
+						row.put(requiredField, observationVariables.get().getValue());
 						continue;
 					}
-					if (observationUnitRow.getEnvironmentVariables().containsKey(field.getName())) {
-						row.put(requiredField, observationUnitRow.getEnvironmentVariables().get(field.getName()).getValue());
+
+					final Optional<ObservationUnitData>
+						environmentVariables = ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getEnvironmentVariables(),field);
+					if (environmentVariables.isPresent()) {
+						row.put(requiredField, environmentVariables.get().getValue());
 						continue;
 					}
 
