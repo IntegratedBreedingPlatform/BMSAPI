@@ -7,10 +7,10 @@ import java.util.List;
 
 public interface GermplasmStudySourceService {
 
-	public List<GermplasmStudySourceDto> getGermplasmStudySources(GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest);
+	List<GermplasmStudySourceDto> getGermplasmStudySources(GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest);
 
-	public long countGermplasmStudySources(GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest);
+	long countGermplasmStudySources(GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest);
 
-	public long countFilteredGermplasmStudySources(GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest);
+	long countFilteredGermplasmStudySources(GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest);
 
 }
