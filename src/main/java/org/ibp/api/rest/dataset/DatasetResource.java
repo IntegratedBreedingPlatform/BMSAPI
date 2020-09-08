@@ -200,7 +200,7 @@ public class DatasetResource {
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
 		@RequestBody final ObservationUnitsSearchDTO searchDTO,
-		@ApiIgnore @PageableDefault(page = 0, size = 50) final Pageable pageable) {
+		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
 
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 		Preconditions

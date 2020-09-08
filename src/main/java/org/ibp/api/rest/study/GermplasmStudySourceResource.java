@@ -53,7 +53,7 @@ public class GermplasmStudySourceResource {
 	public ResponseEntity<GermplasmStudySourceTable> getGermplasmStudySourceTable(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest,
-		final @ApiIgnore @PageableDefault(page = 0, size = 50) Pageable pageable) {
+		final @ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
 		germplasmStudySourceSearchRequest.setStudyId(studyId);
 

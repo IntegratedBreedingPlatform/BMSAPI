@@ -8,15 +8,14 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -68,7 +67,7 @@ public interface StudyService {
 
 	long countStudies(StudySearchFilter studySearchFilter);
 
-	List<StudyDto> getStudies(StudySearchFilter studySearchFilter, PageRequest pageRequest);
+	List<StudyDto> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	List<TreeNode> getStudyTree(String parentKey, String programUUID);
 
