@@ -38,13 +38,13 @@ public class StudyGermplasmResource {
 
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list",
 		notes = "Create germplasm entries in study based on the specified germplasm list")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/germplasm/list/{germplasmListId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entry-lists/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<StudyGermplasmDto>> createStudyGermplasm(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
-		@PathVariable final Integer studyId, @PathVariable final Integer germplasmListId) {
+		@PathVariable final Integer studyId, @RequestBody final GermplasmEntryRequestDto germplasmEntryRequestDto) {
 
-		return new ResponseEntity<>(this.studyGermplasmService.createStudyGermplasmList(studyId, germplasmListId),
+		return new ResponseEntity<>(this.studyGermplasmService.createStudyGermplasmList(studyId, germplasmEntryRequestDto.getGermplasmListId()),
 			HttpStatus.OK);
 
 	}
