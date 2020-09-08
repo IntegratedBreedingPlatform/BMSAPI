@@ -77,5 +77,10 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		return this.middlewareStudyGermplasmService.saveStudyGermplasm(studyId, studyGermplasmList);
 	}
 
+	@Override
+	public void deleteStudyGermplasm(final Integer studyId) {
+		this.studyValidator.validate(studyId, true);
+		this.middlewareStudyGermplasmService.deleteStudyGermplasm(studyId);
+	}
 
 }

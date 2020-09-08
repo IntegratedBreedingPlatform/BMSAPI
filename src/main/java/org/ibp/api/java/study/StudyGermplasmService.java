@@ -9,4 +9,6 @@ public interface StudyGermplasmService {
 	StudyGermplasmDto replaceStudyGermplasm(Integer studyId, Integer entryId, StudyGermplasmDto studyGermplasmDto);
 
 	List<StudyGermplasmDto> createStudyGermplasmList(Integer studyId, Integer germplasmListId);
+
+	void deleteStudyGermplasm(Integer studyId);
 }

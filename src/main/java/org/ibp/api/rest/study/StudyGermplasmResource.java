@@ -44,8 +44,23 @@ public class StudyGermplasmResource {
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmEntryRequestDto germplasmEntryRequestDto) {
 
-		return new ResponseEntity<>(this.studyGermplasmService.createStudyGermplasmList(studyId, germplasmEntryRequestDto.getGermplasmListId()),
+		return new ResponseEntity<>(
+			this.studyGermplasmService.createStudyGermplasmList(studyId, germplasmEntryRequestDto.getGermplasmListId()),
 			HttpStatus.OK);
+
+	}
+
+	@ApiOperation(value = "Delete germplasm entries in study",
+		notes = "Delete germplasm entries in study")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entry-lists", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity deleteStudyGermplasm(final @PathVariable String cropname,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId) {
+
+		this.studyGermplasmService.deleteStudyGermplasm(studyId);
+
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
 	}
 
