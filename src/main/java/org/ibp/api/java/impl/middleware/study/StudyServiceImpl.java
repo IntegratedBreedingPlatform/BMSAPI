@@ -25,10 +25,12 @@ import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyFilters;
-import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyFilters;
+import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
@@ -39,10 +41,11 @@ import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -88,6 +91,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private FieldMapService fieldMapService;
+
+	@Autowired
+	private StudyGermplasmService studyGermplasmService;
 
 	@Override
 	public List<StudySummary> search(final String programUniqueId, final String cropname, final String principalInvestigator,
@@ -428,6 +434,18 @@ public class StudyServiceImpl implements StudyService {
 		} else {
 			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
 		}
+	}
+
+	@Override
+	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final Pageable pageable) {
+		this.studyValidator.validate(studyId, false);
+		return this.studyGermplasmService.getStudyEntries(studyId, pageable);
+	}
+
+	@Override
+	public long countAllStudyEntries(final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
+		return this.studyGermplasmService.countStudyEntries(studyId);
 	}
 
 }

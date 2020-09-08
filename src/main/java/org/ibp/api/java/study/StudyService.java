@@ -8,14 +8,15 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -76,4 +77,9 @@ public interface StudyService {
 	boolean hasCrossesOrSelections(final int studyId);
 
 	Integer getEnvironmentDatasetId(Integer studyId);
+
+	List<StudyEntryDto> getStudyEntries(Integer studyId, Pageable pageable);
+
+	long countAllStudyEntries(Integer studyId);
+
 }
