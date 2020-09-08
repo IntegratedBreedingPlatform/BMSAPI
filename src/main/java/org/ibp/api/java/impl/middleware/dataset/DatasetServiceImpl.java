@@ -562,7 +562,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Set<Integer> variableIds =
 			new TreeSet(observations.stream().map(ObservationDTO::getObservationVariableDbId).collect(Collectors.toSet()));
 		final List<String> variableNames =
-			variableIds.stream().map(termId -> varMap.get(termId).getName()).collect(Collectors.toList());
+			variableIds.stream().map(termId -> varMap.get(termId).getAlias()).collect(Collectors.toList());
 
 		/* tree -> {
 		 *     obsUnit1 -> {
@@ -787,7 +787,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariable> environmentDetailAndConditionVariables = this.middlewareDatasetService
 			.getObservationSetVariables(environmentDatasetId, Lists.newArrayList(
 				VariableType.ENVIRONMENT_DETAIL.getId(),
-				VariableType.STUDY_CONDITION.getId()));
+				VariableType.ENVIRONMENT_CONDITION.getId()));
 		this.addLocationIdVariable(environmentDetailAndConditionVariables);
 		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
 		Collections.sort(environmentDetailAndConditionVariables, new Comparator<MeasurementVariable>() {

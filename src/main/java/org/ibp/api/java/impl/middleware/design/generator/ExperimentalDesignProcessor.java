@@ -121,7 +121,7 @@ public class ExperimentalDesignProcessor {
 			observationUnitData = null;
 
 			if (measurementVariable.getVariableType() == VariableType.ENVIRONMENT_DETAIL
-				|| measurementVariable.getVariableType() == VariableType.STUDY_CONDITION) {
+				|| measurementVariable.getVariableType() == VariableType.ENVIRONMENT_CONDITION) {
 				observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), String.valueOf(measurementVariable.getValue()));
 				environmentObservationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 			} else {

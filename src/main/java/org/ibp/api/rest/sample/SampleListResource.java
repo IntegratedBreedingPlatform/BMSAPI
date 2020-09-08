@@ -10,6 +10,7 @@ import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,7 +201,8 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Get sample lists given a tree parent node folder", notes = "Get sample lists given a tree parent node folder")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')"
+		+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/sample-lists/tree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getSampleListByParentFolderId(
