@@ -26,7 +26,7 @@ public class StudyGermplasmResource {
 
 	@ApiOperation(value = "Replace germplasm entry in study",
 		notes = "Replace germplasm entry in study")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/germplasm/{entryId}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<StudyGermplasmDto> replaceStudyGermplasm(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
@@ -38,7 +38,7 @@ public class StudyGermplasmResource {
 
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list",
 		notes = "Create germplasm entries in study based on the specified germplasm list")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entry-lists/generation", method = RequestMethod.POST)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<StudyGermplasmDto>> createStudyGermplasm(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
@@ -52,7 +52,7 @@ public class StudyGermplasmResource {
 
 	@ApiOperation(value = "Delete germplasm entries in study",
 		notes = "Delete germplasm entries in study")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entry-lists", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteStudyGermplasm(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
