@@ -6,7 +6,6 @@ import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmS
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.GermplasmStudySourceService;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
