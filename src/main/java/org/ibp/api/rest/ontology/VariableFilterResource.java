@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 // TODO move to VariableResource class once work to refactor URLs there (ie. to start with crops) is worked on
 @Api(value = "Ontology Variable Filter Service")
 @Controller
-@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_ONTOLOGIES', 'CROP_MANAGEMENT')")
+@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'MANAGE_ONTOLOGIES', 'CROP_MANAGEMENT')")
 @RequestMapping("/crops")
 public class VariableFilterResource {
 
