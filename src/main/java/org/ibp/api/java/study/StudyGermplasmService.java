@@ -1,5 +1,6 @@
 package org.ibp.api.java.study;
 
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 
 import java.util.List;
@@ -11,4 +12,6 @@ public interface StudyGermplasmService {
 	List<StudyGermplasmDto> createStudyGermplasmList(Integer studyId, Integer germplasmListId);
 
 	void deleteStudyGermplasm(Integer studyId);
+
+	void updateStudyEntryProperty(Integer studyId, StudyEntryPropertyData studyEntryPropertyData);
 }

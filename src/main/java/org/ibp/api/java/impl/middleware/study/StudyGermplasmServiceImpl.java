@@ -2,27 +2,20 @@ package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.ibp.api.domain.study.Measurement;
-import org.ibp.api.domain.study.MeasurementIdentifier;
-import org.ibp.api.domain.study.Trait;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyGermplasmService;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,6 +74,11 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	public void deleteStudyGermplasm(final Integer studyId) {
 		this.studyValidator.validate(studyId, true);
 		this.middlewareStudyGermplasmService.deleteStudyGermplasm(studyId);
+
+	@Override
+	public void updateStudyEntryProperty(final Integer studyId, final StudyEntryPropertyData studyEntryPropertyData) {
+		this.studyValidator.validate(studyId, true);
+		this.middlewareStudyGermplasmService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}
 
 }

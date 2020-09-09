@@ -2,6 +2,7 @@ package org.ibp.api.rest.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.java.study.StudyGermplasmService;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import java.util.List;
 
+// TODO: Move these services to StudyResource
 @Api(value = "Study Germplasm Services")
 @Controller
 @RequestMapping("/crops")
@@ -63,5 +65,20 @@ public class StudyGermplasmResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
 	}
+
+	@ApiOperation(value = "Update germplasm entry property",
+		notes = "Update germplasm entry property")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity updateStudyEntryProperty(final @PathVariable String cropname,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @RequestBody StudyEntryPropertyData studyEntryPropertyData) {
+
+		this.studyGermplasmService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
+
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+	}
+
 
 }
