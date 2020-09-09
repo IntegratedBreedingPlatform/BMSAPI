@@ -30,7 +30,7 @@ import java.util.List;
 public class DatasetValidator {
 
 	private static final List<VariableType> OBSERVATION_DATASET_VALID_VAR_TYPES =
-		Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD);
+		Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.GERMPLASM_DESCRIPTOR);
 
 	private static final List<VariableType> ENVIRONMENT_DATASET_VALID_VAR_TYPES =
 		Arrays.asList(VariableType.ENVIRONMENT_CONDITION, VariableType.ENVIRONMENT_DETAIL);
