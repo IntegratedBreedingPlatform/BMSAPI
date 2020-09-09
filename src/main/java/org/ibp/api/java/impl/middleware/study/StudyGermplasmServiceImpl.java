@@ -73,7 +73,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	@Override
 	public void deleteStudyGermplasm(final Integer studyId) {
 		this.studyValidator.validate(studyId, true);
-		this.middlewareStudyGermplasmService.deleteStudyGermplasm(studyId);
+		this.middlewareStudyGermplasmService.deleteStudyEntries(studyId);
+	}
 
 	@Override
 	public void updateStudyEntryProperty(final Integer studyId, final StudyEntryPropertyData studyEntryPropertyData) {
