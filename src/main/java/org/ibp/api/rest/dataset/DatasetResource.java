@@ -2,6 +2,8 @@ package org.ibp.api.rest.dataset;
 
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.fest.util.Collections;
@@ -9,7 +11,6 @@ import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -24,6 +25,8 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
 import java.util.Arrays;
@@ -124,7 +128,7 @@ public class DatasetResource {
 	public ResponseEntity<List<MeasurementVariableDto>> getVariables(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer variableTypeId) {
-		
+
 		final List<MeasurementVariableDto> variables =
 			this.studyDatasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.getById(variableTypeId));
 		return new ResponseEntity<>(variables, HttpStatus.OK);
@@ -137,7 +141,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
 		@RequestBody final ObservationDto observation) {
-		
+
 		return new ResponseEntity<>(
 			this.studyDatasetService.createObservation(studyId, datasetId, observationUnitId, observation), HttpStatus.OK);
 	}
@@ -149,7 +153,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId, @PathVariable final Integer observationId,
 		@ApiParam("Only some fields will be updated: ie. value, draftValue") @RequestBody final ObservationDto observationDto) {
-		
+
 		return new ResponseEntity<>(
 			this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationDto),
 			HttpStatus.OK);
@@ -161,7 +165,7 @@ public class DatasetResource {
 	public ResponseEntity<String> countPhenotypesByInstance(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer instanceId) {
-		
+
 		final long count = this.studyDatasetService.countObservationsByInstance(studyId, datasetId, instanceId);
 		final HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.add("X-Total-Count", String.valueOf(count));
@@ -175,7 +179,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<DatasetDTO> generateDataset(@PathVariable final String cropName, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer parentId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
-		
+
 		return new ResponseEntity<>(
 			this.studyDatasetService.generateSubObservationDataset(cropName, studyId, parentId, datasetGeneratorInput), HttpStatus.OK);
 	}
@@ -184,26 +188,29 @@ public class DatasetResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/table", method = RequestMethod.POST)
 	@ResponseBody
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "Results page you want to retrieve (0..N)"),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. ")
+	})
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
-		@RequestBody final ObservationUnitsSearchDTO searchDTO) {
+		@RequestBody final ObservationUnitsSearchDTO searchDTO,
+		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
 
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
-		final SortedPageRequest sortedRequest = searchDTO.getSortedRequest();
-		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
 		Preconditions
 			.checkArgument(Collections.isEmpty(searchDTO.getFilterColumns()), "filterColumns should be null or empty");
-		
-
-		final Integer pageNumber = sortedRequest.getPageNumber();
-		final Integer pageSize = sortedRequest.getPageSize();
 
 		final Integer instanceId = searchDTO.getInstanceId();
 		final Boolean draftMode = searchDTO.getDraftMode();
 
 		final PagedResult<ObservationUnitRow> pageResult =
-			new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<ObservationUnitRow>() {
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<ObservationUnitRow>() {
 
 				@Override
 				public long getCount() {
@@ -218,7 +225,7 @@ public class DatasetResource {
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
-					return DatasetResource.this.studyDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO);
+					return DatasetResource.this.studyDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO, pageable);
 				}
 			});
 
@@ -245,7 +252,7 @@ public class DatasetResource {
 		Preconditions.checkNotNull(searchDTO.getFilter(), "filter inside params cannot be null");
 		Preconditions
 			.checkArgument(!Collections.isEmpty(searchDTO.getFilterColumns()), "filterColumns cannot be null or empty");
-		
+
 		return new ResponseEntity<>(this.studyDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO), HttpStatus.OK);
 	}
 
@@ -254,7 +261,7 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets", method = RequestMethod.GET)
 	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@RequestParam(value = "datasetTypeIds", required = false) final Set<Integer> datasetTypeIds) {
-		
+
 		return new ResponseEntity<>(this.studyDatasetService.getDatasets(studyId, datasetTypeIds), HttpStatus.OK);
 	}
 
@@ -264,7 +271,7 @@ public class DatasetResource {
 	public ResponseEntity<DatasetDTO> getDataset(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		
+
 		return new ResponseEntity<>(this.studyDatasetService.getDataset(crop, studyId, datasetId), HttpStatus.OK);
 	}
 
@@ -276,7 +283,7 @@ public class DatasetResource {
 	public ResponseEntity<Void> deleteObservation(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
 		@PathVariable final Integer observationId) {
-		
+
 		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -288,7 +295,7 @@ public class DatasetResource {
 		method = RequestMethod.PUT)
 	public ResponseEntity<Void> postObservationUnits(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final ObservationsPutRequestInput input) {
-		
+
 		this.studyDatasetService.importObservations(studyId, datasetId, input);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -299,7 +306,7 @@ public class DatasetResource {
 	public ResponseEntity<List<StudyInstance>> getDatasetInstances(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		
+
 		return new ResponseEntity<>(this.studyDatasetService.getDatasetInstances(studyId, datasetId), HttpStatus.OK);
 	}
 
@@ -312,7 +319,7 @@ public class DatasetResource {
 		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds,
 		@RequestParam(value = "collectionOrderId") final Integer collectionOrderId,
 		@RequestParam(value = "singleFile") final boolean singleFile) {
-		
+
 		final DatasetExportService exportMethod = this.getExportFileStrategy(fileType);
 		if (exportMethod != null) {
 			final File file = exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId, singleFile);
@@ -350,7 +357,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> acceptDraftData(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		
+
 		this.studyDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -361,7 +368,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> rejectDraftData(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		
+
 		this.studyDatasetService.rejectDatasetDraftData(studyId, datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -387,7 +394,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> setValuesToMissing(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		
+
 		this.studyDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -398,7 +405,7 @@ public class DatasetResource {
 	public ResponseEntity<FilteredPhenotypesInstancesCountDTO> countFilteredPhenotypesAndInstances(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final ObservationUnitsSearchDTO filterParams) {
-		
+
 		final FilteredPhenotypesInstancesCountDTO
 			result = this.studyDatasetService.countFilteredInstancesAndPhenotypes(studyId, datasetId, filterParams);
 
@@ -413,7 +420,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@RequestBody final ObservationUnitsSearchDTO searchDTO) {
-		
+
 		this.studyDatasetService.acceptDraftDataFilteredByVariable(studyId, datasetId, searchDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -426,7 +433,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@RequestBody final ObservationUnitsParamDTO paramDTO) {
-		
+
 		this.studyDatasetService.setValueToVariable(studyId, datasetId, paramDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -436,7 +443,7 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getAllVariables(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId) {
-		
+
 		final List<MeasurementVariable> columns = this.studyDatasetService.getAllDatasetVariables(studyId, datasetId);
 		return new ResponseEntity<>(columns, HttpStatus.OK);
 	}
