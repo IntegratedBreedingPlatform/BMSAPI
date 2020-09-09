@@ -1,45 +1,86 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.domain.study.Measurement;
+import org.ibp.api.domain.study.MeasurementIdentifier;
+import org.ibp.api.domain.study.Trait;
+import org.ibp.api.java.germplasm.GermplamListService;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyGermplasmService;
+import org.modelmapper.Converter;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 
-    @Resource
-    private StudyValidator studyValidator;
+	@Resource
+	private StudyValidator studyValidator;
 
-    @Autowired
-    private PedigreeService pedigreeService;
+	@Autowired
+	private PedigreeService pedigreeService;
 
-    @Autowired
-    private CrossExpansionProperties crossExpansionProperties;
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
+	@Resource
+	private StudyGermplasmValidator studyGermplasmValidator;
 
-    @Resource
-    private StudyGermplasmValidator studyGermplasmValidator;
+	@Autowired
+	private GermplasmListValidator germplasmListValidator;
 
-    @Resource
-    private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
+	@Autowired
+	private GermplamListService germplasmListService;
 
-    @Override
-    public StudyGermplasmDto replaceStudyGermplasm(final Integer studyId, final Integer entryId, final StudyGermplasmDto studyGermplasmDto) {
-        final Integer gid = studyGermplasmDto.getGermplasmId();
-        this.studyValidator.validate(studyId, true);
-        this.studyGermplasmValidator.validate(studyId, entryId, gid);
+	@Resource
+	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
 
-        return this.middlewareStudyGermplasmService.replaceStudyGermplasm(studyId, entryId, gid, this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
-    }
+	@Override
+	public StudyGermplasmDto replaceStudyGermplasm(final Integer studyId, final Integer entryId,
+		final StudyGermplasmDto studyGermplasmDto) {
+		final Integer gid = studyGermplasmDto.getGermplasmId();
+		this.studyValidator.validate(studyId, true);
+		this.studyGermplasmValidator.validate(studyId, entryId, gid);
 
+		return this.middlewareStudyGermplasmService
+			.replaceStudyGermplasm(studyId, entryId, gid, this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
+	}
+
+	@Override
+	public List<StudyGermplasmDto> createStudyGermplasmList(final Integer studyId, final Integer germplasmListId) {
+		final GermplasmList germplasmList = this.germplasmListService.getGermplasmList(germplasmListId);
+
+		this.germplasmListValidator.validateGermplasmList(germplasmListId);
+		this.studyGermplasmValidator.validateStudyAlreadyHasStudyGermplasm(studyId);
+		this.studyValidator.validate(studyId, true);
+
+		final ModelMapper mapper = StudyGermplasmMapper.getInstance();
+		final List<StudyGermplasmDto> studyGermplasmList =
+			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyGermplasmDto.class)).collect(Collectors.toList());
+
+		return this.middlewareStudyGermplasmService.saveStudyGermplasm(studyId, studyGermplasmList);
+	}
+
+	@Override
+	public void deleteStudyGermplasm(final Integer studyId) {
+		this.studyValidator.validate(studyId, true);
+		this.middlewareStudyGermplasmService.deleteStudyGermplasm(studyId);
+	}
 
 }
