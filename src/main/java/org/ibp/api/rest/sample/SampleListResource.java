@@ -54,7 +54,7 @@ public class SampleListResource {
 	public CsvExportSampleListService csvExportSampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'SAMPLE_LISTS','INFORMATION_MANAGEMENT')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'SAMPLE_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestParam final String programUUID, @RequestBody final SampleListDto dto) {
@@ -151,7 +151,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Search Sample List", notes = "Search Sample List")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'SAMPLE_LISTS','INFORMATION_MANAGEMENT')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'SAMPLE_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists/search", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<org.generationcp.middleware.pojos.SampleList>> search(@PathVariable final String crop,
@@ -164,7 +164,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Download Sample List as CSV file", notes = "Download Sample List as CSV file")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'SAMPLE_LISTS','INFORMATION_MANAGEMENT')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'SAMPLE_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists/{listId}/download", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> download(@PathVariable final String crop, @PathVariable final Integer listId, @RequestParam final String programUUID,
 		@RequestParam final String listName) throws IOException {

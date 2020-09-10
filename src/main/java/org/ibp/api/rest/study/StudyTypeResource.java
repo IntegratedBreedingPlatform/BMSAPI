@@ -20,7 +20,7 @@ import java.util.List;
 
 @Api(value = "StudyType Services")
 @Controller
-@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 @RequestMapping("/crops")
 public class StudyTypeResource {
 
