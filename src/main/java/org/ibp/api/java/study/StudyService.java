@@ -4,6 +4,7 @@ package org.ibp.api.java.study;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -81,5 +82,7 @@ public interface StudyService {
 	List<StudyEntryDto> getStudyEntries(Integer studyId, Pageable pageable);
 
 	long countAllStudyEntries(Integer studyId);
+
+	List<MeasurementVariable> getEntryDescriptorColumns(Integer studyId);
 
 }

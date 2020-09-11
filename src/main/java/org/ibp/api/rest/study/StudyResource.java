@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.common.PagedResult;
@@ -113,4 +114,16 @@ public class StudyResource {
 		return new ResponseEntity<>(resultPage.getPageResults(), headers, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get Entry Descriptors as Columns", notes = "Retrieves ALL MeasurementVariables associated to the entry plus "
+		+ "some calculated inventory columns")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/table/columns", method = RequestMethod.GET)
+	public ResponseEntity<List<MeasurementVariable>> getEntryTableColumns(@PathVariable final String crop, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId) {
+
+		final List<MeasurementVariable> entryDescriptors =
+			this.studyService.getEntryDescriptorColumns(studyId);
+
+		return new ResponseEntity<>(entryDescriptors, HttpStatus.OK);
+	}
 }
