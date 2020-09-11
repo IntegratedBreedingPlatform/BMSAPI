@@ -84,7 +84,7 @@ public class StudyGermplasmValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (this.middlewareStudyGermplasmService.countStudyGermplasm(studyId) > 0) {
+		if (this.middlewareStudyGermplasmService.countStudyEntries(studyId) > 0) {
 			errors.reject("study.has.existing.study.germplasm");
 		}
 
