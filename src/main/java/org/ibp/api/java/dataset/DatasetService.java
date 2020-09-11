@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -214,7 +215,7 @@ public interface DatasetService {
 	 * @param observationUnitId Id of the observation unit
 	 * @param observationId     Id of the observation to be deleted
 	 */
-	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
+	void deleteObservation(Integer studyId, Integer datasetId, Integer observationUnitId, Integer observationId);
 
 	/**
 	 * It will import a list of observation presented as a List<List<String>>.
@@ -255,7 +256,7 @@ public interface DatasetService {
 	 * @param draftMode  Indicates to count all observation units  or draft observations
 	 * @return Number of observations units that matches the dataset id and draftMode
 	 */
-	Integer countAllObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
+	Integer countAllObservationUnitsForDataset(Integer datasetId, Integer instanceId, Boolean draftMode);
 
 	/**
 	 * Count how many observation units are affected by a filter
@@ -269,7 +270,7 @@ public interface DatasetService {
 	 * @return Number of observation units that matches the datasetId, draftMode and filter
 	 */
 	long countFilteredObservationUnitsForDataset(
-		Integer datasetId, Integer instanceId, final Boolean draftMode, ObservationUnitsSearchDTO.Filter filter);
+		Integer datasetId, Integer instanceId, Boolean draftMode, ObservationUnitsSearchDTO.Filter filter);
 
 	/**
 	 * It will accept all the draft data even when there are out of bounds values for numerical types.
@@ -322,5 +323,8 @@ public interface DatasetService {
 	 */
 	void setValueToVariable(Integer studyId, Integer datasetId, ObservationUnitsParamDTO searchDTO);
 
-	List<MeasurementVariable> getAllDatasetVariables(final int studyId, final int datasetId);
+	List<MeasurementVariable> getAllDatasetVariables(int studyId, int datasetId);
+
+	void replaceObservationUnitsEntry(int studyId, int datasetId, ObservationUnitEntryReplaceRequest request);
+
 }

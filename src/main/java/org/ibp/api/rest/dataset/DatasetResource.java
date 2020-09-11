@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -439,5 +440,18 @@ public class DatasetResource {
 		
 		final List<MeasurementVariable> columns = this.studyDatasetService.getAllDatasetVariables(studyId, datasetId);
 		return new ResponseEntity<>(columns, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Replace the entry (gid) for a set of observation units", notes = "Replace the entry (gid) for a set of observation units")
+	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/entries", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> updateObservationUnitsEntry(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
+		@RequestBody final ObservationUnitEntryReplaceRequest request) {
+
+		this.studyDatasetService.replaceObservationUnitsEntry(studyId, datasetId, request);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
