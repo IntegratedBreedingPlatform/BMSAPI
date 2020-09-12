@@ -39,7 +39,7 @@ public class GermplasmStudySourceValidator {
 		germplasmStudySourceSearchRequest.setStudyId(studyId);
 		germplasmStudySourceSearchRequest.setFilter(filter);
 		final List<GermplasmStudySourceDto> germplasmStudySourceDtos =
-			germplasmStudySourceService.getGermplasmStudySources(germplasmStudySourceSearchRequest);
+			germplasmStudySourceService.getGermplasmStudySources(germplasmStudySourceSearchRequest, null);
 		if (!germplasmStudySourceDtos.isEmpty()) {
 			errors.reject("study.entry.replace.invalid.gid", new Object[] {String.valueOf(gid)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());

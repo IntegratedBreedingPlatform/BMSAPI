@@ -868,9 +868,8 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		this.datasetValidator.validatePlotDatasetType(datasetId);
-		BindingResult errors;
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		if (this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())) {
-			errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("study.has.means.dataset", new Object[] {String.valueOf(studyId)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -887,14 +886,12 @@ public class DatasetServiceImpl implements DatasetService {
 
 		// observation units
 		final List<ObservationUnitRow> observationUnitRows =
-			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest().getSearchRequest());
+			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest().getSearchRequest(),null);
 		if (observationUnitRows.isEmpty()) {
-			errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("study.entry.replace.empty.units", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		if (observationUnitRows.stream().filter(o -> !o.getSamplesCount().equals("-")).count()>0) {
-			errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("study.entry.replace.samples.found", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -908,7 +905,6 @@ public class DatasetServiceImpl implements DatasetService {
 		studyTransactionsRequest.setObservationUnitIds(observationUnitIds);
 
 		if (studyTransactionsService.countStudyTransactions(studyId, studyTransactionsRequest) > 0) {
-			errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("study.entry.replace.samples.found", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
