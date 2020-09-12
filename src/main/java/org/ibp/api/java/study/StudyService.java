@@ -70,7 +70,7 @@ public interface StudyService {
 
 	long countStudies(StudySearchFilter studySearchFilter);
 
-	List<StudyDto> getStudies(StudySearchFilter studySearchFilter);
+	List<StudyDto> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	List<TreeNode> getStudyTree(String parentKey, String programUUID);
 
