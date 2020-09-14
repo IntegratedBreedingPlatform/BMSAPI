@@ -478,9 +478,9 @@ public class StudyServiceImpl implements StudyService {
 		}
 
 		//Add Inventory related columns
-		entryDescriptors.add(this.buildVirtualColumn("activeLots", TermId.GID_ACTIVE_LOTS_COUNT));
-		entryDescriptors.add(this.buildVirtualColumn("available", TermId.GID_AVAILABLE_BALANCE));
-		entryDescriptors.add(this.buildVirtualColumn("unit", TermId.GID_UNIT));
+		entryDescriptors.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
+		entryDescriptors.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
+		entryDescriptors.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
 
 		return entryDescriptors;
 	}
@@ -488,7 +488,7 @@ public class StudyServiceImpl implements StudyService {
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
 		final MeasurementVariable sampleColumn = new MeasurementVariable();
 		sampleColumn.setName(name);
-		sampleColumn.setAlias(termId.name());
+		sampleColumn.setAlias(name);
 		sampleColumn.setTermId(termId.getId());
 		sampleColumn.setFactor(true);
 		return sampleColumn;
