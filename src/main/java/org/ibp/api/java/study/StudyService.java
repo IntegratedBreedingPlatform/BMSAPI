@@ -80,7 +80,7 @@ public interface StudyService {
 
 	Integer getEnvironmentDatasetId(Integer studyId);
 
-	List<StudyEntryDto> getStudyEntries(Integer studyId, StudyEntrySearchDto studyEntrySearchDto, Pageable pageable);
+	List<StudyEntryDto> getStudyEntries(Integer studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 
 	long countAllStudyEntries(Integer studyId);
 

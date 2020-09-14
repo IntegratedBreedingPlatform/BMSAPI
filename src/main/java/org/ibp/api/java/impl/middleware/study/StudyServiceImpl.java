@@ -448,9 +448,9 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
+	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 		this.studyValidator.validate(studyId, false);
-		return this.studyGermplasmService.getStudyEntries(studyId, studyEntrySearchDto, pageable);
+		return this.studyGermplasmService.getStudyEntries(studyId, filter, pageable);
 	}
 
 	@Override
