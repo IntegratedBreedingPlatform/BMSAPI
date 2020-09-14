@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -405,8 +406,8 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter) {
-		return this.middlewareStudyService.getStudies(studySearchFilter);
+	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		return this.middlewareStudyService.getStudies(studySearchFilter, pageable);
 	}
 
 	@Override
@@ -447,9 +448,9 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final Pageable pageable) {
+	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
 		this.studyValidator.validate(studyId, false);
-		return this.studyGermplasmService.getStudyEntries(studyId, pageable);
+		return this.studyGermplasmService.getStudyEntries(studyId, studyEntrySearchDto, pageable);
 	}
 
 	@Override
@@ -492,6 +493,5 @@ public class StudyServiceImpl implements StudyService {
 		sampleColumn.setFactor(true);
 		return sampleColumn;
 	}
-
 
 }

@@ -5,21 +5,29 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -28,11 +36,14 @@ import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
+import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
+import org.ibp.api.java.impl.middleware.study.validator.GermplasmStudySourceValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
@@ -42,6 +53,9 @@ import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -53,6 +67,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +115,18 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private DatasetTypeService datasetTypeService;
+
+	@Autowired
+	private OntologyDataManager ontologyDataManager;
+
+	@Autowired
+	private StudyService studyService;
+
+	@Autowired
+	private GermplasmStudySourceValidator germplasmStudySourceValidator;
+
+	@Autowired
+	private StudyTransactionsService studyTransactionsService;
 
 	static final String PLOT_DATASET_NAME = "Observations";
 
@@ -311,7 +338,22 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
+
+		Pageable convertedPageable = null;
+		if (pageable != null && pageable.getSort() != null) {
+			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+			if (iterator.hasNext()) {
+				// Convert the sort property name from termid to actual term name.
+				final Sort.Order sort = iterator.next();
+				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
+				if (term != null) {
+					pageable.getSort().and(new Sort(sort.getDirection(), term.getName()));
+					convertedPageable =
+						new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(), term.getName());
+				}
+			}
+		}
 
 		List<Integer> instanceIds = null;
 		if (searchDTO.getInstanceId() != null) {
@@ -320,7 +362,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
 
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
-			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO);
+			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO, convertedPageable);
 
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
@@ -340,7 +382,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
 
-		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO);
+		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO, null);
 	}
 
 	@Override
@@ -819,5 +861,64 @@ public class DatasetServiceImpl implements DatasetService {
 		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
 		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);
 		environmentDetailAndConditionVariables.add(0, locationIdVariable);
+	}
+
+	@Override
+	public void replaceObservationUnitsEntry(final int studyId, final int datasetId, final ObservationUnitEntryReplaceRequest request) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		this.datasetValidator.validatePlotDatasetType(datasetId);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		if (this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())) {
+			errors.reject("study.has.means.dataset", new Object[] {String.valueOf(studyId)}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		BaseValidator.checkNotNull(request, "param.null", new String[] {"lotGeneratorInputDto"});
+		BaseValidator.checkNotNull(request.getSearchRequest(), "param.null", new String[] {"searchRequest"});
+		BaseValidator.checkNotNull(request.getEntryId(), "param.null", new String[] {"entryNo"});
+
+		studyValidator.validateStudyContainsEntry(studyId, request.getEntryId());
+
+		germplasmStudySourceValidator.validateDifferentGermplasmStudySource(studyId, request.getEntryId());
+
+		this.processSearchComposite(request.getSearchRequest());
+
+		// observation units
+		final List<ObservationUnitRow> observationUnitRows =
+			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest().getSearchRequest(),null);
+		if (observationUnitRows.isEmpty()) {
+			errors.reject("study.entry.replace.empty.units", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		if (observationUnitRows.stream().filter(o -> !o.getSamplesCount().equals("-")).count()>0) {
+			errors.reject("study.entry.replace.samples.found", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final List<Integer> observationUnitIds = observationUnitRows.stream().map(ObservationUnitRow::getObservationUnitId).collect(
+			Collectors.toList());
+		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
+		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+		transactionsSearchDto.setTransactionStatus(Lists.newArrayList(TransactionStatus.PENDING.getIntValue(),TransactionStatus.CONFIRMED.getIntValue()));
+		studyTransactionsRequest.setTransactionsSearch(transactionsSearchDto);
+		studyTransactionsRequest.setObservationUnitIds(observationUnitIds);
+
+		if (studyTransactionsService.countStudyTransactions(studyId, studyTransactionsRequest) > 0) {
+			errors.reject("study.entry.replace.samples.found", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		this.middlewareDatasetService.replaceObservationUnitEntry(observationUnitIds, request.getEntryId());
+	}
+
+	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
+		if (searchDTO.getItemIds() != null && !searchDTO.getItemIds().isEmpty()) {
+			final ObservationUnitsSearchDTO searchRequest = new ObservationUnitsSearchDTO();
+			final ObservationUnitsSearchDTO.Filter filter = searchRequest.new Filter();
+			filter.setFilteredNdExperimentIds(searchDTO.getItemIds());
+			searchRequest.setFilter(filter);
+			searchDTO.setSearchRequest(searchRequest);
+		}
 	}
 }

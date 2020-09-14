@@ -13,7 +13,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -40,6 +39,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -253,9 +253,10 @@ public class DatasetServiceImplTest {
 		final List<ObservationUnitRow> observationDtoTestData = this.mockObservationUnitRowList();
 
 		Mockito.doReturn(observationDtoTestData).when(this.middlewareDatasetService)
-			.getObservationUnitRows(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.any());
+			.getObservationUnitRows(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.any(), ArgumentMatchers.any());
 		final List<org.ibp.api.rest.dataset.ObservationUnitRow> actualObservations =
-			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO());
+			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO(), Mockito.mock(
+				PageRequest.class));
 
 		Assert.assertEquals(this.mapObservationUnitRows(observationDtoTestData), actualObservations);
 
@@ -266,7 +267,7 @@ public class DatasetServiceImplTest {
 		final List<Map<String, Object>> listOfMap = new ArrayList<>();
 
 		Mockito.doReturn(listOfMap).when(this.middlewareDatasetService)
-			.getObservationUnitRowsAsMapList(ArgumentMatchers.eq(TEST_STUDY_IDENTIFIER), ArgumentMatchers.eq(1), ArgumentMatchers.any(ObservationUnitsSearchDTO.class));
+			.getObservationUnitRowsAsMapList(ArgumentMatchers.eq(TEST_STUDY_IDENTIFIER), ArgumentMatchers.eq(1), ArgumentMatchers.any(ObservationUnitsSearchDTO.class), ArgumentMatchers.isNull());
 		final List<Map<String, Object>> result =
 			this.studyDatasetService.getObservationUnitRowsAsMapList(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO());
 
@@ -584,11 +585,6 @@ public class DatasetServiceImplTest {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
 
 		paramDTO.setObservationUnitsSearchDTO(searchDTO);
@@ -615,11 +611,6 @@ public class DatasetServiceImplTest {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
 
 		paramDTO.setObservationUnitsSearchDTO(searchDTO);

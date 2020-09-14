@@ -104,7 +104,7 @@ public class StudyResource {
 
 				@Override
 				public List<StudyEntryDto> getResults(final PagedResult<StudyEntryDto> pagedResult) {
-					return StudyResource.this.studyService.getStudyEntries(studyId, pageable);
+					return StudyResource.this.studyService.getStudyEntries(studyId, null, pageable);
 				}
 			});
 

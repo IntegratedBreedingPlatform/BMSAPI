@@ -5,6 +5,8 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -16,9 +18,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,6 +34,10 @@ public class StudyValidator {
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
+
+	@Autowired
+	private StudyGermplasmService studyGermplasmService;
+
 
 	private BindingResult errors;
 
@@ -63,6 +69,15 @@ public class StudyValidator {
 		}
 		if (!programUUID.equals(study.getProgramUUID())) {
 			this.errors.reject("invalid.program.uuid.study", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validateStudyContainsEntry(final Integer studyId, final Integer entryId) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		final Optional<StudyGermplasmDto> entry = this.studyGermplasmService.getStudyGermplasm(studyId, entryId);
+		if (!entry.isPresent()){
+			errors.reject("invalid.entryid");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
