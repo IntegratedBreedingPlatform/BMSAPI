@@ -8,6 +8,7 @@ import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Before;
@@ -41,6 +42,9 @@ public class StudyGermplasmServiceImplTest {
 
 	@Mock
 	private org.ibp.api.java.germplasm.GermplamListService germplasmListService;
+
+	@Mock
+	private TermValidator termValidator;
 
 	@Mock
 	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
@@ -104,10 +108,16 @@ public class StudyGermplasmServiceImplTest {
 	public void testUpdateStudyEntryProperty() {
 
 		final Integer studyId = random.nextInt();
+		final Integer variableId = random.nextInt();
+		final Integer studyEntryPropertyId = random.nextInt();
 		final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
+		studyEntryPropertyData.setVariableId(variableId);
+		studyEntryPropertyData.setStudyEntryPropertyId(studyEntryPropertyId);
 		this.studyGermplasmService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.termValidator).validate(variableId);
+		Mockito.verify(this.studyGermplasmValidator).validateStudyEntryProperty(studyEntryPropertyId);
 		Mockito.verify(this.middlewareStudyGermplasmService).updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}
 

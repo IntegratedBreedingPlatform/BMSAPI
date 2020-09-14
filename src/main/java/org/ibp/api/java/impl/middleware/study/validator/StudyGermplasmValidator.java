@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.study.validator;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -94,8 +95,21 @@ public class StudyGermplasmValidator {
 
 	}
 
-    void validateGermplasmHasDifferentStudySource(final int studyId, final Integer entryId) {
+	public void validateStudyEntryProperty(final Integer studyEntryPropertyDataId) {
 
-    }
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		final Optional<StudyEntryPropertyData> studyEntryPropertyData =
+			this.middlewareStudyGermplasmService.getStudyEntryPropertyData(studyEntryPropertyDataId);
+		if (!studyEntryPropertyData.isPresent()) {
+			errors.reject("invalid.study.entry.property.data.id");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+	}
+
+	void validateGermplasmHasDifferentStudySource(final int studyId, final Integer entryId) {
+
+	}
 
 }

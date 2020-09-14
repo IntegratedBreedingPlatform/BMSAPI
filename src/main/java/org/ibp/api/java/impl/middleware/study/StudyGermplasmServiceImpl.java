@@ -7,6 +7,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyGermplasmService;
@@ -40,6 +41,9 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 
 	@Autowired
 	private GermplamListService germplasmListService;
+
+	@Autowired
+	private TermValidator termValidator;
 
 	@Resource
 	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
@@ -79,6 +83,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	@Override
 	public void updateStudyEntryProperty(final Integer studyId, final StudyEntryPropertyData studyEntryPropertyData) {
 		this.studyValidator.validate(studyId, true);
+		this.termValidator.validate(studyEntryPropertyData.getVariableId());
+		this.studyGermplasmValidator.validateStudyEntryProperty(studyEntryPropertyData.getStudyEntryPropertyId());
 		this.middlewareStudyGermplasmService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}
 
