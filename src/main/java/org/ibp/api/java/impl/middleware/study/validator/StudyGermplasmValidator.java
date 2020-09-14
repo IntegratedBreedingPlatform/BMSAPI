@@ -81,8 +81,4 @@ public class StudyGermplasmValidator {
 
     }
 
-    void validateGermplasmHasDifferentStudySource(final int studyId, final Integer entryId) {
-
-    }
-
 }
