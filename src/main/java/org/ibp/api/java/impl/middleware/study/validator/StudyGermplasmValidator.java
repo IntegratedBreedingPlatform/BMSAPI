@@ -54,7 +54,7 @@ public class StudyGermplasmValidator {
         // Check if means has dataset or advance or cross list
         boolean hasMeansDataset = this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
         if (hasMeansDataset) {
-            errors.reject("study.has.means.dataset", new Object[] {String.valueOf(studyId)}, "");
+            errors.reject("study.has.means.dataset");
         }
         boolean hasCrossesOrSelections = this.studyService.hasCrossesOrSelections(studyId);
         if (hasCrossesOrSelections) {
