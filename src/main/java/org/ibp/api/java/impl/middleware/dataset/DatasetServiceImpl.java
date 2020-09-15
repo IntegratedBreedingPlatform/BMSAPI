@@ -43,7 +43,6 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
-import org.ibp.api.java.impl.middleware.study.validator.GermplasmStudySourceValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
@@ -121,9 +120,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private StudyService studyService;
-
-	@Autowired
-	private GermplasmStudySourceValidator germplasmStudySourceValidator;
 
 	@Autowired
 	private StudyTransactionsService studyTransactionsService;
@@ -870,17 +866,25 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validatePlotDatasetType(datasetId);
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		if (this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())) {
-			errors.reject("study.has.means.dataset", new Object[] {String.valueOf(studyId)}, "");
+			errors.reject("study.has.means.dataset");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		BaseValidator.checkNotNull(request, "param.null", new String[] {"lotGeneratorInputDto"});
+		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
 		BaseValidator.checkNotNull(request.getSearchRequest(), "param.null", new String[] {"searchRequest"});
-		BaseValidator.checkNotNull(request.getEntryId(), "param.null", new String[] {"entryNo"});
+		BaseValidator.checkNotNull(request.getEntryId(), "param.null", new String[] {"entryId"});
+
+		if (!request.getSearchRequest().isValid()) {
+			errors.reject("search.composite.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 
 		studyValidator.validateStudyContainsEntry(studyId, request.getEntryId());
 
-		germplasmStudySourceValidator.validateDifferentGermplasmStudySource(studyId, request.getEntryId());
+		if (this.studyService.hasCrossesOrSelections(studyId)) {
+			errors.reject("study.has.crosses.or.selections");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 
 		this.processSearchComposite(request.getSearchRequest());
 
@@ -905,7 +909,7 @@ public class DatasetServiceImpl implements DatasetService {
 		studyTransactionsRequest.setObservationUnitIds(observationUnitIds);
 
 		if (studyTransactionsService.countStudyTransactions(studyId, studyTransactionsRequest) > 0) {
-			errors.reject("study.entry.replace.samples.found", "");
+			errors.reject("study.entry.replace.transactions.found", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 

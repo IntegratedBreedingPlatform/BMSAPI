@@ -52,7 +52,7 @@ public class StudyValidator {
 
 		final Study study = this.studyDataManager.getStudy(studyId);
 
-		if (study == null) {
+		if (study == null || study.getType() == null) {
 			this.errors.reject("study.not.exist", "");
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
