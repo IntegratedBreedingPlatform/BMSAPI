@@ -16,6 +16,7 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -51,50 +52,6 @@ public class GermplasmServiceImplTest {
 		this.germplasmServiceImpl.setPedigreeService(this.pedigreeService);
 		this.germplasmServiceImpl.setLocationDataManger(this.locationDataManger);
 		this.germplasmServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
-	}
-
-	@Test
-	public void testSearchGermplasm() {
-
-		final Germplasm gp = new Germplasm();
-		gp.setGid(3);
-		gp.setGpid1(1);
-		gp.setGpid2(2);
-		gp.setMethodId(1);
-		gp.setLocationId(1);
-
-		final List<Germplasm> middlewareSearchResults = Lists.newArrayList(gp);
-		Mockito.doReturn(middlewareSearchResults).when(this.germplasmDataManager).searchForGermplasm(Mockito.any(GermplasmSearchParameter.class));
-
-		final String gpPedigree = "CML1/CML2";
-		final Integer gid = gp.getGid();
-		Mockito.doReturn(gpPedigree).when(this.pedigreeService).getCrossExpansion(gid, this.crossExpansionProperties);
-
-		final Name gpName = new Name();
-		gpName.setGermplasmId(gid);
-		gpName.setNval("CML1");
-		final List<Name> gpNames = Lists.newArrayList(gpName);
-			Mockito.doReturn(gpNames).when(this.germplasmDataManager).getNamesByGID(ArgumentMatchers.anyInt(),ArgumentMatchers.eq(null),
-				ArgumentMatchers.eq(null));
-
-		final Method gpMethod = new Method();
-		gpMethod.setMname("Backcross");
-		Mockito.doReturn(gpMethod).when(this.germplasmDataManager).getMethodByID(ArgumentMatchers.anyInt());
-
-		final Location gpLocation = new Location();
-		gpLocation.setLname("Mexico");
-		Mockito.doReturn(gpLocation).when(this.locationDataManger).getLocationByID(ArgumentMatchers.anyInt());
-
-		final List<GermplasmSummary> germplasmSummaries = this.germplasmServiceImpl.searchGermplasm("CML", 1, 20);
-		Assert.assertTrue(!germplasmSummaries.isEmpty());
-
-		Assert.assertEquals(gid.toString(), germplasmSummaries.get(0).getGermplasmId());
-		Assert.assertEquals(gp.getGpid1().toString(), germplasmSummaries.get(0).getParent1Id());
-		Assert.assertEquals(gp.getGpid2().toString(), germplasmSummaries.get(0).getParent2Id());
-		Assert.assertEquals(gpPedigree, germplasmSummaries.get(0).getPedigreeString());
-		Assert.assertEquals(gpMethod.getMname(), germplasmSummaries.get(0).getBreedingMethod());
-		Assert.assertEquals(gpLocation.getLname(), germplasmSummaries.get(0).getLocation());
-		Assert.assertEquals(gpName.getNval(), germplasmSummaries.get(0).getNames().get(0).getName());
 	}
 
 	@Test

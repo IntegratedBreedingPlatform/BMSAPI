@@ -1,14 +1,17 @@
 
 package org.ibp.api.java.germplasm;
 
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.ibp.api.domain.germplasm.DescendantTree;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -18,7 +21,7 @@ public interface GermplasmService {
 
 	int searchGermplasmCount(String searchText);
 
-	List<GermplasmSummary> searchGermplasm(String searchText, int pageNumber, int pageSize);
+	List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable);
 
 	GermplasmSummary getGermplasm(String germplasmId);
 

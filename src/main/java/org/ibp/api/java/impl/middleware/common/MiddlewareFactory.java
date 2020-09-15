@@ -18,6 +18,8 @@ import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsService;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsServiceImpl;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
@@ -499,6 +501,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmStudySourceService getGermplasmStudySourceService() {
 		return new GermplasmStudySourceServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmSearchService getGermplasmSearchService() {
+		return new GermplasmSearchServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
