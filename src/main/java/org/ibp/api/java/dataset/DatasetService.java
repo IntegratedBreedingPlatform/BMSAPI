@@ -3,6 +3,7 @@ package org.ibp.api.java.dataset;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
@@ -11,11 +12,11 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
+import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -329,5 +330,7 @@ public interface DatasetService {
 	List<MeasurementVariable> getAllDatasetVariables(int studyId, int datasetId);
 
 	void replaceObservationUnitsEntry(int studyId, int datasetId, ObservationUnitEntryReplaceRequest request);
+
+	ObservationUnitsMetadata getObservationUnitsMetadata(int studyId, int datasetId, SearchCompositeDto<ObservationUnitsSearchDTO, Integer> request);
 
 }
