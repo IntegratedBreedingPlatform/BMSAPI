@@ -88,7 +88,7 @@ public class StudyResource {
 				"Default sort order is ascending. " +
 				"Multiple sort criteria are supported.")
 	})
-	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries/table", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryDto>> getEntriesAsTable(final @PathVariable String cropName, @PathVariable final String programUUID,

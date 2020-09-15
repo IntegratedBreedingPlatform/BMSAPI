@@ -3,6 +3,7 @@ package org.ibp.api.rest.dataset.validator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -12,8 +13,8 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
-import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,6 +71,7 @@ public class StudyValidatorTest {
 		study.setId(studyId);
 		study.setLocked(true);
 		study.setCreatedBy("1");
+		study.setStudyType(new StudyTypeDto());
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		this.studyValidator.validate(studyId, true);
 	}
@@ -85,6 +87,7 @@ public class StudyValidatorTest {
 		study.setLocked(true);
 		study.setCreatedBy(String.valueOf(USER_ID));
 		study.setProgramUUID(PROGRAM_UUID);
+		study.setStudyType(new StudyTypeDto());
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		this.studyValidator.validate(studyId, true);
 	}
@@ -101,7 +104,7 @@ public class StudyValidatorTest {
 		study.setLocked(true);
 		study.setCreatedBy("1");
 		study.setProgramUUID(PROGRAM_UUID);
-
+		study.setStudyType(new StudyTypeDto());
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		this.studyValidator.validate(studyId, true);
 	}
@@ -115,6 +118,7 @@ public class StudyValidatorTest {
 		study.setLocked(false);
 		study.setCreatedBy("1");
 		study.setProgramUUID(PROGRAM_UUID);
+		study.setStudyType(new StudyTypeDto());
 
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(),
@@ -149,6 +153,7 @@ public class StudyValidatorTest {
 		study.setLocked(false);
 		study.setCreatedBy("1");
 		study.setProgramUUID(PROGRAM_UUID);
+		study.setStudyType(new StudyTypeDto());
 
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(),
@@ -178,13 +183,12 @@ public class StudyValidatorTest {
 		study.setLocked(false);
 		study.setCreatedBy("1");
 		study.setProgramUUID(PROGRAM_UUID);
+		study.setStudyType(new StudyTypeDto());
 
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		this.studyValidator.validate(studyId, ran.nextBoolean(), false);
 		Mockito.verifyZeroInteractions(this.studyInstanceService);
 	}
-
-
 
 
 }

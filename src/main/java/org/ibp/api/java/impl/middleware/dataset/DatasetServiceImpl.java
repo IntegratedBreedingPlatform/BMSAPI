@@ -43,6 +43,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
+import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
@@ -914,6 +915,30 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		this.middlewareDatasetService.replaceObservationUnitEntry(observationUnitIds, request.getEntryId());
+	}
+
+	@Override
+	public ObservationUnitsMetadata getObservationUnitsMetadata(final int studyId, final int datasetId,
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> request) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
+
+		if (!request.isValid()) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), SearchCompositeDto.class.getName());
+			errors.reject("search.composite.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		this.processSearchComposite(request);
+
+		final List<ObservationUnitRow> observationUnitRows =
+			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest(),null);
+
+		final ObservationUnitsMetadata observationUnitsMetadata = new ObservationUnitsMetadata();
+		observationUnitsMetadata.setSelectedObservationUnits(Long.valueOf(observationUnitRows.size()));
+		observationUnitsMetadata.setSelectedInstances(observationUnitRows.stream().map(i -> i.getTrialInstance()).distinct().count());
+		return observationUnitsMetadata;
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
