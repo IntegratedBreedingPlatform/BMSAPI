@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -25,6 +26,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -43,6 +45,9 @@ public class StudyValidatorTest {
 
 	@Mock
 	private StudyInstanceService studyInstanceService;
+
+	@Mock
+	private StudyGermplasmService studyGermplasmService;
 
 	@InjectMocks
 	private StudyValidator studyValidator;
@@ -190,5 +195,20 @@ public class StudyValidatorTest {
 		Mockito.verifyZeroInteractions(this.studyInstanceService);
 	}
 
+	@Test
+	public void testStudyContainsEntry_ThrowsRightException() {
+		final Random ran = new Random();
+		final int studyId = ran.nextInt();
+		final int entryId = ran.nextInt();
+		Mockito.when(this.studyGermplasmService.getStudyGermplasm(studyId, entryId)).thenReturn(Optional.empty());
+
+		try {
+			this.studyValidator.validateStudyContainsEntry(studyId, entryId);
+			Assert.fail("Expected validation exception to be thrown but was not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("invalid.entryid"));
+		}
+	}
 
 }
