@@ -82,14 +82,8 @@ public class StudyServiceImplTest {
 
 	final PodamFactory factory = new PodamFactoryImpl();
 
-	final Function<ObservationDto, Observation> observationTransformFunction = new Function<ObservationDto, Observation>() {
-
-		@Override
-		public Observation apply(final ObservationDto input) {
-			return StudyServiceImplTest.this.mapObservationDtoToObservation(input);
-		}
-
-	};
+	final Function<ObservationDto, Observation> observationTransformFunction =
+		input -> StudyServiceImplTest.this.mapObservationDtoToObservation(input);
 
 
 	@Before
@@ -331,7 +325,7 @@ public class StudyServiceImplTest {
 			observation.setEntryCode(measurement.getEntryCode());
 
 			final List<MeasurementDto> measurementsDto = measurement.getVariableMeasurements();
-			final List<Measurement> measurements = new ArrayList<Measurement>();
+			final List<Measurement> measurements = new ArrayList<>();
 			for (final MeasurementDto measurementDto : measurementsDto) {
 				measurements.add(new Measurement(
 					new MeasurementIdentifier(measurementDto.getPhenotypeId(), new Trait(

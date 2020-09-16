@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -25,6 +26,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
+import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
@@ -48,12 +50,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
+import static org.mockito.ArgumentMatchers.eq;
 
 public class DatasetServiceImplTest {
 
@@ -743,4 +747,52 @@ public class DatasetServiceImplTest {
 		Assert.assertTrue(header.contains(var6.getAlias()));
 	}
 
+	@Test
+	public void getObservationUnitsMetadata() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final int obsUnitId1 = random.nextInt();
+		final int obsUnitId2 = random.nextInt();
+		final int obsUnitId3 = random.nextInt();
+		final int obsUnitId4 = random.nextInt();
+
+		final ObservationUnitRow observationUnitRow1 = new ObservationUnitRow();
+		observationUnitRow1.setObservationUnitId(obsUnitId1);
+		observationUnitRow1.setTrialInstance(1);
+		observationUnitRow1.setVariables(new HashMap<>());
+		observationUnitRow1.setEnvironmentVariables(new HashMap<>());
+
+		final ObservationUnitRow observationUnitRow2 = new ObservationUnitRow();
+		observationUnitRow2.setObservationUnitId(obsUnitId2);
+		observationUnitRow2.setTrialInstance(1);
+		observationUnitRow2.setVariables(new HashMap<>());
+		observationUnitRow2.setEnvironmentVariables(new HashMap<>());
+
+		final ObservationUnitRow observationUnitRow3 = new ObservationUnitRow();
+		observationUnitRow3.setObservationUnitId(obsUnitId3);
+		observationUnitRow3.setTrialInstance(2);
+		observationUnitRow3.setVariables(new HashMap<>());
+		observationUnitRow3.setEnvironmentVariables(new HashMap<>());
+
+		final ObservationUnitRow observationUnitRow4 = new ObservationUnitRow();
+		observationUnitRow4.setObservationUnitId(obsUnitId4);
+		observationUnitRow4.setTrialInstance(3);
+		observationUnitRow4.setVariables(new HashMap<>());
+		observationUnitRow4.setEnvironmentVariables(new HashMap<>());
+
+		final List<ObservationUnitRow> selectedRows =
+			Lists.newArrayList(observationUnitRow1, observationUnitRow2, observationUnitRow3, observationUnitRow4);
+		final Set<Integer> itemIds = Sets.newHashSet(obsUnitId1, obsUnitId2, obsUnitId3, obsUnitId4);
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
+		searchCompositeDto.setItemIds(itemIds);
+
+		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
+			.thenReturn(selectedRows);
+
+		final ObservationUnitsMetadata metadata =
+			this.studyDatasetService.getObservationUnitsMetadata(studyId, datasetId, searchCompositeDto);
+		Assert.assertEquals(metadata.getSelectedInstances(), Long.valueOf(3));
+		Assert.assertEquals(metadata.getSelectedObservationUnits(), Long.valueOf(selectedRows.size()));
+	}
 }
