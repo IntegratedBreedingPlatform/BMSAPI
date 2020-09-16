@@ -468,12 +468,11 @@ public class StudyServiceImpl implements StudyService {
 			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
-		//Remove OBS_UNIT_ID column
+		//Remove OBS_UNIT_ID column and STOCKID if present
 		for (Iterator<MeasurementVariable> i = entryDescriptors.iterator(); i.hasNext();) {
 			final MeasurementVariable measurementVariable = i.next();
-			if (measurementVariable.getTermId() == TermId.OBS_UNIT_ID.getId()) {
+			if (measurementVariable.getTermId() == TermId.OBS_UNIT_ID.getId() || measurementVariable.getTermId() == TermId.STOCKID.getId()) {
 				i.remove();
-				break;
 			}
 		}
 
