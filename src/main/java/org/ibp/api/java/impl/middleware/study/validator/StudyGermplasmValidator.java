@@ -108,16 +108,4 @@ public class StudyGermplasmValidator {
 
 	}
 
-	public void validateStudyEntry(final Integer studyId, final Integer entryId) {
-
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-
-		final Optional<StudyGermplasmDto> entry = this.middlewareStudyGermplasmService.getStudyGermplasm(studyId, entryId);
-		if (!entry.isPresent()) {
-			errors.reject("invalid.entryid");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-	}
-
 }

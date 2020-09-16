@@ -84,8 +84,8 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	public void updateStudyEntryProperty(final Integer studyId, final Integer entryId,
 		final StudyEntryPropertyData studyEntryPropertyData) {
 		this.studyValidator.validate(studyId, true);
+		this.studyValidator.validateStudyContainsEntry(studyId, entryId);
 		this.termValidator.validate(studyEntryPropertyData.getVariableId());
-		this.studyGermplasmValidator.validateStudyEntry(studyId, entryId);
 		this.studyGermplasmValidator.validateStudyEntryProperty(studyEntryPropertyData.getStudyEntryPropertyId());
 		this.middlewareStudyGermplasmService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}

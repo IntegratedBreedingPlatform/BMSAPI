@@ -117,9 +117,9 @@ public class StudyGermplasmServiceImplTest {
 		this.studyGermplasmService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.studyValidator).validateStudyContainsEntry(studyId, entryId);
 		Mockito.verify(this.termValidator).validate(variableId);
 		Mockito.verify(this.studyGermplasmValidator).validateStudyEntryProperty(studyEntryPropertyId);
-		Mockito.verify(this.studyGermplasmValidator).validateStudyEntry(studyId, entryId);
 		Mockito.verify(this.middlewareStudyGermplasmService).updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}
 
