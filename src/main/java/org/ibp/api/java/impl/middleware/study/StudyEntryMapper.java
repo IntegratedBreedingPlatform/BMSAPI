@@ -9,7 +9,7 @@ import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 
-public class StudyGermplasmMapper {
+public class StudyEntryMapper {
 
 	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
 	private static final String DEFAULT_ENTRY_TYPE = String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
@@ -17,7 +17,7 @@ public class StudyGermplasmMapper {
 	/**
 	 * We do not want public constructor of this class as all methods are static
 	 */
-	private StudyGermplasmMapper() {
+	private StudyEntryMapper() {
 
 	}
 
@@ -25,12 +25,12 @@ public class StudyGermplasmMapper {
 	 * Configuring the application wide {@link ModelMapper} with ontology related configuration.
 	 */
 	static {
-		StudyGermplasmMapper.addStudyGermplasmDtoMapping(StudyGermplasmMapper.applicationWideModelMapper);
-		StudyGermplasmMapper.addGermplasmListDataMapping(StudyGermplasmMapper.applicationWideModelMapper);
+		StudyEntryMapper.addStudyGermplasmDtoMapping(StudyEntryMapper.applicationWideModelMapper);
+		StudyEntryMapper.addGermplasmListDataMapping(StudyEntryMapper.applicationWideModelMapper);
 	}
 
 	public static ModelMapper getInstance() {
-		return StudyGermplasmMapper.applicationWideModelMapper;
+		return StudyEntryMapper.applicationWideModelMapper;
 	}
 
 	private static void addStudyGermplasmDtoMapping(final ModelMapper mapper) {

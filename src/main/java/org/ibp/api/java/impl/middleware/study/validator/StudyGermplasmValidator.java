@@ -81,12 +81,12 @@ public class StudyGermplasmValidator {
 
 	}
 
-	public void validateStudyAlreadyHasStudyGermplasm(final Integer studyId) {
+	public void validateStudyAlreadyHasStudyEntries(final Integer studyId) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		if (this.middlewareStudyGermplasmService.countStudyEntries(studyId) > 0) {
-			errors.reject("study.has.existing.study.germplasm");
+			errors.reject("study.has.existing.study.entries");
 		}
 
 		if (this.errors.hasErrors()) {
@@ -103,6 +103,18 @@ public class StudyGermplasmValidator {
 			this.middlewareStudyGermplasmService.getStudyEntryPropertyData(studyEntryPropertyDataId);
 		if (!studyEntryPropertyData.isPresent()) {
 			errors.reject("invalid.study.entry.property.data.id");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+	}
+
+	public void validateStudyEntry(final Integer studyId, final Integer entryId) {
+
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		final Optional<StudyGermplasmDto> entry = this.middlewareStudyGermplasmService.getStudyGermplasm(studyId, entryId);
+		if (!entry.isPresent()) {
+			errors.reject("invalid.entryid");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 

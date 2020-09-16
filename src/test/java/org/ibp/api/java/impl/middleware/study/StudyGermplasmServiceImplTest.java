@@ -68,7 +68,7 @@ public class StudyGermplasmServiceImplTest {
 		Mockito.doReturn(crossExpansion).when(this.pedigreeService).getCrossExpansion(newGid, this.crossExpansionProperties);
 		final StudyGermplasmDto dto = new StudyGermplasmDto();
 		dto.setGermplasmId(newGid);
-		this.studyGermplasmService.replaceStudyGermplasm(studyId, entryId, dto);
+		this.studyGermplasmService.replaceStudyEntry(studyId, entryId, dto);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.studyGermplasmValidator).validate(studyId, entryId, newGid);
 		Mockito.verify(this.middlewareStudyGermplasmService).replaceStudyGermplasm(studyId, entryId, newGid, crossExpansion);
@@ -86,19 +86,19 @@ public class StudyGermplasmServiceImplTest {
 
 		Mockito.when(this.germplasmListService.getGermplasmList(germplasmListId)).thenReturn(germplasmList);
 
-		this.studyGermplasmService.createStudyGermplasmList(studyId, germplasmListId);
+		this.studyGermplasmService.createStudyEntries(studyId, germplasmListId);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
-		Mockito.verify(this.studyGermplasmValidator).validateStudyAlreadyHasStudyGermplasm(studyId);
+		Mockito.verify(this.studyGermplasmValidator).validateStudyAlreadyHasStudyEntries(studyId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.middlewareStudyGermplasmService).saveStudyGermplasm(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
+		Mockito.verify(this.middlewareStudyGermplasmService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
 
 	}
 
 	@Test
 	public void testDeleteStudyGermplasm() {
 		final Integer studyId = random.nextInt();
-		this.studyGermplasmService.deleteStudyGermplasm(studyId);
+		this.studyGermplasmService.deleteStudyEntries(studyId);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.middlewareStudyGermplasmService).deleteStudyEntries(studyId);
@@ -108,16 +108,18 @@ public class StudyGermplasmServiceImplTest {
 	public void testUpdateStudyEntryProperty() {
 
 		final Integer studyId = random.nextInt();
+		final Integer entryId = random.nextInt();
 		final Integer variableId = random.nextInt();
 		final Integer studyEntryPropertyId = random.nextInt();
 		final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
 		studyEntryPropertyData.setVariableId(variableId);
 		studyEntryPropertyData.setStudyEntryPropertyId(studyEntryPropertyId);
-		this.studyGermplasmService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
+		this.studyGermplasmService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.termValidator).validate(variableId);
 		Mockito.verify(this.studyGermplasmValidator).validateStudyEntryProperty(studyEntryPropertyId);
+		Mockito.verify(this.studyGermplasmValidator).validateStudyEntry(studyId, entryId);
 		Mockito.verify(this.middlewareStudyGermplasmService).updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}
 

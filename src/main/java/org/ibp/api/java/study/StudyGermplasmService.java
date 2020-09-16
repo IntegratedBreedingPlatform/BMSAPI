@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface StudyGermplasmService {
 
-	StudyGermplasmDto replaceStudyGermplasm(Integer studyId, Integer entryId, StudyGermplasmDto studyGermplasmDto);
+	StudyGermplasmDto replaceStudyEntry(Integer studyId, Integer entryId, StudyGermplasmDto studyGermplasmDto);
 
-	List<StudyGermplasmDto> createStudyGermplasmList(Integer studyId, Integer germplasmListId);
+	List<StudyGermplasmDto> createStudyEntries(Integer studyId, Integer germplasmListId);
 
-	void deleteStudyGermplasm(Integer studyId);
+	void deleteStudyEntries(Integer studyId);
 
-	void updateStudyEntryProperty(Integer studyId, StudyEntryPropertyData studyEntryPropertyData);
+	void updateStudyEntryProperty(Integer studyId, Integer entryId, StudyEntryPropertyData studyEntryPropertyData);
 }

@@ -49,7 +49,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
 
 	@Override
-	public StudyGermplasmDto replaceStudyGermplasm(final Integer studyId, final Integer entryId,
+	public StudyGermplasmDto replaceStudyEntry(final Integer studyId, final Integer entryId,
 		final StudyGermplasmDto studyGermplasmDto) {
 		final Integer gid = studyGermplasmDto.getGermplasmId();
 		this.studyValidator.validate(studyId, true);
@@ -60,30 +60,32 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public List<StudyGermplasmDto> createStudyGermplasmList(final Integer studyId, final Integer germplasmListId) {
+	public List<StudyGermplasmDto> createStudyEntries(final Integer studyId, final Integer germplasmListId) {
 		final GermplasmList germplasmList = this.germplasmListService.getGermplasmList(germplasmListId);
 
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
-		this.studyGermplasmValidator.validateStudyAlreadyHasStudyGermplasm(studyId);
+		this.studyGermplasmValidator.validateStudyAlreadyHasStudyEntries(studyId);
 		this.studyValidator.validate(studyId, true);
 
-		final ModelMapper mapper = StudyGermplasmMapper.getInstance();
+		final ModelMapper mapper = StudyEntryMapper.getInstance();
 		final List<StudyGermplasmDto> studyGermplasmList =
 			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyGermplasmDto.class)).collect(Collectors.toList());
 
-		return this.middlewareStudyGermplasmService.saveStudyGermplasm(studyId, studyGermplasmList);
+		return this.middlewareStudyGermplasmService.saveStudyEntries(studyId, studyGermplasmList);
 	}
 
 	@Override
-	public void deleteStudyGermplasm(final Integer studyId) {
+	public void deleteStudyEntries(final Integer studyId) {
 		this.studyValidator.validate(studyId, true);
 		this.middlewareStudyGermplasmService.deleteStudyEntries(studyId);
 	}
 
 	@Override
-	public void updateStudyEntryProperty(final Integer studyId, final StudyEntryPropertyData studyEntryPropertyData) {
+	public void updateStudyEntryProperty(final Integer studyId, final Integer entryId,
+		final StudyEntryPropertyData studyEntryPropertyData) {
 		this.studyValidator.validate(studyId, true);
 		this.termValidator.validate(studyEntryPropertyData.getVariableId());
+		this.studyGermplasmValidator.validateStudyEntry(studyId, entryId);
 		this.studyGermplasmValidator.validateStudyEntryProperty(studyEntryPropertyData.getStudyEntryPropertyId());
 		this.middlewareStudyGermplasmService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}

@@ -42,7 +42,7 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 			new StudyGermplasmDto(newEntryId, String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), newGid,
 				RandomStringUtils.randomAlphabetic(20), 6, RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 				RandomStringUtils.randomAlphabetic(20));
-		Mockito.doReturn(dto).when(this.studyGermplasmService).replaceStudyGermplasm(studyId, entryId, newDto);
+		Mockito.doReturn(dto).when(this.studyGermplasmService).replaceStudyEntry(studyId, entryId, newDto);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}",
@@ -80,7 +80,7 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 		final List<StudyGermplasmDto> studyGermplasmDtoList = new ArrayList<>();
 		studyGermplasmDtoList.add(dto);
 		Mockito.doReturn(studyGermplasmDtoList).when(this.studyGermplasmService)
-			.createStudyGermplasmList(studyId, germplasmEntryRequestDto.getGermplasmListId());
+			.createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation",
