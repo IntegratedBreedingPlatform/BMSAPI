@@ -6,24 +6,24 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class ObservationUnitsMetadata {
 
-	private Long selectedObservationUnits;
+	private Long countObservationUnits;
 
-	private Long selectedInstances;
+	private Long countInstances;
 
-	public Long getSelectedObservationUnits() {
-		return selectedObservationUnits;
+	public Long getCountObservationUnits() {
+		return countObservationUnits;
 	}
 
-	public void setSelectedObservationUnits(final Long selectedObservationUnits) {
-		this.selectedObservationUnits = selectedObservationUnits;
+	public void setCountObservationUnits(final Long countObservationUnits) {
+		this.countObservationUnits = countObservationUnits;
 	}
 
-	public Long getSelectedInstances() {
-		return selectedInstances;
+	public Long getCountInstances() {
+		return countInstances;
 	}
 
-	public void setSelectedInstances(final Long selectedInstances) {
-		this.selectedInstances = selectedInstances;
+	public void setCountInstances(final Long countInstances) {
+		this.countInstances = countInstances;
 	}
 
 	@Override

@@ -807,8 +807,8 @@ public class DatasetServiceImplTest {
 
 		final ObservationUnitsMetadata metadata =
 			this.studyDatasetService.getObservationUnitsMetadata(studyId, datasetId, searchCompositeDto);
-		Assert.assertEquals(metadata.getSelectedInstances(), Long.valueOf(3));
-		Assert.assertEquals(metadata.getSelectedObservationUnits(), Long.valueOf(selectedRows.size()));
+		Assert.assertEquals(metadata.getCountInstances(), Long.valueOf(3));
+		Assert.assertEquals(metadata.getCountObservationUnits(), Long.valueOf(selectedRows.size()));
 	}
 
 	@Test
