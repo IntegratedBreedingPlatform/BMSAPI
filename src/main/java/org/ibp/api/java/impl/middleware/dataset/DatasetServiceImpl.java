@@ -897,7 +897,7 @@ public class DatasetServiceImpl implements DatasetService {
 			errors.reject("study.entry.replace.empty.units", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		if (observationUnitRows.stream().filter(o -> !o.getSamplesCount().equals("-")).count()>0) {
+		if (observationUnitRows.stream().anyMatch(o -> !o.getSamplesCount().equals("-"))) {
 			errors.reject("study.entry.replace.samples.found", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
