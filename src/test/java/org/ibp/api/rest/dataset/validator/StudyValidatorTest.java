@@ -4,11 +4,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
@@ -48,6 +50,9 @@ public class StudyValidatorTest {
 
 	@Mock
 	private StudyGermplasmService studyGermplasmService;
+
+	@Mock
+	private StudyService studyService;
 
 	@InjectMocks
 	private StudyValidator studyValidator;
@@ -208,6 +213,32 @@ public class StudyValidatorTest {
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("invalid.entryid"));
+		}
+	}
+
+	@Test
+	public void testValidateHasNoCrossesOrSelections() {
+		final Random ran = new Random();
+		final int studyId = ran.nextInt();
+		Mockito.when(this.studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.TRUE);
+		try {
+			this.studyValidator.validateHasNoCrossesOrSelections(studyId);
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("study.has.crosses.or.selections"));
+		}
+	}
+
+	@Test
+	public void testValidateStudyHasNoMeansDataset() {
+		final Random ran = new Random();
+		final int studyId = ran.nextInt();
+		Mockito.when(this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.TRUE);
+		try {
+			this.studyValidator.validateStudyHasNoMeansDataset(studyId);
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("study.has.means.dataset"));
 		}
 	}
 

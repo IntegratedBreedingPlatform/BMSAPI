@@ -3,23 +3,14 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.collection.IsCollectionWithSize;
-import org.hamcrest.collection.IsIn;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
@@ -43,11 +34,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 public class StudyServiceImplTest {
@@ -75,9 +62,6 @@ public class StudyServiceImplTest {
 	@Mock
 	private ObservationValidator observationValidator;
 
-	@Mock
-	private DatasetService datasetService;
-
 	private final String programUID = UUID.randomUUID().toString();
 
 	final PodamFactory factory = new PodamFactoryImpl();
@@ -97,7 +81,6 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl.setValidationUtil(new ValidationUtil());
 		this.studyServiceImpl.setObservationValidator(this.observationValidator);
 		this.studyServiceImpl.setStudyValidator(this.studyValidator);
-		this.studyServiceImpl.setDatasetService(this.datasetService);
 		// Make all test data accessible
 		Mockito.when(this.securityService.isAccessible(Matchers.any(org.generationcp.middleware.service.api.study.StudySummary.class),
 			Matchers.anyString()))
@@ -269,46 +252,6 @@ public class StudyServiceImplTest {
 		int studyId = 101;
 		this.studyServiceImpl.getStudyReference(studyId);
 		Mockito.verify(this.studyDataManager).getStudyReference(studyId);
-	}
-
-	@Test
-	public void testGetEntryDescriptorColumns() {
-		final Random random = new Random();
-		final int studyId = random.nextInt();
-		final int datasetId = random.nextInt();
-		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetId(datasetId);
-		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
-		final List<DatasetDTO> datasetDTOS = Collections.singletonList(datasetDTO);
-		Mockito.when(this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
-			.thenReturn(datasetDTOS);
-
-		final MeasurementVariable entryCodeVariable = new MeasurementVariable(TermId.ENTRY_CODE.getId());
-		final MeasurementVariable observationUnitIdVariable = new MeasurementVariable(TermId.OBS_UNIT_ID.getId());
-		final MeasurementVariable entryNoVariable = new MeasurementVariable(TermId.ENTRY_NO.getId());
-		final MeasurementVariable designationVariable = new MeasurementVariable(TermId.DESIG.getId());
-		final MeasurementVariable stockIdVariable = new MeasurementVariable(TermId.STOCKID.getId());
-		final MeasurementVariable crossVariable = new MeasurementVariable(TermId.CROSS.getId());
-		final MeasurementVariable gidVariable = new MeasurementVariable(TermId.GID.getId());
-
-		final List<MeasurementVariable> measurementVariables = Lists
-			.newArrayList(entryCodeVariable, observationUnitIdVariable, entryNoVariable, designationVariable, stockIdVariable,
-				crossVariable, gidVariable);
-
-		Mockito.when(this.datasetService.getObservationSetVariables(datasetId, Lists
-			.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()))).thenReturn(measurementVariables);
-
-		final List<MeasurementVariable> results = studyServiceImpl.getEntryDescriptorColumns(studyId);
-
-		MatcherAssert.assertThat(results, IsCollectionWithSize.hasSize(8));
-		MatcherAssert.assertThat(entryCodeVariable, IsIn.in(results));
-		MatcherAssert.assertThat(entryNoVariable, IsIn.in(results));
-		MatcherAssert.assertThat(designationVariable, IsIn.in(results));
-		MatcherAssert.assertThat(crossVariable, IsIn.in(results));
-		MatcherAssert.assertThat(gidVariable, IsIn.in(results));
-		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_UNIT.getId()), IsIn.in(results));
-		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_AVAILABLE_BALANCE.getId()), IsIn.in(results));
-		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_ACTIVE_LOTS_COUNT.getId()), IsIn.in(results));
 	}
 
 	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {

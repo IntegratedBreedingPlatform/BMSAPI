@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.constant.AppConstants;
@@ -13,10 +12,6 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -31,9 +26,7 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyDto;
-import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
-import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -59,10 +52,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -99,12 +89,6 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private FieldMapService fieldMapService;
-
-	@Autowired
-	private StudyGermplasmService studyGermplasmService;
-
-	@Autowired
-	private DatasetService datasetService;
 
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
@@ -331,50 +315,6 @@ public class StudyServiceImpl implements StudyService {
 		}
 	}
 
-	@Override
-	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
-		this.studyValidator.validate(studyId, false);
-		return this.studyGermplasmService.getStudyEntries(studyId, filter, pageable);
-	}
-
-	@Override
-	public long countAllStudyEntries(final Integer studyId) {
-		this.studyValidator.validate(studyId, false);
-		return this.studyGermplasmService.countStudyEntries(studyId);
-	}
-
-	@Override
-	public List<MeasurementVariable> getEntryDescriptorColumns(final Integer studyId) {
-		this.studyValidator.validate(studyId, false);
-		final Integer plotDatasetId = datasetService.getDatasets( studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
-
-		final List<Integer> termsToRemove = Lists
-			.newArrayList(TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
-
-		final List<MeasurementVariable> entryDescriptors =
-			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
-				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
-
-		//Remove OBS_UNIT_ID column and STOCKID if present
-		entryDescriptors.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
-
-		//Add Inventory related columns
-		entryDescriptors.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
-		entryDescriptors.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
-		entryDescriptors.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
-
-		return entryDescriptors;
-	}
-
-	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
-		final MeasurementVariable sampleColumn = new MeasurementVariable();
-		sampleColumn.setName(name);
-		sampleColumn.setAlias(name);
-		sampleColumn.setTermId(termId.getId());
-		sampleColumn.setFactor(true);
-		return sampleColumn;
-	}
-
 	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
 		return StudyMapper.getInstance()
 			.map(measurement, Observation.class);
@@ -491,7 +431,4 @@ public class StudyServiceImpl implements StudyService {
 		this.middlewareStudyService = middlewareStudyService;
 	}
 
-	public void setDatasetService(final DatasetService datasetService) {
-		this.datasetService = datasetService;
-	}
 }

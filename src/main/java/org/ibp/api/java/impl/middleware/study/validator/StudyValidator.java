@@ -3,11 +3,13 @@ package org.ibp.api.java.impl.middleware.study.validator;
 import org.apache.commons.lang3.BooleanUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
@@ -37,6 +39,9 @@ public class StudyValidator {
 
 	@Autowired
 	private StudyGermplasmService studyGermplasmService;
+
+	@Autowired
+	private StudyService studyService;
 
 
 	private BindingResult errors;
@@ -113,6 +118,20 @@ public class StudyValidator {
 				this.errors.reject("at.least.one.instance.cannot.be.deleted");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
+		}
+	}
+
+	public void validateHasNoCrossesOrSelections(final Integer studyId) {
+		if (this.studyService.hasCrossesOrSelections(studyId)) {
+			errors.reject("study.has.crosses.or.selections");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	public void validateStudyHasNoMeansDataset(final Integer studyId) {
+		if (this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())) {
+			errors.reject("study.has.means.dataset");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 

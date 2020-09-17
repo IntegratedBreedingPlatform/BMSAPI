@@ -869,24 +869,18 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		this.datasetValidator.validatePlotDatasetType(datasetId);
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		if (this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())) {
-			errors.reject("study.has.means.dataset");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		this.studyValidator.validateStudyHasNoMeansDataset(studyId);
 
 		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
 		BaseValidator.checkNotNull(request.getSearchRequest(), "param.null", new String[] {"searchRequest"});
 		BaseValidator.checkNotNull(request.getEntryId(), "param.null", new String[] {"entryId"});
 
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
 
 		studyValidator.validateStudyContainsEntry(studyId, request.getEntryId());
 
-		if (this.studyService.hasCrossesOrSelections(studyId)) {
-			errors.reject("study.has.crosses.or.selections");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		studyValidator.validateHasNoCrossesOrSelections(studyId);
 
 		this.processSearchComposite(request.getSearchRequest());
 

@@ -4,14 +4,11 @@ package org.ibp.api.java.study;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyDto;
-import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -79,11 +76,5 @@ public interface StudyService {
 	boolean hasCrossesOrSelections(final int studyId);
 
 	Integer getEnvironmentDatasetId(Integer studyId);
-
-	List<StudyEntryDto> getStudyEntries(Integer studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
-
-	long countAllStudyEntries(Integer studyId);
-
-	List<MeasurementVariable> getEntryDescriptorColumns(Integer studyId);
 
 }

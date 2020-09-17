@@ -812,51 +812,6 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testGetReplaceObservationUnitsEntry_HasMeansDataset() {
-		final Random random = new Random();
-		final int studyId = random.nextInt();
-		final int datasetId = random.nextInt();
-
-		final Set<Integer> itemIds = Sets.newHashSet(random.nextInt(), random.nextInt(), random.nextInt(), random.nextInt());
-		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(itemIds);
-
-		final ObservationUnitEntryReplaceRequest observationUnitEntryReplaceRequest = new ObservationUnitEntryReplaceRequest();
-		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
-		observationUnitEntryReplaceRequest.setEntryId(random.nextInt());
-
-		Mockito.when(studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.TRUE);
-		try {
-			this.studyDatasetService.replaceObservationUnitsEntry(studyId, datasetId, observationUnitEntryReplaceRequest);
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("study.has.means.dataset"));
-		}
-	}
-
-	@Test
-	public void testGetReplaceObservationUnitsEntry_HasCrossesOrSelections() {
-		final Random random = new Random();
-		final int studyId = random.nextInt();
-		final int datasetId = random.nextInt();
-
-		final Set<Integer> itemIds = Sets.newHashSet(random.nextInt(), random.nextInt(), random.nextInt(), random.nextInt());
-		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(itemIds);
-
-		final ObservationUnitEntryReplaceRequest observationUnitEntryReplaceRequest = new ObservationUnitEntryReplaceRequest();
-		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
-		observationUnitEntryReplaceRequest.setEntryId(random.nextInt());
-
-		Mockito.when(studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
-		Mockito.when(studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.TRUE);
-		try {
-			this.studyDatasetService.replaceObservationUnitsEntry(studyId, datasetId, observationUnitEntryReplaceRequest);
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("study.has.crosses.or.selections"));
-		}
-	}
-
-	@Test
 	public void testGetReplaceObservationUnitsEntry_NoObservationSelected() {
 		final Random random = new Random();
 		final int studyId = random.nextInt();
