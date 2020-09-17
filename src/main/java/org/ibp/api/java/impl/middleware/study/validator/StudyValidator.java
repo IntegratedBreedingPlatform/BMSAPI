@@ -122,6 +122,7 @@ public class StudyValidator {
 	}
 
 	public void validateHasNoCrossesOrSelections(final Integer studyId) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		if (this.studyService.hasCrossesOrSelections(studyId)) {
 			errors.reject("study.has.crosses.or.selections");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -129,6 +130,7 @@ public class StudyValidator {
 	}
 
 	public void validateStudyHasNoMeansDataset(final Integer studyId) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		if (this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())) {
 			errors.reject("study.has.means.dataset");
 			throw new ApiRequestValidationException(errors.getAllErrors());

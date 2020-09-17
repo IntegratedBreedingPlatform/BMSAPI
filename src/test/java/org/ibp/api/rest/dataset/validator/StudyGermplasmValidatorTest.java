@@ -9,10 +9,15 @@ import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyService;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -35,6 +40,9 @@ public class StudyGermplasmValidatorTest {
     @Mock
     private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
 
+    @Mock
+    private StudyValidator studyValidator;
+
     @InjectMocks
     private StudyGermplasmValidator validator = new StudyGermplasmValidator();
 
@@ -50,29 +58,6 @@ public class StudyGermplasmValidatorTest {
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
         Mockito.doReturn(Optional.empty()).when(this.middlewareStudyGermplasmService).getStudyGermplasm(studyId, entryId);
-        this.validator.validate(studyId, entryId, newGid);
-    }
-
-    @Test(expected = ApiRequestValidationException.class)
-    public void testValidate_StudyHasMeansDataset() {
-        final Random random = new Random();
-        final int studyId = random.nextInt();
-        final int entryId = random.nextInt();
-        final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyGermplasm(studyId, entryId);
-        Mockito.doReturn(true).when(this.studyService).studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
-        this.validator.validate(studyId, entryId, newGid);
-    }
-
-    @Test(expected = ApiRequestValidationException.class)
-    public void testValidate_StudyHasCrossesOrSelections() {
-        final Random random = new Random();
-        final int studyId = random.nextInt();
-        final int entryId = random.nextInt();
-        final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyGermplasm(studyId, entryId);
-        Mockito.doReturn(false).when(this.studyService).studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
-        Mockito.doReturn(true).when(this.studyService).hasCrossesOrSelections(studyId);
         this.validator.validate(studyId, entryId, newGid);
     }
 
