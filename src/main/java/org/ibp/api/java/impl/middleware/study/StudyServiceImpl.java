@@ -376,17 +376,15 @@ public class StudyServiceImpl implements StudyService {
 		this.studyValidator.validate(studyId, false);
 		final Integer plotDatasetId = datasetService.getDatasets( studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 
+		final List<Integer> termsToRemove = Lists
+			.newArrayList(TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
+
 		final List<MeasurementVariable> entryDescriptors =
 			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
 		//Remove OBS_UNIT_ID column and STOCKID if present
-		for (Iterator<MeasurementVariable> i = entryDescriptors.iterator(); i.hasNext();) {
-			final MeasurementVariable measurementVariable = i.next();
-			if (measurementVariable.getTermId() == TermId.OBS_UNIT_ID.getId() || measurementVariable.getTermId() == TermId.STOCKID.getId()) {
-				i.remove();
-			}
-		}
+		entryDescriptors.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
 		//Add Inventory related columns
 		entryDescriptors.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
