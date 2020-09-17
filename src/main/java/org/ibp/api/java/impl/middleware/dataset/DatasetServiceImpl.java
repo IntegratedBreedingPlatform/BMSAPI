@@ -929,8 +929,8 @@ public class DatasetServiceImpl implements DatasetService {
 			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest(),null);
 
 		final ObservationUnitsMetadata observationUnitsMetadata = new ObservationUnitsMetadata();
-		observationUnitsMetadata.setCountObservationUnits(Long.valueOf(observationUnitRows.size()));
-		observationUnitsMetadata.setCountInstances(observationUnitRows.stream().map(i -> i.getTrialInstance()).distinct().count());
+		observationUnitsMetadata.setObservationUnitsCount(Long.valueOf(observationUnitRows.size()));
+		observationUnitsMetadata.setInstancesCount(observationUnitRows.stream().map(i -> i.getTrialInstance()).distinct().count());
 		return observationUnitsMetadata;
 	}
 
