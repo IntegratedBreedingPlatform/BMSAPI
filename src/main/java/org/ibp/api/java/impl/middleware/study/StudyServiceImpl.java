@@ -106,34 +106,6 @@ public class StudyServiceImpl implements StudyService {
 	@Autowired
 	private DatasetService datasetService;
 
-	void setStudyDataManager(final StudyDataManager studyDataManager) {
-		this.studyDataManager = studyDataManager;
-	}
-
-	void setSecurityService(final SecurityService securityService) {
-		this.securityService = securityService;
-	}
-
-	void setValidationUtil(final ValidationUtil validationUtil) {
-		this.validationUtil = validationUtil;
-	}
-
-	void setObservationValidator(final ObservationValidator observationValidator) {
-		this.observationValidator = observationValidator;
-	}
-
-	void setStudyValidator(final StudyValidator studyValidator) {
-		this.studyValidator = studyValidator;
-	}
-
-	void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
-		this.middlewareStudyService = middlewareStudyService;
-	}
-
-	public void setDatasetService(final DatasetService datasetService) {
-		this.datasetService = datasetService;
-	}
-
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
 	}
@@ -495,4 +467,31 @@ public class StudyServiceImpl implements StudyService {
 		errors.add(observationIdentifierError);
 	}
 
+	public void setStudyDataManager(final StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
+	}
+
+	public void setSecurityService(final SecurityService securityService) {
+		this.securityService = securityService;
+	}
+
+	public void setValidationUtil(final ValidationUtil validationUtil) {
+		this.validationUtil = validationUtil;
+	}
+
+	public void setObservationValidator(final ObservationValidator observationValidator) {
+		this.observationValidator = observationValidator;
+	}
+
+	public void setStudyValidator(final StudyValidator studyValidator) {
+		this.studyValidator = studyValidator;
+	}
+
+	public void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
+		this.middlewareStudyService = middlewareStudyService;
+	}
+
+	public void setDatasetService(final DatasetService datasetService) {
+		this.datasetService = datasetService;
+	}
 }
