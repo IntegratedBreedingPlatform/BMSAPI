@@ -21,7 +21,8 @@ public interface GermplasmService {
 
 	int searchGermplasmCount(String searchText);
 
-	List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable);
+	List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
+		final String programUUID);
 
 	GermplasmSummary getGermplasm(String germplasmId);
 

@@ -16,12 +16,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -48,6 +48,7 @@ public class GermplasmResource {
 	@ResponseBody
 	public ResponseEntity<List<GermplasmSearchResponse>> searchGermplasm(
 		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmSearchRequest germplasmSearchRequest,
 		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
 	) {
@@ -71,7 +72,7 @@ public class GermplasmResource {
 
 				@Override
 				public List<GermplasmSearchResponse> getResults(final PagedResult<GermplasmSearchResponse> pagedResult) {
-					return germplasmService.searchGermplasm(germplasmSearchRequest, pageable);
+					return germplasmService.searchGermplasm(germplasmSearchRequest, pageable, programUUID);
 				}
 			});
 

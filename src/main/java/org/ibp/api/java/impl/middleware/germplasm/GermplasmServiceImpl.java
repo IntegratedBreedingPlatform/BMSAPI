@@ -74,8 +74,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private GermplasmSearchService germplasmSearchService;
 
 	@Override
-	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable) {
-		return this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageable);
+	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
+		final String programUUID) {
+
+		// TODO if program-role then germplasmSearchRequest.setInProgramListOnly(true);
+		return this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageable, programUUID);
 	}
 
 	/*
