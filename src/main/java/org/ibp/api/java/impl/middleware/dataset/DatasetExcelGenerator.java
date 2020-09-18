@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -678,13 +677,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	private static List<MeasurementVariable> filterByVariableType(
 		final List<MeasurementVariable> measurementVariables, final VariableType variableType) {
-		final Collection<MeasurementVariable> variablesByType = CollectionUtils.select(measurementVariables, new Predicate() {
-
-			@Override
-			public boolean evaluate(final Object o) {
-				final MeasurementVariable measurementVariable = (MeasurementVariable) o;
-				return measurementVariable.getVariableType().equals(variableType);
-			}
+		final Collection<MeasurementVariable> variablesByType = CollectionUtils.select(measurementVariables, o -> {
+			final MeasurementVariable measurementVariable = (MeasurementVariable) o;
+			return measurementVariable.getVariableType().equals(variableType);
 		});
 		return Lists.newArrayList(variablesByType);
 	}

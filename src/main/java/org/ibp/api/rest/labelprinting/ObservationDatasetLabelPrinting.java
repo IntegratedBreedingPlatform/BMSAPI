@@ -281,7 +281,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		studyTransactionsRequest.setTransactionsSearch(transactionsSearch);
 
 		final List<StudyTransactionsDto> studyTransactionsDtos =
-			studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest);
+			studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest, null);
 
 		final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap = new HashMap<>();
 		studyTransactionsDtos.forEach(studyTransactionsDto -> studyTransactionsDto.getObservationUnits().forEach(

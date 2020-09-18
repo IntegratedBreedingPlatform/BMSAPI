@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 @Api(value = "Study Services")
@@ -31,9 +29,6 @@ public class StudyResource {
 
 	@Autowired
 	private StudyService studyService;
-
-	@Autowired
-	private StudyDataManager studyDataManager;
 
 	@ApiOperation(value = "Check if a study is sampled.",
 			notes = "Returns boolean indicating if there are samples associated to the study.")
@@ -70,4 +65,5 @@ public class StudyResource {
 		final List<TreeNode> studyTree = this.studyService.getStudyTree(parentFolderId, programUUID);
 		return new ResponseEntity<>(studyTree, HttpStatus.OK);
 	}
+
 }
