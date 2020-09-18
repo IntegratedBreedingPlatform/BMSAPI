@@ -120,12 +120,14 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 
 		final Random random = new Random();
 		final int studyId = random.nextInt();
+		final int entryId = random.nextInt();
+		final int propertyId = random.nextInt();
 
 		final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries",
-				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+			.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}/properties/{propertyId}",
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, entryId, propertyId)
 			.content(this.convertObjectToByte(studyEntryPropertyData))
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
