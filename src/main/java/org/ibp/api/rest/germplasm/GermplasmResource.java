@@ -39,9 +39,9 @@ public class GermplasmResource {
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
-			value = "Results page you want to retrieve (1..N)"),
+			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
 		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
-			value = "Number of records per page."),
+			value = "Number of records per page. <b>Note:</b> this query may return additional records using some filters"),
 		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
@@ -50,7 +50,8 @@ public class GermplasmResource {
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmSearchRequest germplasmSearchRequest,
-		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE)
+		final Pageable pageable
 	) {
 
 		BaseValidator.checkNotNull(germplasmSearchRequest, "param.null", new String[] {"germplasmSearchDTO"});
