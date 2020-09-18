@@ -42,6 +42,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
@@ -124,6 +125,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private StudyTransactionsService studyTransactionsService;
+
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
 
 	static final String PLOT_DATASET_NAME = "Observations";
 
@@ -865,27 +869,18 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		this.datasetValidator.validatePlotDatasetType(datasetId);
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		if (this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())) {
-			errors.reject("study.has.means.dataset");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		this.studyValidator.validateStudyHasNoMeansDataset(studyId);
 
 		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
 		BaseValidator.checkNotNull(request.getSearchRequest(), "param.null", new String[] {"searchRequest"});
 		BaseValidator.checkNotNull(request.getEntryId(), "param.null", new String[] {"entryId"});
 
-		if (!request.getSearchRequest().isValid()) {
-			errors.reject("search.composite.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.inventoryCommonValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
 
 		studyValidator.validateStudyContainsEntry(studyId, request.getEntryId());
 
-		if (this.studyService.hasCrossesOrSelections(studyId)) {
-			errors.reject("study.has.crosses.or.selections");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		studyValidator.validateHasNoCrossesOrSelections(studyId);
 
 		this.processSearchComposite(request.getSearchRequest());
 
@@ -896,7 +891,7 @@ public class DatasetServiceImpl implements DatasetService {
 			errors.reject("study.entry.replace.empty.units", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		if (observationUnitRows.stream().filter(o -> !o.getSamplesCount().equals("-")).count()>0) {
+		if (observationUnitRows.stream().anyMatch(o -> !o.getSamplesCount().equals("-"))) {
 			errors.reject("study.entry.replace.samples.found", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -924,11 +919,9 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
 
-		if (!request.isValid()) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), SearchCompositeDto.class.getName());
-			errors.reject("search.composite.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), SearchCompositeDto.class.getName());
+		this.inventoryCommonValidator.validateSearchCompositeDto(request, errors);
+
 
 		this.processSearchComposite(request);
 
@@ -936,8 +929,8 @@ public class DatasetServiceImpl implements DatasetService {
 			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest(),null);
 
 		final ObservationUnitsMetadata observationUnitsMetadata = new ObservationUnitsMetadata();
-		observationUnitsMetadata.setSelectedObservationUnits(Long.valueOf(observationUnitRows.size()));
-		observationUnitsMetadata.setSelectedInstances(observationUnitRows.stream().map(i -> i.getTrialInstance()).distinct().count());
+		observationUnitsMetadata.setObservationUnitsCount(Long.valueOf(observationUnitRows.size()));
+		observationUnitsMetadata.setInstancesCount(observationUnitRows.stream().map(i -> i.getTrialInstance()).distinct().count());
 		return observationUnitsMetadata;
 	}
 

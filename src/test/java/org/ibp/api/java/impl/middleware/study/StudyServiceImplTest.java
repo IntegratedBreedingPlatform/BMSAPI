@@ -19,8 +19,8 @@ import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,14 +66,8 @@ public class StudyServiceImplTest {
 
 	final PodamFactory factory = new PodamFactoryImpl();
 
-	final Function<ObservationDto, Observation> observationTransformFunction = new Function<ObservationDto, Observation>() {
-
-		@Override
-		public Observation apply(final ObservationDto input) {
-			return StudyServiceImplTest.this.mapObservationDtoToObservation(input);
-		}
-
-	};
+	final Function<ObservationDto, Observation> observationTransformFunction =
+		input -> StudyServiceImplTest.this.mapObservationDtoToObservation(input);
 
 
 	@Before
@@ -253,6 +247,13 @@ public class StudyServiceImplTest {
 
 	}
 
+	@Test
+	public void testGetStudyReference() {
+		int studyId = 101;
+		this.studyServiceImpl.getStudyReference(studyId);
+		Mockito.verify(this.studyDataManager).getStudyReference(studyId);
+	}
+
 	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
 		final Observation observation = new Observation();
 		if (measurement != null) {
@@ -267,7 +268,7 @@ public class StudyServiceImplTest {
 			observation.setEntryCode(measurement.getEntryCode());
 
 			final List<MeasurementDto> measurementsDto = measurement.getVariableMeasurements();
-			final List<Measurement> measurements = new ArrayList<Measurement>();
+			final List<Measurement> measurements = new ArrayList<>();
 			for (final MeasurementDto measurementDto : measurementsDto) {
 				measurements.add(new Measurement(
 					new MeasurementIdentifier(measurementDto.getPhenotypeId(), new Trait(
@@ -282,11 +283,4 @@ public class StudyServiceImplTest {
 		return observation;
 	}
 
-
-	@Test
-	public void testGetStudyReference() {
-		int studyId = 101;
-		this.studyServiceImpl.getStudyReference(studyId);
-		Mockito.verify(this.studyDataManager).getStudyReference(studyId);
-	}
 }

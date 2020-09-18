@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -33,6 +32,9 @@ public class StudyGermplasmValidator {
 	@Autowired
 	private SampleService sampleService;
 
+	@Autowired
+	private StudyValidator studyValidator;
+
 	@Resource
 	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
 
@@ -51,15 +53,9 @@ public class StudyGermplasmValidator {
 
 		this.germplasmValidator.validateGermplasmId(this.errors, newGid);
 
-		// Check if means has dataset or advance or cross list
-		boolean hasMeansDataset = this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
-		if (hasMeansDataset) {
-			errors.reject("study.has.means.dataset");
-		}
-		boolean hasCrossesOrSelections = this.studyService.hasCrossesOrSelections(studyId);
-		if (hasCrossesOrSelections) {
-			errors.reject("study.has.crosses.or.selections");
-		}
+		studyValidator.validateStudyHasNoMeansDataset(studyId);
+
+		studyValidator.validateHasNoCrossesOrSelections(studyId);
 
 		Boolean entryHasSamples = this.sampleService.studyEntryHasSamples(studyId, entryId);
 		if (entryHasSamples) {

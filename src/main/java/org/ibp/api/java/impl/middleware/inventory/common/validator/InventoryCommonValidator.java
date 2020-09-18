@@ -42,6 +42,7 @@ public class InventoryCommonValidator {
 		}
 	}
 
+	//TODO: Needs to be moved to a BMS common validator, it is not not exclusive to Inventory
 	public void validateSearchCompositeDto(
 		final SearchCompositeDto searchCompositeDto,
 		final BindingResult errors) {
