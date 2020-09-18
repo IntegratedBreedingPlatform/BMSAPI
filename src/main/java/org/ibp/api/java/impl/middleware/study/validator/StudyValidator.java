@@ -81,7 +81,7 @@ public class StudyValidator {
 	public void validateStudyContainsEntry(final Integer studyId, final Integer entryId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		final Optional<StudyGermplasmDto> entry = this.studyGermplasmService.getStudyGermplasm(studyId, entryId);
-		if (!entry.isPresent()){
+		if (!entry.isPresent()) {
 			errors.reject("invalid.entryid");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -119,6 +119,18 @@ public class StudyValidator {
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
+	}
+
+	public void validateStudyShouldNotHaveObservation(final Integer studyId) {
+		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
+		final List<Integer> restrictedInstances =
+			studyInstances.stream().filter(instance -> BooleanUtils.isTrue(instance.isHasExperimentalDesign()))
+				.map(instance -> instance.getInstanceNumber()).collect(Collectors.toList());
+		if (!restrictedInstances.isEmpty()) {
+			this.errors.reject("study.must.not.have.observation");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
 	}
 
 	public void validateHasNoCrossesOrSelections(final Integer studyId) {

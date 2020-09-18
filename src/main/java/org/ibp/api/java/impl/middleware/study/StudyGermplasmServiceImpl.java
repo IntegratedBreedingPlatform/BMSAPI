@@ -6,14 +6,20 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.java.germplasm.GermplamListService;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyGermplasmService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,85 +29,129 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 
-    @Resource
-    private StudyValidator studyValidator;
+	@Resource
+	private StudyValidator studyValidator;
 
-    @Autowired
-    private PedigreeService pedigreeService;
+	@Autowired
+	private PedigreeService pedigreeService;
 
-    @Autowired
-    private CrossExpansionProperties crossExpansionProperties;
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
-    @Resource
-    private StudyGermplasmValidator studyGermplasmValidator;
+	@Resource
+	private StudyGermplasmValidator studyGermplasmValidator;
 
-    @Resource
-    private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
+	@Autowired
+	private GermplasmListValidator germplasmListValidator;
 
-    @Resource
-    private DatasetService datasetService;
+	@Autowired
+	private GermplamListService germplasmListService;
 
-    @Override
-    public StudyGermplasmDto replaceStudyGermplasm(final Integer studyId, final Integer entryId, final StudyGermplasmDto studyGermplasmDto) {
-        final Integer gid = studyGermplasmDto.getGermplasmId();
-        this.studyValidator.validate(studyId, true);
-        this.studyGermplasmValidator.validate(studyId, entryId, gid);
+	@Autowired
+	private TermValidator termValidator;
 
-        return this.middlewareStudyGermplasmService.replaceStudyGermplasm(studyId, entryId, gid, this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
-    }
+	@Resource
+	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
 
-    @Override
-    public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
-        this.studyValidator.validate(studyId, false);
-        return this.middlewareStudyGermplasmService.getStudyEntries(studyId, filter, pageable);
-    }
+	@Resource
+	private DatasetService datasetService;
 
-    @Override
-    public long countAllStudyEntries(final Integer studyId) {
-        this.studyValidator.validate(studyId, false);
-        return this.middlewareStudyGermplasmService.countStudyEntries(studyId);
-    }
+	@Override
+	public StudyGermplasmDto replaceStudyEntry(final Integer studyId, final Integer entryId,
+		final StudyGermplasmDto studyGermplasmDto) {
+		final Integer gid = studyGermplasmDto.getGermplasmId();
+		this.studyValidator.validate(studyId, true);
+		this.studyGermplasmValidator.validate(studyId, entryId, gid);
 
-    @Override
-    public List<MeasurementVariable> getEntryDescriptorColumns(final Integer studyId) {
-        this.studyValidator.validate(studyId, false);
-        final Integer plotDatasetId =
-            datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+		return this.middlewareStudyGermplasmService
+			.replaceStudyGermplasm(studyId, entryId, gid, this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
+	}
 
-        final List<Integer> termsToRemove = Lists
-            .newArrayList(TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
+	@Override
+	public List<StudyGermplasmDto> createStudyEntries(final Integer studyId, final Integer germplasmListId) {
+		final GermplasmList germplasmList = this.germplasmListService.getGermplasmList(germplasmListId);
 
-        final List<MeasurementVariable> entryDescriptors =
-            this.datasetService.getObservationSetVariables(plotDatasetId, Lists
-                .newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
+		this.germplasmListValidator.validateGermplasmList(germplasmListId);
+		this.studyGermplasmValidator.validateStudyAlreadyHasStudyEntries(studyId);
+		this.studyValidator.validate(studyId, true);
 
-        //Remove OBS_UNIT_ID column and STOCKID if present
-        entryDescriptors.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
+		final ModelMapper mapper = StudyEntryMapper.getInstance();
+		final List<StudyGermplasmDto> studyGermplasmList =
+			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyGermplasmDto.class)).collect(Collectors.toList());
 
-        //Add Inventory related columns
-        entryDescriptors.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
-        entryDescriptors.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
-        entryDescriptors.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
+		return this.middlewareStudyGermplasmService.saveStudyEntries(studyId, studyGermplasmList);
+	}
 
-        return entryDescriptors;
-    }
+	@Override
+	public void deleteStudyEntries(final Integer studyId) {
+		this.studyValidator.validate(studyId, true);
+		this.studyValidator.validateStudyShouldNotHaveObservation(studyId);
+		this.middlewareStudyGermplasmService.deleteStudyEntries(studyId);
+	}
 
-    private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
-        final MeasurementVariable sampleColumn = new MeasurementVariable();
-        sampleColumn.setName(name);
-        sampleColumn.setAlias(name);
-        sampleColumn.setTermId(termId.getId());
-        sampleColumn.setFactor(true);
-        return sampleColumn;
-    }
+	@Override
+	public void updateStudyEntryProperty(final Integer studyId, final Integer entryId,
+		final StudyEntryPropertyData studyEntryPropertyData) {
+		this.studyValidator.validate(studyId, true);
+		this.studyValidator.validateStudyContainsEntry(studyId, entryId);
+		this.termValidator.validate(studyEntryPropertyData.getVariableId());
+		this.studyGermplasmValidator.validateStudyEntryProperty(studyEntryPropertyData.getStudyEntryPropertyId());
+		this.middlewareStudyGermplasmService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
+	}
 
-    public void setDatasetService(final DatasetService datasetService) {
-        this.datasetService = datasetService;
-    }
+	@Override
+	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
+		this.studyValidator.validate(studyId, false);
+		return this.middlewareStudyGermplasmService.getStudyEntries(studyId, filter, pageable);
+	}
+
+	@Override
+	public long countAllStudyEntries(final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
+		return this.middlewareStudyGermplasmService.countStudyEntries(studyId);
+	}
+
+	@Override
+	public List<MeasurementVariable> getEntryDescriptorColumns(final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
+		final Integer plotDatasetId =
+			datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+
+		final List<Integer> termsToRemove = Lists
+			.newArrayList(TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
+
+		final List<MeasurementVariable> entryDescriptors =
+			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
+				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
+
+		//Remove OBS_UNIT_ID column and STOCKID if present
+		entryDescriptors.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
+
+		//Add Inventory related columns
+		entryDescriptors.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
+		entryDescriptors.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
+		entryDescriptors.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
+
+		return entryDescriptors;
+	}
+
+	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
+		final MeasurementVariable sampleColumn = new MeasurementVariable();
+		sampleColumn.setName(name);
+		sampleColumn.setAlias(name);
+		sampleColumn.setTermId(termId.getId());
+		sampleColumn.setFactor(true);
+		return sampleColumn;
+	}
+
+	public void setDatasetService(final DatasetService datasetService) {
+		this.datasetService = datasetService;
+	}
 
 }
