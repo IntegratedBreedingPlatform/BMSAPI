@@ -90,6 +90,10 @@ public class StudyServiceImpl implements StudyService {
 	@Autowired
 	private FieldMapService fieldMapService;
 
+	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
+		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
+	}
+
 	@Override
 	public List<StudySummary> search(final String programUniqueId, final String cropname, final String principalInvestigator,
 		final String location, final String season) {
@@ -148,11 +152,6 @@ public class StudyServiceImpl implements StudyService {
 		return new Observation();
 	}
 
-	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
-		return StudyMapper.getInstance()
-			.map(measurement, Observation.class);
-	}
-
 	@Override
 	public Observation updateObservation(final Integer studyIdentifier, final Observation observation) {
 		this.validationUtil.invokeValidation("StudyServiceImpl", new Command() {
@@ -163,38 +162,6 @@ public class StudyServiceImpl implements StudyService {
 			}
 		});
 		return this.mapAndUpdateObservation(studyIdentifier, observation);
-	}
-
-	/**
-	 * Translates to the middleware pojo. Updates the database and then translates back the results.
-	 *
-	 * @param studyIdentifier
-	 * @param observation
-	 * @return
-	 */
-	private Observation mapAndUpdateObservation(final Integer studyIdentifier, final Observation observation) {
-		this.validateMeasurementSubmitted(studyIdentifier, observation);
-
-		final List<Measurement> measurements = observation.getMeasurements();
-
-		final List<MeasurementDto> traits = new ArrayList<>();
-		for (final Measurement measurement : measurements) {
-			traits.add(new MeasurementDto(new MeasurementVariableDto(measurement.getMeasurementIdentifier()
-				.getTrait()
-				.getTraitId(), measurement
-				.getMeasurementIdentifier()
-				.getTrait()
-				.getTraitName()), measurement.getMeasurementIdentifier()
-				.getMeasurementId(),
-				measurement.getMeasurementValue(), measurement.getValueStatus()));
-		}
-		final ObservationDto middlewareMeasurement =
-			new ObservationDto(observation.getUniqueIdentifier(), observation.getEnvironmentNumber(), observation.getEntryType(),
-				observation.getGermplasmId(), observation.getGermplasmDesignation(), observation.getEntryNumber(),
-				observation.getEntryCode(), observation.getReplicationNumber(), observation.getPlotNumber(),
-				observation.getBlockNumber(), traits);
-
-		return this.mapObservationDtoToObservation(this.middlewareStudyService.updateObservation(studyIdentifier, middlewareMeasurement));
 	}
 
 	@Override
@@ -217,97 +184,14 @@ public class StudyServiceImpl implements StudyService {
 		return returnList;
 	}
 
-	/**
-	 * Essentially makes sure that the underlying observation has not changed
-	 *
-	 * @param studyIdentifier the study in which the observation is being updated
-	 * @param observation     the actual observation update.
-	 */
-	private void validateMeasurementSubmitted(final Integer studyIdentifier, final Observation observation) {
-		// If null do something
-		final Observation existingObservation = this.getSingleObservation(studyIdentifier, observation.getUniqueIdentifier());
-		final List<ObjectError> errors = new ArrayList<>();
-		if (existingObservation == null || existingObservation.getUniqueIdentifier() == null) {
-			this.validateExistingObservation(studyIdentifier, observation, errors);
-		} else {
-			this.validateMeasurementHasNotBeenCreated(observation, existingObservation, errors);
-		}
-		if (!errors.isEmpty()) {
-			throw new ApiRequestValidationException(errors);
-		}
-
-	}
-
-	private void validateMeasurementHasNotBeenCreated(final Observation observation, final Observation existingObservation,
-		final List<ObjectError> errors) {
-		final List<Measurement> measurements = observation.getMeasurements();
-		int counter = 0;
-		for (final Measurement measurement : measurements) {
-			// Relies on the hash coded generated in the MeasurementIdentifier object
-			final Measurement existingMeasurement = existingObservation.getMeasurement(measurement.getMeasurementIdentifier());
-			if (existingMeasurement == null) {
-				final String[] errorMessage = {"measurement.already.inserted"};
-				final List<String> object = new ArrayList<>();
-				final ObjectMapper objectMapper = new ObjectMapper();
-				try {
-					object.add(objectMapper.writeValueAsString(measurement));
-				} catch (final JsonProcessingException e) {
-					throw new ApiRuntimeException("Error mapping measurement to JSON", e);
-				}
-				final FieldError objectError =
-					new FieldError("Observation", "Measurements [" + counter + "]", null, false, errorMessage, object.toArray(),
-						"Error processing measurement");
-				errors.add(objectError);
-				counter++;
-			}
-		}
-	}
-
-	private void validateExistingObservation(final Integer studyIdentifier, final Observation observation, final List<ObjectError> errors) {
-		final String[] errorKey = {"no.observation.found"};
-		final Object[] erroyKeyArguments = {studyIdentifier, observation.getUniqueIdentifier()};
-		final FieldError observationIdentifierError =
-			new FieldError("Observation", "uniqueIdentifier", null, false, errorKey, erroyKeyArguments,
-				"Error retrieving observation");
-		errors.add(observationIdentifierError);
-	}
-
 	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
 		return this.fieldMapService.getFieldMap(studyId);
 	}
 
-	void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
-		this.middlewareStudyService = middlewareStudyService;
-	}
-
-	void setStudyDataManager(final StudyDataManager studyDataManager) {
-		this.studyDataManager = studyDataManager;
-	}
-
-	void setSecurityService(final SecurityService securityService) {
-		this.securityService = securityService;
-	}
-
-	void setValidationUtil(final ValidationUtil validationUtil) {
-		this.validationUtil = validationUtil;
-	}
-
-	void setObservationValidator(final ObservationValidator observationValidator) {
-		this.observationValidator = observationValidator;
-	}
-
-	void setStudyValidator(final StudyValidator studyValidator) {
-		this.studyValidator = studyValidator;
-	}
-
 	@Override
 	public String getProgramUUID(final Integer studyIdentifier) {
 		return this.middlewareStudyService.getProgramUUID(studyIdentifier);
-	}
-
-	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
-		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
 	}
 
 	@Override
@@ -429,6 +313,122 @@ public class StudyServiceImpl implements StudyService {
 		} else {
 			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
 		}
+	}
+
+	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
+		return StudyMapper.getInstance()
+			.map(measurement, Observation.class);
+	}
+
+	/**
+	 * Translates to the middleware pojo. Updates the database and then translates back the results.
+	 *
+	 * @param studyIdentifier
+	 * @param observation
+	 * @return
+	 */
+	private Observation mapAndUpdateObservation(final Integer studyIdentifier, final Observation observation) {
+		this.validateMeasurementSubmitted(studyIdentifier, observation);
+
+		final List<Measurement> measurements = observation.getMeasurements();
+
+		final List<MeasurementDto> traits = new ArrayList<>();
+		for (final Measurement measurement : measurements) {
+			traits.add(new MeasurementDto(new MeasurementVariableDto(measurement.getMeasurementIdentifier()
+				.getTrait()
+				.getTraitId(), measurement
+				.getMeasurementIdentifier()
+				.getTrait()
+				.getTraitName()), measurement.getMeasurementIdentifier()
+				.getMeasurementId(),
+				measurement.getMeasurementValue(), measurement.getValueStatus()));
+		}
+		final ObservationDto middlewareMeasurement =
+			new ObservationDto(observation.getUniqueIdentifier(), observation.getEnvironmentNumber(), observation.getEntryType(),
+				observation.getGermplasmId(), observation.getGermplasmDesignation(), observation.getEntryNumber(),
+				observation.getEntryCode(), observation.getReplicationNumber(), observation.getPlotNumber(),
+				observation.getBlockNumber(), traits);
+
+		return this.mapObservationDtoToObservation(this.middlewareStudyService.updateObservation(studyIdentifier, middlewareMeasurement));
+	}
+
+	/**
+	 * Essentially makes sure that the underlying observation has not changed
+	 *
+	 * @param studyIdentifier the study in which the observation is being updated
+	 * @param observation     the actual observation update.
+	 */
+	private void validateMeasurementSubmitted(final Integer studyIdentifier, final Observation observation) {
+		// If null do something
+		final Observation existingObservation = this.getSingleObservation(studyIdentifier, observation.getUniqueIdentifier());
+		final List<ObjectError> errors = new ArrayList<>();
+		if (existingObservation == null || existingObservation.getUniqueIdentifier() == null) {
+			this.validateExistingObservation(studyIdentifier, observation, errors);
+		} else {
+			this.validateMeasurementHasNotBeenCreated(observation, existingObservation, errors);
+		}
+		if (!errors.isEmpty()) {
+			throw new ApiRequestValidationException(errors);
+		}
+
+	}
+
+	private void validateMeasurementHasNotBeenCreated(final Observation observation, final Observation existingObservation,
+		final List<ObjectError> errors) {
+		final List<Measurement> measurements = observation.getMeasurements();
+		int counter = 0;
+		for (final Measurement measurement : measurements) {
+			// Relies on the hash coded generated in the MeasurementIdentifier object
+			final Measurement existingMeasurement = existingObservation.getMeasurement(measurement.getMeasurementIdentifier());
+			if (existingMeasurement == null) {
+				final String[] errorMessage = {"measurement.already.inserted"};
+				final List<String> object = new ArrayList<>();
+				final ObjectMapper objectMapper = new ObjectMapper();
+				try {
+					object.add(objectMapper.writeValueAsString(measurement));
+				} catch (final JsonProcessingException e) {
+					throw new ApiRuntimeException("Error mapping measurement to JSON", e);
+				}
+				final FieldError objectError =
+					new FieldError("Observation", "Measurements [" + counter + "]", null, false, errorMessage, object.toArray(),
+						"Error processing measurement");
+				errors.add(objectError);
+				counter++;
+			}
+		}
+	}
+
+	private void validateExistingObservation(final Integer studyIdentifier, final Observation observation, final List<ObjectError> errors) {
+		final String[] errorKey = {"no.observation.found"};
+		final Object[] erroyKeyArguments = {studyIdentifier, observation.getUniqueIdentifier()};
+		final FieldError observationIdentifierError =
+			new FieldError("Observation", "uniqueIdentifier", null, false, errorKey, erroyKeyArguments,
+				"Error retrieving observation");
+		errors.add(observationIdentifierError);
+	}
+
+	public void setStudyDataManager(final StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
+	}
+
+	public void setSecurityService(final SecurityService securityService) {
+		this.securityService = securityService;
+	}
+
+	public void setValidationUtil(final ValidationUtil validationUtil) {
+		this.validationUtil = validationUtil;
+	}
+
+	public void setObservationValidator(final ObservationValidator observationValidator) {
+		this.observationValidator = observationValidator;
+	}
+
+	public void setStudyValidator(final StudyValidator studyValidator) {
+		this.studyValidator = studyValidator;
+	}
+
+	public void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
+		this.middlewareStudyService = middlewareStudyService;
 	}
 
 }

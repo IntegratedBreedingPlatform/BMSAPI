@@ -5,10 +5,13 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -17,11 +20,14 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -30,11 +36,15 @@ import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
+import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
+import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
@@ -109,6 +119,15 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
+
+	@Autowired
+	private StudyService studyService;
+
+	@Autowired
+	private StudyTransactionsService studyTransactionsService;
+
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
 
 	static final String PLOT_DATASET_NAME = "Observations";
 
@@ -843,5 +862,85 @@ public class DatasetServiceImpl implements DatasetService {
 		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
 		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);
 		environmentDetailAndConditionVariables.add(0, locationIdVariable);
+	}
+
+	@Override
+	public void replaceObservationUnitsEntry(final int studyId, final int datasetId, final ObservationUnitEntryReplaceRequest request) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		this.datasetValidator.validatePlotDatasetType(datasetId);
+		this.studyValidator.validateStudyHasNoMeansDataset(studyId);
+
+		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
+		BaseValidator.checkNotNull(request.getSearchRequest(), "param.null", new String[] {"searchRequest"});
+		BaseValidator.checkNotNull(request.getEntryId(), "param.null", new String[] {"entryId"});
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.inventoryCommonValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
+
+		studyValidator.validateStudyContainsEntry(studyId, request.getEntryId());
+
+		studyValidator.validateHasNoCrossesOrSelections(studyId);
+
+		this.processSearchComposite(request.getSearchRequest());
+
+		// observation units
+		final List<ObservationUnitRow> observationUnitRows =
+			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest().getSearchRequest(),null);
+		if (observationUnitRows.isEmpty()) {
+			errors.reject("study.entry.replace.empty.units", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		if (observationUnitRows.stream().anyMatch(o -> !o.getSamplesCount().equals("-"))) {
+			errors.reject("study.entry.replace.samples.found", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final List<Integer> observationUnitIds = observationUnitRows.stream().map(ObservationUnitRow::getObservationUnitId).collect(
+			Collectors.toList());
+		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
+		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+		transactionsSearchDto.setTransactionStatus(Lists.newArrayList(TransactionStatus.PENDING.getIntValue(),TransactionStatus.CONFIRMED.getIntValue()));
+		studyTransactionsRequest.setTransactionsSearch(transactionsSearchDto);
+		studyTransactionsRequest.setObservationUnitIds(observationUnitIds);
+
+		if (studyTransactionsService.countStudyTransactions(studyId, studyTransactionsRequest) > 0) {
+			errors.reject("study.entry.replace.transactions.found", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		this.middlewareDatasetService.replaceObservationUnitEntry(observationUnitIds, request.getEntryId());
+	}
+
+	@Override
+	public ObservationUnitsMetadata getObservationUnitsMetadata(final int studyId, final int datasetId,
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> request) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), SearchCompositeDto.class.getName());
+		this.inventoryCommonValidator.validateSearchCompositeDto(request, errors);
+
+
+		this.processSearchComposite(request);
+
+		final List<ObservationUnitRow> observationUnitRows =
+			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest(),null);
+
+		final ObservationUnitsMetadata observationUnitsMetadata = new ObservationUnitsMetadata();
+		observationUnitsMetadata.setObservationUnitsCount(Long.valueOf(observationUnitRows.size()));
+		observationUnitsMetadata.setInstancesCount(observationUnitRows.stream().map(i -> i.getTrialInstance()).distinct().count());
+		return observationUnitsMetadata;
+	}
+
+	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
+		if (searchDTO.getItemIds() != null && !searchDTO.getItemIds().isEmpty()) {
+			final ObservationUnitsSearchDTO searchRequest = new ObservationUnitsSearchDTO();
+			final ObservationUnitsSearchDTO.Filter filter = searchRequest.new Filter();
+			filter.setFilteredNdExperimentIds(searchDTO.getItemIds());
+			searchRequest.setFilter(filter);
+			searchDTO.setSearchRequest(searchRequest);
+		}
 	}
 }
