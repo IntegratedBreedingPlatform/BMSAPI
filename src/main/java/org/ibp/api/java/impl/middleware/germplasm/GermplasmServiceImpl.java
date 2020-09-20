@@ -81,6 +81,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageable, programUUID);
 	}
 
+	@Override
+	public long countSearchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+		return this.germplasmSearchService.countSearchGermplasm(germplasmSearchRequest, programUUID);
+	}
+
 	/*
 	 * TODO
 	 *  - Remove

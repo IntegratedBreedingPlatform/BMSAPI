@@ -14,6 +14,7 @@ import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -61,14 +62,12 @@ public class GermplasmResource {
 
 				@Override
 				public long getCount() {
-					// TODO
-					return 0;
+					return germplasmService.countSearchGermplasm(null, programUUID);
 				}
 
 				@Override
 				public long getFilteredCount() {
-					// TODO
-					return 0;
+					return germplasmService.countSearchGermplasm(germplasmSearchRequest, programUUID);
 				}
 
 				@Override
@@ -78,8 +77,11 @@ public class GermplasmResource {
 			});
 
 		final List<GermplasmSearchResponse> pageResults = result.getPageResults();
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(result.getTotalResults()));
+		headers.add("X-Filtered-Count", Long.toString(result.getFilteredResults()));
 
-		return new ResponseEntity<>(pageResults, HttpStatus.OK);
+		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
 	}
 
 }

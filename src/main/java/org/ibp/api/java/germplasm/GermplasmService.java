@@ -24,6 +24,8 @@ public interface GermplasmService {
 	List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
 		final String programUUID);
 
+	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
+
 	GermplasmSummary getGermplasm(String germplasmId);
 
 	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, Boolean includeSiblings);
@@ -48,4 +50,5 @@ public interface GermplasmService {
 		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNUmber);
 
 	long countAttributesByGid(String gid, List<String> attributeDbIds);
+
 }
