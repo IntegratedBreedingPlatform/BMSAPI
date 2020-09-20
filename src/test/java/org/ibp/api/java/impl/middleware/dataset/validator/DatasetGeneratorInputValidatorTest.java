@@ -1,9 +1,14 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.OntologyDataManagerImpl;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
@@ -20,6 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
@@ -59,6 +65,11 @@ public class DatasetGeneratorInputValidatorTest {
 	@Mock
 	final Environment environment = new StandardEnvironment();
 
+	@Mock
+	final OntologyDataManager ontologyDataManager = new OntologyDataManagerImpl();
+
+	private VariableType variableType;
+
 	@Before
 	public void setup() {
 
@@ -77,6 +88,12 @@ public class DatasetGeneratorInputValidatorTest {
 		meansDatasetType.setObservationType(false);
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(meansDatasetType);
 
+		final Term observationUnitTerm =
+			new Term(org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId(), "OBS", "Desc");
+		variableType =
+			new VariableType(String.valueOf(org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId()), "OBS",
+				"Desc");
+		Mockito.when(this.ontologyDataManager.getAllTermsByCvId(CvId.VARIABLE_TYPE)).thenReturn(Lists.newArrayList(observationUnitTerm));
 	}
 
 	@Test
@@ -161,10 +178,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
@@ -215,10 +228,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
@@ -262,10 +271,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
@@ -310,10 +315,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
@@ -358,10 +359,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
@@ -411,10 +408,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
@@ -463,10 +456,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
@@ -516,10 +505,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
@@ -572,10 +557,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
@@ -623,10 +604,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
@@ -671,10 +648,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final Integer parentId = random.nextInt();
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
 		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
-		final VariableType variableType = new VariableType(
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
-			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
 
 		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";

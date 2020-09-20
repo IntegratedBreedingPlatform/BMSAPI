@@ -147,13 +147,13 @@ public class DatasetValidator {
 				this.errors.reject("variable.already.dataset.variable", new Object[] {String.valueOf(variableId)}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 
-					// If variable was found, check it is a supported variable type for dataset
-				} else if (this.isInvalidVariableTypeForDatasetType(datasetType, variableType)) {
-					this.errors
-						.reject("dataset.variable.cannot.be.deleted", new Object[] {String.valueOf(variableId),  ontologyDataManager.getTermById(variableType.getId()).getName()},
-							"");
-					throw new NotSupportedException(this.errors.getAllErrors().get(0));
-				}
+				// If variable was found, check it is a supported variable type for dataset
+			} else if (this.isInvalidVariableTypeForDatasetType(datasetType, variableType)) {
+				this.errors
+					.reject("dataset.variable.cannot.be.deleted",
+						new Object[] {String.valueOf(variableId), ontologyDataManager.getTermById(variableType.getId()).getName()},
+						"");
+				throw new NotSupportedException(this.errors.getAllErrors().get(0));
 			}
 		}
 
