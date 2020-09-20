@@ -25,7 +25,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -114,7 +119,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	@Override
 	public InstanceObservationData addInstanceObservation(final Integer studyId, final Integer instanceId,
 		final InstanceObservationData instanceObservationData) {
-		this.validateInstanceData(studyId, instanceId, instanceObservationData, VariableType.STUDY_CONDITION);
+		this.validateInstanceData(studyId, instanceId, instanceObservationData, VariableType.ENVIRONMENT_CONDITION);
 
 		instanceObservationData.setInstanceId(instanceId);
 		this.middlewareStudyInstanceService.addInstanceObservation(instanceObservationData);
@@ -125,7 +130,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	public InstanceObservationData updateInstanceObservation(final Integer studyId, final Integer instanceId,
 		final Integer observationDataId,
 		final InstanceObservationData instanceObservationData) {
-		this.validateInstanceData(studyId, instanceId, instanceObservationData, VariableType.STUDY_CONDITION);
+		this.validateInstanceData(studyId, instanceId, instanceObservationData, VariableType.ENVIRONMENT_CONDITION);
 		final Integer variableId = instanceObservationData.getVariableId();
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());

@@ -96,7 +96,7 @@ public class LotResource {
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')" + PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchLots(
 		@PathVariable final String cropName,
@@ -124,7 +124,7 @@ public class LotResource {
 							"Default sort order is ascending. " +
 							"Multiple sort criteria are supported.")
 	})
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')" + PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	@ResponseBody
 	@JsonView(InventoryView.LotView.class)
 	public ResponseEntity<List<ExtendedLotDto>> getLots(@PathVariable final String cropName, //

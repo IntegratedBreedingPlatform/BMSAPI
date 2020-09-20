@@ -10,8 +10,8 @@ import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
-import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
+import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,7 +185,7 @@ public abstract class LabelPrintingStrategy {
 		if(!labelsGeneratorInput.isAutomaticBarcode()){
 			for (final Map<Integer, String> data:labelsData.getData()){
 				List<Integer> barcodeIds =
-					labelsGeneratorInput.getBarcodeFields().stream().filter(labelId -> data.get(labelId) == null).collect(
+					labelsGeneratorInput.getBarcodeFields().stream().filter(labelId -> StringUtils.isEmpty(data.get(labelId))).collect(
 						Collectors.toList());
 					if(!barcodeIds.isEmpty()){
 						errors.reject("label.fields.barcodes.selected.empty.value","");

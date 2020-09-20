@@ -494,7 +494,7 @@ public class DerivedVariableServiceImplTest {
 		final int observationUnitId = 1;
 		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation = new HashMap<>();
 		final Map<String, List<Object>> valuesMap = new HashMap<>();
-		valuesMap.put(String.valueOf(VARIABLE6_TERMID), Collections.singletonList("2019-08-21"));
+		valuesMap.put(String.valueOf(VARIABLE6_TERMID), Collections.singletonList("03/31/2018"));
 		valuesFromSubObservation.put(observationUnitId, valuesMap);
 		final Map<Integer, MeasurementVariable> measurementVariablesMap = this.createMeasurementVariablesMap();
 		final List<String> inputVariables = Collections.singletonList(DerivedVariableUtils.wrapTerm(String.valueOf(VARIABLE6_TERMID)));

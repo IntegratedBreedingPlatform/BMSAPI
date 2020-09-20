@@ -118,6 +118,11 @@ public class GermplamListServiceImpl implements GermplamListService {
 		return treeNodes;
 	}
 
+	@Override
+	public GermplasmList getGermplasmList(final Integer germplasmListId) {
+		return this.germplasmListManager.getGermplasmListById(germplasmListId);
+	}
+
 	private void validateParentId(final String parentId, final String programUUID) {
 		if (parentId != null && !PROGRAM_LISTS.equals(parentId) && !CROP_LISTS.equals(parentId) && !Util.isPositiveInteger(parentId)) {
 			this.errors.reject("list.parent.id.invalid", "");

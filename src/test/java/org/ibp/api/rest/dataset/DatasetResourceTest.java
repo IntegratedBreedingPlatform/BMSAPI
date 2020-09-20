@@ -9,7 +9,6 @@ import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -368,7 +367,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean()))
 			.thenReturn(100);
 		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-			ArgumentMatchers.any()))
+			ArgumentMatchers.any(), ArgumentMatchers.any()))
 			.thenReturn(Lists.newArrayList(obsDto));
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
@@ -377,10 +376,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 		searchDTO.setInstanceId(instanceId);
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.post(
@@ -845,10 +840,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
 
 		paramDTO.setObservationUnitsSearchDTO(searchDTO);
@@ -874,11 +865,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
 		searchDTO.setDatasetId(datasetId);
 

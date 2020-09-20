@@ -1,10 +1,7 @@
 package org.ibp.api.rest.labelprinting;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.commons.util.DateUtil;
-import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -14,7 +11,6 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDt
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
@@ -42,17 +38,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @Transactional
@@ -87,7 +86,6 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	private static List<Field> DEFAULT_LOT_DETAILS_FIELDS;
 	private static List<Field> DEFAULT_TRANSACTION_DETAILS_FIELDS;
 
-	static String PLOT = "PLOT";
 	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	private static final String LOCATION_ID = "LOCATION_ID";
 	private static final String GID = "GID";
@@ -95,10 +93,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	private static final String PLOT_NO = "PLOT_NO";
 	private static final String ENTRY_NO = "ENTRY_NO";
 
-	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF,  FileType.XLS);
-
-	//Variable ids of PI_NAME_ID and COOPERATOR_ID
-	static List<Integer> PAIR_ID_VARIABLES = Arrays.asList(TermId.PI_ID.getId(), TermId.COOPERATOOR_ID.getId());
+	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
 	private static List<Integer> STATIC_FIELD_IDS;
 	private static List<Integer> STATIC_LOT_FIELD_IDS;
@@ -111,81 +106,24 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final String parentagePropValue = this.getMessage("label.printing.field.parentage");
 		final String seasonPropValue = this.getMessage("label.printing.field.season");
 
-		final String transactionIdPropValue = this.getMessage("label.printing.field.transaction.id");
-		final String transactionStatusPropValue = this.getMessage("label.printing.field.transaction.status");
-		final String transactionTypePropValue = this.getMessage("label.printing.field.transaction.type");
-		final String transactionCreationDatePropValue = this.getMessage("label.printing.field.transaction.creation.date");
-		final String transactionNotesPropValue = this.getMessage("label.printing.field.transaction.notes");
-		final String transactionUsernamePropValue = this.getMessage("label.printing.field.transaction.username");
-		final String lotIDPropValue = this.getMessage("label.printing.field.lot.id");
-		final String lotUIDPropValue = this.getMessage("label.printing.field.lot.uid");
-		final String lotStockIdPropValue = this.getMessage("label.printing.field.lot.stock.id");
-		final String lotAvailableBalancePropValue = this.getMessage("label.printing.field.lot.available.balance");
-		final String lotUnitsPropValue = this.getMessage("label.printing.field.lot.units");
-		final String lotStorageLocationAbbrPropValue = this.getMessage("label.printing.field.lot.storage.location.abbr");
-		final String lotStorageLocationPropValue = this.getMessage("label.printing.field.lot.storage.location");
-		final String lotNotesPropValue = this.getMessage("label.printing.field.lot.notes");
-
 		STUDY_NAME_FIELD = new Field(LabelPrintingStaticField.STUDY_NAME.getFieldId(), studyNamePropValue);
 		YEAR_FIELD = new Field(LabelPrintingStaticField.YEAR.getFieldId(), yearPropValue);
 		PARENTAGE_FIELD = new Field(LabelPrintingStaticField.PARENTAGE.getFieldId(), parentagePropValue);
-		SEASON_FIELD = new Field(TermId.SEASON_VAR.getId(),seasonPropValue);
+		SEASON_FIELD = new Field(TermId.SEASON_VAR.getId(), seasonPropValue);
+
 		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD);
 
-		DEFAULT_TRANSACTION_DETAILS_FIELDS = ImmutableList.<Field>builder()
-			.add(new Field(LabelPrintingStaticField.TRN_ID.getFieldId(), transactionIdPropValue))
-			.add(new Field(LabelPrintingStaticField.STATUS.getFieldId(), transactionStatusPropValue))
-			.add(new Field(LabelPrintingStaticField.TYPE.getFieldId(), transactionTypePropValue))
-			.add(new Field(LabelPrintingStaticField.CREATED.getFieldId(), transactionCreationDatePropValue))
-			.add(new Field(LabelPrintingStaticField.TRN_NOTES.getFieldId(), transactionNotesPropValue))
-			.add(new Field(LabelPrintingStaticField.USERNAME.getFieldId(), transactionUsernamePropValue)).build();
+		DEFAULT_TRANSACTION_DETAILS_FIELDS = ObservationLabelPrintingHelper.buildTransactionDetailsFields(messageSource);
 
-		DEFAULT_LOT_DETAILS_FIELDS = ImmutableList.<Field>builder()
-			.add(new Field(LabelPrintingStaticField.LOT_ID.getFieldId(), lotIDPropValue))
-			.add(new Field(LabelPrintingStaticField.LOT_UID.getFieldId(), lotUIDPropValue))
-			.add(new Field(LabelPrintingStaticField.STOCK_ID.getFieldId(), lotStockIdPropValue))
-			.add(new Field(LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId(), lotAvailableBalancePropValue))
-			.add(new Field(LabelPrintingStaticField.UNITS.getFieldId(), lotUnitsPropValue))
-			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId(), lotStorageLocationAbbrPropValue))
-			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION.getFieldId(), lotStorageLocationPropValue))
-			.add(new Field(LabelPrintingStaticField.NOTES.getFieldId(), lotNotesPropValue)).build();
+		DEFAULT_LOT_DETAILS_FIELDS = ObservationLabelPrintingHelper.buildLotDetailsFields(messageSource);
 
-		STATIC_FIELD_IDS = Arrays.asList(LabelPrintingStaticField.STUDY_NAME.getFieldId(), LabelPrintingStaticField.YEAR.getFieldId(),
-			LabelPrintingStaticField.PARENTAGE.getFieldId(),
-			LabelPrintingStaticField.LOT_ID.getFieldId(),
-			LabelPrintingStaticField.LOT_UID.getFieldId(),
-			LabelPrintingStaticField.STOCK_ID.getFieldId(),
-			LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId(),
-			LabelPrintingStaticField.UNITS.getFieldId(),
-			LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId(),
-			LabelPrintingStaticField.STORAGE_LOCATION.getFieldId(),
-			LabelPrintingStaticField.NOTES.getFieldId(),
-			LabelPrintingStaticField.TRN_ID.getFieldId(),
-			LabelPrintingStaticField.STATUS.getFieldId(),
-			LabelPrintingStaticField.TYPE.getFieldId(),
-			LabelPrintingStaticField.CREATED.getFieldId(),
-			LabelPrintingStaticField.TRN_NOTES.getFieldId(),
-			LabelPrintingStaticField.USERNAME.getFieldId()
-		);
+		STATIC_LOT_FIELD_IDS = DEFAULT_LOT_DETAILS_FIELDS.stream().map(Field::getId).collect(Collectors.toList());
+		STATIC_TRANSACTION_FIELD_IDS = DEFAULT_TRANSACTION_DETAILS_FIELDS.stream().map(Field::getId).collect(Collectors.toList());
 
-		STATIC_LOT_FIELD_IDS = Arrays.asList(LabelPrintingStaticField.LOT_ID.getFieldId(),
-			LabelPrintingStaticField.LOT_UID.getFieldId(),
-			LabelPrintingStaticField.STOCK_ID.getFieldId(),
-			LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId(),
-			LabelPrintingStaticField.UNITS.getFieldId(),
-			LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId(),
-			LabelPrintingStaticField.STORAGE_LOCATION.getFieldId(),
-			LabelPrintingStaticField.NOTES.getFieldId()
-		);
+		STATIC_FIELD_IDS = Stream.of(STATIC_LOT_FIELD_IDS, STATIC_TRANSACTION_FIELD_IDS,
+			Arrays.asList(LabelPrintingStaticField.STUDY_NAME.getFieldId(), LabelPrintingStaticField.YEAR.getFieldId(),
+				LabelPrintingStaticField.PARENTAGE.getFieldId())).flatMap(Collection::stream).collect(Collectors.toList());
 
-		STATIC_TRANSACTION_FIELD_IDS = Arrays.asList(
-			LabelPrintingStaticField.TRN_ID.getFieldId(),
-			LabelPrintingStaticField.STATUS.getFieldId(),
-			LabelPrintingStaticField.TYPE.getFieldId(),
-			LabelPrintingStaticField.CREATED.getFieldId(),
-			LabelPrintingStaticField.TRN_NOTES.getFieldId(),
-			LabelPrintingStaticField.USERNAME.getFieldId()
-		);
 	}
 
 	@Override
@@ -203,10 +141,10 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	public LabelsNeededSummary getSummaryOfLabelsNeeded(final LabelsInfoInput labelsInfoInput) {
 		final LabelsNeededSummary labelsNeededSummary = new LabelsNeededSummary();
-		final List<InstanceDetailsDTO>  InstanceDetailsDTOs =
+		final List<InstanceDetailsDTO> InstanceDetailsDTOs =
 			this.middlewareDatasetService.getInstanceDetails(labelsInfoInput.getDatasetId(), labelsInfoInput.getStudyId());
 		long totalNumberOfLabelsNeeded = 0;
-		for (final InstanceDetailsDTO instanceDetailsDTO :InstanceDetailsDTOs) {
+		for (final InstanceDetailsDTO instanceDetailsDTO : InstanceDetailsDTOs) {
 			final LabelsNeededSummary.Row row =
 				new LabelsNeededSummary.Row(instanceDetailsDTO.getEnvironment().toString(), instanceDetailsDTO.getnOfObservations(),
 					instanceDetailsDTO.getnOfObservations(),
@@ -247,15 +185,15 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
 		final DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
 
-		final String defaultFileName = this.getDefaultFileName(study, datasetDTO);
+		final String defaultFileName = ObservationLabelPrintingHelper.getDefaultFileName(study, datasetDTO);
 
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
 		resultsMap.put(this.getMessage("label.printing.name"), study.getStudyName());
 		resultsMap.put(this.getMessage("label.printing.title"), study.getDescription());
-		resultsMap.put(this.getMessage("label.printing.objective"), (study.getObjective() == null) ? StringUtils.EMPTY : study.getObjective());
+		resultsMap.put(this.getMessage("label.printing.objective"), //
+			(study.getObjective() == null) ? StringUtils.EMPTY : study.getObjective());
 		resultsMap.put(this.getMessage("label.printing.selected.dataset"), datasetDTO.getName());
-		resultsMap.put(
-			this.getMessage("label.printing.number.of.environments.in.dataset"),
+		resultsMap.put(this.getMessage("label.printing.number.of.environments.in.dataset"), //
 			String.valueOf(datasetDTO.getInstances().size()));
 
 		return new OriginResourceMetadata(defaultFileName, resultsMap);
@@ -283,7 +221,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 		final List<MeasurementVariable> environmentVariables = this.middlewareDatasetService.getObservationSetVariables(environmentDatasetId,
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-				VariableType.STUDY_CONDITION.getId()));
+				VariableType.ENVIRONMENT_CONDITION.getId()));
 
 		final List<MeasurementVariable> treatmentFactors =
 			this.middlewareDatasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
@@ -292,8 +230,8 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
 		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
-			.getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId(),VariableType.SELECTION_METHOD
-				.getId(), VariableType.TRAIT.getId()));
+			.getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId(), VariableType.SELECTION_METHOD
+					.getId(), VariableType.TRAIT.getId()));
 
 		final LabelType studyDetailsLabelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
 		final LabelType lotDetailsLabelType = new LabelType(lotDetailsPropValue, lotDetailsPropValue);
@@ -305,19 +243,19 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final List<Field> studyDetailsFields = new LinkedList<>();
 		//Requirement to add Study Name as an available label when in fact it is not a variable.
 		studyDetailsFields.addAll(DEFAULT_STUDY_DETAILS_FIELDS);
-		studyDetailsFields.addAll(this.transform(studyDetailsVariables));
-		studyDetailsFields.addAll(this.transform(environmentVariables));
-		studyDetailsFields.addAll(this.transform(treatmentFactors));
+		studyDetailsFields.addAll(ObservationLabelPrintingHelper.transform(studyDetailsVariables));
+		studyDetailsFields.addAll(ObservationLabelPrintingHelper.transform(environmentVariables));
+		studyDetailsFields.addAll(ObservationLabelPrintingHelper.transform(treatmentFactors));
 		studyDetailsLabelType.setFields(studyDetailsFields);
 
 		final LabelType datasetDetailsLabelType = new LabelType(datasetDetailsPropValue, datasetDetailsPropValue);
 		final List<Field> datasetDetailsFields = new LinkedList<>();
 
-		datasetDetailsFields.addAll(this.transform(plotVariables));
-		datasetDetailsFields.addAll(this.transform(datasetVariables));
+		datasetDetailsFields.addAll(ObservationLabelPrintingHelper.transform(plotVariables));
+		datasetDetailsFields.addAll(ObservationLabelPrintingHelper.transform(datasetVariables));
 		datasetDetailsFields.add(PARENTAGE_FIELD);
 
-		if(studyDetailsFields.indexOf(SEASON_FIELD)== -1){
+		if (studyDetailsFields.indexOf(SEASON_FIELD) == -1) {
 			studyDetailsFields.add(SEASON_FIELD);
 		}
 		datasetDetailsLabelType.setFields(datasetDetailsFields);
@@ -326,7 +264,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		labelTypes.add(datasetDetailsLabelType);
 		labelTypes.add(lotDetailsLabelType);
 		labelTypes.add(transactionDetailsLabelType);
-		this.removePairIdVariables(labelTypes);
+		ObservationLabelPrintingHelper.removePairIdVariables(labelTypes);
 		return labelTypes;
 	}
 
@@ -343,11 +281,11 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		studyTransactionsRequest.setTransactionsSearch(transactionsSearch);
 
 		final List<StudyTransactionsDto> studyTransactionsDtos =
-			studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest);
+			studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest, null);
 
 		final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap = new HashMap<>();
-		studyTransactionsDtos.forEach(studyTransactionsDto -> observationUnitDtoTransactionDtoMap
-			.put(studyTransactionsDto.getObservationUnits().get(0).getObsUnitId(), studyTransactionsDto));
+		studyTransactionsDtos.forEach(studyTransactionsDto -> studyTransactionsDto.getObservationUnits().forEach(
+			observationUnitDto -> observationUnitDtoTransactionDtoMap.put(observationUnitDto.getObsUnitId(), studyTransactionsDto)));
 
 		final Map<Integer, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
 
@@ -393,15 +331,21 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 					if (TermId.getById(termId).equals(TermId.SEASON_VAR)) {
 						final ObservationUnitData observationUnitData =
 							observationUnitRow.getEnvironmentVariables().get("Crop_season_Code");
-						row.put(requiredField, this.getSeason(observationUnitData != null ? observationUnitData.getValue() : null));
+						row.put(requiredField, ObservationLabelPrintingHelper.getSeason(observationUnitData != null ? observationUnitData.getValue() : null));
 						continue;
 					}
-					if (observationUnitRow.getVariables().containsKey(field.getName())) {
-						row.put(requiredField, observationUnitRow.getVariables().get(field.getName()).getValue());
+
+					final Optional<ObservationUnitData> observationVariables =
+						ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(), field);
+					if (observationVariables.isPresent()) {
+						row.put(requiredField, observationVariables.get().getValue());
 						continue;
 					}
-					if (observationUnitRow.getEnvironmentVariables().containsKey(field.getName())) {
-						row.put(requiredField, observationUnitRow.getEnvironmentVariables().get(field.getName()).getValue());
+
+					final Optional<ObservationUnitData> environmentVariables =
+						ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getEnvironmentVariables(), field);
+					if (environmentVariables.isPresent()) {
+						row.put(requiredField, environmentVariables.get().getValue());
 						continue;
 					}
 
@@ -450,7 +394,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 						continue;
 
 					}
-					if (LabelPrintingStaticField.NOTES.getFieldId().equals(requiredField)) {
+					if (LabelPrintingStaticField.LOT_NOTES.getFieldId().equals(requiredField)) {
 						row.put(requiredField, studyTransactionsDto.getLot().getNotes());
 						continue;
 
@@ -472,7 +416,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 					}
 					if (LabelPrintingStaticField.CREATED.getFieldId().equals(requiredField)) {
-						row.put(requiredField, Objects.toString(studyTransactionsDto.getCreatedDate(),""));
+						row.put(requiredField, Objects.toString(studyTransactionsDto.getCreatedDate(), ""));
 						continue;
 					}
 					if (LabelPrintingStaticField.TRN_NOTES.getFieldId().equals(requiredField)) {
@@ -520,55 +464,8 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		return SUPPORTED_FILE_TYPES;
 	}
 
-	List<Field> transform(final List<MeasurementVariable> measurementVariables) {
-		final List<Field> fields = new LinkedList<>();
-		for (final MeasurementVariable measurementVariable : measurementVariables) {
-			final Field field = new Field(measurementVariable);
-			//Requirement to show PLOT OBS_UNIT_ID label when variable = OBS_UNIT_ID in Plot Dataset
-			//Which is in fact the only dataset that cointains this variable.
-			if (field.getId().equals(TermId.OBS_UNIT_ID.getId())) {
-				field.setName(PLOT.concat(StringUtils.SPACE).concat(field.getName()));
-			}
-			if (field.getId().equals(TermId.SEASON_VAR.getId())) {
-				field.setName(this.getMessage("label.printing.field.season"));
-			}
-			fields.add(field);
-		}
-		return fields;
-	}
-
-	private String getDefaultFileName(final StudyDetails studyDetails, final DatasetDTO datasetDTO) {
-
-		final String fileName = "Labels-for-".concat(studyDetails.getStudyName()).concat("-").concat(datasetDTO.getName())
-			.concat("-").concat(DateUtil.getCurrentDateAsStringValue());
-		return FileUtils.cleanFileName(fileName);
-	}
-
 	String getMessage(final String code) {
 		return this.messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
-	}
-
-	private String getSeason(final String seasonStr) {
-		final String value;
-		if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_DRY.getId()) {
-			value = Season.DRY.getLabel().toUpperCase();
-		} else if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_WET.getId()) {
-			value = Season.WET.getLabel().toUpperCase();
-		} else {
-			value = Season.GENERAL.getLabel().toUpperCase();
-		}
-		return value;
-	}
-
-	void removePairIdVariables(final List<LabelType> labelTypes) {
-		for (final LabelType labelType : labelTypes) {
-			final Iterator<Field> fieldIterator = labelType.getFields().iterator();
-			while (fieldIterator.hasNext()) {
-				if (PAIR_ID_VARIABLES.contains(fieldIterator.next().getId())) {
-					fieldIterator.remove();
-				}
-			}
-		}
 	}
 
 	void setMessageSource(final ResourceBundleMessageSource messageSource) {

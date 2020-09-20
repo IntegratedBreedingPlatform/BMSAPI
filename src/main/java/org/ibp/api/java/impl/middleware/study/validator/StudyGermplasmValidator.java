@@ -1,8 +1,8 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -20,65 +20,88 @@ import java.util.Optional;
 @Component
 public class StudyGermplasmValidator {
 
-    @Resource
-    private GermplasmValidator germplasmValidator;
+	@Resource
+	private GermplasmValidator germplasmValidator;
 
-    @Resource
-    private PlantingServiceImpl plantingService;
+	@Resource
+	private PlantingServiceImpl plantingService;
 
-    @Resource
-    private StudyService studyService;
+	@Resource
+	private StudyService studyService;
 
-    @Autowired
-    private SampleService sampleService;
+	@Autowired
+	private SampleService sampleService;
 
-    @Resource
-    private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
+	@Autowired
+	private StudyValidator studyValidator;
 
+	@Resource
+	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
 
-    private BindingResult errors;
+	private BindingResult errors;
 
-    public void validate(final Integer studyId, final Integer entryId, final Integer newGid) {
+	public void validate(final Integer studyId, final Integer entryId, final Integer newGid) {
 
-        this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-        if (newGid == null){
-            errors.reject("gid.is.required");
-        }
-        final Optional<StudyGermplasmDto> entry = this.middlewareStudyGermplasmService.getStudyGermplasm(studyId, entryId);
-        if (!entry.isPresent()){
-            errors.reject("invalid.entryid");
-        }
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		if (newGid == null) {
+			errors.reject("gid.is.required");
+		}
+		final Optional<StudyGermplasmDto> entry = this.middlewareStudyGermplasmService.getStudyGermplasm(studyId, entryId);
+		if (!entry.isPresent()) {
+			errors.reject("invalid.entryid");
+		}
 
-        this.germplasmValidator.validateGermplasmId(this.errors, newGid);
+		this.germplasmValidator.validateGermplasmId(this.errors, newGid);
 
-        // Check if means has dataset or advance or cross list
-        boolean hasMeansDataset = this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
-        if (hasMeansDataset) {
-            errors.reject("study.has.means.dataset");
-        }
-        boolean hasCrossesOrSelections = this.studyService.hasCrossesOrSelections(studyId);
-        if (hasCrossesOrSelections) {
-            errors.reject("study.has.crosses.or.selections");
-        }
+		studyValidator.validateStudyHasNoMeansDataset(studyId);
 
-        Boolean entryHasSamples = this.sampleService.studyEntryHasSamples(studyId, entryId);
-        if (entryHasSamples) {
-            errors.reject("study.entry.has.samples");
-        }
+		studyValidator.validateHasNoCrossesOrSelections(studyId);
 
-        // Check that study has no confirmed or pending transactions for given entry
-        final Integer pendingTransactions =
-                this.plantingService.getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING).size();
-        final Integer confirmedTransactions =
-                this.plantingService.getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.CONFIRMED).size();
-        if (pendingTransactions > 0 || confirmedTransactions > 0) {
-            errors.reject("entry.has.pending.or.confirmed.transactions");
-        }
+		Boolean entryHasSamples = this.sampleService.studyEntryHasSamples(studyId, entryId);
+		if (entryHasSamples) {
+			errors.reject("study.entry.has.samples");
+		}
 
-        if (this.errors.hasErrors()) {
-            throw new ApiRequestValidationException(this.errors.getAllErrors());
-        }
+		// Check that study has no confirmed or pending transactions for given entry
+		final Integer pendingTransactions =
+			this.plantingService.getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING).size();
+		final Integer confirmedTransactions =
+			this.plantingService.getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.CONFIRMED).size();
+		if (pendingTransactions > 0 || confirmedTransactions > 0) {
+			errors.reject("entry.has.pending.or.confirmed.transactions");
+		}
 
-    }
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+	}
+
+	public void validateStudyAlreadyHasStudyEntries(final Integer studyId) {
+
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		if (this.middlewareStudyGermplasmService.countStudyEntries(studyId) > 0) {
+			errors.reject("study.has.existing.study.entries");
+		}
+
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+	}
+
+	public void validateStudyEntryProperty(final Integer studyEntryPropertyDataId) {
+
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		final Optional<StudyEntryPropertyData> studyEntryPropertyData =
+			this.middlewareStudyGermplasmService.getStudyEntryPropertyData(studyEntryPropertyDataId);
+		if (!studyEntryPropertyData.isPresent()) {
+			errors.reject("invalid.study.entry.property.data.id");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+	}
 
 }

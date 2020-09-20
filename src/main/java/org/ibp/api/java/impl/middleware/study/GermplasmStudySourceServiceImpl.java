@@ -6,6 +6,7 @@ import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmS
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.GermplasmStudySourceService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,12 +34,12 @@ public class GermplasmStudySourceServiceImpl implements GermplasmStudySourceServ
 
 	@Override
 	public List<GermplasmStudySourceDto> getGermplasmStudySources(
-		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest) {
+		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest, final Pageable pageable) {
 
 		this.studyValidator.validate(germplasmStudySourceSearchRequest.getStudyId(), false);
 
 		final List<GermplasmStudySourceDto> germplasmStudySourceDtoList = this.germplasmStudySourceMiddlewareService
-			.getGermplasmStudySources(germplasmStudySourceSearchRequest);
+			.getGermplasmStudySources(germplasmStudySourceSearchRequest, pageable);
 
 		final Map<Integer, String> crossExpansionsMap = this.pedigreeService
 			.getCrossExpansions(germplasmStudySourceDtoList.stream().map(GermplasmStudySourceDto::getGid).collect(Collectors.toSet()), null,

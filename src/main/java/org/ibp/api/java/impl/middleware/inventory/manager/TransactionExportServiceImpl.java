@@ -42,17 +42,18 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 	private static final int TRANSACTIONS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX = 3;
 	private static final int TRANSACTIONS_SHEET_STORAGE_LOCATION_COLUMN_INDEX = 4;
 	private static final int TRANSACTIONS_SHEET_STOCK_ID_COLUMN_INDEX = 5;
-	private static final int TRANSACTIONS_SHEET_TRN_ID_COLUMN_INDEX = 6;
-	private static final int TRANSACTIONS_SHEET_CREATED_COLUMN_INDEX = 7;
-	private static final int TRANSACTIONS_SHEET_USERNAME_COLUMN_INDEX = 8;
-	private static final int TRANSACTIONS_SHEET_STATUS_COLUMN_INDEX = 9;
-	private static final int TRANSACTIONS_SHEET_TYPE_COLUMN_INDEX = 10;
-	private static final int TRANSACTIONS_SHEET_UNITS_COLUMN_INDEX = 11;
-	private static final int TRANSACTIONS_SHEET_AMOUNT_COLUMN_INDEX = 12;
-	private static final int TRANSACTIONS_SHEET_NOTES_COLUMN_INDEX = 13;
-	private static final int TRANSACTIONS_SHEET_NEW_AMOUNT_COLUMN_INDEX = 14;
-	private static final int TRANSACTIONS_SHEET_NEW_BALANCE_COLUMN_INDEX = 15;
-	private static final int TRANSACTIONS_SHEET_NEW_NOTES_COLUMN_INDEX = 16;
+	private static final int TRANSACTIONS_SHEET_LOT_AVAILABLE_COLUMN_INDEX = 6;
+	private static final int TRANSACTIONS_SHEET_TRN_ID_COLUMN_INDEX = 7;
+	private static final int TRANSACTIONS_SHEET_CREATED_COLUMN_INDEX = 8;
+	private static final int TRANSACTIONS_SHEET_USERNAME_COLUMN_INDEX = 9;
+	private static final int TRANSACTIONS_SHEET_STATUS_COLUMN_INDEX = 10;
+	private static final int TRANSACTIONS_SHEET_TYPE_COLUMN_INDEX = 11;
+	private static final int TRANSACTIONS_SHEET_UNITS_COLUMN_INDEX = 12;
+	private static final int TRANSACTIONS_SHEET_AMOUNT_COLUMN_INDEX = 13;
+	private static final int TRANSACTIONS_SHEET_NOTES_COLUMN_INDEX = 14;
+	private static final int TRANSACTIONS_SHEET_NEW_AMOUNT_COLUMN_INDEX = 15;
+	private static final int TRANSACTIONS_SHEET_NEW_BALANCE_COLUMN_INDEX = 16;
+	private static final int TRANSACTIONS_SHEET_NEW_NOTES_COLUMN_INDEX = 17;
 
 	@Autowired
 	ResourceBundleMessageSource messageSource;
@@ -123,6 +124,9 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 				CellType.STRING, row);
 			this.writeCell(
 				TransactionExportServiceImpl.TRANSACTIONS_SHEET_STOCK_ID_COLUMN_INDEX, transactionDto.getLot().getStockId(),
+				CellType.STRING, row);
+			this.writeCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_AVAILABLE_COLUMN_INDEX,
+				transactionDto.getLot().getAvailableBalance() == null ? "0" : transactionDto.getLot().getAvailableBalance().toString(),
 				CellType.STRING, row);
 			this.writeCell(
 				TransactionExportServiceImpl.TRANSACTIONS_SHEET_TRN_ID_COLUMN_INDEX, transactionDto.getTransactionId().toString(),
@@ -195,6 +199,11 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		cell.setCellValue(
 			this.messageSource.getMessage("export.inventory.manager.transaction.template.sheet.stock.id.column", null, locale));
 
+		cell = row.createCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_AVAILABLE_COLUMN_INDEX, CellType.NUMERIC);
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
+		cell.setCellValue(
+			this.messageSource.getMessage("export.inventory.manager.transaction.template.sheet.lot.available.column", null, locale));
+
 		cell = row.createCell(TransactionExportServiceImpl.TRANSACTIONS_SHEET_TRN_ID_COLUMN_INDEX, CellType.STRING);
 		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
 		cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.transaction.template.sheet.trn.id.column", null, locale));
@@ -252,6 +261,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_STORAGE_LOCATION_COLUMN_INDEX, 21 * 250);
 
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_STOCK_ID_COLUMN_INDEX, 13 * 250);
+		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_LOT_AVAILABLE_COLUMN_INDEX, 20 * 250);
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_TRN_ID_COLUMN_INDEX, 11 * 250);
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_CREATED_COLUMN_INDEX, 12 * 250);
 		xlsSheet.setColumnWidth(TransactionExportServiceImpl.TRANSACTIONS_SHEET_USERNAME_COLUMN_INDEX, 13 * 250);

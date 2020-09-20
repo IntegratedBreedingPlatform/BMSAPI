@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -254,7 +253,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 				.getMeasurementVariables(
 					environmentDatasetId, Lists
 						.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-							VariableType.STUDY_CONDITION.getId()));
+							VariableType.ENVIRONMENT_CONDITION.getId()));
 
 		final List<MeasurementVariable> plotVariables =
 			this.datasetService.getMeasurementVariables(plotDatasetId, Lists
@@ -316,7 +315,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			filterByVariableType(environmentConditions, VariableType.STUDY_CONDITION), ENVIRONMENT);
+			filterByVariableType(environmentConditions, VariableType.ENVIRONMENT_CONDITION), ENVIRONMENT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.descriptors",
@@ -407,7 +406,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	List<MeasurementVariable> getEnvironmentalConditions(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentConditions =
-			filterByVariableType(environmentVariables, VariableType.STUDY_CONDITION);
+			filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_CONDITION);
 		final Map<Integer, String> environmentConditionMap =
 			this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, instance.getInstanceId());
 		for (final MeasurementVariable variable : environmentConditions) {
@@ -678,13 +677,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	private static List<MeasurementVariable> filterByVariableType(
 		final List<MeasurementVariable> measurementVariables, final VariableType variableType) {
-		final Collection<MeasurementVariable> variablesByType = CollectionUtils.select(measurementVariables, new Predicate() {
-
-			@Override
-			public boolean evaluate(final Object o) {
-				final MeasurementVariable measurementVariable = (MeasurementVariable) o;
-				return measurementVariable.getVariableType().equals(variableType);
-			}
+		final Collection<MeasurementVariable> variablesByType = CollectionUtils.select(measurementVariables, o -> {
+			final MeasurementVariable measurementVariable = (MeasurementVariable) o;
+			return measurementVariable.getVariableType().equals(variableType);
 		});
 		return Lists.newArrayList(variablesByType);
 	}
