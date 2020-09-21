@@ -150,7 +150,8 @@ public class DatasetValidator {
 				// If variable was found, check it is a supported variable type for dataset
 			} else if (this.isInvalidVariableTypeForDatasetType(datasetType, variableType)) {
 				this.errors
-					.reject("dataset.variable.cannot.be.deleted", new Object[] {String.valueOf(variableId), variableType.getName()},
+					.reject("dataset.variable.cannot.be.deleted",
+						new Object[] {String.valueOf(variableId), ontologyDataManager.getTermById(variableType.getId()).getName()},
 						"");
 				throw new NotSupportedException(this.errors.getAllErrors().get(0));
 			}
