@@ -34,7 +34,7 @@ public class DerivedVariableResource {
 	private DerivedVariableService derivedVariableService;
 
 	@ApiOperation(value = "Execute Derived Variable", notes = "Execute the formula of a derived variable for each observation of specified instances.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> calculate(
 		@PathVariable final String crop,
@@ -58,7 +58,7 @@ public class DerivedVariableResource {
 
 	@ApiOperation(value = "Get Missing Formula Variables", notes =
 		"Gets the list of formula variables that are not yet added in study.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/missing", method = RequestMethod.GET)
 	public ResponseEntity<Set<FormulaVariable>> missingFormulaVariables(
@@ -73,7 +73,7 @@ public class DerivedVariableResource {
 
 	@ApiOperation(value = "Get All Formula Variables", notes =
 		"Gets the list of formula variables in study.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/formula-variables", method = RequestMethod.GET)
 	public ResponseEntity<Set<FormulaVariable>> formulaVariables(
@@ -101,7 +101,7 @@ public class DerivedVariableResource {
 	}
 
 	@ApiOperation(value = "Get a map of formula variables and dataset(s) from where they belong to", notes = "")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/dataset-map", method = RequestMethod.GET)
 	public ResponseEntity<Map<Integer, VariableDatasetsDTO>> getFormulaVariableDatasetMap(

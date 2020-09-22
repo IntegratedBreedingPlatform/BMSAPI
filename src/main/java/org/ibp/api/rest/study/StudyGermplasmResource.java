@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -105,7 +106,7 @@ public class StudyGermplasmResource {
 				"Multiple sort criteria are supported.")
 	})
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')"+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryDto>> getEntriesAsTable(final @PathVariable String cropName,
 		@PathVariable final String programUUID,
@@ -133,7 +134,7 @@ public class StudyGermplasmResource {
 
 	@ApiOperation(value = "Get Entry Descriptors as Columns", notes = "Retrieves ALL MeasurementVariables associated to the entry plus "
 		+ "some calculated inventory columns")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')"+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/table/columns", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getEntryTableColumns(@PathVariable final String crop,
 		@PathVariable final String programUUID,

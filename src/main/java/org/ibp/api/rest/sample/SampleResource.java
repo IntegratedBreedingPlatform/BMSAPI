@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.sample.SampleService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -29,7 +30,7 @@ import java.util.List;
 @Api(value = "Sample Services")
 @Controller
 @RequestMapping("/crops")
-@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'SAMPLE_LISTS')")
+@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'SAMPLE_LISTS')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 public class SampleResource {
 
 	@Autowired

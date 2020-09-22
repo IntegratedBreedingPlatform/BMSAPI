@@ -1,6 +1,7 @@
 package org.ibp.api.rest.user;
 
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class UserResource {
 	@ApiOperation(value = "Filter users", notes = "List all users in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/users/filter", method = RequestMethod.GET)
 	@ResponseBody
-	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN', 'STUDIES', 'MANAGE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	public ResponseEntity<List<UserDetailDto>> filterUsers(@RequestParam final String cropName, @RequestParam final String programUUID) {
 		return new ResponseEntity<>(this.userService.getUsersByProjectUUID(programUUID), HttpStatus.OK);
 	}

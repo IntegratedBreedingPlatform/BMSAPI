@@ -4,6 +4,7 @@ package org.ibp.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(value = "Variable Cache Controller")
 @RestController
-@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'CROP_MANAGEMENT', 'MANAGE_ONTOLOGIES')")
+@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'CROP_MANAGEMENT', 'MANAGE_ONTOLOGIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 public class VariableCacheController {
 
 	@Autowired

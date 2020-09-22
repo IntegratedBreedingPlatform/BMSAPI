@@ -3,6 +3,7 @@ package org.ibp.api.rest.preset;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.preset.PresetService;
 import org.ibp.api.rest.preset.domain.PresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ import java.util.List;
 	+ "'MANAGE_INVENTORY',"
 	+ "'MANAGE_LOTS',"
 	+ "'LOT_LABEL_PRINTING'"
-	+ ")")
+	+ ")" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 @RestController
 public class PresetResource {
 
