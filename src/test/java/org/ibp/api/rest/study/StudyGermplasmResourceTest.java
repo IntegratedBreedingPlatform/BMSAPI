@@ -3,6 +3,7 @@ package org.ibp.api.rest.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hamcrest.Matchers;
@@ -27,16 +28,16 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 	private StudyGermplasmService studyGermplasmService;
 
 	@Test
-	public void testReplaceStudyGermplasm() throws Exception {
+	public void testReplaceStudyEntry() throws Exception {
 
 		final Random random = new Random();
 		final int studyId = random.nextInt();
 		final int entryId = random.nextInt();
 		final int newGid = random.nextInt();
 		final int newEntryId = random.nextInt();
-		final StudyGermplasmDto newDto = new StudyGermplasmDto();
+		final StudyEntryDto newDto = new StudyEntryDto();
 		newDto.setEntryId(random.nextInt());
-		newDto.setGermplasmId(newGid);
+		newDto.setGid(newGid);
 
 		final StudyGermplasmDto dto =
 			new StudyGermplasmDto(newEntryId, String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), newGid,

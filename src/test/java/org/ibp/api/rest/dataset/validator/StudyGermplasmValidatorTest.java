@@ -57,7 +57,7 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.empty()).when(this.middlewareStudyGermplasmService).getStudyGermplasm(studyId, entryId);
+        Mockito.doReturn(Optional.empty()).when(this.middlewareStudyGermplasmService).getStudyEntry(studyId, entryId);
         this.validator.validate(studyId, entryId, newGid);
     }
 
@@ -67,7 +67,7 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyGermplasm(studyId, entryId);
+        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntry(studyId, entryId);
         Mockito.doReturn(false).when(this.studyService).studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
         Mockito.doReturn(false).when(this.studyService).hasCrossesOrSelections(studyId);
         Mockito.doReturn(true).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
@@ -80,7 +80,7 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyGermplasm(studyId, entryId);
+        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntry(studyId, entryId);
         Mockito.doReturn(false).when(this.studyService).studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
         Mockito.doReturn(false).when(this.studyService).hasCrossesOrSelections(studyId);
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
@@ -94,7 +94,7 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyGermplasm(studyId, entryId);
+        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntry(studyId, entryId);
         Mockito.doReturn(false).when(this.studyService).studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
         Mockito.doReturn(false).when(this.studyService).hasCrossesOrSelections(studyId);
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
@@ -108,7 +108,7 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyGermplasm(studyId, entryId);
+        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntry(studyId, entryId);
         Mockito.doReturn(false).when(this.studyService).studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
         Mockito.doReturn(false).when(this.studyService).hasCrossesOrSelections(studyId);
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);

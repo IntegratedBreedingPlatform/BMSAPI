@@ -205,7 +205,7 @@ public class StudyValidatorTest {
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();
 		final int entryId = ran.nextInt();
-		Mockito.when(this.studyGermplasmService.getStudyGermplasm(studyId, entryId)).thenReturn(Optional.empty());
+		Mockito.when(this.studyGermplasmService.getStudyEntry(studyId, entryId)).thenReturn(Optional.empty());
 
 		try {
 			this.studyValidator.validateStudyContainsEntry(studyId, entryId);

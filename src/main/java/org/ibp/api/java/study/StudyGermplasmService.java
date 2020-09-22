@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface StudyGermplasmService {
 
-	StudyGermplasmDto replaceStudyEntry(Integer studyId, Integer entryId, StudyGermplasmDto studyGermplasmDto);
+	StudyEntryDto replaceStudyEntry(Integer studyId, Integer entryId, StudyEntryDto studyEntryDto);
 
 	List<StudyGermplasmDto> createStudyEntries(Integer studyId, Integer germplasmListId);
 

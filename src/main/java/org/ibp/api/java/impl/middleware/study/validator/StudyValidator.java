@@ -3,10 +3,11 @@ package org.ibp.api.java.impl.middleware.study.validator;
 import org.apache.commons.lang3.BooleanUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -16,13 +17,14 @@ import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -42,7 +44,6 @@ public class StudyValidator {
 
 	@Autowired
 	private StudyService studyService;
-
 
 	private BindingResult errors;
 
@@ -80,8 +81,12 @@ public class StudyValidator {
 
 	public void validateStudyContainsEntry(final Integer studyId, final Integer entryId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		final Optional<StudyGermplasmDto> entry = this.studyGermplasmService.getStudyGermplasm(studyId, entryId);
-		if (!entry.isPresent()) {
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setEntryIds(Arrays.asList(entryId));
+		final List<StudyEntryDto> studyEntries =
+			this.studyGermplasmService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+
+		if (studyEntries.isEmpty()) {
 			errors.reject("invalid.entryid");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}

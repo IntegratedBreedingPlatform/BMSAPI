@@ -11,8 +11,8 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionWithSize;
@@ -76,18 +76,18 @@ public class StudyGermplasmServiceImplTest {
 	private final Random random = new Random();
 
 	@Test
-	public void testReplaceStudyGermplasm() {
+	public void testReplaceStudyEntry() {
 		final Integer studyId = random.nextInt();
 		final Integer entryId = random.nextInt();
 		final Integer newGid = random.nextInt();
 		final String crossExpansion = RandomStringUtils.randomAlphabetic(20);
 		Mockito.doReturn(crossExpansion).when(this.pedigreeService).getCrossExpansion(newGid, this.crossExpansionProperties);
-		final StudyGermplasmDto dto = new StudyGermplasmDto();
-		dto.setGermplasmId(newGid);
+		final StudyEntryDto dto = new StudyEntryDto();
+		dto.setGid(newGid);
 		this.studyGermplasmService.replaceStudyEntry(studyId, entryId, dto);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.studyGermplasmValidator).validate(studyId, entryId, newGid);
-		Mockito.verify(this.middlewareStudyGermplasmService).replaceStudyGermplasm(studyId, entryId, newGid, crossExpansion);
+		Mockito.verify(this.middlewareStudyGermplasmService).replaceStudyEntry(studyId, entryId, newGid, crossExpansion);
 	}
 
 	@Test

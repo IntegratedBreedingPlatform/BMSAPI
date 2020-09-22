@@ -63,14 +63,14 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	private DatasetService datasetService;
 
 	@Override
-	public StudyGermplasmDto replaceStudyEntry(final Integer studyId, final Integer entryId,
-		final StudyGermplasmDto studyGermplasmDto) {
-		final Integer gid = studyGermplasmDto.getGermplasmId();
+	public StudyEntryDto replaceStudyEntry(final Integer studyId, final Integer entryId,
+		final StudyEntryDto studyEntryDto) {
+		final Integer gid = studyEntryDto.getGid();
 		this.studyValidator.validate(studyId, true);
 		this.studyGermplasmValidator.validate(studyId, entryId, gid);
 
 		return this.middlewareStudyGermplasmService
-			.replaceStudyGermplasm(studyId, entryId, gid, this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
+			.replaceStudyEntry(studyId, entryId, gid, this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
 	}
 
 	@Override
