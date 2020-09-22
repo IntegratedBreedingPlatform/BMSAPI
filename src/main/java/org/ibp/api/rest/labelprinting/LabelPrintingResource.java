@@ -188,12 +188,7 @@ public class LabelPrintingResource {
 			case SUBOBSERVATION_DATASET:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.STUDIES.name())
-					|| this.request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name())
-					|| this.request.isUserInRole("MS_MANAGE_OBSERVATION_UNITS")
-					|| this.request.isUserInRole("MS_WITHDRAW_INVENTORY")
-					|| this.request.isUserInRole("MS_CREATE_PENDING_WITHDRAWALS")
-					|| this.request.isUserInRole("MS_CREATE_CONFIRMED_WITHDRAWALS")
-				|| this.request.isUserInRole("MS_CREATE_LOTS"); //TODO FIXME: This is provisory to solve the case when the user doesn't have the STUDIES permission but have permissions that have a hierarchy of  STUDIES.
+					|| this.request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name());
 			case LOT:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())

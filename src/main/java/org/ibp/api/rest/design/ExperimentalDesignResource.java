@@ -2,7 +2,6 @@ package org.ibp.api.rest.design;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.design.ExperimentalDesignService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,7 @@ public class ExperimentalDesignResource {
 	private ExperimentalDesignService experimentalDesignService;
 
 	@ApiOperation(value = "Generate experimental design for study", notes = "Generate experimental design for study")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/experimental-designs/generation", method = RequestMethod.POST)
 	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
@@ -37,7 +36,7 @@ public class ExperimentalDesignResource {
 
 
 	@ApiOperation(value = "Delete experimental design of study", notes = "Delete experimental design of study")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/experimental-designs", method = RequestMethod.DELETE)
 	public ResponseEntity deleteStudyExperimentDesign(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {

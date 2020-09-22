@@ -33,7 +33,7 @@ public class StudyResource {
 	@ApiOperation(value = "Check if a study is sampled.",
 			notes = "Returns boolean indicating if there are samples associated to the study.")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/sampled", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<Boolean> hasSamples(final @PathVariable String cropName, @PathVariable final String programUUID,
 			@PathVariable final Integer studyId) {
@@ -44,7 +44,7 @@ public class StudyResource {
 	@ApiOperation(value = "Partially modifies a study",
 			notes = "As of now, it only allows to update the status")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}", method = RequestMethod.PATCH)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')"+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<Void> patchStudy (final @PathVariable String cropName, @PathVariable final String programUUID,
 			@PathVariable final Integer studyId, @RequestBody final Study study) {
