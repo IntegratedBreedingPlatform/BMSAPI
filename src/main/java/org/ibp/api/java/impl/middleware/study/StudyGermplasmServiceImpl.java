@@ -11,7 +11,6 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
@@ -74,7 +73,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	}
 
 	@Override
-	public List<StudyGermplasmDto> createStudyEntries(final Integer studyId, final Integer germplasmListId) {
+	public List<StudyEntryDto> createStudyEntries(final Integer studyId, final Integer germplasmListId) {
 		final GermplasmList germplasmList = this.germplasmListService.getGermplasmList(germplasmListId);
 
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
@@ -82,10 +81,10 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		this.studyValidator.validate(studyId, true);
 
 		final ModelMapper mapper = StudyEntryMapper.getInstance();
-		final List<StudyGermplasmDto> studyGermplasmList =
-			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyGermplasmDto.class)).collect(Collectors.toList());
+		final List<StudyEntryDto> studyEntryDtoList =
+			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyEntryDto.class)).collect(Collectors.toList());
 
-		return this.middlewareStudyGermplasmService.saveStudyEntries(studyId, studyGermplasmList);
+		return this.middlewareStudyGermplasmService.saveStudyEntries(studyId, studyEntryDtoList);
 	}
 
 	@Override
