@@ -33,7 +33,7 @@ public class PlantingResource {
 	private InventoryLock inventoryLock;
 
 	private static final String HAS_PLANTING_PERMISSIONS =
-		"hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS' , 'MS_WITHDRAW_INVENTORY')";
+		"hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS' , 'MS_WITHDRAW_INVENTORY')";
 
 	@ApiOperation(value = "Planting preparation search", notes = "Planting search returns data necessary to prepare planting")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/preparation/search", method = RequestMethod.POST)

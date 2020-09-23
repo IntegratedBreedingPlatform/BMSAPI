@@ -283,8 +283,8 @@ public abstract class UserTestDataGenerator {
 		parent.setDescription("Full");
 
 		permission.setPermissionId(4);
-		permission.setName("BREEDING_ACTIVITIES");
-		permission.setDescription("Breeding Activities");
+		permission.setName("GERMPLASM");
+		permission.setDescription("Germplasm");
 		permission.setParent(parent);
 		permissions.add(permission);
 		role.setPermissions(permissions);
