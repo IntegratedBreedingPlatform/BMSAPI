@@ -96,7 +96,7 @@ public class StudyInventoryResource {
 	@ApiOperation(value = "Cancel pending Study Transactions", notes = "Cancel any transaction with pending status")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/transactions/cancellation", method = RequestMethod.POST)
 	@ResponseBody
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES','MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY','MS_CANCEL_PENDING_TRANSACTIONS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES','MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY','MS_CANCEL_PENDING_TRANSACTIONS')")
 	public ResponseEntity<Void> cancelPendingTransaction(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
