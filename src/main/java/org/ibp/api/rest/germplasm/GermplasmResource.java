@@ -17,6 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,15 +30,21 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 
 @Api(value = "Germplasm Services")
-// TODO @PreAuthorize("hasAnyAuthority('ADMIN', ...)")
 @Controller
 public class GermplasmResource {
+
+	private static final String HAS_GERMPLASM_SEARCH = " or hasAnyAuthority('STUDIES'"
+		+ ", 'MANAGE_STUDIES'"
+		+ ", 'QUERIES'"
+		+ ", 'GRAPHICAL_QUERIES'"
+		+ ")";
 
 	@Autowired
 	private GermplasmService germplasmService;
 
 	@ApiOperation(value = "Search germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')" + HAS_GERMPLASM_SEARCH)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
 			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
