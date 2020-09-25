@@ -31,7 +31,7 @@ public class StudyEntryMapper {
 	 * Configuring the application wide {@link ModelMapper} with ontology related configuration.
 	 */
 	static {
-		StudyEntryMapper.addStudyGermplasmDtoMapping(StudyEntryMapper.applicationWideModelMapper);
+		StudyEntryMapper.addStudyEntryDtoMapping(StudyEntryMapper.applicationWideModelMapper);
 		StudyEntryMapper.addGermplasmListDataMapping(StudyEntryMapper.applicationWideModelMapper);
 	}
 
@@ -39,7 +39,7 @@ public class StudyEntryMapper {
 		return StudyEntryMapper.applicationWideModelMapper;
 	}
 
-	private static void addStudyGermplasmDtoMapping(final ModelMapper mapper) {
+	private static void addStudyEntryDtoMapping(final ModelMapper mapper) {
 		mapper.addMappings(new PropertyMap<StudyGermplasmDto, StudyGermplasm>() {
 
 			@Override
@@ -67,16 +67,14 @@ public class StudyEntryMapper {
 				this.map().setDesignation(this.source.getDesignation());
 				this.map().setEntryCode(this.source.getEntryCode());
 
-				final Map<String, StudyEntryPropertyData> stringStudyEntryPropertyDataMap = new HashMap<>();
+				final Map<Integer, StudyEntryPropertyData> stringStudyEntryPropertyDataMap = new HashMap<>();
 				stringStudyEntryPropertyDataMap
-					.put("ENTRY_TYPE", new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(), DEFAULT_ENTRY_TYPE));
+					.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(), DEFAULT_ENTRY_TYPE));
 				stringStudyEntryPropertyDataMap
-					.put("SEED_SOURCE", new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(), this.source.getSeedSource()));
+					.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(), this.source.getSeedSource()));
 				stringStudyEntryPropertyDataMap
-					.put("GROUP_GID",
+					.put(TermId.GROUPGID.getId(),
 						new StudyEntryPropertyData(null, TermId.GROUPGID.getId(), String.valueOf(this.source.getGermplasm().getMgid())));
-				stringStudyEntryPropertyDataMap
-					.put("ENTRY_TYPE", new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(), DEFAULT_ENTRY_TYPE));
 
 				this.map().setVariables(stringStudyEntryPropertyDataMap);
 			}
