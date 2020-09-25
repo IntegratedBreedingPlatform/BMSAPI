@@ -1,11 +1,14 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -24,6 +27,7 @@ import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -66,25 +70,29 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Autowired
 	private InstanceValidator instanceValidator;
 
+	@Autowired
+	private GermplasmSearchService germplasmSearchService;
+
 	@Override
-	public List<GermplasmSummary> searchGermplasm(final String searchText, final int pageNumber, final int pageSize) {
-		final List<GermplasmSummary> results = new ArrayList<GermplasmSummary>();
-		try {
-			final GermplasmSearchParameter searchParams = new GermplasmSearchParameter(searchText, Operation.LIKE);
-			final int start = pageSize * (pageNumber - 1);
-			final int numOfRows = pageSize;
-			searchParams.setStartingRow(start);
-			searchParams.setNumberOfEntries(numOfRows);
-			final List<Germplasm> searchResults = this.germplasmDataManager.searchForGermplasm(searchParams);
-			for (final Germplasm germplasm : searchResults) {
-				results.add(this.populateGermplasmSummary(germplasm));
-			}
-		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
-		}
-		return results;
+	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
+		final String programUUID) {
+
+		// TODO if program-role then germplasmSearchRequest.setInProgramListOnly(true);
+		return this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageable, programUUID);
 	}
 
+	@Override
+	public long countSearchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+		return this.germplasmSearchService.countSearchGermplasm(germplasmSearchRequest, programUUID);
+	}
+
+	/*
+	 * TODO
+	 *  - Remove
+	 *  - GermplasmSearchResponse replaces GermplasmSummary
+	 *  - find a substitute to use in getGermplasm(), which is used only for validation now
+	 */
+	@Deprecated
 	private GermplasmSummary populateGermplasmSummary(final Germplasm germplasm) throws MiddlewareQueryException {
 		if (germplasm == null) {
 			return null;
@@ -175,6 +183,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return progenyDTO;
 	}
 
+	// TODO delete
 	@Override
 	public PedigreeTree getPedigreeTree(final String germplasmId, Integer levels) {
 
@@ -189,6 +198,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return pedigreeTree;
 	}
 
+	// TODO delete
 	@Override
 	public DescendantTree getDescendantTree(final String germplasmId) {
 		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
@@ -200,6 +210,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return descendantTree;
 	}
 
+	// TODO delete
 	private DescendantTreeTreeNode traversePopulateDescendatTree(final GermplasmPedigreeTreeNode mwTreeNode) {
 		final DescendantTreeTreeNode treeNode = new DescendantTreeTreeNode();
 		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid());
@@ -220,6 +231,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return treeNode;
 	}
 
+	// TODO delete
 	private PedigreeTreeNode traversePopulate(final GermplasmPedigreeTreeNode mwTreeNode) {
 		final PedigreeTreeNode treeNode = new PedigreeTreeNode();
 		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid().toString());
