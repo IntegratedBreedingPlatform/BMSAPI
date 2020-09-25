@@ -8,7 +8,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignGeneratorTestDataUtil;
@@ -25,21 +25,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -97,8 +87,8 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 		final int replicationCount = 5;
 		final int startingPlotNumber = 1;
 
-		final List<StudyGermplasmDto> studyGermplasmDtoList =
-			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
+		final List<StudyEntryDto> studyEntryDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTreatments, numberOfControls);
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setReplicationsCount(replicationCount);
 		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
@@ -115,12 +105,12 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 			.thenReturn(measurementVariables);
 		when(this.experimentalDesignProcessor
 			.generateObservationUnitRows(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
-				refEq(studyGermplasmDtoList), refEq(mainDesign),
+				refEq(studyEntryDtoList), refEq(mainDesign),
 				eq(ENTRY_NO),
 				any(Map.class), any(Map.class))).thenReturn(observationUnitRowList);
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyEntryDtoList);
 
 		Assert.assertEquals(replicationCount, experimentalDesignInput.getNumberOfBlocks().intValue());
 		assertSame(result, observationUnitRowList);

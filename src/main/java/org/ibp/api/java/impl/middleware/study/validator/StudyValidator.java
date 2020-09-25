@@ -23,6 +23,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,7 +83,7 @@ public class StudyValidator {
 	public void validateStudyContainsEntry(final Integer studyId, final Integer entryId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
-		filter.setEntryIds(Arrays.asList(entryId));
+		filter.setEntryIds(Collections.singletonList(entryId));
 		final List<StudyEntryDto> studyEntries =
 			this.studyGermplasmService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
 

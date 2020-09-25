@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -49,8 +50,8 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final int numberOfControls = 0;
 		final Integer startingPlotNumber = 1;
 
-		final List<StudyGermplasmDto> studyGermplasmDtoList =
-			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
+		final List<StudyEntryDto> studyEntryDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTreatments, numberOfControls);
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
 		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
@@ -62,7 +63,7 @@ public class EntryListOrderDesignTypeServiceImplTest {
 			.thenReturn(this.createMeasurementVariables());
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyEntryDtoList);
 
 		assertEquals(numberOfTreatments * trialInstancesForDesignGeneration.size(), result.size());
 		final Map<Integer, List<ObservationUnitRow>> instancesRowMap = new HashMap<>();
@@ -109,8 +110,8 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final Integer checkInsertionManner = InsertionMannerItem.INSERT_EACH_IN_TURN.getId();
 		final Integer startingPlotNumber = 1;
 
-		final List<StudyGermplasmDto> studyGermplasmDtoList =
-			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
+		final List<StudyEntryDto> studyEntryDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTreatments, numberOfControls);
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setCheckStartingPosition(checkStartingPosition);
 		experimentalDesignInput.setCheckSpacing(checkSpacing);
@@ -125,7 +126,7 @@ public class EntryListOrderDesignTypeServiceImplTest {
 			.thenReturn(this.createMeasurementVariables());
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyEntryDtoList);
 
 		assertEquals(8 * trialInstancesForDesignGeneration.size(), result.size());
 		assertEquals(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()),

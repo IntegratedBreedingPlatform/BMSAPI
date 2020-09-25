@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignGeneratorTestDataUtil;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
@@ -21,18 +21,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -83,8 +75,8 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		final Integer replicationsCount = 6;
 		final Integer startingPlotNumber = 1;
 
-		final List<StudyGermplasmDto> studyGermplasmDtoList =
-			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
+		final List<StudyEntryDto> studyGermplasmDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTreatments, numberOfControls);
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setBlockSize(blockSize);
 		experimentalDesignInput.setReplicationsCount(replicationsCount);
@@ -127,8 +119,8 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		final Integer replicationsCount = 6;
 		final Integer startingPlotNumber = 1;
 
-		final List<StudyGermplasmDto> studyGermplasmDtoList =
-			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
+		final List<StudyEntryDto> studyGermplasmDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTreatments, numberOfControls);
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setBlockSize(blockSize);
 		experimentalDesignInput.setReplicationsCount(replicationsCount);

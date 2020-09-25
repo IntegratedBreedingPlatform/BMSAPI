@@ -1,7 +1,5 @@
 package org.ibp.api.rest.dataset.validator;
 
-import gherkin.formatter.Argument;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.SampleService;
@@ -11,7 +9,6 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
-import org.ibp.api.java.study.StudyService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;

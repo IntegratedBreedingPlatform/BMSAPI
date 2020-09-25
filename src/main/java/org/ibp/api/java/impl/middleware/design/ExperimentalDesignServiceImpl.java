@@ -4,17 +4,17 @@ import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.ExperimentalDesignService;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
-import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
@@ -28,11 +28,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -85,13 +81,13 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 		}
 
 		// Validate design type parameters based on study germplasm list
-		final List<StudyGermplasmDto> studyGermplasmDtoList = this.middlewareStudyGermplasmService.getGermplasm(studyId);
-		this.experimentalDesignTypeValidator.validate(experimentalDesignInput, studyGermplasmDtoList);
+		final List<StudyEntryDto> studyEntryDtoList = this.middlewareStudyGermplasmService.getStudyEntries(studyId);
+		this.experimentalDesignTypeValidator.validate(experimentalDesignInput, studyEntryDtoList);
 
 		// Generate observation unit rows
 		final String programUUID = this.studyService.getProgramUUID(studyId);
 		final List<ObservationUnitRow> observationUnitRows =
-			experimentalDesignTypeService.generateDesign(studyId, experimentalDesignInput, programUUID, studyGermplasmDtoList);
+			experimentalDesignTypeService.generateDesign(studyId, experimentalDesignInput, programUUID, studyEntryDtoList);
 
 		// Save experimental design and observation unit rows
 		final List<MeasurementVariable> measurementVariables =

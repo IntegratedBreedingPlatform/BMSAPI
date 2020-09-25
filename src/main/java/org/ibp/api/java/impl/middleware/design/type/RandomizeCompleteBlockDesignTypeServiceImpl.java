@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
@@ -60,7 +60,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
-		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final String programUUID, final List<StudyEntryDto> studyEntryDtoList) {
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -70,12 +70,12 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
 		final Map<String, List<String>> treatmentFactorValues =
 			this.getTreatmentFactorValues(experimentalDesignInput.getTreatmentFactorsData());
-		treatmentFactorValues.put(entryNumberName, Collections.singletonList(Integer.toString(studyGermplasmDtoList.size())));
+		treatmentFactorValues.put(entryNumberName, Collections.singletonList(Integer.toString(studyEntryDtoList.size())));
 
 		final List<String> treatmentFactors = this.getTreatmentFactors(treatmentFactorValues);
 		final List<String> treatmentLevels = this.getLevels(treatmentFactorValues);
 		treatmentFactors.add(entryNumberName);
-		treatmentLevels.add(Integer.toString(studyGermplasmDtoList.size()));
+		treatmentLevels.add(Integer.toString(studyEntryDtoList.size()));
 
 		experimentalDesignInput.setNumberOfBlocks(experimentalDesignInput.getReplicationsCount());
 
@@ -88,7 +88,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor
 			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
-				studyGermplasmDtoList, mainDesign, entryNumberName,
+					studyEntryDtoList, mainDesign, entryNumberName,
 				treatmentFactorValues, new HashMap<>());
 	}
 

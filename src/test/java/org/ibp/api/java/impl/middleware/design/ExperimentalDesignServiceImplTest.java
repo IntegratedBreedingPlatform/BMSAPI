@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ForbiddenException;
@@ -80,7 +81,7 @@ public class ExperimentalDesignServiceImplTest {
 
 	private final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 	private final CropType cropType = new CropType();
-	private final List<StudyGermplasmDto> studyList = new ArrayList<>();
+	private final List<StudyEntryDto> studyList = new ArrayList<>();
 	private final List<MeasurementVariable> variables = new ArrayList<>();
 	private final List<ObservationUnitRow> rows = new ArrayList<>();
 
