@@ -4,8 +4,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -42,6 +45,9 @@ public class GermplasmResource {
 	@Autowired
 	private GermplasmService germplasmService;
 
+	@Autowired
+	private UserService userService;
+
 	@ApiOperation(value = "Search germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')" + HAS_GERMPLASM_SEARCH)
@@ -63,6 +69,13 @@ public class GermplasmResource {
 	) {
 
 		BaseValidator.checkNotNull(germplasmSearchRequest, "param.null", new String[] {"germplasmSearchDTO"});
+
+		final String userName = SecurityUtil.getLoggedInUserName();
+		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUUID);
+
+		if (user.hasOnlyProgramRoles(cropName)) {
+			germplasmSearchRequest.setInProgramListOnly(true);
+		}
 
 		final PagedResult<GermplasmSearchResponse> result =
 			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmSearchResponse>() {

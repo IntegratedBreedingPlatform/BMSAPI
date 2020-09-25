@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.germplasm.AttributeDTO;
@@ -16,6 +17,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -77,7 +79,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
 		final String programUUID) {
 
-		// TODO if program-role then germplasmSearchRequest.setInProgramListOnly(true);
 		return this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageable, programUUID);
 	}
 
