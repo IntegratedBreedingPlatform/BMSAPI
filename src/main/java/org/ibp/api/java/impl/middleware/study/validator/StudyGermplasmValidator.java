@@ -8,7 +8,6 @@ import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -16,7 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -29,9 +28,6 @@ public class StudyGermplasmValidator {
 
 	@Resource
 	private PlantingServiceImpl plantingService;
-
-	@Resource
-	private StudyService studyService;
 
 	@Autowired
 	private SampleService sampleService;
@@ -52,7 +48,7 @@ public class StudyGermplasmValidator {
 		}
 
 		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
-		filter.setEntryIds(Arrays.asList(entryId));
+		filter.setEntryIds(Collections.singletonList(entryId));
 		final List<StudyEntryDto> studyEntries =
 			this.middlewareStudyGermplasmService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
 

@@ -1,5 +1,6 @@
 package org.ibp.api.rest.dataset.validator;
 
+import gherkin.formatter.Argument;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -32,9 +33,6 @@ public class StudyGermplasmValidatorTest {
     private PlantingServiceImpl plantingService;
 
     @Mock
-    private StudyService studyService;
-
-    @Mock
     private SampleService sampleService;
 
     @Mock
@@ -57,7 +55,8 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.empty()).when(this.middlewareStudyGermplasmService).getStudyEntry(studyId, entryId);
+        Mockito.doReturn(Optional.empty()).when(this.middlewareStudyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+                ArgumentMatchers.any(), ArgumentMatchers.any());
         this.validator.validate(studyId, entryId, newGid);
     }
 
@@ -67,9 +66,8 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntry(studyId, entryId);
-        Mockito.doReturn(false).when(this.studyService).studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
-        Mockito.doReturn(false).when(this.studyService).hasCrossesOrSelections(studyId);
+        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+                ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(true).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         this.validator.validate(studyId, entryId, newGid);
     }
@@ -80,9 +78,8 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntry(studyId, entryId);
-        Mockito.doReturn(false).when(this.studyService).studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
-        Mockito.doReturn(false).when(this.studyService).hasCrossesOrSelections(studyId);
+        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+                ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         Mockito.doReturn(Collections.singletonList(new Transaction())).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING);
         this.validator.validate(studyId, entryId, newGid);
@@ -94,23 +91,22 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntry(studyId, entryId);
-        Mockito.doReturn(false).when(this.studyService).studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
-        Mockito.doReturn(false).when(this.studyService).hasCrossesOrSelections(studyId);
+        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+                ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         Mockito.doReturn(Collections.emptyList()).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING);
         Mockito.doReturn(Collections.singletonList(new Transaction())).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.CONFIRMED);
         this.validator.validate(studyId, entryId, newGid);
     }
 
-    public void testValidate_Succesful() {
+    @Test
+    public void testValidate_Successful() {
         final Random random = new Random();
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntry(studyId, entryId);
-        Mockito.doReturn(false).when(this.studyService).studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
-        Mockito.doReturn(false).when(this.studyService).hasCrossesOrSelections(studyId);
+        Mockito.doReturn(Optional.of(new StudyGermplasmDto(entryId))).when(this.middlewareStudyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+                ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         Mockito.doReturn(Collections.emptyList()).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING);
         Mockito.doReturn(Collections.emptyList()).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.CONFIRMED);

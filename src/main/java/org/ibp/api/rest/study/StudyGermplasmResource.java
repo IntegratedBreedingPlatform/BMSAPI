@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.study.StudyGermplasmService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -29,7 +28,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 // TODO: Move these services to StudyResource
-@Api(value = "Study Germplasm Services")
+@Api(value = "Study Entry Services")
 @Controller
 @RequestMapping("/crops")
 public class StudyGermplasmResource {
@@ -53,7 +52,7 @@ public class StudyGermplasmResource {
 		notes = "Create germplasm entries in study based on the specified germplasm list")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<List<StudyGermplasmDto>> createStudyEntries(final @PathVariable String cropname,
+	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmEntryRequestDto germplasmEntryRequestDto) {
 

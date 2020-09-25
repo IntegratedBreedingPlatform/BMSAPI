@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -205,7 +206,8 @@ public class StudyValidatorTest {
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();
 		final int entryId = ran.nextInt();
-		Mockito.when(this.studyGermplasmService.getStudyEntry(studyId, entryId)).thenReturn(Optional.empty());
+		Mockito.doReturn(Optional.empty()).when(this.studyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+				ArgumentMatchers.any(), ArgumentMatchers.any());
 
 		try {
 			this.studyValidator.validateStudyContainsEntry(studyId, entryId);
