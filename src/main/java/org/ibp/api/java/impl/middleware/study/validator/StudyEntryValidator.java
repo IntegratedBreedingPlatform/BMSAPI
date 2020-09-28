@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class StudyGermplasmValidator {
+public class StudyEntryValidator {
 
 	@Resource
 	private GermplasmValidator germplasmValidator;

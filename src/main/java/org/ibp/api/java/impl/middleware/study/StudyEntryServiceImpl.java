@@ -15,7 +15,7 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
-import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyEntryService;
 import org.modelmapper.ModelMapper;
@@ -44,7 +44,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Resource
-	private StudyGermplasmValidator studyGermplasmValidator;
+	private StudyEntryValidator studyEntryValidator;
 
 	@Autowired
 	private GermplasmListValidator germplasmListValidator;
@@ -66,7 +66,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final StudyEntryDto studyEntryDto) {
 		final Integer gid = studyEntryDto.getGid();
 		this.studyValidator.validate(studyId, true);
-		this.studyGermplasmValidator.validate(studyId, entryId, gid);
+		this.studyEntryValidator.validate(studyId, entryId, gid);
 
 		return this.middlewareStudyEntryService
 			.replaceStudyEntry(studyId, entryId, gid, this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
@@ -77,7 +77,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final GermplasmList germplasmList = this.germplasmListService.getGermplasmList(germplasmListId);
 
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
-		this.studyGermplasmValidator.validateStudyAlreadyHasStudyEntries(studyId);
+		this.studyEntryValidator.validateStudyAlreadyHasStudyEntries(studyId);
 		this.studyValidator.validate(studyId, true);
 
 		final ModelMapper mapper = StudyEntryMapper.getInstance();
@@ -100,7 +100,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		this.studyValidator.validate(studyId, true);
 		this.studyValidator.validateStudyContainsEntry(studyId, entryId);
 		this.termValidator.validate(studyEntryPropertyData.getVariableId());
-		this.studyGermplasmValidator.validateStudyEntryProperty(studyEntryPropertyData.getStudyEntryPropertyId());
+		this.studyEntryValidator.validateStudyEntryProperty(studyEntryPropertyData.getStudyEntryPropertyId());
 		this.middlewareStudyEntryService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}
 

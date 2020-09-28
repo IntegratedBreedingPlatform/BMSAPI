@@ -20,7 +20,7 @@ import org.hamcrest.collection.IsCollectionWithSize;
 import org.hamcrest.collection.IsIn;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
-import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class StudyEntryServiceImplTest {
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Mock
-	private StudyGermplasmValidator studyGermplasmValidator;
+	private StudyEntryValidator studyEntryValidator;
 
 	@Mock
 	private GermplasmListValidator germplasmListValidator;
@@ -87,7 +87,7 @@ public class StudyEntryServiceImplTest {
 		dto.setGid(newGid);
 		this.studyEntryService.replaceStudyEntry(studyId, entryId, dto);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.studyGermplasmValidator).validate(studyId, entryId, newGid);
+		Mockito.verify(this.studyEntryValidator).validate(studyId, entryId, newGid);
 		Mockito.verify(this.middlewareStudyEntryService).replaceStudyEntry(studyId, entryId, newGid, crossExpansion);
 	}
 
@@ -106,7 +106,7 @@ public class StudyEntryServiceImplTest {
 		this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
-		Mockito.verify(this.studyGermplasmValidator).validateStudyAlreadyHasStudyEntries(studyId);
+		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
 
@@ -136,7 +136,7 @@ public class StudyEntryServiceImplTest {
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.studyValidator).validateStudyContainsEntry(studyId, entryId);
 		Mockito.verify(this.termValidator).validate(variableId);
-		Mockito.verify(this.studyGermplasmValidator).validateStudyEntryProperty(studyEntryPropertyId);
+		Mockito.verify(this.studyEntryValidator).validateStudyEntryProperty(studyEntryPropertyId);
 		Mockito.verify(this.middlewareStudyEntryService).updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}
 

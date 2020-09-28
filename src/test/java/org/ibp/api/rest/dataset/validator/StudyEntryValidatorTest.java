@@ -8,7 +8,7 @@ import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Random;
 
-public class StudyGermplasmValidatorTest {
+public class StudyEntryValidatorTest {
 
     @Mock
     private GermplasmValidator germplasmValidator;
@@ -36,7 +36,7 @@ public class StudyGermplasmValidatorTest {
     private StudyValidator studyValidator;
 
     @InjectMocks
-    private StudyGermplasmValidator validator = new StudyGermplasmValidator();
+    private StudyEntryValidator validator = new StudyEntryValidator();
 
     @Before
     public void setup() {
