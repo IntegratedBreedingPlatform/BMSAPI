@@ -156,7 +156,7 @@ public class PRepDesignTypeServiceImplTest {
 
 		// Set the first germplasm as CHECK_ENTRY.
 		final StudyEntryDto checkImportedGermplasm = importedGermplasmList.get(0);
-		checkImportedGermplasm.getVariables().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
+		checkImportedGermplasm.getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 
 		final Map<BreedingViewDesignParameter, List<ListItem>> map =
 			this.designTypeService
@@ -192,7 +192,7 @@ public class PRepDesignTypeServiceImplTest {
 		final StudyEntryDto checkImportedGermplasm = importedGermplasmList.get(0);
 		// Any custom entry type (categorical id not in SystemDefineEntryType) is considered as check type.
 		final int customEntryTypeCategoricalId = 1000;
-		checkImportedGermplasm.getVariables().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(customEntryTypeCategoricalId));
+		checkImportedGermplasm.getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(customEntryTypeCategoricalId));
 
 		final Map<BreedingViewDesignParameter, List<ListItem>> map =
 			this.designTypeService

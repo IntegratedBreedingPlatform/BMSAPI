@@ -74,7 +74,7 @@ public class StudyEntryMapper {
 					.put(TermId.GROUPGID.getId(),
 						new StudyEntryPropertyData(null, TermId.GROUPGID.getId(), String.valueOf(this.source.getGermplasm().getMgid())));
 
-				this.map().setVariables(stringStudyEntryPropertyDataMap);
+				this.map().setProperties(stringStudyEntryPropertyDataMap);
 			}
 		});
 	}

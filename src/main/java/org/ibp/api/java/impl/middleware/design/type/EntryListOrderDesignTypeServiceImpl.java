@@ -187,7 +187,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 				newList.addAll(checks);
 			}
 			final StudyEntryDto primaryNewGermplasm = SerializationUtils.clone(primaryGermplasm);
-			primaryNewGermplasm.getVariables().put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
+			primaryNewGermplasm.getProperties().put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
 					String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
 
 			newList.add(primaryNewGermplasm);

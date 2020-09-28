@@ -42,7 +42,7 @@ public abstract class StudyEntryTestDataGenerator {
 		properties.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(), "SOURCE" + entryNumber));
 		properties.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(), String.valueOf(systemDefinedEntryType.getEntryTypeCategoricalId())));
 		properties.put(TermId.GROUPGID.getId(), new StudyEntryPropertyData(null, TermId.GROUPGID.getId(), String.valueOf(0)));
-		studyEntryDto.setVariables(properties);
+		studyEntryDto.setProperties(properties);
 		return studyEntryDto;
 	}
 

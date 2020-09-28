@@ -40,7 +40,7 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 		newDto.setGid(newGid);
 
 		final StudyEntryDto dto = new StudyEntryDto(newEntryId, 6, RandomStringUtils.randomAlphabetic(20), newGid, RandomStringUtils.randomAlphabetic(20));
-		dto.getVariables().put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+		dto.getProperties().put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
 		Mockito.doReturn(dto).when(this.studyGermplasmService).replaceStudyEntry(studyId, entryId, newDto);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
