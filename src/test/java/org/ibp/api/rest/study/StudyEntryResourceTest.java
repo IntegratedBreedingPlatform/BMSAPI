@@ -22,7 +22,7 @@ import java.util.Random;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-public class StudyGermplasmResourceTest extends ApiUnitTestBase {
+public class StudyEntryResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private StudyEntryService studyEntryService;

@@ -31,7 +31,7 @@ import java.util.List;
 @Api(value = "Study Entry Services")
 @Controller
 @RequestMapping("/crops")
-public class StudyGermplasmResource {
+public class StudyEntryResource {
 
 	@Resource
 	private StudyEntryService studyEntryService;
@@ -115,12 +115,12 @@ public class StudyGermplasmResource {
 
 				@Override
 				public long getCount() {
-					return StudyGermplasmResource.this.studyEntryService.countAllStudyEntries(studyId);
+					return StudyEntryResource.this.studyEntryService.countAllStudyEntries(studyId);
 				}
 
 				@Override
 				public List<StudyEntryDto> getResults(final PagedResult<StudyEntryDto> pagedResult) {
-					return StudyGermplasmResource.this.studyEntryService.getStudyEntries(studyId, null, pageable);
+					return StudyEntryResource.this.studyEntryService.getStudyEntries(studyId, null, pageable);
 				}
 			});
 
