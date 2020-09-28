@@ -2,10 +2,10 @@ package org.ibp.api.rest.study;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.study.StudyGermplasmService;
@@ -39,10 +39,8 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 		newDto.setEntryId(random.nextInt());
 		newDto.setGid(newGid);
 
-		final StudyGermplasmDto dto =
-			new StudyGermplasmDto(newEntryId, String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), newGid,
-				RandomStringUtils.randomAlphabetic(20), 6, RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
-				RandomStringUtils.randomAlphabetic(20));
+		final StudyEntryDto dto = new StudyEntryDto(newEntryId, 6, RandomStringUtils.randomAlphabetic(20), newGid, RandomStringUtils.randomAlphabetic(20));
+		dto.getVariables().put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
 		Mockito.doReturn(dto).when(this.studyGermplasmService).replaceStudyEntry(studyId, entryId, newDto);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
@@ -54,12 +52,10 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$.entryId", Matchers.is(dto.getEntryId())))
 			.andExpect(jsonPath("$.designation", Matchers.is(dto.getDesignation())))
-			.andExpect(jsonPath("$.entryType", Matchers.is(dto.getEntryType())))
-			.andExpect(jsonPath("$.germplasmId", Matchers.is(dto.getGermplasmId())))
+			.andExpect(jsonPath("$.germplasmId", Matchers.is(dto.getGid())))
 			.andExpect(jsonPath("$.entryNumber", Matchers.is(dto.getEntryNumber())))
-			.andExpect(jsonPath("$.entryCode", Matchers.is(dto.getEntryCode())))
-			.andExpect(jsonPath("$.seedSource", Matchers.is(dto.getSeedSource())))
-			.andExpect(jsonPath("$.cross", Matchers.is(dto.getCross())));
+			.andExpect(jsonPath("$.entryCode", Matchers.is(dto.getEntryCode())));
+
 	}
 
 	@Test
@@ -74,14 +70,10 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 		final GermplasmEntryRequestDto germplasmEntryRequestDto = new GermplasmEntryRequestDto();
 		germplasmEntryRequestDto.setGermplasmListId(germplasmListId);
 
-		final StudyGermplasmDto dto =
-			new StudyGermplasmDto(entryId, String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), gid,
-				RandomStringUtils.randomAlphabetic(20), 6, RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
-				RandomStringUtils.randomAlphabetic(20));
-		final List<StudyGermplasmDto> studyGermplasmDtoList = new ArrayList<>();
-		studyGermplasmDtoList.add(dto);
-		Mockito.doReturn(studyGermplasmDtoList).when(this.studyGermplasmService)
-			.createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId());
+		final StudyEntryDto dto = new StudyEntryDto(entryId, 6, RandomStringUtils.randomAlphabetic(20), gid, RandomStringUtils.randomAlphabetic(20));
+		final List<StudyEntryDto> studyEntries = new ArrayList<>();
+		studyEntries.add(dto);
+		Mockito.doReturn(studyEntries).when(this.studyGermplasmService).createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation",
@@ -92,12 +84,9 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$[0].entryId", Matchers.is(dto.getEntryId())))
 			.andExpect(jsonPath("$[0].designation", Matchers.is(dto.getDesignation())))
-			.andExpect(jsonPath("$[0].entryType", Matchers.is(dto.getEntryType())))
-			.andExpect(jsonPath("$[0].germplasmId", Matchers.is(dto.getGermplasmId())))
+			.andExpect(jsonPath("$[0].germplasmId", Matchers.is(dto.getGid())))
 			.andExpect(jsonPath("$[0].entryNumber", Matchers.is(dto.getEntryNumber())))
-			.andExpect(jsonPath("$[0].entryCode", Matchers.is(dto.getEntryCode())))
-			.andExpect(jsonPath("$[0].seedSource", Matchers.is(dto.getSeedSource())))
-			.andExpect(jsonPath("$[0].cross", Matchers.is(dto.getCross())));
+			.andExpect(jsonPath("$[0].entryCode", Matchers.is(dto.getEntryCode())));
 
 	}
 

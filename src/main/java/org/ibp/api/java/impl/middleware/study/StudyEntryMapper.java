@@ -6,7 +6,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.ModelMapper;
@@ -40,18 +39,17 @@ public class StudyEntryMapper {
 	}
 
 	private static void addStudyEntryDtoMapping(final ModelMapper mapper) {
-		mapper.addMappings(new PropertyMap<StudyGermplasmDto, StudyGermplasm>() {
+		mapper.addMappings(new PropertyMap<StudyEntryDto, StudyGermplasm>() {
 
 			@Override
 			protected void configure() {
 				this.map().setEntryNumber(this.source.getEntryNumber());
-				this.map().setEntryType(this.source.getEntryType());
-				this.map().setPosition(this.source.getPosition());
-				this.map().getGermplasmListEntrySummary().setGid(this.source.getGermplasmId());
-				this.map().getGermplasmListEntrySummary().setCross(this.source.getCross());
+				this.map().setEntryType(this.source.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId()).orElse(""));
+				this.map().getGermplasmListEntrySummary().setGid(this.source.getGid());
+				this.map().getGermplasmListEntrySummary().setCross(this.source.getStudyEntryPropertyValue(TermId.CROSS.getId()).orElse(""));
 				this.map().getGermplasmListEntrySummary().setDesignation(this.source.getDesignation());
 				this.map().getGermplasmListEntrySummary().setEntryCode(this.source.getEntryCode());
-				this.map().getGermplasmListEntrySummary().setSeedSource(this.source.getSeedSource());
+				this.map().getGermplasmListEntrySummary().setSeedSource(this.source.getStudyEntryPropertyValue(TermId.SEED_SOURCE.getId()).orElse(""));
 			}
 		});
 	}

@@ -7,7 +7,6 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
@@ -130,7 +129,7 @@ public class ExperimentalDesignServiceImplTest {
 	public void testGenerateDesign() {
 		Mockito.doReturn(this.cropType).when(this.workbenchDataManager).getCropTypeByName(CROP);
 		Mockito.doReturn(PROGRAM_UUID).when(this.studyService).getProgramUUID(STUDY_ID);
-		Mockito.doReturn(this.studyList).when(this.middlewareStudyGermplasmService).getGermplasm(STUDY_ID);
+		Mockito.doReturn(this.studyList).when(this.middlewareStudyGermplasmService).getStudyEntries(STUDY_ID);
 		Mockito.doReturn(this.rows).when(this.designTypeService).generateDesign(STUDY_ID, this.designInput, PROGRAM_UUID, this.studyList);
 		Mockito.doReturn(this.variables).when(this.designTypeService).getMeasurementVariables(STUDY_ID, this.designInput, PROGRAM_UUID);
 
