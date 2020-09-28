@@ -8,7 +8,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +40,7 @@ public class StudyValidator {
 	private StudyInstanceService studyInstanceService;
 
 	@Autowired
-	private StudyGermplasmService studyGermplasmService;
+	private StudyEntryService studyEntryService;
 
 	@Autowired
 	private StudyService studyService;
@@ -85,7 +84,7 @@ public class StudyValidator {
 		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
 		filter.setEntryIds(Collections.singletonList(entryId));
 		final List<StudyEntryDto> studyEntries =
-			this.studyGermplasmService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+			this.studyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
 
 		if (studyEntries.isEmpty()) {
 			errors.reject("invalid.entryid");

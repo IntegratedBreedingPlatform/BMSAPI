@@ -8,7 +8,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -50,7 +50,7 @@ public class StudyValidatorTest {
 	private StudyInstanceService studyInstanceService;
 
 	@Mock
-	private StudyGermplasmService studyGermplasmService;
+	private StudyEntryService studyEntryService;
 
 	@Mock
 	private StudyService studyService;
@@ -206,7 +206,7 @@ public class StudyValidatorTest {
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();
 		final int entryId = ran.nextInt();
-		Mockito.doReturn(Optional.empty()).when(this.studyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+		Mockito.doReturn(Optional.empty()).when(this.studyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
 				ArgumentMatchers.any(), ArgumentMatchers.any());
 
 		try {

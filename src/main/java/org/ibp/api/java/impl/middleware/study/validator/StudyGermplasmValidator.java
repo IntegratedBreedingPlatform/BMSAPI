@@ -5,6 +5,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -36,7 +37,7 @@ public class StudyGermplasmValidator {
 	private StudyValidator studyValidator;
 
 	@Resource
-	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
+	private StudyEntryService middlewareStudyEntryService;
 
 	private BindingResult errors;
 
@@ -50,7 +51,7 @@ public class StudyGermplasmValidator {
 		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
 		filter.setEntryIds(Collections.singletonList(entryId));
 		final List<StudyEntryDto> studyEntries =
-			this.middlewareStudyGermplasmService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
 
 		if (studyEntries.isEmpty()) {
 			errors.reject("invalid.entryid");
@@ -86,7 +87,7 @@ public class StudyGermplasmValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (this.middlewareStudyGermplasmService.countStudyEntries(studyId) > 0) {
+		if (this.middlewareStudyEntryService.countStudyEntries(studyId) > 0) {
 			errors.reject("study.has.existing.study.entries");
 		}
 
@@ -101,7 +102,7 @@ public class StudyGermplasmValidator {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final Optional<StudyEntryPropertyData> studyEntryPropertyData =
-			this.middlewareStudyGermplasmService.getStudyEntryPropertyData(studyEntryPropertyDataId);
+			this.middlewareStudyEntryService.getStudyEntryPropertyData(studyEntryPropertyDataId);
 		if (!studyEntryPropertyData.isPresent()) {
 			errors.reject("invalid.study.entry.property.data.id");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());

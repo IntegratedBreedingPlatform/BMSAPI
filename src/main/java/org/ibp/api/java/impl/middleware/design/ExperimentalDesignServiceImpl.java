@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
@@ -48,7 +49,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 	private StudyService studyService;
 
 	@Autowired
-	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
+	private StudyEntryService middlewareStudyEntryService;
 
 	@Resource
 	private org.generationcp.middleware.service.api.study.generation.ExperimentDesignService experimentDesignMiddlewareService;
@@ -81,7 +82,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 		}
 
 		// Validate design type parameters based on study germplasm list
-		final List<StudyEntryDto> studyEntryDtoList = this.middlewareStudyGermplasmService.getStudyEntries(studyId);
+		final List<StudyEntryDto> studyEntryDtoList = this.middlewareStudyEntryService.getStudyEntries(studyId);
 		this.experimentalDesignTypeValidator.validate(experimentalDesignInput, studyEntryDtoList);
 
 		// Generate observation unit rows

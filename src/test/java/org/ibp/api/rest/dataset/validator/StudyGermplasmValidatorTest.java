@@ -4,6 +4,7 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -29,7 +30,7 @@ public class StudyGermplasmValidatorTest {
     private SampleService sampleService;
 
     @Mock
-    private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
+    private StudyEntryService middlewareStudyEntryService;
 
     @Mock
     private StudyValidator studyValidator;
@@ -48,7 +49,7 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.empty()).when(this.middlewareStudyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+        Mockito.doReturn(Optional.empty()).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         this.validator.validate(studyId, entryId, newGid);
     }
@@ -59,7 +60,7 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(true).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         this.validator.validate(studyId, entryId, newGid);
@@ -71,7 +72,7 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         Mockito.doReturn(Collections.singletonList(new Transaction())).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING);
@@ -84,7 +85,7 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         Mockito.doReturn(Collections.emptyList()).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING);
@@ -98,7 +99,7 @@ public class StudyGermplasmValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyGermplasmService).getStudyEntries(ArgumentMatchers.eq(studyId),
+        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         Mockito.doReturn(Collections.emptyList()).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING);
