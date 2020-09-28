@@ -8,7 +8,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.java.study.StudyGermplasmService;
+import org.ibp.api.java.study.StudyEntryService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +34,7 @@ import java.util.List;
 public class StudyGermplasmResource {
 
 	@Resource
-	private StudyGermplasmService studyGermplasmService;
+	private StudyEntryService studyEntryService;
 
 	@ApiOperation(value = "Replace germplasm entry in study",
 		notes = "Replace germplasm entry in study")
@@ -43,7 +43,7 @@ public class StudyGermplasmResource {
 	public ResponseEntity<StudyEntryDto> replaceStudyGermplasm(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer entryId, @RequestBody final StudyEntryDto studyEntryDto) {
-		return new ResponseEntity<>(this.studyGermplasmService.replaceStudyEntry(studyId, entryId, studyEntryDto),
+		return new ResponseEntity<>(this.studyEntryService.replaceStudyEntry(studyId, entryId, studyEntryDto),
 			HttpStatus.OK);
 
 	}
@@ -57,7 +57,7 @@ public class StudyGermplasmResource {
 		@PathVariable final Integer studyId, @RequestBody final GermplasmEntryRequestDto germplasmEntryRequestDto) {
 
 		return new ResponseEntity<>(
-			this.studyGermplasmService.createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId()),
+			this.studyEntryService.createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId()),
 			HttpStatus.OK);
 
 	}
@@ -70,7 +70,7 @@ public class StudyGermplasmResource {
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
 
-		this.studyGermplasmService.deleteStudyEntries(studyId);
+		this.studyEntryService.deleteStudyEntries(studyId);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
@@ -85,7 +85,7 @@ public class StudyGermplasmResource {
 		@PathVariable final Integer studyId, @PathVariable final Integer entryId, @PathVariable final Integer propertyId,
 		@RequestBody StudyEntryPropertyData studyEntryPropertyData) {
 
-		this.studyGermplasmService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
+		this.studyEntryService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
@@ -115,12 +115,12 @@ public class StudyGermplasmResource {
 
 				@Override
 				public long getCount() {
-					return StudyGermplasmResource.this.studyGermplasmService.countAllStudyEntries(studyId);
+					return StudyGermplasmResource.this.studyEntryService.countAllStudyEntries(studyId);
 				}
 
 				@Override
 				public List<StudyEntryDto> getResults(final PagedResult<StudyEntryDto> pagedResult) {
-					return StudyGermplasmResource.this.studyGermplasmService.getStudyEntries(studyId, null, pageable);
+					return StudyGermplasmResource.this.studyEntryService.getStudyEntries(studyId, null, pageable);
 				}
 			});
 
@@ -139,7 +139,7 @@ public class StudyGermplasmResource {
 		@PathVariable final Integer studyId) {
 
 		final List<MeasurementVariable> entryDescriptors =
-			this.studyGermplasmService.getEntryDescriptorColumns(studyId);
+			this.studyEntryService.getEntryDescriptorColumns(studyId);
 
 		return new ResponseEntity<>(entryDescriptors, HttpStatus.OK);
 	}

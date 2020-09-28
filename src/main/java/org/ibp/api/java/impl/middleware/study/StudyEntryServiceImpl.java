@@ -11,14 +11,13 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
-import org.ibp.api.java.study.StudyGermplasmService;
+import org.ibp.api.java.study.StudyEntryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class StudyGermplasmServiceImpl implements StudyGermplasmService {
+public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private StudyValidator studyValidator;
@@ -57,7 +56,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	private TermValidator termValidator;
 
 	@Resource
-	private StudyEntryService middlewareStudyEntryService;
+	private org.generationcp.middleware.service.api.study.StudyEntryService middlewareStudyEntryService;
 
 	@Resource
 	private DatasetService datasetService;

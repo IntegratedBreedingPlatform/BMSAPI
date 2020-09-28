@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface StudyGermplasmService {
+public interface StudyEntryService {
 
 	StudyEntryDto replaceStudyEntry(Integer studyId, Integer entryId, StudyEntryDto studyEntryDto);
 

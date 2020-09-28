@@ -8,7 +8,7 @@ import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.study.StudyGermplasmService;
+import org.ibp.api.java.study.StudyEntryService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 
 	@Autowired
-	private StudyGermplasmService studyGermplasmService;
+	private StudyEntryService studyEntryService;
 
 	@Test
 	public void testReplaceStudyEntry() throws Exception {
@@ -41,7 +41,7 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 
 		final StudyEntryDto dto = new StudyEntryDto(newEntryId, 6, RandomStringUtils.randomAlphabetic(20), newGid, RandomStringUtils.randomAlphabetic(20));
 		dto.getProperties().put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
-		Mockito.doReturn(dto).when(this.studyGermplasmService).replaceStudyEntry(studyId, entryId, newDto);
+		Mockito.doReturn(dto).when(this.studyEntryService).replaceStudyEntry(studyId, entryId, newDto);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}",
@@ -73,7 +73,7 @@ public class StudyGermplasmResourceTest extends ApiUnitTestBase {
 		final StudyEntryDto dto = new StudyEntryDto(entryId, 6, RandomStringUtils.randomAlphabetic(20), gid, RandomStringUtils.randomAlphabetic(20));
 		final List<StudyEntryDto> studyEntries = new ArrayList<>();
 		studyEntries.add(dto);
-		Mockito.doReturn(studyEntries).when(this.studyGermplasmService).createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId());
+		Mockito.doReturn(studyEntries).when(this.studyEntryService).createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation",
