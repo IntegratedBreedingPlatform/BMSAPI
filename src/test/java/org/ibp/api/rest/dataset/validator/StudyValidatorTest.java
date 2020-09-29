@@ -29,6 +29,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Random;
 
@@ -206,7 +207,7 @@ public class StudyValidatorTest {
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();
 		final int entryId = ran.nextInt();
-		Mockito.doReturn(Optional.empty()).when(this.studyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
+		Mockito.doReturn(Collections.emptyList()).when(this.studyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
 				ArgumentMatchers.any(), ArgumentMatchers.any());
 
 		try {

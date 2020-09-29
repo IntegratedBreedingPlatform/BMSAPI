@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.mockito.*;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Random;
 
 public class StudyEntryValidatorTest {
@@ -49,7 +48,7 @@ public class StudyEntryValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.empty()).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
+        Mockito.doReturn(Collections.emptyList()).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         this.validator.validate(studyId, entryId, newGid);
     }
@@ -60,7 +59,7 @@ public class StudyEntryValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
+        Mockito.doReturn(Collections.singletonList(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(true).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         this.validator.validate(studyId, entryId, newGid);
@@ -72,7 +71,7 @@ public class StudyEntryValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
+        Mockito.doReturn(Collections.singletonList(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         Mockito.doReturn(Collections.singletonList(new Transaction())).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING);
@@ -85,7 +84,7 @@ public class StudyEntryValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
+        Mockito.doReturn(Collections.singletonList(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         Mockito.doReturn(Collections.emptyList()).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING);
@@ -99,7 +98,7 @@ public class StudyEntryValidatorTest {
         final int studyId = random.nextInt();
         final int entryId = random.nextInt();
         final int newGid = random.nextInt();
-        Mockito.doReturn(Optional.of(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
+        Mockito.doReturn(Collections.singletonList(new StudyEntryDto(entryId, entryId, "ABC"))).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         Mockito.doReturn(false).when(this.sampleService).studyEntryHasSamples(studyId, entryId);
         Mockito.doReturn(Collections.emptyList()).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING);

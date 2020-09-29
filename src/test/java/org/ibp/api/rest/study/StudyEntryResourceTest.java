@@ -52,7 +52,7 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$.entryId", Matchers.is(dto.getEntryId())))
 			.andExpect(jsonPath("$.designation", Matchers.is(dto.getDesignation())))
-			.andExpect(jsonPath("$.germplasmId", Matchers.is(dto.getGid())))
+			.andExpect(jsonPath("$.gid", Matchers.is(dto.getGid())))
 			.andExpect(jsonPath("$.entryNumber", Matchers.is(dto.getEntryNumber())))
 			.andExpect(jsonPath("$.entryCode", Matchers.is(dto.getEntryCode())));
 
@@ -84,7 +84,7 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$[0].entryId", Matchers.is(dto.getEntryId())))
 			.andExpect(jsonPath("$[0].designation", Matchers.is(dto.getDesignation())))
-			.andExpect(jsonPath("$[0].germplasmId", Matchers.is(dto.getGid())))
+			.andExpect(jsonPath("$[0].gid", Matchers.is(dto.getGid())))
 			.andExpect(jsonPath("$[0].entryNumber", Matchers.is(dto.getEntryNumber())))
 			.andExpect(jsonPath("$[0].entryCode", Matchers.is(dto.getEntryCode())));
 

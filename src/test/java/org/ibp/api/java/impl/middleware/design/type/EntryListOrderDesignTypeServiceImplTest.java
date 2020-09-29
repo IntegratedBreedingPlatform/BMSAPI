@@ -76,7 +76,6 @@ public class EntryListOrderDesignTypeServiceImplTest {
 				index = 1;
 				germplasmId = 100;
 			}
-			System.out.println("ROW " + index);
 			instancesRowMap.putIfAbsent(trialInstance, new ArrayList<>());
 			instancesRowMap.get(trialInstance).add(row);
 

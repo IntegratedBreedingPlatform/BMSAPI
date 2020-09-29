@@ -40,9 +40,9 @@ public class StudyEntryResource {
 		notes = "Replace germplasm entry in study")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<StudyEntryDto> replaceStudyGermplasm(final @PathVariable String cropname,
-		@PathVariable final String programUUID,
-		@PathVariable final Integer studyId, @PathVariable final Integer entryId, @RequestBody final StudyEntryDto studyEntryDto) {
+	public ResponseEntity<StudyEntryDto> replaceStudyEntry(final @PathVariable String cropname,
+														   @PathVariable final String programUUID,
+														   @PathVariable final Integer studyId, @PathVariable final Integer entryId, @RequestBody final StudyEntryDto studyEntryDto) {
 		return new ResponseEntity<>(this.studyEntryService.replaceStudyEntry(studyId, entryId, studyEntryDto),
 			HttpStatus.OK);
 
