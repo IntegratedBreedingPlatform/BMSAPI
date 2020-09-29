@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.domain.germplasm.AttributeDTO;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
@@ -102,6 +103,20 @@ public class GermplasmResource {
 		headers.add("X-Filtered-Count", Long.toString(result.getFilteredResults()));
 
 		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
+	}
+
+	/**
+	 * Simple search to feed autocomplete features
+	 * @return a limited set of results matching the query criteria
+	 */
+	@ApiOperation(value = "Search germplasm attributes")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes/search", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<AttributeDTO>> searchAttributes(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = true) final String query) {
+
+		return new ResponseEntity<>(this.germplasmService.searchAttributes(query), HttpStatus.OK);
 	}
 
 }

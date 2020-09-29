@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -74,6 +75,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmSearchService germplasmSearchService;
+
+	@Autowired
+	private AttributeService attributeService;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -186,22 +190,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
-		this.germplasmDataManager = germplasmDataManager;
+	@Override
+	public List<AttributeDTO> searchAttributes(final String query) {
+		return this.attributeService.searchAttributes(query);
 	}
 
-	void setPedigreeService(final PedigreeService pedigreeService) {
-		this.pedigreeService = pedigreeService;
-	}
-
-	void setLocationDataManger(final LocationDataManager locationDataManger) {
-		this.locationDataManger = locationDataManger;
-	}
-
-	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
-		this.crossExpansionProperties = crossExpansionProperties;
-	}
-	
 	@Override
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		final PedigreeDTO pedigreeDTO;
@@ -227,7 +220,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return progenyDTO;
 	}
 
-	// TODO delete
+	// TODO delete. See populateGermplasmSummary
 	@Override
 	public PedigreeTree getPedigreeTree(final String germplasmId, Integer levels) {
 
@@ -242,7 +235,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return pedigreeTree;
 	}
 
-	// TODO delete
+	// TODO delete. See populateGermplasmSummary
 	@Override
 	public DescendantTree getDescendantTree(final String germplasmId) {
 		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
@@ -254,7 +247,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return descendantTree;
 	}
 
-	// TODO delete
+	// TODO delete. See populateGermplasmSummary
 	private DescendantTreeTreeNode traversePopulateDescendatTree(final GermplasmPedigreeTreeNode mwTreeNode) {
 		final DescendantTreeTreeNode treeNode = new DescendantTreeTreeNode();
 		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid());
@@ -275,7 +268,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return treeNode;
 	}
 
-	// TODO delete
+	// TODO delete. See populateGermplasmSummary
 	private PedigreeTreeNode traversePopulate(final GermplasmPedigreeTreeNode mwTreeNode) {
 		final PedigreeTreeNode treeNode = new PedigreeTreeNode();
 		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid().toString());
@@ -403,5 +396,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
+	}
+
+	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
+		this.germplasmDataManager = germplasmDataManager;
+	}
+
+	void setPedigreeService(final PedigreeService pedigreeService) {
+		this.pedigreeService = pedigreeService;
+	}
+
+	void setLocationDataManger(final LocationDataManager locationDataManger) {
+		this.locationDataManger = locationDataManger;
+	}
+
+	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
+		this.crossExpansionProperties = crossExpansionProperties;
 	}
 }

@@ -28,6 +28,8 @@ public interface GermplasmService {
 
 	GermplasmSummary getGermplasm(String germplasmId);
 
+	List<AttributeDTO> searchAttributes(String name);
+
 	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, Boolean includeSiblings);
 
 	ProgenyDTO getProgeny(Integer germplasmDbId);
