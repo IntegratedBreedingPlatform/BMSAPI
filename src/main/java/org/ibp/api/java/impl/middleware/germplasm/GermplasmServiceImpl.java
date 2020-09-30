@@ -5,7 +5,7 @@ import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.domain.germplasm.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -191,7 +191,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<AttributeDTO> searchAttributes(final String query) {
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(final String query) {
 		return this.attributeService.searchAttributes(query);
 	}
 

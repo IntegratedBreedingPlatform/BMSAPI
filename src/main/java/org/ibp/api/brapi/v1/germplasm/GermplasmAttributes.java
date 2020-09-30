@@ -1,6 +1,6 @@
 package org.ibp.api.brapi.v1.germplasm;
 
-import org.generationcp.middleware.domain.germplasm.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
