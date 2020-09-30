@@ -1,16 +1,24 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.collect.Lists;
+import org.fest.util.Collections;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
+import org.ibp.api.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class LocationValidator {
+
+	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 
 	@Autowired
 	private LocationDataManager locationDataManager;
@@ -28,6 +36,19 @@ public class LocationValidator {
 			if (locationList.isEmpty()) {
 				errors.reject("seed.location.invalid", "");
 			}
+		}
+	}
+
+	public void validateSeedLocationAbbr(final BindingResult errors, final List<String> locationAbbreviations) {
+		if (Util.countNullOrEmptyStrings(locationAbbreviations) > 0) {
+			errors.reject("lot.input.list.location.null.or.empty", "");
+			return;
+		}
+
+		final List<Location> storageLocations =
+			locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE, null, locationAbbreviations);
+		if (locationAbbreviations.size() != storageLocations.size()) {
+			errors.reject("location.invalid", "");
 		}
 	}
 
