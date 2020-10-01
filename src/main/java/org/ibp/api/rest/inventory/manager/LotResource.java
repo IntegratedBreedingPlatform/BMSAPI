@@ -1,11 +1,22 @@
 package org.ibp.api.rest.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
-import org.generationcp.middleware.domain.inventory.manager.*;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.InventoryView;
+import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMergeRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
@@ -35,11 +46,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Api(value = "Lot Services")
 @RestController

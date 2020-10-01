@@ -1,17 +1,18 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
-import org.generationcp.middleware.domain.inventory.manager.LotMergeRequestDto;
-import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
-import org.junit.Test;
-
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMergeRequestDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
