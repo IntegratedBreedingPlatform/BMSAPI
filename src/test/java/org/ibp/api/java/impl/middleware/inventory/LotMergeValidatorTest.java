@@ -21,7 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class LotMergeValidatorTest {
 
-	private static final String LOT_KEEP_UUID = "lotUUID";
+	private static final String LOT_KEEP_UUID = UUID.randomUUID().toString();
 
 	@InjectMocks
 	private LotMergeValidator lotMergeValidator;
@@ -153,7 +153,7 @@ public class LotMergeValidatorTest {
 	}
 
 	private ExtendedLotDto createDummyExtendedLotDto(Integer gid, LotStatus lotStatus, String unitName, String lotUUID) {
-		ExtendedLotDto dto = new ExtendedLotDto();
+		final ExtendedLotDto dto = new ExtendedLotDto();
 		dto.setGid(gid);
 		dto.setStatus(lotStatus.name());
 		dto.setUnitName(unitName);

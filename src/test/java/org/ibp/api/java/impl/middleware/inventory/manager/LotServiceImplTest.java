@@ -16,11 +16,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LotServiceImplTest {
 
-    private static final Integer USER_ID = 1234;
+    private static final Integer USER_ID = ThreadLocalRandom.current().nextInt();
 
     @InjectMocks
     private LotServiceImpl lotService;
