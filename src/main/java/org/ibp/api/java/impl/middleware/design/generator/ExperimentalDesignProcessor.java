@@ -117,7 +117,9 @@ public class ExperimentalDesignProcessor {
 				environmentObservationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 			} else {
 
-				if (!StringUtils.isEmpty(measurementVariable.getTreatmentLabel())) {
+				if (EXP_DESIGN_VARIABLE_IDS.contains(termId)) {
+					observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), bvEntryMap.get(measurementVariable.getName()));
+				} else if (!StringUtils.isEmpty(measurementVariable.getTreatmentLabel())) {
 					if (treatmentLevelData == null) {
 						observationUnitData = new ObservationUnitData(measurementVariable.getTermId(),
 							bvEntryMap.get(ExperimentalDesignUtil.cleanBVDesignKey(Integer.toString(measurementVariable.getTermId()))));
