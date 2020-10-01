@@ -84,7 +84,7 @@ public class InventoryCommonValidator {
 	}
 
 	public void validateLotNotes(final List<String> notes, final BindingResult errors) {
-		if (notes.stream().anyMatch(s -> StringUtils.isBlank(s))) {
+		if (notes.stream().filter(s -> StringUtils.isBlank(s)).findAny().isPresent()) {
 			errors.reject("lot.input.list.notes.null.or.empty", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
