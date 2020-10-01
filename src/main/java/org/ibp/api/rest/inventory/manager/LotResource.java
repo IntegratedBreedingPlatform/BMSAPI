@@ -332,7 +332,7 @@ public class LotResource {
 	@RequestMapping(value = "/crops/{cropName}/lots/merge", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS
-			+ " or hasAnyAuthority('MERGE_LOT')")
+			+ " or hasAnyAuthority('MERGE_LOTS')")
 	public ResponseEntity<Void> mergeLots(
 			@PathVariable final String cropName, //
 			@ApiParam("Lot template for merge action."
