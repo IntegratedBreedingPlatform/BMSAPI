@@ -32,8 +32,8 @@ public class LotMergeValidator {
 		this.validateAtLeastTwoLotsToMerge(extendedLotDtos);
 		this.validateKeepLotIsSelected(keepLotUUID, extendedLotDtos);
 
-		AtomicReference<Integer> gid = new AtomicReference<>();
-		AtomicReference<String> unitName = new AtomicReference<>();
+		final AtomicReference<Integer> gid = new AtomicReference<>();
+		final AtomicReference<String> unitName = new AtomicReference<>();
 		boolean invalidLot = extendedLotDtos.
 				stream().
 				anyMatch(lot -> {
@@ -59,16 +59,23 @@ public class LotMergeValidator {
 						return true;
 					}
 
+					//Validate that the discarded lot has amount greater than zero
+					if (!keepLotUUID.equals(lot.getLotUUID()) && lot.getActualBalance() <= 0d) {
+						errors.reject("lot.merge.discarded.lot.invalid.actual.balance", "");
+						return true;
+					}
+
 					return false;
 				});
+
 		if (invalidLot) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
 	private void validateAtLeastTwoLotsToMerge(final List<ExtendedLotDto> extendedLotDtos) {
-		Set<String> lotUUIDs = new HashSet<>();
-		boolean atLeastTwoLotPresent = extendedLotDtos.stream()
+		final Set<String> lotUUIDs = new HashSet<>();
+		final boolean atLeastTwoLotPresent = extendedLotDtos.stream()
 				.anyMatch(extendedLotDto -> {
 					lotUUIDs.add(extendedLotDto.getLotUUID());
 					if (lotUUIDs.size() == 2) {

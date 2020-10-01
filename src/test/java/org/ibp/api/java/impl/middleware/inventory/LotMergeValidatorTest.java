@@ -57,7 +57,7 @@ public class LotMergeValidatorTest {
     @Test
 	public void shouldAllLotsToBeMergedBeValid() {
 		final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(
-				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", LOT_KEEP_UUID),
+				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", LOT_KEEP_UUID, 0D),
 				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName")
 		);
 
@@ -94,8 +94,8 @@ public class LotMergeValidatorTest {
 	@Test
 	public void shouldFailValidateLotsToBeMergedIfThereIsTwoLotsWithSameUUID(){
 		final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(
-				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", "UUID"),
-				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", "UUID")
+				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", "UUID", 0D),
+				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", "UUID", 5D)
 		);
 		try {
 			this.lotMergeValidator.validate(LOT_KEEP_UUID, extendedLotDtos);
@@ -108,7 +108,7 @@ public class LotMergeValidatorTest {
 	@Test
 	public void shouldFailValidateLotsToBeMergedWithNotActiveStatus() {
 		final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(
-				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", LOT_KEEP_UUID),
+				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", LOT_KEEP_UUID, 0D),
 				this.createDummyExtendedLotDto(1, LotStatus.CLOSED, "unitName")
 		);
 
@@ -123,7 +123,7 @@ public class LotMergeValidatorTest {
 	@Test
 	public void shouldFailValidateLotsToBeMergedWithDifferentGid() {
 		final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(
-				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", LOT_KEEP_UUID),
+				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", LOT_KEEP_UUID, 0D),
 				this.createDummyExtendedLotDto(2, LotStatus.ACTIVE, "unitName"));
 
 		try {
@@ -137,7 +137,7 @@ public class LotMergeValidatorTest {
 	@Test
 	public void shouldFailValidateLotsToBeMergedWithDifferentUnitName() {
 		final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(
-				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", LOT_KEEP_UUID),
+				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", LOT_KEEP_UUID, 0D),
 				this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "otherUnitName"));
 
 		try {
@@ -148,16 +148,32 @@ public class LotMergeValidatorTest {
 		}
 	}
 
-	private ExtendedLotDto createDummyExtendedLotDto(Integer gid, LotStatus lotStatus, String unitName) {
-		return this.createDummyExtendedLotDto(gid, lotStatus, unitName, UUID.randomUUID().toString());
+	@Test
+	public void shouldFailValidateLotsToBeMergedIfDiscardedLotHasZeroAsActualBalance() {
+		final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(
+			this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", LOT_KEEP_UUID, 0D),
+			this.createDummyExtendedLotDto(1, LotStatus.ACTIVE, "unitName", UUID.randomUUID().toString(), 0D)
+		);
+
+		try {
+			this.lotMergeValidator.validate(LOT_KEEP_UUID, extendedLotDtos);
+		} catch (Exception e) {
+			assertThat(e, instanceOf(ApiRequestValidationException.class));
+			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("lot.merge.discarded.lot.invalid.actual.balance"));
+		}
 	}
 
-	private ExtendedLotDto createDummyExtendedLotDto(Integer gid, LotStatus lotStatus, String unitName, String lotUUID) {
+	private ExtendedLotDto createDummyExtendedLotDto(Integer gid, LotStatus lotStatus, String unitName) {
+		return this.createDummyExtendedLotDto(gid, lotStatus, unitName, UUID.randomUUID().toString(), 5D);
+	}
+
+	private ExtendedLotDto createDummyExtendedLotDto(Integer gid, LotStatus lotStatus, String unitName, String lotUUID, double actualBalance) {
 		final ExtendedLotDto dto = new ExtendedLotDto();
 		dto.setGid(gid);
 		dto.setStatus(lotStatus.name());
 		dto.setUnitName(unitName);
 		dto.setLotUUID(lotUUID);
+		dto.setActualBalance(actualBalance);
 		return dto;
 	}
 }
