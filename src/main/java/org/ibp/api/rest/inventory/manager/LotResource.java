@@ -228,6 +228,7 @@ public class LotResource {
 			lotsSearchDto.setLotUUIDs(lotUIDs);
 			extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
 			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, Sets.newHashSet(lotUIDs));
+			this.extendedLotListValidator.validateLotUUIDsDuplicated(extendedLotDtos, lotUIDs);
 		}
 
 		try {
