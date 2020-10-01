@@ -14,8 +14,8 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
-import org.generationcp.middleware.domain.inventory.manager.LotUpdateDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -223,7 +223,7 @@ public class LotResource {
 			}
 		} else {
 			final List<String> lotUIDs =
-				lotRequest.getMultiInput().getLotList().stream().map(LotUpdateDto::getLotUID).collect(Collectors.toList());
+				lotRequest.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getLotUID).collect(Collectors.toList());
 			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 			lotsSearchDto.setLotUUIDs(lotUIDs);
 			extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
