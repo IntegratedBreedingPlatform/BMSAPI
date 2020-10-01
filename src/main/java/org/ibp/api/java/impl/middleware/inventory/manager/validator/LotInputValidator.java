@@ -4,10 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotSingleUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -111,7 +109,10 @@ public class LotInputValidator {
 			}
 
 			this.inventoryCommonValidator.validateLotNotes(lotUpdateRequestDto.getSingleInput().getNotes(), errors);
-			this.validateTransactionStatus(lotDtos, lotUpdateRequestDto.getSingleInput());
+			if (lotUpdateRequestDto.getSingleInput().getUnitId() != null) {
+				final List<String> lotUUids = lotDtos.stream().map(extendedLotDto -> extendedLotDto.getLotUUID()).collect(Collectors.toList());
+				this.validateNoConfirmedTransactions(lotUUids);
+			}
 
 		} else if (lotUpdateRequestDto.getMultiInput() != null) {
 			final List<String> filteredLocationAbbrs =
@@ -136,7 +137,13 @@ public class LotInputValidator {
 				this.inventoryCommonValidator.validateLotNotes(notesList, errors);
 			}
 
-			this.validateTransactionStatus(lotUpdateRequestDto.getMultiInput());
+			final List<String> lotUUids =
+				lotUpdateRequestDto.getMultiInput().getLotList().stream().filter(lotUpdateDto -> !StringUtils.isBlank(lotUpdateDto.getUnitName()))
+					.map(LotMultiUpdateRequestDto.LotUpdateDto::getLotUID).collect(Collectors.toList());
+
+			if (!Collections.isEmpty(lotUUids)) {
+				this.validateNoConfirmedTransactions(lotUUids);
+			}
 		}
 
 		if (this.errors.hasErrors()) {
@@ -152,34 +159,9 @@ public class LotInputValidator {
 		}
 	}
 
-	private void validateTransactionStatus(final List<ExtendedLotDto> lotDtos, final LotSingleUpdateRequestDto lotSingleUpdateRequestDto) {
+	private void validateNoConfirmedTransactions(final List<String> lotUUids) {
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
-		transactionsSearchDto.setLotIds(lotDtos.stream().map(LotDto::getLotId).collect(Collectors.toList()));
-		final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
-
-		if (transactionDtos == null || transactionDtos.isEmpty()) {
-			return;
-		}
-
-		if (transactionDtos.stream().map(TransactionDto::getTransactionStatus)
-			.anyMatch(s -> s.equals(TransactionStatus.CONFIRMED.getValue()))
-			&& (lotSingleUpdateRequestDto.getUnitId() != null)) {
-
-			this.errors.reject("lots.transactions.status.confirmed.cannot.change.unit");
-		}
-	}
-
-	private void validateTransactionStatus(final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
-		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
-		final List<String> LotUUids =
-			lotMultiUpdateRequestDto.getLotList().stream().filter(lotUpdateDto -> !StringUtils.isBlank(lotUpdateDto.getUnitName()))
-				.map(LotMultiUpdateRequestDto.LotUpdateDto::getLotUID).collect(Collectors.toList());
-
-		if (Collections.isEmpty(LotUUids)) {
-			return;
-		}
-
-		transactionsSearchDto.setLotUUIDs(LotUUids);
+		transactionsSearchDto.setLotUUIDs(lotUUids);
 		final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
 
 		if (Collections.isEmpty(transactionDtos)) {
