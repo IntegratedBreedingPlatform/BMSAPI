@@ -8,7 +8,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSingleUpdateRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotUpdateDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -116,14 +115,14 @@ public class LotInputValidator {
 
 		} else if (lotUpdateRequestDto.getMultiInput() != null) {
 			final List<String> filteredLocationAbbrs =
-				lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotUpdateDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
+				lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
 
 			if (filteredLocationAbbrs.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
 				this.locationValidator.validateSeedLocationAbbr(this.errors, filteredLocationAbbrs);
 			}
 
 			final List<String> unitNames =
-				lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotUpdateDto::getUnitName).distinct().collect(Collectors.toList());
+				lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getUnitName).distinct().collect(Collectors.toList());
 			if (unitNames.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
 				if (unitNames.stream().anyMatch(s -> StringUtils.isBlank(s))) {
 					errors.reject("lot.input.list.units.null.or.empty", "");
@@ -132,7 +131,7 @@ public class LotInputValidator {
 				}
 			}
 
-			final List<String> notesList = lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotUpdateDto::getNotes).distinct().collect(Collectors.toList());
+			final List<String> notesList = lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getNotes).distinct().collect(Collectors.toList());
 			if (notesList.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
 				this.inventoryCommonValidator.validateLotNotes(notesList, errors);
 			}
@@ -174,7 +173,7 @@ public class LotInputValidator {
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
 		final List<String> LotUUids =
 			lotMultiUpdateRequestDto.getLotList().stream().filter(lotUpdateDto -> !StringUtils.isBlank(lotUpdateDto.getUnitName()))
-				.map(LotUpdateDto::getLotUID).collect(Collectors.toList());
+				.map(LotMultiUpdateRequestDto.LotUpdateDto::getLotUID).collect(Collectors.toList());
 
 		if (Collections.isEmpty(LotUUids)) {
 			return;
