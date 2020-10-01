@@ -208,7 +208,6 @@ public class LotServiceImpl implements LotService {
 	public void mergeLots(final String keepLotUUID, final LotsSearchDto lotsSearchDto) {
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(lotsSearchDto, null);
 		this.lotMergeValidator.validate(keepLotUUID, lotDtos);
-		lotsSearchDto.setLotIds(lotDtos.stream().map(LotDto::getLotId).collect(Collectors.toList()));
 
 		final ExtendedLotDto lotDto = lotDtos.stream()
 				.filter(extendedLotDto -> keepLotUUID.equals(extendedLotDto.getLotUUID()))
