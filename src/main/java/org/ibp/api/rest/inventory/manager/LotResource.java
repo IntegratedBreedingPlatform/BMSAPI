@@ -1,21 +1,11 @@
 package org.ibp.api.rest.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
-import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.InventoryView;
-import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
-import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
@@ -29,6 +19,7 @@ import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
@@ -44,21 +35,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Api(value = "Lot Services")
 @RestController
@@ -93,6 +74,9 @@ public class LotResource {
 
 	@Autowired
 	private InventoryLock inventoryLock;
+
+	@Autowired
+	private LotMergeValidator lotMergeValidator;
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
@@ -321,6 +305,38 @@ public class LotResource {
 		} finally {
 			inventoryLock.unlockRead();
 		}
+	}
+
+	@ApiOperation(value = "Merge lots", notes = "Merge lots from the same germplasm. It keeps one lot and all the other lot balances will be then transferred to this lot and subsequently discarded.")
+	@RequestMapping(value = "/crops/{cropName}/lots/merge", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS
+			+ " or hasAnyAuthority('MERGE_LOT')")
+	public ResponseEntity<Void> mergeLots(
+			@PathVariable final String cropName, //
+			@ApiParam("Lot template for merge action."
+					+ "SearchComposite is a list of UUIDs or a search id (internal usage) ")
+			@RequestBody final LotMergeRequestDto lotMergeRequestDto) {
+
+		try {
+			inventoryLock.lockWrite();
+
+			this.lotMergeValidator.validateRequest(lotMergeRequestDto);
+
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
+			final SearchCompositeDto<Integer, String> searchComposite = lotMergeRequestDto.getSearchComposite();
+			this.inventoryCommonValidator.validateSearchCompositeDto(searchComposite, errors);
+			final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchComposite);
+			if (searchComposite.getSearchRequest() == null) {
+				final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
+				this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchComposite.getItemIds());
+			}
+
+			this.lotService.mergeLots(lotMergeRequestDto.getLotUUIDToKeep(), searchDTO);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }
