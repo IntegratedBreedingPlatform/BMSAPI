@@ -48,10 +48,10 @@ public class BreedingMethodResource {
 		return new ResponseEntity<>(MethodType.getAll(), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "List breeding method classes by method type code")
+	@ApiOperation(value = "List breeding method classes")
 	@RequestMapping(value = "/crops/{cropName}/breedingmethod-classes", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Map<String, List<MethodClassDTO>>> getBreedingMethodClasses(
+	public ResponseEntity<List<MethodClassDTO>> getBreedingMethodClasses(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID
 	) {
