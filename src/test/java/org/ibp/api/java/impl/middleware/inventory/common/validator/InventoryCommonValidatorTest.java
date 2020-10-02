@@ -110,6 +110,16 @@ public class InventoryCommonValidatorTest {
 		}
 	}
 
+	@Test
+	public void test_validateLotNotesLists_throwsException() {
+		try {
+			this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+			this.inventoryCommonValidator.validateLotNotes(Collections.singletonList(""), errors);
+		} catch (ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.notes.null.or.empty"));
+		}
+	}
+
 	private List<VariableDetails> buildVariableDetails() {
 		final VariableDetails unitKg = new VariableDetails();
 		unitKg.setName("kg");

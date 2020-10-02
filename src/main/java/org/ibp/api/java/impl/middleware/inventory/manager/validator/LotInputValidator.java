@@ -1,10 +1,11 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -86,28 +87,64 @@ public class LotInputValidator {
 		}
 	}
 
-	public void validate(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto updateRequestDto) {
+	public void validate(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
 
-		final Integer locationId = updateRequestDto.getLocationId();
-		if (locationId != null) {
-			this.locationValidator.validateSeedLocationId(this.errors, locationId);
-		}
+		if (lotUpdateRequestDto.getSingleInput() != null) {
+			final Integer locationId = lotUpdateRequestDto.getSingleInput().getLocationId();
+			if (locationId != null) {
+				this.locationValidator.validateSeedLocationId(this.errors, locationId);
+			}
 
-		final Integer unitId = updateRequestDto.getUnitId();
-		if (unitId != null) {
-			this.inventoryUnitValidator.validateInventoryUnitId(this.errors, unitId);
-		}
+			final Integer unitId = lotUpdateRequestDto.getSingleInput().getUnitId();
+			if (unitId != null) {
+				this.inventoryUnitValidator.validateInventoryUnitId(this.errors, unitId);
+			}
 
-		final Integer gid = updateRequestDto.getGid();
-		if (gid != null) {
-			this.germplasmValidator.validateGermplasmId(this.errors, gid);
-		}
+			final Integer gid = lotUpdateRequestDto.getSingleInput().getGid();
+			if (gid != null) {
+				this.germplasmValidator.validateGermplasmId(this.errors, gid);
+			}
 
-		this.inventoryCommonValidator.validateLotNotes(updateRequestDto.getNotes(), errors);
-		this.validateTransactionStatus(lotDtos, updateRequestDto);
+			this.inventoryCommonValidator.validateLotNotes(lotUpdateRequestDto.getSingleInput().getNotes(), errors);
+			if (lotUpdateRequestDto.getSingleInput().getUnitId() != null) {
+				final List<String> lotUUids = lotDtos.stream().map(extendedLotDto -> extendedLotDto.getLotUUID()).collect(Collectors.toList());
+				this.validateNoConfirmedTransactions(lotUUids);
+			}
+
+		} else if (lotUpdateRequestDto.getMultiInput() != null) {
+			final List<String> filteredLocationAbbrs =
+				lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
+
+			if (filteredLocationAbbrs.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
+				this.locationValidator.validateSeedLocationAbbr(this.errors, filteredLocationAbbrs);
+			}
+
+			final List<String> unitNames =
+				lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getUnitName).distinct().collect(Collectors.toList());
+			if (unitNames.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
+				if (unitNames.stream().anyMatch(s -> StringUtils.isBlank(s))) {
+					errors.reject("lot.input.list.units.null.or.empty", "");
+				} else {
+					this.inventoryCommonValidator.validateUnitNames(unitNames, errors);
+				}
+			}
+
+			final List<String> notesList = lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getNotes).distinct().collect(Collectors.toList());
+			if (notesList.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
+				this.inventoryCommonValidator.validateLotNotes(notesList, errors);
+			}
+
+			final List<String> lotUUids =
+				lotUpdateRequestDto.getMultiInput().getLotList().stream().filter(lotUpdateDto -> !StringUtils.isBlank(lotUpdateDto.getUnitName()))
+					.map(LotMultiUpdateRequestDto.LotUpdateDto::getLotUID).collect(Collectors.toList());
+
+			if (!Collections.isEmpty(lotUUids)) {
+				this.validateNoConfirmedTransactions(lotUUids);
+			}
+		}
 
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -122,18 +159,18 @@ public class LotInputValidator {
 		}
 	}
 
-	private void validateTransactionStatus(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto updateRequestDto) {
+	private void validateNoConfirmedTransactions(final List<String> lotUUids) {
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
-		transactionsSearchDto.setLotIds(lotDtos.stream().map(LotDto::getLotId).collect(Collectors.toList()));
+		transactionsSearchDto.setLotUUIDs(lotUUids);
 		final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
 
-		if (transactionDtos == null || transactionDtos.isEmpty()) {
+		if (Collections.isEmpty(transactionDtos)) {
 			return;
 		}
 
 		if (transactionDtos.stream().map(TransactionDto::getTransactionStatus)
 			.anyMatch(s -> s.equals(TransactionStatus.CONFIRMED.getValue()))
-			&& (updateRequestDto.getUnitId() != null)) {
+		) {
 
 			this.errors.reject("lots.transactions.status.confirmed.cannot.change.unit");
 		}

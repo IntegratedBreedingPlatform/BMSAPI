@@ -56,4 +56,13 @@ public class ExtendedLotListValidator {
 		}
 	}
 
+	public void validateLotUUIDsDuplicated(final List<ExtendedLotDto> extendedLotDtos, final List<String> lotUUIDs) {
+		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
+		if (lotUUIDs.size() != extendedLotDtos.size()) {
+			errors.reject("lots.duplicated", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+	}
+
 }
