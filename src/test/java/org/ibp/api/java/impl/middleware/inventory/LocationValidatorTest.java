@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.inventory;
 
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
@@ -20,8 +21,11 @@ import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
@@ -32,6 +36,7 @@ public class LocationValidatorTest {
 	public static final String STOCK_ID = "ABCD";
 	public static final String COMMENTS = "Comments";
 	public static final int GID = 1;
+	final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 
 	@Mock
 	private LocationDataManager locationDataManager;
@@ -131,5 +136,48 @@ public class LocationValidatorTest {
 		this.locationValidator.validateSeedLocationId(this.errors, LOCATION_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
+	}
+
+	@Test
+	public void testValidateValidSeedLocationAbbr() {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
+		final Location location = new Location();
+		location.setLabbr("DSS");
+		final List<Location> locationList = Lists.newArrayList(location);
+		final List<String> locationAbbrList = Lists.newArrayList("DSS");
+
+		Mockito.when(this.locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE,null,locationAbbrList)).thenReturn(locationList);
+		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
+
+		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
+	}
+
+	@Test
+	public void testValidateInvalidSeedLocationAbbr() {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
+		final List<Location> locationList = Collections.emptyList();
+		final List<String> locationAbbrList = Lists.newArrayList("DSS");;
+
+		Mockito.when(this.locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE,null,locationAbbrList)).thenReturn(locationList);
+		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
+
+		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
+		final ObjectError objectError = this.errors.getAllErrors().get(0);
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("lot.input.invalid.abbreviations"));
+
+	}
+
+	@Test
+	public void testValidateEmptySeedLocationAbbr() {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
+		final Location location = new Location();
+		location.setLabbr("DSS");
+		final List<String> locationAbbrList = Lists.newArrayList("");
+
+		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
+
+		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
+		final ObjectError objectError = this.errors.getAllErrors().get(0);
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("lot.input.list.location.null.or.empty"));
 	}
 }

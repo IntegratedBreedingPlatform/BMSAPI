@@ -1,6 +1,7 @@
 package org.ibp.api.rest.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -25,6 +27,7 @@ import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
@@ -59,13 +62,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Api(value = "Lot Services")
 @RestController
 public class LotResource {
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
-	private static final String HAS_MANAGE_LOTS = "hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_LOTS')";
+	private static final String HAS_MANAGE_LOTS = "hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_INVENTORY', 'MANAGE_LOTS')";
 
 	@Autowired
 	private LotService lotService;
@@ -198,12 +202,33 @@ public class LotResource {
 		@ApiParam("Request with fields to update and criteria to update") @RequestBody final LotUpdateRequestDto lotRequest) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		this.inventoryCommonValidator.validateSearchCompositeDto(lotRequest.getSearchComposite(), errors);
-		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotRequest.getSearchComposite());
 
-		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-		if (lotRequest.getSearchComposite().getSearchRequest() == null) {
-			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, lotRequest.getSearchComposite().getItemIds());
+		List<ExtendedLotDto> extendedLotDtos = null;
+
+		if ((lotRequest.getSingleInput() == null && lotRequest.getMultiInput() == null) || //
+		 	(lotRequest.getSingleInput() != null && lotRequest.getMultiInput() != null)) {
+			errors.reject("lot.update.invalid.input", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (lotRequest.getSingleInput() != null) {
+			this.inventoryCommonValidator.validateSearchCompositeDto(lotRequest.getSingleInput().getSearchComposite(), errors);
+			final LotsSearchDto searchDTO =
+				this.searchRequestDtoResolver.getLotsSearchDto(lotRequest.getSingleInput().getSearchComposite());
+
+			extendedLotDtos = this.lotService.searchLots(searchDTO, null);
+			if (lotRequest.getSingleInput().getSearchComposite().getSearchRequest() == null) {
+				this.extendedLotListValidator
+					.validateAllProvidedLotUUIDsExist(extendedLotDtos, lotRequest.getSingleInput().getSearchComposite().getItemIds());
+			}
+		} else {
+			final List<String> lotUIDs =
+				lotRequest.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getLotUID).collect(Collectors.toList());
+			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+			lotsSearchDto.setLotUUIDs(lotUIDs);
+			extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, Sets.newHashSet(lotUIDs));
+			this.extendedLotListValidator.validateLotUUIDsDuplicated(extendedLotDtos, lotUIDs);
 		}
 
 		try {

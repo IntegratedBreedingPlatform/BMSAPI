@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.common.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.Util;
@@ -82,4 +83,17 @@ public class InventoryCommonValidator {
 		}
 	}
 
+	public void validateLotNotes(final List<String> notes, final BindingResult errors) {
+		if (notes.stream().filter(s -> StringUtils.isBlank(s)).findAny().isPresent()) {
+			errors.reject("lot.input.list.notes.null.or.empty", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final List<String> filteredNotes =
+			notes.stream().filter(loteNotes -> loteNotes.length() > LOT_NOTES_MAX_LENGTH).map(s -> s).collect(Collectors.toList());
+		if (!Collections.isEmpty(filteredNotes)) {
+			errors.reject("lot.notes.length", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
 }
