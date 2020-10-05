@@ -42,7 +42,7 @@ public class LocationServiceImpl implements LocationService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (!StringUtils.isEmpty(programUUID)) {
+		if (programUUID != null) {
 			this.programValidator.validate(new ProgramSummary(crop, programUUID), errors);
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
