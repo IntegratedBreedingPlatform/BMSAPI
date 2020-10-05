@@ -2,11 +2,9 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.fest.util.Collections;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.ibp.api.Util;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -42,14 +40,14 @@ public class LocationValidator {
 		}
 	}
 
-	public void validateSeedLocationAbbr(final BindingResult errors, final List<String> locationAbbreviations) {
+	public void validateSeedLocationAbbr(final BindingResult errors, final String programUUID, final List<String> locationAbbreviations) {
 		if (locationAbbreviations.stream().anyMatch(s -> StringUtils.isBlank(s))) {
 			errors.reject("lot.input.list.location.null.or.empty", "");
 			return;
 		}
 
 		final List<Location> existingLocations =
-			locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE, null, locationAbbreviations);
+			locationDataManager.getFilteredLocations(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, false);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 
 			final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());

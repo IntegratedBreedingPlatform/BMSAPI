@@ -6,7 +6,6 @@ import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
@@ -118,7 +117,7 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public List<String> createLots(final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
+	public List<String> createLots(final String programUUID, final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
 		// validations
 		final SearchCompositeDto<Integer, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
@@ -162,20 +161,20 @@ public class LotServiceImpl implements LotService {
 		// save to db
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		final CropType cropType = this.contextUtil.getProjectInContext().getCropType();
-		return this.lotService.saveLots(cropType, loggedInUser.getUserid(), lotList);
+		return this.lotService.saveLots(cropType, programUUID, loggedInUser.getUserid(), lotList);
 	}
 
 	@Override
-	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
+	public void updateLots(final String programUUID, final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
 		this.lotInputValidator.validate(lotDtos, lotRequest);
-		this.lotService.updateLots(lotDtos, lotRequest);
+		this.lotService.updateLots(programUUID, lotDtos, lotRequest);
 	}
 
 	@Override
-	public void importLotsWithInitialTransaction(final LotImportRequestDto lotImportRequestDto) {
+	public void importLotsWithInitialTransaction(final String programUUID, final LotImportRequestDto lotImportRequestDto) {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		final CropType cropType = this.contextUtil.getProjectInContext().getCropType();
-		this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+		this.lotImportRequestDtoValidator.validate(programUUID, lotImportRequestDto);
 		final List<LotItemDto> lotsWithNoStockId =
 			lotImportRequestDto.getLotList().stream().filter(x -> StringUtils.isEmpty(x.getStockId())).collect(Collectors.toList());
 		if (!lotsWithNoStockId.isEmpty()) {
@@ -188,7 +187,7 @@ public class LotServiceImpl implements LotService {
 				lotItemDto.setStockId(nextStockIDPrefix + ++i);
 			}
 		}
-		this.lotService.saveLots(cropType, loggedInUser.getUserid(), lotImportRequestDto.getLotList());
+		this.lotService.saveLots(cropType, programUUID, loggedInUser.getUserid(), lotImportRequestDto.getLotList());
 	}
 
 	@Override

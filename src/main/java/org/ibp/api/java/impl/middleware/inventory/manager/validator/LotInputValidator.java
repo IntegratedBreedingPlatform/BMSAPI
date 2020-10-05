@@ -119,7 +119,7 @@ public class LotInputValidator {
 				lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
 
 			if (filteredLocationAbbrs.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
-				this.locationValidator.validateSeedLocationAbbr(this.errors, filteredLocationAbbrs);
+				this.locationValidator.validateSeedLocationAbbr(this.errors, null, filteredLocationAbbrs);
 			}
 
 			final List<String> unitNames =

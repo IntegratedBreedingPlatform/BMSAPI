@@ -14,8 +14,8 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMergeRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -195,7 +195,7 @@ public class LotResource {
 			+ "SearchComposite is a list of gids or a search id (internal usage) ")
 		@RequestBody final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
 
-		return new ResponseEntity<>(this.lotService.createLots(lotGeneratorBatchRequestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.lotService.createLots(programUUID, lotGeneratorBatchRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Lots", notes = "Update one or more Lots")
@@ -203,7 +203,7 @@ public class LotResource {
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('UPDATE_LOTS')")
 	@ResponseBody
 	public ResponseEntity<Void> updateLots(
-		@PathVariable final String cropName,
+		@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
 		@ApiParam("Request with fields to update and criteria to update") @RequestBody final LotUpdateRequestDto lotRequest) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
@@ -238,7 +238,7 @@ public class LotResource {
 
 		try {
 			inventoryLock.lockWrite();
-			this.lotService.updateLots(extendedLotDtos, lotRequest);
+			this.lotService.updateLots(programUUID, extendedLotDtos, lotRequest);
 		} finally {
 			inventoryLock.unlockWrite();
 		}
@@ -252,8 +252,8 @@ public class LotResource {
 		method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
 	public ResponseEntity<Void> importLotsWithInitialBalance(@PathVariable final String cropName,
-		@RequestBody final LotImportRequestDto lotImportRequestDto) {
-		this.lotService.importLotsWithInitialTransaction(lotImportRequestDto);
+		@RequestParam(required = false) final String programUUID, @RequestBody final LotImportRequestDto lotImportRequestDto) {
+		this.lotService.importLotsWithInitialTransaction(programUUID, lotImportRequestDto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -262,12 +262,14 @@ public class LotResource {
 		value = "/crops/{cropName}/lot-lists/templates/xls",
 		method = RequestMethod.GET)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
-	public ResponseEntity<FileSystemResource> getTemplate(@PathVariable final String cropName) {
+	public ResponseEntity<FileSystemResource> getTemplate(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID) {
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
-		final List<LocationDto> locations = this.locationService.getLocations(LotResource.STORAGE_LOCATION_TYPE, null, false, null);
+		final List<LocationDto> locations =
+			this.locationService.getLocations(cropName, programUUID, LotResource.STORAGE_LOCATION_TYPE, null, null, false);
 
 		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
 		final HttpHeaders headers = new HttpHeaders();
