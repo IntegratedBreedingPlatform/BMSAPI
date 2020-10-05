@@ -3,7 +3,7 @@ package org.ibp.api.brapi.v1.location;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
 
