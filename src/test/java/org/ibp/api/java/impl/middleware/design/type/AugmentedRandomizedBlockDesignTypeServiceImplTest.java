@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewVariableParameter;
 import org.ibp.api.java.impl.middleware.design.generator.AugmentedRandomizedBlockDesignGenerator;
@@ -84,8 +84,8 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 		final Integer numberOfBlocks = 5;
 		final Integer startingPlotNumber = 1;
 
-		final List<StudyGermplasmDto> studyGermplasmDtoList =
-			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
+		final List<StudyEntryDto> studyEntryDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTreatments, numberOfControls);
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setNumberOfBlocks(numberOfBlocks);
 		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
@@ -104,12 +104,12 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 			.thenReturn(measurementVariables);
 		when(this.experimentalDesignProcessor
 			.generateObservationUnitRows(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
-				refEq(studyGermplasmDtoList), refEq(mainDesign),
+				refEq(studyEntryDtoList), refEq(mainDesign),
 				eq(ENTRY_NO),
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyEntryDtoList);
 
 		assertSame(result, observationUnitRowList);
 	}
@@ -119,14 +119,14 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 
 		final int numberOfTestEntries = 3;
 		final int numberOfCheckEntries = 2;
-		final List<StudyGermplasmDto> studyGermplasmDtoList =
-			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTestEntries, numberOfCheckEntries);
+		final List<StudyEntryDto> studyEntryDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTestEntries, numberOfCheckEntries);
 
-		final Set<Integer> entryIdsOfCheckEntries = this.designTypeService.getEntryIdsOfChecks(studyGermplasmDtoList);
-		final Set<Integer> entryIdsOfTestEntries = this.designTypeService.getEntryIdsOfTestEntries(studyGermplasmDtoList);
+		final Set<Integer> entryIdsOfCheckEntries = this.designTypeService.getEntryIdsOfChecks(studyEntryDtoList);
+		final Set<Integer> entryIdsOfTestEntries = this.designTypeService.getEntryIdsOfTestEntries(studyEntryDtoList);
 
 		final Map<Integer, Integer> result = this.designTypeService
-			.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyGermplasmDtoList, entryIdsOfCheckEntries,
+			.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyEntryDtoList, entryIdsOfCheckEntries,
 				entryIdsOfTestEntries);
 
 		assertEquals("Entry Number 1 should be mapped to Test Entry", 3, result.get(1).intValue());
@@ -142,10 +142,10 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 
 		final int numberOfTestEntries = 3;
 		final int numberOfCheckEntries = 2;
-		final List<StudyGermplasmDto> studyGermplasmDtoList =
-			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTestEntries, numberOfCheckEntries);
+		final List<StudyEntryDto> studyEntryDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTestEntries, numberOfCheckEntries);
 
-		final Set<Integer> result = this.designTypeService.getEntryIdsOfChecks(studyGermplasmDtoList);
+		final Set<Integer> result = this.designTypeService.getEntryIdsOfChecks(studyEntryDtoList);
 
 		assertEquals("There are only 2 checks in the germplasm list", numberOfCheckEntries, result.size());
 
@@ -160,10 +160,10 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 
 		final int numberOfTestEntries = 3;
 		final int numberOfCheckEntries = 2;
-		final List<StudyGermplasmDto> studyGermplasmDtoList =
-			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTestEntries, numberOfCheckEntries);
+		final List<StudyEntryDto> studyEntryDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTestEntries, numberOfCheckEntries);
 
-		final Set<Integer> result = this.designTypeService.getEntryIdsOfTestEntries(studyGermplasmDtoList);
+		final Set<Integer> result = this.designTypeService.getEntryIdsOfTestEntries(studyEntryDtoList);
 
 		assertEquals("There should be 3 test entries in the list", numberOfTestEntries, result.size());
 

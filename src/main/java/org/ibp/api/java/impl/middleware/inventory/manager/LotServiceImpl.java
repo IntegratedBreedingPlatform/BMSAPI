@@ -218,6 +218,4 @@ public class LotServiceImpl implements LotService {
 		this.lotService.mergeLots(loggedInUser.getUserid(), lotDto.getLotId(), lotsSearchDto);
 	}
 
-
-
 }

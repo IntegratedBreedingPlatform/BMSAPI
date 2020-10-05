@@ -7,9 +7,8 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.java.study.StudyGermplasmService;
+import org.ibp.api.java.study.StudyEntryService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.data.domain.Pageable;
@@ -29,22 +28,22 @@ import javax.annotation.Resource;
 import java.util.List;
 
 // TODO: Move these services to StudyResource
-@Api(value = "Study Germplasm Services")
+@Api(value = "Study Entry Services")
 @Controller
 @RequestMapping("/crops")
-public class StudyGermplasmResource {
+public class StudyEntryResource {
 
 	@Resource
-	private StudyGermplasmService studyGermplasmService;
+	private StudyEntryService studyEntryService;
 
 	@ApiOperation(value = "Replace germplasm entry in study",
 		notes = "Replace germplasm entry in study")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<StudyGermplasmDto> replaceStudyGermplasm(final @PathVariable String cropname,
-		@PathVariable final String programUUID,
-		@PathVariable final Integer studyId, @PathVariable final Integer entryId, @RequestBody final StudyGermplasmDto studyGermplasmDto) {
-		return new ResponseEntity<>(this.studyGermplasmService.replaceStudyEntry(studyId, entryId, studyGermplasmDto),
+	public ResponseEntity<StudyEntryDto> replaceStudyEntry(final @PathVariable String cropname,
+														   @PathVariable final String programUUID,
+														   @PathVariable final Integer studyId, @PathVariable final Integer entryId, @RequestBody final StudyEntryDto studyEntryDto) {
+		return new ResponseEntity<>(this.studyEntryService.replaceStudyEntry(studyId, entryId, studyEntryDto),
 			HttpStatus.OK);
 
 	}
@@ -53,12 +52,12 @@ public class StudyGermplasmResource {
 		notes = "Create germplasm entries in study based on the specified germplasm list")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<List<StudyGermplasmDto>> createStudyEntries(final @PathVariable String cropname,
+	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmEntryRequestDto germplasmEntryRequestDto) {
 
 		return new ResponseEntity<>(
-			this.studyGermplasmService.createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId()),
+			this.studyEntryService.createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId()),
 			HttpStatus.OK);
 
 	}
@@ -71,7 +70,7 @@ public class StudyGermplasmResource {
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
 
-		this.studyGermplasmService.deleteStudyEntries(studyId);
+		this.studyEntryService.deleteStudyEntries(studyId);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
@@ -86,7 +85,7 @@ public class StudyGermplasmResource {
 		@PathVariable final Integer studyId, @PathVariable final Integer entryId, @PathVariable final Integer propertyId,
 		@RequestBody StudyEntryPropertyData studyEntryPropertyData) {
 
-		this.studyGermplasmService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
+		this.studyEntryService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
@@ -116,12 +115,12 @@ public class StudyGermplasmResource {
 
 				@Override
 				public long getCount() {
-					return StudyGermplasmResource.this.studyGermplasmService.countAllStudyEntries(studyId);
+					return StudyEntryResource.this.studyEntryService.countAllStudyEntries(studyId);
 				}
 
 				@Override
 				public List<StudyEntryDto> getResults(final PagedResult<StudyEntryDto> pagedResult) {
-					return StudyGermplasmResource.this.studyGermplasmService.getStudyEntries(studyId, null, pageable);
+					return StudyEntryResource.this.studyEntryService.getStudyEntries(studyId, null, pageable);
 				}
 			});
 
@@ -140,7 +139,7 @@ public class StudyGermplasmResource {
 		@PathVariable final Integer studyId) {
 
 		final List<MeasurementVariable> entryDescriptors =
-			this.studyGermplasmService.getEntryDescriptorColumns(studyId);
+			this.studyEntryService.getEntryDescriptorColumns(studyId);
 
 		return new ResponseEntity<>(entryDescriptors, HttpStatus.OK);
 	}
