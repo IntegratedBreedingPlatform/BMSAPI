@@ -6,13 +6,13 @@ import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -23,6 +23,7 @@ import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDt
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotImportRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,10 +72,10 @@ public class LotServiceImpl implements LotService {
 	private InventoryCommonValidator inventoryCommonValidator;
 
 	@Autowired
-	private SearchRequestService searchRequestService;
+	private SearchRequestDtoResolver searchRequestDtoResolver;
 
 	@Autowired
-	private SearchRequestDtoResolver searchRequestDtoResolver;
+	private LotMergeValidator lotMergeValidator;
 
 	private static final String DEFAULT_STOCKID_PREFIX = "SID";
 
@@ -198,9 +199,25 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public void closeLots(final LotsSearchDto searchDTO) {
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
-		extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
+		extendedLotListValidator.validateClosedLots(lotDtos);
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		lotService.closeLots(loggedInUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toList()));
 	}
+
+	@Override
+	public void mergeLots(final String keepLotUUID, final LotsSearchDto lotsSearchDto) {
+		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(lotsSearchDto, null);
+		this.lotMergeValidator.validate(keepLotUUID, lotDtos);
+
+		final ExtendedLotDto lotDto = lotDtos.stream()
+				.filter(extendedLotDto -> keepLotUUID.equals(extendedLotDto.getLotUUID()))
+				.findFirst()
+				.get();
+
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+		this.lotService.mergeLots(loggedInUser.getUserid(), lotDto.getLotId(), lotsSearchDto);
+	}
+
+
 
 }
