@@ -1,20 +1,21 @@
 
 package org.ibp.api.brapi.v1.trial;
 
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -23,10 +24,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TrialResourceBrapiTest extends ApiUnitTestBase {
 
@@ -64,10 +63,8 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		studySummary.setInstanceMetaData(Lists.newArrayList(instanceMetadata));
 
 		final List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
-		Mockito.when(this.studyDataManager.findPagedProjects(org.mockito.Matchers.anyMapOf(StudyFilters.class, String.class),
-				org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt())).thenReturn(mwStudySummary);
-		Mockito.when(this.studyDataManager.countAllStudies(org.mockito.Matchers.anyMapOf(StudyFilters.class, String.class)))
-				.thenReturn(200L);
+		Mockito.when(this.studyServiceMW.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
+		Mockito.when(this.studyServiceMW.countStudies(ArgumentMatchers.any())).thenReturn(200L);
 
 		final Project project = new Project();
 		project.setProjectName("maize");
@@ -137,11 +134,9 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		studySummary.setInstanceMetaData(Lists.newArrayList(instanceMetadata));
 
 		final List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
-		Mockito.when(this.studyDataManager.findPagedProjects(org.mockito.Matchers.anyMapOf(StudyFilters.class, String.class),
-				org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt())).thenReturn(mwStudySummary);
 		final int count = 200;
-		Mockito.when(this.studyDataManager.countAllStudies(org.mockito.Matchers.anyMapOf(StudyFilters.class, String.class)))
-				.thenReturn(new Long(count));
+		Mockito.when(this.studyServiceMW.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
+		Mockito.when(this.studyServiceMW.countStudies(ArgumentMatchers.any())).thenReturn(new Long(count));
 
 		final Project project = new Project();
 		project.setProjectName("maize");

@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.service.api.study.StudyFilters;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -22,21 +22,14 @@ import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/#reference/trials">BrAPI Trial services</a>.
@@ -78,20 +71,30 @@ public class TrialResourceBrapi {
 			return new ResponseEntity<>(trialSummaries, HttpStatus.NOT_FOUND);
 		}
 
-		final Map<StudyFilters, String> parameters = this.setParameters(programDbId, locationDbId, sortBy, sortOrder);
+		final StudySearchFilter filter = new StudySearchFilter();
+		filter.setProgramDbId(programDbId);
+		filter.setLocationDbId(locationDbId);
+
+		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+
+		final PageRequest pageRequest;
+		if (StringUtils.isNotEmpty(sortBy) && StringUtils.isNotEmpty(sortOrder)) {
+			pageRequest = new PageRequest(finalPageNumber, finalPageSize, new Sort(Sort.Direction.fromString(sortOrder), sortBy));
+		} else {
+			pageRequest = new PageRequest(finalPageNumber, finalPageSize);
+		}
 		final PagedResult<StudySummary> resultPage =
 				new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudySummary>() {
 
 					@Override
 					public long getCount() {
-						return TrialResourceBrapi.this.studyService.countStudies(parameters);
+						return TrialResourceBrapi.this.studyService.countStudies(filter);
 					}
 
 					@Override
 					public List<StudySummary> getResults(final PagedResult<StudySummary> pagedResult) {
-						// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
-						final int pageNumber = pagedResult.getPageNumber() + 1;
-						return TrialResourceBrapi.this.studyService.getStudies(parameters, pagedResult.getPageSize(), pageNumber);
+						return TrialResourceBrapi.this.studyService.getStudies(filter, pageRequest);
 					}
 				});
 
@@ -159,31 +162,6 @@ public class TrialResourceBrapi {
 				return trialSummary1.getStartDate().compareTo(trialSummary2.getStartDate());
 			}
 		};
-	}
-
-	private Map<StudyFilters, String> setParameters(final String programDbId, final String locationDbId, final String sortByField,
-			final String sortOrder) {
-
-		final Map<StudyFilters, String> parametersMap = new EnumMap<>(StudyFilters.class);
-		if (!StringUtils.isBlank(programDbId)) {
-			parametersMap.put(StudyFilters.PROGRAM_ID, programDbId);
-		}
-		if (!StringUtils.isBlank(locationDbId)) {
-			parametersMap.put(StudyFilters.LOCATION_ID, locationDbId);
-		}
-
-		if (!StringUtils.isBlank(sortByField) && "trialName".equals(sortByField)) {
-			parametersMap.put(StudyFilters.SORT_BY_FIELD, "name");
-		} else {
-			parametersMap.put(StudyFilters.SORT_BY_FIELD, "projectId");
-
-		}
-		if (StringUtils.isBlank(sortOrder) || TrialResourceBrapi.ORDER_BY_ASCENDING.equalsIgnoreCase(sortOrder)) {
-			parametersMap.put(StudyFilters.ORDER, "asc");
-		} else if (!StringUtils.isBlank(sortOrder) && TrialResourceBrapi.ORDER_BY_DESCENDING.equalsIgnoreCase(sortOrder)) {
-			parametersMap.put(StudyFilters.ORDER, "desc");
-		}
-		return parametersMap;
 	}
 
 	private String parameterValidation(final Boolean active, final String sortBy, final String sortOrder) {

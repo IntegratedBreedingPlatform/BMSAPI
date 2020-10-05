@@ -16,20 +16,10 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudyFilters;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
-import org.generationcp.middleware.service.api.study.StudySearchParameters;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.study.*;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.study.FieldMap;
@@ -71,9 +61,6 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private SecurityService securityService;
@@ -205,8 +192,13 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public Long countStudies(final Map<StudyFilters, String> filters) {
-		return this.studyDataManager.countAllStudies(filters);
+	public List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		return this.middlewareStudyService.getStudies(studySearchFilter, pageable);
+	}
+
+	@Override
+	public long countStudies(final StudySearchFilter studySearchFilter) {
+		return this.middlewareStudyService.countStudies(studySearchFilter);
 	}
 
 	@Override
@@ -218,22 +210,6 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
 		return this.middlewareStudyService.countPhenotypes(requestDTO);
-	}
-
-	@Override
-	public List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters,
-		final Integer pageSize, final Integer pageNumber) {
-		final List<org.generationcp.middleware.domain.dms.StudySummary> studySummaryList =
-			this.studyDataManager.findPagedProjects(filters, pageSize, pageNumber);
-
-		for (final org.generationcp.middleware.domain.dms.StudySummary studySummary : studySummaryList) {
-			final Project project = this.workbenchDataManager.getProjectByUuid(studySummary.getProgramDbId());
-			if (project != null) {
-				studySummary.setProgramName(project.getProjectName());
-			}
-		}
-
-		return studySummaryList;
 	}
 
 	@Override

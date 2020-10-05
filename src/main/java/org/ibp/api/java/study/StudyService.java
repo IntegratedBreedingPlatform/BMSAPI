@@ -9,7 +9,6 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.study.FieldMap;
@@ -48,14 +47,13 @@ public interface StudyService {
 
 	StudyDetailsDto getStudyDetailsByGeolocation (final Integer geolocationId);
 
-	Long countStudies(final Map<StudyFilters, String> filters);
+	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
+
+	long countStudies(StudySearchFilter studySearchFilter);
 
 	List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO);
 
 	long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO);
-
-	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters, Integer pageSize,
-		Integer pageNumber);
 
 	Boolean isSampled(final Integer studyId);
 
