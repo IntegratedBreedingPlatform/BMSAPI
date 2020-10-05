@@ -51,7 +51,7 @@ import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
-import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
@@ -497,8 +497,8 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public StudyGermplasmService getStudyGermplasmService() {
-		return new StudyGermplasmServiceImpl(this.getCropDatabaseSessionProvider());
+	public StudyEntryService getStudyEntryService() {
+		return new StudyEntryServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

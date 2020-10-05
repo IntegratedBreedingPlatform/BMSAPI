@@ -11,14 +11,13 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
-import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
-import org.ibp.api.java.study.StudyGermplasmService;
+import org.ibp.api.java.study.StudyEntryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class StudyGermplasmServiceImpl implements StudyGermplasmService {
+public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private StudyValidator studyValidator;
@@ -45,7 +44,7 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Resource
-	private StudyGermplasmValidator studyGermplasmValidator;
+	private StudyEntryValidator studyEntryValidator;
 
 	@Autowired
 	private GermplasmListValidator germplasmListValidator;
@@ -57,42 +56,42 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 	private TermValidator termValidator;
 
 	@Resource
-	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
+	private org.generationcp.middleware.service.api.study.StudyEntryService middlewareStudyEntryService;
 
 	@Resource
 	private DatasetService datasetService;
 
 	@Override
-	public StudyGermplasmDto replaceStudyEntry(final Integer studyId, final Integer entryId,
-		final StudyGermplasmDto studyGermplasmDto) {
-		final Integer gid = studyGermplasmDto.getGermplasmId();
+	public StudyEntryDto replaceStudyEntry(final Integer studyId, final Integer entryId,
+		final StudyEntryDto studyEntryDto) {
+		final Integer gid = studyEntryDto.getGid();
 		this.studyValidator.validate(studyId, true);
-		this.studyGermplasmValidator.validate(studyId, entryId, gid);
+		this.studyEntryValidator.validate(studyId, entryId, gid);
 
-		return this.middlewareStudyGermplasmService
-			.replaceStudyGermplasm(studyId, entryId, gid, this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
+		return this.middlewareStudyEntryService
+			.replaceStudyEntry(studyId, entryId, gid, this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
 	}
 
 	@Override
-	public List<StudyGermplasmDto> createStudyEntries(final Integer studyId, final Integer germplasmListId) {
+	public List<StudyEntryDto> createStudyEntries(final Integer studyId, final Integer germplasmListId) {
 		final GermplasmList germplasmList = this.germplasmListService.getGermplasmList(germplasmListId);
 
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
-		this.studyGermplasmValidator.validateStudyAlreadyHasStudyEntries(studyId);
+		this.studyEntryValidator.validateStudyAlreadyHasStudyEntries(studyId);
 		this.studyValidator.validate(studyId, true);
 
 		final ModelMapper mapper = StudyEntryMapper.getInstance();
-		final List<StudyGermplasmDto> studyGermplasmList =
-			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyGermplasmDto.class)).collect(Collectors.toList());
+		final List<StudyEntryDto> studyEntryDtoList =
+			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyEntryDto.class)).collect(Collectors.toList());
 
-		return this.middlewareStudyGermplasmService.saveStudyEntries(studyId, studyGermplasmList);
+		return this.middlewareStudyEntryService.saveStudyEntries(studyId, studyEntryDtoList);
 	}
 
 	@Override
 	public void deleteStudyEntries(final Integer studyId) {
 		this.studyValidator.validate(studyId, true);
 		this.studyValidator.validateStudyShouldNotHaveObservation(studyId);
-		this.middlewareStudyGermplasmService.deleteStudyEntries(studyId);
+		this.middlewareStudyEntryService.deleteStudyEntries(studyId);
 	}
 
 	@Override
@@ -101,20 +100,20 @@ public class StudyGermplasmServiceImpl implements StudyGermplasmService {
 		this.studyValidator.validate(studyId, true);
 		this.studyValidator.validateStudyContainsEntry(studyId, entryId);
 		this.termValidator.validate(studyEntryPropertyData.getVariableId());
-		this.studyGermplasmValidator.validateStudyEntryProperty(studyEntryPropertyData.getStudyEntryPropertyId());
-		this.middlewareStudyGermplasmService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
+		this.studyEntryValidator.validateStudyEntryProperty(studyEntryPropertyData.getStudyEntryPropertyId());
+		this.middlewareStudyEntryService.updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}
 
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 		this.studyValidator.validate(studyId, false);
-		return this.middlewareStudyGermplasmService.getStudyEntries(studyId, filter, pageable);
+		return this.middlewareStudyEntryService.getStudyEntries(studyId, filter, pageable);
 	}
 
 	@Override
 	public long countAllStudyEntries(final Integer studyId) {
 		this.studyValidator.validate(studyId, false);
-		return this.middlewareStudyGermplasmService.countStudyEntries(studyId);
+		return this.middlewareStudyEntryService.countStudyEntries(studyId);
 	}
 
 	@Override

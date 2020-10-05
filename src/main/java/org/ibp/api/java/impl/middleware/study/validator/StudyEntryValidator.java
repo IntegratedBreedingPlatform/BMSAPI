@@ -1,33 +1,34 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
+import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Component
-public class StudyGermplasmValidator {
+public class StudyEntryValidator {
 
 	@Resource
 	private GermplasmValidator germplasmValidator;
 
 	@Resource
 	private PlantingServiceImpl plantingService;
-
-	@Resource
-	private StudyService studyService;
 
 	@Autowired
 	private SampleService sampleService;
@@ -36,7 +37,7 @@ public class StudyGermplasmValidator {
 	private StudyValidator studyValidator;
 
 	@Resource
-	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
+	private StudyEntryService middlewareStudyEntryService;
 
 	private BindingResult errors;
 
@@ -46,8 +47,13 @@ public class StudyGermplasmValidator {
 		if (newGid == null) {
 			errors.reject("gid.is.required");
 		}
-		final Optional<StudyGermplasmDto> entry = this.middlewareStudyGermplasmService.getStudyGermplasm(studyId, entryId);
-		if (!entry.isPresent()) {
+
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setEntryIds(Collections.singletonList(entryId));
+		final List<StudyEntryDto> studyEntries =
+			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+
+		if (studyEntries.isEmpty()) {
 			errors.reject("invalid.entryid");
 		}
 
@@ -81,7 +87,7 @@ public class StudyGermplasmValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (this.middlewareStudyGermplasmService.countStudyEntries(studyId) > 0) {
+		if (this.middlewareStudyEntryService.countStudyEntries(studyId) > 0) {
 			errors.reject("study.has.existing.study.entries");
 		}
 
@@ -96,7 +102,7 @@ public class StudyGermplasmValidator {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final Optional<StudyEntryPropertyData> studyEntryPropertyData =
-			this.middlewareStudyGermplasmService.getStudyEntryPropertyData(studyEntryPropertyDataId);
+			this.middlewareStudyEntryService.getStudyEntryPropertyData(studyEntryPropertyDataId);
 		if (!studyEntryPropertyData.isPresent()) {
 			errors.reject("invalid.study.entry.property.data.id");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());

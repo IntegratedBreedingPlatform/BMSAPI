@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewDesignParameter;
@@ -27,16 +27,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -88,8 +81,8 @@ public class PRepDesignTypeServiceImplTest {
 		final Integer replicationPercentage = 50;
 		final Integer startingPlotNumber = 1;
 
-		final List<StudyGermplasmDto> studyGermplasmDtoList =
-			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
+		final List<StudyEntryDto> studyGermplasmDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTreatments, numberOfControls);
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setBlockSize(blockSize);
 		experimentalDesignInput.setReplicationPercentage(replicationPercentage);
@@ -129,7 +122,7 @@ public class PRepDesignTypeServiceImplTest {
 		final float replicationPercentage = 50.0f;
 		final float noOfTestEntriesToReplicate = Math.round((float) noOfTestEntries * (replicationPercentage / 100));
 
-		final List<StudyGermplasmDto> importedGermplasmList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
+		final List<StudyEntryDto> importedGermplasmList = StudyEntryTestDataGenerator.createStudyEntryDtoList(5, 0);
 
 		final Map<BreedingViewDesignParameter, List<ListItem>> map =
 			this.designTypeService
@@ -159,11 +152,11 @@ public class PRepDesignTypeServiceImplTest {
 		final float replicationPercentage = 50.0f;
 		final float noOfTestEntriesToReplicate = Math.round((float) noOfTestEntries * (replicationPercentage / 100));
 
-		final List<StudyGermplasmDto> importedGermplasmList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
+		final List<StudyEntryDto> importedGermplasmList = StudyEntryTestDataGenerator.createStudyEntryDtoList(5, 0);
 
 		// Set the first germplasm as CHECK_ENTRY.
-		final StudyGermplasmDto checkImportedGermplasm = importedGermplasmList.get(0);
-		checkImportedGermplasm.setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		final StudyEntryDto checkImportedGermplasm = importedGermplasmList.get(0);
+		checkImportedGermplasm.getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 
 		final Map<BreedingViewDesignParameter, List<ListItem>> map =
 			this.designTypeService
@@ -193,13 +186,13 @@ public class PRepDesignTypeServiceImplTest {
 		final float replicationPercentage = 50;
 		final float noOfTestEntriesToReplicate = Math.round((float) noOfTestEntries * (replicationPercentage / 100));
 
-		final List<StudyGermplasmDto> importedGermplasmList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
+		final List<StudyEntryDto> importedGermplasmList = StudyEntryTestDataGenerator.createStudyEntryDtoList(5, 0);
 
 		// Set the first germplasm as CUSTOM ENTRY_TYPE.
-		final StudyGermplasmDto checkImportedGermplasm = importedGermplasmList.get(0);
-		// Any custom entry type (cagetorical id not in SystemDefineEntryType) is considered as check type.
+		final StudyEntryDto checkImportedGermplasm = importedGermplasmList.get(0);
+		// Any custom entry type (categorical id not in SystemDefineEntryType) is considered as check type.
 		final int customEntryTypeCategoricalId = 1000;
-		checkImportedGermplasm.setCheckType(customEntryTypeCategoricalId);
+		checkImportedGermplasm.getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(customEntryTypeCategoricalId));
 
 		final Map<BreedingViewDesignParameter, List<ListItem>> map =
 			this.designTypeService

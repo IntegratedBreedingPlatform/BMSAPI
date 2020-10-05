@@ -8,7 +8,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudyGermplasmService;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -22,12 +22,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Random;
 
@@ -49,7 +51,7 @@ public class StudyValidatorTest {
 	private StudyInstanceService studyInstanceService;
 
 	@Mock
-	private StudyGermplasmService studyGermplasmService;
+	private StudyEntryService studyEntryService;
 
 	@Mock
 	private StudyService studyService;
@@ -205,7 +207,8 @@ public class StudyValidatorTest {
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();
 		final int entryId = ran.nextInt();
-		Mockito.when(this.studyGermplasmService.getStudyGermplasm(studyId, entryId)).thenReturn(Optional.empty());
+		Mockito.doReturn(Collections.emptyList()).when(this.studyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
+				ArgumentMatchers.any(), ArgumentMatchers.any());
 
 		try {
 			this.studyValidator.validateStudyContainsEntry(studyId, entryId);

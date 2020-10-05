@@ -11,15 +11,16 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.hamcrest.collection.IsIn;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
-import org.ibp.api.java.impl.middleware.study.validator.StudyGermplasmValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
-public class StudyGermplasmServiceImplTest {
+public class StudyEntryServiceImplTest {
 
 	@Mock
 	private StudyValidator studyValidator;
@@ -48,7 +49,7 @@ public class StudyGermplasmServiceImplTest {
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Mock
-	private StudyGermplasmValidator studyGermplasmValidator;
+	private StudyEntryValidator studyEntryValidator;
 
 	@Mock
 	private GermplasmListValidator germplasmListValidator;
@@ -60,13 +61,13 @@ public class StudyGermplasmServiceImplTest {
 	private TermValidator termValidator;
 
 	@Mock
-	private org.generationcp.middleware.service.api.study.StudyGermplasmService middlewareStudyGermplasmService;
+	private StudyEntryService middlewareStudyEntryService;
 
 	@Mock
 	private DatasetService datasetService;
 
 	@InjectMocks
-	private final StudyGermplasmServiceImpl studyGermplasmService = new StudyGermplasmServiceImpl();
+	private final StudyEntryServiceImpl studyEntryService = new StudyEntryServiceImpl();
 
 	@Before
 	public void setup() {
@@ -76,18 +77,18 @@ public class StudyGermplasmServiceImplTest {
 	private final Random random = new Random();
 
 	@Test
-	public void testReplaceStudyGermplasm() {
+	public void testReplaceStudyEntry() {
 		final Integer studyId = random.nextInt();
 		final Integer entryId = random.nextInt();
 		final Integer newGid = random.nextInt();
 		final String crossExpansion = RandomStringUtils.randomAlphabetic(20);
 		Mockito.doReturn(crossExpansion).when(this.pedigreeService).getCrossExpansion(newGid, this.crossExpansionProperties);
-		final StudyGermplasmDto dto = new StudyGermplasmDto();
-		dto.setGermplasmId(newGid);
-		this.studyGermplasmService.replaceStudyEntry(studyId, entryId, dto);
+		final StudyEntryDto dto = new StudyEntryDto();
+		dto.setGid(newGid);
+		this.studyEntryService.replaceStudyEntry(studyId, entryId, dto);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.studyGermplasmValidator).validate(studyId, entryId, newGid);
-		Mockito.verify(this.middlewareStudyGermplasmService).replaceStudyGermplasm(studyId, entryId, newGid, crossExpansion);
+		Mockito.verify(this.studyEntryValidator).validate(studyId, entryId, newGid);
+		Mockito.verify(this.middlewareStudyEntryService).replaceStudyEntry(studyId, entryId, newGid, crossExpansion);
 	}
 
 	@Test
@@ -102,22 +103,22 @@ public class StudyGermplasmServiceImplTest {
 
 		Mockito.when(this.germplasmListService.getGermplasmList(germplasmListId)).thenReturn(germplasmList);
 
-		this.studyGermplasmService.createStudyEntries(studyId, germplasmListId);
+		this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
-		Mockito.verify(this.studyGermplasmValidator).validateStudyAlreadyHasStudyEntries(studyId);
+		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.middlewareStudyGermplasmService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
+		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
 
 	}
 
 	@Test
 	public void testDeleteStudyGermplasm() {
 		final Integer studyId = random.nextInt();
-		this.studyGermplasmService.deleteStudyEntries(studyId);
+		this.studyEntryService.deleteStudyEntries(studyId);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.middlewareStudyGermplasmService).deleteStudyEntries(studyId);
+		Mockito.verify(this.middlewareStudyEntryService).deleteStudyEntries(studyId);
 	}
 
 	@Test
@@ -130,13 +131,13 @@ public class StudyGermplasmServiceImplTest {
 		final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
 		studyEntryPropertyData.setVariableId(variableId);
 		studyEntryPropertyData.setStudyEntryPropertyId(studyEntryPropertyId);
-		this.studyGermplasmService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
+		this.studyEntryService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.studyValidator).validateStudyContainsEntry(studyId, entryId);
 		Mockito.verify(this.termValidator).validate(variableId);
-		Mockito.verify(this.studyGermplasmValidator).validateStudyEntryProperty(studyEntryPropertyId);
-		Mockito.verify(this.middlewareStudyGermplasmService).updateStudyEntryProperty(studyId, studyEntryPropertyData);
+		Mockito.verify(this.studyEntryValidator).validateStudyEntryProperty(studyEntryPropertyId);
+		Mockito.verify(this.middlewareStudyEntryService).updateStudyEntryProperty(studyId, studyEntryPropertyData);
 	}
 
 	@Test
@@ -166,7 +167,7 @@ public class StudyGermplasmServiceImplTest {
 		Mockito.when(this.datasetService.getObservationSetVariables(datasetId, Lists
 			.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()))).thenReturn(measurementVariables);
 
-		final List<MeasurementVariable> results = studyGermplasmService.getEntryDescriptorColumns(studyId);
+		final List<MeasurementVariable> results = studyEntryService.getEntryDescriptorColumns(studyId);
 
 		MatcherAssert.assertThat(results, IsCollectionWithSize.hasSize(8));
 		MatcherAssert.assertThat(entryCodeVariable, IsIn.in(results));
