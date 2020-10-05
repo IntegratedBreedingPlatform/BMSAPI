@@ -4,7 +4,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Assert;
@@ -13,12 +15,7 @@ import org.junit.Test;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,9 +37,9 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setStartingPlotNo(1);
 		designInput.setDesignType(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		// Make the first ImportedGermplasm a check entry type.
-		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		importedGermplasmList.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
@@ -77,7 +74,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setStartingPlotNo(1);
 		designInput.setDesignType(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
@@ -100,9 +97,9 @@ public class ExperimentalDesignTypeValidatorTest {
 		treatmentFactorsData.put("1", "100");
 		designInput.setTreatmentFactorsData(treatmentFactorsData);
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		// Make the first ImportedGermplasm a check entry type.
-		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		importedGermplasmList.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
@@ -122,7 +119,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setReplicationsCount(2);
 		designInput.setDesignType(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
@@ -139,7 +136,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setStartingPlotNo(1);
 		designInput.setDesignType(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
@@ -177,7 +174,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setColsPerReplications(1);
 		designInput.setDesignType(ExperimentDesignType.ROW_COL.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
@@ -198,7 +195,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setDesignType(ExperimentDesignType.ROW_COL.getId());
 
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 		} catch (final ApiRequestValidationException e) {
@@ -218,7 +215,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		treatmentFactorsData.put("1", "100");
 		designInput.setTreatmentFactorsData(treatmentFactorsData);
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -235,7 +232,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setBlockSize(1);
 		designInput.setDesignType(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -252,7 +249,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setReplicationsCount(1);
 		designInput.setDesignType(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -270,7 +267,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setBlockSize(10);
 		designInput.setDesignType(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -288,7 +285,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setBlockSize(3);
 		designInput.setDesignType(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -328,7 +325,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		treatmentFactorsData.put("1", "100");
 		designInput.setTreatmentFactorsData(treatmentFactorsData);
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -347,7 +344,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setColsPerReplications(1);
 		designInput.setDesignType(ExperimentDesignType.ROW_COL.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -381,7 +378,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setReplicationPercentage(50);
 		designInput.setDesignType(ExperimentDesignType.P_REP.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 		} catch (final ApiRequestValidationException e) {
@@ -394,7 +391,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setDesignType(ExperimentDesignType.P_REP.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -411,7 +408,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setReplicationPercentage(101);
 		designInput.setDesignType(ExperimentDesignType.P_REP.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -432,7 +429,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		treatmentFactorsData.put("1", "100");
 		designInput.setTreatmentFactorsData(treatmentFactorsData);
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -451,8 +448,8 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
 		designInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
-		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 		} catch (final ApiRequestValidationException e) {
@@ -466,7 +463,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setStartingPlotNo(1);
 		designInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 		} catch (final ApiRequestValidationException e) {
@@ -485,8 +482,8 @@ public class ExperimentalDesignTypeValidatorTest {
 		treatmentFactorsData.put("1", "100");
 		designInput.setTreatmentFactorsData(treatmentFactorsData);
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
-		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -502,9 +499,9 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setStartingPlotNo(1);
 		designInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
-		for (final StudyGermplasmDto dto : importedGermplasmList) {
-			dto.setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
+		for (final StudyEntryDto dto : importedGermplasmList) {
+			dto.getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		}
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
@@ -523,8 +520,8 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setCheckStartingPosition(1);
 		designInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
-		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -542,8 +539,8 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
 		designInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
-		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -561,8 +558,8 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
 		designInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
-		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -581,8 +578,8 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
 		designInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
-		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -601,8 +598,8 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
 		designInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
-		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		try {
 			this.designTypeValidator.validate(designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
@@ -656,11 +653,11 @@ public class ExperimentalDesignTypeValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.designTypeValidator.setErrors(errors);
 
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 		// Make the first ImportedGermplasm a check entry type.
-		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		importedGermplasmList.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 
-		this.designTypeValidator.validateIfCheckEntriesExistInstudyGermplasmDtoList(importedGermplasmList);
+		this.designTypeValidator.validateIfCheckEntriesExistInstudyEntryDtoList(importedGermplasmList);
 		Assert.assertFalse(errors.hasErrors());
 	}
 
@@ -668,9 +665,9 @@ public class ExperimentalDesignTypeValidatorTest {
 	public void testValidateIfCheckEntriesExistInGermplasmList_WhenCheckEntriesDoNotExist() {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.designTypeValidator.setErrors(errors);
-		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		final List<StudyEntryDto> importedGermplasmList = this.createStudyGermplasmList();
 
-		this.designTypeValidator.validateIfCheckEntriesExistInstudyGermplasmDtoList(importedGermplasmList);
+		this.designTypeValidator.validateIfCheckEntriesExistInstudyEntryDtoList(importedGermplasmList);
 		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
 			hasItem("germplasm.list.check.required.augmented.design"));
 	}
@@ -744,9 +741,9 @@ public class ExperimentalDesignTypeValidatorTest {
 
 
 
-	private List<StudyGermplasmDto> createStudyGermplasmList() {
+	private List<StudyEntryDto> createStudyGermplasmList() {
 
-		final List<StudyGermplasmDto> importedGermplasmList = new LinkedList<>();
+		final List<StudyEntryDto> importedGermplasmList = new LinkedList<>();
 
 		// Create 10 imported germplasm entries
 		for (int i = 1; i <= 10; i++) {
@@ -757,14 +754,17 @@ public class ExperimentalDesignTypeValidatorTest {
 
 	}
 
-	private StudyGermplasmDto createGermplasm(final int entryNo) {
-		final StudyGermplasmDto germplasm = new StudyGermplasmDto();
+	private StudyEntryDto createGermplasm(final int entryNo) {
+		final StudyEntryDto germplasm = new StudyEntryDto();
 		germplasm.setEntryNumber(entryNo);
 		germplasm.setEntryCode(String.valueOf(entryNo));
 		germplasm.setDesignation("DESIG" + entryNo);
-		germplasm.setSeedSource("SOURCE" + entryNo);
-		germplasm.setCheckType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
-		germplasm.setCross("");
+
+		final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
+		properties.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(), "SOURCE" + entryNo));
+		properties.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+		properties.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), ""));
+		germplasm.setProperties(properties);
 
 		return germplasm;
 	}

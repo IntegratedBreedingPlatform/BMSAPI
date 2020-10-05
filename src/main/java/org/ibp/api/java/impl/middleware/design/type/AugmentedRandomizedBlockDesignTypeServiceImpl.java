@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewVariableParameter;
@@ -18,12 +18,7 @@ import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -49,12 +44,12 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
-		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final String programUUID, final List<StudyEntryDto> studyEntryDtoList) {
 
 		// Generate experiment design parameters input to design runner
-		final Set<Integer> entryIdsOfChecks = this.getEntryIdsOfChecks(studyGermplasmDtoList);
+		final Set<Integer> entryIdsOfChecks = this.getEntryIdsOfChecks(studyEntryDtoList);
 		final Integer numberOfControls = entryIdsOfChecks.size();
-		final Integer numberOfTreatments = studyGermplasmDtoList.size() - numberOfControls;
+		final Integer numberOfTreatments = studyEntryDtoList.size() - numberOfControls;
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -64,15 +59,15 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 			.generate(experimentalDesignInput, this.getBreedingViewVariablesMap(standardVariablesMap), numberOfTreatments, numberOfControls, null);
 
 		// Generate observation unit rows
-		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(studyGermplasmDtoList);
+		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(studyEntryDtoList);
 		final Map<Integer, Integer> designExpectedEntriesMap =
-			this.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyGermplasmDtoList,
+			this.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyEntryDtoList,
 				entryIdsOfChecks, entryIdsOfTestEntries);
 		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor
 			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
-				studyGermplasmDtoList, mainDesign, entryNumberName, null,
+					studyEntryDtoList, mainDesign, entryNumberName, null,
 				designExpectedEntriesMap);
 	}
 
@@ -117,7 +112,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 	}
 
-	Map<Integer, Integer> createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(final List<StudyGermplasmDto> studyGermplasmDtoList,
+	Map<Integer, Integer> createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(final List<StudyEntryDto> studyEntryDtoList,
 		final Set<Integer> entryIdsOfChecks, final Set<Integer> entryIdsOfTestEntries) {
 
 		/**
@@ -133,42 +128,45 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final Map<Integer, Integer> designExpectedEntriesMap = new HashMap<>();
 
 		// Map the last entries to the check entries in the list.
-		int index = studyGermplasmDtoList.size() - entryIdsOfChecks.size();
+		int index = studyEntryDtoList.size() - entryIdsOfChecks.size();
 		for (final Integer checkEntryId : entryIdsOfChecks) {
-			designExpectedEntriesMap.put(studyGermplasmDtoList.get(index).getEntryNumber(), checkEntryId);
+			designExpectedEntriesMap.put(studyEntryDtoList.get(index).getEntryNumber(), checkEntryId);
 			index++;
 		}
 
 		// Map the top entries to the test entries in the list.
 		index = 0;
 		for (final Integer checkEntryId : entryIdsOfTestEntries) {
-			designExpectedEntriesMap.put(studyGermplasmDtoList.get(index).getEntryNumber(), checkEntryId);
+			designExpectedEntriesMap.put(studyEntryDtoList.get(index).getEntryNumber(), checkEntryId);
 			index++;
 		}
 
 		return designExpectedEntriesMap;
 	}
 
-	Set<Integer> getEntryIdsOfChecks(final List<StudyGermplasmDto> studyGermplasmDtoList) {
+	Set<Integer> getEntryIdsOfChecks(final List<StudyEntryDto> studyEntryDtoList) {
 
 		final HashSet<Integer> entryIdsOfChecks = new HashSet<>();
 
-		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (!studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())) {
-				entryIdsOfChecks.add(studyGermplasmDto.getEntryNumber());
+		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
+			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
+			if (entryType.isPresent() && SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() != Integer.valueOf(entryType.get())) {
+				entryIdsOfChecks.add(studyEntryDto.getEntryNumber());
 			}
 		}
 
 		return entryIdsOfChecks;
 	}
 
-	Set<Integer> getEntryIdsOfTestEntries(final List<StudyGermplasmDto> studyGermplasmDtoList) {
+	Set<Integer> getEntryIdsOfTestEntries(final List<StudyEntryDto> studyEntryDtoList) {
 
 		final HashSet<Integer> entryIdsOfTestEntries = new HashSet<>();
 
-		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())) {
-				entryIdsOfTestEntries.add(studyGermplasmDto.getEntryNumber());
+
+		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
+			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
+			if (entryType.isPresent() && SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() == Integer.valueOf(entryType.get())) {
+				entryIdsOfTestEntries.add(studyEntryDto.getEntryNumber());
 			}
 		}
 

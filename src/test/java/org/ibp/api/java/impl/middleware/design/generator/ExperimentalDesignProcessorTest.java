@@ -1,12 +1,12 @@
 package org.ibp.api.java.impl.middleware.design.generator;
 
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewDesignParameter;
-import org.ibp.api.java.impl.middleware.design.type.StudyGermplasmTestDataGenerator;
+import org.ibp.api.java.impl.middleware.design.type.StudyEntryTestDataGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Assert;
@@ -19,14 +19,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExperimentalDesignProcessorTest {
@@ -95,10 +88,10 @@ public class ExperimentalDesignProcessorTest {
 
 		final Map<String, List<String>> treatmentFactorValues = new HashMap<>();
 
-		final List<StudyGermplasmDto> studyGermplasmDtoList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
+		final List<StudyEntryDto> studyEntryDtoList = StudyEntryTestDataGenerator.createStudyEntryDtoList(5, 0);
 		final List<ObservationUnitRow> measurementRowList =
 			this.experimentalDesignProcessor
-				.generateObservationUnitRows(trialInstancesForDesignGeneration, new ArrayList<>(), studyGermplasmDtoList,
+				.generateObservationUnitRows(trialInstancesForDesignGeneration, new ArrayList<>(), studyEntryDtoList,
 					mainDesign, ENTRY_NO,
 					treatmentFactorValues, new HashMap<>());
 
@@ -130,7 +123,7 @@ public class ExperimentalDesignProcessorTest {
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2));
 
 		try {
-			final List<StudyGermplasmDto> studyGermplasmDtoList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
+			final List<StudyEntryDto> studyGermplasmDtoList = StudyEntryTestDataGenerator.createStudyEntryDtoList(5, 0);
 			this.experimentalDesignProcessor
 				.generateObservationUnitRows(trialInstancesForDesignGeneration, new ArrayList<>(), studyGermplasmDtoList,
 					mainDesign, ENTRY_NO,	new HashMap<>(), new HashMap<>());
@@ -149,7 +142,7 @@ public class ExperimentalDesignProcessorTest {
 		Mockito.doThrow(new IOException()).when(this.designRunner)
 			.runBVDesign(mainDesign);
 		try {
-			final List<StudyGermplasmDto> studyGermplasmDtoList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
+			final List<StudyEntryDto> studyGermplasmDtoList = StudyEntryTestDataGenerator.createStudyEntryDtoList(5, 0);
 			this.experimentalDesignProcessor
 				.generateObservationUnitRows(new HashSet<>(Collections.singletonList(2)), new ArrayList<>(), studyGermplasmDtoList,
 					mainDesign, ENTRY_NO,	new HashMap<>(), new HashMap<>());
