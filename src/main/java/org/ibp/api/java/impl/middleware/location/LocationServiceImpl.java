@@ -1,5 +1,7 @@
 package org.ibp.api.java.impl.middleware.location;
 
+import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.location.LocationMapper;
@@ -18,6 +20,19 @@ public class LocationServiceImpl implements LocationService {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
+
+	@Autowired
+	private org.generationcp.middleware.api.location.LocationService locationService;
+
+	@Override
+	public LocationDTO getLocation(final Integer locationId) {
+		return this.locationService.getLocation(locationId);
+	}
+
+	@Override
+	public List<LocationTypeDTO> getLocationTypes() {
+		return this.locationService.getLocationTypes();
+	}
 
 	@Override
 	public List<LocationDto> getLocations(final Set<Integer> locationTypes, final String programUUID, final boolean favoriteLocations, final List<String> locationAbbreviations) {
