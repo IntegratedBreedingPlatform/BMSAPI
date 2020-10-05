@@ -30,7 +30,7 @@ public class LocationResource {
 	@ResponseBody
 	public ResponseEntity<List<LocationDto>> listFavoriteLocations(
 		@PathVariable final String cropname,
-		@RequestParam final String programUUID,
+		@RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "list of location types")
 		@RequestParam final Set<Integer> locationTypes,
 		@ApiParam(value = "isFavoriteLocation", required = true)
