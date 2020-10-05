@@ -25,7 +25,7 @@ import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
@@ -269,13 +269,13 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public long countStudies(final StudySearchFilter studySearchFilter) {
-		return this.middlewareStudyService.countStudies(studySearchFilter);
+	public long countStudyInstances(final StudySearchFilter studySearchFilter) {
+		return this.middlewareStudyService.countStudyInstances(studySearchFilter);
 	}
 
 	@Override
-	public List<StudyDto> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
-		return this.middlewareStudyService.getStudies(studySearchFilter, pageable);
+	public List<StudyInstanceDto> getStudyInstances(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		return this.middlewareStudyService.getStudyInstances(studySearchFilter, pageable);
 	}
 
 	@Override

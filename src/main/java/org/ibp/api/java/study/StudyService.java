@@ -8,7 +8,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -65,9 +65,9 @@ public interface StudyService {
 
 	void updateStudy(final Study study);
 
-	long countStudies(StudySearchFilter studySearchFilter);
+	long countStudyInstances(StudySearchFilter studySearchFilter);
 
-	List<StudyDto> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
+	List<StudyInstanceDto> getStudyInstances(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	List<TreeNode> getStudyTree(String parentKey, String programUUID);
 
