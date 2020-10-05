@@ -34,4 +34,6 @@ public interface LotService {
 	LotSearchMetadata getLotsSearchMetadata(LotsSearchDto lotsSearchDto);
 
 	void closeLots(LotsSearchDto lotsSearchDto);
+
+	void mergeLots(String keepLotUUID, LotsSearchDto lotsSearchDto);
 }
