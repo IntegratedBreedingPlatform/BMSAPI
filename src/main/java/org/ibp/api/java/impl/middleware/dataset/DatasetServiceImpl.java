@@ -934,6 +934,11 @@ public class DatasetServiceImpl implements DatasetService {
 		return observationUnitsMetadata;
 	}
 
+	@Override
+	public boolean checkIfAnyLocationIDsExistInExperiments(final int studyId, final Integer datasetId, final List<Integer> locationIds) {
+		return this.studyDataManager.checkIfAnyLocationIDsExistInExperiments(datasetId, locationIds);
+	}
+
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
 		if (searchDTO.getItemIds() != null && !searchDTO.getItemIds().isEmpty()) {
 			final ObservationUnitsSearchDTO searchRequest = new ObservationUnitsSearchDTO();

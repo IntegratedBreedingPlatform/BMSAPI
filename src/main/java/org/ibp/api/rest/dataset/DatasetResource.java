@@ -475,4 +475,19 @@ public class DatasetResource {
 
 		return new ResponseEntity<>(this.studyDatasetService.getObservationUnitsMetadata(studyId, datasetId, request), HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Check if LocationIds have experiments", notes = "Returns 1 if specific instance (environment) has experiments")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/experiments/{instanceId}", method = RequestMethod.HEAD)
+	public ResponseEntity<String> checkIfAnyLocationIDsExistInExperiments (
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @PathVariable final List<Integer> instanceId) {
+
+		final boolean isExists = this.studyDatasetService.checkIfAnyLocationIDsExistInExperiments(studyId, datasetId, instanceId);
+		final String idExists = isExists ? "1" : "0";
+		final HttpHeaders respHeaders = new HttpHeaders();
+		respHeaders.add("X-Has-Experiments", idExists);
+
+		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
+	}
 }

@@ -333,4 +333,5 @@ public interface DatasetService {
 
 	ObservationUnitsMetadata getObservationUnitsMetadata(int studyId, int datasetId, SearchCompositeDto<ObservationUnitsSearchDTO, Integer> request);
 
+	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, Integer dataSetId, List<Integer> locationIds);
 }
