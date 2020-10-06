@@ -57,11 +57,20 @@ public class StudyEntryResource {
 	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmEntryRequestDto germplasmEntryRequestDto) {
-
+		this.studyEntryService.deleteStudyEntries(studyId);
 		return new ResponseEntity<>(
 			this.studyEntryService.createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId()),
 			HttpStatus.OK);
 
+	}
+
+	@ApiOperation(value = "Checks if a study has Study Entries",
+		notes = "Checks if a study has Study Entries")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/hasStudyEntries", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Boolean> hasEntries(final @PathVariable String cropname,
+		@PathVariable final String programUUID,	@PathVariable final Integer studyId) {
+		return new ResponseEntity<>(this.studyEntryService.hasStudyEntries(studyId), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Delete germplasm entries in study",
@@ -129,6 +138,7 @@ public class StudyEntryResource {
 		final StudyEntryTable studyEntryTable = new StudyEntryTable();
 		studyEntryTable.setData(resultPage.getPageResults());
 		studyEntryTable.setRecordsTotal((int) resultPage.getTotalResults());
+		studyEntryTable.setRecordsFiltered((int) resultPage.getTotalResults());
 		return new ResponseEntity<>(studyEntryTable, HttpStatus.OK);
 	}
 

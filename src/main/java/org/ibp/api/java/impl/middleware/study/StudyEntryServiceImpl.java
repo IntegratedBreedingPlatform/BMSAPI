@@ -111,6 +111,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
+	public Boolean hasStudyEntries(final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
+		return this.middlewareStudyEntryService.hasStudyEntries(studyId);
+	}
+
+	@Override
 	public long countAllStudyEntries(final Integer studyId) {
 		this.studyValidator.validate(studyId, false);
 		return this.middlewareStudyEntryService.countStudyEntries(studyId);

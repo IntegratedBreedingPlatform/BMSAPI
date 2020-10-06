@@ -16,6 +16,8 @@ public interface StudyEntryService {
 
 	List<StudyEntryDto> getStudyEntries(Integer studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 
+	Boolean hasStudyEntries(Integer studyId);
+
 	void deleteStudyEntries(Integer studyId);
 
 	void updateStudyEntryProperty(Integer studyId, Integer entryId, StudyEntryPropertyData studyEntryPropertyData);
