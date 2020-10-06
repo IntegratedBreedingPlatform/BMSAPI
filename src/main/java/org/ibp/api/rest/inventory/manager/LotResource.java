@@ -178,10 +178,11 @@ public class LotResource {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<String>> createLot(
 		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@ApiParam("Lot to be created")
 		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
 		final SingleEntityResponse<String> singleEntityResponse =
-			new SingleEntityResponse<String>(this.lotService.saveLot(lotGeneratorInputDto));
+			new SingleEntityResponse<>(this.lotService.saveLot(programUUID, lotGeneratorInputDto));
 		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
 	}
 

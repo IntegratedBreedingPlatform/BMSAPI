@@ -24,7 +24,7 @@ public class LocationValidator {
 	@Autowired
 	private LocationDataManager locationDataManager;
 
-	public void validateSeedLocationId(final BindingResult errors, final Integer locationId) {
+	public void validateSeedLocationId(final BindingResult errors, final String programUUID, final Integer locationId) {
 		if (locationId == null) {
 			errors.reject("location.required", "");
 			return;
@@ -32,11 +32,16 @@ public class LocationValidator {
 		final Location location = locationDataManager.getLocationByID(locationId);
 		if (location == null) {
 			errors.reject("location.invalid", "");
-		} else {
-			final List<Location> locationList = this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(locationId));
-			if (locationList.isEmpty()) {
-				errors.reject("seed.location.invalid", "");
-			}
+			return;
+		}
+		if (!StringUtils.isEmpty(programUUID) && location.getUniqueID() != null && !location.getUniqueID().equals(programUUID)) {
+			errors.reject("location.belongs.to.another.program", "");
+			return;
+		}
+		final List<Location> locationList = this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(locationId));
+		if (locationList.isEmpty()) {
+			errors.reject("seed.location.invalid", "");
+			return;
 		}
 	}
 

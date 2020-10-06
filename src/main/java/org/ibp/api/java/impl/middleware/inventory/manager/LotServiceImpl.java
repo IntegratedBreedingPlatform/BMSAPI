@@ -99,10 +99,10 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public String saveLot(
+	public String saveLot(final String programUUID,
 		final LotGeneratorInputDto lotGeneratorInputDto) {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		lotInputValidator.validate(lotGeneratorInputDto);
+		lotInputValidator.validate(programUUID, lotGeneratorInputDto);
 		if (lotGeneratorInputDto.getGenerateStock()) {
 			final String nextStockIDPrefix;
 			if (lotGeneratorInputDto.getStockPrefix() == null || lotGeneratorInputDto.getStockPrefix().isEmpty()) {
@@ -122,7 +122,7 @@ public class LotServiceImpl implements LotService {
 		final SearchCompositeDto<Integer, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(searchComposite, errors);
-		this.lotInputValidator.validate(lotGeneratorBatchRequestDto);
+		this.lotInputValidator.validate(programUUID, lotGeneratorBatchRequestDto);
 		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
 		this.germplasmValidator.validateGids(errors, gids);
 		if (errors.hasErrors()) {
@@ -166,7 +166,7 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public void updateLots(final String programUUID, final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
-		this.lotInputValidator.validate(lotDtos, lotRequest);
+		this.lotInputValidator.validate(programUUID, lotDtos, lotRequest);
 		this.lotService.updateLots(programUUID, lotDtos, lotRequest);
 	}
 
