@@ -68,7 +68,7 @@ public class LocationValidatorTest {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 
-		this.locationValidator.validateSeedLocationId(this.errors, locationId);
+		this.locationValidator.validateSeedLocationId(this.errors, null, locationId);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
@@ -88,7 +88,7 @@ public class LocationValidatorTest {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(null);
-		this.locationValidator.validateSeedLocationId(this.errors, LOCATION_ID);
+		this.locationValidator.validateSeedLocationId(this.errors, null, LOCATION_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
@@ -110,7 +110,7 @@ public class LocationValidatorTest {
 		final Location location = new Location();
 		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(location);
 		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(LOCATION_ID))).thenReturn(Lists.newArrayList());
-		this.locationValidator.validateSeedLocationId(this.errors, LOCATION_ID);
+		this.locationValidator.validateSeedLocationId(this.errors, null, LOCATION_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
@@ -133,7 +133,7 @@ public class LocationValidatorTest {
 		final List<Location> locationList = Lists.newArrayList(location);
 		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(location);
 		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(LOCATION_ID))).thenReturn(locationList);
-		this.locationValidator.validateSeedLocationId(this.errors, LOCATION_ID);
+		this.locationValidator.validateSeedLocationId(this.errors, null, LOCATION_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
 	}
@@ -146,8 +146,9 @@ public class LocationValidatorTest {
 		final List<Location> locationList = Lists.newArrayList(location);
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");
 
-		Mockito.when(this.locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE,null,locationAbbrList)).thenReturn(locationList);
-		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
+		Mockito.when(this.locationDataManager.getFilteredLocations(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, false))
+			.thenReturn(locationList);
+		this.locationValidator.validateSeedLocationAbbr(this.errors, null, locationAbbrList);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
 	}
@@ -158,8 +159,9 @@ public class LocationValidatorTest {
 		final List<Location> locationList = Collections.emptyList();
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");;
 
-		Mockito.when(this.locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE,null,locationAbbrList)).thenReturn(locationList);
-		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
+		Mockito.when(this.locationDataManager.getFilteredLocations(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, false))
+			.thenReturn(locationList);
+		this.locationValidator.validateSeedLocationAbbr(this.errors, null, locationAbbrList);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
@@ -174,7 +176,7 @@ public class LocationValidatorTest {
 		location.setLabbr("DSS");
 		final List<String> locationAbbrList = Lists.newArrayList("");
 
-		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
+		this.locationValidator.validateSeedLocationAbbr(this.errors, null, locationAbbrList);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
