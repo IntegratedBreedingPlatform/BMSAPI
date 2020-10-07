@@ -57,7 +57,6 @@ public class StudyEntryResource {
 	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmEntryRequestDto germplasmEntryRequestDto) {
-		this.studyEntryService.deleteStudyEntries(studyId);
 		return new ResponseEntity<>(
 			this.studyEntryService.createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId()),
 			HttpStatus.OK);
