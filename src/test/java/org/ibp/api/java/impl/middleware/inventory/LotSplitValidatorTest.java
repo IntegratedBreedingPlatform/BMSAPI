@@ -48,7 +48,7 @@ public class LotSplitValidatorTest {
 		LotSplitRequestDto.NewLotSplitDto newLotSplitDto = new LotSplitRequestDto.NewLotSplitDto();
 		lotSplitRequestDto.setNewLot(newLotSplitDto);
 
-		Mockito.doNothing().when(this.lotInputValidator)
+		Mockito.doNothing().when(this.lotInputValidator);
 
 		this.lotSplitValidator.validateRequest(lotSplitRequestDto);
 	}

@@ -43,6 +43,7 @@ import static org.junit.Assert.assertThat;
 public class LotServiceImplTest {
 
     private static final Integer USER_ID = ThreadLocalRandom.current().nextInt();
+    private static final String PROGRAM_UUID = UUID.randomUUID().toString();
 
     @InjectMocks
     private LotServiceImpl lotService;
@@ -128,17 +129,17 @@ public class LotServiceImplTest {
         Mockito.doNothing().when(this.lotSplitValidator).validate(dummyExtendedLotDto, initialDeposit.getAmount());
 
         final String newLotUUID = UUID.randomUUID().toString();
-        Mockito.doReturn(newLotUUID).when(lotServiceSpy).saveLot(ArgumentMatchers.any(LotGeneratorInputDto.class));
+        Mockito.doReturn(newLotUUID).when(lotServiceSpy).saveLot(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.any(LotGeneratorInputDto.class));
 
         Mockito.doNothing().when(this.transactionService).saveLotBalanceAdjustment(ArgumentMatchers.any(LotAdjustmentRequestDto.class));
         Mockito.doNothing().when(this.transactionService).saveDeposits(ArgumentMatchers.any(LotDepositRequestDto.class), ArgumentMatchers.eq(
             TransactionStatus.CONFIRMED), ArgumentMatchers.eq(TransactionSourceType.SPLIT_LOT), ArgumentMatchers.eq(dummyExtendedLotDto.getLotId()));
 
-        lotServiceSpy.splitLot(lotSplitRequestDto, null);
+        lotServiceSpy.splitLot(null, lotSplitRequestDto);
 
         Mockito.verify(this.lotSplitValidator).validateRequest(lotSplitRequestDto);
         Mockito.verify(this.lotSplitValidator).validate(dummyExtendedLotDto, initialDeposit.getAmount());
-        Mockito.verify(lotServiceSpy).saveLot(this.lotGeneratorInputDtoArgumentCaptor.capture());
+        Mockito.verify(lotServiceSpy).saveLot(ArgumentMatchers.eq(PROGRAM_UUID), this.lotGeneratorInputDtoArgumentCaptor.capture());
         LotGeneratorInputDto actualLotGeneratorInputDto = this.lotGeneratorInputDtoArgumentCaptor.getValue();
         assertNotNull(actualLotGeneratorInputDto);
         assertThat(actualLotGeneratorInputDto.getGid(), is(dummyExtendedLotDto.getGid()));

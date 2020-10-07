@@ -403,7 +403,7 @@ public class LotResource {
 
 		try {
 			inventoryLock.lockWrite();
-			this.lotService.splitLot(lotSplitRequestDto, programUUID);
+			this.lotService.splitLot(programUUID, lotSplitRequestDto);
 		} finally {
 			inventoryLock.unlockWrite();
 		}

@@ -233,7 +233,7 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public void splitLot(final LotSplitRequestDto lotSplitRequestDto, final String programUUID) {
+	public void splitLot(final String programUUID, final LotSplitRequestDto lotSplitRequestDto) {
 
 		this.lotSplitValidator.validateRequest(lotSplitRequestDto);
 
@@ -256,7 +256,7 @@ public class LotServiceImpl implements LotService {
 		lotGeneratorInputDto.setNotes(newLot.getNotes());
 		lotGeneratorInputDto.setGenerateStock(newLot.getGenerateStock());
 		lotGeneratorInputDto.setStockPrefix(newLot.getStockPrefix());
-		String newLotUUID = this.saveLot(lotGeneratorInputDto);
+		String newLotUUID = this.saveLot(programUUID, lotGeneratorInputDto);
 
 		//Create an adjustment transaction for the split lot
 		LotAdjustmentRequestDto lotAdjustmentRequestDto = new LotAdjustmentRequestDto();
