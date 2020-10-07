@@ -278,7 +278,7 @@ public class TransactionResource {
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
 		try {
 			inventoryLock.lockWrite();
-			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.PENDING);
+			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.PENDING, null, null);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
 			inventoryLock.unlockWrite();
@@ -315,7 +315,7 @@ public class TransactionResource {
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
 		try {
 			inventoryLock.lockWrite();
-			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED);
+			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
 
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {

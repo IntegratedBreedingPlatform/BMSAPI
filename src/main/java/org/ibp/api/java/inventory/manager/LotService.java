@@ -38,6 +38,6 @@ public interface LotService {
 
 	void mergeLots(String keepLotUUID, LotsSearchDto lotsSearchDto);
 
-	void splitLot(LotSplitRequestDto lotSplitRequestDto);
+	void splitLot(LotSplitRequestDto lotSplitRequestDto, String programUUID);
 
 }

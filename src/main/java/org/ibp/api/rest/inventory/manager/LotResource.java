@@ -14,8 +14,8 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMergeRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
@@ -387,19 +387,20 @@ public class LotResource {
 	}
 
 	@ApiOperation(value = "Split lot", notes = "It generates a new lot using an existing lot as the source for the initial deposit.")
-	@RequestMapping(value = "/crops/{cropName}/lots/merge", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/lots/split", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS
 		+ " or hasAnyAuthority('SPLIT_LOT')")
 	public ResponseEntity<Void> splitLot(
 		@PathVariable final String cropName, //
+		@RequestParam(required = false) final String programUUID,//
 		@ApiParam("Lot template for merge action."
 			+ "SearchComposite is a list of UUIDs or a search id (internal usage) ")
 		@RequestBody final LotSplitRequestDto lotSplitRequestDto) {
 
 		try {
 			inventoryLock.lockWrite();
-			this.lotService.splitLot(lotSplitRequestDto);
+			this.lotService.splitLot(lotSplitRequestDto, programUUID);
 		} finally {
 			inventoryLock.unlockWrite();
 		}

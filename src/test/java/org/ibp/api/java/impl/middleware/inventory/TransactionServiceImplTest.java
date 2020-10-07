@@ -109,7 +109,7 @@ public class TransactionServiceImplTest {
 
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 		lotDepositRequestDto.setSelectedLots(new SearchCompositeDto<>());
-		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus);
+		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus, null, null);
 
 		Mockito.verify(this.studyValidator, Mockito.times(0)).validate(ArgumentMatchers.anyInt(), ArgumentMatchers.anyBoolean());
 		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
@@ -122,7 +122,8 @@ public class TransactionServiceImplTest {
 		Mockito.verify(this.transactionService)
 			.depositLots(workbenchUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
 				lotDepositRequestDto,
-				transactionStatus);
+				transactionStatus,
+				null, null);
 
 	}
 
@@ -139,7 +140,7 @@ public class TransactionServiceImplTest {
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 		lotDepositRequestDto.setSourceStudyId(99);
 		lotDepositRequestDto.setSelectedLots(new SearchCompositeDto<>());
-		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus);
+		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus, null, null);
 
 		Mockito.verify(this.studyValidator).validate(lotDepositRequestDto.getSourceStudyId(), true);
 		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
@@ -152,7 +153,8 @@ public class TransactionServiceImplTest {
 		Mockito.verify(this.transactionService)
 			.depositLots(workbenchUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
 				lotDepositRequestDto,
-				transactionStatus);
+				transactionStatus,
+				null, null);
 
 	}
 
