@@ -245,7 +245,7 @@ public class LotServiceImpl implements LotService {
 
 		ExtendedLotDto splitLotDto = extendedLotDtos.get(0);
 		LotSplitRequestDto.InitialLotDepositDto initialDeposit = lotSplitRequestDto.getInitialDeposit();
-		this.lotSplitValidator.validate(splitLotDto, initialDeposit.getAmount());
+		this.lotSplitValidator.validateSplitLot(splitLotDto, initialDeposit.getAmount());
 
 		//Creates the new lot
 		final LotSplitRequestDto.NewLotSplitDto newLot = lotSplitRequestDto.getNewLot();

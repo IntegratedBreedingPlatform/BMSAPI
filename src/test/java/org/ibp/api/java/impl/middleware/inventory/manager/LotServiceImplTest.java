@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
+import factory.ExtendedLotDtoDummyFactory;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
@@ -86,8 +87,8 @@ public class LotServiceImplTest {
 
         final String keepLotUUID = "keepLotUUID";
         final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(
-          this.createDummyExtendedLotDto(1, keepLotUUID),
-          this.createDummyExtendedLotDto(2, "UUID")
+            ExtendedLotDtoDummyFactory.create(1, keepLotUUID),
+            ExtendedLotDtoDummyFactory.create(2, "UUID")
         );
 
         Mockito.doNothing().when(this.lotMergeValidator).validate(keepLotUUID, extendedLotDtos);
@@ -101,8 +102,6 @@ public class LotServiceImplTest {
 
     @Test
     public void shouldSplitLot() {
-        final String splitLotUUID = UUID.randomUUID().toString();
-        final String unitName = "unitName";
         final double lotActualBalance = 10D;
         final LotServiceImpl lotServiceSpy = Mockito.spy(this.lotService);
 
@@ -119,14 +118,14 @@ public class LotServiceImplTest {
         newLotSplitDto.setStockPrefix(UUID.randomUUID().toString());
         lotSplitRequestDto.setNewLot(newLotSplitDto);
 
-        final ExtendedLotDto dummyExtendedLotDto = this.createDummyExtendedLotDto(1, splitLotUUID, new Random().nextInt(), unitName, new Random().nextInt(), lotActualBalance);
+        final ExtendedLotDto dummyExtendedLotDto = ExtendedLotDtoDummyFactory.create(lotActualBalance);
         final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(dummyExtendedLotDto);
 
         Mockito.doNothing().when(this.lotSplitValidator).validateRequest(lotSplitRequestDto);
         Mockito.doReturn(extendedLotDtos).when(lotServiceSpy).searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull());
         Mockito.doNothing().when(this.extendedLotListValidator).validateAllProvidedLotUUIDsExist(ArgumentMatchers.any(List.class),
             ArgumentMatchers.any(Set.class));
-        Mockito.doNothing().when(this.lotSplitValidator).validate(dummyExtendedLotDto, initialDeposit.getAmount());
+        Mockito.doNothing().when(this.lotSplitValidator).validateSplitLot(dummyExtendedLotDto, initialDeposit.getAmount());
 
         final String newLotUUID = UUID.randomUUID().toString();
         Mockito.doReturn(newLotUUID).when(lotServiceSpy).saveLot(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.any(LotGeneratorInputDto.class));
@@ -135,10 +134,10 @@ public class LotServiceImplTest {
         Mockito.doNothing().when(this.transactionService).saveDeposits(ArgumentMatchers.any(LotDepositRequestDto.class), ArgumentMatchers.eq(
             TransactionStatus.CONFIRMED), ArgumentMatchers.eq(TransactionSourceType.SPLIT_LOT), ArgumentMatchers.eq(dummyExtendedLotDto.getLotId()));
 
-        lotServiceSpy.splitLot(null, lotSplitRequestDto);
+        lotServiceSpy.splitLot(PROGRAM_UUID, lotSplitRequestDto);
 
         Mockito.verify(this.lotSplitValidator).validateRequest(lotSplitRequestDto);
-        Mockito.verify(this.lotSplitValidator).validate(dummyExtendedLotDto, initialDeposit.getAmount());
+        Mockito.verify(this.lotSplitValidator).validateSplitLot(dummyExtendedLotDto, initialDeposit.getAmount());
         Mockito.verify(lotServiceSpy).saveLot(ArgumentMatchers.eq(PROGRAM_UUID), this.lotGeneratorInputDtoArgumentCaptor.capture());
         LotGeneratorInputDto actualLotGeneratorInputDto = this.lotGeneratorInputDtoArgumentCaptor.getValue();
         assertNotNull(actualLotGeneratorInputDto);
@@ -171,20 +170,6 @@ public class LotServiceImplTest {
         assertThat(actualLotDepositRequestDto.getSelectedLots().getItemIds(), contains(newLotUUID));
     }
 
-    private ExtendedLotDto createDummyExtendedLotDto(final Integer lotId, final String UUID) {
-        return this.createDummyExtendedLotDto(lotId, UUID, 1, "unitName", 1, 5D);
-    }
 
-    private ExtendedLotDto createDummyExtendedLotDto(final Integer lotId, final String UUID, final Integer gid, final String unitName,
-        final Integer unitId, final double actualBalance) {
-        final ExtendedLotDto lotDto = new ExtendedLotDto();
-        lotDto.setLotId(lotId);
-        lotDto.setLotUUID(UUID);
-        lotDto.setGid(gid);
-        lotDto.setUnitName(unitName);
-        lotDto.setUnitId(unitId);
-        lotDto.setActualBalance(actualBalance);
-        return lotDto;
-    }
 
 }
