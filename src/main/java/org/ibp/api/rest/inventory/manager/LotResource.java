@@ -35,6 +35,7 @@ import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryComm
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotSplitValidator;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
@@ -103,6 +104,9 @@ public class LotResource {
 
 	@Autowired
 	private LotMergeValidator lotMergeValidator;
+
+	@Autowired
+	private LotSplitValidator lotSplitValidator;
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
@@ -400,6 +404,8 @@ public class LotResource {
 		@ApiParam("Lot template for merge action."
 			+ "SearchComposite is a list of UUIDs or a search id (internal usage) ")
 		@RequestBody final LotSplitRequestDto lotSplitRequestDto) {
+
+		this.lotSplitValidator.validateRequest(lotSplitRequestDto);
 
 		try {
 			inventoryLock.lockWrite();

@@ -109,7 +109,7 @@ public class TransactionServiceImplTest {
 
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 		lotDepositRequestDto.setSelectedLots(new SearchCompositeDto<>());
-		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus, null, null);
+		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus);
 
 		Mockito.verify(this.studyValidator, Mockito.times(0)).validate(ArgumentMatchers.anyInt(), ArgumentMatchers.anyBoolean());
 		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
@@ -140,7 +140,7 @@ public class TransactionServiceImplTest {
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 		lotDepositRequestDto.setSourceStudyId(99);
 		lotDepositRequestDto.setSelectedLots(new SearchCompositeDto<>());
-		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus, null, null);
+		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus);
 
 		Mockito.verify(this.studyValidator).validate(lotDepositRequestDto.getSourceStudyId(), true);
 		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);

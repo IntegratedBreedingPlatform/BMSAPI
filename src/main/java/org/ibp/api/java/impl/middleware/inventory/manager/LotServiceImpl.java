@@ -6,7 +6,6 @@ import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
@@ -20,6 +19,7 @@ import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
@@ -31,7 +31,6 @@ import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeVali
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotSplitValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.inventory.manager.LotService;
-import org.ibp.api.java.inventory.manager.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -46,6 +45,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -119,12 +119,7 @@ public class LotServiceImpl implements LotService {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		lotInputValidator.validate(programUUID, lotGeneratorInputDto);
 		if (lotGeneratorInputDto.getGenerateStock()) {
-			final String nextStockIDPrefix;
-			if (lotGeneratorInputDto.getStockPrefix() == null || lotGeneratorInputDto.getStockPrefix().isEmpty()) {
-				nextStockIDPrefix = this.stockService.calculateNextStockIDPrefix(DEFAULT_STOCKID_PREFIX, "-");
-			} else {
-				nextStockIDPrefix = this.stockService.calculateNextStockIDPrefix(lotGeneratorInputDto.getStockPrefix(), "-");
-			}
+			final String nextStockIDPrefix = this.resolveStockIdPrefix(lotGeneratorInputDto.getStockPrefix());
 			lotGeneratorInputDto.setStockId(nextStockIDPrefix + "1");
 		}
 
@@ -147,15 +142,9 @@ public class LotServiceImpl implements LotService {
 		final LotGeneratorInputDto lotGeneratorInput = lotGeneratorBatchRequestDto.getLotGeneratorInput();
 
 		// resolve stock id prefix
-		String nextStockIdPrefix = null;
-		if (lotGeneratorInput.getGenerateStock()) {
-			final String stockPrefix = lotGeneratorInput.getStockPrefix();
-			if (stockPrefix == null || stockPrefix.isEmpty()) {
-				nextStockIdPrefix = this.stockService.calculateNextStockIDPrefix(DEFAULT_STOCKID_PREFIX, "-");
-			} else {
-				nextStockIdPrefix = this.stockService.calculateNextStockIDPrefix(stockPrefix, "-");
-			}
-		}
+		final String nextStockIdPrefix = lotGeneratorInput.getGenerateStock() ?
+			this.resolveStockIdPrefix(lotGeneratorInput.getStockPrefix()) :
+			null;
 
 		// generate lot lists
 		final List<LotItemDto> lotList = new ArrayList<>();
@@ -235,51 +224,64 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public void splitLot(final String programUUID, final LotSplitRequestDto lotSplitRequestDto) {
 
-		this.lotSplitValidator.validateRequest(lotSplitRequestDto);
+		final List<String> lotUUIDs = Arrays.asList(lotSplitRequestDto.getSplitLotUUID());
+		final LotsSearchDto splitLotSearchDto = new LotsSearchDto();
+		splitLotSearchDto.setLotUUIDs(lotUUIDs);
+		final List<ExtendedLotDto> splitLotDtosSearchResult = this.searchLots(splitLotSearchDto, null);
+		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(splitLotDtosSearchResult, new HashSet<>(lotUUIDs));
 
-		List<String> lotUUIDs = Arrays.asList(lotSplitRequestDto.getSplitLotUUID());
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotUUIDs(lotUUIDs);
-		final List<ExtendedLotDto> extendedLotDtos = this.searchLots(lotsSearchDto, null);
-		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, new HashSet<>(lotUUIDs));
-
-		ExtendedLotDto splitLotDto = extendedLotDtos.get(0);
+		final ExtendedLotDto splitLotDto = splitLotDtosSearchResult.get(0);
 		LotSplitRequestDto.InitialLotDepositDto initialDeposit = lotSplitRequestDto.getInitialDeposit();
-		this.lotSplitValidator.validateSplitLot(splitLotDto, initialDeposit.getAmount());
+		this.lotSplitValidator.validateSplitLot(programUUID, splitLotDto, lotSplitRequestDto.getNewLot(), lotSplitRequestDto.getInitialDeposit());
 
 		//Creates the new lot
 		final LotSplitRequestDto.NewLotSplitDto newLot = lotSplitRequestDto.getNewLot();
-		final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
-		lotGeneratorInputDto.setGid(splitLotDto.getGid());
-		lotGeneratorInputDto.setUnitId(splitLotDto.getUnitId());
-		lotGeneratorInputDto.setLocationId(newLot.getLocationId());
-		lotGeneratorInputDto.setNotes(newLot.getNotes());
-		lotGeneratorInputDto.setGenerateStock(newLot.getGenerateStock());
-		lotGeneratorInputDto.setStockPrefix(newLot.getStockPrefix());
-		String newLotUUID = this.saveLot(programUUID, lotGeneratorInputDto);
+		final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto(splitLotDto.getGid(), splitLotDto.getUnitId(), newLot);
+		lotInputValidator.validate(programUUID, lotGeneratorInputDto);
+		if (lotGeneratorInputDto.getGenerateStock()) {
+			final String nextStockIDPrefix = this.resolveStockIdPrefix(lotGeneratorInputDto.getStockPrefix());
+			lotGeneratorInputDto.setStockId(nextStockIDPrefix + "1");
+		}
+
+		final Integer loggedInUserId = this.securityService.getCurrentlyLoggedInUser().getUserid();
+		final String newLotUUID = this.lotService.saveLot(this.contextUtil.getProjectInContext().getCropType(), loggedInUserId,
+			lotGeneratorInputDto);
 
 		//Create an adjustment transaction for the split lot
-		LotAdjustmentRequestDto lotAdjustmentRequestDto = new LotAdjustmentRequestDto();
-		lotAdjustmentRequestDto.setBalance(splitLotDto.getActualBalance() - initialDeposit.getAmount());
-
-		SearchCompositeDto<Integer, String> balanceAdjustmentSearchCompositeDto = new SearchCompositeDto<>();
-		balanceAdjustmentSearchCompositeDto.setItemIds(Arrays.asList(splitLotDto.getLotUUID()).stream().collect(Collectors.toSet()));
-		lotAdjustmentRequestDto.setSelectedLots(balanceAdjustmentSearchCompositeDto);
-		this.transactionService.saveLotBalanceAdjustment(lotAdjustmentRequestDto);
+		this.transactionService.saveAdjustmentTransactions(loggedInUserId,
+			Arrays.asList(splitLotDto.getLotId()).stream().collect(Collectors.toSet()),
+			splitLotDto.getActualBalance() - initialDeposit.getAmount(),
+			null);
 
 		//Create deposit transaction for the new lot
-		LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
+		final LotsSearchDto newLotSearchDto = new LotsSearchDto();
+		newLotSearchDto.setLotUUIDs(Arrays.asList(newLotUUID));
+		final List<ExtendedLotDto> newLotDtosSearchResult = this.searchLots(newLotSearchDto, null);
+		if (newLotDtosSearchResult.isEmpty()) {
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
+			errors.reject("lot.split.new.lot.null", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		final ExtendedLotDto newLotDto = newLotDtosSearchResult.get(0);
+
+		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 		final Map<String, Double> depositsPerUnit = new HashMap() {{
 			put(splitLotDto.getUnitName(), initialDeposit.getAmount());
 		}};
 		lotDepositRequestDto.setDepositsPerUnit(depositsPerUnit);
 		lotDepositRequestDto.setNotes(initialDeposit.getNotes());
 
-		SearchCompositeDto<Integer, String> saveDepositSearchCompositeDto = new SearchCompositeDto<>();
-		saveDepositSearchCompositeDto.setItemIds(Arrays.asList(newLotUUID).stream().collect(Collectors.toSet()));
-		lotDepositRequestDto.setSelectedLots(saveDepositSearchCompositeDto);
-		this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED, TransactionSourceType.SPLIT_LOT,
+		this.transactionService.depositLots(loggedInUserId,
+			Arrays.asList(newLotDto.getLotId()).stream().collect(Collectors.toSet()),
+			lotDepositRequestDto, TransactionStatus.CONFIRMED, TransactionSourceType.SPLIT_LOT,
 			splitLotDto.getLotId());
+	}
+
+	private String resolveStockIdPrefix(String stockPrefix) {
+		if (Objects.isNull(stockPrefix) || stockPrefix.isEmpty()) {
+			return this.stockService.calculateNextStockIDPrefix(DEFAULT_STOCKID_PREFIX, "-");
+		}
+		return this.stockService.calculateNextStockIDPrefix(stockPrefix, "-");
 	}
 
 }

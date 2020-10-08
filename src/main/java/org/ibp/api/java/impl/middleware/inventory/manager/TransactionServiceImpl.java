@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
-import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -168,8 +167,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void saveDeposits(final LotDepositRequestDto lotDepositRequestDto, final TransactionStatus transactionStatus,
-		final TransactionSourceType transactionSourceType, final Integer sourceId) {
+	public void saveDeposits(final LotDepositRequestDto lotDepositRequestDto, final TransactionStatus transactionStatus) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
 		if (lotDepositRequestDto.getSourceStudyId() != null) {
@@ -190,8 +188,8 @@ public class TransactionServiceImpl implements TransactionService {
 			.depositLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
 				lotDepositRequestDto,
 				transactionStatus,
-				transactionSourceType,
-				sourceId);
+				null,
+				null);
 	}
 
 	@Override

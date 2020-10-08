@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
 import factory.ExtendedLotDtoDummyFactory;
+import org.generationcp.commons.service.StockService;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
@@ -9,9 +11,14 @@ import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.inventory.TransactionService;
+import org.hamcrest.collection.IsArrayContaining;
 import org.hamcrest.collection.IsMapContaining;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotSplitValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -50,9 +57,6 @@ public class LotServiceImplTest {
     private LotServiceImpl lotService;
 
     @Mock
-    private TransactionServiceImpl transactionService;
-
-    @Mock
     private LotMergeValidator lotMergeValidator;
 
     @Mock
@@ -62,16 +66,28 @@ public class LotServiceImplTest {
     private ExtendedLotListValidator extendedLotListValidator;
 
     @Mock
+    private LotInputValidator lotInputValidator;
+
+    @Mock
     private SecurityService securityService;
 
     @Mock
-    private org.generationcp.middleware.service.api.inventory.LotService inventoryLotService;
+    private org.generationcp.middleware.service.api.inventory.LotService middlewareLotService;
+
+    @Mock
+    private TransactionService middlewareTransactionService;
+
+    @Mock
+    private ContextUtil contextUtil;
+
+    @Mock
+    private StockService stockService;
+
+    @Captor
+    private ArgumentCaptor<Set> setCollectionArgumentCaptor;
 
     @Captor
     private ArgumentCaptor<LotGeneratorInputDto> lotGeneratorInputDtoArgumentCaptor;
-
-    @Captor
-    private ArgumentCaptor<LotAdjustmentRequestDto> lotAdjustmentRequestDtoArgumentCaptor;
 
     @Captor
     private ArgumentCaptor<LotDepositRequestDto> lotDepositRequestDtoArgumentCaptor;
@@ -97,13 +113,12 @@ public class LotServiceImplTest {
 
         this.lotService.mergeLots(keepLotUUID, lotsSearchDto);
 
-        Mockito.verify(this.inventoryLotService).mergeLots(USER_ID, 1, lotsSearchDto);
+        Mockito.verify(this.middlewareLotService).mergeLots(USER_ID, 1, lotsSearchDto);
     }
 
     @Test
     public void shouldSplitLot() {
         final double lotActualBalance = 10D;
-        final LotServiceImpl lotServiceSpy = Mockito.spy(this.lotService);
 
         final LotSplitRequestDto lotSplitRequestDto = new LotSplitRequestDto();
         final LotSplitRequestDto.InitialLotDepositDto initialDeposit = new LotSplitRequestDto.InitialLotDepositDto();
@@ -118,56 +133,79 @@ public class LotServiceImplTest {
         newLotSplitDto.setStockPrefix(UUID.randomUUID().toString());
         lotSplitRequestDto.setNewLot(newLotSplitDto);
 
-        final ExtendedLotDto dummyExtendedLotDto = ExtendedLotDtoDummyFactory.create(lotActualBalance);
-        final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(dummyExtendedLotDto);
-
+        final ExtendedLotDto splitExtendedLotDto = ExtendedLotDtoDummyFactory.create(lotActualBalance);
         Mockito.doNothing().when(this.lotSplitValidator).validateRequest(lotSplitRequestDto);
-        Mockito.doReturn(extendedLotDtos).when(lotServiceSpy).searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull());
-        Mockito.doNothing().when(this.extendedLotListValidator).validateAllProvidedLotUUIDsExist(ArgumentMatchers.any(List.class),
-            ArgumentMatchers.any(Set.class));
-        Mockito.doNothing().when(this.lotSplitValidator).validateSplitLot(dummyExtendedLotDto, initialDeposit.getAmount());
+
+        Mockito.doNothing().when(this.extendedLotListValidator).validateAllProvidedLotUUIDsExist(ArgumentMatchers.anyList(),
+            ArgumentMatchers.anySet());
+        Mockito.doNothing().when(this.lotSplitValidator).validateSplitLot(PROGRAM_UUID, splitExtendedLotDto, newLotSplitDto, initialDeposit);
+
+        Mockito.doNothing().when(this.lotInputValidator).validate(ArgumentMatchers.eq(PROGRAM_UUID),
+            ArgumentMatchers.any(LotGeneratorInputDto.class));
+
+        Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(new WorkbenchUser(USER_ID));
+
+        final Project project = new Project();
+        project.setCropType(new CropType(CropType.CropEnum.BEAN.name()));
+        Mockito.when(this.contextUtil.getProjectInContext()).thenReturn(project);
+
+        Mockito.when(this.stockService.calculateNextStockIDPrefix(ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
+            .thenReturn(UUID.randomUUID().toString());
 
         final String newLotUUID = UUID.randomUUID().toString();
-        Mockito.doReturn(newLotUUID).when(lotServiceSpy).saveLot(ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.any(LotGeneratorInputDto.class));
+        Mockito.when(this.middlewareLotService.saveLot(ArgumentMatchers.eq(project.getCropType()), ArgumentMatchers.eq(USER_ID), ArgumentMatchers.any(LotGeneratorInputDto.class))).
+            thenReturn(newLotUUID);
 
-        Mockito.doNothing().when(this.transactionService).saveLotBalanceAdjustment(ArgumentMatchers.any(LotAdjustmentRequestDto.class));
-        Mockito.doNothing().when(this.transactionService).saveDeposits(ArgumentMatchers.any(LotDepositRequestDto.class), ArgumentMatchers.eq(
-            TransactionStatus.CONFIRMED), ArgumentMatchers.eq(TransactionSourceType.SPLIT_LOT), ArgumentMatchers.eq(dummyExtendedLotDto.getLotId()));
+        Mockito.doNothing().when(this.middlewareTransactionService).saveAdjustmentTransactions(ArgumentMatchers.eq(USER_ID),
+            ArgumentMatchers.any(Set.class), ArgumentMatchers.eq(5D), ArgumentMatchers.isNull());
 
-        lotServiceSpy.splitLot(PROGRAM_UUID, lotSplitRequestDto);
+        final ExtendedLotDto newSplitExtendedLotDto = ExtendedLotDtoDummyFactory.create(lotActualBalance);
+        Mockito.when(this.lotService.searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull()))
+            .thenReturn(Arrays.asList(splitExtendedLotDto))
+            .thenReturn(Arrays.asList(newSplitExtendedLotDto));
 
-        Mockito.verify(this.lotSplitValidator).validateRequest(lotSplitRequestDto);
-        Mockito.verify(this.lotSplitValidator).validateSplitLot(dummyExtendedLotDto, initialDeposit.getAmount());
-        Mockito.verify(lotServiceSpy).saveLot(ArgumentMatchers.eq(PROGRAM_UUID), this.lotGeneratorInputDtoArgumentCaptor.capture());
+        Mockito.doNothing().when(this.middlewareTransactionService).depositLots(ArgumentMatchers.eq(USER_ID),
+            ArgumentMatchers.anySet(), ArgumentMatchers.any(LotDepositRequestDto.class), ArgumentMatchers.eq(TransactionStatus.CONFIRMED),
+            ArgumentMatchers.eq(TransactionSourceType.SPLIT_LOT), ArgumentMatchers.eq(newSplitExtendedLotDto.getLotId()));
+
+        this.lotService.splitLot(PROGRAM_UUID, lotSplitRequestDto);
+
+        Mockito.verify(this.lotSplitValidator).validateSplitLot(PROGRAM_UUID, splitExtendedLotDto, newLotSplitDto, initialDeposit);
+        Mockito.verify(this.middlewareLotService).saveLot(ArgumentMatchers.eq(project.getCropType()),
+            ArgumentMatchers.eq(USER_ID),
+            this.lotGeneratorInputDtoArgumentCaptor.capture());
         LotGeneratorInputDto actualLotGeneratorInputDto = this.lotGeneratorInputDtoArgumentCaptor.getValue();
         assertNotNull(actualLotGeneratorInputDto);
-        assertThat(actualLotGeneratorInputDto.getGid(), is(dummyExtendedLotDto.getGid()));
-        assertThat(actualLotGeneratorInputDto.getUnitId(), is(dummyExtendedLotDto.getUnitId()));
+        assertThat(actualLotGeneratorInputDto.getGid(), is(splitExtendedLotDto.getGid()));
+        assertThat(actualLotGeneratorInputDto.getUnitId(), is(splitExtendedLotDto.getUnitId()));
         assertThat(actualLotGeneratorInputDto.getLocationId(), is(newLotSplitDto.getLocationId()));
         assertThat(actualLotGeneratorInputDto.getNotes(), is(newLotSplitDto.getNotes()));
         assertThat(actualLotGeneratorInputDto.getGenerateStock(), is(newLotSplitDto.getGenerateStock()));
         assertThat(actualLotGeneratorInputDto.getStockPrefix(), is(newLotSplitDto.getStockPrefix()));
 
-        Mockito.verify(this.transactionService).saveLotBalanceAdjustment(this.lotAdjustmentRequestDtoArgumentCaptor.capture());
-        LotAdjustmentRequestDto actualLotAdjustmentRequestDto = this.lotAdjustmentRequestDtoArgumentCaptor.getValue();
-        assertNotNull(actualLotAdjustmentRequestDto);
-        assertThat(actualLotAdjustmentRequestDto.getBalance(), is(5D));
-        assertNotNull(actualLotAdjustmentRequestDto.getSelectedLots());
-        assertNotNull(actualLotAdjustmentRequestDto.getSelectedLots().getItemIds());
-        assertThat(actualLotAdjustmentRequestDto.getSelectedLots().getItemIds(), hasSize(1));
-        assertThat(actualLotAdjustmentRequestDto.getSelectedLots().getItemIds(), contains(dummyExtendedLotDto.getLotUUID()));
+        Mockito.verify(this.middlewareTransactionService).saveAdjustmentTransactions(ArgumentMatchers.eq(USER_ID),
+            this.setCollectionArgumentCaptor.capture(), ArgumentMatchers.eq(5D), ArgumentMatchers.isNull());
+        final Set<Integer> saveAdjustmentTransactionLotIds = this.setCollectionArgumentCaptor.getValue();
+        assertNotNull(saveAdjustmentTransactionLotIds);
+        assertThat(saveAdjustmentTransactionLotIds, hasSize(1));
+        assertThat(saveAdjustmentTransactionLotIds, contains(splitExtendedLotDto.getLotId()));
 
-        Mockito.verify(this.transactionService).saveDeposits(this.lotDepositRequestDtoArgumentCaptor.capture(), ArgumentMatchers.eq(TransactionStatus.CONFIRMED),
-            ArgumentMatchers.eq(TransactionSourceType.SPLIT_LOT), ArgumentMatchers.eq(dummyExtendedLotDto.getLotId()));
+        Mockito.verify(this.middlewareTransactionService).depositLots(ArgumentMatchers.eq(USER_ID),
+            this.setCollectionArgumentCaptor.capture(),
+            this.lotDepositRequestDtoArgumentCaptor.capture(),
+            ArgumentMatchers.eq(TransactionStatus.CONFIRMED),
+            ArgumentMatchers.eq(TransactionSourceType.SPLIT_LOT),
+            ArgumentMatchers.eq(splitExtendedLotDto.getLotId()));
         LotDepositRequestDto actualLotDepositRequestDto = this.lotDepositRequestDtoArgumentCaptor.getValue();
         assertNotNull(actualLotDepositRequestDto);
-        assertThat(actualLotDepositRequestDto.getDepositsPerUnit(), IsMapContaining.hasKey(dummyExtendedLotDto.getUnitName()));
+        assertThat(actualLotDepositRequestDto.getDepositsPerUnit(), IsMapContaining.hasKey(splitExtendedLotDto.getUnitName()));
         assertThat(actualLotDepositRequestDto.getDepositsPerUnit(), IsMapContaining.hasValue(initialDeposit.getAmount()));
         assertThat(actualLotDepositRequestDto.getNotes(), is(initialDeposit.getNotes()));
-        assertNotNull(actualLotDepositRequestDto.getSelectedLots());
-        assertNotNull(actualLotDepositRequestDto.getSelectedLots().getItemIds());
-        assertThat(actualLotDepositRequestDto.getSelectedLots().getItemIds(), hasSize(1));
-        assertThat(actualLotDepositRequestDto.getSelectedLots().getItemIds(), contains(newLotUUID));
+
+        final Set<Integer> depositLotLotIds = this.setCollectionArgumentCaptor.getValue();
+        assertNotNull(depositLotLotIds);
+        assertThat(depositLotLotIds, hasSize(1));
+        assertThat(depositLotLotIds, contains(newSplitExtendedLotDto.getLotId()));
     }
 
 

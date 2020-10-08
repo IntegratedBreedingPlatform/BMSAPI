@@ -1,23 +1,28 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import factory.ExtendedLotDtoDummyFactory;
+import gherkin.formatter.Argument;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotSplitValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BindingResult;
 
 import java.util.Arrays;
+import java.util.Random;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -28,6 +33,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class LotSplitValidatorTest {
 
 	private static final String SPLIT_LOT_UUID = UUID.randomUUID().toString();
+	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
 
 	@InjectMocks
 	private LotSplitValidator lotSplitValidator;
@@ -37,6 +43,9 @@ public class LotSplitValidatorTest {
 
 	@Mock
 	private InventoryCommonValidator inventoryCommonValidator;
+
+	@Mock
+	private LocationValidator locationValidator;
 
 	@Before
 	public void setUp() {
@@ -107,12 +116,24 @@ public class LotSplitValidatorTest {
 	@Test
 	public void shouldValidateSplitLot() {
 		final ExtendedLotDto lotDto = ExtendedLotDtoDummyFactory.create();
+		final LotSplitRequestDto.NewLotSplitDto dummyNewLotSplitDto = this.createDummyNewLotSplitDto();
+		final LotSplitRequestDto.InitialLotDepositDto dummyInitialLotDepositDto = this.createDummyInitialLotDepositDto(5d);
 
-		Mockito.doNothing().when(this.lotInputValidator).validateLotBalance(lotDto.getActualBalance());
+		Mockito.doNothing().when(this.inventoryCommonValidator).validateLotNotes(ArgumentMatchers.eq(dummyNewLotSplitDto.getNotes()), ArgumentMatchers.any(
+			BindingResult.class));
+		Mockito.doNothing().when(this.inventoryCommonValidator).validateTransactionNotes(ArgumentMatchers.eq(dummyInitialLotDepositDto.getNotes()), ArgumentMatchers.any(
+			BindingResult.class));
+		Mockito.doNothing().when(this.locationValidator).validateSeedLocationId(ArgumentMatchers.any(BindingResult.class),
+			ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.eq(dummyNewLotSplitDto.getLocationId()));
 
-		this.lotSplitValidator.validateSplitLot(lotDto, 2D);
+		this.lotSplitValidator.validateSplitLot(PROGRAM_UUID, lotDto, dummyNewLotSplitDto, dummyInitialLotDepositDto);
 
-		Mockito.verify(this.lotInputValidator).validateLotBalance(lotDto.getActualBalance());
+		Mockito.verify(this.inventoryCommonValidator).validateLotNotes(ArgumentMatchers.eq(dummyNewLotSplitDto.getNotes()), ArgumentMatchers.any(
+			BindingResult.class));
+		Mockito.verify(this.inventoryCommonValidator).validateTransactionNotes(ArgumentMatchers.eq(dummyInitialLotDepositDto.getNotes()), ArgumentMatchers.any(
+			BindingResult.class));
+		Mockito.verify(this.locationValidator).validateSeedLocationId(ArgumentMatchers.any(BindingResult.class),
+			ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.eq(dummyNewLotSplitDto.getLocationId()));
 	}
 
 	@Test
@@ -120,16 +141,19 @@ public class LotSplitValidatorTest {
 		final double amount = 5D;
 		final ExtendedLotDto lotDto = ExtendedLotDtoDummyFactory.create(amount);
 
-		Mockito.doNothing().when(this.lotInputValidator).validateLotBalance(lotDto.getActualBalance());
+		final LotSplitRequestDto dummyLotSplitRequestDto = this.createDummyLotSplitRequestDto();
+		dummyLotSplitRequestDto.getInitialDeposit().setAmount(amount);
 
 		try {
-			this.lotSplitValidator.validateSplitLot(lotDto, amount);
+			this.lotSplitValidator.validateSplitLot(PROGRAM_UUID, lotDto, Mockito.mock(LotSplitRequestDto.NewLotSplitDto.class),
+				dummyLotSplitRequestDto.getInitialDeposit());
 		} catch (Exception e) {
 			assertThat(e, instanceOf(ApiRequestValidationException.class));
 			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("lot.split.new.lot.invalid.amount"));
 		}
 
-		Mockito.verify(this.lotInputValidator).validateLotBalance(lotDto.getActualBalance());
+		Mockito.verifyZeroInteractions(this.inventoryCommonValidator);
+		Mockito.verifyZeroInteractions(this.locationValidator);
 	}
 
 	@Test
@@ -137,16 +161,19 @@ public class LotSplitValidatorTest {
 		final double amount = 5D;
 		final ExtendedLotDto lotDto = ExtendedLotDtoDummyFactory.create(amount);
 
-		Mockito.doNothing().when(this.lotInputValidator).validateLotBalance(lotDto.getActualBalance());
+		final LotSplitRequestDto dummyLotSplitRequestDto = this.createDummyLotSplitRequestDto();
+		dummyLotSplitRequestDto.getInitialDeposit().setAmount(amount + 1);
 
 		try {
-			this.lotSplitValidator.validateSplitLot(lotDto, amount + 1);
+			this.lotSplitValidator.validateSplitLot(PROGRAM_UUID, lotDto, Mockito.mock(LotSplitRequestDto.NewLotSplitDto.class),
+				dummyLotSplitRequestDto.getInitialDeposit());
 		} catch (Exception e) {
 			assertThat(e, instanceOf(ApiRequestValidationException.class));
 			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("lot.split.new.lot.invalid.amount"));
 		}
 
-		Mockito.verify(this.lotInputValidator).validateLotBalance(lotDto.getActualBalance());
+		Mockito.verifyZeroInteractions(this.inventoryCommonValidator);
+		Mockito.verifyZeroInteractions(this.locationValidator);
 	}
 
 	@Test
@@ -154,13 +181,34 @@ public class LotSplitValidatorTest {
 		final ExtendedLotDto lotDto = ExtendedLotDtoDummyFactory.create(1, LotStatus.CLOSED, "unitName");
 
 		try {
-			this.lotSplitValidator.validateSplitLot(lotDto, 1D);
+			this.lotSplitValidator.validateSplitLot(PROGRAM_UUID, lotDto,
+				Mockito.mock(LotSplitRequestDto.NewLotSplitDto.class),
+				Mockito.mock(LotSplitRequestDto.InitialLotDepositDto.class));
 		} catch (Exception e) {
 			assertThat(e, instanceOf(ApiRequestValidationException.class));
 			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("lots.closed"));
 		}
 
-		Mockito.verifyZeroInteractions(this.lotInputValidator);
+		Mockito.verifyZeroInteractions(this.inventoryCommonValidator);
+		Mockito.verifyZeroInteractions(this.locationValidator);
+	}
+
+	@Test
+	public void shouldFailValidateSplitLotWithZeroAvailableBalance() {
+		final ExtendedLotDto lotDto = ExtendedLotDtoDummyFactory.create(1, LotStatus.ACTIVE, "unitName");
+		lotDto.setAvailableBalance(0D);
+
+		try {
+			this.lotSplitValidator.validateSplitLot(PROGRAM_UUID, lotDto,
+				Mockito.mock(LotSplitRequestDto.NewLotSplitDto.class),
+				Mockito.mock(LotSplitRequestDto.InitialLotDepositDto.class));
+		} catch (Exception e) {
+			assertThat(e, instanceOf(ApiRequestValidationException.class));
+			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("lot.split.new.lot.invalid.available.balance"));
+		}
+
+		Mockito.verifyZeroInteractions(this.inventoryCommonValidator);
+		Mockito.verifyZeroInteractions(this.locationValidator);
 	}
 
 	private LotSplitRequestDto createDummyLotSplitRequestDto() {
@@ -171,13 +219,26 @@ public class LotSplitValidatorTest {
 		final LotSplitRequestDto lotSplitRequestDto = new LotSplitRequestDto();
 		lotSplitRequestDto.setSplitLotUUID(splitLotUUID);
 
-		final LotSplitRequestDto.InitialLotDepositDto initialLotDepositDto = new LotSplitRequestDto.InitialLotDepositDto();
-		initialLotDepositDto.setAmount(5d);
+		final LotSplitRequestDto.InitialLotDepositDto initialLotDepositDto = this.createDummyInitialLotDepositDto(5d);
 		lotSplitRequestDto.setInitialDeposit(initialLotDepositDto);
 
-		final LotSplitRequestDto.NewLotSplitDto newLotSplitDto = new LotSplitRequestDto.NewLotSplitDto();
+		final LotSplitRequestDto.NewLotSplitDto newLotSplitDto = this.createDummyNewLotSplitDto();
 		lotSplitRequestDto.setNewLot(newLotSplitDto);
 
 		return lotSplitRequestDto;
+	}
+
+	private LotSplitRequestDto.InitialLotDepositDto createDummyInitialLotDepositDto(double amount) {
+		final LotSplitRequestDto.InitialLotDepositDto initialLotDepositDto = new LotSplitRequestDto.InitialLotDepositDto();
+		initialLotDepositDto.setAmount(amount);
+		initialLotDepositDto.setNotes("Initial Deposit note");
+		return initialLotDepositDto;
+	}
+
+	private LotSplitRequestDto.NewLotSplitDto createDummyNewLotSplitDto() {
+		final LotSplitRequestDto.NewLotSplitDto newLotSplitDto = new LotSplitRequestDto.NewLotSplitDto();
+		newLotSplitDto.setNotes("New Lot note");
+		newLotSplitDto.setLocationId(new Random().nextInt());
+		return newLotSplitDto;
 	}
 }
