@@ -935,8 +935,9 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public boolean checkIfAnyLocationIDsExistInExperiments(final int studyId, final Integer datasetId, final List<Integer> locationIds) {
-		return this.studyDataManager.checkIfAnyLocationIDsExistInExperiments(datasetId, locationIds);
+	public Long getDatasetObservationUnitCount(final Integer datasetId) {
+		return this.middlewareDatasetService.getDatasetObservationUnitCount(datasetId);
+
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
