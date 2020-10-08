@@ -7,7 +7,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -29,7 +28,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/#reference/trials">BrAPI Trial services</a>.
@@ -48,19 +50,19 @@ public class TrialResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<TrialSummaries> listTrialSummaries(@PathVariable final String crop,
-			@ApiParam(value = "Program filter to only return studies associated with given program id.",
-					required = false) @RequestParam(value = "programDbId", required = false) final String programDbId,
-			@ApiParam(value = "Location filter to only return studies associated with given location id.",
-					required = false) @RequestParam(value = "locationDbId", required = false) final String locationDbId,
-			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
+			@ApiParam(value = "Program filter to only return studies associated with given program id.") @RequestParam(value = "programDbId",
+					required = false) final String programDbId,
+			@ApiParam(value = "Location filter to only return studies associated with given location id.") @RequestParam(value = "locationDbId",
+					required = false) final String locationDbId,
+			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION) @RequestParam(value = "page",
 					required = false) final Integer currentPage,
-			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
+			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(value = "pageSize",
 					required = false) final Integer pageSize,
-			@ApiParam(value = "Filter active status true/false", required = false) @RequestParam(value = "active",
+			@ApiParam(value = "Filter active status true/false") @RequestParam(value = "active",
 					required = false) final Boolean active,
-			@ApiParam(value = "Sort order. Name of the field to sorty by.", required = false) @RequestParam(value = "sortBy",
+			@ApiParam(value = "Sort order. Name of the field to sort by.") @RequestParam(value = "sortBy",
 					required = false) final String sortBy,
-			@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder",
+			@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder",
 					required = false) final String sortOrder) {
 
 		final String validationError = this.parameterValidation(active, sortBy, sortOrder);
@@ -118,50 +120,7 @@ public class TrialResourceBrapi {
 			final TrialSummary trialSummaryDto = modelMapper.map(mwStudy, TrialSummary.class);
 			trialSummaryList.add(trialSummaryDto);
 		}
-		if ("programName".equals(sortBy)) {
-			this.orderListByProgramName(trialSummaryList, sortOrder);
-		} else if ("startDate".equals(sortBy)) {
-			this.orderListByStartDate(trialSummaryList, sortOrder);
-		}
 		return trialSummaryList;
-	}
-
-	private void orderListByStartDate(final List<TrialSummary> trialSummaryList, final String sortOrder) {
-		if (StringUtil.isEmpty(sortOrder) || TrialResourceBrapi.ORDER_BY_DESCENDING.equalsIgnoreCase(sortOrder)) {
-			final Comparator desc = Collections.reverseOrder(TrialResourceBrapi.getComparatorStartDate());
-			Collections.sort(trialSummaryList, desc);
-		} else {
-			Collections.sort(trialSummaryList, TrialResourceBrapi.getComparatorStartDate());
-		}
-	}
-
-	private void orderListByProgramName(final List<TrialSummary> trialSummaryList, final String sortOrder) {
-		if (StringUtil.isEmpty(sortOrder) || TrialResourceBrapi.ORDER_BY_DESCENDING.equalsIgnoreCase(sortOrder)) {
-			final Comparator desc = Collections.reverseOrder(TrialResourceBrapi.getComparatorProgramName());
-			Collections.sort(trialSummaryList, desc);
-		} else {
-			Collections.sort(trialSummaryList, TrialResourceBrapi.getComparatorProgramName());
-		}
-	}
-
-	private static Comparator<TrialSummary> getComparatorProgramName() {
-		return new Comparator<TrialSummary>() {
-
-			@Override
-			public int compare(final TrialSummary trialSummary1, final TrialSummary trialSummary2) {
-				return trialSummary1.getProgramName().compareTo(trialSummary2.getProgramName());
-			}
-		};
-	}
-
-	private static Comparator<TrialSummary> getComparatorStartDate() {
-		return new Comparator<TrialSummary>() {
-
-			@Override
-			public int compare(final TrialSummary trialSummary1, final TrialSummary trialSummary2) {
-				return trialSummary1.getStartDate().compareTo(trialSummary2.getStartDate());
-			}
-		};
 	}
 
 	private String parameterValidation(final Boolean active, final String sortBy, final String sortOrder) {
