@@ -22,7 +22,7 @@ import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.ibp.api.java.rpackage.RPackageService;
-import org.ibp.api.java.study.StudyGermplasmService;
+import org.ibp.api.java.study.StudyEntryService;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.junit.After;
 import org.junit.Before;
@@ -190,8 +190,8 @@ public abstract class ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public StudyGermplasmService studyGermplasmService() {
-			return Mockito.mock(StudyGermplasmService.class);
+		public StudyEntryService studyEntryService() {
+			return Mockito.mock(StudyEntryService.class);
 		}
 
 		@Bean

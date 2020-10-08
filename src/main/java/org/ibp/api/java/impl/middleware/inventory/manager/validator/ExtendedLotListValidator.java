@@ -30,8 +30,8 @@ public class ExtendedLotListValidator {
 	public void validateEmptyUnits(final List<ExtendedLotDto> extendedLotDtos) {
 		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
 		//Validate that none of them has null unit id
-		final long lotsWithoutUnitCount = extendedLotDtos.stream().filter(lot -> lot.getUnitId() == null).count();
-		if (lotsWithoutUnitCount != 0) {
+		final boolean lotsWithoutUnit = extendedLotDtos.stream().anyMatch(lot -> lot.getUnitId() == null);
+		if (lotsWithoutUnit) {
 			errors.reject("lots.with.no.unit",null, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -40,9 +40,9 @@ public class ExtendedLotListValidator {
 	public void validateClosedLots(final List<ExtendedLotDto> extendedLotDtos) {
 		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
 		//Validate that none of them are closed
-		final long closedLotsCount =
-			extendedLotDtos.stream().filter(lot -> lot.getStatus().equalsIgnoreCase(LotStatus.CLOSED.name())).count();
-		if (closedLotsCount != 0) {
+		final boolean closedLot =
+			extendedLotDtos.stream().anyMatch(lot -> lot.getStatus().equalsIgnoreCase(LotStatus.CLOSED.name()));
+		if (closedLot) {
 			errors.reject("lots.closed", null, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -54,6 +54,15 @@ public class ExtendedLotListValidator {
 			errors.reject("lots.does.not.exist", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+	}
+
+	public void validateLotUUIDsDuplicated(final List<ExtendedLotDto> extendedLotDtos, final List<String> lotUUIDs) {
+		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
+		if (lotUUIDs.size() != extendedLotDtos.size()) {
+			errors.reject("lots.duplicated", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
 	}
 
 }

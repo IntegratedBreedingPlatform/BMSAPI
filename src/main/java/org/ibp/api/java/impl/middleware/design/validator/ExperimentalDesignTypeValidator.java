@@ -2,7 +2,8 @@ package org.ibp.api.java.impl.middleware.design.validator;
 
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
@@ -10,11 +11,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.StringTokenizer;
+import java.util.*;
 
 @Component
 public class ExperimentalDesignTypeValidator {
@@ -65,29 +62,29 @@ public class ExperimentalDesignTypeValidator {
 	private BindingResult errors;
 
 	public void validate(final ExperimentalDesignInput experimentalDesignInput,
-		final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final List<StudyEntryDto> studyEntryDtoList) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final Integer experimentalDesignTypeId = experimentalDesignInput.getDesignType();
 
 		if (ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId().equals(experimentalDesignTypeId)) {
-			this.validateRandomizedCompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
+			this.validateRandomizedCompleteBlockDesign(experimentalDesignInput, studyEntryDtoList);
 
 		} else if (ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId().equals(experimentalDesignTypeId)) {
-			this.validateResolvableIncompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
+			this.validateResolvableIncompleteBlockDesign(experimentalDesignInput, studyEntryDtoList);
 
 		} else if (ExperimentDesignType.ROW_COL.getId().equals(experimentalDesignTypeId)) {
-			this.validateResolvableRowColumnDesign(experimentalDesignInput, studyGermplasmDtoList);
+			this.validateResolvableRowColumnDesign(experimentalDesignInput, studyEntryDtoList);
 
 		} else if (ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getId().equals(experimentalDesignTypeId)) {
-			this.validateAugmentedDesign(experimentalDesignInput, studyGermplasmDtoList);
+			this.validateAugmentedDesign(experimentalDesignInput, studyEntryDtoList);
 
 		} else if (ExperimentDesignType.ENTRY_LIST_ORDER.getId().equals(experimentalDesignTypeId)) {
-			this.validateEntryListOrderDesign(experimentalDesignInput, studyGermplasmDtoList);
+			this.validateEntryListOrderDesign(experimentalDesignInput, studyEntryDtoList);
 
 		} else if (ExperimentDesignType.P_REP.getId().equals(experimentalDesignTypeId)) {
-			this.validatePrepDesign(experimentalDesignInput, studyGermplasmDtoList);
+			this.validatePrepDesign(experimentalDesignInput, studyEntryDtoList);
 		}
 
 		if (this.errors.hasErrors()) {
@@ -99,17 +96,17 @@ public class ExperimentalDesignTypeValidator {
 	 * Validates the parameters and germplasm entries required for generating randomized block design.
 	 *
 	 * @param experimentalDesignInput
-	 * @param studyGermplasmDtoList
+	 * @param studyEntryDtoList
 	 */
 	private void validateRandomizedCompleteBlockDesign(final ExperimentalDesignInput experimentalDesignInput,
-		final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final List<StudyEntryDto> studyEntryDtoList) {
 
-		this.validateStudyGermplasmDtoList(studyGermplasmDtoList);
+		this.validateStudyEntryDtoList(studyEntryDtoList);
 
-		if (experimentalDesignInput != null && studyGermplasmDtoList != null) {
+		if (experimentalDesignInput != null && studyEntryDtoList != null) {
 			this.validateReplicationCountLimit(experimentalDesignInput, EXPERIMENT_DESIGN_REPLICATION_COUNT_RCBD_ERROR);
 			this.validatePlotNumberRange(experimentalDesignInput);
-			this.validatePlotNumberShouldNotExceedLimit(experimentalDesignInput, studyGermplasmDtoList.size());
+			this.validatePlotNumberShouldNotExceedLimit(experimentalDesignInput, studyEntryDtoList.size());
 		}
 	}
 
@@ -117,23 +114,23 @@ public class ExperimentalDesignTypeValidator {
 	 * Validates the parameters and germplasm entries required for generating resolvable incomplete block design.
 	 *
 	 * @param experimentalDesignInput
-	 * @param studyGermplasmDtoList
+	 * @param studyEntryDtoList
 	 */
 	private void validateResolvableIncompleteBlockDesign(final ExperimentalDesignInput experimentalDesignInput,
-		final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final List<StudyEntryDto> studyEntryDtoList) {
 
-		this.validateStudyGermplasmDtoList(studyGermplasmDtoList);
+		this.validateStudyEntryDtoList(studyEntryDtoList);
 
-		if (experimentalDesignInput != null && studyGermplasmDtoList != null) {
+		if (experimentalDesignInput != null && studyEntryDtoList != null) {
 
 			this.validateReplicationCountLimit(experimentalDesignInput, EXPERIMENT_DESIGN_REPLICATION_COUNT_RESOLVABLE_ERROR);
 			this.validatePlotNumberRange(experimentalDesignInput);
-			this.validatePlotNumberShouldNotExceedLimit(experimentalDesignInput, studyGermplasmDtoList.size());
+			this.validatePlotNumberShouldNotExceedLimit(experimentalDesignInput, studyEntryDtoList.size());
 			this.validateNoTreatmentFactors(experimentalDesignInput);
 
 			final Integer blockSize = experimentalDesignInput.getBlockSize() == null? -1 : experimentalDesignInput.getBlockSize();
 			final Integer replicationCount = experimentalDesignInput.getReplicationsCount();
-			final Integer treatmentSize = studyGermplasmDtoList.size();
+			final Integer treatmentSize = studyEntryDtoList.size();
 			final int blockLevel = treatmentSize / blockSize;
 
 			if (blockSize <= 1) {
@@ -179,20 +176,20 @@ public class ExperimentalDesignTypeValidator {
 	 * Validates the parameters and germplasm entries required for generating resolvable row column design.
 	 *
 	 * @param experimentalDesignInput
-	 * @param studyGermplasmDtoList
+	 * @param studyEntryDtoList
 	 */
 	private void validateResolvableRowColumnDesign(final ExperimentalDesignInput experimentalDesignInput,
-		final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final List<StudyEntryDto> studyEntryDtoList) {
 
-		this.validateStudyGermplasmDtoList(studyGermplasmDtoList);
+		this.validateStudyEntryDtoList(studyEntryDtoList);
 
-		if (experimentalDesignInput != null && studyGermplasmDtoList != null) {
+		if (experimentalDesignInput != null && studyEntryDtoList != null) {
 
 			this.validatePlotNumberRange(experimentalDesignInput);
 			this.validateReplicationCountLimit(experimentalDesignInput, EXPERIMENT_DESIGN_REPLICATION_COUNT_RESOLVABLE_ERROR);
-			this.validatePlotNumberShouldNotExceedLimit(experimentalDesignInput, studyGermplasmDtoList.size());
+			this.validatePlotNumberShouldNotExceedLimit(experimentalDesignInput, studyEntryDtoList.size());
 			this.validateNoTreatmentFactors(experimentalDesignInput);
-			final int size = studyGermplasmDtoList.size();
+			final int size = studyEntryDtoList.size();
 
 			final Integer rowsPerReplication = experimentalDesignInput.getRowsPerReplications() == null ? 0 : experimentalDesignInput.getRowsPerReplications();
 			final Integer colsPerReplication = experimentalDesignInput.getColsPerReplications() == null ? 0 : experimentalDesignInput.getColsPerReplications();
@@ -238,14 +235,14 @@ public class ExperimentalDesignTypeValidator {
 	 * Validates the parameters and germplasm entries required for generating P-rep design.
 	 *
 	 * @param experimentalDesignInput
-	 * @param studyGermplasmDtoList
+	 * @param studyEntryDtoList
 	 */
 	private void validatePrepDesign(final ExperimentalDesignInput experimentalDesignInput,
-		final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final List<StudyEntryDto> studyEntryDtoList) {
 
-		this.validateStudyGermplasmDtoList(studyGermplasmDtoList);
+		this.validateStudyEntryDtoList(studyEntryDtoList);
 
-		if (experimentalDesignInput != null && studyGermplasmDtoList != null) {
+		if (experimentalDesignInput != null && studyEntryDtoList != null) {
 
 			if (experimentalDesignInput.getReplicationPercentage() == null
 				|| experimentalDesignInput.getReplicationPercentage() < MINIMUM_REPLICATION_PERCENTAGE
@@ -263,19 +260,19 @@ public class ExperimentalDesignTypeValidator {
 	 * Validates the parameters and germplasm entries required for generating augmented design.
 	 *
 	 * @param experimentalDesignInput
-	 * @param studyGermplasmDtoList
+	 * @param studyEntryDtoList
 	 * @);
 	 */
 	private void validateAugmentedDesign(final ExperimentalDesignInput experimentalDesignInput,
-		final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final List<StudyEntryDto> studyEntryDtoList) {
 
-		this.validateStudyGermplasmDtoList(studyGermplasmDtoList);
+		this.validateStudyEntryDtoList(studyEntryDtoList);
 
-		if (experimentalDesignInput != null && studyGermplasmDtoList != null) {
+		if (experimentalDesignInput != null && studyEntryDtoList != null) {
 
-			final int treatmentSize = studyGermplasmDtoList.size();
+			final int treatmentSize = studyEntryDtoList.size();
 
-			this.validateIfCheckEntriesExistInstudyGermplasmDtoList(studyGermplasmDtoList);
+			this.validateIfCheckEntriesExistInstudyEntryDtoList(studyEntryDtoList);
 			this.validateStartingPlotNo(experimentalDesignInput, treatmentSize);
 			this.validateNoTreatmentFactors(experimentalDesignInput);
 
@@ -286,18 +283,18 @@ public class ExperimentalDesignTypeValidator {
 	 * Validates the parameters and germplasm entries required for generating entry list order design.
 	 *
 	 * @param experimentalDesignInput
-	 * @param studyGermplasmDtoList
+	 * @param studyEntryDtoList
 	 */
 	private void validateEntryListOrderDesign(final ExperimentalDesignInput experimentalDesignInput,
-		final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final List<StudyEntryDto> studyEntryDtoList) {
 
-		if (experimentalDesignInput != null && studyGermplasmDtoList != null) {
+		if (experimentalDesignInput != null && studyEntryDtoList != null) {
 
-			final List<StudyGermplasmDto> checkList = new LinkedList<>();
+			final List<StudyEntryDto> checkList = new LinkedList<>();
 
-			final List<StudyGermplasmDto> testEntryList = new LinkedList<>();
+			final List<StudyEntryDto> testEntryList = new LinkedList<>();
 
-			this.loadChecksAndTestEntries(studyGermplasmDtoList, checkList, testEntryList);
+			this.loadChecksAndTestEntries(studyEntryDtoList, checkList, testEntryList);
 
 			if (testEntryList.isEmpty()) {
 				this.errors.reject(GERMPLASM_LIST_ALL_ENTRIES_CAN_NOT_BE_CHECKS);
@@ -331,7 +328,7 @@ public class ExperimentalDesignTypeValidator {
 					this.errors.reject(CHECK_MANNER_OF_INSERTION_INVALID);
 				}
 
-				if (studyGermplasmDtoList.size() - checkList.size() == 0) {
+				if (studyEntryDtoList.size() - checkList.size() == 0) {
 					this.errors.reject(GERMPLASM_LIST_ALL_ENTRIES_CAN_NOT_BE_CHECKS);
 				}
 			}
@@ -344,11 +341,12 @@ public class ExperimentalDesignTypeValidator {
 		}
 	}
 
-	void validateIfCheckEntriesExistInstudyGermplasmDtoList(final List<StudyGermplasmDto> studyGermplasmDtoList) {
+	void validateIfCheckEntriesExistInstudyEntryDtoList(final List<StudyEntryDto> studyEntryDtoList) {
 
 		final Integer testEntryType = SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId();
-		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (!testEntryType.equals(studyGermplasmDto.getCheckType())) {
+		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
+			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
+			if (entryType.isPresent() && !testEntryType.equals(Integer.valueOf(entryType.get()))) {
 				return;
 			}
 		}
@@ -373,16 +371,20 @@ public class ExperimentalDesignTypeValidator {
 	}
 
 
-	private void loadChecksAndTestEntries(final List<StudyGermplasmDto> studyGermplasmDtoList, final List<StudyGermplasmDto> checkList,
-		final List<StudyGermplasmDto> testEntryList) {
+	private void loadChecksAndTestEntries(final List<StudyEntryDto> studyEntryDtoList, final List<StudyEntryDto> checkList,
+		final List<StudyEntryDto> testEntryList) {
 
 		final Integer testEntryType = SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId();
-		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (testEntryType.equals(studyGermplasmDto.getCheckType())) {
-				testEntryList.add(studyGermplasmDto);
-			} else {
-				checkList.add(studyGermplasmDto);
+		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
+			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
+			if (entryType.isPresent()) {
+				if (testEntryType.equals(Integer.valueOf(entryType.get()))) {
+					testEntryList.add(studyEntryDto);
+				} else {
+					checkList.add(studyEntryDto);
+				}
 			}
+
 		}
 	}
 
@@ -412,8 +414,8 @@ public class ExperimentalDesignTypeValidator {
 		}
 	}
 
-	private void validateStudyGermplasmDtoList(final List<StudyGermplasmDto> studyGermplasmDtoList) {
-		if (studyGermplasmDtoList == null || studyGermplasmDtoList.isEmpty()) {
+	private void validateStudyEntryDtoList(final List<StudyEntryDto> studyEntryDtoList) {
+		if (studyEntryDtoList == null || studyEntryDtoList.isEmpty()) {
 			this.errors.reject(EXPERIMENT_DESIGN_GENERATE_NO_GERMPLASM);
 		}
 	}
