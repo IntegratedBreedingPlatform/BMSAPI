@@ -250,7 +250,7 @@ public class LotServiceImpl implements LotService {
 		//Create an adjustment transaction for the split lot
 		this.transactionService.saveAdjustmentTransactions(loggedInUserId,
 			Arrays.asList(splitLotDto.getLotId()).stream().collect(Collectors.toSet()),
-			splitLotDto.getActualBalance() - initialDeposit.getAmount(),
+			splitLotDto.getAvailableBalance() - initialDeposit.getAmount(),
 			null);
 
 		//Create deposit transaction for the new lot
