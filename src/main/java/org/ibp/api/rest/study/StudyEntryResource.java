@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -98,6 +99,20 @@ public class StudyEntryResource {
 		this.studyEntryService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+	}
+
+	@ApiOperation(value = "Get Study Entry Entry Types",
+		notes = "Get Study Entry Entry Types")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entryTypes", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<Enumeration>> getStudyTypes(final @PathVariable String cropname,
+		@PathVariable final String programUUID,	@PathVariable final Integer studyId) {
+
+		final List<Enumeration> entryTypes =
+			this.studyEntryService.getEntryTypes(programUUID);
+
+		return new ResponseEntity<>(entryTypes, HttpStatus.OK);
 
 	}
 

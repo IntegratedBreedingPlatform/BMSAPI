@@ -1,11 +1,13 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -60,6 +62,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private DatasetService datasetService;
+
+	@Resource
+	private OntologyDataManager ontologyDataManager;
 
 	@Override
 	public StudyEntryDto replaceStudyEntry(final Integer studyId, final Integer entryId,
@@ -144,6 +149,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		entryDescriptors.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
 
 		return entryDescriptors;
+	}
+
+	@Override
+	public List<Enumeration> getEntryTypes(final String programUuid) {
+		return this.ontologyDataManager.getStandardVariable(TermId.ENTRY_TYPE.getId(), programUuid).getEnumerations();
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
