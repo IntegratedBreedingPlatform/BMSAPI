@@ -57,13 +57,12 @@ public class LotInputValidator {
 
 	private static final Integer STOCK_ID_MAX_LENGTH = 35;
 
-
 	public LotInputValidator() {
 	}
 
-	public void validate(final LotGeneratorInputDto lotGeneratorInputDto) {
+	public void validate(final String programUUID, final LotGeneratorInputDto lotGeneratorInputDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
-		this.locationValidator.validateSeedLocationId(this.errors, lotGeneratorInputDto.getLocationId());
+		this.locationValidator.validateSeedLocationId(this.errors, programUUID, lotGeneratorInputDto.getLocationId());
 		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
@@ -73,12 +72,12 @@ public class LotInputValidator {
 		}
 	}
 
-	public void validate(final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
+	public void validate(final String programUUID, final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		final LotGeneratorInputDto lotGeneratorInputDto = lotGeneratorBatchRequestDto.getLotGeneratorInput();
 		BaseValidator.checkNotNull(lotGeneratorInputDto, "param.null", new String[] {"lotGeneratorInputDto"});
 
-		this.locationValidator.validateSeedLocationId(this.errors, lotGeneratorInputDto.getLocationId());
+		this.locationValidator.validateSeedLocationId(this.errors, programUUID, lotGeneratorInputDto.getLocationId());
 		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.validateStockId(lotGeneratorInputDto);
 		this.inventoryCommonValidator.validateLotNotes(lotGeneratorInputDto.getNotes(), errors);
@@ -87,7 +86,7 @@ public class LotInputValidator {
 		}
 	}
 
-	public void validate(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
+	public void validate(final String programUUID, final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
@@ -95,7 +94,7 @@ public class LotInputValidator {
 		if (lotUpdateRequestDto.getSingleInput() != null) {
 			final Integer locationId = lotUpdateRequestDto.getSingleInput().getLocationId();
 			if (locationId != null) {
-				this.locationValidator.validateSeedLocationId(this.errors, locationId);
+				this.locationValidator.validateSeedLocationId(this.errors, programUUID, locationId);
 			}
 
 			final Integer unitId = lotUpdateRequestDto.getSingleInput().getUnitId();
@@ -119,7 +118,7 @@ public class LotInputValidator {
 				lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
 
 			if (filteredLocationAbbrs.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
-				this.locationValidator.validateSeedLocationAbbr(this.errors, filteredLocationAbbrs);
+				this.locationValidator.validateSeedLocationAbbr(this.errors, programUUID, filteredLocationAbbrs);
 			}
 
 			final List<String> unitNames =
