@@ -476,10 +476,10 @@ public class DatasetResource {
 		return new ResponseEntity<>(this.studyDatasetService.getObservationUnitsMetadata(studyId, datasetId, request), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Count observation-unit of dataset", notes = "Returns count of observation unit of dataset")
+	@ApiOperation( value = "Count observation units of dataset", notes = "Returns count of observation units of dataset")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units", method = RequestMethod.HEAD)
-	public ResponseEntity<String> checkIfAnyLocationIDsExistInExperiments (
+	public ResponseEntity<String> countObservationUnits(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 
