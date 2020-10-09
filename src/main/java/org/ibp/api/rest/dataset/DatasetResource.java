@@ -483,7 +483,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 
-		final Long count = this.studyDatasetService.getDatasetObservationUnitCount(datasetId);
+		final Long count = this.studyDatasetService.countObservationUnits(datasetId);
 		final HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.add("X-Dataset-Observation-Unit", String.valueOf(count));
 

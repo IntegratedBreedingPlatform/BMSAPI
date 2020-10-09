@@ -333,5 +333,5 @@ public interface DatasetService {
 
 	ObservationUnitsMetadata getObservationUnitsMetadata(int studyId, int datasetId, SearchCompositeDto<ObservationUnitsSearchDTO, Integer> request);
 
-	Long getDatasetObservationUnitCount(Integer dataSetId);
+	Long countObservationUnits(Integer dataSetId);
 }
