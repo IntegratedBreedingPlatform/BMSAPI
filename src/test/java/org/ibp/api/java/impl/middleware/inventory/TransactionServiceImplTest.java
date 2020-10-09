@@ -122,7 +122,8 @@ public class TransactionServiceImplTest {
 		Mockito.verify(this.transactionService)
 			.depositLots(workbenchUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
 				lotDepositRequestDto,
-				transactionStatus);
+				transactionStatus,
+				null, null);
 
 	}
 
@@ -152,7 +153,8 @@ public class TransactionServiceImplTest {
 		Mockito.verify(this.transactionService)
 			.depositLots(workbenchUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
 				lotDepositRequestDto,
-				transactionStatus);
+				transactionStatus,
+				null, null);
 
 	}
 
