@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 @Component
 public class LotSplitValidator {
@@ -50,9 +51,15 @@ public class LotSplitValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		if (splitLotDto.getAvailableBalance() == null || splitLotDto.getAvailableBalance() <= 0) {
+		if (Objects.isNull(splitLotDto.getAvailableBalance()) || splitLotDto.getAvailableBalance() <= 0) {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), Double.class.getName());
 			this.errors.reject("lot.split.new.lot.invalid.available.balance");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (Objects.isNull(initialLotDepositDto) || initialLotDepositDto.getAmount() <= 0) {
+			this.errors = new MapBindingResult(new HashMap<String, String>(), Double.class.getName());
+			this.errors.reject("lot.split.initial.deposit.invalid");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 

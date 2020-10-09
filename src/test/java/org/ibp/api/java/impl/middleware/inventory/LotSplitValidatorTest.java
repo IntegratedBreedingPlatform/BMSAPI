@@ -211,6 +211,26 @@ public class LotSplitValidatorTest {
 		Mockito.verifyZeroInteractions(this.locationValidator);
 	}
 
+	@Test
+	public void shouldFailValidateSplitLotWithZeroInitialDepositAmount() {
+		final ExtendedLotDto lotDto = ExtendedLotDtoDummyFactory.create(1, LotStatus.ACTIVE, "unitName");
+		lotDto.setAvailableBalance(5D);
+
+		LotSplitRequestDto.InitialLotDepositDto dummyInitialLotDepositDto = this.createDummyInitialLotDepositDto(0D);
+
+		try {
+			this.lotSplitValidator.validateSplitLot(PROGRAM_UUID, lotDto,
+				Mockito.mock(LotSplitRequestDto.NewLotSplitDto.class),
+				dummyInitialLotDepositDto);
+		} catch (Exception e) {
+			assertThat(e, instanceOf(ApiRequestValidationException.class));
+			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("lot.split.initial.deposit.invalid"));
+		}
+
+		Mockito.verifyZeroInteractions(this.inventoryCommonValidator);
+		Mockito.verifyZeroInteractions(this.locationValidator);
+	}
+
 	private LotSplitRequestDto createDummyLotSplitRequestDto() {
 		return this.createDummyLotSplitRequestDto(SPLIT_LOT_UUID);
 	}
