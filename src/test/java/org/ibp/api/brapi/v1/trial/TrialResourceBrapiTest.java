@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -52,7 +53,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		final StudySummary studySummary = new StudySummary().setName(name).setSeasons(ImmutableList.<String>builder().add(season).build())
 				.setStudyDbid(studyDbId).setLocationId(locationId).setProgramDbId(programDbId).setType(type)
 				.setYears(ImmutableList.<String>builder().add(year).build()).setProgramDbId(programDbId).setProgramName(programName)
-				.setStartDate(startDate).setEndDate(endDate).setActive(true)
+				.setStartDate(DateUtil.parseDate(startDate)).setEndDate(DateUtil.parseDate(endDate)).setActive(true)
 				.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
 
 		final InstanceMetadata instanceMetadata = new InstanceMetadata();
@@ -123,7 +124,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		final StudySummary studySummary = new StudySummary().setName(name).setSeasons(ImmutableList.<String>builder().add(season).build())
 				.setStudyDbid(studyDbId).setLocationId(locationId).setProgramDbId(programDbId).setType(type)
 				.setYears(ImmutableList.<String>builder().add(year).build()).setProgramDbId(programDbId).setProgramName(programName)
-				.setStartDate(startDate).setEndDate(endDate).setActive(true)
+				.setStartDate(DateUtil.parseDate(startDate)).setEndDate(DateUtil.parseDate(endDate)).setActive(true)
 				.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
 
 		final InstanceMetadata instanceMetadata = new InstanceMetadata();

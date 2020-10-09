@@ -1,6 +1,7 @@
 
 package org.ibp.api.brapi.v1.trial;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
@@ -8,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -49,6 +51,7 @@ public class TrialResourceBrapi {
 	@ApiOperation(value = "List of trial summaries", notes = "Get a list of trial summaries.")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
 	@ResponseBody
+	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<TrialSummaries> listTrialSummaries(@PathVariable final String crop,
 			@ApiParam(value = "Program filter to only return studies associated with given program id.") @RequestParam(value = "programDbId",
 					required = false) final String programDbId,

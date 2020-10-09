@@ -2,6 +2,8 @@ package org.ibp.api.brapi.v1.trial;
 
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.service.api.user.ContactDto;
+import org.ibp.api.brapi.v1.study.Contact;
 import org.ibp.api.brapi.v1.study.StudySummaryDto;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
@@ -26,6 +28,19 @@ public class TrialSummaryMapper {
 
 	public static ModelMapper getInstance() {
 		return TrialSummaryMapper.applicationWideModelMapper;
+	}
+
+	private static class ContactConverter implements Converter<List<ContactDto>, List<Contact>> {
+
+		@Override public List<Contact> convert(final MappingContext<List<ContactDto>, List<Contact>> context) {
+			final List<Contact> contacts = new ArrayList<>();
+			for (final ContactDto contactDto : context.getSource()) {
+				contacts.add(new Contact(contactDto.getContactDbId(), contactDto.getEmail(), contactDto.getName(),
+						contactDto.getType(), "", ""));
+			}
+			return context.getMappingEngine().map(context.create(contacts, context.getDestinationType()));
+		}
+
 	}
 
 	private static class StudySummaryConverter implements Converter<List<InstanceMetadata>, List<StudySummaryDto>> {
@@ -59,6 +74,8 @@ public class TrialSummaryMapper {
 				map(source.getLocationId(), destination.getLocationDbId());
 				map(source.getStudyDbid(), destination.getTrialDbId());
 				map(source.getName(), destination.getTrialName());
+				map(source.getDescription(), destination.getTrialDescription());
+				map(source.getObservationUnitId(), destination.getTrialPUI());
 				map(source.getProgramDbId(), destination.getProgramDbId());
 				map(source.getProgramName(), destination.getProgramName());
 				map(source.getStartDate(), destination.getStartDate());
@@ -66,7 +83,7 @@ public class TrialSummaryMapper {
 				map(source.isActive(), destination.isActive());
 				map(source.getOptionalInfo(), destination.getAdditionalInfo());
 				this.using(new StudySummaryConverter()).map(this.source.getInstanceMetaData()).setStudies(null);
-
+				this.using(new ContactConverter()).map(this.source.getContacts()).setContacts(null);
 			}
 
 		});
