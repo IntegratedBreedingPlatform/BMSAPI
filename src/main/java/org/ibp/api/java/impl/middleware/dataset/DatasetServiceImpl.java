@@ -936,7 +936,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Long countObservationUnits(final Integer datasetId) {
-		return this.middlewareDatasetService.getDatasetObservationUnitCount(datasetId);
+		return this.middlewareDatasetService.countObservationUnits(datasetId);
 
 	}
 
