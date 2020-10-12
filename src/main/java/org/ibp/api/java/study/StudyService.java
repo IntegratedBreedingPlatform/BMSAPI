@@ -38,7 +38,7 @@ public interface StudyService {
 
 	String getProgramUUID(Integer studyIdentifier);
 
-	StudyDetailsDto getStudyDetailsByGeolocation (final Integer geolocationId);
+	StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId);
 
 	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
 

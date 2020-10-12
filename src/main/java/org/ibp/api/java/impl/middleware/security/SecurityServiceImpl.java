@@ -12,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Service
@@ -31,7 +30,6 @@ public class SecurityServiceImpl implements SecurityService {
 			// Blank program UUID means this could be historic data loaded in crop db. Allow access to all such lists.
 			return true;
 		}
-
 
 		final WorkbenchUser listOwner = this.userService.getUserById(germplasmList.getUserId());
 		final WorkbenchUser loggedInUser = this.getCurrentlyLoggedInUser();

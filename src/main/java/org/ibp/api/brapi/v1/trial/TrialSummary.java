@@ -9,7 +9,11 @@ import org.ibp.api.brapi.v1.study.Contact;
 import org.ibp.api.brapi.v1.study.StudySummaryDto;
 import org.pojomatic.Pojomatic;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TrialSummary {
@@ -89,7 +93,7 @@ public class TrialSummary {
 		return this.programName;
 	}
 
-	public void setProgramName(String programName) {
+	public void setProgramName(final String programName) {
 		this.programName = programName;
 	}
 
@@ -125,7 +129,7 @@ public class TrialSummary {
 		return this.studies;
 	}
 
-	public void setStudies(List<StudySummaryDto> studies) {
+	public void setStudies(final List<StudySummaryDto> studies) {
 		this.studies = studies;
 	}
 
@@ -137,7 +141,7 @@ public class TrialSummary {
 		return this.additionalInfo;
 	}
 
-	public void setAdditionalInfo(Map<String, String> additionalInfo) {
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 		this.additionalInfo = additionalInfo;
 	}
 
@@ -146,7 +150,7 @@ public class TrialSummary {
 	}
 
 	public String getLocationDbId() {
-		return locationDbId;
+		return this.locationDbId;
 	}
 
 	public TrialSummary setLocationDbId(final String locationDbId) {
@@ -155,7 +159,7 @@ public class TrialSummary {
 	}
 
 	public String getTrialDescription() {
-		return trialDescription;
+		return this.trialDescription;
 	}
 
 	public void setTrialDescription(final String trialDescription) {
@@ -163,7 +167,7 @@ public class TrialSummary {
 	}
 
 	public String getTrialPUI() {
-		return trialPUI;
+		return this.trialPUI;
 	}
 
 	public void setTrialPUI(final String trialPUI) {
@@ -171,7 +175,7 @@ public class TrialSummary {
 	}
 
 	public String getCommonCropName() {
-		return commonCropName;
+		return this.commonCropName;
 	}
 
 	public void setCommonCropName(final String commonCropName) {
@@ -179,7 +183,7 @@ public class TrialSummary {
 	}
 
 	public List<Contact> getContacts() {
-		return contacts;
+		return this.contacts;
 	}
 
 	public void setContacts(final List<Contact> contacts) {
@@ -187,7 +191,7 @@ public class TrialSummary {
 	}
 
 	public String getDocumentationURL() {
-		return documentationURL;
+		return this.documentationURL;
 	}
 
 	public void setDocumentationURL(final String documentationURL) {
@@ -195,7 +199,7 @@ public class TrialSummary {
 	}
 
 	public List<String> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<String> externalReferences) {
@@ -203,7 +207,7 @@ public class TrialSummary {
 	}
 
 	public String getPublications() {
-		return publications;
+		return this.publications;
 	}
 
 	public void setPublications(final String publications) {
@@ -211,7 +215,7 @@ public class TrialSummary {
 	}
 
 	public List<String> getDatasetAuthorships() {
-		return datasetAuthorships;
+		return this.datasetAuthorships;
 	}
 
 	public void setDatasetAuthorships(final List<String> datasetAuthorships) {
@@ -229,7 +233,7 @@ public class TrialSummary {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 }

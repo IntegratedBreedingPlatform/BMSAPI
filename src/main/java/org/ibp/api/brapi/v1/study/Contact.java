@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-@AutoProperty @JsonInclude(JsonInclude.Include.NON_NULL) @JsonPropertyOrder({"contactDbId", "email", "instituteName", "name", "type", "orcid"})
+@AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({"contactDbId", "email", "instituteName", "name", "type", "orcid"})
 public class Contact {
 
 	private Integer contactDbId;
@@ -43,7 +45,8 @@ public class Contact {
 		this.orcid = orcid;
 	}
 
-	public Contact(final Integer contactDbId, final String email, final String name, final String type, final String orcid, final String instituteName) {
+	public Contact(final Integer contactDbId, final String email, final String name, final String type, final String orcid,
+		final String instituteName) {
 		this(contactDbId, email, name, type, orcid);
 		this.instituteName = instituteName;
 	}
@@ -52,7 +55,7 @@ public class Contact {
 	 * @return the contactDBId
 	 */
 	public Integer getContactDbId() {
-		return contactDbId;
+		return this.contactDbId;
 	}
 
 	/**
@@ -68,7 +71,7 @@ public class Contact {
 	 * @return the name
 	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
@@ -84,7 +87,7 @@ public class Contact {
 	 * @return the email
 	 */
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
 	/**
@@ -100,7 +103,7 @@ public class Contact {
 	 * @return the type
 	 */
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
 	/**
@@ -116,7 +119,7 @@ public class Contact {
 	 * @return the orcid
 	 */
 	public String getOrcid() {
-		return orcid;
+		return this.orcid;
 	}
 
 	/**
@@ -129,22 +132,25 @@ public class Contact {
 	}
 
 	public String getInstituteName() {
-		return instituteName;
+		return this.instituteName;
 	}
 
-	public void setInstituteName(String instituteName) {
+	public void setInstituteName(final String instituteName) {
 		this.instituteName = instituteName;
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 		return Pojomatic.hashCode(this);
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		return Pojomatic.toString(this);
 	}
 
-	@Override public boolean equals(Object o) {
+	@Override
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 
