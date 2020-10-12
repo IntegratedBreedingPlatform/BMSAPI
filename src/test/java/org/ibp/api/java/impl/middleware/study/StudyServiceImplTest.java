@@ -3,23 +3,19 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,15 +31,12 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class StudyServiceImplTest {
 
 	private static final int TEST_STUDY_IDENTIFIER = 2013;
 
 	private static final int TEST_OBSERVATION_IDENTIFIER = 5;
-
-	private static final String TEST_CROP_NAME = "maize";
 
 	private StudyServiceImpl studyServiceImpl;
 
@@ -54,15 +47,10 @@ public class StudyServiceImplTest {
 	private StudyDataManager studyDataManager;
 
 	@Mock
-	private SecurityService securityService;
-
-	@Mock
 	private StudyValidator studyValidator;
 
 	@Mock
 	private ObservationValidator observationValidator;
-
-	private final String programUID = UUID.randomUUID().toString();
 
 	final PodamFactory factory = new PodamFactoryImpl();
 
@@ -77,47 +65,10 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl = new StudyServiceImpl();
 		this.studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
 		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
-		this.studyServiceImpl.setSecurityService(this.securityService);
 		this.studyServiceImpl.setValidationUtil(new ValidationUtil());
 		this.studyServiceImpl.setObservationValidator(this.observationValidator);
 		this.studyServiceImpl.setStudyValidator(this.studyValidator);
-		// Make all test data accessible
-		Mockito.when(this.securityService.isAccessible(Matchers.any(org.generationcp.middleware.service.api.study.StudySummary.class),
-			Matchers.anyString()))
-				.thenReturn(true);
 	}
-
-	@Test
-	public void testListAllStudies() {
-		final StudyTypeDto studyTypeDto= StudyTypeDto.getTrialDto();
-		final List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
-		final org.generationcp.middleware.service.api.study.StudySummary studySummary =
-				new org.generationcp.middleware.service.api.study.StudySummary();
-		studySummary.setId(1);
-		studySummary.setName("Study Name");
-		studySummary.setObjective("Study Objective");
-		studySummary.setTitle("Study Title");
-		studySummary.setProgramUUID(this.programUID);
-		studySummary.setStartDate("2015-01-01");
-		studySummary.setEndDate("2015-12-31");
-		studySummary.setType(studyTypeDto);
-
-		mockResult.add(studySummary);
-
-		Mockito.when(this.mockMiddlewareStudyService.search(Matchers.any(StudySearchParameters.class))).thenReturn(mockResult);
-
-		final List<StudySummary> studySummaries = this.studyServiceImpl.search(this.programUID, TEST_CROP_NAME, null, null, null);
-		Assert.assertEquals(mockResult.size(), studySummaries.size());
-		Assert.assertEquals(studySummary.getId().toString(), studySummaries.get(0).getId());
-		Assert.assertEquals(studySummary.getName(), studySummaries.get(0).getName());
-		Assert.assertEquals(studySummary.getTitle(), studySummaries.get(0).getTitle());
-		Assert.assertEquals(studySummary.getObjective(), studySummaries.get(0).getObjective());
-		Assert.assertEquals(studySummary.getStartDate(), studySummaries.get(0).getStartDate());
-		Assert.assertEquals(studySummary.getEndDate(), studySummaries.get(0).getEndDate());
-		Assert.assertEquals(studySummary.getType().getName(), studySummaries.get(0).getType());
-
-	}
-
 
 	@Test
 	public void testGetObservations() {

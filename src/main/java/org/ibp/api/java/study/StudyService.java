@@ -11,17 +11,12 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudySummary;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Map;
 
 public interface StudyService {
-
-	List<StudySummary> search(final String programUniqueId, String cropname, String principalInvestigator, String location, String season);
 
 	List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize,
 		final String sortBy, final String sortOrder);
@@ -40,8 +35,6 @@ public interface StudyService {
 	 * @return
 	 */
 	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
-
-	Map<Integer, FieldMap> getFieldMap(final String studyIdentifier);
 
 	String getProgramUUID(Integer studyIdentifier);
 
@@ -68,10 +61,6 @@ public interface StudyService {
 	List<StudyInstanceDto> getStudyInstances(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	List<TreeNode> getStudyTree(String parentKey, String programUUID);
-
-	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
-
-	boolean hasCrossesOrSelections(final int studyId);
 
 	Integer getEnvironmentDatasetId(Integer studyId);
 

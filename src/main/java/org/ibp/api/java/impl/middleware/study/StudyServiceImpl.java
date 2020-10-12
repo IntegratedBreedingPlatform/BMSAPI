@@ -19,24 +19,14 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
-import org.generationcp.middleware.service.api.study.StudySearchParameters;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.study.*;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
-import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +41,6 @@ import org.springframework.validation.ObjectError;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional
@@ -70,9 +59,6 @@ public class StudyServiceImpl implements StudyService {
 	private StudyDataManager studyDataManager;
 
 	@Autowired
-	private SecurityService securityService;
-
-	@Autowired
 	private StudyValidator studyValidator;
 
 	@Autowired
@@ -81,48 +67,8 @@ public class StudyServiceImpl implements StudyService {
 	@Autowired
 	private ValidationUtil validationUtil;
 
-	@Autowired
-	private FieldMapService fieldMapService;
-
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
-	}
-
-	@Override
-	public List<StudySummary> search(final String programUniqueId, final String cropname, final String principalInvestigator,
-		final String location, final String season) {
-		final List<StudySummary> studySummaries = new ArrayList<>();
-		try {
-			final StudySearchParameters searchParameters = new StudySearchParameters();
-			searchParameters.setProgramUniqueId(programUniqueId);
-			searchParameters.setPrincipalInvestigator(principalInvestigator);
-			searchParameters.setLocation(location);
-			searchParameters.setSeason(season);
-			final List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries =
-				this.middlewareStudyService.search(searchParameters);
-
-			for (final org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
-				if (!this.securityService.isAccessible(mwStudySummary, cropname)) {
-					continue;
-				}
-
-				final StudySummary summary = new StudySummary(String.valueOf(mwStudySummary.getId()));
-				summary.setName(mwStudySummary.getName());
-				summary.setTitle(mwStudySummary.getTitle());
-				summary.setObjective(mwStudySummary.getObjective());
-				summary.setStartDate(mwStudySummary.getStartDate());
-				summary.setEndDate(mwStudySummary.getEndDate());
-				summary.setType(mwStudySummary.getType()
-					.getName());
-				summary.setPrincipalInvestigator(mwStudySummary.getPrincipalInvestigator());
-				summary.setLocation(mwStudySummary.getLocation());
-				summary.setSeason(mwStudySummary.getSeason());
-				studySummaries.add(summary);
-			}
-		} catch (final MiddlewareException e) {
-			throw new ApiRuntimeException("Error! Caused by: " + e.getMessage(), e);
-		}
-		return studySummaries;
 	}
 
 	@Override
@@ -176,11 +122,6 @@ public class StudyServiceImpl implements StudyService {
 			}
 		});
 		return returnList;
-	}
-
-	@Override
-	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
-		return this.fieldMapService.getFieldMap(studyId);
 	}
 
 	@Override
@@ -275,16 +216,6 @@ public class StudyServiceImpl implements StudyService {
 			nodes = TreeViewUtil.convertStudyFolderReferencesToTreeView(folders, true);
 		}
 		return nodes;
-	}
-
-	@Override
-	public boolean studyHasGivenDatasetType(final Integer studyId, final Integer datasetTypeId) {
-		return this.middlewareStudyService.studyHasGivenDatasetType(studyId, datasetTypeId);
-	}
-
-	@Override
-	public boolean hasCrossesOrSelections(final int studyId) {
-		return this.middlewareStudyService.hasCrossesOrSelections(studyId);
 	}
 
 	@Override
@@ -392,10 +323,6 @@ public class StudyServiceImpl implements StudyService {
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
-	}
-
-	public void setSecurityService(final SecurityService securityService) {
-		this.securityService = securityService;
 	}
 
 	public void setValidationUtil(final ValidationUtil validationUtil) {
