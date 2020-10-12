@@ -6,7 +6,6 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -20,22 +19,10 @@ import java.util.List;
 public class SecurityServiceImpl implements SecurityService {
 
 	@Autowired
-	private HttpServletRequest request;
-
-	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private UserService userService;
-
-	@Override
-	public boolean isAccessible(final StudySummary study, final String cropname) {
-		if (StringUtils.isBlank(study.getProgramUUID())) {
-			// Blank program UUID == templates, allowed for all.
-			return true;
-		}
-		return this.loggedInUserIsMemberOf(study.getProgramUUID(), cropname);
-	}
 
 	@Override
 	public boolean isAccessible(final GermplasmList germplasmList, final String cropname) {
