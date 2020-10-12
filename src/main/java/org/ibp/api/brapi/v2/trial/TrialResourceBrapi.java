@@ -26,13 +26,19 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +64,10 @@ public class TrialResourceBrapi {
                 final String programDbId,
             @ApiParam(value = "Filter to only return trials associated with given location id") @RequestParam(value = "locationDbId", required = false)
                 final String locationDbId,
+            @ApiParam(value = "Filter to only return trials with end date after specified searchDateRangeStart (yyyy-MM-dd)")
+                @RequestParam(value = "searchDateRangeStart", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") final Date searchDateRangeStart,
+            @ApiParam(value = "Filter to only return trials with start date before specified searchDateRangeEnd (yyyy-MM-dd)") @RequestParam(value = "searchDateRangeEnd", required = false)
+                @DateTimeFormat(pattern = "yyyy-MM-dd") final Date searchDateRangeEnd,
             @ApiParam(value = "Filter to only return trials associated with given study id") @RequestParam(value = "studyDbId", required = false)
                 final String studyDbId,
             @ApiParam(value = "Filter to only return trials associated with given trial id") @RequestParam(value = "trialDbId", required = false)
@@ -75,24 +85,17 @@ public class TrialResourceBrapi {
                 final String sortOrder) {
         final boolean isSortOrderValid = "ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
         Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
-        final String validationError = this.parameterValidation(active, sortBy, sortOrder);
+        final String validationError = this.parameterValidation(crop, commonCropName, active, sortBy, sortOrder);
         if (!StringUtils.isBlank(validationError)) {
             final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
             final Metadata metadata = new Metadata(null, status);
             final TrialSummaries trialSummaries = new TrialSummaries().withMetadata(metadata).withResult(new Result<TrialSummary>());
-            return new ResponseEntity<>(trialSummaries, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(trialSummaries, HttpStatus.BAD_REQUEST);
         }
 
-        // TODO implement more elegant parameter setting withXXX
-        final StudySearchFilter filter = new StudySearchFilter();
-        filter.setProgramDbId(programDbId);
-        filter.setLocationDbId(locationDbId);
-        filter.setStudyDbId(studyDbId);
-        filter.setTrialDbId(trialDbId);
-        filter.setTrialName(trialName);
-        filter.setTrialPUI(trialPUI);
-        filter.setContactDbId(contactDbId);
-        // TODO add searchDateRangeStart and searchDateRangeEnd as query parameters
+        final StudySearchFilter filter = new StudySearchFilter().withProgramDbId(programDbId).withLocationDbId(locationDbId)
+                .withStudyDbId(studyDbId).withTrialDbId(trialDbId).withTrialName(trialName).withTrialPUI(trialPUI).withContactDbId(contactDbId)
+                .withSearchDateRangeStart(searchDateRangeStart).withSearchDateRangeEnd(searchDateRangeEnd);
 
         final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
         final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -141,12 +144,15 @@ public class TrialResourceBrapi {
         return trialSummaryList;
     }
 
-    private String parameterValidation(final Boolean active, final String sortBy, final String sortOrder) {
+    private String parameterValidation(final String crop, final String commonCropName, final Boolean active, final String sortBy, final String sortOrder) {
         final List<String> sortbyFields = ImmutableList.<String>builder().add("trialDbId").add("trialName").add("programDbId")
                 .add("programName").add("locationDbId").add("startDate").add("endDate").build();
         final List<String> sortOrders = ImmutableList.<String>builder().add("asc")
                 .add("desc").build();
 
+        if (!StringUtils.isEmpty(commonCropName) && !crop.equals(commonCropName)) {
+            return "Invalid commonCropName value";
+        }
         if (active != null && !active) {
             return "No inactive studies found.";
         }

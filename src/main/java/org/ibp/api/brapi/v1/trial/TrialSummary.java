@@ -53,13 +53,13 @@ public class TrialSummary {
 	private String documentationURL;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private List<String> externalReferences;
+	private List<String> externalReferences = new ArrayList<>();
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String publications;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private String datasetAuthorships;
+	private List<String> datasetAuthorships = new ArrayList<>();
 
 	public TrialSummary() {
 
