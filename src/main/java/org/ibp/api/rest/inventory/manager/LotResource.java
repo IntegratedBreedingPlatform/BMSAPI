@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMergeRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -34,6 +35,7 @@ import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryComm
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotSplitValidator;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
@@ -102,6 +104,9 @@ public class LotResource {
 
 	@Autowired
 	private LotMergeValidator lotMergeValidator;
+
+	@Autowired
+	private LotSplitValidator lotSplitValidator;
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
@@ -382,6 +387,29 @@ public class LotResource {
 			}
 
 			this.lotService.mergeLots(lotMergeRequestDto.getLotUUIDToKeep(), searchDTO);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Split lot", notes = "It generates a new lot using an existing lot as the source for the initial deposit.")
+	@RequestMapping(value = "/crops/{cropName}/lots/split", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS
+		+ " or hasAnyAuthority('SPLIT_LOT')")
+	public ResponseEntity<Void> splitLot(
+		@PathVariable final String cropName, //
+		@RequestParam(required = false) final String programUUID,//
+		@ApiParam("Lot template for merge action."
+			+ "SearchComposite is a list of UUIDs or a search id (internal usage) ")
+		@RequestBody final LotSplitRequestDto lotSplitRequestDto) {
+
+		this.lotSplitValidator.validateRequest(lotSplitRequestDto);
+
+		try {
+			inventoryLock.lockWrite();
+			this.lotService.splitLot(programUUID, lotSplitRequestDto);
 		} finally {
 			inventoryLock.unlockWrite();
 		}

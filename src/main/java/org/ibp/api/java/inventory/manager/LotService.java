@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -36,4 +37,7 @@ public interface LotService {
 	void closeLots(LotsSearchDto lotsSearchDto);
 
 	void mergeLots(String keepLotUUID, LotsSearchDto lotsSearchDto);
+
+	void splitLot(String programUUID, LotSplitRequestDto lotSplitRequestDto);
+
 }
