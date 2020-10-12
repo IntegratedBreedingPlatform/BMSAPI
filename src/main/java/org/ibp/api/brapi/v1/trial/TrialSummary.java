@@ -210,11 +210,11 @@ public class TrialSummary {
 		this.publications = publications;
 	}
 
-	public String getDatasetAuthorships() {
+	public List<String> getDatasetAuthorships() {
 		return datasetAuthorships;
 	}
 
-	public void setDatasetAuthorships(final String datasetAuthorships) {
+	public void setDatasetAuthorships(final List<String> datasetAuthorships) {
 		this.datasetAuthorships = datasetAuthorships;
 	}
 
