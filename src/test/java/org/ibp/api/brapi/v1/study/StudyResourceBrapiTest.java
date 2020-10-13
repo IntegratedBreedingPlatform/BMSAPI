@@ -188,7 +188,8 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<LocationDetailsDto> locations = StudyTestDataProvider.getListLocationDetailsDto();
 		final LocationDetailsDto location = locations.get(0);
 
-		Mockito.when(this.studyServiceMW.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId())).thenReturn(studyDetailsDto);
+		Mockito.when(this.studyServiceMW.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId()))
+			.thenReturn(studyDetailsDto);
 		Mockito.when(this.locationDataManager.getLocationsByFilter(0, 1, filters)).thenReturn(locations);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}")
@@ -336,7 +337,8 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<StudyInstanceDto> studyInstanceDtos = StudyTestDataProvider.getListStudyDto();
 		final StudyInstanceDto studyInstanceDto = studyInstanceDtos.get(0);
 
-		Mockito.when(this.studyServiceMW.getStudyInstances(Mockito.any(StudySearchFilter.class), Mockito.any(PageRequest.class))).thenReturn(studyInstanceDtos);
+		Mockito.when(this.studyServiceMW.getStudyInstances(Mockito.any(StudySearchFilter.class), Mockito.any(PageRequest.class)))
+			.thenReturn(studyInstanceDtos);
 		Mockito.when(this.studyServiceMW.countStudyInstances(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies")

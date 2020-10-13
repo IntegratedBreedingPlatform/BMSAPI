@@ -2,7 +2,9 @@ package org.ibp.api.brapi.v1.trial;
 
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.util.Util;
+import org.ibp.api.brapi.v1.study.Contact;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +31,12 @@ public class TrialSummaryTestDataProvider {
 		return instanceMetadatas;
 	}
 
+	public static List<ContactDto> getContacts() {
+		final List<ContactDto> contacts = new ArrayList<>();
+		contacts.add(new ContactDto(1, "Maize Breeder", "admin@abc.org", "Creator"));
+		return contacts;
+	}
+
 	public static StudySummary getTrialSummary() {
 		final StudySummary studySummary = new StudySummary();
 		studySummary.setLocationId("1");
@@ -41,6 +49,7 @@ public class TrialSummaryTestDataProvider {
 		studySummary.setName("STUDY1");
 		studySummary.setOptionalInfo(getOptionalInfo());
 		studySummary.setInstanceMetaData(getInstanceMatadatas());
+		studySummary.setContacts(getContacts());
 		return studySummary;
 	}
 
