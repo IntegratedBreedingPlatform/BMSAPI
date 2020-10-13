@@ -4,6 +4,7 @@ package org.ibp.api.brapi.v1.trial;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.study.Contact;
 import org.ibp.api.brapi.v1.study.StudySummaryDto;
@@ -54,13 +55,13 @@ public class TrialSummary {
 	private List<Contact> contacts = new ArrayList<>();
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private String documentationURL;
+	private String documentationURL = StringUtils.EMPTY;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private List<String> externalReferences = new ArrayList<>();
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private String publications;
+	private String publications  = StringUtils.EMPTY;;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private List<String> datasetAuthorships = new ArrayList<>();
