@@ -45,7 +45,7 @@ public class LotImportRequestDtoValidator {
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 
-	public void validate(final LotImportRequestDto lotImportRequestDto) {
+	public void validate(final String programUUID, final LotImportRequestDto lotImportRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
 
 		if (lotImportRequestDto == null) {
@@ -75,7 +75,7 @@ public class LotImportRequestDtoValidator {
 		}
 
 		this.validateGermplasmList(lotList);
-		this.validateStorageLocations(lotList);
+		this.validateStorageLocations(programUUID, lotList);
 		this.validateUnitNames(lotList);
 		this.validateStockIds(lotList);
 		this.validateInitialBalances(lotList);
@@ -92,7 +92,7 @@ public class LotImportRequestDtoValidator {
 		this.germplasmValidator.validateGids(this.errors, gids);
 	}
 
-	private void validateStorageLocations(final List<LotItemDto> lotList) {
+	private void validateStorageLocations(final String programUUID, final List<LotItemDto> lotList) {
 		final List<String> locationAbbreviations =
 				lotList.stream().map(LotItemDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
 		if (Util.countNullOrEmptyStrings(locationAbbreviations)>0) {
@@ -100,7 +100,7 @@ public class LotImportRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		final List<Location> existingLocations =
-				locationDataManager.getFilteredLocations(STORAGE_LOCATION_TYPE, null, locationAbbreviations);
+			locationDataManager.getFilteredLocations(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, false);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 			final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
 			final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);

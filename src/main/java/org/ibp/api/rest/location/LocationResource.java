@@ -55,24 +55,18 @@ public class LocationResource {
 
 
 	@ApiOperation(value = "List locations", notes = "Get a list of locations filter by types")
-	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/locations", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropname}/locations", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<LocationDto>> listFavoriteLocations(
 		@PathVariable final String cropname,
-		@PathVariable final String programUUID,
+		@RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "list of location types")
 		@RequestParam final Set<Integer> locationTypes,
 		@ApiParam(value = "isFavoriteLocation", required = true)
 		@RequestParam final boolean favoriteLocations) {
 
-		final Project project = workbenchDataManager.getProjectByUuid(programUUID);
-
-		if (project == null) {
-			return new ResponseEntity("programUUID: " + programUUID + " not found", HttpStatus.NOT_FOUND);
-		}
-		//TODO Expose locationAbbreviations
-		final List<LocationDto> locations = locationService.getLocations(locationTypes, programUUID, favoriteLocations, null);
-		return new ResponseEntity<>(locations, HttpStatus.OK);
+		return new ResponseEntity<>(locationService.getLocations(cropname, programUUID, locationTypes, null, null, favoriteLocations),
+			HttpStatus.OK);
 
 	}
 }

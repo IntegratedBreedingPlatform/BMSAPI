@@ -13,5 +13,6 @@ public interface LocationService {
 
 	List<LocationTypeDTO> getLocationTypes();
 
-	List<LocationDto> getLocations(Set<Integer> locationTypes, String programUUID, boolean favoriteLocations, List<String> locationAbbreviations);
+	List<LocationDto> getLocations(String crop, String programUUID, Set<Integer> locationTypes, final List<Integer> locationIds,
+		List<String> locationAbbreviations, boolean favoriteLocations);
 }
