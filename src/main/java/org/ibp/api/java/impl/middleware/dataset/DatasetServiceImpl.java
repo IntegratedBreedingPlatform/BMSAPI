@@ -28,6 +28,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -66,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -485,6 +487,11 @@ public class DatasetServiceImpl implements DatasetService {
 			for (final String obsUnitId : obsUnitIdsList) {
 				table.row(obsUnitId).clear();
 			}
+		}
+		// Convert date values if necessary
+		final String fileType = input.getFileType() == null ? "" : input.getFileType().toUpperCase();
+		if (fileType.indexOf("KSU") >=0) {
+			this.correctKSUDateFormatIfNecessary(table, datasetMeasurementVariables);
 		}
 
 		// Check for data issues
@@ -948,5 +955,25 @@ public class DatasetServiceImpl implements DatasetService {
 			searchRequest.setFilter(filter);
 			searchDTO.setSearchRequest(searchRequest);
 		}
+	}
+
+	private void correctKSUDateFormatIfNecessary(final Table<String, String, String> table, final List<MeasurementVariable> measurementVariables) {
+		final List<String> dateMeasurementVariables = measurementVariables.stream().filter(measurementVariable -> measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE
+			.getId()).collect(Collectors.toList()).stream().map(measurementVariable -> measurementVariable.getName()).collect(Collectors.toList());
+		if (dateMeasurementVariables != null) {
+			for (final String obsUnit : table.rowKeySet()) {
+				for (final String colVariable : table.columnKeySet()) {
+					if (dateMeasurementVariables.contains(colVariable)) {
+						String value = table.get(obsUnit, colVariable);
+						final Date parsed = Util.tryParseDateAccurately(value, Util.DATE_AS_NUMBER_FORMAT);
+						if (parsed == null) {
+							value = Util.tryConvertDate(value, Util.DATE_AS_NUMBER_FORMAT_KSU, Util.DATE_AS_NUMBER_FORMAT);
+							table.put(obsUnit, colVariable, value);
+						}
+					}
+				}
+			}
+		}
+
 	}
 }

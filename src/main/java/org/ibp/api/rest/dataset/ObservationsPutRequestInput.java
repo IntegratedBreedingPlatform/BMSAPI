@@ -12,6 +12,7 @@ import java.util.List;
 public class ObservationsPutRequestInput {
 
 	private boolean processWarnings;
+	private String fileType;
 	// DO NOT CHANGE THIS VARIABLE EVEN WHEN IT IS ALWAYS TRUE, IT WILL BE USED WHEN WE IMPLEMENT THE IMPORT DATASET PROCESS
 	private boolean draftMode = true;
 	private List<List<String>> data;
@@ -55,4 +56,11 @@ public class ObservationsPutRequestInput {
 		return Pojomatic.equals(this, o);
 	}
 
+	public String getFileType() {
+		return this.fileType;
+	}
+
+	public void setFileType(final String fileType) {
+		this.fileType = fileType;
+	}
 }
