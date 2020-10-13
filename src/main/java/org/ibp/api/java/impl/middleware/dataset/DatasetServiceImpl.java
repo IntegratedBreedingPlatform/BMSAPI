@@ -967,8 +967,11 @@ public class DatasetServiceImpl implements DatasetService {
 						String value = table.get(obsUnit, colVariable);
 						final Date parsed = Util.tryParseDateAccurately(value, Util.DATE_AS_NUMBER_FORMAT);
 						if (parsed == null) {
-							value = Util.tryConvertDate(value, Util.DATE_AS_NUMBER_FORMAT_KSU, Util.DATE_AS_NUMBER_FORMAT);
-							table.put(obsUnit, colVariable, value);
+							final Date ksuParsed = Util.tryParseDateAccurately(value, Util.DATE_AS_NUMBER_FORMAT_KSU);
+							if (ksuParsed != null){
+								value = Util.formatDateAsStringValue(ksuParsed, Util.DATE_AS_NUMBER_FORMAT);
+								table.put(obsUnit, colVariable, value);
+							}
 						}
 					}
 				}
