@@ -28,4 +28,10 @@ public interface StudyEntryService {
 	List<MeasurementVariable> getEntryDescriptorColumns(Integer studyId);
 
 	List<Enumeration> getEntryTypes(String programUuid);
+
+	void addOrUpdateStudyEntryType(String programUuid, Enumeration entryType);
+
+	void deleteStudyEntryType(Integer entryTypeId);
+
+	Boolean isStudyEntryTypeUsed(Integer entryTypeId);
 }

@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -9,6 +10,7 @@ import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
@@ -65,6 +67,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
+
+	@Resource
+	private OntologyService ontologyService;
 
 	@Override
 	public StudyEntryDto replaceStudyEntry(final Integer studyId, final Integer entryId,
@@ -154,6 +159,23 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public List<Enumeration> getEntryTypes(final String programUuid) {
 		return this.ontologyDataManager.getStandardVariable(TermId.ENTRY_TYPE.getId(), programUuid).getEnumerations();
+	}
+
+	@Override
+	public void addOrUpdateStudyEntryType(final String programUuid, final Enumeration entryType){
+		final StandardVariable stdVar =
+			this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), programUuid);
+		this.ontologyService.saveOrUpdateStandardVariableEnumeration(stdVar, entryType);
+	}
+
+	@Override
+	public void deleteStudyEntryType(final Integer entryTypeId) {
+		this.ontologyService.deleteStandardVariableValidValue(TermId.ENTRY_TYPE.getId(), entryTypeId);
+	}
+
+	@Override
+	public Boolean isStudyEntryTypeUsed(final Integer entryTypeId) {
+		return !this.ontologyService.validateDeleteStandardVariableEnumeration(TermId.ENTRY_TYPE.getId(), entryTypeId);
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {

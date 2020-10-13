@@ -1,5 +1,6 @@
 package org.ibp.api.rest.study;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -102,18 +103,44 @@ public class StudyEntryResource {
 
 	}
 
-	@ApiOperation(value = "Get Study Entry Entry Types",
-		notes = "Get Study Entry Entry Types")
+	@ApiOperation(value = "Get Study Entry Types",
+		notes = "Get Study Entry Types")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entryTypes", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<Enumeration>> getStudyTypes(final @PathVariable String cropname,
+	public ResponseEntity<List<Enumeration>> getStudyEntryTypes(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId) {
-
 		final List<Enumeration> entryTypes =
 			this.studyEntryService.getEntryTypes(programUUID);
-
 		return new ResponseEntity<>(entryTypes, HttpStatus.OK);
+	}
 
+	@ApiOperation(value = "Add or update Study Entry Type",
+		notes = "Add or update Study Entry Type")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entryTypes/addOrUpdate", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity addOrUpdateStudyEntryType(final @PathVariable String cropname,
+		@PathVariable final String programUUID,	@PathVariable final Integer studyId, @RequestBody Enumeration entryType) {
+		this.studyEntryService.addOrUpdateStudyEntryType(programUUID, entryType);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@ApiOperation(value = "Delete Study Entry Type",
+		notes = "Delete Study Entry Types")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entryTypes/delete/{entryTypeId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity deleteStudyEntryType(final @PathVariable String cropname,
+		@PathVariable final String programUUID,	@PathVariable final Integer studyId, @PathVariable final Integer entryTypeId) {
+		this.studyEntryService.deleteStudyEntryType(entryTypeId);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@ApiOperation(value = "Checks if Study Entry Type is used in a study",
+		notes = "Checks if Study Entry Type is used in a study")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entryTypes/isUsed/{entryTypeId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Boolean> isStudyEntryTypeUsed(final @PathVariable String cropname,
+		@PathVariable final String programUUID,	@PathVariable final Integer studyId, @PathVariable final Integer entryTypeId) {
+		return new ResponseEntity<>(this.studyEntryService.isStudyEntryTypeUsed(entryTypeId), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get study entries",
