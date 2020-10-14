@@ -632,7 +632,7 @@ public class DatasetServiceImplTest {
 			.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Assert.fail("KSU Date format supported: d/M/yy");
 		}
 
@@ -975,8 +975,8 @@ public class DatasetServiceImplTest {
 		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
 		observationUnitEntryReplaceRequest.setEntryId(random.nextInt());
 
-		Mockito.when(studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
-		Mockito.when(studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
 			.thenReturn(new ArrayList<>());
 
@@ -1008,8 +1008,8 @@ public class DatasetServiceImplTest {
 		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
 		observationUnitEntryReplaceRequest.setEntryId(random.nextInt());
 
-		Mockito.when(studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
-		Mockito.when(studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
 			.thenReturn(Collections.singletonList(observationUnitRow1));
 
@@ -1042,11 +1042,11 @@ public class DatasetServiceImplTest {
 		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
 		observationUnitEntryReplaceRequest.setEntryId(random.nextInt());
 
-		Mockito.when(studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
-		Mockito.when(studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
 			.thenReturn(Collections.singletonList(observationUnitRow1));
-		Mockito.when(studyTransactionsService.countStudyTransactions(eq(studyId), Mockito.any())).thenReturn(1L);
+		Mockito.when(this.studyTransactionsService.countStudyTransactions(eq(studyId), Mockito.any())).thenReturn(1L);
 
 		try {
 			this.studyDatasetService.replaceObservationUnitsEntry(studyId, datasetId, observationUnitEntryReplaceRequest);
@@ -1077,15 +1077,15 @@ public class DatasetServiceImplTest {
 		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
 		observationUnitEntryReplaceRequest.setEntryId(newEntryId);
 
-		Mockito.when(studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
-		Mockito.when(studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
 			.thenReturn(Collections.singletonList(observationUnitRow1));
-		Mockito.when(studyTransactionsService.countStudyTransactions(eq(studyId), Mockito.any())).thenReturn(0L);
+		Mockito.when(this.studyTransactionsService.countStudyTransactions(eq(studyId), Mockito.any())).thenReturn(0L);
 
 		this.studyDatasetService.replaceObservationUnitsEntry(studyId, datasetId, observationUnitEntryReplaceRequest);
 
-		Mockito.verify(middlewareDatasetService, times(1)).replaceObservationUnitEntry(eq(itemIds), eq(newEntryId));
+		Mockito.verify(this.middlewareDatasetService, times(1)).replaceObservationUnitEntry(eq(itemIds), eq(newEntryId));
 	}
 
 }
