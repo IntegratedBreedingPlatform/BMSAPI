@@ -95,6 +95,31 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		final Map<Integer, String> pedigreeStringMap =
 			this.pedigreeService.getCrossExpansions(new HashSet<>(responseMap.keySet()), null, this.crossExpansionProperties);
+
+		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
+			final Integer gid = entry.getKey();
+			final GermplasmSearchResponse response = entry.getValue();
+			response.setPedigreeString(pedigreeStringMap.get(gid));
+		}
+
+		this.addParentsFromPedigreeTable(responseMap, germplasmSearchRequest);
+
+		return responseList;
+	}
+
+	private void addParentsFromPedigreeTable(final Map<Integer, GermplasmSearchResponse> responseMap,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+
+		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+
+		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
+			|| !(addedColumnsPropertyIds.contains(ColumnLabels.FGID.getName())
+			|| addedColumnsPropertyIds.contains(ColumnLabels.CROSS_FEMALE_PREFERRED_NAME.getName())
+			|| addedColumnsPropertyIds.contains(ColumnLabels.MGID.getName())
+			|| addedColumnsPropertyIds.contains(ColumnLabels.CROSS_MALE_PREFERRED_NAME.getName()))) {
+			return;
+		}
+
 		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
 		/**
 		 * TODO Investigate sql approach.
@@ -109,7 +134,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
 			final Integer gid = entry.getKey();
 			final GermplasmSearchResponse response = entry.getValue();
-			response.setPedigreeString(pedigreeStringMap.get(gid));
 
 			final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
 			final Optional<Germplasm> maleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.MGID.getName());
@@ -125,8 +149,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 				response.setMaleParentPreferredName(germplasm.getPreferredName().getNval());
 			}
 		}
-
-		return responseList;
 	}
 
 	@Override
