@@ -1,6 +1,5 @@
 package org.ibp.api.rest.study;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -10,8 +9,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.domain.study.GermplasmStudySourceTable;
-import org.ibp.api.domain.study.StudyEntryTable;
 import org.ibp.api.java.study.StudyEntryService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -155,10 +152,11 @@ public class StudyEntryResource {
 				"Default sort order is ascending. " +
 				"Multiple sort criteria are supported.")
 	})
-	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.POST)
+
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
-	public ResponseEntity<StudyEntryTable> getEntriesAsTable(final @PathVariable String cropName,
+	public ResponseEntity<List<StudyEntryDto>> getEntriesAsTable(final @PathVariable String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @ApiIgnore final Pageable pageable) {
 
@@ -176,11 +174,10 @@ public class StudyEntryResource {
 				}
 			});
 
-		final StudyEntryTable studyEntryTable = new StudyEntryTable();
-		studyEntryTable.setData(resultPage.getPageResults());
-		studyEntryTable.setRecordsTotal((int) resultPage.getTotalResults());
-		studyEntryTable.setRecordsFiltered((int) resultPage.getTotalResults());
-		return new ResponseEntity<>(studyEntryTable, HttpStatus.OK);
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
+		headers.add("X-Total-Pages", Long.toString(resultPage.getTotalPages()));
+		return new ResponseEntity<>(resultPage.getPageResults(), headers, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get Entry Descriptors as Columns", notes = "Retrieves ALL MeasurementVariables associated to the entry plus "
