@@ -965,13 +965,10 @@ public class DatasetServiceImpl implements DatasetService {
 					for (final String colVariable : table.columnKeySet()) {
 						if (dateMeasurementVariables.contains(colVariable)) {
 							String value = table.get(obsUnit, colVariable);
-							if (Util.isDateMatchPattern(value, Util.DATE_AS_NUMBER_FORMAT_KSU)) {
-								final Date ksuParsed = Util.tryParseDateAccurately(value, Util.DATE_AS_NUMBER_FORMAT_KSU);
-								if (ksuParsed !=null ) {
-									value = Util.formatDateAsStringValue(ksuParsed, Util.DATE_AS_NUMBER_FORMAT);
-									table.put(obsUnit, colVariable, value);
-								}
-
+							final Date ksuParsed = Util.tryParseDateAccurately(value, Util.DATE_AS_NUMBER_FORMAT_KSU);
+							if (ksuParsed !=null ) {
+								value = Util.formatDateAsStringValue(ksuParsed, Util.DATE_AS_NUMBER_FORMAT);
+								table.put(obsUnit, colVariable, value);
 							}
 						}
 					}
