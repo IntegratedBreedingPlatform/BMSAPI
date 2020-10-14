@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Api(value = "Breeding methods Services")
 @RestController
-public class BreedingMethodResource {
+public class BreedingMethodResourceGroup {
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
