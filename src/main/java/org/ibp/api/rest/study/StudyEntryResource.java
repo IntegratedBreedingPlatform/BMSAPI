@@ -65,15 +65,6 @@ public class StudyEntryResource {
 
 	}
 
-	@ApiOperation(value = "Checks if a study has Study Entries",
-		notes = "Checks if a study has Study Entries")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/hasStudyEntries", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<Boolean> hasEntries(final @PathVariable String cropname,
-		@PathVariable final String programUUID,	@PathVariable final Integer studyId) {
-		return new ResponseEntity<>(this.studyEntryService.hasStudyEntries(studyId), HttpStatus.OK);
-	}
-
 	@ApiOperation(value = "Delete germplasm entries in study",
 		notes = "Delete germplasm entries in study")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.DELETE)
@@ -103,46 +94,7 @@ public class StudyEntryResource {
 
 	}
 
-	@ApiOperation(value = "Get Study Entry Types",
-		notes = "Get Study Entry Types")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entryTypes", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<Enumeration>> getStudyEntryTypes(final @PathVariable String cropname,
-		@PathVariable final String programUUID,	@PathVariable final Integer studyId) {
-		final List<Enumeration> entryTypes =
-			this.studyEntryService.getEntryTypes(programUUID);
-		return new ResponseEntity<>(entryTypes, HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Add or update Study Entry Type",
-		notes = "Add or update Study Entry Type")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entryTypes/addOrUpdate", method = RequestMethod.PUT)
-	@ResponseBody
-	public ResponseEntity addOrUpdateStudyEntryType(final @PathVariable String cropname,
-		@PathVariable final String programUUID,	@PathVariable final Integer studyId, @RequestBody Enumeration entryType) {
-		this.studyEntryService.addOrUpdateStudyEntryType(programUUID, entryType);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
-	@ApiOperation(value = "Delete Study Entry Type",
-		notes = "Delete Study Entry Types")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entryTypes/delete/{entryTypeId}", method = RequestMethod.DELETE)
-	@ResponseBody
-	public ResponseEntity deleteStudyEntryType(final @PathVariable String cropname,
-		@PathVariable final String programUUID,	@PathVariable final Integer studyId, @PathVariable final Integer entryTypeId) {
-		this.studyEntryService.deleteStudyEntryType(entryTypeId);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
-	@ApiOperation(value = "Checks if Study Entry Type is used in a study",
-		notes = "Checks if Study Entry Type is used in a study")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entryTypes/isUsed/{entryTypeId}", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<Boolean> isStudyEntryTypeUsed(final @PathVariable String cropname,
-		@PathVariable final String programUUID,	@PathVariable final Integer studyId, @PathVariable final Integer entryTypeId) {
-		return new ResponseEntity<>(this.studyEntryService.isStudyEntryTypeUsed(entryTypeId), HttpStatus.OK);
-	}
-
+	// TODO check if this can be removed
 	@ApiOperation(value = "Get study entries",
 		notes = "Get study entries as table")
 	@ApiImplicitParams({

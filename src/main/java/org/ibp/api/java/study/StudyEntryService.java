@@ -17,8 +17,6 @@ public interface StudyEntryService {
 
 	List<StudyEntryDto> getStudyEntries(Integer studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 
-	Boolean hasStudyEntries(Integer studyId);
-
 	void deleteStudyEntries(Integer studyId);
 
 	void updateStudyEntryProperty(Integer studyId, Integer entryId, StudyEntryPropertyData studyEntryPropertyData);
@@ -27,11 +25,4 @@ public interface StudyEntryService {
 
 	List<MeasurementVariable> getEntryDescriptorColumns(Integer studyId);
 
-	List<Enumeration> getEntryTypes(String programUuid);
-
-	void addOrUpdateStudyEntryType(String programUuid, Enumeration entryType);
-
-	void deleteStudyEntryType(Integer entryTypeId);
-
-	Boolean isStudyEntryTypeUsed(Integer entryTypeId);
 }
