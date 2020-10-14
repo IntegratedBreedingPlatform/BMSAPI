@@ -1,18 +1,20 @@
 
 package org.ibp.api.brapi.v1.trial;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.apache.commons.lang.StringUtils;
+import org.generationcp.middleware.service.api.BrapiView;
+import org.ibp.api.brapi.v1.study.Contact;
+import org.ibp.api.brapi.v1.study.StudySummaryDto;
+import org.pojomatic.Pojomatic;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import org.ibp.api.brapi.v1.study.StudySummaryDto;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TrialSummary {
@@ -21,21 +23,48 @@ public class TrialSummary {
 
 	private String trialName;
 
+	@JsonView(BrapiView.BrapiV2.class)
+	private String trialDescription;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String trialPUI;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String commonCropName;
+
 	private String programDbId;
 
 	private String programName;
 
-	private String startDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date startDate;
 
-	private String endDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date endDate;
 
 	private String locationDbId;
 
 	private boolean active;
 
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private List<StudySummaryDto> studies = new ArrayList<>();
 
 	private Map<String, String> additionalInfo = new HashMap<String, String>();
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<Contact> contacts = new ArrayList<>();
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String documentationURL = StringUtils.EMPTY;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<String> externalReferences = new ArrayList<>();
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String publications  = StringUtils.EMPTY;;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<String> datasetAuthorships = new ArrayList<>();
 
 	public TrialSummary() {
 
@@ -65,7 +94,7 @@ public class TrialSummary {
 		return this.programName;
 	}
 
-	public void setProgramName(String programName) {
+	public void setProgramName(final String programName) {
 		this.programName = programName;
 	}
 
@@ -73,19 +102,19 @@ public class TrialSummary {
 		this.programDbId = programDbId;
 	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return this.startDate;
 	}
 
-	public void setStartDate(final String startDate) {
+	public void setStartDate(final Date startDate) {
 		this.startDate = startDate;
 	}
 
-	public String getEndDate() {
+	public Date getEndDate() {
 		return this.endDate;
 	}
 
-	public void setEndDate(final String endDate) {
+	public void setEndDate(final Date endDate) {
 		this.endDate = endDate;
 	}
 
@@ -101,7 +130,7 @@ public class TrialSummary {
 		return this.studies;
 	}
 
-	public void setStudies(List<StudySummaryDto> studies) {
+	public void setStudies(final List<StudySummaryDto> studies) {
 		this.studies = studies;
 	}
 
@@ -113,7 +142,7 @@ public class TrialSummary {
 		return this.additionalInfo;
 	}
 
-	public void setAdditionalInfo(Map<String, String> additionalInfo) {
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 		this.additionalInfo = additionalInfo;
 	}
 
@@ -122,7 +151,7 @@ public class TrialSummary {
 	}
 
 	public String getLocationDbId() {
-		return locationDbId;
+		return this.locationDbId;
 	}
 
 	public TrialSummary setLocationDbId(final String locationDbId) {
@@ -130,31 +159,82 @@ public class TrialSummary {
 		return this;
 	}
 
-	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof TrialSummary)) {
-			return false;
-		}
-		if (other == this) {
-			return true;
-		}
+	public String getTrialDescription() {
+		return this.trialDescription;
+	}
 
-		final TrialSummary castOther = (TrialSummary) other;
-		return new EqualsBuilder().append(this.getTrialDbId(), castOther.getTrialDbId()) //
-			.append(this.getProgramDbId(),castOther.getProgramDbId()) //
-			.append(this.getProgramName(),castOther.getProgramName()) //
-			.append(this.getStartDate(),castOther.getStartDate()) //
-			.isEquals();
+	public void setTrialDescription(final String trialDescription) {
+		this.trialDescription = trialDescription;
+	}
+
+	public String getTrialPUI() {
+		return this.trialPUI;
+	}
+
+	public void setTrialPUI(final String trialPUI) {
+		this.trialPUI = trialPUI;
+	}
+
+	public String getCommonCropName() {
+		return this.commonCropName;
+	}
+
+	public void setCommonCropName(final String commonCropName) {
+		this.commonCropName = commonCropName;
+	}
+
+	public List<Contact> getContacts() {
+		return this.contacts;
+	}
+
+	public void setContacts(final List<Contact> contacts) {
+		this.contacts = contacts;
+	}
+
+	public String getDocumentationURL() {
+		return this.documentationURL;
+	}
+
+	public void setDocumentationURL(final String documentationURL) {
+		this.documentationURL = documentationURL;
+	}
+
+	public List<String> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<String> externalReferences) {
+		this.externalReferences = externalReferences;
+	}
+
+	public String getPublications() {
+		return this.publications;
+	}
+
+	public void setPublications(final String publications) {
+		this.publications = publications;
+	}
+
+	public List<String> getDatasetAuthorships() {
+		return this.datasetAuthorships;
+	}
+
+	public void setDatasetAuthorships(final List<String> datasetAuthorships) {
+		this.datasetAuthorships = datasetAuthorships;
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.trialDbId).append(this.programDbId).append(this.programName).append(this.startDate)
-			.hashCode();
+		return Pojomatic.hashCode(this);
 	}
 
 	@Override
 	public String toString() {
-		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }
