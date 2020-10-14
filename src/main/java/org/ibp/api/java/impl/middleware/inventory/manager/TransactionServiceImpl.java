@@ -187,7 +187,9 @@ public class TransactionServiceImpl implements TransactionService {
 		this.transactionService
 			.depositLots(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
 				lotDepositRequestDto,
-				transactionStatus);
+				transactionStatus,
+				null,
+				null);
 	}
 
 	@Override

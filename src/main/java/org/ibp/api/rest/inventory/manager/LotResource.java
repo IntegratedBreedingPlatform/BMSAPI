@@ -14,8 +14,10 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMergeRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -32,6 +34,8 @@ import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotSplitValidator;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
@@ -97,6 +101,12 @@ public class LotResource {
 
 	@Autowired
 	private InventoryLock inventoryLock;
+
+	@Autowired
+	private LotMergeValidator lotMergeValidator;
+
+	@Autowired
+	private LotSplitValidator lotSplitValidator;
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
@@ -173,10 +183,11 @@ public class LotResource {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<String>> createLot(
 		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@ApiParam("Lot to be created")
 		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
 		final SingleEntityResponse<String> singleEntityResponse =
-			new SingleEntityResponse<String>(this.lotService.saveLot(lotGeneratorInputDto));
+			new SingleEntityResponse<>(this.lotService.saveLot(programUUID, lotGeneratorInputDto));
 		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
 	}
 
@@ -190,7 +201,7 @@ public class LotResource {
 			+ "SearchComposite is a list of gids or a search id (internal usage) ")
 		@RequestBody final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
 
-		return new ResponseEntity<>(this.lotService.createLots(lotGeneratorBatchRequestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.lotService.createLots(programUUID, lotGeneratorBatchRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Lots", notes = "Update one or more Lots")
@@ -198,7 +209,7 @@ public class LotResource {
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('UPDATE_LOTS')")
 	@ResponseBody
 	public ResponseEntity<Void> updateLots(
-		@PathVariable final String cropName,
+		@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
 		@ApiParam("Request with fields to update and criteria to update") @RequestBody final LotUpdateRequestDto lotRequest) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
@@ -233,7 +244,7 @@ public class LotResource {
 
 		try {
 			inventoryLock.lockWrite();
-			this.lotService.updateLots(extendedLotDtos, lotRequest);
+			this.lotService.updateLots(programUUID, extendedLotDtos, lotRequest);
 		} finally {
 			inventoryLock.unlockWrite();
 		}
@@ -247,8 +258,8 @@ public class LotResource {
 		method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
 	public ResponseEntity<Void> importLotsWithInitialBalance(@PathVariable final String cropName,
-		@RequestBody final LotImportRequestDto lotImportRequestDto) {
-		this.lotService.importLotsWithInitialTransaction(lotImportRequestDto);
+		@RequestParam(required = false) final String programUUID, @RequestBody final LotImportRequestDto lotImportRequestDto) {
+		this.lotService.importLotsWithInitialTransaction(programUUID, lotImportRequestDto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -257,12 +268,14 @@ public class LotResource {
 		value = "/crops/{cropName}/lot-lists/templates/xls",
 		method = RequestMethod.GET)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
-	public ResponseEntity<FileSystemResource> getTemplate(@PathVariable final String cropName) {
+	public ResponseEntity<FileSystemResource> getTemplate(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID) {
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
-		final List<LocationDto> locations = this.locationService.getLocations(LotResource.STORAGE_LOCATION_TYPE, null, false, null);
+		final List<LocationDto> locations =
+			this.locationService.getLocations(cropName, programUUID, LotResource.STORAGE_LOCATION_TYPE, null, null, false);
 
 		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
 		final HttpHeaders headers = new HttpHeaders();
@@ -346,6 +359,61 @@ public class LotResource {
 		} finally {
 			inventoryLock.unlockRead();
 		}
+	}
+
+	@ApiOperation(value = "Merge lots", notes = "Merge lots from the same germplasm. It keeps one lot and all the other lot balances will be then transferred to this lot and subsequently discarded.")
+	@RequestMapping(value = "/crops/{cropName}/lots/merge", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS
+			+ " or hasAnyAuthority('MERGE_LOTS')")
+	public ResponseEntity<Void> mergeLots(
+			@PathVariable final String cropName, //
+			@ApiParam("Lot template for merge action."
+					+ "SearchComposite is a list of UUIDs or a search id (internal usage) ")
+			@RequestBody final LotMergeRequestDto lotMergeRequestDto) {
+
+		try {
+			inventoryLock.lockWrite();
+
+			this.lotMergeValidator.validateRequest(lotMergeRequestDto);
+
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
+			final SearchCompositeDto<Integer, String> searchComposite = lotMergeRequestDto.getSearchComposite();
+			this.inventoryCommonValidator.validateSearchCompositeDto(searchComposite, errors);
+			final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchComposite);
+			if (searchComposite.getSearchRequest() == null) {
+				final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
+				this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchComposite.getItemIds());
+			}
+
+			this.lotService.mergeLots(lotMergeRequestDto.getLotUUIDToKeep(), searchDTO);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Split lot", notes = "It generates a new lot using an existing lot as the source for the initial deposit.")
+	@RequestMapping(value = "/crops/{cropName}/lots/split", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize(HAS_MANAGE_LOTS
+		+ " or hasAnyAuthority('SPLIT_LOT')")
+	public ResponseEntity<Void> splitLot(
+		@PathVariable final String cropName, //
+		@RequestParam(required = false) final String programUUID,//
+		@ApiParam("Lot template for merge action."
+			+ "SearchComposite is a list of UUIDs or a search id (internal usage) ")
+		@RequestBody final LotSplitRequestDto lotSplitRequestDto) {
+
+		this.lotSplitValidator.validateRequest(lotSplitRequestDto);
+
+		try {
+			inventoryLock.lockWrite();
+			this.lotService.splitLot(programUUID, lotSplitRequestDto);
+		} finally {
+			inventoryLock.unlockWrite();
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }

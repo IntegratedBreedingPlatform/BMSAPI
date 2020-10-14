@@ -70,7 +70,7 @@ public class LotInputValidatorTest {
 		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setNotes(RandomStringUtils.randomAlphabetic(256));
-		this.lotInputValidator.validate(this.lotGeneratorInputDto);
+		this.lotInputValidator.validate(null, this.lotGeneratorInputDto);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -81,7 +81,7 @@ public class LotInputValidatorTest {
 		this.lotGeneratorInputDto.setStockId(STOCK_ID);
 		this.lotGeneratorInputDto.setNotes(COMMENTS);
 
-		this.lotInputValidator.validate(this.lotGeneratorInputDto);
+		this.lotInputValidator.validate(null, this.lotGeneratorInputDto);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -93,7 +93,7 @@ public class LotInputValidatorTest {
 		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		this.lotGeneratorInputDto.setGenerateStock(true);
 
-		this.lotInputValidator.validate(this.lotGeneratorInputDto);
+		this.lotInputValidator.validate(null, this.lotGeneratorInputDto);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -106,7 +106,7 @@ public class LotInputValidatorTest {
 		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		this.lotGeneratorInputDto.setGenerateStock(true);
 
-		this.lotInputValidator.validate(this.lotGeneratorInputDto);
+		this.lotInputValidator.validate(null, this.lotGeneratorInputDto);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -119,7 +119,7 @@ public class LotInputValidatorTest {
 		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		this.lotGeneratorInputDto.setGenerateStock(true);
 
-		this.lotInputValidator.validate(this.lotGeneratorInputDto);
+		this.lotInputValidator.validate(null, this.lotGeneratorInputDto);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -131,7 +131,7 @@ public class LotInputValidatorTest {
 		this.lotGeneratorInputDto.setGenerateStock(false);
 		this.lotGeneratorInputDto.setStockPrefix(STOCK_PREFIX);
 
-		this.lotInputValidator.validate(this.lotGeneratorInputDto);
+		this.lotInputValidator.validate(null, this.lotGeneratorInputDto);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -143,6 +143,6 @@ public class LotInputValidatorTest {
 		this.lotGeneratorInputDto.setGenerateStock(false);
 		this.lotGeneratorInputDto.setStockId(RandomStringUtils.randomAlphabetic(40));
 
-		this.lotInputValidator.validate(this.lotGeneratorInputDto);
+		this.lotInputValidator.validate(null, this.lotGeneratorInputDto);
 	}
 }

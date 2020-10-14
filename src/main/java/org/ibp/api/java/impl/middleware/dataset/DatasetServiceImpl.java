@@ -878,9 +878,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.inventoryCommonValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
 
-		studyValidator.validateStudyContainsEntry(studyId, request.getEntryId());
+		this.studyValidator.validateStudyContainsEntry(studyId, request.getEntryId());
 
-		studyValidator.validateHasNoCrossesOrSelections(studyId);
+		this.studyValidator.validateHasNoCrossesOrSelections(studyId);
 
 		this.processSearchComposite(request.getSearchRequest());
 
@@ -904,7 +904,7 @@ public class DatasetServiceImpl implements DatasetService {
 		studyTransactionsRequest.setTransactionsSearch(transactionsSearchDto);
 		studyTransactionsRequest.setObservationUnitIds(observationUnitIds);
 
-		if (studyTransactionsService.countStudyTransactions(studyId, studyTransactionsRequest) > 0) {
+		if (this.studyTransactionsService.countStudyTransactions(studyId, studyTransactionsRequest) > 0) {
 			errors.reject("study.entry.replace.transactions.found", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -932,6 +932,12 @@ public class DatasetServiceImpl implements DatasetService {
 		observationUnitsMetadata.setObservationUnitsCount(Long.valueOf(observationUnitRows.size()));
 		observationUnitsMetadata.setInstancesCount(observationUnitRows.stream().map(i -> i.getTrialInstance()).distinct().count());
 		return observationUnitsMetadata;
+	}
+
+	@Override
+	public Long countObservationUnits(final Integer datasetId) {
+		return this.middlewareDatasetService.countObservationUnits(datasetId);
+
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
