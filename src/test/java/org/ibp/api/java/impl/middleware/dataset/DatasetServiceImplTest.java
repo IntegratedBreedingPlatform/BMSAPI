@@ -537,17 +537,18 @@ public class DatasetServiceImplTest {
 		}
 	}
 
-	@Test(expected = ApiRequestValidationException.class)
-	public void testImportDataset_ImportInvalidDateFormat() {
+	@Test
+	public void testImportDataset_ValidDateFormat() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();
 		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A", "KSU_Date");
 		final List<String> row1 = Arrays.asList("1", "1", "5/9/20");
-
+		final List<String> row2 = Arrays.asList("2", "1", "20201201");
 		data.add(header);
 		data.add(row1);
+		data.add(row2);
 
 		observationsPutRequestInput.setData(data);
 		observationsPutRequestInput.setProcessWarnings(true);
@@ -570,16 +571,21 @@ public class DatasetServiceImplTest {
 		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setVariables(observationUnitDataMap);
+		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow2 = new ObservationUnitRow();
+		observationUnitRow.setObservationUnitId(2);
+		observationUnitRow.setVariables(observationUnitDataMap);
 		storedData.put("1", observationUnitRow);
+		storedData.put("2", observationUnitRow);
 		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
 		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
-		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1", "2")))
 			.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
 		} catch (final PreconditionFailedException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalid.cell.date.value"));
+			e.printStackTrace();
+			Assert.fail("yyyyMMdd and d/M/yy should be supported");
 			throw e;
 		}
 	}
@@ -590,7 +596,6 @@ public class DatasetServiceImplTest {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
-		observationsPutRequestInput.setFileType("KSU");
 		final List<List<String>> data = new ArrayList<>();
 		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A", "KSU_Date");
 		final List<String> row1 = Arrays.asList("1", "1", "5/9/20");
@@ -634,11 +639,10 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testImportDataset_ImportKSUInvalidDateFormat() {
+	public void testImportDataset_ImportInvalidDateFormat() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
-		observationsPutRequestInput.setFileType("KSU");
 		final List<List<String>> data = new ArrayList<>();
 		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A", "KSU_Date");
 		final List<String> row1 = Arrays.asList("1", "1", "5/19/12");
