@@ -6,21 +6,16 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Service
 public class SecurityServiceImpl implements SecurityService {
-
-	@Autowired
-	private HttpServletRequest request;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -29,22 +24,12 @@ public class SecurityServiceImpl implements SecurityService {
 	private UserService userService;
 
 	@Override
-	public boolean isAccessible(final StudySummary study, final String cropname) {
-		if (StringUtils.isBlank(study.getProgramUUID())) {
-			// Blank program UUID == templates, allowed for all.
-			return true;
-		}
-		return this.loggedInUserIsMemberOf(study.getProgramUUID(), cropname);
-	}
-
-	@Override
 	public boolean isAccessible(final GermplasmList germplasmList, final String cropname) {
 
 		if (StringUtils.isBlank(germplasmList.getProgramUUID())) {
 			// Blank program UUID means this could be historic data loaded in crop db. Allow access to all such lists.
 			return true;
 		}
-
 
 		final WorkbenchUser listOwner = this.userService.getUserById(germplasmList.getUserId());
 		final WorkbenchUser loggedInUser = this.getCurrentlyLoggedInUser();

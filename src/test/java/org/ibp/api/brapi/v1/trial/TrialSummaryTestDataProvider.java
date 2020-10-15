@@ -2,6 +2,9 @@ package org.ibp.api.brapi.v1.trial;
 
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.service.api.user.ContactDto;
+import org.generationcp.middleware.util.Util;
+import org.ibp.api.brapi.v1.study.Contact;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,18 +31,25 @@ public class TrialSummaryTestDataProvider {
 		return instanceMetadatas;
 	}
 
+	public static List<ContactDto> getContacts() {
+		final List<ContactDto> contacts = new ArrayList<>();
+		contacts.add(new ContactDto(1, "Maize Breeder", "admin@abc.org", "Creator"));
+		return contacts;
+	}
+
 	public static StudySummary getTrialSummary() {
 		final StudySummary studySummary = new StudySummary();
 		studySummary.setLocationId("1");
 		studySummary.setActive(Boolean.TRUE);
-		studySummary.setEndDate("20170404");
+		studySummary.setEndDate(Util.tryParseDate("20170404"));
 		studySummary.setProgramDbId("64646");
 		studySummary.setProgramName("PROGRAM1");
-		studySummary.setStartDate("20160404");
+		studySummary.setStartDate(Util.tryParseDate("20160404"));
 		studySummary.setStudyDbid(2);
 		studySummary.setName("STUDY1");
 		studySummary.setOptionalInfo(getOptionalInfo());
 		studySummary.setInstanceMetaData(getInstanceMatadatas());
+		studySummary.setContacts(getContacts());
 		return studySummary;
 	}
 
