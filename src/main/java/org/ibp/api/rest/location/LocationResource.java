@@ -61,7 +61,7 @@ public class LocationResource {
 		@PathVariable final String cropname,
 		@RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "list of location types")
-		@RequestParam final Set<Integer> locationTypes,
+		@RequestParam(required = false) final Set<Integer> locationTypes,
 		@ApiParam(value = "isFavoriteLocation", required = true)
 		@RequestParam final boolean favoriteLocations) {
 
