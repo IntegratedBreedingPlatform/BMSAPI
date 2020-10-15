@@ -26,7 +26,7 @@ import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -111,7 +111,7 @@ public class StudyResourceBrapi {
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<EntityListResponse<StudyDto>> listStudies(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<StudyInstanceDto>> listStudies(@PathVariable final String crop,
 		@ApiParam(value = "Common name for the crop associated with this study.") @RequestParam(value = "commonCropName", required = false)
 		final String commonCropName,
 		@ApiParam(value = "Filter based on study type unique identifier") @RequestParam(value = "studyTypeDbId", required = false)
@@ -151,28 +151,28 @@ public class StudyResourceBrapi {
 		final StudySearchFilter studySearchFilter =
 			new StudySearchFilter(studyTypeDbId, programDbId, locationDbId, seasonDbId, trialDbId, studyDbId, active);
 
-		final PagedResult<StudyDto> resultPage =
-			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudyDto>() {
+		final PagedResult<StudyInstanceDto> resultPage =
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudyInstanceDto>() {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyService.countStudies(studySearchFilter);
+					return StudyResourceBrapi.this.studyService.countStudyInstances(studySearchFilter);
 				}
 
 				@Override
-				public List<StudyDto> getResults(final PagedResult<StudyDto> pagedResult) {
-					return StudyResourceBrapi.this.studyService.getStudies(studySearchFilter, pageRequest);
+				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
+					return StudyResourceBrapi.this.studyService.getStudyInstances(studySearchFilter, pageRequest);
 				}
 			});
 
-		final List<StudyDto> summaryDtoList = resultPage.getPageResults();
+		final List<StudyInstanceDto> summaryDtoList = resultPage.getPageResults();
 
-		final Result<StudyDto> result = new Result<StudyDto>().withData(summaryDtoList);
+		final Result<StudyInstanceDto> result = new Result<StudyInstanceDto>().withData(summaryDtoList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
-		final EntityListResponse<StudyDto> entityListResponse = new EntityListResponse<>(metadata, result);
+		final EntityListResponse<StudyInstanceDto> entityListResponse = new EntityListResponse<>(metadata, result);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
@@ -339,7 +339,7 @@ public class StudyResourceBrapi {
 		final String sanitizedFilename = FileUtils.sanitizeFileName(filename);
 
 		respHeaders.set(StudyResourceBrapi.CONTENT_TYPE, String.format("%s;charset=utf-8", mimeType));
-		respHeaders.set(StudyResourceBrapi.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"; filename*=utf-8\'\'%s",
+		respHeaders.set(StudyResourceBrapi.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"; filename*=utf-8''%s",
 			sanitizedFilename, FileUtils.encodeFilenameForDownload(sanitizedFilename)));
 
 		return new ResponseEntity<>(fileSystemResource, respHeaders, HttpStatus.OK);
