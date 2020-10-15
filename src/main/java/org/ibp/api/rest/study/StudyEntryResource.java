@@ -145,4 +145,23 @@ public class StudyEntryResource {
 
 		return new ResponseEntity<>(entryDescriptors, HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Get Study Test Entries count",
+		notes = "Get Study Test Entries count")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/count-test-entries", method = RequestMethod.GET)
+	public ResponseEntity<Long> countStudyTestEntries(@PathVariable final String crop,
+		@PathVariable final String programUUID,	@PathVariable final Integer studyId) {
+
+		return new ResponseEntity<>(this.studyEntryService.countAllStudyTestEntries(studyId), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get Study Check Entries count",
+		notes = "Get Study Check Entries count")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/count-check-entries/{checkOnly}", method = RequestMethod.GET)
+	public ResponseEntity<Long> countCheckTestEntries(@PathVariable final String crop,
+		@PathVariable final String programUUID,	@PathVariable final Integer studyId, @PathVariable final Boolean checkOnly) {
+		return new ResponseEntity<>(this.studyEntryService.countAllCheckTestEntries(studyId, programUUID, checkOnly), HttpStatus.OK);
+	}
 }

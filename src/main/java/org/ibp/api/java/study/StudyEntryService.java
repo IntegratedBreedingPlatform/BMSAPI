@@ -23,6 +23,10 @@ public interface StudyEntryService {
 
 	long countAllStudyEntries(Integer studyId);
 
+	long countAllStudyTestEntries(Integer studyId);
+
+	long countAllCheckTestEntries(Integer studyId, String programUuid, Boolean checkOnly);
+
 	List<MeasurementVariable> getEntryDescriptorColumns(Integer studyId);
 
 }
