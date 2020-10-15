@@ -35,8 +35,8 @@ public class EntryTypeResource {
 		return new ResponseEntity<>(entryTypes, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Add Entry Type",
-		notes = "Add or update Study Entry Type")
+	@ApiOperation(value = "Add Study Entry Type",
+		notes = "Add Study Entry Type")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/entry-types", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity addEntryType(final @PathVariable String cropname,
@@ -45,8 +45,8 @@ public class EntryTypeResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	@ApiOperation(value = "Add or update Study Entry Type",
-		notes = "Add or update Study Entry Type")
+	@ApiOperation(value = "Update Study Entry Type",
+		notes = "Update Study Entry Type")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/entry-types", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateEntryType(final @PathVariable String cropname,
