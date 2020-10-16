@@ -5,7 +5,7 @@ import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataI
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
