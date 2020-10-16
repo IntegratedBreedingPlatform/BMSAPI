@@ -161,7 +161,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				Collections.singletonList(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())));
 		} else {
 			final List<String> checkEntryTypeIds = entryTypes.stream()
-				.filter(enttryType -> enttryType.getId() != SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())
+				.filter(entryType -> entryType.getId() != SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())
 				.map(entryType -> String.valueOf(entryType.getId())).collect(Collectors.toList());
 			return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId, checkEntryTypeIds);
 		}
