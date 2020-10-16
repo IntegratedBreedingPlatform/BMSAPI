@@ -167,6 +167,16 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		}
 	}
 
+	@Override
+	public StudyEntryMetadata getStudyEntriesMetadata(final Integer studyId, final String programUuid) {
+		this.studyValidator.validate(studyId, false);
+		final StudyEntryMetadata studyEntryMetadata = new StudyEntryMetadata();
+		studyEntryMetadata.setTestEntriesCount(this.countAllStudyTestEntries(studyId));
+		studyEntryMetadata.setCheckEntriesCount(this.countAllCheckTestEntries(studyId, programUuid, true));
+		studyEntryMetadata.setNonTestEntriesCount(this.countAllCheckTestEntries(studyId, programUuid, false));
+		return studyEntryMetadata;
+	}
+
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
 		final MeasurementVariable sampleColumn = new MeasurementVariable();
 		sampleColumn.setName(name);

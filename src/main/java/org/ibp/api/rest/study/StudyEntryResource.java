@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.study.StudyEntryMetadata;
 import org.ibp.api.java.study.StudyEntryService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -146,22 +147,13 @@ public class StudyEntryResource {
 		return new ResponseEntity<>(entryDescriptors, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get Study Test Entries count",
-		notes = "Get Study Test Entries count")
+	@ApiOperation(value = "Get Study Entries metadata",
+		notes = "Get Study Entries metadata")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/count-test-entries", method = RequestMethod.GET)
-	public ResponseEntity<Long> countStudyTestEntries(@PathVariable final String crop,
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/metadata", method = RequestMethod.GET)
+	public ResponseEntity<StudyEntryMetadata> countStudyTestEntries(@PathVariable final String crop,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId) {
 
-		return new ResponseEntity<>(this.studyEntryService.countAllStudyTestEntries(studyId), HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Get Study Check Entries count",
-		notes = "Get Study Check Entries count")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/count-check-entries/{checkOnly}", method = RequestMethod.GET)
-	public ResponseEntity<Long> countCheckTestEntries(@PathVariable final String crop,
-		@PathVariable final String programUUID,	@PathVariable final Integer studyId, @PathVariable final Boolean checkOnly) {
-		return new ResponseEntity<>(this.studyEntryService.countAllCheckTestEntries(studyId, programUUID, checkOnly), HttpStatus.OK);
+		return new ResponseEntity<>(this.studyEntryService.getStudyEntriesMetadata(studyId, programUUID), HttpStatus.OK);
 	}
 }
