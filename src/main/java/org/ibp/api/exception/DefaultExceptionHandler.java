@@ -176,7 +176,6 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = INTERNAL_SERVER_ERROR)
 	@ResponseBody
 	public ErrorResponse handleBVDesignException(BVDesignException ex) {
-		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
 		DefaultExceptionHandler.LOG.error("BVDesign app failed to execute.", ex);
 		response.addError(this.messageSource.getMessage(ex.getBvErrorCode(), null, LocaleContextHolder.getLocale()));
@@ -185,10 +184,9 @@ public class DefaultExceptionHandler {
 
 	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ExceptionHandler(BVLicenseParseException.class)
-	@ResponseStatus(value = PRECONDITION_FAILED)
+	@ResponseStatus(value = INTERNAL_SERVER_ERROR)
 	@ResponseBody
 	public ErrorResponse handleBVLicenseParseException(final BVLicenseParseException ex) {
-		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
 		final String mainError = this.messageSource.getMessage(ex.getBvErrorCode(), null, LocaleContextHolder.getLocale());
 		DefaultExceptionHandler.LOG.error("BVDesign license checking failed: " + mainError, ex);
