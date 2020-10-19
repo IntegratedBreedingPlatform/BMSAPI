@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.domain.common.PagedResult;
@@ -26,6 +27,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 // TODO: Move these services to StudyResource
 @Api(value = "Study Entry Services")
@@ -103,12 +105,14 @@ public class StudyEntryResource {
 				"Default sort order is ascending. " +
 				"Multiple sort criteria are supported.")
 	})
-	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryDto>> getEntriesAsTable(final @PathVariable String cropName,
 		@PathVariable final String programUUID,
-		@PathVariable final Integer studyId, @ApiIgnore final Pageable pageable) {
+		@PathVariable final Integer studyId,
+		@RequestBody final StudyEntrySearchDto searchDTO,
+		@ApiIgnore final Pageable pageable) {
 
 		final PagedResult<StudyEntryDto> resultPage =
 			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<StudyEntryDto>() {
@@ -120,7 +124,8 @@ public class StudyEntryResource {
 
 				@Override
 				public List<StudyEntryDto> getResults(final PagedResult<StudyEntryDto> pagedResult) {
-					return StudyEntryResource.this.studyEntryService.getStudyEntries(studyId, null, pageable);
+					StudyEntrySearchDto.Filter filter = Objects.isNull(searchDTO) ? null : searchDTO.getFilter();
+					return StudyEntryResource.this.studyEntryService.getStudyEntries(studyId, filter, pageable);
 				}
 			});
 

@@ -2,10 +2,12 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -20,13 +22,16 @@ import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyEntryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,6 +65,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private DatasetService datasetService;
+
+	@Autowired
+	private OntologyDataManager ontologyDataManager;
 
 	@Override
 	public StudyEntryDto replaceStudyEntry(final Integer studyId, final Integer entryId,
@@ -107,7 +115,23 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 		this.studyValidator.validate(studyId, false);
-		return this.middlewareStudyEntryService.getStudyEntries(studyId, filter, pageable);
+
+		Pageable convertedPageable = null;
+		if (pageable != null && pageable.getSort() != null) {
+			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+			if (iterator.hasNext()) {
+				// Convert the sort property name from termid to actual term name.
+				final Sort.Order sort = iterator.next();
+				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
+				if (term != null) {
+					pageable.getSort().and(new Sort(sort.getDirection(), term.getName()));
+					convertedPageable =
+						new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(), term.getName());
+				}
+			}
+		}
+
+		return this.middlewareStudyEntryService.getStudyEntries(studyId, filter, convertedPageable);
 	}
 
 	@Override
