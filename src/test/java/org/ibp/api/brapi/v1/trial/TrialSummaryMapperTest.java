@@ -1,6 +1,7 @@
 package org.ibp.api.brapi.v1.trial;
 
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.ibp.api.brapi.v1.study.Contact;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
 
@@ -26,6 +27,12 @@ public class TrialSummaryMapperTest {
 		assertThat(studySummary.getName(), equalTo(studySummaryDto.getTrialName()));
 		assertThat(studySummary.getOptionalInfo().size(), equalTo(studySummaryDto.getAdditionalInfo().size()));
 		assertThat(studySummary.getInstanceMetaData().size(), equalTo(studySummaryDto.getStudies().size()));
+		assertThat(studySummary.getContacts().size(), equalTo(studySummaryDto.getContacts().size()));
+		final Contact contact = studySummaryDto.getContacts().get(0);
+		assertThat(studySummary.getContacts().get(0).getContactDbId(), equalTo(contact.getContactDbId()));
+		assertThat(studySummary.getContacts().get(0).getEmail(), equalTo(contact.getEmail()));
+		assertThat(studySummary.getContacts().get(0).getName(), equalTo(contact.getName()));
+		assertThat(studySummary.getContacts().get(0).getType(), equalTo(contact.getType()));
 	}
 
 }

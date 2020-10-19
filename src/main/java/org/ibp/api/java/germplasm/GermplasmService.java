@@ -2,7 +2,7 @@
 package org.ibp.api.java.germplasm;
 
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
-import org.generationcp.middleware.domain.germplasm.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -27,6 +27,8 @@ public interface GermplasmService {
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
 	GermplasmSummary getGermplasm(String germplasmId);
+
+	List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(String name);
 
 	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, Boolean includeSiblings);
 

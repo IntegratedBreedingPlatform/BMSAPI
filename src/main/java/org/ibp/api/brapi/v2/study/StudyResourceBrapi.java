@@ -5,7 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.ibp.api.brapi.v1.common.Metadata;

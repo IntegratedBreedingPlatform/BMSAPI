@@ -5,10 +5,10 @@ import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataI
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -90,34 +90,34 @@ public class StudyTestDataProvider {
 		return locationDetailsDtoList;
 	}
 
-	public static StudyDto getStudyDto() {
-		final StudyDto studyDto = new StudyDto();
-		studyDto.setProgramName("Maize Program");
-		studyDto.setProgramDbId(UUID.randomUUID().toString());
-		studyDto.setLocationName("Afghanistan");
-		studyDto.setLocationDbId("1");
-		studyDto.setActive("true");
-		studyDto.setCommonCropName("maize");
-		studyDto.setStartDate(new Date());
-		studyDto.setEndDate(new Date());
+	public static StudyInstanceDto getStudyDto() {
+		final StudyInstanceDto studyInstanceDto = new StudyInstanceDto();
+		studyInstanceDto.setProgramName("Maize Program");
+		studyInstanceDto.setProgramDbId(UUID.randomUUID().toString());
+		studyInstanceDto.setLocationName("Afghanistan");
+		studyInstanceDto.setLocationDbId("1");
+		studyInstanceDto.setActive("true");
+		studyInstanceDto.setCommonCropName("maize");
+		studyInstanceDto.setStartDate(new Date());
+		studyInstanceDto.setEndDate(new Date());
 
 		final SeasonDto seasonDto = new SeasonDto("Dry Season", String.valueOf(TermId.SEASON_DRY.getId()));
-		studyDto.setSeasons(Arrays.asList(seasonDto));
+		studyInstanceDto.setSeasons(Arrays.asList(seasonDto));
 
-		studyDto.setStudyDbId("1");
-		studyDto.setStudyName("Study1");
-		studyDto.setTrialDbId("2");
-		studyDto.setStudyTypeDbId("6");
-		studyDto.setStudyTypeName("Trial");
-		studyDto.setStudyDbId("6");
-		studyDto.setTrialName("Trial1");
-		return studyDto;
+		studyInstanceDto.setStudyDbId("1");
+		studyInstanceDto.setStudyName("Study1");
+		studyInstanceDto.setTrialDbId("2");
+		studyInstanceDto.setStudyTypeDbId("6");
+		studyInstanceDto.setStudyTypeName("Trial");
+		studyInstanceDto.setStudyDbId("6");
+		studyInstanceDto.setTrialName("Trial1");
+		return studyInstanceDto;
 	}
 
-	public static List<StudyDto> getListStudyDto() {
-		final List<StudyDto> studyDtoList = new ArrayList<>();
-		studyDtoList.add(StudyTestDataProvider.getStudyDto());
-		return studyDtoList;
+	public static List<StudyInstanceDto> getListStudyDto() {
+		final List<StudyInstanceDto> studyInstanceDtoList = new ArrayList<>();
+		studyInstanceDtoList.add(StudyTestDataProvider.getStudyDto());
+		return studyInstanceDtoList;
 	}
 
 }
