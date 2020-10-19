@@ -124,8 +124,7 @@ public class StudyEntryResource {
 
 				@Override
 				public List<StudyEntryDto> getResults(final PagedResult<StudyEntryDto> pagedResult) {
-					StudyEntrySearchDto.Filter filter = Objects.isNull(searchDTO) ? null : searchDTO.getFilter();
-					return StudyEntryResource.this.studyEntryService.getStudyEntries(studyId, filter, pageable);
+					return StudyEntryResource.this.studyEntryService.getStudyEntries(studyId, searchDTO.getFilter(), pageable);
 				}
 			});
 

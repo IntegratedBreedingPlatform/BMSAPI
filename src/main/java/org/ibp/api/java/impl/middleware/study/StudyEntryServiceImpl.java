@@ -66,9 +66,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Resource
 	private DatasetService datasetService;
 
-	@Autowired
-	private OntologyDataManager ontologyDataManager;
-
 	@Override
 	public StudyEntryDto replaceStudyEntry(final Integer studyId, final Integer entryId,
 		final StudyEntryDto studyEntryDto) {
@@ -115,23 +112,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 		this.studyValidator.validate(studyId, false);
-
-		Pageable convertedPageable = null;
-		if (pageable != null && pageable.getSort() != null) {
-			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
-			if (iterator.hasNext()) {
-				// Convert the sort property name from termid to actual term name.
-				final Sort.Order sort = iterator.next();
-				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
-				if (term != null) {
-					pageable.getSort().and(new Sort(sort.getDirection(), term.getName()));
-					convertedPageable =
-						new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(), term.getName());
-				}
-			}
-		}
-
-		return this.middlewareStudyEntryService.getStudyEntries(studyId, filter, convertedPageable);
+		return this.middlewareStudyEntryService.getStudyEntries(studyId, filter, pageable);
 	}
 
 	@Override
