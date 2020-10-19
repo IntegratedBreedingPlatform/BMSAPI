@@ -1,9 +1,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
@@ -14,7 +12,6 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
@@ -29,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,9 +60,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private DatasetService datasetService;
-
-	@Resource
-	private EntryTypeService entryTypeService;
 
 	@Override
 	public StudyEntryDto replaceStudyEntry(final Integer studyId, final Integer entryId,
@@ -145,36 +138,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		entryDescriptors.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
 
 		return entryDescriptors;
-	}
-
-	@Override
-	public long countAllStudyTestEntries(final Integer studyId) {
-		return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
-			Collections.singletonList(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
-	}
-
-	@Override
-	public long countAllCheckTestEntries(final Integer studyId, final String programUuid, final Boolean checkOnly) {
-		final List<Enumeration> entryTypes = this.entryTypeService.getEntryTypes(programUuid);
-		if(checkOnly) {
-			return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
-				Collections.singletonList(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())));
-		} else {
-			final List<String> checkEntryTypeIds = entryTypes.stream()
-				.filter(entryType -> entryType.getId() != SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())
-				.map(entryType -> String.valueOf(entryType.getId())).collect(Collectors.toList());
-			return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId, checkEntryTypeIds);
-		}
-	}
-
-	@Override
-	public StudyEntryMetadata getStudyEntriesMetadata(final Integer studyId, final String programUuid) {
-		this.studyValidator.validate(studyId, false);
-		final StudyEntryMetadata studyEntryMetadata = new StudyEntryMetadata();
-		studyEntryMetadata.setTestEntriesCount(this.countAllStudyTestEntries(studyId));
-		studyEntryMetadata.setCheckEntriesCount(this.countAllCheckTestEntries(studyId, programUuid, true));
-		studyEntryMetadata.setNonTestEntriesCount(this.countAllCheckTestEntries(studyId, programUuid, false));
-		return studyEntryMetadata;
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
