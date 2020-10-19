@@ -4,12 +4,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.java.impl.middleware.study.StudyEntryMetadata;
 import org.ibp.api.java.study.StudyEntryService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -57,6 +55,7 @@ public class StudyEntryResource {
 	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmEntryRequestDto germplasmEntryRequestDto) {
+
 		return new ResponseEntity<>(
 			this.studyEntryService.createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId()),
 			HttpStatus.OK);
@@ -92,7 +91,6 @@ public class StudyEntryResource {
 
 	}
 
-	// TODO check if this can be removed
 	@ApiOperation(value = "Get study entries",
 		notes = "Get study entries as table")
 	@ApiImplicitParams({
@@ -105,7 +103,6 @@ public class StudyEntryResource {
 				"Default sort order is ascending. " +
 				"Multiple sort criteria are supported.")
 	})
-
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
@@ -145,15 +142,5 @@ public class StudyEntryResource {
 			this.studyEntryService.getEntryDescriptorColumns(studyId);
 
 		return new ResponseEntity<>(entryDescriptors, HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Get Study Entries metadata",
-		notes = "Get Study Entries metadata")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/metadata", method = RequestMethod.GET)
-	public ResponseEntity<StudyEntryMetadata> countStudyTestEntries(@PathVariable final String crop,
-		@PathVariable final String programUUID,	@PathVariable final Integer studyId) {
-
-		return new ResponseEntity<>(this.studyEntryService.getStudyEntriesMetadata(studyId, programUUID), HttpStatus.OK);
 	}
 }
