@@ -955,23 +955,25 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
-	private void correctKSUDateFormatIfNecessary(final Table<String, String, String> table, final List<MeasurementVariable> measurementVariables) {
-
-		final List<String> dateVariables = measurementVariables.stream().filter(measurementVariable -> measurementVariable.getDataTypeId()!=null && measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE .getId()).map(measurementVariable -> measurementVariable.getName()).collect(Collectors.toList());
+	private void correctKSUDateFormatIfNecessary(final Table<String, String, String> table,
+		final List<MeasurementVariable> measurementVariables) {
+		final List<String> dateVariables = measurementVariables.stream().filter(
+			measurementVariable -> measurementVariable.getDataTypeId() != null
+				&& measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId())
+			.map(measurementVariable -> measurementVariable.getName()).collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(dateVariables)) {
 			for (final String colVariable : table.columnKeySet()) {
 				if (dateVariables.contains(colVariable)) {
 					for (final String obsUnit : table.rowKeySet()) {
-							String value = table.get(obsUnit, colVariable);
-							final Date ksuParsed = Util.tryParseDate(value, Util.DATE_AS_NUMBER_FORMAT_KSU);
-							if (ksuParsed !=null ) {
-								value = Util.formatDateAsStringValue(ksuParsed, Util.DATE_AS_NUMBER_FORMAT);
-								table.put(obsUnit, colVariable, value);
-							}
+						String value = table.get(obsUnit, colVariable);
+						final Date ksuParsed = Util.tryParseDate(value, Util.DATE_AS_NUMBER_FORMAT_KSU);
+						if (ksuParsed != null) {
+							value = Util.formatDateAsStringValue(ksuParsed, Util.DATE_AS_NUMBER_FORMAT);
+							table.put(obsUnit, colVariable, value);
 						}
 					}
+				}
 			}
 		}
-
 	}
 }
