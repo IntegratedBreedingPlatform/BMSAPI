@@ -60,6 +60,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -956,23 +957,19 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private void correctKSUDateFormatIfNecessary(final Table<String, String, String> table, final List<MeasurementVariable> measurementVariables) {
 
-		final List<MeasurementVariable> dateVariables = measurementVariables.stream().filter(measurementVariable -> measurementVariable.getDataTypeId()!=null && measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE
-			.getId()).collect(Collectors.toList());
-		if (dateVariables != null) {
-			final List<String> dateMeasurementVariables = dateVariables.stream().map(measurementVariable -> measurementVariable.getName()).collect(Collectors.toList());
-			if (dateMeasurementVariables != null) {
-				for (final String obsUnit : table.rowKeySet()) {
-					for (final String colVariable : table.columnKeySet()) {
-						if (dateMeasurementVariables.contains(colVariable)) {
+		final List<String> dateVariables = measurementVariables.stream().filter(measurementVariable -> measurementVariable.getDataTypeId()!=null && measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE .getId()).map(measurementVariable -> measurementVariable.getName()).collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(dateVariables)) {
+			for (final String colVariable : table.columnKeySet()) {
+				if (dateVariables.contains(colVariable)) {
+					for (final String obsUnit : table.rowKeySet()) {
 							String value = table.get(obsUnit, colVariable);
-							final Date ksuParsed = Util.tryParseDateAccurately(value, Util.DATE_AS_NUMBER_FORMAT_KSU);
+							final Date ksuParsed = Util.tryParseDate(value, Util.DATE_AS_NUMBER_FORMAT_KSU);
 							if (ksuParsed !=null ) {
 								value = Util.formatDateAsStringValue(ksuParsed, Util.DATE_AS_NUMBER_FORMAT);
 								table.put(obsUnit, colVariable, value);
 							}
 						}
 					}
-				}
 			}
 		}
 
