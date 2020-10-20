@@ -2,12 +2,10 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -22,16 +20,13 @@ import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyEntryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
