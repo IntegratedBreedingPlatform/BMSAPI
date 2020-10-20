@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
@@ -32,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,6 +92,16 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final ModelMapper mapper = StudyEntryMapper.getInstance();
 		final List<StudyEntryDto> studyEntryDtoList =
 			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyEntryDto.class)).collect(Collectors.toList());
+
+		final Map<Integer, GermplasmListData> germplasmListDataMap =
+			germplasmList.getListData().stream().collect(Collectors.toMap(GermplasmListData::getGermplasmId, g -> g));
+		final List<Integer> germplasmDescriptorIds = this.getEntryDescriptorColumns(studyId).stream()
+			.map(measurementVariable -> measurementVariable.getTermId()).collect(Collectors.toList());
+
+		for(final StudyEntryDto studyEntryDto: studyEntryDtoList) {
+			studyEntryDto.setProperties(
+				StudyEntryPropertiesMapper.map(germplasmListDataMap.get(studyEntryDto.getGid()), germplasmDescriptorIds));
+		}
 
 		return this.middlewareStudyEntryService.saveStudyEntries(studyId, studyEntryDtoList);
 	}

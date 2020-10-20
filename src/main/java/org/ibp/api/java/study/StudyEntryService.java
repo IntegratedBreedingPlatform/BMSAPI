@@ -1,6 +1,5 @@
 package org.ibp.api.java.study;
 
-import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;

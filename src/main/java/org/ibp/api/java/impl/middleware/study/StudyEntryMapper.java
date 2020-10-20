@@ -1,11 +1,9 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
@@ -13,13 +11,12 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.spi.MappingContext;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class StudyEntryMapper {
 
 	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
-	private static final String DEFAULT_ENTRY_TYPE = String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+	private List<Integer> germplasmDescriptorIds;
 
 	/**
 	 * We do not want public constructor of this class as all methods are static
@@ -71,27 +68,6 @@ public class StudyEntryMapper {
 		}
 	}
 
-
-	private static class PropertiesConverter implements Converter<GermplasmListData, Map<Integer, StudyEntryPropertyData>> {
-
-		@Override
-		public Map<Integer, StudyEntryPropertyData> convert(final MappingContext<GermplasmListData, Map<Integer, StudyEntryPropertyData>> context) {
-			final Map<Integer, StudyEntryPropertyData> stringStudyEntryPropertyDataMap = new HashMap<>();
-			final GermplasmListData listData = context.getSource();
-			stringStudyEntryPropertyDataMap
-					.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(), DEFAULT_ENTRY_TYPE));
-			stringStudyEntryPropertyDataMap
-					.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(), listData.getSeedSource()));
-			stringStudyEntryPropertyDataMap
-					.put(TermId.GROUPGID.getId(),
-							new StudyEntryPropertyData(null, TermId.GROUPGID.getId(), String.valueOf(listData.getGermplasm().getMgid())));
-
-
-			return context.getMappingEngine().map(context.create(stringStudyEntryPropertyDataMap, context.getDestinationType()));
-		}
-
-	}
-
 	private static void addGermplasmListDataMapping(final ModelMapper mapper) {
 		mapper.addMappings(new PropertyMap<GermplasmListData, StudyEntryDto>() {
 
@@ -102,9 +78,12 @@ public class StudyEntryMapper {
 				this.map().setGid(this.source.getGermplasmId());
 				this.map().setDesignation(this.source.getDesignation());
 				this.map().setEntryCode(this.source.getEntryCode());
-				this.using(new PropertiesConverter()).map(this.source).setProperties(null);
 			}
 		});
+	}
+
+	public void setGermplasmDescriptorIds(final List<Integer> germplasmDescriptorIds) {
+		this.germplasmDescriptorIds = germplasmDescriptorIds;
 	}
 
 }
