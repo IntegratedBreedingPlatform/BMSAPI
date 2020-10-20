@@ -35,33 +35,4 @@ public class EntryTypeResource {
 		return new ResponseEntity<>(entryTypes, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Add Study Entry Type",
-		notes = "Add Study Entry Type")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/entry-types", method = RequestMethod.POST)
-	@ResponseBody
-	public ResponseEntity addEntryType(final @PathVariable String cropname,
-		@PathVariable final String programUUID,	@RequestBody Enumeration entryType) {
-		this.entryTypeService.addEntryType(programUUID, entryType);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
-	@ApiOperation(value = "Update Study Entry Type",
-		notes = "Update Study Entry Type")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/entry-types", method = RequestMethod.PUT)
-	@ResponseBody
-	public ResponseEntity updateEntryType(final @PathVariable String cropname,
-		@PathVariable final String programUUID,	@RequestBody Enumeration entryType) {
-		this.entryTypeService.updateEntryType(programUUID, entryType);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
-	@ApiOperation(value = "Delete Study Entry Type", notes = "Delete Study Entry Types")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/entry-types", method = RequestMethod.DELETE)
-	@ResponseBody
-	public ResponseEntity deleteStudyEntryType(final @PathVariable String cropname,
-		@PathVariable final String programUUID, @PathVariable final Integer entryTypeId) {
-		this.entryTypeService.deleteEntryType(entryTypeId);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
 }

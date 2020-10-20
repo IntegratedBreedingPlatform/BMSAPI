@@ -10,10 +10,4 @@ public interface EntryTypeService {
 
 	List<Enumeration> getEntryTypes(String programUuid);
 
-	void addEntryType(String programUuid, Enumeration entryType);
-
-	void updateEntryType(String programUuid, Enumeration entryType);
-
-	void deleteEntryType(Integer entryTypeId);
-
 }
