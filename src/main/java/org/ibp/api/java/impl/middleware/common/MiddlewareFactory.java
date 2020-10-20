@@ -45,6 +45,7 @@ import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.MethodServiceImpl;
+import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.*;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
@@ -351,6 +352,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public OntologyDataManager getOntologyDataManager() {
 		return new OntologyDataManagerImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyService getOntologyService() {
+		return new OntologyServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
