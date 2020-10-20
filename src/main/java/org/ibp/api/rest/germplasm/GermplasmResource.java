@@ -4,8 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.commons.security.SecurityUtil;
+import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -17,6 +21,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,15 +34,24 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 
 @Api(value = "Germplasm Services")
-// TODO @PreAuthorize("hasAnyAuthority('ADMIN', ...)")
 @Controller
 public class GermplasmResource {
+
+	private static final String HAS_GERMPLASM_SEARCH = " or hasAnyAuthority('STUDIES'"
+		+ ", 'MANAGE_STUDIES'"
+		+ ", 'QUERIES'"
+		+ ", 'GRAPHICAL_QUERIES'"
+		+ ")";
 
 	@Autowired
 	private GermplasmService germplasmService;
 
+	@Autowired
+	private UserService userService;
+
 	@ApiOperation(value = "Search germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')" + HAS_GERMPLASM_SEARCH)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
 			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
@@ -56,6 +70,13 @@ public class GermplasmResource {
 	) {
 
 		BaseValidator.checkNotNull(germplasmSearchRequest, "param.null", new String[] {"germplasmSearchDTO"});
+
+		final String userName = SecurityUtil.getLoggedInUserName();
+		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUUID);
+
+		if (user.hasOnlyProgramRoles(cropName)) {
+			germplasmSearchRequest.setInProgramListOnly(true);
+		}
 
 		final PagedResult<GermplasmSearchResponse> result =
 			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmSearchResponse>() {
@@ -82,6 +103,20 @@ public class GermplasmResource {
 		headers.add("X-Filtered-Count", Long.toString(result.getFilteredResults()));
 
 		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
+	}
+
+	/**
+	 * Simple search to feed autocomplete features
+	 * @return a limited set of results matching the query criteria
+	 */
+	@ApiOperation(value = "Search germplasm attributes")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes/search", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<AttributeDTO>> searchAttributes(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = true) final String query) {
+
+		return new ResponseEntity<>(this.germplasmService.searchAttributes(query), HttpStatus.OK);
 	}
 
 }
