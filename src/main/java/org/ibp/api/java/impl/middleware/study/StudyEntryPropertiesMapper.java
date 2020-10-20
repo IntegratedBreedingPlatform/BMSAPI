@@ -30,6 +30,9 @@ public class StudyEntryPropertiesMapper {
 			} else if(TermId.GERMPLASM_SOURCE.getId() == variableId) {
 				studyEntryProperties.put(TermId.GERMPLASM_SOURCE.getId(),
 					createStudyEntryPropertyValue(TermId.GERMPLASM_SOURCE.getId(), source.getSeedSource()));
+			} else if (TermId.ENTRY_CODE.getId() == variableId) {
+				studyEntryProperties.put(TermId.ENTRY_CODE.getId(),
+					createStudyEntryPropertyValue(TermId.ENTRY_CODE.getId(), source.getEntryCode()));
 			}
 		}
 
