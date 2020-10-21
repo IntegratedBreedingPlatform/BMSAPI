@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,11 +23,11 @@ public class EntryTypeResource {
 	@Resource
 	private EntryTypeService entryTypeService;
 
-	@ApiOperation(value = "Get Study Entry Types",
-		notes = "Get Study Entry Types")
+	@ApiOperation(value = "Get Entry Types",
+		notes = "Get Entry Types")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/entry-types", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<Enumeration>> getStudyEntryTypes(final @PathVariable String cropname,
+	public ResponseEntity<List<Enumeration>> getEntryTypes(final @PathVariable String cropname,
 		@PathVariable final String programUUID) {
 		final List<Enumeration> entryTypes =
 			this.entryTypeService.getEntryTypes(programUUID);
