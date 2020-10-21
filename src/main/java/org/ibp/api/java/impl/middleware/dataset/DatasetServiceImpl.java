@@ -28,6 +28,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -59,6 +60,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -66,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -486,6 +489,8 @@ public class DatasetServiceImpl implements DatasetService {
 				table.row(obsUnitId).clear();
 			}
 		}
+		// Convert date values if necessary
+		this.correctKSUDateFormatIfNecessary(table, datasetMeasurementVariables);
 
 		// Check for data issues
 		this.observationsTableValidator.validateObservationsValuesDataTypes(table, datasetMeasurementVariables);
@@ -947,6 +952,28 @@ public class DatasetServiceImpl implements DatasetService {
 			filter.setFilteredNdExperimentIds(searchDTO.getItemIds());
 			searchRequest.setFilter(filter);
 			searchDTO.setSearchRequest(searchRequest);
+		}
+	}
+
+	private void correctKSUDateFormatIfNecessary(final Table<String, String, String> table,
+		final List<MeasurementVariable> measurementVariables) {
+		final List<String> dateVariables = measurementVariables.stream().filter(
+			measurementVariable -> measurementVariable.getDataTypeId() != null
+				&& measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId())
+			.map(measurementVariable -> measurementVariable.getName()).collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(dateVariables)) {
+			for (final String colVariable : table.columnKeySet()) {
+				if (dateVariables.contains(colVariable)) {
+					for (final String obsUnit : table.rowKeySet()) {
+						String value = table.get(obsUnit, colVariable);
+						final Date ksuParsed = Util.tryParseDate(value, Util.DATE_AS_NUMBER_FORMAT_KSU);
+						if (ksuParsed != null) {
+							value = Util.formatDateAsStringValue(ksuParsed, Util.DATE_AS_NUMBER_FORMAT);
+							table.put(obsUnit, colVariable, value);
+						}
+					}
+				}
+			}
 		}
 	}
 }

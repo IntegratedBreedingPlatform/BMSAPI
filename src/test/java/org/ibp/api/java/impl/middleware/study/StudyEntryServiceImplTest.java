@@ -103,6 +103,15 @@ public class StudyEntryServiceImplTest {
 
 		Mockito.when(this.germplasmListService.getGermplasmList(germplasmListId)).thenReturn(germplasmList);
 
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setDatasetId(datasetId);
+		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
+		final List<DatasetDTO> datasetDTOS = Collections.singletonList(datasetDTO);
+		Mockito.when(this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
+			.thenReturn(datasetDTOS);
+
 		this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
