@@ -11,12 +11,9 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.spi.MappingContext;
 
-import java.util.List;
-
 public class StudyEntryMapper {
 
 	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
-	private List<Integer> germplasmDescriptorIds;
 
 	/**
 	 * We do not want public constructor of this class as all methods are static
@@ -81,9 +78,4 @@ public class StudyEntryMapper {
 			}
 		});
 	}
-
-	public void setGermplasmDescriptorIds(final List<Integer> germplasmDescriptorIds) {
-		this.germplasmDescriptorIds = germplasmDescriptorIds;
-	}
-
 }
