@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -92,9 +91,8 @@ public class StudyEntryResource {
 
 	}
 
-	// TODO check if this can be removed
 	@ApiOperation(value = "Get study entries",
-		notes = "Get study entries as table")
+		notes = "Get study entries")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
 			value = "Results page you want to retrieve (0..N)"),
@@ -105,11 +103,10 @@ public class StudyEntryResource {
 				"Default sort order is ascending. " +
 				"Multiple sort criteria are supported.")
 	})
-
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
-	public ResponseEntity<List<StudyEntryDto>> getEntriesAsTable(final @PathVariable String cropName,
+	public ResponseEntity<List<StudyEntryDto>> getStudyEntries(final @PathVariable String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @ApiIgnore final Pageable pageable) {
 
