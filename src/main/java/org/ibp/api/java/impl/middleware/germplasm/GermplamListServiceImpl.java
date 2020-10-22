@@ -5,13 +5,13 @@ import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
+import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.Util;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -121,6 +122,20 @@ public class GermplamListServiceImpl implements GermplamListService {
 	@Override
 	public GermplasmList getGermplasmList(final Integer germplasmListId) {
 		return this.germplasmListManager.getGermplasmListById(germplasmListId);
+	}
+
+	@Override
+	public List<GermplasmListTypeDTO> getGermplasmListTypes() {
+		List<UserDefinedField> germplasmListTypes = this.germplasmListManager.getGermplasmListTypes();
+		return germplasmListTypes.stream()
+			.map(userDefinedField -> {
+				GermplasmListTypeDTO germplasmListTypeDTO = new GermplasmListTypeDTO();
+				germplasmListTypeDTO.setCode(userDefinedField.getFcode());
+				germplasmListTypeDTO.setId(userDefinedField.getFldno());
+				germplasmListTypeDTO.setName(userDefinedField.getFname());
+				return germplasmListTypeDTO;
+			})
+			.collect(Collectors.toList());
 	}
 
 	private void validateParentId(final String parentId, final String programUUID) {

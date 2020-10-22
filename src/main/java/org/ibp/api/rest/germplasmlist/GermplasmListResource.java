@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,4 +38,16 @@ public class GermplasmListResource {
 		final List<TreeNode> children = this.germplamListService.getGermplasmListChildrenNodes(crop, programUUID, parentFolderId, onlyFolders);
 		return new ResponseEntity<>(children, HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Get germplasm lists types", notes = "Get germplasm lists types")
+	@RequestMapping(value = "/crops/{crop}/germplasm-list-types", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmListTypeDTO>> getGermplasmListTypes(
+		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID) {
+		List<GermplasmListTypeDTO> germplasmListTypes = this.germplamListService.getGermplasmListTypes();
+		return new ResponseEntity<>(germplasmListTypes, HttpStatus.OK);
+	}
+
+
 }
