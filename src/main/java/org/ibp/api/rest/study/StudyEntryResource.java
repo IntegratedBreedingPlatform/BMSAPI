@@ -111,7 +111,7 @@ public class StudyEntryResource {
 	public ResponseEntity<List<StudyEntryDto>> getStudyEntries(final @PathVariable String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@RequestBody final StudyEntrySearchDto searchDTO,
+		@RequestBody(required = false) final StudyEntrySearchDto searchDTO,
 		@ApiIgnore final Pageable pageable) {
 
 		final PagedResult<StudyEntryDto> resultPage =
@@ -124,7 +124,8 @@ public class StudyEntryResource {
 
 				@Override
 				public List<StudyEntryDto> getResults(final PagedResult<StudyEntryDto> pagedResult) {
-					return StudyEntryResource.this.studyEntryService.getStudyEntries(studyId, searchDTO.getFilter(), pageable);
+					StudyEntrySearchDto.Filter filter = (Objects.isNull(searchDTO) ? null : searchDTO.getFilter());
+					return StudyEntryResource.this.studyEntryService.getStudyEntries(studyId, filter, pageable);
 				}
 			});
 
