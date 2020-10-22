@@ -144,7 +144,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				// Convert the sort property name from termid to actual term name.
 				final Sort.Order sort = iterator.next();
 				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
-				String sortProperty = Objects.isNull(term) ? sort.getProperty() : term.getName();
+				final String sortProperty = Objects.isNull(term) ? sort.getProperty() : term.getName();
 				pageable.getSort().and(new Sort(sort.getDirection(), sortProperty));
 				convertedPageable =
 					new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(),
