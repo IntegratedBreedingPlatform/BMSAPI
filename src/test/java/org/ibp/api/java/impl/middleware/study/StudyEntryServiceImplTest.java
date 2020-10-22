@@ -165,12 +165,11 @@ public class StudyEntryServiceImplTest {
 		final MeasurementVariable observationUnitIdVariable = new MeasurementVariable(TermId.OBS_UNIT_ID.getId());
 		final MeasurementVariable entryNoVariable = new MeasurementVariable(TermId.ENTRY_NO.getId());
 		final MeasurementVariable designationVariable = new MeasurementVariable(TermId.DESIG.getId());
-		final MeasurementVariable stockIdVariable = new MeasurementVariable(TermId.STOCKID.getId());
 		final MeasurementVariable crossVariable = new MeasurementVariable(TermId.CROSS.getId());
 		final MeasurementVariable gidVariable = new MeasurementVariable(TermId.GID.getId());
 
 		final List<MeasurementVariable> measurementVariables = Lists
-			.newArrayList(entryCodeVariable, observationUnitIdVariable, entryNoVariable, designationVariable, stockIdVariable,
+			.newArrayList(entryCodeVariable, observationUnitIdVariable, entryNoVariable, designationVariable,
 				crossVariable, gidVariable);
 
 		Mockito.when(this.datasetService.getObservationSetVariables(datasetId, Lists

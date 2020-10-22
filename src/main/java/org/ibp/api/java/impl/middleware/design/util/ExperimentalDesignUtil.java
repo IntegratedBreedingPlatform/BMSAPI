@@ -79,9 +79,6 @@ public class ExperimentalDesignUtil {
 		} else if (termId == TermId.GROUPGID.getId()) {
 			final Optional<String> groupGID = studyEntryDto.getStudyEntryPropertyValue(TermId.GROUPGID.getId());
 			return new ObservationUnitData(termId, groupGID.orElse(StringUtils.EMPTY));
-		} else if (termId == TermId.STOCKID.getId()) {
-			final Optional<String> stockId = studyEntryDto.getStudyEntryPropertyValue(TermId.STOCKID.getId());
-			return new ObservationUnitData(termId, stockId.orElse(StringUtils.EMPTY));
 		} else if (termId == TermId.CROSS.getId()) {
 			final Optional<String> cross = studyEntryDto.getStudyEntryPropertyValue(TermId.CROSS.getId());
 			return new ObservationUnitData(termId, cross.orElse(StringUtils.EMPTY));
