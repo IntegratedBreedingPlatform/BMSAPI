@@ -126,7 +126,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 	@Override
 	public List<GermplasmListTypeDTO> getGermplasmListTypes() {
-		List<UserDefinedField> germplasmListTypes = this.germplasmListManager.getGermplasmListTypes();
+		final List<UserDefinedField> germplasmListTypes = this.germplasmListManager.getGermplasmListTypes();
 		return germplasmListTypes.stream()
 			.map(userDefinedField -> {
 				GermplasmListTypeDTO germplasmListTypeDTO = new GermplasmListTypeDTO();

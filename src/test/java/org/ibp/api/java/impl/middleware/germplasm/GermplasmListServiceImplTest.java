@@ -2,9 +2,12 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.UserDefinedField;
+import org.hamcrest.Matchers;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.junit.Assert;
@@ -15,8 +18,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.times;
 
 public class GermplasmListServiceImplTest {
@@ -110,6 +118,28 @@ public class GermplasmListServiceImplTest {
 
 		germplamListService.getGermplasmListChildrenNodes("maize", program, parentId, Boolean.FALSE);
 		Mockito.verify(germplasmListManager, times(1)).getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), program, GermplamListServiceImpl.BATCH_SIZE);
+	}
+
+	@Test
+	public void shouldGetGermplasmListTypes() {
+
+		final UserDefinedField userDefinedField = new UserDefinedField();
+		userDefinedField.setFcode("CHECK");
+		userDefinedField.setFldno(new Random().nextInt());
+		userDefinedField.setFname("CHECK LIST");
+
+		Mockito.when(this.germplasmListManager.getGermplasmListTypes()).thenReturn(Arrays.asList(userDefinedField));
+
+		List<GermplasmListTypeDTO> germplasmListTypes = this.germplamListService.getGermplasmListTypes();
+		assertNotNull(germplasmListTypes);
+		assertThat(germplasmListTypes, hasSize(1));
+		final GermplasmListTypeDTO actualGermplasmListTypeDTO = germplasmListTypes.get(0);
+		assertThat(actualGermplasmListTypeDTO.getCode(), Matchers.is(userDefinedField.getFcode()));
+		assertThat(actualGermplasmListTypeDTO.getId(), Matchers.is(userDefinedField.getFldno()));
+		assertThat(actualGermplasmListTypeDTO.getName(), Matchers.is(userDefinedField.getFname()));
+
+		Mockito.verify(this.germplasmListManager).getGermplasmListTypes();
+		Mockito.verifyNoMoreInteractions(this.germplasmListManager);
 	}
 
 }

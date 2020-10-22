@@ -45,7 +45,7 @@ public class GermplasmListResource {
 	public ResponseEntity<List<GermplasmListTypeDTO>> getGermplasmListTypes(
 		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID) {
-		List<GermplasmListTypeDTO> germplasmListTypes = this.germplamListService.getGermplasmListTypes();
+		final List<GermplasmListTypeDTO> germplasmListTypes = this.germplamListService.getGermplasmListTypes();
 		return new ResponseEntity<>(germplasmListTypes, HttpStatus.OK);
 	}
 
