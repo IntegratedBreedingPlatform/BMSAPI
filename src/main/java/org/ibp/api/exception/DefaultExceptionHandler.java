@@ -110,6 +110,18 @@ public class DefaultExceptionHandler {
 	}
 
 	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ApiValidationException.class)
+	@ResponseStatus(value = BAD_REQUEST)
+	@ResponseBody
+	public ErrorResponse handleApiValidationException(final ApiValidationException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
+		final String message = this.getMessage(ex.getErrorCode(), ex.getParams());
+		response.addError(message);
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ExceptionHandler(ResourceNotFoundException.class)
 	@ResponseStatus(value = NOT_FOUND)
 	@ResponseBody
