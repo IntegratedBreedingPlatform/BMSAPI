@@ -93,8 +93,8 @@ public class StudyEntryResource {
 
 	}
 
-	@ApiOperation(value = "Get study entries",
-		notes = "Get study entries")
+	@ApiOperation(value = "Returns a paginated list of study entries",
+		notes = "Returns a paginated list of study entries")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
 			value = "Results page you want to retrieve (0..N)"),
