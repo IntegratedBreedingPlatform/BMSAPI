@@ -5,20 +5,27 @@ import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
+import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.Util;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +37,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
+import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
 
 @Service
 @Transactional
@@ -50,7 +61,13 @@ public class GermplamListServiceImpl implements GermplamListService {
 	public GermplasmDataManager germplasmDataManager;
 
 	@Autowired
+	public GermplasmListService germplasmListService;
+
+	@Autowired
 	public ProgramValidator programValidator;
+
+	@Autowired
+	public SecurityService securityService;
 
 	private BindingResult errors;
 
@@ -68,7 +85,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 		}
 
 		this.validateParentId(parentId, programUUID);
-		BaseValidator.checkNotNull(folderOnly, "list.folder.only");
+		checkNotNull(folderOnly, "list.folder.only");
 
 		final List<TreeNode> treeNodes = new ArrayList<>();
 		if (parentId == null) {
@@ -122,6 +139,121 @@ public class GermplamListServiceImpl implements GermplamListService {
 	@Override
 	public GermplasmList getGermplasmList(final Integer germplasmListId) {
 		return this.germplasmListManager.getGermplasmListById(germplasmListId);
+	}
+
+	@Override
+	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request) {
+
+		// validations
+
+		checkNotNull(request, "param.null", new String[] {"request"});
+		checkNotNull(request.getEntries(), "param.null", new String[] {"request entries"});
+		checkArgument(!request.getEntries().isEmpty(), "param.null", new String[] {"request entries"});
+		checkNotNull(request.getType(), "param.null", new String[] {"type"});
+		checkNotNull(request.getName(), "param.null", new String[] {"name"});
+		checkNotNull(request.getDate(), "param.null", new String[] {"date"});
+
+		final String currentProgram = ContextHolder.getCurrentProgram();
+		final String parentFolderId = request.getParentFolderId();
+		checkNotNull(parentFolderId, "param.null", new String[] {"parentFolderId"});
+		this.validateParentId(parentFolderId, currentProgram);
+
+		// process and assign defaults + more validations
+		this.processEntries(request.getEntries());
+
+		// properties that depend on CROP/PROGRAM folder
+		int status = GermplasmList.Status.LIST.getCode();
+		String programUUID = null;
+		// If the germplasm list is saved in 'Crop lists' folder, the programUUID should be null
+		// so that the germplasm list will be accessible to all programs of the same crop.
+		if (CROP_LISTS.equals(parentFolderId)) {
+			// list should be locked by default if it is saved in 'Crop lists' folder.
+			status = GermplasmList.Status.LOCKED_LIST.getCode();
+		} else {
+			programUUID = currentProgram;
+		}
+
+		if (CROP_LISTS.equals(parentFolderId) || PROGRAM_LISTS.equals(parentFolderId)) {
+			request.setParentFolderId(null);
+		}
+
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+
+		// finally save
+		return this.germplasmListService.create(request, status, programUUID, loggedInUser);
+	}
+
+	private void processEntries(final List<GermplasmListGeneratorDTO.GermplasmEntryDTO> entries) {
+
+		final Map<Integer, String> preferrredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(
+			entries.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList()));
+
+		int entryNo = 1;
+		boolean hasEntryNo = false;
+		boolean hasEntryCode = false;
+		boolean hasEntryCodeEmpty = false;
+		boolean hasSeedSource = false;
+		boolean hasSeedSourceEmpty = false;
+		boolean hasDesignation = false;
+		boolean hasDesignationEmpty = false;
+		boolean hasGroupName = false;
+		boolean hasGroupNameEmpty = false;
+
+		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : entries) {
+			if (entry.getGid() == null) {
+				throw new ApiValidationException("", "error.germplasmlist.save.gid");
+			}
+
+			if (entry.getEntryNo() == null) {
+				entry.setEntryNo(entryNo++);
+			} else {
+				hasEntryNo = true;
+			}
+
+			if (isBlank(entry.getEntryCode())) {
+				entry.setEntryCode(String.valueOf(entry.getEntryNo()));
+				hasEntryCodeEmpty = true;
+			} else {
+				hasEntryCode = true;
+			}
+
+			if (isBlank(entry.getSeedSource())) {
+				entry.setSeedSource(GermplasmListDataDAO.SOURCE_UNKNOWN);
+				hasSeedSourceEmpty = true;
+			} else {
+				hasSeedSource = true;
+			}
+
+			if (isBlank(entry.getDesignation())) {
+				entry.setDesignation(preferrredNamesMap.get(entry.getGid()));
+				hasDesignationEmpty = true;
+			} else {
+				hasDesignation = true;
+			}
+
+			if (isBlank(entry.getGroupName())) {
+				entry.setGroupName(GermplasmListDataDAO.GROUP_NAME_DEFAULT);
+				hasGroupNameEmpty = true;
+			} else {
+				hasGroupName = true;
+			}
+		}
+		if (hasEntryNo && entryNo > 1) {
+			throw new ApiValidationException("", "error.germplasmlist.save.entryno.gaps");
+		}
+		if (hasEntryCode && hasEntryCodeEmpty) {
+			throw new ApiValidationException("", "error.germplasmlist.save.gaps", "entryCode");
+		}
+		if (hasSeedSource && hasSeedSourceEmpty) {
+			throw new ApiValidationException("", "error.germplasmlist.save.gaps", "seedSource");
+		}
+		if (hasDesignation && hasDesignationEmpty) {
+			throw new ApiValidationException("", "error.germplasmlist.save.gaps", "designation");
+		}
+		if (hasGroupName && hasGroupNameEmpty) {
+			throw new ApiValidationException("", "error.germplasmlist.save.gaps", "groupName");
+		}
+
 	}
 
 	@Override
