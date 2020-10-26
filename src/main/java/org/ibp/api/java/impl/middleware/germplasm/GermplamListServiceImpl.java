@@ -5,11 +5,11 @@ import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
-import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -25,7 +25,6 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplamListService;
-import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +51,12 @@ public class GermplamListServiceImpl implements GermplamListService {
 	public static final String CROP_LISTS = "CROPLISTS";
 	private static final String LEAD_CLASS = "lead";
 	public static final int BATCH_SIZE = 500;
+
+	// List entry params
+	static final String ENTRY_CODE = "entryCode";
+	static final String SEED_SOURCE = "seedSource";
+	static final String DESIGNATION = "designation";
+	static final String GROUP_NAME = "groupName";
 
 	@Autowired
 	private GermplasmListManager germplasmListManager;
@@ -256,16 +261,16 @@ public class GermplamListServiceImpl implements GermplamListService {
 			throw new ApiValidationException("", "error.germplasmlist.save.entryno.gaps");
 		}
 		if (hasEntryCode && hasEntryCodeEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", "entryCode");
+			throw new ApiValidationException("", "error.germplasmlist.save.gaps", ENTRY_CODE);
 		}
 		if (hasSeedSource && hasSeedSourceEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", "seedSource");
+			throw new ApiValidationException("", "error.germplasmlist.save.gaps", SEED_SOURCE);
 		}
 		if (hasDesignation && hasDesignationEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", "designation");
+			throw new ApiValidationException("", "error.germplasmlist.save.gaps", DESIGNATION);
 		}
 		if (hasGroupName && hasGroupNameEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", "groupName");
+			throw new ApiValidationException("", "error.germplasmlist.save.gaps", GROUP_NAME);
 		}
 
 	}
