@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmAttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
@@ -122,13 +123,23 @@ public class GermplasmResource {
 	}
 
 	@ApiOperation(value = "Returns germplasm name types filtered by a list of codes", notes = "Returns germplasm name types filtered by a list of codes")
-	@RequestMapping(value = "/crops/{cropName}/germplasm-name-types", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/name-types", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmNameTypeDTO>> getGermplasmNameTypes(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam final Set<String> codes) {
 
 		return new ResponseEntity<>(this.germplasmService.getGermplasmNameTypesByCodes(codes), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Returns germplasm attributes filtered by a list of codes", notes = "Returns germplasm attributes filtered by a list of codes")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmAttributeDTO>> getGermplasmAttributes(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam final Set<String> codes) {
+
+		return new ResponseEntity<>(this.germplasmService.getGermplasmAttributesByCodes(codes), HttpStatus.OK);
 	}
 
 }

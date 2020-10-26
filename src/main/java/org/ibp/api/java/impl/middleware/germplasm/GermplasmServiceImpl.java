@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.attribute.AttributeService;
+import org.generationcp.middleware.api.germplasm.GermplasmAttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -412,7 +413,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(final Set<String> codes) {
 
-		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes("NAMES", "NAME", codes)
+		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes("NAMES", Collections.singleton("NAME"), codes)
 			.stream()
 			.map(userDefinedField -> {
 				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
@@ -420,6 +421,26 @@ public class GermplasmServiceImpl implements GermplasmService {
 				germplasmNameTypeDTO.setName(userDefinedField.getFname());
 				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
 				return germplasmNameTypeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GermplasmAttributeDTO> getGermplasmAttributesByCodes(final Set<String> codes) {
+
+		final Set<String> types = new HashSet<>();
+		types.add("ATTRIBUTE");
+		types.add("METHOD");
+		types.add("PASSPORT");
+		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes("ATRIBUTS", types, codes)
+			.stream()
+			.map(userDefinedField -> {
+				final GermplasmAttributeDTO attributeDTO =
+					new GermplasmAttributeDTO();
+				attributeDTO.setId(userDefinedField.getFldno());
+				attributeDTO.setName(userDefinedField.getFname());
+				attributeDTO.setCode(userDefinedField.getFcode());
+				return attributeDTO;
 			})
 			.collect(Collectors.toList());
 	}
@@ -451,4 +472,5 @@ public class GermplasmServiceImpl implements GermplasmService {
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
 	}
+
 }
