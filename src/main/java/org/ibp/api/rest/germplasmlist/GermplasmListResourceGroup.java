@@ -24,7 +24,7 @@ import java.util.List;
 
 @Api(value = "Germplasm List Services")
 @Controller
-public class GermplasmListResource {
+public class GermplasmListResourceGroup {
 
 	@Autowired
 	public GermplamListService germplamListService;
