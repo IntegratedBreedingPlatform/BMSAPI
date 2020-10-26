@@ -17,6 +17,8 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.Util;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -68,6 +70,12 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 	@Autowired
 	public SecurityService securityService;
+
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
 	private BindingResult errors;
 
@@ -232,7 +240,8 @@ public class GermplamListServiceImpl implements GermplamListService {
 			}
 
 			if (isBlank(entry.getGroupName())) {
-				entry.setGroupName(GermplasmListDataDAO.GROUP_NAME_DEFAULT);
+				final String crossExpansion = this.pedigreeService.getCrossExpansion(entry.getGid(), this.crossExpansionProperties);
+				entry.setGroupName(crossExpansion);
 				hasGroupNameEmpty = true;
 			} else {
 				hasGroupName = true;
