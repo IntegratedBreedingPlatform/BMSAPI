@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.attribute.AttributeService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -406,6 +407,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
 		return this.germplasmDataManager.countAttributesByGid(gid, attributeDbIds);
+	}
+
+	@Override
+	public List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(final Set<String> codes) {
+
+		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes("NAMES", "NAME", codes)
+			.stream()
+			.map(userDefinedField -> {
+				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
+				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
+				germplasmNameTypeDTO.setName(userDefinedField.getFname());
+				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
+				return germplasmNameTypeDTO;
+			})
+			.collect(Collectors.toList());
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
