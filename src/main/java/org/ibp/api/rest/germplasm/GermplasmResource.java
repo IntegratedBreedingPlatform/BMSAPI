@@ -8,6 +8,7 @@ import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
@@ -65,8 +66,7 @@ public class GermplasmResource {
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmSearchRequest germplasmSearchRequest,
-		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE)
-		final Pageable pageable
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
 	) {
 
 		BaseValidator.checkNotNull(germplasmSearchRequest, "param.null", new String[] {"germplasmSearchDTO"});
@@ -107,6 +107,7 @@ public class GermplasmResource {
 
 	/**
 	 * Simple search to feed autocomplete features
+	 *
 	 * @return a limited set of results matching the query criteria
 	 */
 	@ApiOperation(value = "Search germplasm attributes")
@@ -117,6 +118,17 @@ public class GermplasmResource {
 		@RequestParam(required = true) final String query) {
 
 		return new ResponseEntity<>(this.germplasmService.searchAttributes(query), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Import germplasm updates")
+	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity importGermplasmUpdates(@PathVariable final String cropName,
+		@RequestBody final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+
+		this.germplasmService.importGermplasmUpdates(germplasmUpdateDTOList);
+
+		return new ResponseEntity(HttpStatus.OK);
 	}
 
 }

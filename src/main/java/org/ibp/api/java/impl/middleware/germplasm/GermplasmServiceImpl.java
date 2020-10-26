@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
@@ -406,6 +407,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
 		return this.germplasmDataManager.countAttributesByGid(gid, attributeDbIds);
+	}
+
+	@Override
+	public void importGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+
+		// Validation
+		for (final GermplasmUpdateDTO germplasmUpdateDTO : germplasmUpdateDTOList) {
+
+		}
+
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
