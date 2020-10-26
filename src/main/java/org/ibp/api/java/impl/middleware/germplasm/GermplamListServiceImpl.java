@@ -159,7 +159,12 @@ public class GermplamListServiceImpl implements GermplamListService {
 		checkArgument(!request.getEntries().isEmpty(), "param.null", new String[] {"request entries"});
 		checkNotNull(request.getType(), "param.null", new String[] {"type"});
 		checkNotNull(request.getName(), "param.null", new String[] {"name"});
+		checkArgument(request.getName().length() <= 50, "text.field.max.length", new String[] {"name", "50"});
 		checkNotNull(request.getDate(), "param.null", new String[] {"date"});
+
+		if (!StringUtils.isBlank(request.getDescription())) {
+			checkArgument(request.getDescription().length() <= 255, "text.field.max.length", new String[] {"description", "255"});
+		}
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
 		final String parentFolderId = request.getParentFolderId();
