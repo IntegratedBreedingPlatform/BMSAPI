@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -22,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -43,6 +45,9 @@ import static org.mockito.Mockito.times;
 
 public class GermplasmListServiceImplTest {
 
+	private static final String GERMPLASM_LIST_TYPE = "LST";
+	private static final int GID1 = 1;
+	private static final int GID2 = 2;
 	private final String PROGRAM_UUID = org.apache.commons.lang.RandomStringUtils.random(20);
 
 	@Mock
@@ -73,6 +78,17 @@ public class GermplasmListServiceImplTest {
 	public void init() {
 		MockitoAnnotations.initMocks(this);
 		ContextHolder.setCurrentProgram(this.PROGRAM_UUID);
+
+		final UserDefinedField userDefinedField = new UserDefinedField();
+		userDefinedField.setFcode(GERMPLASM_LIST_TYPE);
+		userDefinedField.setFldno(new Random().nextInt());
+		userDefinedField.setFname("GERMPLASM LISTS");
+
+		Mockito.when(this.germplasmListManager.getGermplasmListTypes()).thenReturn(Arrays.asList(userDefinedField));
+		final List<Germplasm> germplasms = new ArrayList<>();
+		germplasms.add(new Germplasm(GID1));
+		germplasms.add(new Germplasm(GID2));
+		Mockito.when(this.germplasmDataManager.getGermplasms(ArgumentMatchers.anyList())).thenReturn(germplasms);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -227,14 +243,14 @@ public class GermplasmListServiceImplTest {
 		list.setName(RandomStringUtils.random(50));
 		list.setDescription(RandomStringUtils.random(255));
 		list.setDate(new Date());
-		list.setType("LST");
+		list.setType(GERMPLASM_LIST_TYPE);
 		list.setParentFolderId(GermplamListServiceImpl.PROGRAM_LISTS);
 		final List<GermplasmListGeneratorDTO.GermplasmEntryDTO> entries = new ArrayList<>();
 		final GermplasmListGeneratorDTO.GermplasmEntryDTO entry1 = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
-		entry1.setGid(1);
+		entry1.setGid(GID1);
 		entries.add(entry1);
 		final GermplasmListGeneratorDTO.GermplasmEntryDTO entry2 = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
-		entry2.setGid(2);
+		entry2.setGid(GID2);
 		entries.add(entry2);
 		list.setEntries(entries);
 		return list;

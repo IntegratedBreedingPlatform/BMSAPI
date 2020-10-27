@@ -10,9 +10,11 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -37,9 +39,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.splitByCharacterType;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
 
@@ -157,21 +161,32 @@ public class GermplamListServiceImpl implements GermplamListService {
 	@Override
 	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request) {
 
+		final String currentProgram = ContextHolder.getCurrentProgram();
+
 		// validations
 
 		checkNotNull(request, "param.null", new String[] {"request"});
 		checkNotNull(request.getEntries(), "param.null", new String[] {"request entries"});
 		checkArgument(!request.getEntries().isEmpty(), "param.null", new String[] {"request entries"});
-		checkNotNull(request.getType(), "param.null", new String[] {"type"});
-		checkNotNull(request.getName(), "param.null", new String[] {"name"});
-		checkArgument(request.getName().length() <= 50, "text.field.max.length", new String[] {"name", "50"});
 		checkNotNull(request.getDate(), "param.null", new String[] {"date"});
 
 		if (!StringUtils.isBlank(request.getDescription())) {
 			checkArgument(request.getDescription().length() <= 255, "text.field.max.length", new String[] {"description", "255"});
 		}
 
-		final String currentProgram = ContextHolder.getCurrentProgram();
+		if (!StringUtils.isBlank(request.getNotes())) {
+			checkArgument(request.getNotes().length() <= 65535, "text.field.max.length", new String[] {"notes", "65535"});
+		}
+
+		final String type = request.getType();
+		checkNotNull(type, "param.null", new String[] {"type"});
+		if (this.getGermplasmListTypes().stream().noneMatch(typeDTO -> typeDTO.getCode().equals(type))) {
+			throw new ApiValidationException("", "error.germplasmlist.save.type.not.exists", type);
+		}
+
+		final String name = request.getName();
+		this.validateListName(currentProgram, name);
+
 		final String parentFolderId = request.getParentFolderId();
 		checkNotNull(parentFolderId, "param.null", new String[] {"parentFolderId"});
 		this.validateParentId(parentFolderId, currentProgram);
@@ -203,8 +218,10 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 	private void processEntries(final List<GermplasmListGeneratorDTO.GermplasmEntryDTO> entries) {
 
-		final Map<Integer, String> preferrredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(
-			entries.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList()));
+		final List<Integer> gids = entries.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
+		final Map<Integer, String> preferrredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
+		final Map<Integer, Germplasm> germplasmMap = this.germplasmDataManager.getGermplasms(gids)
+			.stream().collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
 
 		int entryNo = 1;
 		boolean hasEntryNo = false;
@@ -218,8 +235,11 @@ public class GermplamListServiceImpl implements GermplamListService {
 		boolean hasGroupNameEmpty = false;
 
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : entries) {
-			if (entry.getGid() == null) {
+			final Integer gid = entry.getGid();
+			if (gid == null) {
 				throw new ApiValidationException("", "error.germplasmlist.save.gid");
+			} else if (germplasmMap.get(gid) == null) {
+				throw new ApiValidationException("", "error.germplasmlist.save.gid.not.exists", gid);
 			}
 
 			if (entry.getEntryNo() == null) {
@@ -243,14 +263,14 @@ public class GermplamListServiceImpl implements GermplamListService {
 			}
 
 			if (isBlank(entry.getDesignation())) {
-				entry.setDesignation(preferrredNamesMap.get(entry.getGid()));
+				entry.setDesignation(preferrredNamesMap.get(gid));
 				hasDesignationEmpty = true;
 			} else {
 				hasDesignation = true;
 			}
 
 			if (isBlank(entry.getGroupName())) {
-				final String crossExpansion = this.pedigreeService.getCrossExpansion(entry.getGid(), this.crossExpansionProperties);
+				final String crossExpansion = this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties);
 				entry.setGroupName(crossExpansion);
 				hasGroupNameEmpty = true;
 			} else {
@@ -306,6 +326,21 @@ public class GermplamListServiceImpl implements GermplamListService {
 				this.errors.reject("list.parent.id.not.exist", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
+		}
+	}
+
+	private void validateListName(final String currentProgram, final String name) {
+		checkNotNull(name, "param.null", new String[] {"name"});
+		checkArgument(name.length() <= 50, "text.field.max.length", new String[] {"name", "50"});
+		if (AppConstants.CROP_LISTS.getString().equals(name)) {
+			throw new ApiValidationException("", "error.list.name.invalid", AppConstants.CROP_LISTS.getString());
+		}
+		if (AppConstants.PROGRAM_LISTS.getString().equals(name)) {
+			throw new ApiValidationException("", "error.list.name.invalid", AppConstants.PROGRAM_LISTS.getString());
+		}
+		final List<GermplasmList> germplasmListByName = this.germplasmListManager.getGermplasmListByName(name, currentProgram, 0, 1, Operation.EQUAL);
+		if (!germplasmListByName.isEmpty()) {
+			throw new ApiValidationException("", "error.list.name.exists");
 		}
 	}
 
