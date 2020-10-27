@@ -1,9 +1,11 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
-import org.generationcp.middleware.domain.germplasm.AttributeDTO;
+import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -35,6 +37,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,12 +76,79 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Autowired
 	private GermplasmSearchService germplasmSearchService;
 
+	@Autowired
+	private AttributeService attributeService;
+
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
 		final String programUUID) {
 
-		// TODO if program-role then germplasmSearchRequest.setInProgramListOnly(true);
-		return this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageable, programUUID);
+		final List<GermplasmSearchResponse> responseList =
+			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageable, programUUID);
+
+		if (responseList == null || responseList.isEmpty()) {
+			return responseList;
+		}
+
+		final Map<Integer, GermplasmSearchResponse> responseMap
+			= responseList.stream().collect(Collectors.toMap(GermplasmSearchResponse::getGid, Function.identity()));
+
+		final Map<Integer, String> pedigreeStringMap =
+			this.pedigreeService.getCrossExpansions(new HashSet<>(responseMap.keySet()), null, this.crossExpansionProperties);
+
+		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
+			final Integer gid = entry.getKey();
+			final GermplasmSearchResponse response = entry.getValue();
+			response.setPedigreeString(pedigreeStringMap.get(gid));
+		}
+
+		this.addParentsFromPedigreeTable(responseMap, germplasmSearchRequest);
+
+		return responseList;
+	}
+
+	private void addParentsFromPedigreeTable(final Map<Integer, GermplasmSearchResponse> responseMap,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+
+		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+
+		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
+			|| !(addedColumnsPropertyIds.contains(ColumnLabels.FGID.getName())
+			|| addedColumnsPropertyIds.contains(ColumnLabels.CROSS_FEMALE_PREFERRED_NAME.getName())
+			|| addedColumnsPropertyIds.contains(ColumnLabels.MGID.getName())
+			|| addedColumnsPropertyIds.contains(ColumnLabels.CROSS_MALE_PREFERRED_NAME.getName()))) {
+			return;
+		}
+
+		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
+		/**
+		 * TODO Investigate sql approach.
+		 *  See {@link org.generationcp.middleware.dao.GermplasmSearchDAO#retrievePedigreeGids(List, GermplasmSearchRequest)}
+		 *  -> 1000 results, 10 levels of pedigree => ~10 sec
+		 *  pedigreeDataManager.generatePedigreeTable:
+		 *  -> 1000 results, 1 level of pedigree => ~1 min
+		 */
+		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
+			this.pedigreeDataManager.generatePedigreeTable(responseMap.keySet(), level, false);
+
+		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
+			final Integer gid = entry.getKey();
+			final GermplasmSearchResponse response = entry.getValue();
+
+			final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
+			final Optional<Germplasm> maleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.MGID.getName());
+
+			if (femaleParent.isPresent()) {
+				final Germplasm germplasm = femaleParent.get();
+				response.setFemaleParentGID(germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN);
+				response.setFemaleParentPreferredName(germplasm.getPreferredName().getNval());
+			}
+			if (maleParent.isPresent()) {
+				final Germplasm germplasm = maleParent.get();
+				response.setMaleParentGID(germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN);
+				response.setMaleParentPreferredName(germplasm.getPreferredName().getNval());
+			}
+		}
 	}
 
 	@Override
@@ -142,22 +212,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
-		this.germplasmDataManager = germplasmDataManager;
+	@Override
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(final String query) {
+		return this.attributeService.searchAttributes(query);
 	}
 
-	void setPedigreeService(final PedigreeService pedigreeService) {
-		this.pedigreeService = pedigreeService;
-	}
-
-	void setLocationDataManger(final LocationDataManager locationDataManger) {
-		this.locationDataManger = locationDataManger;
-	}
-
-	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
-		this.crossExpansionProperties = crossExpansionProperties;
-	}
-	
 	@Override
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		final PedigreeDTO pedigreeDTO;
@@ -183,7 +242,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return progenyDTO;
 	}
 
-	// TODO delete
+	// TODO delete. See populateGermplasmSummary
 	@Override
 	public PedigreeTree getPedigreeTree(final String germplasmId, Integer levels) {
 
@@ -198,7 +257,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return pedigreeTree;
 	}
 
-	// TODO delete
+	// TODO delete. See populateGermplasmSummary
 	@Override
 	public DescendantTree getDescendantTree(final String germplasmId) {
 		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
@@ -210,7 +269,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return descendantTree;
 	}
 
-	// TODO delete
+	// TODO delete. See populateGermplasmSummary
 	private DescendantTreeTreeNode traversePopulateDescendatTree(final GermplasmPedigreeTreeNode mwTreeNode) {
 		final DescendantTreeTreeNode treeNode = new DescendantTreeTreeNode();
 		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid());
@@ -231,7 +290,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return treeNode;
 	}
 
-	// TODO delete
+	// TODO delete. See populateGermplasmSummary
 	private PedigreeTreeNode traversePopulate(final GermplasmPedigreeTreeNode mwTreeNode) {
 		final PedigreeTreeNode treeNode = new PedigreeTreeNode();
 		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid().toString());
@@ -359,5 +418,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
+	}
+
+	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
+		this.germplasmDataManager = germplasmDataManager;
+	}
+
+	void setPedigreeService(final PedigreeService pedigreeService) {
+		this.pedigreeService = pedigreeService;
+	}
+
+	void setLocationDataManger(final LocationDataManager locationDataManger) {
+		this.locationDataManger = locationDataManger;
+	}
+
+	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
+		this.crossExpansionProperties = crossExpansionProperties;
 	}
 }
