@@ -205,7 +205,7 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 			xlsBook.createSheet(this.getMessageSource().getMessage("export.germplasm.list.template.sheet.codes", null, locale));
 		int currentRowNum = 0;
 
-		this.setCustomColorAtIndex(xlsBook, IndexedColors.LIGHT_TURQUOISE, 218, 238, 243);
+		this.setCustomColorAtIndex(xlsBook, IndexedColors.AQUA, 218, 227, 243);
 		this.setCustomColorAtIndex(xlsBook, IndexedColors.OLIVE_GREEN, 235, 241, 222);
 
 		final CellStyle backgroundStyle = xlsBook.createCellStyle();
@@ -329,7 +329,7 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 
 		final HSSFFont hSSFFont = this.buildFont(xlsBook,"calibri",11,false);
 		final CellStyle cellStyle = xlsBook.createCellStyle();
-		cellStyle.setFillForegroundColor(codesSheetFirstColumnIndex == 0 ? IndexedColors.LIGHT_TURQUOISE.getIndex() : IndexedColors.OLIVE_GREEN.getIndex());
+		cellStyle.setFillForegroundColor(codesSheetFirstColumnIndex == 0 ? IndexedColors.AQUA.getIndex() : IndexedColors.OLIVE_GREEN.getIndex());
 		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		cellStyle.setFont(hSSFFont);
 
@@ -351,7 +351,7 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 		HSSFCell cell = row.createCell(GermplasmTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, CellType.STRING);
 		final HSSFFont codesFont = this.buildFont(xlsBook, "calibri", 11,true);
 
-		cell.setCellStyle(this.buildHeaderStyle(xlsBook, IndexedColors.LIGHT_TURQUOISE.getIndex(), HorizontalAlignment.LEFT, codesFont));
+		cell.setCellStyle(this.buildHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex(), HorizontalAlignment.LEFT, codesFont));//
 		cell.setCellValue(
 			this.getMessageSource().getMessage(colunmName, null, locale));
 
