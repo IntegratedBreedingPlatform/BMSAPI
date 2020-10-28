@@ -23,10 +23,12 @@ import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.germplasm.*;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private AttributeValidator attributeValidator;
+
+	@Autowired
+	private GermplasmUpdateValidator germplasmUpdateValidator;
 
 	private BindingResult errors;
 
@@ -412,9 +417,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public void importGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
-		// Validation
-		for (final GermplasmUpdateDTO germplasmUpdateDTO : germplasmUpdateDTOList) {
+		this.errors = new MapBindingResult(new HashMap<>(), AttributeDTO.class.getName());
+		this.germplasmUpdateValidator.validate(this.errors, germplasmUpdateDTOList);
 
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 	}

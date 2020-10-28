@@ -59,6 +59,7 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.service.api.userdefinedfield.UserDefinedFieldService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
@@ -74,6 +75,7 @@ import org.generationcp.middleware.service.impl.study.generation.ExperimentDesig
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.service.impl.study.germplasm.source.GermplasmStudySourceServiceImpl;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
+import org.generationcp.middleware.service.impl.userdefinedfield.UserDefinedFieldServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SessionFactory;
@@ -537,6 +539,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public ExperimentModelGenerator getExperimentModelGenerator() {
 		return new ExperimentModelGenerator(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public UserDefinedFieldService getUserDefinedFieldService() {
+		return new UserDefinedFieldServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
