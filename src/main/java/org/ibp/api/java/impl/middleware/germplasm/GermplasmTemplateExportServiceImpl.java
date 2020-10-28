@@ -1,0 +1,145 @@
+package org.ibp.api.java.impl.middleware.germplasm;
+
+import com.google.common.io.Files;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFPalette;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.generationcp.middleware.pojos.Method;
+import org.ibp.api.domain.germplasm.GermplasmName;
+import org.ibp.api.domain.location.LocationDto;
+import org.ibp.api.domain.ontology.VariableDetails;
+import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+
+@Service
+public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExportService {
+
+	private static final String FILE_NAME = "GermplasmImportTemplate.xls";
+
+	@Autowired
+	ResourceBundleMessageSource messageSource;
+
+	@Override
+	public File export(final List<Method> breedingMethods, final List<GermplasmName> germplasmNames,
+		final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> germplasmAttributeDTOS,
+		final List<LocationDto> locationDtos, final List<LocationDto> storagelocationDtos, final List<VariableDetails> units) {
+
+		try {
+			final File temporaryFolder = Files.createTempDir();
+
+			final String fileNameFullPath =
+				temporaryFolder.getAbsolutePath() + File.separator + GermplasmTemplateExportServiceImpl.FILE_NAME;
+			return this.generateTemplateFile(fileNameFullPath, breedingMethods, germplasmNames, germplasmAttributeDTOS, locationDtos,
+				storagelocationDtos, units);
+		} catch (final IOException e) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			errors.reject("cannot.exportAsXLS.germplasm-list.template", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+	}
+
+	private File generateTemplateFile(final String fileNamePath, final List<Method> breedingMethods,
+		final List<GermplasmName> germplasmNames,
+		final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> germplasmAttributeDTOS,
+		final List<LocationDto> locationDtos, final List<LocationDto> storagelocationDtos,
+		final List<VariableDetails> units) throws IOException {
+		final HSSFWorkbook xlsBook = new HSSFWorkbook();
+
+		final File file = new File(fileNamePath);
+		this.writeObservationSheet(xlsBook);
+		this.writeCodesSheet(xlsBook, breedingMethods, germplasmNames, germplasmAttributeDTOS, locationDtos, storagelocationDtos, units);
+
+		try (final FileOutputStream fos = new FileOutputStream(file)) {
+			xlsBook.write(fos);
+
+		}
+		return file;
+	}
+
+	private void writeObservationSheet(final HSSFWorkbook xlsBook) {
+
+	}
+
+	private void writeCodesSheet(final HSSFWorkbook xlsBook, final List<Method> breedingMethods, final List<GermplasmName> germplasmNames,
+		final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> germplasmAttributeDTOS,
+		final List<LocationDto> locationDtos,
+		final List<LocationDto> storagelocationDtos, final List<VariableDetails> units) {
+
+	}
+
+	private void writeCell(
+		final int codesSheetFirstColumnIndex, final String value, final int count, final HSSFWorkbook xlsBook, final HSSFRow row) {
+		HSSFCell cell = row.createCell(codesSheetFirstColumnIndex, CellType.STRING);
+
+		final HSSFFont hSSFFont = this.buildFont(xlsBook,"calibri",11,false);
+		final CellStyle cellStyle = xlsBook.createCellStyle();
+		cellStyle.setFillForegroundColor(codesSheetFirstColumnIndex == 0 ? IndexedColors.LIGHT_TURQUOISE.getIndex() : IndexedColors.OLIVE_GREEN.getIndex());
+		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		cellStyle.setFont(hSSFFont);
+
+		cell.setCellStyle(cellStyle);
+		cell.setCellValue(value);
+		cell.getCellStyle().setBorderLeft(BorderStyle.THIN);
+		cell.getCellStyle().setBorderRight(BorderStyle.THIN);
+		if (count == 1) {
+			cell.getCellStyle().setBorderBottom(BorderStyle.THIN);
+		}
+	}
+
+	private HSSFFont buildFont(final HSSFWorkbook xlsBook, final String fontName, final int fontHeight, final boolean bold) {
+		final HSSFFont hSSFFont = xlsBook.createFont();
+		hSSFFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+		hSSFFont.setFontName(fontName);
+		hSSFFont.setFontHeightInPoints((short) fontHeight);
+		hSSFFont.setBold(bold);
+		return hSSFFont;
+	}
+
+
+	private void setCustomColorAtIndex(
+		final HSSFWorkbook wb, final IndexedColors indexedColor, final int red, final int green,
+		final int blue) {
+		final HSSFPalette customPalette = wb.getCustomPalette();
+		customPalette.setColorAtIndex(indexedColor.index, (byte) red, (byte) green, (byte) blue);
+	}
+
+	private CellStyle buildHeaderStyle(final HSSFWorkbook xlsBook, final short colorIndex, final HorizontalAlignment horizontalAlignment,
+		final HSSFFont hSSFFont) {
+		final CellStyle cellStyle = xlsBook.createCellStyle();
+		cellStyle.setAlignment(horizontalAlignment);
+		cellStyle.setFillForegroundColor(colorIndex);
+		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		cellStyle.setFont(hSSFFont);
+
+		cellStyle.setBorderTop(BorderStyle.THIN);
+		cellStyle.setBorderBottom(BorderStyle.THIN);
+		cellStyle.setBorderLeft(BorderStyle.THIN);
+		cellStyle.setBorderRight(BorderStyle.THIN);
+
+		return cellStyle;
+	}
+
+	public ResourceBundleMessageSource getMessageSource() {
+		return this.messageSource;
+	}
+}
