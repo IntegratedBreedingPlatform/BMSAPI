@@ -5,17 +5,30 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.security.SecurityUtil;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.germplasm.GermplasmName;
+import org.ibp.api.domain.location.LocationDto;
+import org.ibp.api.domain.ontology.VariableDetails;
+import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.location.LocationService;
+import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
+import org.ibp.api.rest.inventory.manager.LotResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
@@ -31,11 +44,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.annotation.Resource;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Api(value = "Germplasm Services")
 @Controller
 public class GermplasmResource {
+
+	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
+	private static final Set<Integer> LOCATION_TYPE = new HashSet<>(Arrays.asList(410,409,405));
 
 	private static final String HAS_GERMPLASM_SEARCH = " or hasAnyAuthority('STUDIES'"
 		+ ", 'MANAGE_STUDIES'"
@@ -48,6 +70,18 @@ public class GermplasmResource {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private GermplasmTemplateExportService germplasmTemplateExportService;
+
+	@Autowired
+	LocationService locationService;
+
+	@Autowired
+	private VariableService variableService;
+
+	@Resource
+	protected MethodService methodService;
 
 	@ApiOperation(value = "Search germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
@@ -119,4 +153,33 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.searchAttributes(query), HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/crops/{cropName}/germplam-sets/templates/xls", method = RequestMethod.GET)
+	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID) {
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
+
+		final List<LocationDto> storageLocation =
+			this.locationService.getLocations(cropName, programUUID, GermplasmResource.STORAGE_LOCATION_TYPE, null, null, false);
+
+		final List<LocationDto> locations =
+			this.locationService.getLocations(cropName, programUUID, GermplasmResource.LOCATION_TYPE, null, null, false);
+
+		final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> attributeDTOS = this.germplasmService.getGermplasmAttributes();
+
+		final List<Method> breedingMethods = this.germplasmService.getAllBreedingMethods();
+
+		final List<GermplasmName> germplasmNames = this.germplasmService.getGermplasmNames();
+
+		final File file =
+			this.germplasmTemplateExportService.export(breedingMethods, germplasmNames, attributeDTOS, locations, storageLocation, units);
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+		final FileSystemResource fileSystemResource = new FileSystemResource(file);
+		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+	}
 }
