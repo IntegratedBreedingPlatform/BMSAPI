@@ -59,7 +59,6 @@ public class GermplamListServiceImpl implements GermplamListService {
 	// List entry params
 	static final String ENTRY_CODE = "entryCode";
 	static final String SEED_SOURCE = "seedSource";
-	static final String DESIGNATION = "designation";
 	static final String GROUP_NAME = "groupName";
 
 	@Autowired
@@ -219,7 +218,6 @@ public class GermplamListServiceImpl implements GermplamListService {
 	private void processEntries(final List<GermplasmListGeneratorDTO.GermplasmEntryDTO> entries) {
 
 		final List<Integer> gids = entries.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
-		final Map<Integer, String> preferrredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
 		final Map<Integer, Germplasm> germplasmMap = this.germplasmDataManager.getGermplasms(gids)
 			.stream().collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
 
@@ -229,8 +227,6 @@ public class GermplamListServiceImpl implements GermplamListService {
 		boolean hasEntryCodeEmpty = false;
 		boolean hasSeedSource = false;
 		boolean hasSeedSourceEmpty = false;
-		boolean hasDesignation = false;
-		boolean hasDesignationEmpty = false;
 		boolean hasGroupName = false;
 		boolean hasGroupNameEmpty = false;
 
@@ -262,13 +258,6 @@ public class GermplamListServiceImpl implements GermplamListService {
 				hasSeedSource = true;
 			}
 
-			if (isBlank(entry.getDesignation())) {
-				entry.setDesignation(preferrredNamesMap.get(gid));
-				hasDesignationEmpty = true;
-			} else {
-				hasDesignation = true;
-			}
-
 			if (isBlank(entry.getGroupName())) {
 				final String crossExpansion = this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties);
 				entry.setGroupName(crossExpansion);
@@ -285,9 +274,6 @@ public class GermplamListServiceImpl implements GermplamListService {
 		}
 		if (hasSeedSource && hasSeedSourceEmpty) {
 			throw new ApiValidationException("", "error.germplasmlist.save.gaps", SEED_SOURCE);
-		}
-		if (hasDesignation && hasDesignationEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", DESIGNATION);
 		}
 		if (hasGroupName && hasGroupNameEmpty) {
 			throw new ApiValidationException("", "error.germplasmlist.save.gaps", GROUP_NAME);
