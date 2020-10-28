@@ -68,9 +68,9 @@ public class BreedingMethodResourceGroup {
 	}
 
 	@ApiOperation(value = "List breeding method filtered by favorites")
-	@RequestMapping(value = "/crops/{cropName}/breedingmethod-favorites", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/breedingmethod", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<BreedingMethodDTO>> getBreedingMethodFavorites(
+	public ResponseEntity<List<BreedingMethodDTO>> getBreedingMethods(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam final boolean favoriteMethods

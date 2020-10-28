@@ -11,6 +11,6 @@ public interface BreedingMethodService {
 
 	BreedingMethodDTO getBreedingMethod(Integer breedingMethodDbId);
 
-	List<BreedingMethodDTO> getBreedingMethods(final String cropName, String programUUID, boolean favoriteMethods);
+	List<BreedingMethodDTO> getBreedingMethods(String cropName, String programUUID, boolean favoriteMethods);
 
 }

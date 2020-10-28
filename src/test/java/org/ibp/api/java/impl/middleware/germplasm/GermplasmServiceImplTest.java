@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -99,8 +100,9 @@ public class GermplasmServiceImplTest {
 		userDefinedField.setFldno(new Random().nextInt());
 		userDefinedField.setFname("LINE NAME");
 
-		final Set<String> types = Collections.singleton("NAME");
-		Mockito.when(this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes("NAMES", types, codes)).thenReturn(Arrays.asList(userDefinedField));
+		final Set<String> types = Collections.singleton(UDTableType.NAMES_NAME.getType());
+		Mockito.when(this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(), types, codes))
+			.thenReturn(Arrays.asList(userDefinedField));
 
 		final List<GermplasmNameTypeDTO> germplasmListTypes = this.germplasmServiceImpl.getGermplasmNameTypesByCodes(codes);
 		assertNotNull(germplasmListTypes);
@@ -110,7 +112,7 @@ public class GermplasmServiceImplTest {
 		assertThat(actualGermplasmListTypeDTO.getId(), is(userDefinedField.getFldno()));
 		assertThat(actualGermplasmListTypeDTO.getName(), is(userDefinedField.getFname()));
 
-		Mockito.verify(this.germplasmDataManager).getUserDefinedFieldByTableTypeAndCodes("NAMES", types, codes);
+		Mockito.verify(this.germplasmDataManager).getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(), types, codes);
 		Mockito.verifyNoMoreInteractions(this.germplasmDataManager);
 	}
 
@@ -123,8 +125,8 @@ public class GermplasmServiceImplTest {
 		userDefinedField.setFldno(new Random().nextInt());
 		userDefinedField.setFname("NOTES");
 
-		Mockito.when(this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(ArgumentMatchers.eq("ATRIBUTS"), ArgumentMatchers.anySet(),
-			ArgumentMatchers.eq(codes))).thenReturn(Arrays.asList(userDefinedField));
+		Mockito.when(this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(ArgumentMatchers.eq(UDTableType.ATRIBUTS_ATTRIBUTE.getTable()),
+			ArgumentMatchers.anySet(), ArgumentMatchers.eq(codes))).thenReturn(Arrays.asList(userDefinedField));
 
 		final List<GermplasmAttributeDTO> germplasmListTypes = this.germplasmServiceImpl.getGermplasmAttributesByCodes(codes);
 		assertNotNull(germplasmListTypes);
@@ -134,14 +136,13 @@ public class GermplasmServiceImplTest {
 		assertThat(actualGermplasmListTypeDTO.getId(), is(userDefinedField.getFldno()));
 		assertThat(actualGermplasmListTypeDTO.getName(), is(userDefinedField.getFname()));
 
-		Mockito.verify(this.germplasmDataManager).getUserDefinedFieldByTableTypeAndCodes(ArgumentMatchers.eq("ATRIBUTS"),
+		Mockito.verify(this.germplasmDataManager).getUserDefinedFieldByTableTypeAndCodes(ArgumentMatchers.eq(UDTableType.ATRIBUTS_ATTRIBUTE.getTable()),
 			this.setArgumentCaptor.capture(), ArgumentMatchers.eq(codes));
 		final Set<String> actualTypes = this.setArgumentCaptor.getValue();
 		assertNotNull(actualTypes);
-		assertThat(actualTypes, hasSize(3));
-		assertThat(actualTypes, contains("ATTRIBUTE", "METHOD", "PASSPORT"));
+		assertThat(actualTypes, hasSize(2));
+		assertThat(actualTypes, contains(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()));
 		Mockito.verifyNoMoreInteractions(this.germplasmDataManager);
 	}
-
 
 }
