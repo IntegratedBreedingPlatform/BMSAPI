@@ -2,7 +2,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.api.germplasm.GermplasmAttributeDTO;
+import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
@@ -128,10 +128,10 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(ArgumentMatchers.eq(UDTableType.ATRIBUTS_ATTRIBUTE.getTable()),
 			ArgumentMatchers.anySet(), ArgumentMatchers.eq(codes))).thenReturn(Arrays.asList(userDefinedField));
 
-		final List<GermplasmAttributeDTO> germplasmListTypes = this.germplasmServiceImpl.getGermplasmAttributesByCodes(codes);
+		final List<AttributeDTO> germplasmListTypes = this.germplasmServiceImpl.getGermplasmAttributesByCodes(codes);
 		assertNotNull(germplasmListTypes);
 		assertThat(germplasmListTypes, hasSize(1));
-		final GermplasmAttributeDTO actualGermplasmListTypeDTO = germplasmListTypes.get(0);
+		final AttributeDTO actualGermplasmListTypeDTO = germplasmListTypes.get(0);
 		assertThat(actualGermplasmListTypeDTO.getCode(), is(userDefinedField.getFcode()));
 		assertThat(actualGermplasmListTypeDTO.getId(), is(userDefinedField.getFldno()));
 		assertThat(actualGermplasmListTypeDTO.getName(), is(userDefinedField.getFname()));

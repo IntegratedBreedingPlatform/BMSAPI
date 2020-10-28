@@ -2,28 +2,39 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.attribute.AttributeService;
-import org.generationcp.middleware.api.germplasm.GermplasmAttributeDTO;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UDTableType;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.ibp.api.domain.germplasm.*;
+import org.ibp.api.domain.germplasm.DescendantTree;
+import org.ibp.api.domain.germplasm.DescendantTreeTreeNode;
+import org.ibp.api.domain.germplasm.GermplasmName;
+import org.ibp.api.domain.germplasm.GermplasmSummary;
+import org.ibp.api.domain.germplasm.PedigreeTree;
+import org.ibp.api.domain.germplasm.PedigreeTreeNode;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -38,7 +49,14 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -427,7 +445,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<GermplasmAttributeDTO> getGermplasmAttributesByCodes(final Set<String> codes) {
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(final Set<String> codes) {
 
 		final Set<String> types = new HashSet<>();
 		types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
@@ -435,8 +453,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
 			.stream()
 			.map(userDefinedField -> {
-				final GermplasmAttributeDTO attributeDTO =
-					new GermplasmAttributeDTO();
+				final org.generationcp.middleware.api.attribute.AttributeDTO attributeDTO =
+					new org.generationcp.middleware.api.attribute.AttributeDTO();
 				attributeDTO.setId(userDefinedField.getFldno());
 				attributeDTO.setName(userDefinedField.getFname());
 				attributeDTO.setCode(userDefinedField.getFcode());

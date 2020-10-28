@@ -2,7 +2,6 @@
 package org.ibp.api.java.germplasm;
 
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
-import org.generationcp.middleware.api.germplasm.GermplasmAttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
@@ -58,6 +57,6 @@ public interface GermplasmService {
 
 	List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(Set<String> codes);
 
-	List<GermplasmAttributeDTO> getGermplasmAttributesByCodes(Set<String> codes);
+	List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(Set<String> codes);
 
 }
