@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import com.google.common.collect.ImmutableSet;
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -434,5 +435,43 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
+	}
+
+	@Override
+	public List<AttributeDTO> getGermplasmAttributes() {
+		final Set<String> types = new HashSet<>();
+		return this.germplasmDataManager.getUserDefinedFieldByFieldTableNameAndType(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
+			ImmutableSet.of(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
+			.stream()
+			.map(userDefinedField -> {
+				final AttributeDTO attributeDTO =
+					new AttributeDTO();
+				attributeDTO.setAttributeDbId(userDefinedField.getFldno());
+				attributeDTO.setAttributeName(userDefinedField.getFname());
+				attributeDTO.setAttributeCode(userDefinedField.getFcode());
+				return attributeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<Method> getAllBreedingMethods() {
+		return this.germplasmDataManager.getAllMethods();
+	}
+
+	@Override
+	public List<GermplasmName> getGermplasmNames() {
+		final Set<String> types = new HashSet<>();
+		return this.germplasmDataManager.getUserDefinedFieldByFieldTableNameAndType(UDTableType.NAMES_NAME.getTable(),
+			ImmutableSet.of(UDTableType.NAMES_NAME.getType()))
+			.stream()
+			.map(userDefinedField -> {
+				final GermplasmName germplasmName =
+					new GermplasmName();
+				germplasmName.setName(userDefinedField.getFname());
+				germplasmName.setNameTypeCode(userDefinedField.getFcode());
+				return germplasmName;
+			})
+			.collect(Collectors.toList());
 	}
 }

@@ -1,14 +1,16 @@
 
 package org.ibp.api.java.germplasm;
 
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.pojos.Method;
 import org.ibp.api.domain.germplasm.DescendantTree;
+import org.ibp.api.domain.germplasm.GermplasmName;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.springframework.data.domain.Pageable;
@@ -53,4 +55,9 @@ public interface GermplasmService {
 
 	long countAttributesByGid(String gid, List<String> attributeDbIds);
 
+	List<AttributeDTO> getGermplasmAttributes();
+
+	List<Method> getAllBreedingMethods();
+
+	List<GermplasmName> getGermplasmNames();
 }
