@@ -8,6 +8,7 @@ import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Map;
 
 @Api(value = "Germplasm Services")
 @Controller
@@ -117,6 +119,21 @@ public class GermplasmResource {
 		@RequestParam(required = true) final String query) {
 
 		return new ResponseEntity<>(this.germplasmService.searchAttributes(query), HttpStatus.OK);
+	}
+
+	/**
+	 * Import a set of germplasm
+	 *
+	 * @return a map indicating the GID that was created per clientId, if null, no germplasm was created
+	 */
+	@ApiOperation(value = "Save a set of germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-sets", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Map<Integer, Integer>> importGermplasm(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmImportRequestDto germplasmImportRequestDto) {
+
+		return new ResponseEntity<>(this.germplasmService.importGemplasm(cropName, germplasmImportRequestDto), HttpStatus.OK);
 	}
 
 }

@@ -2,26 +2,38 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.attribute.AttributeService;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.ibp.api.domain.germplasm.*;
+import org.ibp.api.domain.germplasm.DescendantTree;
+import org.ibp.api.domain.germplasm.DescendantTreeTreeNode;
+import org.ibp.api.domain.germplasm.GermplasmName;
+import org.ibp.api.domain.germplasm.GermplasmSummary;
+import org.ibp.api.domain.germplasm.PedigreeTree;
+import org.ibp.api.domain.germplasm.PedigreeTreeNode;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -36,7 +48,14 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -78,6 +97,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private AttributeService attributeService;
+
+	@Autowired
+	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmService;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -406,6 +428,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
 		return this.germplasmDataManager.countAttributesByGid(gid, attributeDbIds);
+	}
+
+	@Override
+	public Map<Integer, Integer> importGemplasm(final String cropName, final GermplasmImportRequestDto germplasmImportRequestDto) {
+
+		return this.germplasmService.importGermplasmSet(1, cropName, germplasmImportRequestDto);
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
