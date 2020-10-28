@@ -57,7 +57,7 @@ import java.util.Set;
 public class GermplasmResource {
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
-	private static final Set<Integer> LOCATION_TYPE = new HashSet<>(Arrays.asList(410,409,405));
+	private static final Set<Integer> LOCATION_TYPE = new HashSet<>(Arrays.asList(410, 405));
 
 	private static final String HAS_GERMPLASM_SEARCH = " or hasAnyAuthority('STUDIES'"
 		+ ", 'MANAGE_STUDIES'"
