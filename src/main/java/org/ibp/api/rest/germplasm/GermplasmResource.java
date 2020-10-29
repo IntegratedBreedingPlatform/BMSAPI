@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Set;
 
 @Api(value = "Germplasm Services")
 @Controller
@@ -117,6 +119,26 @@ public class GermplasmResource {
 		@RequestParam(required = true) final String query) {
 
 		return new ResponseEntity<>(this.germplasmService.searchAttributes(query), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Returns germplasm name types filtered by a list of codes", notes = "Returns germplasm name types filtered by a list of codes")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/name-types", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmNameTypeDTO>> getGermplasmNameTypes(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final Set<String> codes) {
+
+		return new ResponseEntity<>(this.germplasmService.getGermplasmNameTypesByCodes(codes), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Returns germplasm attributes filtered by a list of codes", notes = "Returns germplasm attributes filtered by a list of codes")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<AttributeDTO>> getGermplasmAttributes(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final Set<String> codes) {
+
+		return new ResponseEntity<>(this.germplasmService.getGermplasmAttributesByCodes(codes), HttpStatus.OK);
 	}
 
 }
