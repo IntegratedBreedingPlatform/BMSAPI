@@ -43,7 +43,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.splitByCharacterType;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
 
@@ -93,13 +92,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
-		if (!StringUtils.isEmpty(programUUID)) {
-			this.programValidator.validate(new ProgramSummary(crop, programUUID), errors);
-			if (errors.hasErrors()) {
-				throw new ResourceNotFoundException(errors.getAllErrors().get(0));
-			}
-		}
-
+		this.validateProgram(crop, programUUID);
 		this.validateParentId(parentId, programUUID);
 		checkNotNull(folderOnly, "list.folder.only");
 
@@ -293,6 +286,27 @@ public class GermplamListServiceImpl implements GermplamListService {
 				return germplasmListTypeDTO;
 			})
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public Map<String, Object> createGermplasmListFolder(final String cropName, final String programUUID, final String folderName,
+		final String parentId) {
+
+		this.validateProgram(cropName, programUUID);
+		this.validateParentId(parentId, programUUID);
+
+
+
+		return null;
+	}
+
+	private void validateProgram(String cropName, String programUUID) {
+		if (!StringUtils.isEmpty(programUUID)) {
+			this.programValidator.validate(new ProgramSummary(cropName, programUUID), errors);
+			if (errors.hasErrors()) {
+				throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+			}
+		}
 	}
 
 	private void validateParentId(final String parentId, final String programUUID) {
