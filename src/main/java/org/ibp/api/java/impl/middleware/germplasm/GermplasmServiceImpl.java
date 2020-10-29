@@ -431,6 +431,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(final Set<String> codes) {
 
+		if (CollectionUtils.isEmpty(codes)) {
+			return new ArrayList<>();
+		}
+
 		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
 			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
 			.stream()
@@ -446,6 +450,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(final Set<String> codes) {
+
+		if (CollectionUtils.isEmpty(codes)) {
+			return new ArrayList<>();
+		}
 
 		final Set<String> types = new HashSet<>();
 		types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());

@@ -126,7 +126,7 @@ public class GermplasmResource {
 	@ResponseBody
 	public ResponseEntity<List<GermplasmNameTypeDTO>> getGermplasmNameTypes(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam final Set<String> codes) {
+		@RequestParam(required = false) final Set<String> codes) {
 
 		return new ResponseEntity<>(this.germplasmService.getGermplasmNameTypesByCodes(codes), HttpStatus.OK);
 	}
@@ -136,7 +136,7 @@ public class GermplasmResource {
 	@ResponseBody
 	public ResponseEntity<List<AttributeDTO>> getGermplasmAttributes(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam final Set<String> codes) {
+		@RequestParam(required = false) final Set<String> codes) {
 
 		return new ResponseEntity<>(this.germplasmService.getGermplasmAttributesByCodes(codes), HttpStatus.OK);
 	}
