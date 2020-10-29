@@ -69,8 +69,9 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Create germplasm list folder", notes = "Create sample list folder.")
+	//TODO: we need to add GERMPLASM_LIST permission
 	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM','MANAGE_GERMPLASM','GERMPLASM_LIST')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/germplasm-list-folders", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/germplasm-list-folders", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createGermplasmListFolder(
 		@PathVariable final String crop,
@@ -78,17 +79,8 @@ public class GermplasmListResourceGroup {
 		@RequestParam final String folderName,
 		@RequestParam final String parentId) {
 
-		final Map<String, Object> map;
-		try {
-			map = this.germplamListService.createGermplasmListFolder(, programUUID, folderName, parentId);
-		} catch (final MiddlewareException e) {
-			LOG.error("Error creating sample list folder", e);
-			final ErrorResponse response = new ErrorResponse();
-			response.addError("Something went wrong, please try again");
-			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-		}
-
-		return new ResponseEntity<>(map, HttpStatus.OK);
+		final Integer folderId = this.germplamListService.createGermplasmListFolder(crop, programUUID, folderName, parentId);
+		return new ResponseEntity<>(folderId, HttpStatus.OK);
 	}
 
 }

@@ -289,15 +289,30 @@ public class GermplamListServiceImpl implements GermplamListService {
 	}
 
 	@Override
-	public Map<String, Object> createGermplasmListFolder(final String cropName, final String programUUID, final String folderName,
+	public Integer createGermplasmListFolder(final String cropName, final String programUUID, final String folderName,
 		final String parentId) {
+
+		errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+
+		if (StringUtils.isEmpty(folderName)) {
+			throw new ApiValidationException("", "list.folder.empty", "");
+		}
 
 		this.validateProgram(cropName, programUUID);
 		this.validateParentId(parentId, programUUID);
 
+		//Validate if parent folder exists
+		this.germplasmListService.getGermplasmListById(Integer.valueOf(parentId))
+			.orElseThrow(() -> new ApiValidationException("", "list.parent.id.not.exist", ""));
 
+		//Validate if there is a folder with same name in parent folder
+		this.germplasmListService.getGermplasmListByParentAndName(folderName, Integer.valueOf(parentId), programUUID)
+			.ifPresent(germplasmList -> {
+				throw new ApiValidationException("", "list.folder.name.exists", "");
+			});
 
-		return null;
+		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
+		return this.germplasmListService.createGermplasmListFolder(createdBy.getUserid(), folderName, Integer.valueOf(parentId), programUUID);
 	}
 
 	private void validateProgram(String cropName, String programUUID) {
