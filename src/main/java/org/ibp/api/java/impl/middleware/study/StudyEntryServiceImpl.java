@@ -118,7 +118,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public List<StudyEntryDto> createStudyEntries(final Integer studyId,
 		final StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto) {
-		this.studyEntryValidator.validateStudyAlreadyHasStudyEntries(studyId);
 		this.studyValidator.validate(studyId, true);
 		if(studyEntryGeneratorBatchRequestDto.getListId() != null) {
 			return this.createStudyEntries(studyId, studyEntryGeneratorBatchRequestDto.getListId());

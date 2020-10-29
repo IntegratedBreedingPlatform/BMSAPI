@@ -115,7 +115,6 @@ public class StudyEntryServiceImplTest {
 		this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
-		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
 
