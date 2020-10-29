@@ -117,14 +117,6 @@ public class GermplasmServiceImplTest {
 	}
 
 	@Test
-	public void shouldGetEmptyGermplasmNameTypesListWithNullCodes() {
-		final List<GermplasmNameTypeDTO> germplasmListTypes = this.germplasmServiceImpl.getGermplasmNameTypesByCodes(null);
-		assertNotNull(germplasmListTypes);
-		assertThat(germplasmListTypes, hasSize(0));
-		Mockito.verifyZeroInteractions(this.germplasmDataManager);
-	}
-
-	@Test
 	public void shouldGetGermplasmAttributesByCodes() {
 		final Set<String> codes = Collections.singleton("NOTE");
 
@@ -151,14 +143,6 @@ public class GermplasmServiceImplTest {
 		assertThat(actualTypes, hasSize(2));
 		assertThat(actualTypes, contains(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()));
 		Mockito.verifyNoMoreInteractions(this.germplasmDataManager);
-	}
-
-	@Test
-	public void shouldGetEmptyGermplasmAttributesListWithNullCodes() {
-		final List<AttributeDTO> germplasmAttributesByCodes = this.germplasmServiceImpl.getGermplasmAttributesByCodes(null);
-		assertNotNull(germplasmAttributesByCodes);
-		assertThat(germplasmAttributesByCodes, hasSize(0));
-		Mockito.verifyZeroInteractions(this.germplasmDataManager);
 	}
 
 }
