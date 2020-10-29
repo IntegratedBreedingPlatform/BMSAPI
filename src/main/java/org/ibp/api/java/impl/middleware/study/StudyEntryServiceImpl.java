@@ -4,12 +4,17 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyEntryGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -20,6 +25,9 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
@@ -31,10 +39,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -63,10 +75,19 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private GermplasmListValidator germplasmListValidator;
 
 	@Autowired
+	private GermplasmValidator germplasmValidator;
+
+	@Autowired
 	private GermplamListService germplasmListService;
 
 	@Autowired
+	private SearchRequestDtoResolver searchRequestDtoResolver;
+
+	@Autowired
 	private TermValidator termValidator;
+
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
 
 	@Resource
 	private org.generationcp.middleware.service.api.study.StudyEntryService middlewareStudyEntryService;
@@ -80,6 +101,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Resource
 	private OntologyDataManager ontologyDataManager;
 
+	@Autowired
+	private GermplasmDataManager germplasmDataManager;
+
 	@Override
 	public StudyEntryDto replaceStudyEntry(final Integer studyId, final Integer entryId,
 		final StudyEntryDto studyEntryDto) {
@@ -92,12 +116,53 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
+	public List<StudyEntryDto> createStudyEntries(final Integer studyId,
+		final StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto) {
+		this.studyEntryValidator.validateStudyAlreadyHasStudyEntries(studyId);
+		this.studyValidator.validate(studyId, true);
+		if(studyEntryGeneratorBatchRequestDto.getListId() != null) {
+			return this.createStudyEntries(studyId, studyEntryGeneratorBatchRequestDto.getListId());
+		}
+
+		final SearchCompositeDto<Integer, Integer> searchComposite = studyEntryGeneratorBatchRequestDto.getSearchComposite();
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
+		//TODO: move search composite validator to common package
+		this.inventoryCommonValidator.validateSearchCompositeDto(searchComposite, errors);
+		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
+		this.germplasmValidator.validateGids(errors, gids);
+
+		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmWithPreferredNameByGIDs(gids);
+		final ModelMapper mapper = StudyEntryMapper.getInstance();
+		//Create StudyEntryDtos from given gids
+		final List<StudyEntryDto> studyEntryDtoList =
+			germplasmList.stream().map(l -> mapper.map(l, StudyEntryDto.class)).collect(Collectors.toList());
+
+
+		final List<Integer> germplasmDescriptorIds = this.getEntryDescriptorColumns(studyId).stream()
+			.map(measurementVariable -> measurementVariable.getTermId()).collect(Collectors.toList());
+		final Map<Integer, Germplasm> germplasmMap =
+			germplasmList.stream().collect(Collectors.toMap(Germplasm::getGid, g -> g));
+
+		//Get the next entry number
+		Integer entryNumber = this.middlewareStudyEntryService.getNextEntryNumber(studyId);
+		for(final StudyEntryDto studyEntryDto: studyEntryDtoList) {
+			studyEntryDto.setProperties(
+				StudyEntryPropertiesMapper.map(germplasmMap.get(studyEntryDto.getGid()), germplasmDescriptorIds,
+					studyEntryGeneratorBatchRequestDto.getEntryTypeId()));
+			//Set the starting entry number
+			studyEntryDto.setEntryNumber(entryNumber);
+			studyEntryDto.setEntryCode(entryNumber.toString());
+			studyEntryDto.setEntryId(entryNumber++);
+
+		}
+		return this.middlewareStudyEntryService.saveStudyEntries(studyId, studyEntryDtoList);
+	}
+
+	@Override
 	public List<StudyEntryDto> createStudyEntries(final Integer studyId, final Integer germplasmListId) {
 		final GermplasmList germplasmList = this.germplasmListService.getGermplasmList(germplasmListId);
 
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
-		this.studyEntryValidator.validateStudyAlreadyHasStudyEntries(studyId);
-		this.studyValidator.validate(studyId, true);
 
 		final ModelMapper mapper = StudyEntryMapper.getInstance();
 		final List<StudyEntryDto> studyEntryDtoList =

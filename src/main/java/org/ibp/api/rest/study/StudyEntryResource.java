@@ -4,7 +4,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.study.StudyEntryGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -56,10 +58,11 @@ public class StudyEntryResource {
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
-		@PathVariable final String programUUID,
-		@PathVariable final Integer studyId, @RequestBody final GermplasmEntryRequestDto germplasmEntryRequestDto) {
+		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
+		@ApiParam("Study Entry template for batch generation. SearchComposite is a list of gids")
+		@RequestBody final StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto) {
 		return new ResponseEntity<>(
-			this.studyEntryService.createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId()),
+			this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorBatchRequestDto),
 			HttpStatus.OK);
 
 	}

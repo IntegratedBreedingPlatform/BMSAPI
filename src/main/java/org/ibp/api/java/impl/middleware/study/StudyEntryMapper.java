@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.study.StudyGermplasm;
@@ -28,6 +29,7 @@ public class StudyEntryMapper {
 	static {
 		StudyEntryMapper.addStudyEntryDtoMapping(StudyEntryMapper.applicationWideModelMapper);
 		StudyEntryMapper.addGermplasmListDataMapping(StudyEntryMapper.applicationWideModelMapper);
+		StudyEntryMapper.addGermplasmMapping(StudyEntryMapper.applicationWideModelMapper);
 	}
 
 	public static ModelMapper getInstance() {
@@ -75,6 +77,18 @@ public class StudyEntryMapper {
 				this.map().setGid(this.source.getGermplasmId());
 				this.map().setDesignation(this.source.getDesignation());
 				this.map().setEntryCode(this.source.getEntryCode());
+			}
+		});
+	}
+
+	private static void addGermplasmMapping(final ModelMapper mapper) {
+		mapper.addMappings(new PropertyMap<Germplasm, StudyEntryDto>() {
+
+			@Override
+			protected void configure() {
+				this.map().setGid(this.source.getGid());
+				this.map().setDesignation(this.source.getPreferredName().getNval());
+				//this.map().setEntryCode(this.source.getEntryCode());
 			}
 		});
 	}
