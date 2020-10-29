@@ -119,7 +119,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<StudyEntryDto> createStudyEntries(final Integer studyId,
 		final StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto) {
 		this.studyValidator.validate(studyId, true);
-		if(studyEntryGeneratorBatchRequestDto.getListId() != null) {
+		if(studyEntryGeneratorBatchRequestDto.getListId() != null && studyEntryGeneratorBatchRequestDto.getListId() != 0) {
 			return this.createStudyEntries(studyId, studyEntryGeneratorBatchRequestDto.getListId());
 		}
 
