@@ -14,7 +14,7 @@ public class StudyEntryPropertiesMapper {
 	private static final String DEFAULT_ENTRY_TYPE = String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 
 	public static Map<Integer, StudyEntryPropertyData> map(final Germplasm source, final List<Integer> germplasmDescriptorIds,
-		final Integer entryTypeId) {
+		final Integer entryTypeId, final String cross) {
 		final Map<Integer, StudyEntryPropertyData> studyEntryProperties = new HashMap<>();
 		for(final Integer variableId: germplasmDescriptorIds) {
 			if(TermId.ENTRY_TYPE.getId() == variableId) {
@@ -28,9 +28,8 @@ public class StudyEntryPropertiesMapper {
 				studyEntryProperties.put(TermId.GROUPGID.getId(),
 					createStudyEntryPropertyValue(TermId.GROUPGID.getId(), String.valueOf(source.getMgid())));
 			} else if(TermId.CROSS.getId() == variableId){
-				//get cross expansion here
-				/*studyEntryProperties.put(TermId.CROSS.getId(),
-					createStudyEntryPropertyValue(TermId.CROSS.getId(), String.valueOf(source.getGroupName())));*/
+				studyEntryProperties.put(TermId.CROSS.getId(),
+					createStudyEntryPropertyValue(TermId.CROSS.getId(), cross));
 			} else if(TermId.GERMPLASM_SOURCE.getId() == variableId) {
 				//Add empty string for seedsource value from germplasm search
 				studyEntryProperties.put(TermId.GERMPLASM_SOURCE.getId(),

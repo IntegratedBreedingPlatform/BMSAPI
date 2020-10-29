@@ -145,10 +145,15 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		//Get the next entry number
 		Integer entryNumber = this.middlewareStudyEntryService.getNextEntryNumber(studyId);
+		final boolean hasCrossGermplasmDescriptor = germplasmDescriptorIds.contains(TermId.CROSS.getId());
 		for(final StudyEntryDto studyEntryDto: studyEntryDtoList) {
+			//Retrieve cross value only if the CROSS is present in the germplasm descriptors
+			final String cross = hasCrossGermplasmDescriptor ?
+				this.pedigreeService.getCrossExpansion(studyEntryDto.getGid(), this.crossExpansionProperties) : "";
+
 			studyEntryDto.setProperties(
 				StudyEntryPropertiesMapper.map(germplasmMap.get(studyEntryDto.getGid()), germplasmDescriptorIds,
-					studyEntryGeneratorBatchRequestDto.getEntryTypeId()));
+					studyEntryGeneratorBatchRequestDto.getEntryTypeId(), cross));
 			//Set the starting entry number
 			studyEntryDto.setEntryNumber(entryNumber);
 			studyEntryDto.setEntryCode(entryNumber.toString());
