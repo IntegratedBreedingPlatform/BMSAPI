@@ -14,12 +14,18 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.service.api.MethodService;
 import org.ibp.api.domain.germplasm.GermplasmName;
 import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
+import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
+import org.ibp.api.java.location.LocationService;
+import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -27,15 +33,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Service
 public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExportService {
+
+	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
+	private static final Set<Integer> LOCATION_TYPE = new HashSet<>(Arrays.asList(410, 405));
 
 	private static final String FILE_NAME = "GermplasmImportTemplate.xls";
 	private static final int OBSERVATION_SHEET_ENTRY_NO_COLUMN_INDEX = 0;
@@ -60,18 +73,27 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 	@Autowired
 	ResourceBundleMessageSource messageSource;
 
+	@Autowired
+	LocationService locationService;
+
+	@Autowired
+	private VariableService variableService;
+
+	@Resource
+	protected MethodService methodService;
+
+	@Autowired
+	private GermplasmService germplasmService;
+
 	@Override
-	public File export(final List<Method> breedingMethods, final List<GermplasmName> germplasmNames,
-		final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> germplasmAttributeDTOS,
-		final List<LocationDto> locationDtos, final List<LocationDto> storagelocationDtos, final List<VariableDetails> units) {
+	public File export(final String cropName, final String programUUID) {
 
 		try {
 			final File temporaryFolder = Files.createTempDir();
 
 			final String fileNameFullPath =
 				temporaryFolder.getAbsolutePath() + File.separator + GermplasmTemplateExportServiceImpl.FILE_NAME;
-			return this.generateTemplateFile(fileNameFullPath, breedingMethods, germplasmNames, germplasmAttributeDTOS, locationDtos,
-				storagelocationDtos, units);
+			return this.generateTemplateFile(fileNameFullPath, cropName, programUUID);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.exportAsXLS.germplasm.template", "");
@@ -79,16 +101,12 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 		}
 	}
 
-	private File generateTemplateFile(final String fileNamePath, final List<Method> breedingMethods,
-		final List<GermplasmName> germplasmNames,
-		final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> germplasmAttributeDTOS,
-		final List<LocationDto> locationDtos, final List<LocationDto> storagelocationDtos,
-		final List<VariableDetails> units) throws IOException {
+	private File generateTemplateFile(final String fileNamePath, final String cropName, final String programUUID) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
 		final File file = new File(fileNamePath);
 		this.writeObservationSheet(xlsBook);
-		this.writeCodesSheet(xlsBook, breedingMethods, germplasmNames, germplasmAttributeDTOS, locationDtos, storagelocationDtos, units);
+		this.writeCodesSheet(xlsBook, cropName, programUUID);
 
 		try (final FileOutputStream fos = new FileOutputStream(file)) {
 			xlsBook.write(fos);
@@ -118,13 +136,13 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 
 		HSSFCell cell = row.createCell(GermplasmTemplateExportServiceImpl.OBSERVATION_SHEET_ENTRY_NO_COLUMN_INDEX, CellType.STRING);
 		final HSSFFont observationFont = this.buildFont(xlsBook, "arial", 10, true);
+
 		cell.setCellStyle(this.buildHeaderStyle(xlsBook, IndexedColors.YELLOW.getIndex(), HorizontalAlignment.CENTER, observationFont));
 		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.entry.no.column", null, locale));
 
 		cell = row.createCell(GermplasmTemplateExportServiceImpl.OBSERVATION_SHEET_LNAME_COLUMN_INDEX, CellType.STRING);
 		cell.setCellStyle(this.buildHeaderStyle(xlsBook, IndexedColors.YELLOW.getIndex(), HorizontalAlignment.CENTER, observationFont));
-		cell.setCellValue(
-			this.getMessageSource().getMessage("export.germplasm.list.template.lname.column", null, locale));
+		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.lname.column", null, locale));
 
 		cell = row.createCell(GermplasmTemplateExportServiceImpl.OBSERVATION_SHEET_DRVNM_COLUMN_INDEX, CellType.STRING);
 		cell.setCellStyle(this.buildHeaderStyle(xlsBook, IndexedColors.YELLOW.getIndex(), HorizontalAlignment.CENTER, observationFont));
@@ -155,8 +173,7 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.breeding.method.column", null, locale));
 
 		cell = row.createCell(GermplasmTemplateExportServiceImpl.OBSERVATION_SHEET_NOTES_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(
-			this.buildHeaderStyle(xlsBook, IndexedColors.PALE_BLUE.getIndex(), HorizontalAlignment.CENTER, observationFont));
+		cell.setCellStyle(this.buildHeaderStyle(xlsBook, IndexedColors.PALE_BLUE.getIndex(), HorizontalAlignment.CENTER, observationFont));
 		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.notes.column", null, locale));
 
 		cell = row.createCell(GermplasmTemplateExportServiceImpl.OBSERVATION_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX, CellType.STRING);
@@ -196,32 +213,44 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 		xlsSheet.setColumnWidth(GermplasmTemplateExportServiceImpl.OBSERVATION_SHEET_GUID_COLUMN_INDEX, 13 * 250);
 	}
 
-	private void writeCodesSheet(final HSSFWorkbook xlsBook, final List<Method> breedingMethods, final List<GermplasmName> germplasmNames,
-		final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> germplasmAttributeDTOS,
-		final List<LocationDto> locationDtos,
-		final List<LocationDto> storagelocationDtos, final List<VariableDetails> units) {
+	private void writeCodesSheet(final HSSFWorkbook xlsBook, final String cropName, final String programUUID) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet xlsSheet =
 			xlsBook.createSheet(this.getMessageSource().getMessage("export.germplasm.list.template.sheet.codes", null, locale));
 		int currentRowNum = 0;
 
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
+
+		final List<LocationDto> storageLocations =
+			this.locationService
+				.getLocations(cropName, programUUID, GermplasmTemplateExportServiceImpl.STORAGE_LOCATION_TYPE, null, null, false);
+
+		final List<LocationDto> locations =
+			this.locationService
+				.getLocations(cropName, programUUID, GermplasmTemplateExportServiceImpl.LOCATION_TYPE, null, null, false);
+
+		final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> attributeDTOs =
+			this.germplasmService.getGermplasmAttributes();
+
+		final List<Method> breedingMethods = this.germplasmService.getAllBreedingMethods();
+
+		final List<GermplasmName> germplasmNames = this.germplasmService.getGermplasmNames();
+
 		this.setCustomColorAtIndex(xlsBook, IndexedColors.AQUA, 218, 227, 243);
 		this.setCustomColorAtIndex(xlsBook, IndexedColors.OLIVE_GREEN, 235, 241, 222);
-
-		final CellStyle backgroundStyle = xlsBook.createCellStyle();
-		final HSSFFont codesSheetFont = this.buildFont(xlsBook, "calibri", 11,false);
-		backgroundStyle.setFont(codesSheetFont);
 
 		this.writeCodesHeader(xlsBook, xlsSheet, currentRowNum++, "export.germplasm.list.template.breeding.methods.column");
 		currentRowNum = this.writeBreedingMethodSection(currentRowNum, xlsBook, xlsSheet, breedingMethods);
 		xlsSheet.createRow(currentRowNum++);
 
 		this.writeCodesHeader(xlsBook, xlsSheet, currentRowNum++, "export.germplasm.list.template.attributes.column");
-		currentRowNum = this.writeAttributeSection(currentRowNum, xlsBook, xlsSheet, germplasmAttributeDTOS);
+		currentRowNum = this.writeAttributeSection(currentRowNum, xlsBook, xlsSheet, attributeDTOs);
 		xlsSheet.createRow(currentRowNum++);
 
 		this.writeCodesHeader(xlsBook, xlsSheet, currentRowNum++, "export.germplasm.list.template.location.abbr.column");
-		currentRowNum = this.writeLocationAbbrSection(currentRowNum, xlsBook, xlsSheet, locationDtos);
+		currentRowNum = this.writeLocationAbbrSection(currentRowNum, xlsBook, xlsSheet, locations);
 		xlsSheet.createRow(currentRowNum++);
 
 		this.writeCodesHeader(xlsBook, xlsSheet, currentRowNum++, "export.germplasm.list.template.name.column");
@@ -229,7 +258,7 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 		xlsSheet.createRow(currentRowNum++);
 
 		this.writeCodesHeader(xlsBook, xlsSheet, currentRowNum++, "export.germplasm.list.template.storage.location.abbr.column");
-		currentRowNum = this.writeLocationAbbrSection(currentRowNum, xlsBook, xlsSheet, storagelocationDtos);
+		currentRowNum = this.writeLocationAbbrSection(currentRowNum, xlsBook, xlsSheet, storageLocations);
 		xlsSheet.createRow(currentRowNum++);
 
 		this.writeCodesHeader(xlsBook, xlsSheet, currentRowNum++, "export.germplasm.list.template.units.column");
@@ -327,7 +356,7 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 		final int codesSheetFirstColumnIndex, final String value, final int count, final HSSFWorkbook xlsBook, final HSSFRow row) {
 		HSSFCell cell = row.createCell(codesSheetFirstColumnIndex, CellType.STRING);
 
-		final HSSFFont hSSFFont = this.buildFont(xlsBook,"calibri",11,false);
+		final HSSFFont hSSFFont = this.buildFont(xlsBook, "calibri", 11, false);
 		final CellStyle cellStyle = xlsBook.createCellStyle();
 		cellStyle.setFillForegroundColor(codesSheetFirstColumnIndex == 0 ? IndexedColors.AQUA.getIndex() : IndexedColors.OLIVE_GREEN.getIndex());
 		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -349,16 +378,14 @@ public class GermplasmTemplateExportServiceImpl implements GermplasmTemplateExpo
 		row.setHeightInPoints(16);
 
 		HSSFCell cell = row.createCell(GermplasmTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, CellType.STRING);
-		final HSSFFont codesFont = this.buildFont(xlsBook, "calibri", 11,true);
+		final HSSFFont codesFont = this.buildFont(xlsBook, "calibri", 11, true);
 
 		cell.setCellStyle(this.buildHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex(), HorizontalAlignment.LEFT, codesFont));//
-		cell.setCellValue(
-			this.getMessageSource().getMessage(colunmName, null, locale));
+		cell.setCellValue(this.getMessageSource().getMessage(colunmName, null, locale));
 
 		cell = row.createCell(GermplasmTemplateExportServiceImpl.CODES_SHEET_SECOND_COLUMN_INDEX, CellType.STRING);
 		cell.setCellStyle(this.buildHeaderStyle(xlsBook, IndexedColors.OLIVE_GREEN.getIndex(), HorizontalAlignment.LEFT, codesFont));
-		cell.setCellValue(
-			this.getMessageSource().getMessage("export.germplasm.list.template.description.column", null, locale));
+		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.description.column", null, locale));
 
 	}
 

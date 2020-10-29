@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface GermplasmTemplateExportService {
 
-	File export(List<Method> breedingMethods, List<GermplasmName> germplasmNames,
-		List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> germplasmAttributeDTOS,
-		List<LocationDto> locationDtos, List<LocationDto> storagelocationDtos, List<VariableDetails> units);
+	File export(final String cropName, final String programUUID);
 
 }

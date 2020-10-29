@@ -56,9 +56,6 @@ import java.util.Set;
 @Controller
 public class GermplasmResource {
 
-	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
-	private static final Set<Integer> LOCATION_TYPE = new HashSet<>(Arrays.asList(410, 405));
-
 	private static final String HAS_GERMPLASM_SEARCH = " or hasAnyAuthority('STUDIES'"
 		+ ", 'MANAGE_STUDIES'"
 		+ ", 'QUERIES'"
@@ -73,15 +70,6 @@ public class GermplasmResource {
 
 	@Autowired
 	private GermplasmTemplateExportService germplasmTemplateExportService;
-
-	@Autowired
-	LocationService locationService;
-
-	@Autowired
-	private VariableService variableService;
-
-	@Resource
-	protected MethodService methodService;
 
 	@ApiOperation(value = "Search germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
@@ -157,24 +145,8 @@ public class GermplasmResource {
 	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID) {
 
-		final VariableFilter variableFilter = new VariableFilter();
-		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
-
-		final List<LocationDto> storageLocation =
-			this.locationService.getLocations(cropName, programUUID, GermplasmResource.STORAGE_LOCATION_TYPE, null, null, false);
-
-		final List<LocationDto> locations =
-			this.locationService.getLocations(cropName, programUUID, GermplasmResource.LOCATION_TYPE, null, null, false);
-
-		final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> attributeDTOS = this.germplasmService.getGermplasmAttributes();
-
-		final List<Method> breedingMethods = this.germplasmService.getAllBreedingMethods();
-
-		final List<GermplasmName> germplasmNames = this.germplasmService.getGermplasmNames();
-
 		final File file =
-			this.germplasmTemplateExportService.export(breedingMethods, germplasmNames, attributeDTOS, locations, storageLocation, units);
+			this.germplasmTemplateExportService.export(cropName, programUUID);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers
