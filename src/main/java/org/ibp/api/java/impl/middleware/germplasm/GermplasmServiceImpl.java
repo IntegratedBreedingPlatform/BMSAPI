@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -40,6 +41,7 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -100,6 +102,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmService;
+
+	@Autowired
+	private SecurityService securityService;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -432,8 +437,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public Map<Integer, Integer> importGemplasm(final String cropName, final GermplasmImportRequestDto germplasmImportRequestDto) {
-
-		return this.germplasmService.importGermplasmSet(1, cropName, germplasmImportRequestDto);
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		return this.germplasmService.importGermplasmSet(user.getUserid(), cropName, germplasmImportRequestDto);
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
