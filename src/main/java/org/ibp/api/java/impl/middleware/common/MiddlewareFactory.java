@@ -24,6 +24,8 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
+import org.generationcp.middleware.api.germplasm.update.GermplasmUpdateService;
+import org.generationcp.middleware.api.germplasm.update.GermplasmUpdateServiceImpl;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsService;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsServiceImpl;
 import org.generationcp.middleware.api.location.LocationService;
@@ -545,6 +547,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public UserDefinedFieldService getUserDefinedFieldService() {
 		return new UserDefinedFieldServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmUpdateService getGermplasmUpdateService() {
+		return new GermplasmUpdateServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,7 +56,7 @@ public class GermplasmUpdateValidator {
 
 	public void validateCodesAndPreferredName(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
-		final Set<String> attributesAndNamesCodes = germplasmUpdateDTOList.get(0).getData().keySet();
+		final Set<String> attributesAndNamesCodes = new HashSet<>(germplasmUpdateDTOList.get(0).getData().keySet());
 
 		final Map<String, Integer> attributeCodes =
 			this.userDefinedFieldService

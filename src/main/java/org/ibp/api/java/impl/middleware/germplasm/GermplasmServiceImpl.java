@@ -1,9 +1,11 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasm.update.GermplasmUpdateService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
@@ -39,6 +41,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -55,6 +58,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmUpdateValidator germplasmUpdateValidator;
+
+	@Autowired
+	private GermplasmUpdateService germplasmUpdateService;
 
 	private BindingResult errors;
 
@@ -84,6 +90,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private AttributeService attributeService;
+
+	@Resource
+	private ContextUtil contextUtil;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -423,6 +432,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+
+		this.germplasmUpdateService.saveGermplasmUpdates(this.contextUtil.getCurrentWorkbenchUser().getUserid(), germplasmUpdateDTOList);
 
 	}
 
