@@ -447,7 +447,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public void importGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		this.errors = new MapBindingResult(new HashMap<>(), AttributeDTO.class.getName());
-		this.germplasmUpdateValidator.validate(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateEmptyList(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateCodesAndPreferredName(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateGermplasmIdAndGermplasmUUID(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateLocationAbbreviation(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateBreedingMethod(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateCreationDate(this.errors, germplasmUpdateDTOList);
 
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());

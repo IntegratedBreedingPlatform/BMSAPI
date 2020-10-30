@@ -40,18 +40,10 @@ public class GermplasmUpdateValidator {
 	@Autowired
 	private UserDefinedFieldService userDefinedFieldService;
 
-	public void validate(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
-
+	public void validateEmptyList(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		if (germplasmUpdateDTOList == null || germplasmUpdateDTOList.isEmpty()) {
 			errors.reject("germplasm.update.empty.list", "");
-			return;
 		}
-
-		this.validateCodesAndPreferredName(errors, germplasmUpdateDTOList);
-		this.validateGermplasmIdAndGermplasmUUID(errors, germplasmUpdateDTOList);
-		this.validateLocationAbbreviation(errors, germplasmUpdateDTOList);
-		this.validateBreedingMethod(errors, germplasmUpdateDTOList);
-		this.validateCreationDate(errors, germplasmUpdateDTOList);
 	}
 
 	public void validateCodesAndPreferredName(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
