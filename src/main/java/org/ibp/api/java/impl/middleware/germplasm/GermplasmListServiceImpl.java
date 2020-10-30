@@ -295,20 +295,18 @@ public class GermplasmListServiceImpl implements GermplamListService {
 		errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
 		if (StringUtils.isEmpty(folderName)) {
-			throw new ApiValidationException("", "list.folder.empty", "");
+			this.errors.reject("list.folder.empty", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		this.validateProgram(cropName, programUUID);
 		this.validateParentId(parentId, programUUID);
 
-		//Validate if parent folder exists
-		this.germplasmListService.getGermplasmListById(Integer.valueOf(parentId))
-			.orElseThrow(() -> new ApiValidationException("", "list.parent.id.not.exist", ""));
-
 		//Validate if there is a folder with same name in parent folder
 		this.germplasmListService.getGermplasmListByParentAndName(folderName, Integer.valueOf(parentId), programUUID)
 			.ifPresent(germplasmList -> {
-				throw new ApiValidationException("", "list.folder.name.exists", "");
+				this.errors.reject("list.folder.name.exists", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			});
 
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
@@ -336,11 +334,11 @@ public class GermplasmListServiceImpl implements GermplamListService {
 		}
 
 		if (Util.isPositiveInteger(parentId) && !StringUtils.isEmpty(programUUID)) {
-			final GermplasmList germplasmList = this.germplasmListManager.getGermplasmListById(Integer.parseInt(parentId));
-			if (germplasmList == null || !germplasmList.isFolder()) {
-				this.errors.reject("list.parent.id.not.exist", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
+			this.germplasmListService.getGermplasmListById(Integer.parseInt(parentId))
+				.orElseThrow(() -> {
+					this.errors.reject("list.parent.id.not.exist", "");
+					return new ApiRequestValidationException(this.errors.getAllErrors());
+				});
 		}
 	}
 
