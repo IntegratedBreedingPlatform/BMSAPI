@@ -161,4 +161,13 @@ public class StudyEntryResource {
 
 		return new ResponseEntity<>(this.studyEntryService.getStudyEntriesMetadata(studyId, programUUID), HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Get existing Germplasm ids", notes = "Retrieves existing Germplasm ids in the study from the given gid list")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/existing-gids/{gids}", method = RequestMethod.GET)
+	public ResponseEntity<List<Integer>> getEntryTableColumns(@PathVariable final String crop,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @PathVariable final List<Integer> gids) {
+		return new ResponseEntity<>(this.studyEntryService.getGidsUsedInStudy(studyId, gids), HttpStatus.OK);
+	}
 }

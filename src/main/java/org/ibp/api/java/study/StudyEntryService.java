@@ -35,4 +35,5 @@ public interface StudyEntryService {
 
 	List<MeasurementVariable> getEntryDescriptorColumns(Integer studyId);
 
+	List<Integer> getGidsUsedInStudy(Integer studyId, List<Integer> gids);
 }

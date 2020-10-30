@@ -284,6 +284,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return studyEntryMetadata;
 	}
 
+	@Override
+	public List<Integer> getGidsUsedInStudy(final Integer studyId, final List<Integer> gids) {
+		this.studyValidator.validate(studyId, false);
+		return this.middlewareStudyEntryService.getGidsUsedInStudy(studyId, gids);
+	}
+
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
 		final MeasurementVariable sampleColumn = new MeasurementVariable();
 		sampleColumn.setName(name);
