@@ -83,4 +83,19 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(folderId, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Update sample list folder", notes = "Update sample list folder. ")
+	//TODO: we need to add GERMPLASM_LIST permission
+	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM','MANAGE_GERMPLASM','GERMPLASM_LIST')")
+	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/germplasm-list-folders/{folderId}", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity updateGermplasmListFolderName(
+		@PathVariable final String crop,
+		@PathVariable final String programUUID,
+		@PathVariable final String folderId,
+		@RequestParam final String newFolderName) {
+
+		final Integer updatedFolderId = this.germplamListService.updateGermplasmListFolderName(crop, programUUID, newFolderName, folderId);
+		return new ResponseEntity<>(updatedFolderId, HttpStatus.OK);
+	}
+
 }
