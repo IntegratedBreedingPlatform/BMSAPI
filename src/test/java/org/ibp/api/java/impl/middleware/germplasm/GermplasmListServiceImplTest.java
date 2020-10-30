@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import io.swagger.annotations.Api;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.ContextHolder;
@@ -22,13 +21,11 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +69,7 @@ public class GermplasmListServiceImplTest {
 	public GermplasmListService germplasmListServiceMiddleware;
 
 	@InjectMocks
-	private GermplamListServiceImpl germplamListService;
+	private GermplasmListServiceImpl germplamListService;
 
 	@Before
 	public void init() {
@@ -105,7 +102,7 @@ public class GermplasmListServiceImplTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testGetGermplasmListChildrenNodes_ProgramNotSpecified_ThrowsException() throws ApiRequestValidationException {
-		germplamListService.getGermplasmListChildrenNodes("maize", null, GermplamListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
+		germplamListService.getGermplasmListChildrenNodes("maize", null, GermplasmListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
 
 	}
 
@@ -123,7 +120,7 @@ public class GermplasmListServiceImplTest {
 	public void testGetGermplasmListChildrenNodes_NoProgramSpecified_ReturnOnlyCropFolder() throws ApiRequestValidationException {
 		final List<TreeNode> result = germplamListService.getGermplasmListChildrenNodes("maize", null, null, Boolean.FALSE);
 		Assert.assertEquals(result.size(), 1);
-		Assert.assertEquals(GermplamListServiceImpl.CROP_LISTS, result.get(0).getKey());
+		Assert.assertEquals(GermplasmListServiceImpl.CROP_LISTS, result.get(0).getKey());
 	}
 
 	@Test
@@ -132,22 +129,22 @@ public class GermplasmListServiceImplTest {
 
 		final List<TreeNode> result = germplamListService.getGermplasmListChildrenNodes("maize", program, null, Boolean.FALSE);
 		Assert.assertEquals(result.size(), 2);
-		Assert.assertEquals(GermplamListServiceImpl.CROP_LISTS, result.get(0).getKey());
-		Assert.assertEquals(GermplamListServiceImpl.PROGRAM_LISTS, result.get(1).getKey());
+		Assert.assertEquals(GermplasmListServiceImpl.CROP_LISTS, result.get(0).getKey());
+		Assert.assertEquals(GermplasmListServiceImpl.PROGRAM_LISTS, result.get(1).getKey());
 
 	}
 
 	@Test
 	public void testGetGermplasmListChildrenNodes_ParentIsCropList_LoadCropGermplasmLists() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
-		germplamListService.getGermplasmListChildrenNodes("maize", program, GermplamListServiceImpl.CROP_LISTS, Boolean.FALSE);
+		germplamListService.getGermplasmListChildrenNodes("maize", program, GermplasmListServiceImpl.CROP_LISTS, Boolean.FALSE);
 		Mockito.verify(germplasmListManager, times(1)).getAllTopLevelLists(null);
 	}
 
 	@Test
 	public void testGetGermplasmListChildrenNodes_ParentIsProgramList_LoadProgramGermplasmLists() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
-		germplamListService.getGermplasmListChildrenNodes("maize", program, GermplamListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
+		germplamListService.getGermplasmListChildrenNodes("maize", program, GermplasmListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
 		Mockito.verify(germplasmListManager, times(1)).getAllTopLevelLists(program);
 	}
 
@@ -162,7 +159,7 @@ public class GermplasmListServiceImplTest {
 		Mockito.when(germplasmListManager.getGermplasmListById(Integer.parseInt(parentId))).thenReturn(germplasmList);
 
 		germplamListService.getGermplasmListChildrenNodes("maize", program, parentId, Boolean.FALSE);
-		Mockito.verify(germplasmListManager, times(1)).getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), program, GermplamListServiceImpl.BATCH_SIZE);
+		Mockito.verify(germplasmListManager, times(1)).getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), program, GermplasmListServiceImpl.BATCH_SIZE);
 	}
 
 	@Test
@@ -227,7 +224,7 @@ public class GermplasmListServiceImplTest {
 			Assert.fail();
 		} catch (final ApiValidationException e) {
 			Assert.assertThat(e.getErrorCode(), is("error.germplasmlist.save.gaps"));
-			Assert.assertThat(e.getParams()[0], is(GermplamListServiceImpl.ENTRY_CODE));
+			Assert.assertThat(e.getParams()[0], is(GermplasmListServiceImpl.ENTRY_CODE));
 		}
 	}
 
@@ -244,7 +241,7 @@ public class GermplasmListServiceImplTest {
 		list.setDescription(RandomStringUtils.random(255));
 		list.setDate(new Date());
 		list.setType(GERMPLASM_LIST_TYPE);
-		list.setParentFolderId(GermplamListServiceImpl.PROGRAM_LISTS);
+		list.setParentFolderId(GermplasmListServiceImpl.PROGRAM_LISTS);
 		final List<GermplasmListGeneratorDTO.GermplasmEntryDTO> entries = new ArrayList<>();
 		final GermplasmListGeneratorDTO.GermplasmEntryDTO entry1 = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
 		entry1.setGid(GID1);

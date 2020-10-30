@@ -48,7 +48,7 @@ import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.ch
 
 @Service
 @Transactional
-public class GermplamListServiceImpl implements GermplamListService {
+public class GermplasmListServiceImpl implements GermplamListService {
 
 	public static final String PROGRAM_LISTS = "LISTS";
 	public static final String CROP_LISTS = "CROPLISTS";
@@ -98,24 +98,24 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 		final List<TreeNode> treeNodes = new ArrayList<>();
 		if (parentId == null) {
-			final TreeNode cropFolderNode = new TreeNode(GermplamListServiceImpl.CROP_LISTS, AppConstants.CROP_LISTS.getString(), true, LEAD_CLASS,
+			final TreeNode cropFolderNode = new TreeNode(GermplasmListServiceImpl.CROP_LISTS, AppConstants.CROP_LISTS.getString(), true, LEAD_CLASS,
 					AppConstants.FOLDER_ICON_PNG.getString(), null);
 			cropFolderNode.setNumOfChildren(this.germplasmListManager.getAllTopLevelLists(null).size());
 			treeNodes.add(cropFolderNode);
 			if (programUUID != null) {
-				final TreeNode programFolderNode = new TreeNode(GermplamListServiceImpl.PROGRAM_LISTS, AppConstants.PROGRAM_LISTS.getString(), true, LEAD_CLASS,
+				final TreeNode programFolderNode = new TreeNode(GermplasmListServiceImpl.PROGRAM_LISTS, AppConstants.PROGRAM_LISTS.getString(), true, LEAD_CLASS,
 						AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
 				programFolderNode.setNumOfChildren(this.germplasmListManager.getAllTopLevelLists(programUUID).size());
 				treeNodes.add(programFolderNode);
 			}
 		} else {
 			final List<GermplasmList> rootLists;
-			if (GermplamListServiceImpl.PROGRAM_LISTS.equals(parentId)) {
+			if (GermplasmListServiceImpl.PROGRAM_LISTS.equals(parentId)) {
 				rootLists = this.germplasmListManager.getAllTopLevelLists(programUUID);
-			} else if (GermplamListServiceImpl.CROP_LISTS.equals(parentId)) {
+			} else if (GermplasmListServiceImpl.CROP_LISTS.equals(parentId)) {
 				rootLists = this.germplasmListManager.getAllTopLevelLists(null);
 			} else {
-				rootLists = this.germplasmListManager.getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID, GermplamListServiceImpl.BATCH_SIZE);
+				rootLists = this.germplasmListManager.getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID, GermplasmListServiceImpl.BATCH_SIZE);
 			}
 
 			this.germplasmListManager.populateGermplasmListCreatedByName(rootLists);
