@@ -1,13 +1,14 @@
 
 package org.ibp.api.java.germplasm;
 
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.ibp.api.domain.germplasm.DescendantTree;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
@@ -15,6 +16,7 @@ import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface GermplasmService {
 
@@ -55,5 +57,9 @@ public interface GermplasmService {
 	long countAttributesByGid(String gid, List<String> attributeDbIds);
 
 	void importGermplasmUpdates(List<GermplasmUpdateDTO> germplasmUpdateDTOList);
+
+	List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(Set<String> codes);
+
+	List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(Set<String> codes);
 
 }

@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -24,7 +26,9 @@ import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyEntryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +36,11 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,6 +76,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private EntryTypeService entryTypeService;
+
+	@Resource
+	private OntologyDataManager ontologyDataManager;
 
 	@Override
 	public StudyEntryDto replaceStudyEntry(final Integer studyId, final Integer entryId,
@@ -126,7 +136,23 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 		this.studyValidator.validate(studyId, false);
-		return this.middlewareStudyEntryService.getStudyEntries(studyId, filter, pageable);
+
+		Pageable convertedPageable = null;
+		if (pageable != null && pageable.getSort() != null) {
+			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+			if (iterator.hasNext()) {
+				// Convert the sort property name from termid to actual term name.
+				final Sort.Order sort = iterator.next();
+				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
+				final String sortProperty = Objects.isNull(term) ? sort.getProperty() : term.getName();
+				pageable.getSort().and(new Sort(sort.getDirection(), sortProperty));
+				convertedPageable =
+					new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(),
+						sortProperty);
+			}
+		}
+
+		return this.middlewareStudyEntryService.getStudyEntries(studyId, filter, convertedPageable);
 	}
 
 	@Override
@@ -142,13 +168,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 
 		final List<Integer> termsToRemove = Lists
-			.newArrayList(TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
+			.newArrayList(TermId.OBS_UNIT_ID.getId());
 
 		final List<MeasurementVariable> entryDescriptors =
 			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
-		//Remove OBS_UNIT_ID column and STOCKID if present
+		//Remove OBS_UNIT_ID column if present
 		entryDescriptors.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
 		//Add Inventory related columns

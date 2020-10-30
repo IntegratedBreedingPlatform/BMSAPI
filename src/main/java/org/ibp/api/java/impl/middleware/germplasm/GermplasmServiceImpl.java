@@ -3,28 +3,41 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.attribute.AttributeService;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasm.update.GermplasmUpdateService;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UDTableType;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.ibp.api.domain.germplasm.*;
+import org.ibp.api.domain.germplasm.DescendantTree;
+import org.ibp.api.domain.germplasm.DescendantTreeTreeNode;
+import org.ibp.api.domain.germplasm.GermplasmName;
+import org.ibp.api.domain.germplasm.GermplasmSummary;
+import org.ibp.api.domain.germplasm.PedigreeTree;
+import org.ibp.api.domain.germplasm.PedigreeTreeNode;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -42,7 +55,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -437,6 +457,41 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	}
 
+	@Override
+	public List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(final Set<String> codes) {
+
+		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
+			.stream()
+			.map(userDefinedField -> {
+				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
+				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
+				germplasmNameTypeDTO.setName(userDefinedField.getFname());
+				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
+				return germplasmNameTypeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(final Set<String> codes) {
+
+		final Set<String> types = new HashSet<>();
+		types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
+		types.add(UDTableType.ATRIBUTS_PASSPORT.getType());
+		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
+			.stream()
+			.map(userDefinedField -> {
+				final org.generationcp.middleware.api.attribute.AttributeDTO attributeDTO =
+					new org.generationcp.middleware.api.attribute.AttributeDTO();
+				attributeDTO.setId(userDefinedField.getFldno());
+				attributeDTO.setName(userDefinedField.getFname());
+				attributeDTO.setCode(userDefinedField.getFcode());
+				return attributeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
 		this.germplasmValidator.validateGermplasmId(this.errors, Integer.valueOf(gid));
@@ -464,4 +519,5 @@ public class GermplasmServiceImpl implements GermplasmService {
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
 	}
+
 }

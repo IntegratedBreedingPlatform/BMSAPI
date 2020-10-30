@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Set;
 
 @Api(value = "Germplasm Services")
 @Controller
@@ -52,7 +54,7 @@ public class GermplasmResource {
 
 	@ApiOperation(value = "Search germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')" + HAS_GERMPLASM_SEARCH)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + HAS_GERMPLASM_SEARCH)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
 			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
@@ -129,6 +131,26 @@ public class GermplasmResource {
 		this.germplasmService.importGermplasmUpdates(germplasmUpdateDTOList);
 
 		return new ResponseEntity(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Returns germplasm name types filtered by a list of codes", notes = "Returns germplasm name types filtered by a list of codes")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/name-types", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmNameTypeDTO>> getGermplasmNameTypes(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final Set<String> codes) {
+
+		return new ResponseEntity<>(this.germplasmService.getGermplasmNameTypesByCodes(codes), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Returns germplasm attributes filtered by a list of codes", notes = "Returns germplasm attributes filtered by a list of codes")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<AttributeDTO>> getGermplasmAttributes(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final Set<String> codes) {
+
+		return new ResponseEntity<>(this.germplasmService.getGermplasmAttributesByCodes(codes), HttpStatus.OK);
 	}
 
 }
