@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.Map;
 
 @Api(value = "Germplasm List Services")
 @Controller
@@ -98,10 +97,10 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(updatedFolderId, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Move germplasm list.", notes = "Move germplasm list.")
+	@ApiOperation(value = "Move germplasm list folder.", notes = "Move germplasm list folder.")
 	//TODO: we need to add GERMPLASM_LIST permission
 	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM','MANAGE_GERMPLASM','GERMPLASM_LIST')")
-	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/germplasm-list/{folderId}/move", method = RequestMethod.PUT)
+	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/germplasm-list-folders/{folderId}/move", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity moveGermplasmList(
 		@PathVariable final String crop,
@@ -110,8 +109,21 @@ public class GermplasmListResourceGroup {
 		@RequestParam final String newParentId,
 		@RequestParam final boolean isCropList) {
 
-		final Integer movedFolderId = this.germplamListService.moveGermplasmList(crop, programUUID, folderId, newParentId, isCropList);
+		final Integer movedFolderId = this.germplamListService.moveGermplasmListFolder(crop, programUUID, folderId, newParentId, isCropList);
 		return new ResponseEntity<>(movedFolderId, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Delete germplasm list folder", notes = "Delete germplasm sample list folder.")
+	//TODO: we need to add GERMPLASM_LIST permission
+	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM','MANAGE_GERMPLASM','GERMPLASM_LIST')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/germplasm-list-folders/{folderId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity deleteGermplasmListFolder(
+		@PathVariable final String crop,
+		@PathVariable final String programUUID,
+		@PathVariable final String folderId) {
+		this.germplamListService.deleteGermplamsListFolder(crop, programUUID, folderId);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }
