@@ -42,6 +42,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -253,6 +254,8 @@ public class GermplamListServiceImpl implements GermplamListService {
 			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
 		final Map<Integer, Germplasm> germplasmMap = this.germplasmDataManager.getGermplasms(gids)
 			.stream().collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
+		final Map<Integer, String> crossExpansions =
+			this.pedigreeService.getCrossExpansionsBulk(new HashSet<>(gids), null, this.crossExpansionProperties);
 
 		int entryNo = 1;
 		boolean hasEntryNo = false;
@@ -292,8 +295,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 			}
 
 			if (isBlank(entry.getGroupName())) {
-				final String crossExpansion = this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties);
-				entry.setGroupName(crossExpansion);
+				entry.setGroupName(crossExpansions.get(gid));
 				hasGroupNameEmpty = true;
 			} else {
 				hasGroupName = true;
