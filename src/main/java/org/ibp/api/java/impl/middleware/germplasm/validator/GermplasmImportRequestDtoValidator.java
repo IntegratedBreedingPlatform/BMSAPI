@@ -166,6 +166,11 @@ public class GermplasmImportRequestDtoValidator {
 		final List<String> existingBreedingMethods =
 			this.breedingMethodService.getBreedingMethods(crop, programUUID, breedingMethodsAbbrs, false).stream().map(
 				BreedingMethodDTO::getCode).collect(Collectors.toList());
+		if (breedingMethodsAbbrs.size() != existingBreedingMethods.size()) {
+			breedingMethodsAbbrs.remove(existingBreedingMethods);
+			errors.reject("germplasm.import.breeding.methods.not.exist",
+				new String[] {Util.buildErrorMessageFromList(new ArrayList<>(breedingMethodsAbbrs), 3)}, "");
+		}
 
 	}
 
