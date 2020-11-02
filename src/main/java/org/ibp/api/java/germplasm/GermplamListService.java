@@ -21,4 +21,6 @@ public interface GermplamListService {
 
 	Integer updateGermplasmListFolderName(String cropName, String programUUID, String newFolderName, String folderId);
 
+	Integer moveGermplasmList(String cropName, String programUUID, String germplasmListId, String newParentFolderId, boolean isCropList);
+
 }

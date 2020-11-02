@@ -83,7 +83,7 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(folderId, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Update sample list folder", notes = "Update sample list folder. ")
+	@ApiOperation(value = "Update germplasm list folder", notes = "Update germplasm list folder. ")
 	//TODO: we need to add GERMPLASM_LIST permission
 	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM','MANAGE_GERMPLASM','GERMPLASM_LIST')")
 	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/germplasm-list-folders/{folderId}", method = RequestMethod.PUT)
@@ -96,6 +96,22 @@ public class GermplasmListResourceGroup {
 
 		final Integer updatedFolderId = this.germplamListService.updateGermplasmListFolderName(crop, programUUID, newFolderName, folderId);
 		return new ResponseEntity<>(updatedFolderId, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Move germplasm list.", notes = "Move germplasm list.")
+	//TODO: we need to add GERMPLASM_LIST permission
+	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM','MANAGE_GERMPLASM','GERMPLASM_LIST')")
+	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/germplasm-list/{folderId}/move", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity moveGermplasmList(
+		@PathVariable final String crop,
+		@PathVariable final String programUUID,
+		@PathVariable final String folderId,
+		@RequestParam final String newParentId,
+		@RequestParam final boolean isCropList) {
+
+		final Integer movedFolderId = this.germplamListService.moveGermplasmList(crop, programUUID, folderId, newParentId, isCropList);
+		return new ResponseEntity<>(movedFolderId, HttpStatus.OK);
 	}
 
 }
