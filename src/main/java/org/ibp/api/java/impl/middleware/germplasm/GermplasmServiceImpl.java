@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
@@ -436,6 +438,41 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
+	public List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(final Set<String> codes) {
+
+		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
+			.stream()
+			.map(userDefinedField -> {
+				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
+				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
+				germplasmNameTypeDTO.setName(userDefinedField.getFname());
+				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
+				return germplasmNameTypeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(final Set<String> codes) {
+
+		final Set<String> types = new HashSet<>();
+		types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
+		types.add(UDTableType.ATRIBUTS_PASSPORT.getType());
+		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
+			.stream()
+			.map(userDefinedField -> {
+				final org.generationcp.middleware.api.attribute.AttributeDTO attributeDTO =
+					new org.generationcp.middleware.api.attribute.AttributeDTO();
+				attributeDTO.setId(userDefinedField.getFldno());
+				attributeDTO.setName(userDefinedField.getFname());
+				attributeDTO.setCode(userDefinedField.getFcode());
+				return attributeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
+	@Override
 	public Map<Integer, Integer> importGemplasm(final String cropName, final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		return this.germplasmService.importGermplasmSet(user.getUserid(), cropName, germplasmImportRequestDto);
@@ -468,4 +505,5 @@ public class GermplasmServiceImpl implements GermplasmService {
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
 	}
+
 }

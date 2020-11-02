@@ -3,10 +3,10 @@ package org.ibp.api.rest.breedingmethod;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
-import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 import org.generationcp.middleware.pojos.MethodGroup;
 import org.generationcp.middleware.pojos.MethodType;
+import org.ibp.api.java.breedingmethod.BreedingMethodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @Api(value = "Breeding methods Services")
 @RestController
@@ -67,4 +66,18 @@ public class BreedingMethodResourceGroup {
 	) {
 		return new ResponseEntity<>(MethodGroup.getAll(), HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "List breeding method filtered by favorites")
+	@RequestMapping(value = "/crops/{cropName}/breedingmethods", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<BreedingMethodDTO>> getBreedingMethods(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam final boolean favoriteMethods
+	) {
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, programUUID,
+			favoriteMethods);
+		return new ResponseEntity<>(breedingMethods, HttpStatus.OK);
+	}
+
 }
