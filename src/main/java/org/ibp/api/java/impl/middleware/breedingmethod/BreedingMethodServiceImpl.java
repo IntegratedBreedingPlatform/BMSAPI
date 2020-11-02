@@ -13,6 +13,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class BreedingMethodServiceImpl implements BreedingMethodService {
@@ -34,7 +35,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
-	public List<BreedingMethodDTO> getBreedingMethods(final String cropName, final String programUUID,
+	public List<BreedingMethodDTO> getBreedingMethods(final String cropName, final String programUUID, final Set<String> abbreviations,
 		final boolean favoriteMethods) {
 		final MapBindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
@@ -50,7 +51,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 			}
 		}
 
-		return this.breedingMethodService.getBreedingMethods(programUUID, favoriteMethods);
+		return this.breedingMethodService.getBreedingMethods(programUUID, abbreviations, favoriteMethods);
 	}
 
 }

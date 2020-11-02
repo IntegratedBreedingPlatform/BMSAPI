@@ -9,6 +9,8 @@ import org.springframework.validation.ObjectError;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Helper methods to manage message codes.
@@ -56,6 +58,20 @@ public abstract class BaseValidator {
 			}
 		}
 		this.addCustomError(errors, BaseValidator.INVALID_ID, null);
+	}
+
+	public static <T> void checkNotNullElements(final Collection<T> collection, final String errorCode) {
+		final Optional<T> nullElement = collection.stream().filter(Objects::isNull).findFirst();
+		if (nullElement.isPresent()) {
+			throw new ApiRequestValidationException(Collections.singletonList(new ObjectError("", new String[] {errorCode}, null, "")));
+		}
+	}
+
+	public static <T> void checkStringsLength(final Collection<String> collection, final Integer maxLength, final String errorCode) {
+		final Optional<String> nullElement = collection.stream().filter(s -> s.length() > maxLength).findFirst();
+		if (nullElement.isPresent()) {
+			throw new ApiRequestValidationException(Collections.singletonList(new ObjectError("", new String[] {errorCode}, null, "")));
+		}
 	}
 
 	public static void checkNotNull(final Object reference, final String errorCode, final Object[] arguments) {
