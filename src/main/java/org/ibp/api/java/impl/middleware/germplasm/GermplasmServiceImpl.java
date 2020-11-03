@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.exceptions.GermplasmUpdateConflictException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -110,9 +111,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private AttributeService attributeService;
-
-	@Resource
-	private ContextUtil contextUtil;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -458,7 +456,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.germplasmUpdateService.saveGermplasmUpdates(this.contextUtil.getCurrentWorkbenchUser().getUserid(), germplasmUpdateDTOList);
+		try {
+			this.germplasmUpdateService
+				.saveGermplasmUpdates(germplasmUpdateDTOList);
+		} catch (GermplasmUpdateConflictException e) {
+			throw new ApiRequestValidationException(e.getErrors());
+		}
 
 	}
 
