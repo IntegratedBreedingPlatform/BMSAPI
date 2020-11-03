@@ -93,16 +93,13 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns, final Map<String, Map<String, String>> studyAndEnvironmentCategoricalValuesMap) {
 		final List<String> values = new LinkedList<>();
 		for (final MeasurementVariable column : subObservationSetColumns) {
-			final ObservationUnitData data = row.getVariables().containsKey(column.getName()) ? row.getVariables().get(column.getName()) : row.getVariables().get(column.getAlias());
-			if (data != null) {
-				if (row.getEnvironmentVariables().containsKey(column.getName()) && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
-					.contains(column.getVariableType())) {
-					this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, data.getValue());
-				} else if(VariableType.STUDY_DETAIL.equals(column.getVariableType())) {
-					this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, data.getValue());
-				} else {
-					values.add(data.getValue());
-				}
+			if (this.getObservationUnitData(row.getEnvironmentVariables(), column) != null && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
+				.contains(column.getVariableType())) {
+				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, this.getObservationUnitData(row.getEnvironmentVariables(), column).getValue());
+			} else if(this.getObservationUnitData(row.getEnvironmentVariables(), column) != null && VariableType.STUDY_DETAIL.equals(column.getVariableType())) {
+				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column,  this.getObservationUnitData(row.getVariables(), column).getValue());
+			} else {
+				values.add(row.getVariables().get(column.getName()).getValue());
 			}
 		}
 		return values.toArray(new String[] {});
@@ -124,6 +121,11 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 			headerNames.add(measurementVariable.getAlias());
 		}
 		return headerNames;
+	}
+
+	private ObservationUnitData getObservationUnitData(final Map<String, ObservationUnitData> variables, final MeasurementVariable column) {
+		final String key = variables.containsKey(column.getName()) ? column.getName() : column.getAlias();
+		return variables.get(key);
 	}
 
 }
