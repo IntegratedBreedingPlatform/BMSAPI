@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDt
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -167,7 +168,7 @@ public class LotInputValidator {
 			return;
 		}
 
-		if (transactionDtos.stream().map(TransactionDto::getTransactionStatus)
+		if (transactionDtos.stream().filter(transactionDto ->  !StringUtil.isEmpty(transactionDto.getLot().getUnitName())).map(TransactionDto::getTransactionStatus)
 			.anyMatch(s -> s.equals(TransactionStatus.CONFIRMED.getValue()))
 		) {
 
