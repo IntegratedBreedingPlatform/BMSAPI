@@ -74,7 +74,7 @@ public class LotInputValidatorTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateDataComments() {
-		Mockito.doCallRealMethod().when(inventoryCommonValidator).validateLotNotes(Mockito.anyString(), Mockito.any(BindingResult.class));
+		Mockito.doCallRealMethod().when(this.inventoryCommonValidator).validateLotNotes(Mockito.anyString(), Mockito.any(BindingResult.class));
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(LOCATION_ID);
 		this.lotGeneratorInputDto.setGenerateStock(false);
@@ -162,19 +162,22 @@ public class LotInputValidatorTest {
 		final ExtendedLotDto extendedLotDto = this.getExtendedlotDto("SEED");
 		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
 		lotUpdateRequestDto.setSingleInput(this.getLotSingleUpdateRequestDto());
-		Mockito.when(transactionService.searchTransactions(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(this.getMockedTransactionsSearchDTO(extendedLotDto));
+		Mockito.when(this.transactionService.searchTransactions(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(this.getMockedTransactionsSearchDTO(extendedLotDto));
 		this.lotInputValidator.validate(null, Arrays.asList(extendedLotDto), lotUpdateRequestDto);
 	}
 
 	@Test
 	public void testInValidateUnitIdAndNameConfirm() {
-		boolean pass = false;
+		boolean pass = true;
 		final ExtendedLotDto extendedLotDto = this.getExtendedlotDto("");
 		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
 		lotUpdateRequestDto.setSingleInput(this.getLotSingleUpdateRequestDto());
-		Mockito.when(transactionService.searchTransactions(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(this.getMockedTransactionsSearchDTO(extendedLotDto));
-		this.lotInputValidator.validate(null, Arrays.asList(extendedLotDto), lotUpdateRequestDto);
-		pass = true;
+		Mockito.when(this.transactionService.searchTransactions(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(this.getMockedTransactionsSearchDTO(extendedLotDto));
+		try {
+			this.lotInputValidator.validate(null, Arrays.asList(extendedLotDto), lotUpdateRequestDto);
+		} catch (final Exception e) {
+			pass = false;
+		}
 		Assert.assertTrue("No exception, existing unit id is not valid and can be updated.", pass);
 	}
 

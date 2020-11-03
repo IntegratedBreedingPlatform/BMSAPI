@@ -67,7 +67,7 @@ public class LotInputValidator {
 		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
 		this.validateStockId(lotGeneratorInputDto);
-		this.inventoryCommonValidator.validateLotNotes(lotGeneratorInputDto.getNotes(), errors);
+		this.inventoryCommonValidator.validateLotNotes(lotGeneratorInputDto.getNotes(), this.errors);
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -81,7 +81,7 @@ public class LotInputValidator {
 		this.locationValidator.validateSeedLocationId(this.errors, programUUID, lotGeneratorInputDto.getLocationId());
 		this.inventoryUnitValidator.validateInventoryUnitId(this.errors, lotGeneratorInputDto.getUnitId());
 		this.validateStockId(lotGeneratorInputDto);
-		this.inventoryCommonValidator.validateLotNotes(lotGeneratorInputDto.getNotes(), errors);
+		this.inventoryCommonValidator.validateLotNotes(lotGeneratorInputDto.getNotes(), this.errors);
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -108,7 +108,7 @@ public class LotInputValidator {
 				this.germplasmValidator.validateGermplasmId(this.errors, gid);
 			}
 
-			this.inventoryCommonValidator.validateLotNotes(lotUpdateRequestDto.getSingleInput().getNotes(), errors);
+			this.inventoryCommonValidator.validateLotNotes(lotUpdateRequestDto.getSingleInput().getNotes(), this.errors);
 			if (lotUpdateRequestDto.getSingleInput().getUnitId() != null) {
 				final List<String> lotUUids = lotDtos.stream().map(extendedLotDto -> extendedLotDto.getLotUUID()).collect(Collectors.toList());
 				this.validateNoConfirmedTransactions(lotUUids);
@@ -126,15 +126,15 @@ public class LotInputValidator {
 				lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getUnitName).distinct().collect(Collectors.toList());
 			if (unitNames.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
 				if (unitNames.stream().anyMatch(s -> StringUtils.isBlank(s))) {
-					errors.reject("lot.input.list.units.null.or.empty", "");
+					this.errors.reject("lot.input.list.units.null.or.empty", "");
 				} else {
-					this.inventoryCommonValidator.validateUnitNames(unitNames, errors);
+					this.inventoryCommonValidator.validateUnitNames(unitNames, this.errors);
 				}
 			}
 
 			final List<String> notesList = lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getNotes).distinct().collect(Collectors.toList());
 			if (notesList.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
-				this.inventoryCommonValidator.validateLotNotes(notesList, errors);
+				this.inventoryCommonValidator.validateLotNotes(notesList, this.errors);
 			}
 
 			final List<String> lotUUids =
@@ -201,7 +201,7 @@ public class LotInputValidator {
 				this.errors.reject("lot.stock.prefix.not.empty", "");
 			}
 		} else {
-			inventoryCommonValidator.validateStockIdPrefix(lotGeneratorInputDto.getStockPrefix(), errors);
+			this.inventoryCommonValidator.validateStockIdPrefix(lotGeneratorInputDto.getStockPrefix(), this.errors);
 			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockId())){
 				this.errors.reject("lot.stock.id.not.empty", "");
 				return;
