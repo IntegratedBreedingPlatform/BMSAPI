@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
+import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Component;
 
@@ -92,13 +93,16 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns, final Map<String, Map<String, String>> studyAndEnvironmentCategoricalValuesMap) {
 		final List<String> values = new LinkedList<>();
 		for (final MeasurementVariable column : subObservationSetColumns) {
-			if (row.getEnvironmentVariables().containsKey(column.getName()) && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
-				.contains(column.getVariableType())) {
-				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, row.getEnvironmentVariables().get(column.getName()).getValue());
-			} else if(VariableType.STUDY_DETAIL.equals(column.getVariableType())) {
-				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, row.getVariables().get(column.getName()).getValue());
-			} else {
-				values.add(row.getVariables().get(column.getName()).getValue());
+			final ObservationUnitData data = row.getVariables().containsKey(column.getName()) ? row.getVariables().get(column.getName()) : row.getVariables().get(column.getAlias());
+			if (data != null) {
+				if (row.getEnvironmentVariables().containsKey(column.getName()) && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
+					.contains(column.getVariableType())) {
+					this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, data.getValue());
+				} else if(VariableType.STUDY_DETAIL.equals(column.getVariableType())) {
+					this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, data.getValue());
+				} else {
+					values.add(data.getValue());
+				}
 			}
 		}
 		return values.toArray(new String[] {});
@@ -106,8 +110,9 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 
 	private void getValue(final Map<String, Map<String, String>> categoricalValuesMap, final List<String> values,
 		final MeasurementVariable column, final String value) {
-		if(categoricalValuesMap.get(column.getName()) != null && categoricalValuesMap.get(column.getName()).get(value) != null) {
-			values.add(categoricalValuesMap.get(column.getName()).get(value));
+		final String key = categoricalValuesMap.containsKey(column.getName()) ? column.getName() : column.getAlias();
+		if(categoricalValuesMap.containsKey(key) && categoricalValuesMap.get(key).get(value) != null) {
+			values.add(categoricalValuesMap.get(key).get(value));
 		} else {
 			values.add(value);
 		}
