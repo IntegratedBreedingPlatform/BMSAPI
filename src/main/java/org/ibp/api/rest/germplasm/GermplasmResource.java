@@ -155,7 +155,7 @@ public class GermplasmResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmImportRequestDto germplasmImportRequestDto) {
 
-		return new ResponseEntity<>(this.germplasmService.importGemplasm(cropName, germplasmImportRequestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmService.importGemplasm(cropName, programUUID, germplasmImportRequestDto), HttpStatus.OK);
 	}
 
 }

@@ -43,6 +43,7 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -107,6 +108,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -473,8 +477,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Map<Integer, Integer> importGemplasm(final String cropName, final GermplasmImportRequestDto germplasmImportRequestDto) {
+	public Map<Integer, Integer> importGemplasm(final String cropName, final String programUUID,
+		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		germplasmImportRequestDtoValidator.validate(programUUID, germplasmImportRequestDto);
 		return this.germplasmService.importGermplasmSet(user.getUserid(), cropName, germplasmImportRequestDto);
 	}
 
