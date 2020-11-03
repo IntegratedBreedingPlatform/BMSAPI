@@ -96,9 +96,9 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 			if (this.getObservationUnitData(row.getEnvironmentVariables(), column) != null && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
 				.contains(column.getVariableType())) {
 				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, this.getObservationUnitData(row.getEnvironmentVariables(), column).getValue());
-			} else if(this.getObservationUnitData(row.getEnvironmentVariables(), column) != null && VariableType.STUDY_DETAIL.equals(column.getVariableType())) {
+			} else if(this.getObservationUnitData(row.getVariables(), column) != null && VariableType.STUDY_DETAIL.equals(column.getVariableType())) {
 				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column,  this.getObservationUnitData(row.getVariables(), column).getValue());
-			} else {
+			} else if (this.getObservationUnitData(row.getVariables(), column) != null){
 				values.add(row.getVariables().get(column.getName()).getValue());
 			}
 		}
