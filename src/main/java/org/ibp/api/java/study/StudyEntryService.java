@@ -34,6 +34,4 @@ public interface StudyEntryService {
 	StudyEntryMetadata getStudyEntriesMetadata(Integer studyId, String programUuid);
 
 	List<MeasurementVariable> getEntryDescriptorColumns(Integer studyId);
-
-	List<Integer> getGidsUsedInStudy(Integer studyId, List<Integer> gids);
 }
