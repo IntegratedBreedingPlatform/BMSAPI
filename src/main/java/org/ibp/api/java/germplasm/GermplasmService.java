@@ -61,6 +61,6 @@ public interface GermplasmService {
 
 	List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(Set<String> codes);
 
-	Map<Integer, Integer> importGemplasm(String cropName, String programUUID, GermplasmImportRequestDto germplasmImportRequestDto);
+	Map<Integer, Integer> importGermplasm(String cropName, String programUUID, GermplasmImportRequestDto germplasmImportRequestDto);
 
 }

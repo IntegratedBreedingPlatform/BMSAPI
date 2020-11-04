@@ -477,11 +477,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Map<Integer, Integer> importGemplasm(final String cropName, final String programUUID,
+	public Map<Integer, Integer> importGermplasm(final String cropName, final String programUUID,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		germplasmImportRequestDtoValidator.validate(programUUID, germplasmImportRequestDto);
-		return this.germplasmService.importGermplasmSet(user.getUserid(), cropName, germplasmImportRequestDto);
+		return this.germplasmService.importGermplasm(user.getUserid(), cropName, germplasmImportRequestDto);
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
