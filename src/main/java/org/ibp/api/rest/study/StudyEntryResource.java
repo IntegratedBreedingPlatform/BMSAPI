@@ -62,7 +62,7 @@ public class StudyEntryResource {
 		@ApiParam("Study Entry template for batch generation. SearchComposite is a list of gids")
 		@RequestBody final StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto) {
 		return new ResponseEntity<>(
-			this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorBatchRequestDto),
+			this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorBatchRequestDto, programUUID),
 			HttpStatus.OK);
 
 	}

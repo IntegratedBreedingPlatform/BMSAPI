@@ -100,17 +100,6 @@ public class InventoryCommonValidatorTest {
 	}
 
 	@Test
-	public void test_validateSearchCompositeDto_throwsException() {
-		try {
-			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto<>();
-			this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-			this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
-		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("search.composite.invalid"));
-		}
-	}
-
-	@Test
 	public void test_validateLotNotesLists_throwsException() {
 		try {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());

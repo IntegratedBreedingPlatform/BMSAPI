@@ -22,7 +22,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotImportRequestDtoValidator;
@@ -77,7 +77,7 @@ public class LotServiceImpl implements LotService {
 	private ExtendedLotListValidator extendedLotListValidator;
 
 	@Autowired
-	private InventoryCommonValidator inventoryCommonValidator;
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Autowired
 	private SearchRequestDtoResolver searchRequestDtoResolver;
@@ -131,7 +131,7 @@ public class LotServiceImpl implements LotService {
 		// validations
 		final SearchCompositeDto<Integer, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
-		this.inventoryCommonValidator.validateSearchCompositeDto(searchComposite, errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
 		this.lotInputValidator.validate(programUUID, lotGeneratorBatchRequestDto);
 		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
 		this.germplasmValidator.validateGids(errors, gids);

@@ -43,18 +43,6 @@ public class InventoryCommonValidator {
 		}
 	}
 
-	//TODO: Needs to be moved to a BMS common validator, it is not not exclusive to Inventory
-	public void validateSearchCompositeDto(
-		final SearchCompositeDto searchCompositeDto,
-		final BindingResult errors) {
-
-		// Validate that searchId or list of elements are provided
-		if (searchCompositeDto == null || !searchCompositeDto.isValid()) {
-			errors.reject("search.composite.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-	}
-
 	public void validateUnitNames(final List<String> unitNames, final BindingResult errors) {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());

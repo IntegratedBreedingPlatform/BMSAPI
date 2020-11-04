@@ -6,6 +6,7 @@ import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class PlantingRequestDtoValidator {
 	private InventoryCommonValidator inventoryCommonValidator;
 
 	@Autowired
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
+
+	@Autowired
 	private VariableService variableService;
 
 	public void validatePlantingRequestDto(final Integer studyId, final Integer datasetId, final PlantingRequestDto plantingRequestDto) {
@@ -42,7 +46,7 @@ public class PlantingRequestDtoValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		inventoryCommonValidator.validateSearchCompositeDto(plantingRequestDto.getSelectedObservationUnits(), errors);
+		searchCompositeDtoValidator.validateSearchCompositeDto(plantingRequestDto.getSelectedObservationUnits(), errors);
 
 		final PlantingPreparationDTO plantingPreparationDTO =
 			plantingService.searchPlantingPreparation(studyId, datasetId, plantingRequestDto.getSelectedObservationUnits());

@@ -30,8 +30,8 @@ import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
-import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
@@ -97,7 +97,7 @@ public class LotResource {
 	private SearchRequestDtoResolver searchRequestDtoResolver;
 
 	@Autowired
-	private InventoryCommonValidator inventoryCommonValidator;
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Autowired
 	private InventoryLock inventoryLock;
@@ -223,7 +223,7 @@ public class LotResource {
 		}
 
 		if (lotRequest.getSingleInput() != null) {
-			this.inventoryCommonValidator.validateSearchCompositeDto(lotRequest.getSingleInput().getSearchComposite(), errors);
+			this.searchCompositeDtoValidator.validateSearchCompositeDto(lotRequest.getSingleInput().getSearchComposite(), errors);
 			final LotsSearchDto searchDTO =
 				this.searchRequestDtoResolver.getLotsSearchDto(lotRequest.getSingleInput().getSearchComposite());
 
@@ -296,7 +296,7 @@ public class LotResource {
 		@RequestBody final SearchCompositeDto<Integer, String> searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
 
 		if (searchCompositeDto.getSearchRequest() == null) {
@@ -321,7 +321,7 @@ public class LotResource {
 		@RequestBody final SearchCompositeDto<Integer, String> searchCompositeDto) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
-		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
 
 		if (searchCompositeDto.getSearchRequest() == null) {
@@ -379,7 +379,7 @@ public class LotResource {
 
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
 			final SearchCompositeDto<Integer, String> searchComposite = lotMergeRequestDto.getSearchComposite();
-			this.inventoryCommonValidator.validateSearchCompositeDto(searchComposite, errors);
+			this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
 			final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchComposite);
 			if (searchComposite.getSearchRequest() == null) {
 				final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);

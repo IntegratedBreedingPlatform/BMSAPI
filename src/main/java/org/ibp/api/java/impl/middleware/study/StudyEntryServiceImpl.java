@@ -24,9 +24,10 @@ import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.germplasm.GermplamListService;
+import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
@@ -43,7 +44,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,7 +52,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,6 +77,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private GermplasmValidator germplasmValidator;
 
 	@Autowired
+	private EntryTypeValidator entryTypeValidator;
+
+	@Autowired
 	private GermplamListService germplasmListService;
 
 	@Autowired
@@ -87,7 +89,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private TermValidator termValidator;
 
 	@Autowired
-	private InventoryCommonValidator inventoryCommonValidator;
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Resource
 	private org.generationcp.middleware.service.api.study.StudyEntryService middlewareStudyEntryService;
@@ -117,16 +119,18 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public List<StudyEntryDto> createStudyEntries(final Integer studyId,
-		final StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto) {
+		final StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto, final String programUuid) {
 		this.studyValidator.validate(studyId, true);
 		if(studyEntryGeneratorBatchRequestDto.getListId() != null && studyEntryGeneratorBatchRequestDto.getListId() != 0) {
 			return this.createStudyEntries(studyId, studyEntryGeneratorBatchRequestDto.getListId());
 		}
 
+		//Validate EntryType
+		this.entryTypeValidator.validateEntryType(studyEntryGeneratorBatchRequestDto.getEntryTypeId(), programUuid);
+
 		final SearchCompositeDto<Integer, Integer> searchComposite = studyEntryGeneratorBatchRequestDto.getSearchComposite();
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
-		//TODO: move search composite validator to common package
-		this.inventoryCommonValidator.validateSearchCompositeDto(searchComposite, errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
 		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
 		this.germplasmValidator.validateGids(errors, gids);
 

@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotWithdrawalInputDtoValidator;
 import org.junit.Before;
@@ -33,12 +34,15 @@ public class LotWithdrawalInputDtoValidatorTest {
 	@Mock
 	private InventoryCommonValidator inventoryCommonValidator;
 
+	@Mock
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
+
 	@InjectMocks
 	private LotWithdrawalInputDtoValidator lotWithdrawalInputDtoValidator;
 
 	@Before
 	public void setUp() {
-		Mockito.doCallRealMethod().when(inventoryCommonValidator)
+		Mockito.doCallRealMethod().when(searchCompositeDtoValidator)
 			.validateSearchCompositeDto(Mockito.any(SearchCompositeDto.class), Mockito.any(BindingResult.class));
 		Mockito.doCallRealMethod().when(inventoryCommonValidator)
 			.validateTransactionNotes(Mockito.anyString(), Mockito.any(BindingResult.class));

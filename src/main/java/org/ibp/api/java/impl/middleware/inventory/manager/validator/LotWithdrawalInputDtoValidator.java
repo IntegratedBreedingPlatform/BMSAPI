@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,9 @@ public class LotWithdrawalInputDtoValidator {
 	@Autowired
 	private InventoryCommonValidator inventoryCommonValidator;
 
+	@Autowired
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
+
 	public void validate(final LotWithdrawalInputDto lotWithdrawalInputDto) {
 		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
@@ -36,7 +40,7 @@ public class LotWithdrawalInputDtoValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		inventoryCommonValidator.validateSearchCompositeDto(lotWithdrawalInputDto.getSelectedLots(), errors);
+		searchCompositeDtoValidator.validateSearchCompositeDto(lotWithdrawalInputDto.getSelectedLots(), errors);
 
 		inventoryCommonValidator.validateTransactionNotes(lotWithdrawalInputDto.getNotes(), errors);
 
