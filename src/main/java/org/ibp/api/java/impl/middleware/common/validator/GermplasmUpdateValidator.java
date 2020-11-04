@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import liquibase.util.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -105,7 +105,8 @@ public class GermplasmUpdateValidator {
 	public void validateLocationAbbreviation(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> locationAbbreviationSet =
-			germplasmUpdateDTOList.stream().map(dto -> dto.getLocationAbbreviation()).collect(Collectors.toSet());
+			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getLocationAbbreviation()))
+				.map(dto -> dto.getLocationAbbreviation()).collect(Collectors.toSet());
 		final List<String> abbreviations =
 			this.locationDataManager.getLocationsByAbbreviation(locationAbbreviationSet).stream().map(loc -> loc.getLabbr()).collect(
 				Collectors.toList());
@@ -121,7 +122,8 @@ public class GermplasmUpdateValidator {
 	public void validateBreedingMethod(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> breedingMethodCodes =
-			germplasmUpdateDTOList.stream().map(dto -> dto.getBreedingMethod()).collect(Collectors.toSet());
+			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethod()))
+				.map(dto -> dto.getBreedingMethod()).collect(Collectors.toSet());
 		final List<String> codes =
 			this.breedingMethodService.getBreedingMethodsByCodes(breedingMethodCodes).stream().map(loc -> loc.getCode()).collect(
 				Collectors.toList());
