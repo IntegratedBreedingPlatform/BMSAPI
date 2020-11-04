@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class Util {
 
-	public static boolean isNullOrEmpty(Object value) {
+	public static boolean isNullOrEmpty(final Object value) {
 		return value instanceof String && Strings.isNullOrEmpty(((String) value).trim()) || value == null || value instanceof Collection
 				&& ((Collection) value).isEmpty() || value instanceof Map && ((Map) value).isEmpty();
 	}
