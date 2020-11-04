@@ -88,7 +88,6 @@ public class StudyEntryMapper {
 			protected void configure() {
 				this.map().setGid(this.source.getGid());
 				this.map().setDesignation(this.source.getPreferredName().getNval());
-				//this.map().setEntryCode(this.source.getEntryCode());
 			}
 		});
 	}
