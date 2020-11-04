@@ -241,13 +241,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 
 		final List<Integer> termsToRemove = Lists
-			.newArrayList(TermId.OBS_UNIT_ID.getId(), TermId.STOCKID.getId());
+			.newArrayList(TermId.OBS_UNIT_ID.getId());
 
 		final List<MeasurementVariable> entryDescriptors =
 			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
-		//Remove OBS_UNIT_ID column and STOCKID if present
+		//Remove OBS_UNIT_ID column if present
 		entryDescriptors.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
 		//Add Inventory related columns
