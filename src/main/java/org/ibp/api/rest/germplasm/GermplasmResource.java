@@ -149,7 +149,7 @@ public class GermplasmResource {
 	 * @return a map indicating the GID that was created per clientId, if null, no germplasm was created
 	 */
 	@ApiOperation(value = "Save a set of germplasm")
-	@RequestMapping(value = "/crops/{cropName}/germplasm-sets", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Map<Integer, Integer>> importGermplasm(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
