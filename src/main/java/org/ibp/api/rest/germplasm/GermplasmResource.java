@@ -149,6 +149,8 @@ public class GermplasmResource {
 	 * @return a map indicating the GID that was created per clientId, if null, no germplasm was created
 	 */
 	@ApiOperation(value = "Save a set of germplasm")
+	//FIXME: When removing current import germplasm, this preauthorize must be modified
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Map<Integer, Integer>> importGermplasm(@PathVariable final String cropName,
