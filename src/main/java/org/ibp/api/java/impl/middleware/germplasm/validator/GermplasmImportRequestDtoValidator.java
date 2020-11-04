@@ -48,9 +48,9 @@ public class GermplasmImportRequestDtoValidator {
 		errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequestDto.class.getName());
 
 		BaseValidator.checkNotNull(germplasmImportRequestDto, "germplasm.import.request.null");
-		BaseValidator.checkNotEmpty(germplasmImportRequestDto.getGermplasmSet(), "germplasm.import.set.null");
+		BaseValidator.checkNotEmpty(germplasmImportRequestDto.getGermplasmList(), "germplasm.import.set.null");
 
-		final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtos = germplasmImportRequestDto.getGermplasmSet();
+		final List<GermplasmImportRequestDto.GermplasmDto> germplasmDtos = germplasmImportRequestDto.getGermplasmList();
 
 		final Set<Integer> clientIds = new HashSet<>();
 		boolean invalid = germplasmDtos.stream().anyMatch(g -> {
