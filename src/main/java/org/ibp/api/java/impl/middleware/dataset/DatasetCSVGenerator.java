@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.ibp.api.Util;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -93,13 +94,13 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns, final Map<String, Map<String, String>> studyAndEnvironmentCategoricalValuesMap) {
 		final List<String> values = new LinkedList<>();
 		for (final MeasurementVariable column : subObservationSetColumns) {
-			if (this.getObservationUnitData(row.getEnvironmentVariables(), column) != null && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
+			if (!Util.isNullOrEmpty(Util.getObservationUnitData(row.getEnvironmentVariables(), column)) && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
 				.contains(column.getVariableType())) {
-				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, this.getObservationUnitData(row.getEnvironmentVariables(), column).getValue());
-			} else if(this.getObservationUnitData(row.getVariables(), column) != null && VariableType.STUDY_DETAIL.equals(column.getVariableType())) {
-				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column,  this.getObservationUnitData(row.getVariables(), column).getValue());
-			} else if (this.getObservationUnitData(row.getVariables(), column) != null){
-				values.add(row.getVariables().get(column.getName()).getValue());
+				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, Util.getObservationUnitData(row.getEnvironmentVariables(), column).getValue());
+			} else if(!Util.isNullOrEmpty(Util.getObservationUnitData(row.getVariables(), column)) && VariableType.STUDY_DETAIL.equals(column.getVariableType())) {
+				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column,  Util.getObservationUnitData(row.getVariables(), column).getValue());
+			} else if (!Util.isNullOrEmpty(Util.getObservationUnitData(row.getVariables(), column))){
+				values.add(Util.getObservationUnitData(row.getVariables(), column).getValue());
 			}
 		}
 		return values.toArray(new String[] {});
@@ -121,11 +122,6 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 			headerNames.add(measurementVariable.getAlias());
 		}
 		return headerNames;
-	}
-
-	private ObservationUnitData getObservationUnitData(final Map<String, ObservationUnitData> variables, final MeasurementVariable column) {
-		final String key = variables.containsKey(column.getName()) ? column.getName() : column.getAlias();
-		return variables.get(key);
 	}
 
 }

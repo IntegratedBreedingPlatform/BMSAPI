@@ -2,6 +2,8 @@ package org.ibp.api;
 
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.ibp.api.rest.dataset.ObservationUnitData;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -48,4 +50,8 @@ public class Util {
 		return list.stream().allMatch(new HashSet<>()::add);
 	}
 
+	public static ObservationUnitData getObservationUnitData(final Map<String, ObservationUnitData> variables, final MeasurementVariable column) {
+		final String key = variables.containsKey(column.getName()) ? column.getName() : column.getAlias();
+		return variables.get(key);
+	}
 }
