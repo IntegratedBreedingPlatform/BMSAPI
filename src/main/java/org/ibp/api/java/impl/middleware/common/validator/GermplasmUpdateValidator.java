@@ -139,7 +139,7 @@ public class GermplasmUpdateValidator {
 	public void validateCreationDate(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTOWithInvalidDate =
-			germplasmUpdateDTOList.stream().filter(o -> !DateUtil.isValidDate(o.getCreationDate())).findAny();
+			germplasmUpdateDTOList.stream().filter(o -> StringUtils.isNotEmpty(o.getCreationDate()) && !DateUtil.isValidDate(o.getCreationDate())).findAny();
 
 		if (optionalGermplasmUpdateDTOWithInvalidDate.isPresent()) {
 			errors.reject("germplasm.update.invalid.creation.date", "");
