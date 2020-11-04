@@ -17,7 +17,7 @@ public interface StudyEntryService {
 
 	List<StudyEntryDto> createStudyEntries(Integer studyId, Integer germplasmListId);
 
-	List<StudyEntryDto> createStudyEntries(Integer studyId, StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto, String programUuid);
+	List<StudyEntryDto> createStudyEntries(Integer studyId, StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto);
 
 	List<StudyEntryDto> getStudyEntries(Integer studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 

@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
-import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -119,17 +118,17 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public List<StudyEntryDto> createStudyEntries(final Integer studyId,
-		final StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto, final String programUuid) {
+		final StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto) {
 		this.studyValidator.validate(studyId, true);
 		if(studyEntryGeneratorBatchRequestDto.getListId() != null && studyEntryGeneratorBatchRequestDto.getListId() != 0) {
 			return this.createStudyEntries(studyId, studyEntryGeneratorBatchRequestDto.getListId());
 		}
 
 		//Validate EntryType
-		this.entryTypeValidator.validateEntryType(studyEntryGeneratorBatchRequestDto.getEntryTypeId(), programUuid);
+		this.entryTypeValidator.validateEntryType(studyEntryGeneratorBatchRequestDto.getEntryTypeId());
 
 		final SearchCompositeDto<Integer, Integer> searchComposite = studyEntryGeneratorBatchRequestDto.getSearchComposite();
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), StudyEntryGeneratorBatchRequestDto.class.getName());
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
 		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
 		this.germplasmValidator.validateGids(errors, gids);
@@ -148,15 +147,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		//Get the next entry number
 		Integer entryNumber = this.middlewareStudyEntryService.getNextEntryNumber(studyId);
-		final boolean hasCrossGermplasmDescriptor = germplasmDescriptorIds.contains(TermId.CROSS.getId());
+		//Retrieve the map if Cross is in Germplasm descriptors
+		Map<Integer, String> gidCrossMap = germplasmDescriptorIds.contains(TermId.CROSS.getId())?
+			this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties) : new HashMap<>();
 		for(final StudyEntryDto studyEntryDto: studyEntryDtoList) {
-			//Retrieve cross value only if the CROSS is present in the germplasm descriptors
-			final String cross = hasCrossGermplasmDescriptor ?
-				this.pedigreeService.getCrossExpansion(studyEntryDto.getGid(), this.crossExpansionProperties) : "";
-
 			studyEntryDto.setProperties(
 				StudyEntryPropertiesMapper.map(germplasmMap.get(studyEntryDto.getGid()), germplasmDescriptorIds,
-					studyEntryGeneratorBatchRequestDto.getEntryTypeId(), cross));
+					studyEntryGeneratorBatchRequestDto.getEntryTypeId(), gidCrossMap.get(studyEntryDto.getGid())));
 			//Set the starting entry number
 			studyEntryDto.setEntryNumber(entryNumber);
 			studyEntryDto.setEntryCode(entryNumber.toString());
