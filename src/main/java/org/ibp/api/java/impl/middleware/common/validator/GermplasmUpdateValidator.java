@@ -64,13 +64,6 @@ public class GermplasmUpdateValidator {
 			errors.reject("germplasm.update.invalid.attribute.or.name.code", new String[] {String.join(",", attributesAndNamesCodes)}, "");
 		}
 
-		final Set<String> preferredNames = germplasmUpdateDTOList.stream().map(dto -> dto.getPreferredName()).collect(Collectors.toSet());
-		preferredNames.removeAll(nameCodes.keySet());
-
-		if (!preferredNames.isEmpty()) {
-			errors.reject("germplasm.update.preferred.name.not.defined", new String[] {String.join(",", preferredNames)}, "");
-		}
-
 	}
 
 	public void validateGermplasmIdAndGermplasmUUID(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
