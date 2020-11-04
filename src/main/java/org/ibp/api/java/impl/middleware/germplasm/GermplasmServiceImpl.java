@@ -1,7 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
@@ -55,7 +54,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -446,7 +444,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		this.errors = new MapBindingResult(new HashMap<>(), AttributeDTO.class.getName());
 		this.germplasmUpdateValidator.validateEmptyList(this.errors, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateCodesAndPreferredName(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateCodes(this.errors, germplasmUpdateDTOList);
 		this.germplasmUpdateValidator.validateGermplasmIdAndGermplasmUUID(this.errors, germplasmUpdateDTOList);
 		this.germplasmUpdateValidator.validateLocationAbbreviation(this.errors, germplasmUpdateDTOList);
 		this.germplasmUpdateValidator.validateBreedingMethod(this.errors, germplasmUpdateDTOList);

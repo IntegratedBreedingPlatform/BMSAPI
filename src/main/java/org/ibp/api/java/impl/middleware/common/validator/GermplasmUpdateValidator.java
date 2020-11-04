@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import liquibase.util.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +48,7 @@ public class GermplasmUpdateValidator {
 		}
 	}
 
-	public void validateCodesAndPreferredName(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public void validateCodes(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> attributesAndNamesCodes = new HashSet<>(germplasmUpdateDTOList.get(0).getData().keySet());
 
@@ -62,6 +64,11 @@ public class GermplasmUpdateValidator {
 
 		if (!attributesAndNamesCodes.isEmpty()) {
 			errors.reject("germplasm.update.invalid.attribute.or.name.code", new String[] {String.join(",", attributesAndNamesCodes)}, "");
+		}
+
+		final Collection<String> ambiguosCodes = CollectionUtils.intersection(attributeCodes.keySet(), nameCodes.keySet());
+		if (!ambiguosCodes.isEmpty()) {
+			errors.reject("germplasm.update.ambiguous.code", new String[] {String.join(",", ambiguosCodes)}, "");
 		}
 
 	}
