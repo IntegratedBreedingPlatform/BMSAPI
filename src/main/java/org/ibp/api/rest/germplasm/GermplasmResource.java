@@ -162,7 +162,7 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.getGermplasmAttributesByCodes(codes), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/crops/{cropName}/germplam-sets/templates/xls", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID) {
 
