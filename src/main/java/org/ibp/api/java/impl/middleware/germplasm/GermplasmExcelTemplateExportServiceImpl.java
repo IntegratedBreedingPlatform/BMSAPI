@@ -104,7 +104,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 			return this.generateTemplateFile(fileNameFullPath, cropName, programUUID);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-			errors.reject("cannot.exportAsXLS.germplasm.template", "");
+			errors.reject("cannot.export.as.xls.germplasm.template", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 	}
