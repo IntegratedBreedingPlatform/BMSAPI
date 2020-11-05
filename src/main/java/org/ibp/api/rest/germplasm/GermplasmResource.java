@@ -125,6 +125,7 @@ public class GermplasmResource {
 	@ApiOperation(value = "Import germplasm updates")
 	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PATCH)
 	@ResponseBody
+	// TODO: Reuse GermplasmDto from IBP-4097
 	public ResponseEntity<Void> importGermplasmUpdates(@PathVariable final String cropName,
 		@RequestBody final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
