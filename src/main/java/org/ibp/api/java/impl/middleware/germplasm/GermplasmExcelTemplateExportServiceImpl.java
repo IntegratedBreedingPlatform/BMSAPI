@@ -258,7 +258,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 
 		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(programUUID, false);
 
-		final List<GermplasmNameTypeDTO> germplasmNames = this.germplasmService.filterGermplasmNameTypes(new HashSet<>());
+		final List<GermplasmNameTypeDTO> germplasmNames = this.germplasmService.filterGermplasmNameTypes(null);
 
 
 		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.breeding.methods.column");
