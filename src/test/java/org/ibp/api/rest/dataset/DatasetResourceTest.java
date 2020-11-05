@@ -366,6 +366,10 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			org.mockito.Matchers.anyInt(),
 			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean()))
 			.thenReturn(100);
+		Mockito.when(this.studyDatasetService.countFilteredObservationUnitsForDataset(
+			org.mockito.Matchers.anyInt(),
+			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean(), ArgumentMatchers.any()))
+			.thenReturn(100L);
 		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
 			ArgumentMatchers.any(), ArgumentMatchers.any()))
 			.thenReturn(Lists.newArrayList(obsDto));
