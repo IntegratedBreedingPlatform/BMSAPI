@@ -493,8 +493,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<Method> getAllBreedingMethods() {
-		return this.germplasmDataManager.getAllMethods();
+	public List<Method> getAllBreedingMethods(final String programUUID) {
+		return this.germplasmDataManager.getMethodsByUniqueID(programUUID);
 	}
 
 	@Override

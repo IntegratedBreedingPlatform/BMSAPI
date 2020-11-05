@@ -236,7 +236,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final List<AttributeDTO> attributeDTOs =
 			this.germplasmService.filterGermplasmAttributes(new HashSet<>());
 
-		final List<Method> breedingMethods = this.germplasmService.getAllBreedingMethods();
+		final List<Method> breedingMethods = this.germplasmService.getAllBreedingMethods(programUUID);
 
 		final List<GermplasmName> germplasmNames = this.germplasmService.getGermplasmNames();
 
