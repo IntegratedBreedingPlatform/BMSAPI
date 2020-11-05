@@ -18,6 +18,8 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Method;
@@ -90,6 +92,9 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 
 	@Autowired
 	protected GermplasmService germplasmService;
+
+	@Autowired
+	BreedingMethodService breedingMethodService;
 
 	public enum ExcelCellStyle {
 		HEADING_STYLE_YELLOW,
@@ -251,13 +256,13 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final List<AttributeDTO> attributeDTOs =
 			this.germplasmService.filterGermplasmAttributes(new HashSet<>());
 
-		final List<Method> breedingMethods = this.germplasmService.getAllBreedingMethods(programUUID);
+		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(programUUID, false);
 
 		final List<GermplasmNameTypeDTO> germplasmNames = this.germplasmService.filterGermplasmNameTypes(new HashSet<>());
 
 
 		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.breeding.methods.column");
-		currentRowNum = this.writeBreedingMethodSection(codesSheet, currentRowNum, breedingMethods);
+		currentRowNum = this.writeBreedingMethodSection(codesSheet, currentRowNum, BreedingMethodDTOs);
 		codesSheet.createRow(currentRowNum++);
 
 		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.attributes.column");
@@ -326,20 +331,20 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		return rowNumIndex;
 	}
 
-	private int writeBreedingMethodSection(final HSSFSheet codesSheet, final int currentRowNum, final List<Method> breedingMethods) {
+	private int writeBreedingMethodSection(final HSSFSheet codesSheet, final int currentRowNum, final List<BreedingMethodDTO> breedingMethodDTOs) {
 		int rowNumIndex = currentRowNum;
-		int count = breedingMethods.size();
-		for (final Method method : breedingMethods) {
+		int count = breedingMethodDTOs.size();
+		for (final BreedingMethodDTO breedingMethodDTO : breedingMethodDTOs) {
 			final HSSFRow row = codesSheet.createRow(rowNumIndex++);
 			HSSFCell cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, CellType.STRING);
 			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_BORDER) :
 				this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_AND_BOTTOM_BORDER));
-			cell.setCellValue(method.getMcode());
+			cell.setCellValue(breedingMethodDTO.getCode());
 
 			cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_SECOND_COLUMN_INDEX, CellType.STRING);
 			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
 				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
-			cell.setCellValue(method.getMname());
+			cell.setCellValue(breedingMethodDTO.getName());
 
 			count--;
 		}

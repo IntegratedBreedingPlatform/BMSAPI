@@ -63,6 +63,4 @@ public interface GermplasmService {
 
 	List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(Set<String> codes);
 
-	List<Method> getAllBreedingMethods(String programUUID);
-
 }

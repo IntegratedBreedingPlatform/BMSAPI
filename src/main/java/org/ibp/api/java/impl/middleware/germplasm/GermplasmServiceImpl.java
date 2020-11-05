@@ -492,9 +492,4 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.crossExpansionProperties = crossExpansionProperties;
 	}
 
-	@Override
-	public List<Method> getAllBreedingMethods(final String programUUID) {
-		return this.germplasmDataManager.getMethodsByUniqueID(programUUID);
-	}
-
 }
