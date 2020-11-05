@@ -430,7 +430,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(final Set<String> codes) {
+	public List<GermplasmNameTypeDTO> filterGermplasmNameTypes(final Set<String> codes) {
 
 		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
 			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
@@ -497,19 +497,4 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.germplasmDataManager.getMethodsByUniqueID(programUUID);
 	}
 
-	@Override
-	public List<GermplasmName> getGermplasmNames() {
-		final Set<String> types = new HashSet<>();
-		return this.germplasmDataManager.getUserDefinedFieldByFieldTableNameAndType(UDTableType.NAMES_NAME.getTable(),
-			ImmutableSet.of(UDTableType.NAMES_NAME.getType()))
-			.stream()
-			.map(userDefinedField -> {
-				final GermplasmName germplasmName =
-					new GermplasmName();
-				germplasmName.setName(userDefinedField.getFname());
-				germplasmName.setNameTypeCode(userDefinedField.getFcode());
-				return germplasmName;
-			})
-			.collect(Collectors.toList());
-	}
 }

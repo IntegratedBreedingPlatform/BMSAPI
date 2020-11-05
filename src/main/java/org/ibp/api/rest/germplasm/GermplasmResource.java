@@ -135,7 +135,7 @@ public class GermplasmResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Set<String> codes) {
 
-		return new ResponseEntity<>(this.germplasmService.getGermplasmNameTypesByCodes(codes), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmService.filterGermplasmNameTypes(codes), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Returns germplasm attributes filtered by a list of codes", notes = "Returns germplasm attributes filtered by a list of codes")

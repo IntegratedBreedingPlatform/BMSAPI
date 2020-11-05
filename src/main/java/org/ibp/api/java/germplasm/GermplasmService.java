@@ -59,11 +59,10 @@ public interface GermplasmService {
 
 	long countAttributesByGid(String gid, List<String> attributeDbIds);
 
-	List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(Set<String> codes);
+	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 
 	List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(Set<String> codes);
 
 	List<Method> getAllBreedingMethods(String programUUID);
 
-	List<GermplasmName> getGermplasmNames();
 }
