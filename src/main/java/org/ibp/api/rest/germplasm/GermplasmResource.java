@@ -10,6 +10,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
@@ -153,7 +154,7 @@ public class GermplasmResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Map<Integer, Integer>> importGermplasm(@PathVariable final String cropName,
+	public ResponseEntity<Map<Integer, GermplasmImportResponseDto>> importGermplasm(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmImportRequestDto germplasmImportRequestDto) {
 

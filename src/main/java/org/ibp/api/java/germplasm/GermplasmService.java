@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
@@ -61,6 +62,7 @@ public interface GermplasmService {
 
 	List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(Set<String> codes);
 
-	Map<Integer, Integer> importGermplasm(String cropName, String programUUID, GermplasmImportRequestDto germplasmImportRequestDto);
+	Map<Integer, GermplasmImportResponseDto> importGermplasm(String cropName, String programUUID,
+		GermplasmImportRequestDto germplasmImportRequestDto);
 
 }

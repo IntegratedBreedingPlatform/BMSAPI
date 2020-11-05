@@ -224,14 +224,16 @@ public class GermplasmImportRequestDtoValidator {
 		final Set<String> attributes = new HashSet<>();
 		germplasmDtos.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
 			.forEach(g -> attributes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
-		final List<String> existingGermplasmAttributes =
-			this.germplasmService.getGermplasmAttributesByCodes(attributes).stream().map(AttributeDTO::getCode).collect(
-				Collectors.toList());
-		if (existingGermplasmAttributes.size() != attributes.size()) {
-			attributes.removeAll(existingGermplasmAttributes);
-			errors.reject("germplasm.import.attributes.not.exist",
-				new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributes), 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+		if (!attributes.isEmpty()) {
+			final List<String> existingGermplasmAttributes =
+				this.germplasmService.getGermplasmAttributesByCodes(attributes).stream().map(AttributeDTO::getCode).collect(
+					Collectors.toList());
+			if (existingGermplasmAttributes.size() != attributes.size()) {
+				attributes.removeAll(existingGermplasmAttributes);
+				errors.reject("germplasm.import.attributes.not.exist",
+					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributes), 3)}, "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
 		}
 	}
 

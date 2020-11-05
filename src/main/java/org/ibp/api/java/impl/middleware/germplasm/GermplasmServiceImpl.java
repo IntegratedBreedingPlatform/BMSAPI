@@ -10,6 +10,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
@@ -477,7 +478,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Map<Integer, Integer> importGermplasm(final String cropName, final String programUUID,
+	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		germplasmImportRequestDtoValidator.validate(programUUID, germplasmImportRequestDto);
