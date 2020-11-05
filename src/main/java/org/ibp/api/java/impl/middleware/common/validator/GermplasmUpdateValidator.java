@@ -51,6 +51,7 @@ public class GermplasmUpdateValidator {
 
 	public void validateCodes(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
+		// TODO: Validate all codes from dto list not just from the first item.
 		final Set<String> attributesAndNamesCodes = new HashSet<>(germplasmUpdateDTOList.get(0).getData().keySet());
 
 		final Map<String, Integer> attributeCodes =
