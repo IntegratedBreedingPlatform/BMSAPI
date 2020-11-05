@@ -254,7 +254,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 				.getLocations(cropName, programUUID, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, false);
 
 		final List<AttributeDTO> attributeDTOs =
-			this.germplasmService.filterGermplasmAttributes(new HashSet<>());
+			this.germplasmService.filterGermplasmAttributes(null);
 
 		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(programUUID, false);
 
