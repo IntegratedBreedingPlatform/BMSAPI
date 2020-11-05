@@ -56,6 +56,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 	private static final Set<Integer> LOCATION_TYPE = new HashSet<>(Arrays.asList(410, 405));
 
 	private static final String FILE_NAME = "GermplasmImportTemplate.xls";
+
 	private static final int OBSERVATION_SHEET_ENTRY_NO_COLUMN_INDEX = 0;
 	private static final int OBSERVATION_SHEET_LNAME_COLUMN_INDEX = 1;
 	private static final int OBSERVATION_SHEET_DRVNM_COLUMN_INDEX = 2;
@@ -76,19 +77,33 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 	private static final int CODES_SHEET_SECOND_COLUMN_INDEX = 1;
 
 	@Autowired
-	ResourceBundleMessageSource messageSource;
+	protected ResourceBundleMessageSource messageSource;
 
 	@Autowired
-	LocationService locationService;
+	protected LocationService locationService;
 
 	@Autowired
-	private VariableService variableService;
+	protected VariableService variableService;
 
 	@Resource
 	protected MethodService methodService;
 
 	@Autowired
-	private GermplasmService germplasmService;
+	protected GermplasmService germplasmService;
+
+	public enum ExcelCellStyle {
+		HEADING_STYLE_YELLOW,
+		HEADING_STYLE_PALE_BLUE,
+		HEADING_STYLE_BLUE,
+		HEADING_STYLE_ORANGE,
+
+		HEADING_STYLE_AQUA,
+		HEADING_STYLE_OLIVE_GREEN,
+		STYLE_AQUA_WITH_LATERAL_BORDER,
+		STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER,
+		STYLE_AQUA_WITH_LATERAL_AND_BOTTOM_BORDER,
+		STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER,
+	}
 
 	private Map<ExcelCellStyle, CellStyle> sheetStylesMap;
 
@@ -405,20 +420,6 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 
 	public ResourceBundleMessageSource getMessageSource() {
 		return this.messageSource;
-	}
-
-	public enum ExcelCellStyle {
-		HEADING_STYLE_YELLOW,
-		HEADING_STYLE_PALE_BLUE,
-		HEADING_STYLE_BLUE,
-		HEADING_STYLE_ORANGE,
-
-		HEADING_STYLE_AQUA,
-		HEADING_STYLE_OLIVE_GREEN,
-		STYLE_AQUA_WITH_LATERAL_BORDER,
-		STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER,
-		STYLE_AQUA_WITH_LATERAL_AND_BOTTOM_BORDER,
-		STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER,
 	}
 
 	private Map<ExcelCellStyle, CellStyle> createStyles() {
