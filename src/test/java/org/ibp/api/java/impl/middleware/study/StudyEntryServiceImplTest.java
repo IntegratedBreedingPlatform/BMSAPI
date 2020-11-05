@@ -2,11 +2,13 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -29,6 +31,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -186,6 +189,53 @@ public class StudyEntryServiceImplTest {
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_UNIT.getId()), IsIn.in(results));
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_AVAILABLE_BALANCE.getId()), IsIn.in(results));
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_ACTIVE_LOTS_COUNT.getId()), IsIn.in(results));
+	}
+
+	@Test
+	public void testCreateStudyGermplasmListDuplicateEntries() {
+
+		final GermplasmList germplasmList = new GermplasmList();
+		List<GermplasmListData> listData = this.duplicateListData();
+		germplasmList.setListData(listData);
+
+		final Integer studyId = random.nextInt();
+		final Integer germplasmListId = random.nextInt();
+
+		Mockito.when(this.germplasmListService.getGermplasmList(germplasmListId)).thenReturn(germplasmList);
+
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setDatasetId(datasetId);
+		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
+		final List<DatasetDTO> datasetDTOS = Collections.singletonList(datasetDTO);
+		Mockito.when(this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
+			.thenReturn(datasetDTOS);
+
+		try {
+			final List<StudyEntryDto> studyEntryDtos = this.studyEntryService.createStudyEntries(studyId, germplasmListId);
+			Assert.notNull(studyEntryDtos, "Duplicate gid in list should be accepted. ");
+		} catch (final Exception e) {
+			Assert.isNull(e, "Duplicate gid in list should be accepted, no exception");
+		}
+
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
+		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
+	}
+
+	private List<GermplasmListData> duplicateListData() {
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+
+		final GermplasmListData data = new GermplasmListData();
+		data.setGermplasm(germplasm);
+		data.setGid(germplasm.getGid());
+
+		List<GermplasmListData> listData = new ArrayList<>();
+		listData.add(data);
+		listData.add(data);
+		return listData;
 	}
 
 }
