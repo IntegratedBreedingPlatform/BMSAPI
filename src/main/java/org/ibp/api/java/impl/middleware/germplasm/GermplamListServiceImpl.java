@@ -6,10 +6,14 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -32,18 +36,19 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.splitByCharacterType;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
 
@@ -69,6 +74,9 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 	@Autowired
 	public GermplasmDataManager germplasmDataManager;
+
+	@Autowired
+	public GermplasmSearchService germplasmSearchService;
 
 	@Autowired
 	public GermplasmListService germplasmListService;
@@ -165,8 +173,6 @@ public class GermplamListServiceImpl implements GermplamListService {
 		// validations
 
 		checkNotNull(request, "param.null", new String[] {"request"});
-		checkNotNull(request.getEntries(), "param.null", new String[] {"request entries"});
-		checkArgument(!request.getEntries().isEmpty(), "param.null", new String[] {"request entries"});
 		checkNotNull(request.getDate(), "param.null", new String[] {"date"});
 
 		if (!StringUtils.isBlank(request.getDescription())) {
@@ -191,7 +197,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 		this.validateParentId(parentFolderId, currentProgram);
 
 		// process and assign defaults + more validations
-		this.processEntries(request.getEntries());
+		this.processEntries(request, currentProgram);
 
 		// properties that depend on CROP/PROGRAM folder
 		int status = GermplasmList.Status.LIST.getCode();
@@ -215,11 +221,41 @@ public class GermplamListServiceImpl implements GermplamListService {
 		return this.germplasmListService.create(request, status, programUUID, loggedInUser);
 	}
 
-	private void processEntries(final List<GermplasmListGeneratorDTO.GermplasmEntryDTO> entries) {
+	private void processEntries(final GermplasmListGeneratorDTO request, final String currentProgram) {
 
-		final List<Integer> gids = entries.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
+		// resolve/validate composite and entries
+
+		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite = request.getSearchComposite();
+		checkArgument(!CollectionUtils.isEmpty(request.getEntries()) || searchComposite != null && searchComposite.isValid(),
+			"error.germplasmlist.save.entries.or.composite");
+
+		if (CollectionUtils.isEmpty(request.getEntries())) {
+			if (!CollectionUtils.isEmpty(searchComposite.getItemIds())) {
+				request.setEntries(searchComposite.getItemIds().stream().map(gid -> {
+					final GermplasmListGeneratorDTO.GermplasmEntryDTO entryDTO = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
+					entryDTO.setGid(gid);
+					return entryDTO;
+				}).collect(Collectors.toList()));
+			} else {
+				final List<GermplasmSearchResponse> list =
+					this.germplasmSearchService.searchGermplasm(searchComposite.getSearchRequest(), null, currentProgram);
+				checkArgument(!list.isEmpty(), "search.composite.empty.result");
+				request.setEntries(list.stream().map(germplasmSearchResponse -> {
+					final GermplasmListGeneratorDTO.GermplasmEntryDTO entryDTO = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
+					entryDTO.setGid(germplasmSearchResponse.getGid());
+					return entryDTO;
+				}).collect(Collectors.toList()));
+			}
+		}
+
+		// process entries
+
+		final List<Integer> gids = request.getEntries()
+			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
 		final Map<Integer, Germplasm> germplasmMap = this.germplasmDataManager.getGermplasms(gids)
 			.stream().collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
+		final Map<Integer, String> crossExpansions =
+			this.pedigreeService.getCrossExpansionsBulk(new HashSet<>(gids), null, this.crossExpansionProperties);
 
 		int entryNo = 1;
 		boolean hasEntryNo = false;
@@ -230,7 +266,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 		boolean hasGroupName = false;
 		boolean hasGroupNameEmpty = false;
 
-		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : entries) {
+		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final Integer gid = entry.getGid();
 			if (gid == null) {
 				throw new ApiValidationException("", "error.germplasmlist.save.gid");
@@ -259,8 +295,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 			}
 
 			if (isBlank(entry.getGroupName())) {
-				final String crossExpansion = this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties);
-				entry.setGroupName(crossExpansion);
+				entry.setGroupName(crossExpansions.get(gid));
 				hasGroupNameEmpty = true;
 			} else {
 				hasGroupName = true;

@@ -32,17 +32,11 @@ public interface GermplasmService {
 
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
-	GermplasmSummary getGermplasm(String germplasmId);
-
 	List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(String name);
 
 	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, Boolean includeSiblings);
 
 	ProgenyDTO getProgeny(Integer germplasmDbId);
-
-	PedigreeTree getPedigreeTree(String germplasmId, Integer levels);
-
-	DescendantTree getDescendantTree(String germplasmId);
 
 	GermplasmDTO getGermplasmDTObyGID (Integer germplasmId);
 

@@ -3,9 +3,7 @@ package org.ibp.api.java.impl.middleware.common.validator;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.ibp.api.Util;
-import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -18,9 +16,6 @@ import java.util.stream.Collectors;
 public class GermplasmValidator {
 
 	@Autowired
-	private GermplasmService germplasmService;
-
-	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
 	public void validateGermplasmId(final BindingResult errors, final Integer germplasmId) {
@@ -28,8 +23,8 @@ public class GermplasmValidator {
 			errors.reject("germplasm.required", "");
 			return;
 		}
-		final GermplasmSummary germplasmSummary = germplasmService.getGermplasm(String.valueOf(germplasmId));
-		if (germplasmSummary == null) {
+		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(germplasmId);
+		if (germplasm == null) {
 			errors.reject("germplasm.invalid", "");
 		}
 	}

@@ -83,6 +83,7 @@ public class GermplasmResource {
 		final String userName = SecurityUtil.getLoggedInUserName();
 		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUUID);
 
+		// TODO Move to dao method, so it cannot be bypassed? IBP-4166
 		if (user.hasOnlyProgramRoles(cropName)) {
 			germplasmSearchRequest.setInProgramListOnly(true);
 		}
