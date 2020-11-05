@@ -12,6 +12,8 @@ public class StudyEntryMetadata {
 
 	private Long nonTestEntriesCount;
 
+	private Boolean hasUnassignedStudyEntriesToPlot;
+
 	public Long getTestEntriesCount() {
 		return testEntriesCount;
 	}
@@ -34,6 +36,14 @@ public class StudyEntryMetadata {
 
 	public void setNonTestEntriesCount(final Long nonTestEntriesCount) {
 		this.nonTestEntriesCount = nonTestEntriesCount;
+	}
+
+	public Boolean getHasUnassignedStudyEntriesToPlot() {
+		return hasUnassignedStudyEntriesToPlot;
+	}
+
+	public void setHasUnassignedStudyEntriesToPlot(final Boolean hasUnassignedStudyEntriesToPlot) {
+		this.hasUnassignedStudyEntriesToPlot = hasUnassignedStudyEntriesToPlot;
 	}
 
 	@Override

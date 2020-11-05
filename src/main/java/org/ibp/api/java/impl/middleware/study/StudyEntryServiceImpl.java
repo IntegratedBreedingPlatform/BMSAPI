@@ -282,6 +282,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		studyEntryMetadata.setTestEntriesCount(this.countAllStudyTestEntries(studyId));
 		studyEntryMetadata.setCheckEntriesCount(this.countAllCheckTestEntries(studyId, programUuid, true));
 		studyEntryMetadata.setNonTestEntriesCount(this.countAllCheckTestEntries(studyId, programUuid, false));
+		studyEntryMetadata.setHasUnassignedStudyEntriesToPlot(this.middlewareStudyEntryService.hasUnassignedStudyEntriesToPlot(studyId));
 		return studyEntryMetadata;
 	}
 
