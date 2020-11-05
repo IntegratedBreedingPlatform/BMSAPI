@@ -446,7 +446,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(final Set<String> codes) {
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(final Set<String> codes) {
 
 		final Set<String> types = new HashSet<>();
 		types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
@@ -490,23 +490,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
-	}
-
-	@Override
-	public List<AttributeDTO> getGermplasmAttributes() {
-		final Set<String> types = new HashSet<>();
-		return this.germplasmDataManager.getUserDefinedFieldByFieldTableNameAndType(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-			ImmutableSet.of(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
-			.stream()
-			.map(userDefinedField -> {
-				final AttributeDTO attributeDTO =
-					new AttributeDTO();
-				attributeDTO.setAttributeDbId(userDefinedField.getFldno());
-				attributeDTO.setAttributeName(userDefinedField.getFname());
-				attributeDTO.setAttributeCode(userDefinedField.getFcode());
-				return attributeDTO;
-			})
-			.collect(Collectors.toList());
 	}
 
 	@Override

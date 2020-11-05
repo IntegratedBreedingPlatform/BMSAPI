@@ -10,24 +10,14 @@ import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.domain.germplasm.GermplasmName;
-import org.ibp.api.domain.location.LocationDto;
-import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.java.location.LocationService;
-import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
-import org.ibp.api.rest.inventory.manager.LotResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
@@ -45,11 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.annotation.Resource;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -159,7 +145,7 @@ public class GermplasmResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Set<String> codes) {
 
-		return new ResponseEntity<>(this.germplasmService.getGermplasmAttributesByCodes(codes), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmService.filterGermplasmAttributes(codes), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls", method = RequestMethod.GET)

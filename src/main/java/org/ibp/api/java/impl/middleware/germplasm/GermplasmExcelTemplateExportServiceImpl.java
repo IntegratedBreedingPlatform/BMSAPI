@@ -17,6 +17,7 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.MethodService;
@@ -232,8 +233,8 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 			this.locationService
 				.getLocations(cropName, programUUID, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, false);
 
-		final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> attributeDTOs =
-			this.germplasmService.getGermplasmAttributes();
+		final List<AttributeDTO> attributeDTOs =
+			this.germplasmService.filterGermplasmAttributes(new HashSet<>());
 
 		final List<Method> breedingMethods = this.germplasmService.getAllBreedingMethods();
 
@@ -290,21 +291,21 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		return rowNumIndex;
 	}
 
-	private int writeAttributeSection(final HSSFSheet codesSheet, final int currentRowNum, final List<org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO> germplasmAttributeDTOS) {
+	private int writeAttributeSection(final HSSFSheet codesSheet, final int currentRowNum, final List<AttributeDTO> germplasmAttributeDTOS) {
 		int rowNumIndex = currentRowNum;
 		int count = germplasmAttributeDTOS.size();
-		for (final org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO germplasmAttributeDTO : germplasmAttributeDTOS) {
+		for (final AttributeDTO germplasmAttributeDTO : germplasmAttributeDTOS) {
 			final HSSFRow row = codesSheet.createRow(rowNumIndex++);
 			HSSFCell cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, CellType.STRING);
 			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_BORDER) :
 				this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_AND_BOTTOM_BORDER));
-			cell.setCellValue(germplasmAttributeDTO.getAttributeCode());
+			cell.setCellValue(germplasmAttributeDTO.getCode());
 
 
 			cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_SECOND_COLUMN_INDEX, CellType.STRING);
 			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
 				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
-			cell.setCellValue(germplasmAttributeDTO.getAttributeName());
+			cell.setCellValue(germplasmAttributeDTO.getName());
 			count--;
 		}
 		return rowNumIndex;

@@ -61,9 +61,7 @@ public interface GermplasmService {
 
 	List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(Set<String> codes);
 
-	List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(Set<String> codes);
-
-	List<AttributeDTO> getGermplasmAttributes();
+	List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(Set<String> codes);
 
 	List<Method> getAllBreedingMethods();
 
