@@ -177,7 +177,7 @@ public class GermplasmImportRequestDtoValidator {
 		final Set<String> nameTypes = new HashSet<>();
 		germplasmDtos.forEach(g -> nameTypes.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		final List<String> existingGermplasmNameTypes =
-			this.germplasmService.getGermplasmNameTypesByCodes(nameTypes).stream().map(GermplasmNameTypeDTO::getCode).collect(
+			this.germplasmService.filterGermplasmNameTypes(nameTypes).stream().map(GermplasmNameTypeDTO::getCode).collect(
 				Collectors.toList());
 		if (existingGermplasmNameTypes.size() != nameTypes.size()) {
 			nameTypes.removeAll(existingGermplasmNameTypes);
@@ -226,7 +226,7 @@ public class GermplasmImportRequestDtoValidator {
 			.forEach(g -> attributes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		if (!attributes.isEmpty()) {
 			final List<String> existingGermplasmAttributes =
-				this.germplasmService.getGermplasmAttributesByCodes(attributes).stream().map(AttributeDTO::getCode).collect(
+				this.germplasmService.filterGermplasmAttributes(attributes).stream().map(AttributeDTO::getCode).collect(
 					Collectors.toList());
 			if (existingGermplasmAttributes.size() != attributes.size()) {
 				attributes.removeAll(existingGermplasmAttributes);
