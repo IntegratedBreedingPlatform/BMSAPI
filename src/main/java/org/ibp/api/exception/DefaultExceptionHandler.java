@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -181,8 +182,9 @@ public class DefaultExceptionHandler {
 	public ErrorResponse handleMiddlewareRequestException(MiddlewareRequestException ex) {
 		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
-		String message = this.getMessage(ex.getErrorCode(), ex.getParams());
-		response.addError(message);
+		for (final Map.Entry<String, Object[]> error : ex.getErrorCodeParamsMap().entrySet()) {
+			response.addError(this.getMessage(error.getKey(), error.getValue()));
+		}
 		return response;
 	}
 
@@ -231,7 +233,7 @@ public class DefaultExceptionHandler {
 		return "ERROR - " + Instant.now().toString() + " - " + ex.getMessage();
 	}
 
-	private ErrorResponse buildErrorResponse(final List<ObjectError> objectErrors){
+	private ErrorResponse buildErrorResponse(final List<ObjectError> objectErrors) {
 		final ErrorResponse response = new ErrorResponse();
 		for (ObjectError error : objectErrors) {
 			String message = this.getMessage(error.getCode(), error.getArguments());
