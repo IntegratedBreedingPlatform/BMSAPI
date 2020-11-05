@@ -123,14 +123,14 @@ public class GermplasmResource {
 	}
 
 	@ApiOperation(value = "Import germplasm updates")
-	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PUT)
+	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity importGermplasmUpdates(@PathVariable final String cropName,
+	public ResponseEntity<Void> importGermplasmUpdates(@PathVariable final String cropName,
 		@RequestBody final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		this.germplasmService.importGermplasmUpdates(germplasmUpdateDTOList);
 
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Returns germplasm name types filtered by a list of codes", notes = "Returns germplasm name types filtered by a list of codes")
