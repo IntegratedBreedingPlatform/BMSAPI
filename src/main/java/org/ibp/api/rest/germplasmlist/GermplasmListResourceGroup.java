@@ -113,7 +113,7 @@ public class GermplasmListResourceGroup {
 	@ApiOperation(value = "Delete germplasm list folder", notes = "Delete germplasm sample list folder.")
 	//TODO: we need to add GERMPLASM_LIST permission
 	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM','MANAGE_GERMPLASM','GERMPLASM_LIST')")
-	@RequestMapping(value = "/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteGermplasmListFolder(
 		@PathVariable final String crop,
