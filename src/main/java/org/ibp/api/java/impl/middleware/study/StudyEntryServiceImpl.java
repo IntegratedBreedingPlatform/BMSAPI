@@ -133,33 +133,20 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
 		this.germplasmValidator.validateGids(errors, gids);
 
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmWithPreferredNameByGIDs(gids);
-		final ModelMapper mapper = StudyEntryMapper.getInstance();
-		//Create StudyEntryDtos from given gids
-		final List<StudyEntryDto> studyEntryDtoList =
-			germplasmList.stream().map(l -> mapper.map(l, StudyEntryDto.class)).collect(Collectors.toList());
-
-
+		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasms(gids);
+		final Map<Integer, String> gidDesignationMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
 		final List<Integer> germplasmDescriptorIds = this.getEntryDescriptorColumns(studyId).stream()
 			.map(measurementVariable -> measurementVariable.getTermId()).collect(Collectors.toList());
-		final Map<Integer, Germplasm> germplasmMap =
-			germplasmList.stream().collect(Collectors.toMap(Germplasm::getGid, g -> g));
 
 		//Get the next entry number
-		Integer entryNumber = this.middlewareStudyEntryService.getNextEntryNumber(studyId);
-		//Retrieve the map if Cross is in Germplasm descriptors
-		Map<Integer, String> gidCrossMap = germplasmDescriptorIds.contains(TermId.CROSS.getId())?
-			this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties) : new HashMap<>();
-		for(final StudyEntryDto studyEntryDto: studyEntryDtoList) {
-			studyEntryDto.setProperties(
-				StudyEntryPropertiesMapper.map(germplasmMap.get(studyEntryDto.getGid()), germplasmDescriptorIds,
-					studyEntryGeneratorBatchRequestDto.getEntryTypeId(), gidCrossMap.get(studyEntryDto.getGid())));
-			//Set the starting entry number
-			studyEntryDto.setEntryNumber(entryNumber);
-			studyEntryDto.setEntryCode(entryNumber.toString());
-			studyEntryDto.setEntryId(entryNumber++);
+		final Integer entryNumber = this.middlewareStudyEntryService.getNextEntryNumber(studyId);
 
-		}
+		//Retrieve the map if Cross is in Germplasm descriptors
+		final Map<Integer, String> gidCrossMap = germplasmDescriptorIds.contains(TermId.CROSS.getId())?
+			this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties) : new HashMap<>();
+
+		final List<StudyEntryDto> studyEntryDtoList = StudyEntryMapper.map(germplasmList, gidDesignationMap, entryNumber,
+			germplasmDescriptorIds, studyEntryGeneratorBatchRequestDto.getEntryTypeId(), gidCrossMap);
 		return this.middlewareStudyEntryService.saveStudyEntries(studyId, studyEntryDtoList);
 	}
 

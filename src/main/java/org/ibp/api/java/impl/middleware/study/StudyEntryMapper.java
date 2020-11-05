@@ -12,6 +12,10 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.spi.MappingContext;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class StudyEntryMapper {
 
 	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
@@ -29,7 +33,6 @@ public class StudyEntryMapper {
 	static {
 		StudyEntryMapper.addStudyEntryDtoMapping(StudyEntryMapper.applicationWideModelMapper);
 		StudyEntryMapper.addGermplasmListDataMapping(StudyEntryMapper.applicationWideModelMapper);
-		StudyEntryMapper.addGermplasmMapping(StudyEntryMapper.applicationWideModelMapper);
 	}
 
 	public static ModelMapper getInstance() {
@@ -81,14 +84,19 @@ public class StudyEntryMapper {
 		});
 	}
 
-	private static void addGermplasmMapping(final ModelMapper mapper) {
-		mapper.addMappings(new PropertyMap<Germplasm, StudyEntryDto>() {
-
-			@Override
-			protected void configure() {
-				this.map().setGid(this.source.getGid());
-				this.map().setDesignation(this.source.getPreferredName().getNval());
-			}
-		});
+	public static List<StudyEntryDto> map(final List<Germplasm> sourceList, final Map<Integer, String> gidDesignationMap,
+		Integer entryNo, final List<Integer> germplasmDescriptorIds, final Integer entryTypeId, final Map<Integer, String> gidCrossMap) {
+		final List<StudyEntryDto> studyEntryDtos = new ArrayList<>();
+		for(final Germplasm source: sourceList) {
+			final StudyEntryDto studyEntryDto = new StudyEntryDto();
+			studyEntryDto.setGid(source.getGid());
+			studyEntryDto.setDesignation(gidDesignationMap.get(source.getGid()));
+			studyEntryDto.setEntryNumber(entryNo);
+			studyEntryDto.setEntryCode(entryNo.toString());
+			studyEntryDto.setEntryId(entryNo++);
+			studyEntryDto.setProperties(StudyEntryPropertiesMapper.map(source, germplasmDescriptorIds, entryTypeId, gidCrossMap.get(source.getGid())));
+			studyEntryDtos.add(studyEntryDto);
+		}
+		return studyEntryDtos;
 	}
 }
