@@ -89,7 +89,7 @@ public class GermplasmServiceImplTest {
 	}
 
 	@Test
-	public void shouldGetGermplasmNameTypesByCodes() {
+	public void shouldFilterGermplasmNameTypes() {
 
 		final Set<String> codes = new HashSet() {{
 			add("LNAME");
@@ -104,7 +104,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(), types, codes))
 			.thenReturn(Arrays.asList(userDefinedField));
 
-		final List<GermplasmNameTypeDTO> germplasmListTypes = this.germplasmServiceImpl.getGermplasmNameTypesByCodes(codes);
+		final List<GermplasmNameTypeDTO> germplasmListTypes = this.germplasmServiceImpl.filterGermplasmNameTypes(codes);
 		assertNotNull(germplasmListTypes);
 		assertThat(germplasmListTypes, hasSize(1));
 		final GermplasmNameTypeDTO actualGermplasmListTypeDTO = germplasmListTypes.get(0);
@@ -117,7 +117,7 @@ public class GermplasmServiceImplTest {
 	}
 
 	@Test
-	public void shouldGetGermplasmAttributesByCodes() {
+	public void shouldFilterGermplasmAttributes() {
 		final Set<String> codes = Collections.singleton("NOTE");
 
 		final UserDefinedField userDefinedField = new UserDefinedField();
@@ -129,7 +129,7 @@ public class GermplasmServiceImplTest {
 			this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(ArgumentMatchers.eq(UDTableType.ATRIBUTS_ATTRIBUTE.getTable()),
 				ArgumentMatchers.anySet(), ArgumentMatchers.eq(codes))).thenReturn(Arrays.asList(userDefinedField));
 
-		final List<AttributeDTO> germplasmListTypes = this.germplasmServiceImpl.getGermplasmAttributesByCodes(codes);
+		final List<AttributeDTO> germplasmListTypes = this.germplasmServiceImpl.filterGermplasmAttributes(codes);
 		assertNotNull(germplasmListTypes);
 		assertThat(germplasmListTypes, hasSize(1));
 		final AttributeDTO actualGermplasmListTypeDTO = germplasmListTypes.get(0);
