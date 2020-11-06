@@ -137,13 +137,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			.map(measurementVariable -> measurementVariable.getTermId()).collect(Collectors.toList());
 
 		//Get the next entry number
-		final Integer entryNumber = this.middlewareStudyEntryService.getNextEntryNumber(studyId);
+		final Integer startingEntryNumber = this.middlewareStudyEntryService.getNextEntryNumber(studyId);
 
 		//Retrieve the map if Cross is in Germplasm descriptors
 		final Map<Integer, String> gidCrossMap = germplasmDescriptorIds.contains(TermId.CROSS.getId())?
 			this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties) : new HashMap<>();
 
-		final List<StudyEntryDto> studyEntryDtoList = StudyEntryMapper.map(germplasmList, gidDesignationMap, entryNumber,
+		final List<StudyEntryDto> studyEntryDtoList = StudyEntryMapper.map(germplasmList, gidDesignationMap, startingEntryNumber,
 			germplasmDescriptorIds, studyEntryGeneratorRequestDto.getEntryTypeId(), gidCrossMap);
 		return this.middlewareStudyEntryService.saveStudyEntries(studyId, studyEntryDtoList);
 	}

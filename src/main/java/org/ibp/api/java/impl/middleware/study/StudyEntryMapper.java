@@ -85,15 +85,16 @@ public class StudyEntryMapper {
 	}
 
 	public static List<StudyEntryDto> map(final List<Germplasm> sourceList, final Map<Integer, String> gidDesignationMap,
-		Integer entryNo, final List<Integer> germplasmDescriptorIds, final Integer entryTypeId, final Map<Integer, String> gidCrossMap) {
+		final Integer startingEntryNumber, final List<Integer> germplasmDescriptorIds, final Integer entryTypeId, final Map<Integer, String> gidCrossMap) {
 		final List<StudyEntryDto> studyEntryDtos = new ArrayList<>();
+		Integer entryNumber = startingEntryNumber;
 		for(final Germplasm source: sourceList) {
 			final StudyEntryDto studyEntryDto = new StudyEntryDto();
 			studyEntryDto.setGid(source.getGid());
 			studyEntryDto.setDesignation(gidDesignationMap.get(source.getGid()));
-			studyEntryDto.setEntryNumber(entryNo);
-			studyEntryDto.setEntryCode(entryNo.toString());
-			studyEntryDto.setEntryId(entryNo++);
+			studyEntryDto.setEntryNumber(entryNumber);
+			studyEntryDto.setEntryCode(entryNumber.toString());
+			studyEntryDto.setEntryId(entryNumber++);
 			studyEntryDto.setProperties(StudyEntryPropertiesMapper.map(source, germplasmDescriptorIds, entryTypeId, gidCrossMap.get(source.getGid())));
 			studyEntryDtos.add(studyEntryDto);
 		}
