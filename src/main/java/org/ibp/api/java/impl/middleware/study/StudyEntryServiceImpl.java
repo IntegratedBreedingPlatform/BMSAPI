@@ -249,11 +249,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public long countAllCheckTestEntries(final Integer studyId, final String programUuid, final Boolean checkOnly) {
-		final List<Enumeration> entryTypes = this.entryTypeService.getEntryTypes(programUuid);
 		if(checkOnly) {
 			return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
 				Collections.singletonList(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())));
 		} else {
+			final List<Enumeration> entryTypes = this.entryTypeService.getEntryTypes(programUuid);
 			final List<String> checkEntryTypeIds = entryTypes.stream()
 				.filter(entryType -> entryType.getId() != SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())
 				.map(entryType -> String.valueOf(entryType.getId())).collect(Collectors.toList());
