@@ -9,7 +9,6 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.service.api.userdefinedfield.UserDefinedFieldService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,9 +16,9 @@ import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,9 +39,6 @@ public class GermplasmUpdateValidator {
 	@Autowired
 	private BreedingMethodService breedingMethodService;
 
-	@Autowired
-	private UserDefinedFieldService userDefinedFieldService;
-
 	public void validateEmptyList(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		if (germplasmUpdateDTOList == null || germplasmUpdateDTOList.isEmpty()) {
 			errors.reject("germplasm.update.empty.list", "");
@@ -54,21 +50,24 @@ public class GermplasmUpdateValidator {
 		// TODO: Validate all codes from dto list not just from the first item.
 		final Set<String> attributesAndNamesCodes = new HashSet<>(germplasmUpdateDTOList.get(0).getData().keySet());
 
-		final Map<String, Integer> attributeCodes =
-			this.userDefinedFieldService
-				.getByTableAndCodesInMap(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), new ArrayList<>(attributesAndNamesCodes));
-		final Map<String, Integer> nameCodes =
-			this.userDefinedFieldService
-				.getByTableAndCodesInMap(UDTableType.NAMES_NAME.getTable(), new ArrayList<>(attributesAndNamesCodes));
+		final Set<String> attributeCodes =
+			this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
+				Collections.singleton(UDTableType.ATRIBUTS_ATTRIBUTE.getType()), attributesAndNamesCodes).stream().map(o -> o.getFcode())
+				.collect(Collectors.toSet());
+		final Set<String> nameCodes =
+			this.germplasmDataManager
+				.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+					Collections.singleton(UDTableType.NAMES_NAME.getType()), attributesAndNamesCodes).stream().map(o -> o.getFcode())
+				.collect(Collectors.toSet());
 
-		attributesAndNamesCodes.removeAll(attributeCodes.keySet());
-		attributesAndNamesCodes.removeAll(nameCodes.keySet());
+		attributesAndNamesCodes.removeAll(attributeCodes);
+		attributesAndNamesCodes.removeAll(nameCodes);
 
 		if (!attributesAndNamesCodes.isEmpty()) {
 			errors.reject("germplasm.update.invalid.attribute.or.name.code", new String[] {String.join(",", attributesAndNamesCodes)}, "");
 		}
 
-		final Collection<String> ambiguosCodes = CollectionUtils.intersection(attributeCodes.keySet(), nameCodes.keySet());
+		final Collection<String> ambiguosCodes = CollectionUtils.intersection(attributeCodes, nameCodes);
 		if (!ambiguosCodes.isEmpty()) {
 			errors.reject("germplasm.update.ambiguous.code", new String[] {String.join(",", ambiguosCodes)}, "");
 		}
@@ -141,7 +140,8 @@ public class GermplasmUpdateValidator {
 	public void validateCreationDate(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTOWithInvalidDate =
-			germplasmUpdateDTOList.stream().filter(o -> StringUtils.isNotEmpty(o.getCreationDate()) && !DateUtil.isValidDate(o.getCreationDate())).findAny();
+			germplasmUpdateDTOList.stream()
+				.filter(o -> StringUtils.isNotEmpty(o.getCreationDate()) && !DateUtil.isValidDate(o.getCreationDate())).findAny();
 
 		if (optionalGermplasmUpdateDTOWithInvalidDate.isPresent()) {
 			errors.reject("germplasm.update.invalid.creation.date", "");
