@@ -60,7 +60,7 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testCreateStudyGermplasmList() throws Exception {
+	public void testCreateStudyEntriesList() throws Exception {
 
 		final Random random = new Random();
 		final int studyId = random.nextInt();
@@ -77,8 +77,8 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(studyEntries).when(this.studyEntryService).createStudyEntries(studyId, germplasmListId);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation",
-				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, entryId)
+			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation-list",
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
 			.content(this.convertObjectToByte(studyEntryListGeneratorRequestDto))
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())

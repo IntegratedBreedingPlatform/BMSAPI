@@ -7,6 +7,7 @@ import org.generationcp.middleware.service.impl.inventory.PlantingPreparationDTO
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.junit.Test;
@@ -33,6 +34,9 @@ public class PlantingRequestDtoValidatorTest {
 
 	@Mock
 	private InventoryCommonValidator inventoryCommonValidator;
+
+	@Mock
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Mock
 	private VariableService variableService;

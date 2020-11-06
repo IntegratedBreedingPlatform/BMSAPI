@@ -25,6 +25,7 @@ import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.PreconditionFailedException;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
@@ -101,6 +102,9 @@ public class DatasetServiceImplTest {
 
 	@Spy
 	private ObservationsTableValidator observationsTableValidator;
+
+	@Mock
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Mock
 	private InstanceValidator instanceValidator;

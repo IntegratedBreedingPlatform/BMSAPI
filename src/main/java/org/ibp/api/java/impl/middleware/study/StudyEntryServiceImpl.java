@@ -151,6 +151,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public List<StudyEntryDto> createStudyEntries(final Integer studyId, final Integer listId) {
 		final GermplasmList germplasmList = this.germplasmListService.getGermplasmList(listId);
+		this.studyValidator.validate(studyId, true);
 
 		this.germplasmListValidator.validateGermplasmList(listId);
 
