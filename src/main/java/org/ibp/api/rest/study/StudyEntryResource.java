@@ -6,7 +6,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.study.StudyEntryGeneratorBatchRequestDto;
+import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
+import org.generationcp.middleware.domain.study.StudyEntryListGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -53,18 +54,30 @@ public class StudyEntryResource {
 
 	}
 
-	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list",
-		notes = "Create germplasm entries in study based on the specified germplasm list")
+	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm ids",
+		notes = "Create germplasm entries in study based on the specified germplasm ids")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
 		@ApiParam("Study Entry template for batch generation. SearchComposite is a list of gids")
-		@RequestBody final StudyEntryGeneratorBatchRequestDto studyEntryGeneratorBatchRequestDto) {
+		@RequestBody final StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto) {
 		return new ResponseEntity<>(
-			this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorBatchRequestDto),
+			this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorRequestDto),
 			HttpStatus.OK);
+	}
 
+	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list",
+		notes = "Create germplasm entries in study based on the specified germplasm list")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation-list", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
+		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
+		@ApiParam("Study Entry template for batch generation.")
+		@RequestBody final StudyEntryListGeneratorRequestDto studyEntryListGeneratorRequestDto) {
+		return new ResponseEntity<>(
+			this.studyEntryService.createStudyEntries(studyId, studyEntryListGeneratorRequestDto.getListId()),
+			HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Delete germplasm entries in study",

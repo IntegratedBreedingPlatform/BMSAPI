@@ -3,6 +3,7 @@ package org.ibp.api.rest.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyEntryListGeneratorRequestDto;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -67,18 +68,18 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 		final int entryId = random.nextInt();
 		final int gid = random.nextInt();
 
-		final GermplasmEntryRequestDto germplasmEntryRequestDto = new GermplasmEntryRequestDto();
-		germplasmEntryRequestDto.setGermplasmListId(germplasmListId);
+		final StudyEntryListGeneratorRequestDto studyEntryListGeneratorRequestDto = new StudyEntryListGeneratorRequestDto();
+		studyEntryListGeneratorRequestDto.setListId(germplasmListId);
 
 		final StudyEntryDto dto = new StudyEntryDto(entryId, 6, RandomStringUtils.randomAlphabetic(20), gid, RandomStringUtils.randomAlphabetic(20));
 		final List<StudyEntryDto> studyEntries = new ArrayList<>();
 		studyEntries.add(dto);
-		Mockito.doReturn(studyEntries).when(this.studyEntryService).createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId());
+		Mockito.doReturn(studyEntries).when(this.studyEntryService).createStudyEntries(studyId, germplasmListId);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation",
 				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, entryId)
-			.content(this.convertObjectToByte(germplasmEntryRequestDto))
+			.content(this.convertObjectToByte(studyEntryListGeneratorRequestDto))
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
