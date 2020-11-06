@@ -39,6 +39,10 @@ public class DatasetCSVGeneratorTest {
 	private final String variableName2 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
 	private final String variableName3 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
 	private final String variableName4 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
+	private final String variablAlias1 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
+	private final String variablAlias2 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
+	private final String variablAlias3 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
+	private final String variablAlias4 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
 	private final String variableValue1 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
 	private final String variableValue2 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
 	private final String variableValue3 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
@@ -73,12 +77,12 @@ public class DatasetCSVGeneratorTest {
 		this.observationUnitRows = Arrays.asList(observationUnitRow);
 
 		final MeasurementVariable measurementVariable1 = new MeasurementVariable();
-		measurementVariable1.setAlias(this.variableName1);
+		measurementVariable1.setAlias(this.variablAlias1);
 		measurementVariable1.setName(this.variableName1);
 		measurementVariable1.setVariableType(VariableType.TRAIT);
 
 		final MeasurementVariable measurementVariable2 = new MeasurementVariable();
-		measurementVariable2.setAlias(this.variableName2);
+		measurementVariable2.setAlias(this.variablAlias2);
 		measurementVariable2.setName(this.variableName2);
 		measurementVariable2.setVariableType(VariableType.STUDY_DETAIL);
 		final List<ValueReference> studyDetailPossibleValues = new ArrayList<>();
@@ -87,7 +91,7 @@ public class DatasetCSVGeneratorTest {
 		measurementVariable2.setDataType(DataType.CATEGORICAL_VARIABLE.getName());
 
 		final MeasurementVariable measurementVariable3 = new MeasurementVariable();
-		measurementVariable3.setAlias(this.variableName3);
+		measurementVariable3.setAlias(this.variablAlias3);
 		measurementVariable3.setName(this.variableName3);
 		measurementVariable3.setVariableType(VariableType.ENVIRONMENT_DETAIL);
 		final List<ValueReference> environmentDetailPossibleValues = new ArrayList<>();
@@ -96,7 +100,7 @@ public class DatasetCSVGeneratorTest {
 		measurementVariable3.setDataType(DataType.CATEGORICAL_VARIABLE.getName());
 
 		final MeasurementVariable measurementVariable4 = new MeasurementVariable();
-		measurementVariable4.setAlias(this.variableName4);
+		measurementVariable4.setAlias(this.variablAlias4);
 		measurementVariable4.setName(this.variableName4);
 		measurementVariable4.setVariableType(VariableType.ENVIRONMENT_CONDITION);
 
@@ -128,8 +132,8 @@ public class DatasetCSVGeneratorTest {
 	public void testGetHeaderNames() {
 		final List<String> result = this.datasetCSVGenerator.getHeaderNames(this.measurementVariables);
 		assertEquals(this.measurementVariables.size(), result.size());
-		assertTrue(result.contains(this.variableName1));
-		assertTrue(result.contains(this.variableName2));
+		assertTrue(result.contains(this.variablAlias1));
+		assertTrue(result.contains(this.variablAlias2));
 	}
 
 	@Test
