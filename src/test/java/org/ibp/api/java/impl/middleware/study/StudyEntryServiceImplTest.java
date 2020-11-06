@@ -2,11 +2,17 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -16,9 +22,14 @@ import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.hamcrest.collection.IsIn;
+import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
+import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
@@ -29,12 +40,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class StudyEntryServiceImplTest {
@@ -52,6 +66,18 @@ public class StudyEntryServiceImplTest {
 	private StudyEntryValidator studyEntryValidator;
 
 	@Mock
+	private EntryTypeValidator entryTypeValidator;
+
+	@Mock
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
+
+	@Mock
+	private GermplasmValidator germplasmValidator;
+
+	@Mock
+	private SearchRequestDtoResolver searchRequestDtoResolver;
+
+	@Mock
 	private GermplasmListValidator germplasmListValidator;
 
 	@Mock
@@ -65,6 +91,9 @@ public class StudyEntryServiceImplTest {
 
 	@Mock
 	private DatasetService datasetService;
+
+	@Mock
+	private GermplasmDataManager germplasmDataManager;
 
 	@InjectMocks
 	private final StudyEntryServiceImpl studyEntryService = new StudyEntryServiceImpl();
@@ -92,7 +121,46 @@ public class StudyEntryServiceImplTest {
 	}
 
 	@Test
-	public void testCreateStudyGermplasmList() {
+	public void testCreateStudyEntries() {
+		final Integer studyId = random.nextInt();
+		final Integer gid = random.nextInt();
+		final List<Integer> gids = Collections.singletonList(gid);
+		final StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto = new StudyEntryGeneratorRequestDto();
+		studyEntryGeneratorRequestDto.setEntryTypeId(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
+		searchCompositeDto.setItemIds(new HashSet(gids));
+		studyEntryGeneratorRequestDto.setSearchComposite(searchCompositeDto);
+
+		Mockito.when(this.searchRequestDtoResolver.resolveGidSearchDto(searchCompositeDto)).thenReturn(gids);
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+		Mockito.when(this.germplasmDataManager.getGermplasms(gids)).thenReturn(Collections.singletonList(germplasm));
+		final Map<Integer, String> gidDesignationMap = new HashMap<>();
+		gidDesignationMap.put(gid, "Designation");
+		Mockito.when(this.germplasmDataManager.getPreferredNamesByGids(gids)).thenReturn(gidDesignationMap);
+
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setDatasetId(datasetId);
+		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
+		final List<DatasetDTO> datasetDTOS = Collections.singletonList(datasetDTO);
+		Mockito.when(this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
+			.thenReturn(datasetDTOS);
+
+		final Integer startingEntryNumber = 5;
+		Mockito.when(this.middlewareStudyEntryService.getNextEntryNumber(studyId)).thenReturn(startingEntryNumber);
+
+		this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorRequestDto);
+
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.entryTypeValidator).validateEntryType(studyEntryGeneratorRequestDto.getEntryTypeId());
+		Mockito.verify(this.searchCompositeDtoValidator)
+			.validateSearchCompositeDto(ArgumentMatchers.eq(searchCompositeDto), ArgumentMatchers.any(BindingResult.class));
+		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(gids));
+	}
+
+	@Test
+	public void testCreateStudyEntriesList() {
 
 		final GermplasmList germplasmList = new GermplasmList();
 		List<GermplasmListData> listData = new ArrayList<>();

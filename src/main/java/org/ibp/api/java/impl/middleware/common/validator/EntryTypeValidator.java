@@ -16,13 +16,11 @@ import java.util.stream.Collectors;
 @Component
 public class EntryTypeValidator {
 
-	private BindingResult errors;
-
 	@Resource
 	private OntologyDataManager ontologyDataManager;
 
 	public void validateEntryType(final Integer entryTypeId) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final List<Integer> entryTypeIds = this.ontologyDataManager.getStandardVariable(TermId.ENTRY_TYPE.getId(), ContextHolder.getCurrentProgram())
 			.getEnumerations().stream().map(entryTypes -> entryTypes.getId()).collect(Collectors.toList());
@@ -30,8 +28,12 @@ public class EntryTypeValidator {
 			errors.reject("entry.type.does.not.exist", "");
 		}
 
-		if (this.errors.hasErrors()) {
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+	}
+
+	void setOntologyDataManager(final OntologyDataManager ontologyDataManager){
+		this.ontologyDataManager = ontologyDataManager;
 	}
 }
