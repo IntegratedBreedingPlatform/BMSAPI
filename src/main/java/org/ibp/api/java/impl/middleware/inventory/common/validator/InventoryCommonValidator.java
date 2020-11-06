@@ -24,9 +24,9 @@ public class InventoryCommonValidator {
 
 	private static final String STOCK_ID_PREFIX_REGEXP = "[a-zA-Z0-9]{1,14}[a-zA-Z]";
 
-	private static Integer TRANSACTION_NOTES_MAX_LENGTH = 255;
+	private static final Integer TRANSACTION_NOTES_MAX_LENGTH = 255;
 
-	private static Integer LOT_NOTES_MAX_LENGTH = 255;
+	private static final Integer LOT_NOTES_MAX_LENGTH = 255;
 
 	@Autowired
 	private VariableService variableService;

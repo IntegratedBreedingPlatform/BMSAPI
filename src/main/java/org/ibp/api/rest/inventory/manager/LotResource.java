@@ -160,10 +160,10 @@ public class LotResource {
 				@Override
 				public List<ExtendedLotDto> getResults(final PagedResult<ExtendedLotDto> pagedResult) {
 					try {
-						inventoryLock.lockRead();
+						LotResource.this.inventoryLock.lockRead();
 						return LotResource.this.lotService.searchLots(searchDTO, pageable);
 					} finally {
-						inventoryLock.unlockRead();
+						LotResource.this.inventoryLock.unlockRead();
 					}
 				}
 			});
@@ -243,10 +243,10 @@ public class LotResource {
 		}
 
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.lotService.updateLots(programUUID, extendedLotDtos, lotRequest);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
@@ -304,10 +304,10 @@ public class LotResource {
 			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
 		try {
-			inventoryLock.lockRead();
+			this.inventoryLock.lockRead();
 			return new ResponseEntity<>(this.lotService.getLotsSearchMetadata(searchDTO), HttpStatus.OK);
 		} finally {
-			inventoryLock.unlockRead();
+			this.inventoryLock.unlockRead();
 		}
 	}
 
@@ -329,10 +329,10 @@ public class LotResource {
 			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchCompositeDto.getItemIds());
 		}
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.lotService.closeLots(searchDTO);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -349,7 +349,7 @@ public class LotResource {
 		searchDTO.setLotUUIDs(Arrays.asList(lotUUID));
 
 		try {
-			inventoryLock.lockRead();
+			this.inventoryLock.lockRead();
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 
 			if (!extendedLotDtos.isEmpty()) {
@@ -357,7 +357,7 @@ public class LotResource {
 			}
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} finally {
-			inventoryLock.unlockRead();
+			this.inventoryLock.unlockRead();
 		}
 	}
 
@@ -373,7 +373,7 @@ public class LotResource {
 			@RequestBody final LotMergeRequestDto lotMergeRequestDto) {
 
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 
 			this.lotMergeValidator.validateRequest(lotMergeRequestDto);
 
@@ -388,7 +388,7 @@ public class LotResource {
 
 			this.lotService.mergeLots(lotMergeRequestDto.getLotUUIDToKeep(), searchDTO);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -408,10 +408,10 @@ public class LotResource {
 		this.lotSplitValidator.validateRequest(lotSplitRequestDto);
 
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.lotService.splitLot(programUUID, lotSplitRequestDto);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

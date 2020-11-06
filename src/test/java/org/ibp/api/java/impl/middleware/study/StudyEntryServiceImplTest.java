@@ -115,9 +115,9 @@ public class StudyEntryServiceImplTest {
 
 	@Test
 	public void testReplaceStudyEntry() {
-		final Integer studyId = random.nextInt();
-		final Integer entryId = random.nextInt();
-		final Integer newGid = random.nextInt();
+		final Integer studyId = this.random.nextInt();
+		final Integer entryId = this.random.nextInt();
+		final Integer newGid = this.random.nextInt();
 		final String crossExpansion = RandomStringUtils.randomAlphabetic(20);
 		Mockito.doReturn(crossExpansion).when(this.pedigreeService).getCrossExpansion(newGid, this.crossExpansionProperties);
 		final StudyEntryDto dto = new StudyEntryDto();
@@ -130,8 +130,8 @@ public class StudyEntryServiceImplTest {
 
 	@Test
 	public void testCreateStudyEntries() {
-		final Integer studyId = random.nextInt();
-		final Integer gid = random.nextInt();
+		final Integer studyId = this.random.nextInt();
+		final Integer gid = this.random.nextInt();
 		final List<Integer> gids = Collections.singletonList(gid);
 		final StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto = new StudyEntryGeneratorRequestDto();
 		studyEntryGeneratorRequestDto.setEntryTypeId(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
@@ -171,11 +171,11 @@ public class StudyEntryServiceImplTest {
 	public void testCreateStudyEntriesList() {
 
 		final GermplasmList germplasmList = new GermplasmList();
-		List<GermplasmListData> listData = new ArrayList<>();
+		final List<GermplasmListData> listData = new ArrayList<>();
 		germplasmList.setListData(listData);
 
-		final Integer studyId = random.nextInt();
-		final Integer germplasmListId = random.nextInt();
+		final Integer studyId = this.random.nextInt();
+		final Integer germplasmListId = this.random.nextInt();
 
 		Mockito.when(this.germplasmListService.getGermplasmList(germplasmListId)).thenReturn(germplasmList);
 
@@ -198,7 +198,7 @@ public class StudyEntryServiceImplTest {
 
 	@Test
 	public void testGetStudyEntriesMetadata() {
-		final Integer studyId = random.nextInt();
+		final int studyId = this.random.nextInt();
 		final String programUUID = UUID.randomUUID().toString();
 		final Long testEntriesCount = Long.valueOf(5);
 		final Long checkEntriesCount = Long.valueOf(3);
@@ -236,7 +236,7 @@ public class StudyEntryServiceImplTest {
 
 	@Test
 	public void testDeleteStudyGermplasm() {
-		final Integer studyId = random.nextInt();
+		final Integer studyId = this.random.nextInt();
 		this.studyEntryService.deleteStudyEntries(studyId);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
@@ -246,10 +246,10 @@ public class StudyEntryServiceImplTest {
 	@Test
 	public void testUpdateStudyEntryProperty() {
 
-		final Integer studyId = random.nextInt();
-		final Integer entryId = random.nextInt();
-		final Integer variableId = random.nextInt();
-		final Integer studyEntryPropertyId = random.nextInt();
+		final Integer studyId = this.random.nextInt();
+		final Integer entryId = this.random.nextInt();
+		final Integer variableId = this.random.nextInt();
+		final Integer studyEntryPropertyId = this.random.nextInt();
 		final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
 		studyEntryPropertyData.setVariableId(variableId);
 		studyEntryPropertyData.setStudyEntryPropertyId(studyEntryPropertyId);
@@ -288,7 +288,7 @@ public class StudyEntryServiceImplTest {
 		Mockito.when(this.datasetService.getObservationSetVariables(datasetId, Lists
 			.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()))).thenReturn(measurementVariables);
 
-		final List<MeasurementVariable> results = studyEntryService.getEntryDescriptorColumns(studyId);
+		final List<MeasurementVariable> results = this.studyEntryService.getEntryDescriptorColumns(studyId);
 
 		MatcherAssert.assertThat(results, IsCollectionWithSize.hasSize(8));
 		MatcherAssert.assertThat(entryCodeVariable, IsIn.in(results));

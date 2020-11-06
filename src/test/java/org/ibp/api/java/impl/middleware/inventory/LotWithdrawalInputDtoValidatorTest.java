@@ -42,9 +42,9 @@ public class LotWithdrawalInputDtoValidatorTest {
 
 	@Before
 	public void setUp() {
-		Mockito.doCallRealMethod().when(searchCompositeDtoValidator)
+		Mockito.doCallRealMethod().when(this.searchCompositeDtoValidator)
 			.validateSearchCompositeDto(Mockito.any(SearchCompositeDto.class), Mockito.any(BindingResult.class));
-		Mockito.doCallRealMethod().when(inventoryCommonValidator)
+		Mockito.doCallRealMethod().when(this.inventoryCommonValidator)
 			.validateTransactionNotes(Mockito.anyString(), Mockito.any(BindingResult.class));
 	}
 
@@ -52,7 +52,7 @@ public class LotWithdrawalInputDtoValidatorTest {
 	public void testValidateLotWithdrawalInputDtoValidatorIsNull() {
 		try {
 			this.lotWithdrawalInputDtoValidator.validate(null);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.withdrawal.input.null"));
 		}
 	}
@@ -66,7 +66,7 @@ public class LotWithdrawalInputDtoValidatorTest {
 			searchCompositeDto.setItemIds(Collections.singleton(RandomStringUtils.randomAlphabetic(38)));
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("search.composite.invalid"));
 		}
 	}
@@ -80,7 +80,7 @@ public class LotWithdrawalInputDtoValidatorTest {
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(256));
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("transaction.notes.length"));
 
 		}
@@ -95,7 +95,7 @@ public class LotWithdrawalInputDtoValidatorTest {
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			lotWithdrawalInputDto.setNotes(RandomStringUtils.randomAlphabetic(255));
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.withdrawal.input.null"));
 		}
 	}
@@ -115,10 +115,10 @@ public class LotWithdrawalInputDtoValidatorTest {
 			lotWithdrawalInputDto.setWithdrawalsPerUnit(withdrawalsPerUnit);
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 			errors.reject("lot.input.invalid.units", "");
-			Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(inventoryCommonValidator)
+			Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(this.inventoryCommonValidator)
 				.validateUnitNames(Mockito.any(List.class), Mockito.any(BindingResult.class));
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.invalid.units"));
 		}
 	}
@@ -140,10 +140,10 @@ public class LotWithdrawalInputDtoValidatorTest {
 			final ExtendedLotDto extendedLotDto1 = new ExtendedLotDto();
 			extendedLotDto1.setUnitName("kg");
 
-			Mockito.doNothing().when(inventoryCommonValidator)
+			Mockito.doNothing().when(this.inventoryCommonValidator)
 				.validateUnitNames(Mockito.any(List.class), Mockito.any(BindingResult.class));
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.amount.invalid"));
 		}
 	}
@@ -170,7 +170,7 @@ public class LotWithdrawalInputDtoValidatorTest {
 			final List<ExtendedLotDto> extendedLotDtos = Arrays.asList(extendedLotDto1, extendedLotDto2);
 
 			this.lotWithdrawalInputDtoValidator.validateWithdrawalInstructionsUnits(lotWithdrawalInputDto, extendedLotDtos);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.instructions.missing.for.units"));
 		}
 	}

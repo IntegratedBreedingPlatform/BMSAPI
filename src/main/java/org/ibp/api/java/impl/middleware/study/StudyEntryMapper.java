@@ -58,14 +58,14 @@ public class StudyEntryMapper {
 
 	private static class OptionalConverter implements Converter<StudyEntryDto, String> {
 
-		private Integer termId;
+		private final Integer termId;
 
 		public OptionalConverter(final Integer termId) {
 			this.termId = termId;
 		}
 
 		@Override
-		public String convert(MappingContext<StudyEntryDto, String> mappingContext) {
+		public String convert(final MappingContext<StudyEntryDto, String> mappingContext) {
 			return mappingContext.getSource().getStudyEntryPropertyValue(this.termId).orElse("");
 		}
 	}

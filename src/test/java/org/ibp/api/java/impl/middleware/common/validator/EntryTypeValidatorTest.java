@@ -56,13 +56,13 @@ public class EntryTypeValidatorTest {
 
 		try {
 			this.entryTypeValidator.validateEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Assert.fail("should not throw a validation error.");
 		}
 		try {
 			this.entryTypeValidator.validateEntryType(SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeCategoricalId());
 			Assert.fail("should throw a validation error.");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			assertThat(e, instanceOf(ApiRequestValidationException.class));
 			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("entry.type.does.not.exist"));
 		}

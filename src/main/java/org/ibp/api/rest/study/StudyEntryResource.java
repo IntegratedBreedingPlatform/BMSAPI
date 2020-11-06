@@ -101,7 +101,7 @@ public class StudyEntryResource {
 	public ResponseEntity updateStudyEntryProperty(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer entryId, @PathVariable final Integer propertyId,
-		@RequestBody StudyEntryPropertyData studyEntryPropertyData) {
+		@RequestBody final StudyEntryPropertyData studyEntryPropertyData) {
 
 		this.studyEntryService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
 

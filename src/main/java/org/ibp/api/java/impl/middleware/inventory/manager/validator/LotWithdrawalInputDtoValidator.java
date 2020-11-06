@@ -33,39 +33,40 @@ public class LotWithdrawalInputDtoValidator {
 	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	public void validate(final LotWithdrawalInputDto lotWithdrawalInputDto) {
-		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
 		if (lotWithdrawalInputDto == null) {
-			errors.reject("lot.withdrawal.input.null", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("lot.withdrawal.input.null", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		searchCompositeDtoValidator.validateSearchCompositeDto(lotWithdrawalInputDto.getSelectedLots(), errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(lotWithdrawalInputDto.getSelectedLots(), this.errors);
 
-		inventoryCommonValidator.validateTransactionNotes(lotWithdrawalInputDto.getNotes(), errors);
+		this.inventoryCommonValidator.validateTransactionNotes(lotWithdrawalInputDto.getNotes(), this.errors);
 
 		if (lotWithdrawalInputDto.getWithdrawalsPerUnit() == null || lotWithdrawalInputDto.getWithdrawalsPerUnit().isEmpty()) {
-			errors.reject("lot.withdrawal.input.null", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("lot.withdrawal.input.null", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(lotWithdrawalInputDto.getWithdrawalsPerUnit().keySet()), errors);
+		this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(lotWithdrawalInputDto.getWithdrawalsPerUnit().keySet()),
+			this.errors);
 
 		lotWithdrawalInputDto.getWithdrawalsPerUnit().forEach((k, v) -> {
 			if (v.isReserveAllAvailableBalance() && v.getWithdrawalAmount() != null && !v.getWithdrawalAmount().equals(0D)) {
-				errors.reject("lot.amount.invalid", "");
-				throw new ApiRequestValidationException(errors.getAllErrors());
+				this.errors.reject("lot.amount.invalid", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 			if (!v.isReserveAllAvailableBalance() && (v.getWithdrawalAmount() == null || v.getWithdrawalAmount() <= 0)) {
-				errors.reject("lot.amount.invalid", "");
-				throw new ApiRequestValidationException(errors.getAllErrors());
+				this.errors.reject("lot.amount.invalid", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		});
 	}
 
 	public void validateWithdrawalInstructionsUnits(final LotWithdrawalInputDto lotWithdrawalInputDto,
 		final List<ExtendedLotDto> extendedLotDtos) {
-		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
 		//All units resulted the search request, must be indicated in the map
 		final Set<String> specifiedUnits = lotWithdrawalInputDto.getWithdrawalsPerUnit().keySet();
@@ -73,15 +74,17 @@ public class LotWithdrawalInputDtoValidator {
 		if (!specifiedUnits.containsAll(lotsUnits)) {
 			final List<String> missingUnits = new ArrayList<>(lotsUnits);
 			missingUnits.removeAll(specifiedUnits);
-			errors.reject("lot.input.instructions.missing.for.units", new String[] {Util.buildErrorMessageFromList(missingUnits, 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors
+				.reject("lot.input.instructions.missing.for.units", new String[] {Util.buildErrorMessageFromList(missingUnits, 3)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (!lotsUnits.containsAll(specifiedUnits)) {
 			final List<String> extraUnits = new ArrayList<>(specifiedUnits);
 			extraUnits.removeAll(lotsUnits);
-			errors.reject("lot.input.instructions.for.non.present.units", new String[] {Util.buildErrorMessageFromList(extraUnits, 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors
+				.reject("lot.input.instructions.for.non.present.units", new String[] {Util.buildErrorMessageFromList(extraUnits, 3)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 

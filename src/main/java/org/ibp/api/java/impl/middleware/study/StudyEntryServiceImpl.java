@@ -221,7 +221,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<MeasurementVariable> getEntryDescriptorColumns(final Integer studyId) {
 		this.studyValidator.validate(studyId, false);
 		final Integer plotDatasetId =
-			datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+			this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 
 		final List<Integer> termsToRemove = Lists
 			.newArrayList(TermId.OBS_UNIT_ID.getId());

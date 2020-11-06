@@ -30,35 +30,35 @@ public class LotDepositRequestDtoValidator {
 	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	public void validate(final LotDepositRequestDto lotDepositRequestDto) {
-		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
 		if (lotDepositRequestDto == null) {
-			errors.reject("lot.deposit.input.null", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("lot.deposit.input.null", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		searchCompositeDtoValidator.validateSearchCompositeDto(lotDepositRequestDto.getSelectedLots(), errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(lotDepositRequestDto.getSelectedLots(), this.errors);
 
-		inventoryCommonValidator.validateTransactionNotes(lotDepositRequestDto.getNotes(), errors);
+		this.inventoryCommonValidator.validateTransactionNotes(lotDepositRequestDto.getNotes(), this.errors);
 
 		if (lotDepositRequestDto.getDepositsPerUnit() == null || lotDepositRequestDto.getDepositsPerUnit().isEmpty()) {
-			errors.reject("lot.deposit.instruction.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("lot.deposit.instruction.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(lotDepositRequestDto.getDepositsPerUnit().keySet()), errors);
+		this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(lotDepositRequestDto.getDepositsPerUnit().keySet()), this.errors);
 
 		lotDepositRequestDto.getDepositsPerUnit().forEach((k, v) -> {
 			if (v == null || v <= 0) {
-				errors.reject("lot.amount.invalid", "");
-				throw new ApiRequestValidationException(errors.getAllErrors());
+				this.errors.reject("lot.amount.invalid", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		});
 	}
 
 	public void validateDepositInstructionsUnits(final LotDepositRequestDto lotDepositRequestDto,
 		final List<ExtendedLotDto> extendedLotDtos) {
-		errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
 		//All units resulted the search request, must be indicated in the map
 		final Set<String> specifiedUnits = lotDepositRequestDto.getDepositsPerUnit().keySet();
@@ -66,15 +66,17 @@ public class LotDepositRequestDtoValidator {
 		if (!specifiedUnits.containsAll(lotsUnits)) {
 			final List<String> missingUnits = new ArrayList<>(lotsUnits);
 			missingUnits.removeAll(specifiedUnits);
-			errors.reject("lot.input.instructions.missing.for.units", new String[] {Util.buildErrorMessageFromList(missingUnits, 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors
+				.reject("lot.input.instructions.missing.for.units", new String[] {Util.buildErrorMessageFromList(missingUnits, 3)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (!lotsUnits.containsAll(specifiedUnits)) {
 			final List<String> extraUnits = new ArrayList<>(specifiedUnits);
 			extraUnits.removeAll(lotsUnits);
-			errors.reject("lot.input.instructions.for.non.present.units", new String[] {Util.buildErrorMessageFromList(extraUnits, 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors
+				.reject("lot.input.instructions.for.non.present.units", new String[] {Util.buildErrorMessageFromList(extraUnits, 3)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 

@@ -65,7 +65,7 @@ public class PlantingRequestDtoValidatorTest {
 			final PlantingRequestDto plantingRequestDto = new PlantingRequestDto();
 			plantingRequestDto.setSelectedObservationUnits(new SearchCompositeDto<>());
 			Mockito
-				.when(plantingService
+				.when(this.plantingService
 					.searchPlantingPreparation(Mockito.eq(STUDY_ID), Mockito.eq(DATASET_ID), Mockito.any(SearchCompositeDto.class)))
 				.thenReturn(plantingPreparationDTO);
 			this.plantingRequestDtoValidator.validatePlantingRequestDto(STUDY_ID, DATASET_ID, plantingRequestDto);
@@ -83,7 +83,7 @@ public class PlantingRequestDtoValidatorTest {
 			final PlantingRequestDto plantingRequestDto = new PlantingRequestDto();
 			plantingRequestDto.setSelectedObservationUnits(new SearchCompositeDto<>());
 			Mockito
-				.when(plantingService
+				.when(this.plantingService
 					.searchPlantingPreparation(Mockito.eq(STUDY_ID), Mockito.eq(DATASET_ID), Mockito.any(SearchCompositeDto.class)))
 				.thenReturn(plantingPreparationDTO);
 			this.plantingRequestDtoValidator.validatePlantingRequestDto(STUDY_ID, DATASET_ID, plantingRequestDto);
@@ -103,7 +103,7 @@ public class PlantingRequestDtoValidatorTest {
 			final PlantingRequestDto.LotEntryNumber lotEntryNumber = new PlantingRequestDto.LotEntryNumber();
 			plantingRequestDto.setLotPerEntryNo(Collections.singletonList(lotEntryNumber));
 			Mockito
-				.when(plantingService
+				.when(this.plantingService
 					.searchPlantingPreparation(Mockito.eq(STUDY_ID), Mockito.eq(DATASET_ID), Mockito.any(SearchCompositeDto.class)))
 				.thenReturn(plantingPreparationDTO);
 			this.plantingRequestDtoValidator.validatePlantingRequestDto(STUDY_ID, DATASET_ID, plantingRequestDto);
@@ -129,7 +129,7 @@ public class PlantingRequestDtoValidatorTest {
 			final PlantingRequestDto.LotEntryNumber lotEntryNumber = new PlantingRequestDto.LotEntryNumber();
 			plantingRequestDto.setLotPerEntryNo(Collections.singletonList(lotEntryNumber));
 			Mockito
-				.when(plantingService
+				.when(this.plantingService
 					.searchPlantingPreparation(Mockito.eq(STUDY_ID), Mockito.eq(DATASET_ID), Mockito.any(SearchCompositeDto.class)))
 				.thenReturn(plantingPreparationDTO);
 			this.plantingRequestDtoValidator.validatePlantingRequestDto(STUDY_ID, DATASET_ID, plantingRequestDto);
@@ -158,7 +158,7 @@ public class PlantingRequestDtoValidatorTest {
 			lotEntryNumber2.setEntryNo(2);
 			plantingRequestDto.setLotPerEntryNo(Arrays.asList(lotEntryNumber1, lotEntryNumber2));
 			Mockito
-				.when(plantingService
+				.when(this.plantingService
 					.searchPlantingPreparation(Mockito.eq(STUDY_ID), Mockito.eq(DATASET_ID), Mockito.any(SearchCompositeDto.class)))
 				.thenReturn(plantingPreparationDTO);
 			this.plantingRequestDtoValidator.validatePlantingRequestDto(STUDY_ID, DATASET_ID, plantingRequestDto);
@@ -190,7 +190,7 @@ public class PlantingRequestDtoValidatorTest {
 			lotEntryNumber1.setLotId(lotId);
 			plantingRequestDto.setLotPerEntryNo(Collections.singletonList(lotEntryNumber1));
 			Mockito
-				.when(plantingService
+				.when(this.plantingService
 					.searchPlantingPreparation(Mockito.eq(STUDY_ID), Mockito.eq(DATASET_ID), Mockito.any(SearchCompositeDto.class)))
 				.thenReturn(plantingPreparationDTO);
 			this.plantingRequestDtoValidator.validatePlantingRequestDto(STUDY_ID, DATASET_ID, plantingRequestDto);
@@ -234,10 +234,10 @@ public class PlantingRequestDtoValidatorTest {
 			variableDetails.setName("Seed_amount_kg");
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.addVariableIds(Collections.singletonList(unitId));
-			Mockito.when(variableService.getVariablesByFilter(variableFilter)).thenReturn(Collections.singletonList(variableDetails));
+			Mockito.when(this.variableService.getVariablesByFilter(variableFilter)).thenReturn(Collections.singletonList(variableDetails));
 
 			Mockito
-				.when(plantingService
+				.when(this.plantingService
 					.searchPlantingPreparation(Mockito.eq(STUDY_ID), Mockito.eq(DATASET_ID), Mockito.any(SearchCompositeDto.class)))
 				.thenReturn(plantingPreparationDTO);
 

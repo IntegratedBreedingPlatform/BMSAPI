@@ -17,18 +17,18 @@ import java.util.List;
 import java.util.Map;
 
 public class StudyEntryPropertiesMapperTest {
-	private static List<Integer> DESCRIPTOR_IDS = Arrays.asList(TermId.ENTRY_TYPE.getId(), TermId.SEED_SOURCE.getId(),
+	private static final List<Integer> DESCRIPTOR_IDS = Arrays.asList(TermId.ENTRY_TYPE.getId(), TermId.SEED_SOURCE.getId(),
 		TermId.GROUPGID.getId(), TermId.CROSS.getId(), TermId.GERMPLASM_SOURCE.getId());
 
 	@Test
 	public void testMapWithGermplasmAsSource() {
 		final Germplasm source = GermplasmTestDataInitializer.createGermplasm(1);
-		final Integer entryTypeId = SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId();
+		final int entryTypeId = SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId();
 		final String cross = "CROSS";
 		final Map<Integer, StudyEntryPropertyData> studyEntryPropertyDataMap =
 			StudyEntryPropertiesMapper.map(source, DESCRIPTOR_IDS, entryTypeId, cross);
 
-		Assert.assertEquals(entryTypeId.toString(), studyEntryPropertyDataMap.get(TermId.ENTRY_TYPE.getId()).getValue());
+		Assert.assertEquals(Integer.toString(entryTypeId), studyEntryPropertyDataMap.get(TermId.ENTRY_TYPE.getId()).getValue());
 		Assert.assertTrue(studyEntryPropertyDataMap.get(TermId.SEED_SOURCE.getId()).getValue().isEmpty());
 		Assert.assertEquals(source.getMgid().toString(), studyEntryPropertyDataMap.get(TermId.GROUPGID.getId()).getValue());
 		Assert.assertEquals(cross, studyEntryPropertyDataMap.get(TermId.CROSS.getId()).getValue());

@@ -39,38 +39,38 @@ public class PlantingRequestDtoValidator {
 	private VariableService variableService;
 
 	public void validatePlantingRequestDto(final Integer studyId, final Integer datasetId, final PlantingRequestDto plantingRequestDto) {
-		errors = new MapBindingResult(new HashMap<String, String>(), PlantingRequestDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), PlantingRequestDto.class.getName());
 
 		if (plantingRequestDto == null) {
-			errors.reject("planting.request.null", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("planting.request.null", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		searchCompositeDtoValidator.validateSearchCompositeDto(plantingRequestDto.getSelectedObservationUnits(), errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(plantingRequestDto.getSelectedObservationUnits(), this.errors);
 
 		final PlantingPreparationDTO plantingPreparationDTO =
-			plantingService.searchPlantingPreparation(studyId, datasetId, plantingRequestDto.getSelectedObservationUnits());
+			this.plantingService.searchPlantingPreparation(studyId, datasetId, plantingRequestDto.getSelectedObservationUnits());
 		if (plantingPreparationDTO.getEntries().isEmpty()) {
-			errors.reject("planting.preparation.empty", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("planting.preparation.empty", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (plantingRequestDto.getLotPerEntryNo() == null || plantingRequestDto.getLotPerEntryNo().isEmpty()) {
-			errors.reject("planting.lot.per.entry.no.null.or.empty", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("planting.lot.per.entry.no.null.or.empty", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (plantingRequestDto.getWithdrawalsPerUnit() == null || plantingRequestDto.getWithdrawalsPerUnit().isEmpty()) {
-			errors.reject("planting.withdrawals.per.unit.null.or.empty", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("planting.withdrawals.per.unit.null.or.empty", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(plantingRequestDto.getWithdrawalsPerUnit().keySet()), errors);
+		this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(plantingRequestDto.getWithdrawalsPerUnit().keySet()), this.errors);
 
 		plantingRequestDto.getWithdrawalsPerUnit().forEach((k, v) -> {
 				if (!v.isValid()) {
-					errors.reject("planting.invalid.withdrawal.instruction", new String[] {k}, "");
-					throw new ApiRequestValidationException(errors.getAllErrors());
+					this.errors.reject("planting.invalid.withdrawal.instruction", new String[] {k}, "");
+					throw new ApiRequestValidationException(this.errors.getAllErrors());
 				}
 			}
 		);
@@ -79,8 +79,8 @@ public class PlantingRequestDtoValidator {
 			plantingRequestDto.getLotPerEntryNo().stream().map(PlantingRequestDto.LotEntryNumber::getEntryNo).collect(
 				Collectors.toSet());
 		if (requestedEntryNos.size() != plantingRequestDto.getLotPerEntryNo().size()) {
-			errors.reject("planting.repeated.entry.no", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("planting.repeated.entry.no", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		final List<PlantingPreparationDTO.PlantingPreparationEntryDTO> filteredPlantingPreparation =
@@ -88,8 +88,8 @@ public class PlantingRequestDtoValidator {
 				Collectors.toList());
 
 		if (filteredPlantingPreparation.size() != requestedEntryNos.size()) {
-			errors.reject("planting.entry.no.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("planting.entry.no.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		final List<Integer> selectedLotsUnitIds = new ArrayList<>();
@@ -101,9 +101,9 @@ public class PlantingRequestDtoValidator {
 				stockDTO = plantingPreparationEntryDTO.getStockByStockId().values().stream()
 				.filter(s -> lotEntryNumber.getLotId().equals(s.getLotId())).findFirst();
 			if (!stockDTO.isPresent()) {
-				errors.reject("planting.lot.entry.no.invalid",
+				this.errors.reject("planting.lot.entry.no.invalid",
 					new String[] {String.valueOf(lotEntryNumber.getLotId()), String.valueOf(lotEntryNumber.getEntryNo())}, "");
-				throw new ApiRequestValidationException(errors.getAllErrors());
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 			selectedLotsUnitIds.add(stockDTO.get().getUnitId());
 		}
@@ -116,11 +116,11 @@ public class PlantingRequestDtoValidator {
 		if (!plantingRequestDto.getWithdrawalsPerUnit().keySet().containsAll(selectedUnitNames)) {
 			final List<String> invalidUnitNames = new ArrayList<>(selectedUnitNames);
 			invalidUnitNames.removeAll(plantingRequestDto.getWithdrawalsPerUnit().keySet());
-			errors.reject("planting.missing.unit.instructions", new String[] {Util.buildErrorMessageFromList(invalidUnitNames, 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("planting.missing.unit.instructions", new String[] {Util.buildErrorMessageFromList(invalidUnitNames, 3)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.inventoryCommonValidator.validateTransactionNotes(plantingRequestDto.getNotes(), errors);
+		this.inventoryCommonValidator.validateTransactionNotes(plantingRequestDto.getNotes(), this.errors);
 
 	}
 

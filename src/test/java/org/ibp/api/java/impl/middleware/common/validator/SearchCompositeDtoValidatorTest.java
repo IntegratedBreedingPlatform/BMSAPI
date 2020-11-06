@@ -27,10 +27,8 @@ public class SearchCompositeDtoValidatorTest {
 			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto<>();
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Program");
 			this.searchCompositeDtoValidator.validateSearchCompositeDto(searchCompositeDto, errors);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), CoreMatchers.hasItem("search.composite.invalid"));
 		}
 	}
-
-
 }

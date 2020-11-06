@@ -45,7 +45,7 @@ public class StudyEntryValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		if (newGid == null) {
-			errors.reject("gid.is.required");
+			this.errors.reject("gid.is.required");
 		}
 
 		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
@@ -54,27 +54,27 @@ public class StudyEntryValidator {
 			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
 
 		if (studyEntries.isEmpty()) {
-			errors.reject("invalid.entryid");
+			this.errors.reject("invalid.entryid");
 		}
 
 		this.germplasmValidator.validateGermplasmId(this.errors, newGid);
 
-		studyValidator.validateStudyHasNoMeansDataset(studyId);
+		this.studyValidator.validateStudyHasNoMeansDataset(studyId);
 
-		studyValidator.validateHasNoCrossesOrSelections(studyId);
+		this.studyValidator.validateHasNoCrossesOrSelections(studyId);
 
-		Boolean entryHasSamples = this.sampleService.studyEntryHasSamples(studyId, entryId);
+		final Boolean entryHasSamples = this.sampleService.studyEntryHasSamples(studyId, entryId);
 		if (entryHasSamples) {
-			errors.reject("study.entry.has.samples");
+			this.errors.reject("study.entry.has.samples");
 		}
 
 		// Check that study has no confirmed or pending transactions for given entry
-		final Integer pendingTransactions =
+		final int pendingTransactions =
 			this.plantingService.getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.PENDING).size();
-		final Integer confirmedTransactions =
+		final int confirmedTransactions =
 			this.plantingService.getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.CONFIRMED).size();
 		if (pendingTransactions > 0 || confirmedTransactions > 0) {
-			errors.reject("entry.has.pending.or.confirmed.transactions");
+			this.errors.reject("entry.has.pending.or.confirmed.transactions");
 		}
 
 		if (this.errors.hasErrors()) {
@@ -90,7 +90,7 @@ public class StudyEntryValidator {
 		final Optional<StudyEntryPropertyData> studyEntryPropertyData =
 			this.middlewareStudyEntryService.getStudyEntryPropertyData(studyEntryPropertyDataId);
 		if (!studyEntryPropertyData.isPresent()) {
-			errors.reject("invalid.study.entry.property.data.id");
+			this.errors.reject("invalid.study.entry.property.data.id");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
