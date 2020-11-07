@@ -7,6 +7,9 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -18,6 +21,7 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,9 +29,11 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public abstract class AbstractDatasetExportService {
@@ -62,6 +68,9 @@ public abstract class AbstractDatasetExportService {
 	@Resource
 	protected DatasetTypeService datasetTypeService;
 
+	@Autowired
+	private LotService lotService;
+
 	private ZipUtil zipUtil = new ZipUtil();
 
 	protected void validate(final int studyId, final int datasetId, final Set<Integer> instanceIds) {
@@ -79,6 +88,14 @@ public abstract class AbstractDatasetExportService {
 
 		// Get all variables for the dataset
 		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId());
+		if (dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+			lotsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
+			if (this.lotService.countSearchLots(lotsSearchDto) > 0) {
+				this.addStockIdColumn(columns);
+			}
+		}
+
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = this.getSelectedDatasetInstancesMap(
 			dataSet.getInstances(),
 			instanceIds);
@@ -182,6 +199,12 @@ public abstract class AbstractDatasetExportService {
 		return columns;
 	}
 
+	protected void addStockIdColumn(final List<MeasurementVariable> plotDataSetColumns) {
+		final Optional<MeasurementVariable>
+			designationColumn = plotDataSetColumns.stream().filter(measurementVariable -> measurementVariable.getName().equals("DESIGNATION")).findFirst();
+		plotDataSetColumns.add(plotDataSetColumns.indexOf(designationColumn.get()) + 1, buildStockIdColumn());
+	}
+
 	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
 
 	protected abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(
@@ -190,4 +213,16 @@ public abstract class AbstractDatasetExportService {
 	void setZipUtil(final ZipUtil zipUtil) {
 		this.zipUtil = zipUtil;
 	}
+
+	private MeasurementVariable buildStockIdColumn() {
+		final MeasurementVariable stockIdColumn = new MeasurementVariable();
+		// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
+		stockIdColumn.setName(TermId.STOCK_ID.name());
+		stockIdColumn.setAlias(TermId.STOCK_ID.name());
+		stockIdColumn.setTermId(TermId.STOCK_ID.getId());
+		stockIdColumn.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
+		stockIdColumn.setFactor(true);
+		return stockIdColumn;
+	}
+
 }
