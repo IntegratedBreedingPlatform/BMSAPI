@@ -30,6 +30,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.ibp.api.Util;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -167,25 +168,27 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		int currentColNum = 0;
 
 		for (final MeasurementVariable column : columns) {
-			final ObservationUnitData observationUnitData = dataRow.getVariables().get(column.getName());
+			final ObservationUnitData observationUnitData = Util.getObservationUnitData(dataRow.getVariables(), column);
 
-			final String dataCell = observationUnitData.getValue();
-			final HSSFCell cell = row.createCell(currentColNum++);
-			if (dataCell != null) {
-				if (column.getPossibleValues() != null && !column.getPossibleValues()
-					.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
-					&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
-					.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
-					cell.setCellValue(DatasetExcelGenerator.getCategoricalCellValue(dataCell, column.getPossibleValues()));
-				} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
-					if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
-						cell.setCellType(CellType.BLANK);
-						cell.setCellType(CellType.NUMERIC);
-						cell.setCellValue(Double.valueOf(dataCell));
+			if (!Util.isNullOrEmpty(observationUnitData)) {
+				final String dataCell = observationUnitData.getValue();
+				final HSSFCell cell = row.createCell(currentColNum++);
+				if (dataCell != null) {
+					if (column.getPossibleValues() != null && !column.getPossibleValues()
+						.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
+						&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
+						.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
+						cell.setCellValue(DatasetExcelGenerator.getCategoricalCellValue(dataCell, column.getPossibleValues()));
+					} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
+						if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
+							cell.setCellType(CellType.BLANK);
+							cell.setCellType(CellType.NUMERIC);
+							cell.setCellValue(Double.valueOf(dataCell));
+						}
+					} else {
+						cell.setCellType(CellType.STRING);
+						cell.setCellValue(dataCell);
 					}
-				} else {
-					cell.setCellType(CellType.STRING);
-					cell.setCellValue(dataCell);
 				}
 			}
 		}
