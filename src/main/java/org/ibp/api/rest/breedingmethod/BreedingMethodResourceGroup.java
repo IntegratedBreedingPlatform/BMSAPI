@@ -75,7 +75,8 @@ public class BreedingMethodResourceGroup {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam final boolean favoriteMethods
 	) {
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, programUUID,
+		//TODO we can expose breeding method codes as filters
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, programUUID, null,
 			favoriteMethods);
 		return new ResponseEntity<>(breedingMethods, HttpStatus.OK);
 	}
