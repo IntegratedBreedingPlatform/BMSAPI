@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -21,7 +21,7 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
-import org.ibp.api.java.inventory.manager.LotService;
+import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -69,7 +69,7 @@ public abstract class AbstractDatasetExportService {
 	protected DatasetTypeService datasetTypeService;
 
 	@Autowired
-	private LotService lotService;
+	private TransactionService transactionService;
 
 	private ZipUtil zipUtil = new ZipUtil();
 
@@ -89,9 +89,10 @@ public abstract class AbstractDatasetExportService {
 		// Get all variables for the dataset
 		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId());
 		if (dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
-			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-			lotsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
-			if (this.lotService.countSearchLots(lotsSearchDto) > 0) {
+			final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+			transactionsSearchDto.setTransactionStatus(Arrays.asList(0,1));
+			transactionsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
+			if (this.transactionService.countSearchTransactions(transactionsSearchDto) > 0) {
 				this.addStockIdColumn(columns);
 			}
 		}
