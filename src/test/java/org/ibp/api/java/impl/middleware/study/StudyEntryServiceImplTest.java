@@ -209,13 +209,24 @@ public class StudyEntryServiceImplTest {
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetId(datasetId);
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
+
+		final List<StudyEntryDto> entryDtos = new ArrayList<>();
+		for (final GermplasmListData gData : listData) {
+			final StudyEntryDto entryDto = new StudyEntryDto();
+			entryDto.setGid(gData.getGid());
+			entryDto.setEntryCode(gData.getEntryCode());
+			entryDto.setEntryId(gData.getEntryId());
+			entryDtos.add(entryDto);
+		}
 		final List<DatasetDTO> datasetDTOS = Collections.singletonList(datasetDTO);
 		Mockito.when(this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
 			.thenReturn(datasetDTOS);
+		Mockito.when(this.middlewareStudyEntryService.saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList())).thenReturn(entryDtos);
 
 		try {
 			final List<StudyEntryDto> studyEntryDtos = this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 			Assert.notNull(studyEntryDtos, "Duplicate gid in list should be accepted. ");
+			org.junit.Assert.assertEquals("Must return same germplasm list data count", listData.size(),studyEntryDtos.size());
 		} catch (final Exception e) {
 			Assert.isNull(e, "Duplicate gid in list should be accepted, no exception");
 		}
