@@ -202,7 +202,8 @@ public abstract class AbstractDatasetExportService {
 
 	protected void addStockIdColumn(final List<MeasurementVariable> plotDataSetColumns) {
 		final Optional<MeasurementVariable>
-			designationColumn = plotDataSetColumns.stream().filter(measurementVariable -> measurementVariable.getName().equals("DESIGNATION")).findFirst();
+			designationColumn = plotDataSetColumns.stream().filter(measurementVariable ->
+			measurementVariable.getTermId() == TermId.DESIG.getId()).findFirst();
 		plotDataSetColumns.add(plotDataSetColumns.indexOf(designationColumn.get()) + 1, buildStockIdColumn());
 	}
 
