@@ -42,18 +42,18 @@ public class InventoryCommonValidatorTest {
 
 	@Before
 	public void setUp() {
-		variableDetails = this.buildVariableDetails();
-		variableFilter = new VariableFilter();
-		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		Mockito.when(variableService.getVariablesByFilter(variableFilter)).thenReturn(variableDetails);
+		this.variableDetails = this.buildVariableDetails();
+		this.variableFilter = new VariableFilter();
+		this.variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+		Mockito.when(this.variableService.getVariablesByFilter(this.variableFilter)).thenReturn(this.variableDetails);
 	}
 
 	@Test
 	public void test_validateLotNotes_throwsException() {
 		try {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-			this.inventoryCommonValidator.validateLotNotes(RandomStringUtils.randomAlphanumeric(256), errors);
-		} catch (ApiRequestValidationException e) {
+			this.inventoryCommonValidator.validateLotNotes(RandomStringUtils.randomAlphanumeric(256), this.errors);
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.notes.length"));
 		}
 	}
@@ -62,8 +62,8 @@ public class InventoryCommonValidatorTest {
 	public void test_validateTransactionNotes_throwsException() {
 		try {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-			this.inventoryCommonValidator.validateTransactionNotes(RandomStringUtils.randomAlphanumeric(256), errors);
-		} catch (ApiRequestValidationException e) {
+			this.inventoryCommonValidator.validateTransactionNotes(RandomStringUtils.randomAlphanumeric(256), this.errors);
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("transaction.notes.length"));
 		}
 	}
@@ -72,8 +72,8 @@ public class InventoryCommonValidatorTest {
 	public void test_validateStockIdPrefix_throwsInvalidLengthException() {
 		try {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-			this.inventoryCommonValidator.validateStockIdPrefix(RandomStringUtils.randomAlphanumeric(256), errors);
-		} catch (ApiRequestValidationException e) {
+			this.inventoryCommonValidator.validateStockIdPrefix(RandomStringUtils.randomAlphanumeric(256), this.errors);
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.stock.prefix.invalid.length"));
 		}
 	}
@@ -83,8 +83,8 @@ public class InventoryCommonValidatorTest {
 		try {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 			this.inventoryCommonValidator
-				.validateStockIdPrefix(RandomStringUtils.randomAlphanumeric(14) + RandomStringUtils.randomNumeric(1), errors);
-		} catch (ApiRequestValidationException e) {
+				.validateStockIdPrefix(RandomStringUtils.randomAlphanumeric(14) + RandomStringUtils.randomNumeric(1), this.errors);
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.stock.prefix.invalid.pattern"));
 		}
 	}
@@ -93,20 +93,9 @@ public class InventoryCommonValidatorTest {
 	public void test_validateUnitNames_throwsException() {
 		try {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-			this.inventoryCommonValidator.validateUnitNames(Collections.singletonList("pounds"), errors);
-		} catch (ApiRequestValidationException e) {
+			this.inventoryCommonValidator.validateUnitNames(Collections.singletonList("pounds"), this.errors);
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.invalid.units"));
-		}
-	}
-
-	@Test
-	public void test_validateSearchCompositeDto_throwsException() {
-		try {
-			final SearchCompositeDto<Integer, Integer> searchCompositeDto = new SearchCompositeDto<>();
-			this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-			this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
-		} catch (ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("search.composite.invalid"));
 		}
 	}
 
@@ -114,8 +103,8 @@ public class InventoryCommonValidatorTest {
 	public void test_validateLotNotesLists_throwsException() {
 		try {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-			this.inventoryCommonValidator.validateLotNotes(Collections.singletonList(""), errors);
-		} catch (ApiRequestValidationException e) {
+			this.inventoryCommonValidator.validateLotNotes(Collections.singletonList(""), this.errors);
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.notes.null.or.empty"));
 		}
 	}

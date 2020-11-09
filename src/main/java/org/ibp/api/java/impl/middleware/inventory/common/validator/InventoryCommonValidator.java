@@ -24,9 +24,9 @@ public class InventoryCommonValidator {
 
 	private static final String STOCK_ID_PREFIX_REGEXP = "[a-zA-Z0-9]{1,14}[a-zA-Z]";
 
-	private static Integer TRANSACTION_NOTES_MAX_LENGTH = 255;
+	private static final Integer TRANSACTION_NOTES_MAX_LENGTH = 255;
 
-	private static Integer LOT_NOTES_MAX_LENGTH = 255;
+	private static final Integer LOT_NOTES_MAX_LENGTH = 255;
 
 	@Autowired
 	private VariableService variableService;
@@ -39,18 +39,6 @@ public class InventoryCommonValidator {
 
 		if (!StringUtils.isEmpty(stockIdPrefix) && !stockIdPrefix.matches(STOCK_ID_PREFIX_REGEXP)) {
 			errors.reject("lot.stock.prefix.invalid.pattern", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-	}
-
-	//TODO: Needs to be moved to a BMS common validator, it is not not exclusive to Inventory
-	public void validateSearchCompositeDto(
-		final SearchCompositeDto searchCompositeDto,
-		final BindingResult errors) {
-
-		// Validate that searchId or list of elements are provided
-		if (searchCompositeDto == null || !searchCompositeDto.isValid()) {
-			errors.reject("search.composite.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}

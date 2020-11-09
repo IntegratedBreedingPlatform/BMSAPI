@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -38,15 +39,16 @@ import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
-import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -75,6 +77,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -130,7 +134,10 @@ public class DatasetServiceImpl implements DatasetService {
 	private StudyTransactionsService studyTransactionsService;
 
 	@Autowired
-	private InventoryCommonValidator inventoryCommonValidator;
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
+
+	@Autowired
+	private LotService lotService;
 
 	static final String PLOT_DATASET_NAME = "Observations";
 
@@ -142,7 +149,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.datasetValidator.validateDataset(studyId, datasetId);
 
-		return this.middlewareDatasetService.getObservationSetColumns(datasetId, draftMode);
+		return this.middlewareDatasetService.getObservationSetColumns(studyId, datasetId, draftMode);
 	}
 
 	@Override
@@ -351,11 +358,10 @@ public class DatasetServiceImpl implements DatasetService {
 				// Convert the sort property name from termid to actual term name.
 				final Sort.Order sort = iterator.next();
 				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
-				if (term != null) {
-					pageable.getSort().and(new Sort(sort.getDirection(), term.getName()));
-					convertedPageable =
-						new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(), term.getName());
-				}
+				final String sortProperty = Objects.isNull(term) ? sort.getProperty() : term.getName();
+				pageable.getSort().and(new Sort(sort.getDirection(), sortProperty));
+				convertedPageable =
+					new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(), sortProperty);
 			}
 		}
 
@@ -881,7 +887,7 @@ public class DatasetServiceImpl implements DatasetService {
 		BaseValidator.checkNotNull(request.getEntryId(), "param.null", new String[] {"entryId"});
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		this.inventoryCommonValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
 
 		this.studyValidator.validateStudyContainsEntry(studyId, request.getEntryId());
 
@@ -925,7 +931,7 @@ public class DatasetServiceImpl implements DatasetService {
 		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), SearchCompositeDto.class.getName());
-		this.inventoryCommonValidator.validateSearchCompositeDto(request, errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(request, errors);
 
 
 		this.processSearchComposite(request);
