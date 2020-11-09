@@ -107,7 +107,7 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(movedFolderId, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Delete germplasm list folder", notes = "Delete germplasm sample list folder.")
+	@ApiOperation(value = "Delete germplasm list folder", notes = "Delete germplasm list folder.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.DELETE)
 	@ResponseBody
