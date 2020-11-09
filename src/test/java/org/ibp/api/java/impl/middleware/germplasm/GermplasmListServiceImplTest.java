@@ -706,7 +706,7 @@ public class GermplasmListServiceImplTest {
 			fail("Should has failed");
 		} catch (Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.has.child"));
+			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.move.folder.has.child"));
 		}
 
 		Mockito.verify(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
@@ -794,7 +794,152 @@ public class GermplasmListServiceImplTest {
 
 	@Test
 	public void shouldDeleteGermplamsListFolder() {
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
 
+		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.isFolder()).thenReturn(true);
+		Mockito.when(actualFolder.getUserId()).thenReturn(USER_ID);
+
+		Mockito.doNothing().when(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(folderId))
+			.thenReturn(Optional.of(actualFolder));
+
+		Mockito.when(this.germplasmListManager.getGermplasmListByParentFolderId(folderId, PROGRAM_UUID)).thenReturn(new ArrayList<>());
+
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(new WorkbenchUser(USER_ID));
+		Mockito.doNothing().when(this.germplasmListServiceMiddleware).deleteGermplasmListFolder(folderId);
+
+		this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId));
+
+		Mockito.verify(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.verify(this.germplasmListServiceMiddleware, new Times(2)).getGermplasmListById(folderId);
+		Mockito.verify(this.germplasmListManager).getGermplasmListByParentFolderId(folderId, PROGRAM_UUID);
+		Mockito.verify(this.germplasmListServiceMiddleware).deleteGermplasmListFolder(folderId);
+		Mockito.verify(this.securityService).getCurrentlyLoggedInUser();
+
+		Mockito.verifyNoMoreInteractions(this.programValidator);
+		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
+		Mockito.verifyNoMoreInteractions(this.germplasmListManager);
+		Mockito.verifyNoMoreInteractions(this.securityService);
+	}
+
+	@Test
+	public void shouldFailDeleteGermplamsListFolderWithNullFolderId() {
+
+		try {
+			this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, null);
+			fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.invalid"));
+		}
+
+		Mockito.verifyZeroInteractions(this.programValidator);
+		Mockito.verifyZeroInteractions(this.germplasmListServiceMiddleware);
+		Mockito.verifyZeroInteractions(this.germplasmListManager);
+		Mockito.verifyZeroInteractions(this.securityService);
+	}
+
+	@Test
+	public void shouldFailDeleteGermplamsListFolderIfNotFolder() {
+
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.isFolder()).thenReturn(false);
+
+		Mockito.doNothing().when(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(folderId))
+			.thenReturn(Optional.of(actualFolder));
+
+		try {
+			this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId));
+			fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.delete.not.folder"));
+		}
+
+		Mockito.verify(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.verify(this.germplasmListServiceMiddleware, new Times(2)).getGermplasmListById(folderId);
+
+		Mockito.verifyNoMoreInteractions(this.programValidator);
+		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
+		Mockito.verifyNoMoreInteractions(this.germplasmListManager);
+
+		Mockito.verifyZeroInteractions(this.securityService);
+	}
+
+	@Test
+	public void shouldFailDeleteGermplamsListFolderIfFolderHasChildren() {
+
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.isFolder()).thenReturn(true);
+
+		Mockito.doNothing().when(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(folderId))
+			.thenReturn(Optional.of(actualFolder));
+
+		Mockito.when(this.germplasmListManager.getGermplasmListByParentFolderId(folderId, PROGRAM_UUID))
+			.thenReturn(Arrays.asList(Mockito.mock(GermplasmList.class)));
+
+		try {
+			this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId));
+			fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.delete.folder.has.child"));
+		}
+
+		Mockito.verify(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.verify(this.germplasmListServiceMiddleware, new Times(2)).getGermplasmListById(folderId);
+		Mockito.verify(this.germplasmListManager).getGermplasmListByParentFolderId(folderId, PROGRAM_UUID);
+
+		Mockito.verifyNoMoreInteractions(this.programValidator);
+		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
+		Mockito.verifyNoMoreInteractions(this.germplasmListManager);
+
+		Mockito.verifyZeroInteractions(this.securityService);
+	}
+
+	@Test
+	public void shouldFailDeleteGermplamsListFolderIfUserIsNotTheOwner() {
+
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.isFolder()).thenReturn(true);
+		Mockito.when(actualFolder.getUserId()).thenReturn(USER_ID + 1);
+
+		Mockito.doNothing().when(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(folderId))
+			.thenReturn(Optional.of(actualFolder));
+
+		Mockito.when(this.germplasmListManager.getGermplasmListByParentFolderId(folderId, PROGRAM_UUID))
+			.thenReturn(new ArrayList<>());
+
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(new WorkbenchUser(USER_ID));
+
+		try {
+			this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId));
+			fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.delete.not.owner"));
+		}
+
+		Mockito.verify(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.verify(this.germplasmListServiceMiddleware, new Times(2)).getGermplasmListById(folderId);
+		Mockito.verify(this.germplasmListManager).getGermplasmListByParentFolderId(folderId, PROGRAM_UUID);
+		Mockito.verify(this.securityService).getCurrentlyLoggedInUser();
+
+		Mockito.verifyNoMoreInteractions(this.programValidator);
+		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
+		Mockito.verifyNoMoreInteractions(this.germplasmListManager);
+
+		Mockito.verifyZeroInteractions(this.securityService);
 	}
 
 	private GermplasmListGeneratorDTO createGermplasmList() {

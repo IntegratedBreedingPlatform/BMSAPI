@@ -119,7 +119,7 @@ public class GermplasmListResourceGroup {
 		@PathVariable final String crop,
 		@PathVariable final String folderId,
 		@RequestParam(required = false) final String programUUID) {
-		this.germplamListService.deleteGermplamsListFolder(crop, programUUID, folderId);
+		this.germplamListService.deleteGermplasmListFolder(crop, programUUID, folderId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

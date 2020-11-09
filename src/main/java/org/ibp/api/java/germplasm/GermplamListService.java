@@ -23,6 +23,6 @@ public interface GermplamListService {
 
 	Integer moveGermplasmListFolder(String cropName, String programUUID, String folderId, String newParentFolderId, boolean isCropList);
 
-	void deleteGermplamsListFolder(String cropName, String programUUID, String folderId);
+	void deleteGermplasmListFolder(String cropName, String programUUID, String folderId);
 
 }

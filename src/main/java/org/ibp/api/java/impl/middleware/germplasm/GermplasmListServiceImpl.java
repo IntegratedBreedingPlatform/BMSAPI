@@ -416,7 +416,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 			});
 
 		if(this.isSourceItemHasChildren(Integer.parseInt(folderId), programUUID)) {
-			this.errors.reject("list.folder.has.child", "");
+			this.errors.reject("list.move.folder.has.child", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
@@ -446,7 +446,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 	}
 
 	@Override
-	public void deleteGermplamsListFolder(final String cropName, final String programUUID, final String folderId) {
+	public void deleteGermplasmListFolder(final String cropName, final String programUUID, final String folderId) {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
@@ -470,7 +470,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 		}
 
 		if(this.isSourceItemHasChildren(Integer.parseInt(folderId), programUUID)) {
-			this.errors.reject("list.folder.has.child", "");
+			this.errors.reject("list.delete.folder.has.child", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
