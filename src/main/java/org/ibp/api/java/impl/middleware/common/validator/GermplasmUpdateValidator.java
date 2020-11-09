@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-// TODO: Possibly merge this to GermplasmImportRequestDtoValidator
 public class GermplasmUpdateValidator {
 
 	@Autowired
@@ -47,7 +47,6 @@ public class GermplasmUpdateValidator {
 
 	public void validateCodes(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
-		// TODO: Validate all codes from dto list not just from the first item.
 		final Set<String> attributesAndNamesCodes = new HashSet<>(germplasmUpdateDTOList.get(0).getData().keySet());
 
 		final Set<String> attributeCodes =
@@ -103,36 +102,40 @@ public class GermplasmUpdateValidator {
 
 	}
 
-	public void validateLocationAbbreviation(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public void validateLocationAbbreviation(final BindingResult errors, final String programUUID,
+		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
-		final Set<String> locationAbbreviationSet =
+		final Set<String> locationAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getLocationAbbreviation()))
 				.map(dto -> dto.getLocationAbbreviation()).collect(Collectors.toSet());
 		final List<String> abbreviations =
-			this.locationDataManager.getLocationsByAbbreviation(locationAbbreviationSet).stream().map(loc -> loc.getLabbr()).collect(
+			this.locationDataManager.getFilteredLocations(programUUID, null, null, new ArrayList<>(locationAbbrs), false).stream()
+				.map(Location::getLabbr).collect(
 				Collectors.toList());
 
-		locationAbbreviationSet.removeAll(abbreviations);
+		locationAbbrs.removeAll(abbreviations);
 
-		if (!locationAbbreviationSet.isEmpty()) {
-			errors.reject("germplasm.update.invalid.location.abbreviation", new String[] {String.join(",", locationAbbreviationSet)}, "");
+		if (!locationAbbrs.isEmpty()) {
+			errors.reject("germplasm.update.invalid.location.abbreviation", new String[] {String.join(",", locationAbbrs)}, "");
 		}
 
 	}
 
-	public void validateBreedingMethod(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public void validateBreedingMethod(final BindingResult errors, final String programUUID,
+		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
-		final Set<String> breedingMethodCodes =
+		final Set<String> breedingMethodsAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethod()))
 				.map(dto -> dto.getBreedingMethod()).collect(Collectors.toSet());
 		final List<String> codes =
-			this.breedingMethodService.getBreedingMethodsByCodes(breedingMethodCodes).stream().map(loc -> loc.getCode()).collect(
-				Collectors.toList());
+			this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false).stream().map(loc -> loc.getCode())
+				.collect(
+					Collectors.toList());
 
-		breedingMethodCodes.removeAll(codes);
+		breedingMethodsAbbrs.removeAll(codes);
 
-		if (!breedingMethodCodes.isEmpty()) {
-			errors.reject("germplasm.update.invalid.breeding.method", new String[] {String.join(",", breedingMethodCodes)}, "");
+		if (!breedingMethodsAbbrs.isEmpty()) {
+			errors.reject("germplasm.update.invalid.breeding.method", new String[] {String.join(",", breedingMethodsAbbrs)}, "");
 		}
 
 	}

@@ -133,18 +133,6 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.searchAttributes(query), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Import germplasm updates")
-	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PATCH)
-	@ResponseBody
-	// TODO: Reuse GermplasmDto from IBP-4097
-	public ResponseEntity<Void> importGermplasmUpdates(@PathVariable final String cropName,
-		@RequestBody final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
-
-		this.germplasmService.importGermplasmUpdates(germplasmUpdateDTOList);
-
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
-
 	@ApiOperation(value = "Returns germplasm name types filtered by a list of codes", notes = "Returns germplasm name types filtered by a list of codes")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/name-types", method = RequestMethod.GET)
 	@ResponseBody
@@ -193,6 +181,18 @@ public class GermplasmResource {
 		@RequestBody final GermplasmImportRequestDto germplasmImportRequestDto) {
 
 		return new ResponseEntity<>(this.germplasmService.importGermplasm(cropName, programUUID, germplasmImportRequestDto), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Import germplasm updates")
+	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PATCH)
+	@ResponseBody
+	public ResponseEntity<Void> importGermplasmUpdates(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+
+		this.germplasmService.importGermplasmUpdates(programUUID, germplasmUpdateDTOList);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }
