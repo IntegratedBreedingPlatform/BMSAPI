@@ -110,7 +110,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		for(final StudyEntryDto studyEntryDto: studyEntryDtoList) {
 			studyEntryDto.setProperties(
-				StudyEntryPropertiesMapper.map(germplasmListDataMap.get(studyEntryDto.getGid()), germplasmDescriptorIds));
+				StudyEntryPropertiesMapper.map(germplasmListDataMap.get(studyEntryDto.getEntryId()), germplasmDescriptorIds));
 		}
 
 		return this.middlewareStudyEntryService.saveStudyEntries(studyId, studyEntryDtoList);
