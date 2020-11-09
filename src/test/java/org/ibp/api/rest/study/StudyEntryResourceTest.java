@@ -73,8 +73,8 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(studyEntries).when(this.studyEntryService).createStudyEntries(studyId, listId);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation/{listId}",
-				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, listId)
+			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation?listId=" + listId,
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())

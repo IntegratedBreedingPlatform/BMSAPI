@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -68,11 +69,11 @@ public class StudyEntryResource {
 
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list id",
 		notes = "Create germplasm entries in study based on the specified germplasm list id ")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation/{listId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
-		@PathVariable final Integer listId) {
+		@RequestParam(value = "listId", required = true) final Integer listId) {
 		return new ResponseEntity<>(
 			this.studyEntryService.createStudyEntries(studyId, listId),
 			HttpStatus.OK);
