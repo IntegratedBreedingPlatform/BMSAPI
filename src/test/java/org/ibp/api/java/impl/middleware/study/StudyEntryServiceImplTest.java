@@ -43,6 +43,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -298,6 +299,82 @@ public class StudyEntryServiceImplTest {
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_UNIT.getId()), IsIn.in(results));
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_AVAILABLE_BALANCE.getId()), IsIn.in(results));
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_ACTIVE_LOTS_COUNT.getId()), IsIn.in(results));
+	}
+
+	@Test
+	public void testCreateStudyGermplasmListDuplicateEntries() {
+
+		final GermplasmList germplasmList = new GermplasmList();
+		final List<GermplasmListData> listData = this.duplicateListData();
+		germplasmList.setListData(listData);
+
+		final Integer studyId = this.random.nextInt();
+		final Integer germplasmListId = this.random.nextInt();
+
+		Mockito.when(this.germplasmListService.getGermplasmList(germplasmListId)).thenReturn(germplasmList);
+
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setDatasetId(datasetId);
+		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
+
+		final List<StudyEntryDto> entryDtos = new ArrayList<>();
+		for (final GermplasmListData gData : listData) {
+			final StudyEntryDto entryDto = new StudyEntryDto();
+			entryDto.setGid(gData.getGid());
+			entryDto.setEntryCode(gData.getEntryCode());
+			entryDto.setEntryId(gData.getEntryId());
+			entryDtos.add(entryDto);
+		}
+		final List<DatasetDTO> datasetDTOS = Collections.singletonList(datasetDTO);
+		Mockito.when(this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
+			.thenReturn(datasetDTOS);
+		Mockito.when(this.middlewareStudyEntryService.saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList())).thenReturn(entryDtos);
+
+		try {
+			final List<StudyEntryDto> studyEntryDtos = this.studyEntryService.createStudyEntries(studyId, germplasmListId);
+			Assert.assertNotNull("Duplicate gid in list should be accepted. ", studyEntryDtos);
+			org.junit.Assert.assertEquals("Must return same germplasm list data count", listData.size(),studyEntryDtos.size());
+		} catch (final Exception e) {
+			org.junit.Assert.fail("Duplicate gid in list should be accepted, no exception");
+		}
+
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
+	}
+
+	private List<GermplasmListData> duplicateListData() {
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+
+		final GermplasmListData data1 = new GermplasmListData();
+		data1.setGermplasm(germplasm);
+		data1.setGid(germplasm.getGid());
+		data1.setEntryId(this.randomEntryId());
+		data1.setEntryCode(StringUtils.randomAlphanumeric(3));
+
+		final GermplasmListData data2 = new GermplasmListData();
+		data2.setGermplasm(germplasm);
+		data2.setGid(germplasm.getGid());
+		data2.setEntryId(this.randomEntryId());
+		data2.setEntryCode(StringUtils.randomAlphanumeric(3));
+
+		final List<GermplasmListData> listData = new ArrayList<>();
+		listData.add(data1);
+		listData.add(data2);
+		return listData;
+	}
+
+	private int randomEntryId() {
+		int entryId;
+		try {
+			final double random = Math.random() * 100;
+			entryId = (int) random;
+		} catch (final Exception e) {
+			entryId = 1;
+		}
+		return entryId;
 	}
 
 }

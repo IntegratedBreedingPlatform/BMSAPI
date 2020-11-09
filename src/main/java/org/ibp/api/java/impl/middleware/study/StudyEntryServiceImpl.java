@@ -159,13 +159,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyEntryDto.class)).collect(Collectors.toList());
 
 		final Map<Integer, GermplasmListData> germplasmListDataMap =
-			germplasmList.getListData().stream().collect(Collectors.toMap(GermplasmListData::getGermplasmId, g -> g));
+			germplasmList.getListData().stream().collect(Collectors.toMap(GermplasmListData::getEntryId, g -> g));
 		final List<Integer> germplasmDescriptorIds = this.getEntryDescriptorColumns(studyId).stream()
 			.map(measurementVariable -> measurementVariable.getTermId()).collect(Collectors.toList());
 
 		for(final StudyEntryDto studyEntryDto: studyEntryDtoList) {
 			studyEntryDto.setProperties(
-				StudyEntryPropertiesMapper.map(germplasmListDataMap.get(studyEntryDto.getGid()), germplasmDescriptorIds));
+				StudyEntryPropertiesMapper.map(germplasmListDataMap.get(studyEntryDto.getEntryId()), germplasmDescriptorIds));
 		}
 
 		return this.middlewareStudyEntryService.saveStudyEntries(studyId, studyEntryDtoList);
