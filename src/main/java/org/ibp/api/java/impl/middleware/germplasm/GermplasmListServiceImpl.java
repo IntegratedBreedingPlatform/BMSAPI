@@ -474,6 +474,12 @@ public class GermplasmListServiceImpl implements GermplamListService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
+		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
+		if (!folder.getUserId().equals(createdBy.getUserid())) {
+			this.errors.reject("list.delete.not.owner", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
 		this.germplasmListService.deleteGermplasmListFolder(Integer.parseInt(folderId));
 	}
 
