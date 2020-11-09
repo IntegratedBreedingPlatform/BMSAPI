@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
-import org.generationcp.middleware.domain.study.StudyEntryListGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -67,16 +66,15 @@ public class StudyEntryResource {
 			HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list",
-		notes = "Create germplasm entries in study based on the specified germplasm list")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation-list", method = RequestMethod.POST)
+	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list id",
+		notes = "Create germplasm entries in study based on the specified germplasm list id ")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation-list/{listId}", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
-		@ApiParam("Study Entry template for batch generation.")
-		@RequestBody final StudyEntryListGeneratorRequestDto studyEntryListGeneratorRequestDto) {
+		@PathVariable final Integer listId) {
 		return new ResponseEntity<>(
-			this.studyEntryService.createStudyEntries(studyId, studyEntryListGeneratorRequestDto.getListId()),
+			this.studyEntryService.createStudyEntries(studyId, listId),
 			HttpStatus.OK);
 	}
 
