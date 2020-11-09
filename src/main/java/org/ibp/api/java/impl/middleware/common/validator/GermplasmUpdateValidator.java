@@ -32,6 +32,9 @@ public class GermplasmUpdateValidator {
 	private GermplasmService germplasmService;
 
 	@Autowired
+	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmMiddlewareService;
+
+	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
 	@Autowired
@@ -95,7 +98,7 @@ public class GermplasmUpdateValidator {
 					Objects::nonNull).collect(Collectors.toSet());
 
 		final List<Germplasm> germplasmByGIDs = this.germplasmDataManager.getGermplasms(new ArrayList<>(gids));
-		final List<Germplasm> germplasmByUUIDs = this.germplasmDataManager.getGermplasmByUUIDs(germplasmUUIDs);
+		final List<Germplasm> germplasmByUUIDs = this.germplasmMiddlewareService.getGermplasmByGUIDs(new ArrayList<>(germplasmUUIDs));
 
 		gids.removeAll(germplasmByGIDs.stream().map(dto -> dto.getGid()).collect(Collectors.toSet()));
 		germplasmUUIDs.removeAll(germplasmByUUIDs.stream().map(dto -> dto.getGermplasmUUID()).collect(Collectors.toSet()));
