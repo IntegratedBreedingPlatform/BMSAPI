@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import com.google.common.collect.ImmutableSet;
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
@@ -11,6 +12,8 @@ import org.generationcp.middleware.api.germplasm.update.GermplasmUpdateService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
@@ -28,6 +31,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -45,6 +49,8 @@ import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -108,6 +114,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private AttributeService attributeService;
+
+	@Autowired
+	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmService;
+
+	@Autowired
+	private SecurityService securityService;
+
+	@Autowired
+	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -186,62 +201,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.germplasmSearchService.countSearchGermplasm(germplasmSearchRequest, programUUID);
 	}
 
-	/*
-	 * TODO
-	 *  - Remove
-	 *  - GermplasmSearchResponse replaces GermplasmSummary
-	 *  - find a substitute to use in getGermplasm(), which is used only for validation now
-	 */
-	@Deprecated
-	private GermplasmSummary populateGermplasmSummary(final Germplasm germplasm) throws MiddlewareQueryException {
-		if (germplasm == null) {
-			return null;
-		}
-		final GermplasmSummary summary = new GermplasmSummary();
-		summary.setGermplasmId(germplasm.getGid().toString());
-		summary.setParent1Id(germplasm.getGpid1() != null && germplasm.getGpid1() != 0 ? germplasm.getGpid1().toString() : "Unknown");
-		summary.setParent2Id(germplasm.getGpid2() != null && germplasm.getGpid2() != 0 ? germplasm.getGpid2().toString() : "Unknown");
-
-		summary.setPedigreeString(this.pedigreeService.getCrossExpansion(germplasm.getGid(), this.crossExpansionProperties));
-
-		// FIXME - select in a loop ... Middleware service should handle all this in main query.
-		final List<Name> namesByGID = this.germplasmDataManager.getNamesByGID(new Integer(germplasm.getGid()), null, null);
-		final List<GermplasmName> names = new ArrayList<GermplasmName>();
-		for (final Name gpName : namesByGID) {
-			final GermplasmName germplasmName = new GermplasmName();
-			germplasmName.setName(gpName.getNval());
-			final UserDefinedField nameType = this.germplasmDataManager.getUserDefinedFieldByID(gpName.getTypeId());
-			if (nameType != null) {
-				germplasmName.setNameTypeCode(nameType.getFcode());
-				germplasmName.setNameTypeDescription(nameType.getFname());
-			}
-			names.add(germplasmName);
-		}
-		summary.addNames(names);
-
-		final Method germplasmMethod = this.germplasmDataManager.getMethodByID(germplasm.getMethodId());
-		if (germplasmMethod != null && germplasmMethod.getMname() != null) {
-			summary.setBreedingMethod(germplasmMethod.getMname());
-		}
-
-		final Location germplasmLocation = this.locationDataManger.getLocationByID(germplasm.getLocationId());
-		if (germplasmLocation != null && germplasmLocation.getLname() != null) {
-			summary.setLocation(germplasmLocation.getLname());
-		}
-		return summary;
-	}
-
-	@Override
-	public GermplasmSummary getGermplasm(final String germplasmId) {
-		final Germplasm germplasm;
-		try {
-			germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
-			return this.populateGermplasmSummary(germplasm);
-		} catch (final NumberFormatException | MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
-		}
-	}
-
 	@Override
 	public List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(final String query) {
 		return this.attributeService.searchAttributes(query);
@@ -270,69 +229,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new ApiRuntimeException("An error has occurred when trying to get the progeny", e);
 		}
 		return progenyDTO;
-	}
-
-	// TODO delete. See populateGermplasmSummary
-	@Override
-	public PedigreeTree getPedigreeTree(final String germplasmId, Integer levels) {
-
-		if (levels == null) {
-			levels = DEFAULT_PEDIGREE_LEVELS;
-		}
-		final GermplasmPedigreeTree mwTree = this.pedigreeDataManager.generatePedigreeTree(Integer.valueOf(germplasmId), levels);
-
-		final PedigreeTree pedigreeTree = new PedigreeTree();
-		pedigreeTree.setRoot(this.traversePopulate(mwTree.getRoot()));
-
-		return pedigreeTree;
-	}
-
-	// TODO delete. See populateGermplasmSummary
-	@Override
-	public DescendantTree getDescendantTree(final String germplasmId) {
-		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
-		final GermplasmPedigreeTree mwTree = this.germplasmGroupingService.getDescendantTree(germplasm);
-
-		final DescendantTree descendantTree = new DescendantTree();
-		descendantTree.setRoot(this.traversePopulateDescendatTree(mwTree.getRoot()));
-
-		return descendantTree;
-	}
-
-	// TODO delete. See populateGermplasmSummary
-	private DescendantTreeTreeNode traversePopulateDescendatTree(final GermplasmPedigreeTreeNode mwTreeNode) {
-		final DescendantTreeTreeNode treeNode = new DescendantTreeTreeNode();
-		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid());
-		treeNode.setProgenitors(mwTreeNode.getGermplasm().getGnpgs());
-		treeNode.setMethodId(mwTreeNode.getGermplasm().getMethodId());
-		treeNode.setParent1Id(mwTreeNode.getGermplasm().getGpid1());
-		treeNode.setParent2Id(mwTreeNode.getGermplasm().getGpid2());
-		treeNode.setManagementGroupId(mwTreeNode.getGermplasm().getMgid());
-
-		final Name preferredName = mwTreeNode.getGermplasm().findPreferredName();
-		treeNode.setName(preferredName != null ? preferredName.getNval() : null);
-
-		final List<DescendantTreeTreeNode> nodeChildren = new ArrayList<>();
-		for (final GermplasmPedigreeTreeNode mwChild : mwTreeNode.getLinkedNodes()) {
-			nodeChildren.add(this.traversePopulateDescendatTree(mwChild));
-		}
-		treeNode.setChildren(nodeChildren);
-		return treeNode;
-	}
-
-	// TODO delete. See populateGermplasmSummary
-	private PedigreeTreeNode traversePopulate(final GermplasmPedigreeTreeNode mwTreeNode) {
-		final PedigreeTreeNode treeNode = new PedigreeTreeNode();
-		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid().toString());
-		treeNode.setName(mwTreeNode.getGermplasm().getPreferredName() != null ? mwTreeNode.getGermplasm().getPreferredName().getNval()
-				: null);
-
-		final List<PedigreeTreeNode> nodeParents = new ArrayList<>();
-		for (final GermplasmPedigreeTreeNode mwParent : mwTreeNode.getLinkedNodes()) {
-			nodeParents.add(this.traversePopulate(mwParent));
-		}
-		treeNode.setParents(nodeParents);
-		return treeNode;
 	}
 
 	@Override
@@ -458,7 +354,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<GermplasmNameTypeDTO> getGermplasmNameTypesByCodes(final Set<String> codes) {
+	public List<GermplasmNameTypeDTO> filterGermplasmNameTypes(final Set<String> codes) {
 
 		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
 			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
@@ -474,7 +370,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<org.generationcp.middleware.api.attribute.AttributeDTO> getGermplasmAttributesByCodes(final Set<String> codes) {
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(final Set<String> codes) {
 
 		final Set<String> types = new HashSet<>();
 		types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
@@ -490,6 +386,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 				return attributeDTO;
 			})
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
+		final GermplasmImportRequestDto germplasmImportRequestDto) {
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		germplasmImportRequestDtoValidator.validate(programUUID, germplasmImportRequestDto);
+		return this.germplasmService.importGermplasm(user.getUserid(), cropName, germplasmImportRequestDto);
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {

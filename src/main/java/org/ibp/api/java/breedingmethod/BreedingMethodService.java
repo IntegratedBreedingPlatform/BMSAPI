@@ -4,6 +4,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 
 import java.util.List;
+import java.util.Set;
 
 public interface BreedingMethodService {
 
@@ -11,6 +12,6 @@ public interface BreedingMethodService {
 
 	BreedingMethodDTO getBreedingMethod(Integer breedingMethodDbId);
 
-	List<BreedingMethodDTO> getBreedingMethods(String cropName, String programUUID, boolean favoriteMethods);
+	List<BreedingMethodDTO> getBreedingMethods(String cropName, String programUUID, Set<String> abbreviations, boolean favoriteMethods);
 
 }
