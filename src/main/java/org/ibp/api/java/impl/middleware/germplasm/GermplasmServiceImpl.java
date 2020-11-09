@@ -10,6 +10,8 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
@@ -27,6 +29,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -42,6 +45,8 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -99,6 +104,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private AttributeService attributeService;
+
+	@Autowired
+	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmService;
+
+	@Autowired
+	private SecurityService securityService;
+
+	@Autowired
+	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -343,6 +357,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 				return attributeDTO;
 			})
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
+		final GermplasmImportRequestDto germplasmImportRequestDto) {
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		germplasmImportRequestDtoValidator.validate(programUUID, germplasmImportRequestDto);
+		return this.germplasmService.importGermplasm(user.getUserid(), cropName, germplasmImportRequestDto);
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
