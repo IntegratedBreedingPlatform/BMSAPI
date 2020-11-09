@@ -23,7 +23,6 @@ import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.hamcrest.collection.IsIn;
 import org.ibp.api.java.entrytype.EntryTypeService;
@@ -225,13 +224,13 @@ public class StudyEntryServiceImplTest {
 			.map(entryType -> String.valueOf(entryType.getId())).collect(Collectors.toList());
 		Mockito.when(this.middlewareStudyEntryService
 			.countStudyGermplasmByEntryTypeIds(studyId, checkEntryTypeIds)).thenReturn(nonTestEntriesCount);
-		Mockito.when(this.middlewareStudyEntryService.hasUnassignedStudyEntriesToPlot(studyId)).thenReturn(false);
+		Mockito.when(this.middlewareStudyEntryService.hasUnassignedEntries(studyId)).thenReturn(false);
 
 		final StudyEntryMetadata metadata = this.studyEntryService.getStudyEntriesMetadata(studyId, programUUID);
 		Assert.assertEquals(testEntriesCount, metadata.getTestEntriesCount());
 		Assert.assertEquals(checkEntriesCount, metadata.getCheckEntriesCount());
 		Assert.assertEquals(nonTestEntriesCount, metadata.getNonTestEntriesCount());
-		Assert.assertFalse(metadata.getHasUnassignedStudyEntriesToPlot());
+		Assert.assertFalse(metadata.getHasUnassignedEntries());
 	}
 
 	@Test
