@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
-import org.generationcp.middleware.api.germplasm.update.GermplasmUpdateService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
@@ -70,9 +69,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmUpdateValidator germplasmUpdateValidator;
-
-	@Autowired
-	private GermplasmUpdateService germplasmUpdateService;
 
 	private BindingResult errors;
 
@@ -339,7 +335,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.germplasmUpdateService.saveGermplasmUpdates(programUUID, germplasmUpdateDTOList);
+		this.germplasmService.importGermplasmUpdates(germplasmUpdateDTOList);
 
 	}
 
