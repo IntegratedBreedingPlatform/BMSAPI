@@ -346,11 +346,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
-		if (StringUtils.isEmpty(folderName)) {
-			this.errors.reject("list.folder.empty", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
+		this.validateFolderName(folderName);
 		this.validateProgram(cropName, programUUID);
 		this.validateNodeId(parentId, programUUID, ListNodeType.PARENT);
 
@@ -368,11 +364,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
-		if (StringUtils.isEmpty(newFolderName)) {
-			this.errors.reject("list.folder.empty", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
+		this.validateFolderName(newFolderName);
 		this.validateProgram(cropName, programUUID);
 		this.validateNodeId(folderId, programUUID, ListNodeType.FOLDER);
 
@@ -527,9 +519,9 @@ public class GermplasmListServiceImpl implements GermplamListService {
 		}
 	}
 
-	private boolean isSourceItemHasChildren(final Integer sourceItemId, final String programUUID) {
+	private boolean isSourceItemHasChildren(final Integer nodeId, final String programUUID) {
 		List<GermplasmList> listChildren = this.germplasmListManager
-			.getGermplasmListByParentFolderId(sourceItemId, programUUID);
+			.getGermplasmListByParentFolderId(nodeId, programUUID);
 		return !listChildren.isEmpty();
 	}
 
@@ -541,7 +533,14 @@ public class GermplasmListServiceImpl implements GermplamListService {
 			});
 	}
 
-	private Integer getFolderIdAsInteger(String folderId) {
+	private void validateFolderName(final String folderName) {
+		if (StringUtils.isEmpty(folderName)) {
+			this.errors.reject("list.folder.empty", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private Integer getFolderIdAsInteger(final String folderId) {
 		return (CROP_LISTS.equals(folderId) || PROGRAM_LISTS.equals(folderId)) ? null : Integer.valueOf(folderId);
 	}
 
