@@ -32,6 +32,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.util.Assert;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -216,6 +217,7 @@ public class StudyEntryServiceImplTest {
 			final List<StudyEntryDto> studyEntryDtos = this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 			Assert.notNull(studyEntryDtos, "Duplicate gid in list should be accepted. ");
 		} catch (final Exception e) {
+			e.printStackTrace();
 			Assert.isNull(e, "Duplicate gid in list should be accepted, no exception");
 		}
 
@@ -228,14 +230,33 @@ public class StudyEntryServiceImplTest {
 	private List<GermplasmListData> duplicateListData() {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 
-		final GermplasmListData data = new GermplasmListData();
-		data.setGermplasm(germplasm);
-		data.setGid(germplasm.getGid());
+		final GermplasmListData data1 = new GermplasmListData();
+		data1.setGermplasm(germplasm);
+		data1.setGid(germplasm.getGid());
+		data1.setEntryId(this.randomEntryId());
+		data1.setEntryCode(StringUtils.randomAlphanumeric(3));
+
+		final GermplasmListData data2 = new GermplasmListData();
+		data2.setGermplasm(germplasm);
+		data2.setGid(germplasm.getGid());
+		data2.setEntryId(this.randomEntryId());
+		data2.setEntryCode(StringUtils.randomAlphanumeric(3));
 
 		final List<GermplasmListData> listData = new ArrayList<>();
-		listData.add(data);
-		listData.add(data);
+		listData.add(data1);
+		listData.add(data2);
 		return listData;
+	}
+
+	private int randomEntryId() {
+		int entryId;
+		try {
+			final double random = Math.random() * 100;
+			entryId = (int) random;
+		} catch (final Exception e) {
+			entryId = 1;
+		}
+		return entryId;
 	}
 
 }
