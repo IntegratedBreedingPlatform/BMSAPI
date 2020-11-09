@@ -228,7 +228,7 @@ public class StudyEntryServiceImplTest {
 			Assert.notNull(studyEntryDtos, "Duplicate gid in list should be accepted. ");
 			org.junit.Assert.assertEquals("Must return same germplasm list data count", listData.size(),studyEntryDtos.size());
 		} catch (final Exception e) {
-			Assert.isNull(e, "Duplicate gid in list should be accepted, no exception");
+			org.junit.Assert.fail("Duplicate gid in list should be accepted, no exception");
 		}
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
