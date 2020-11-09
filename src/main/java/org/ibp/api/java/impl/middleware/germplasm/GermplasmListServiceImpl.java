@@ -385,12 +385,12 @@ public class GermplasmListServiceImpl implements GermplamListService {
 	}
 
 	@Override
-	public Integer moveGermplasmListFolder(final String cropName, final String programUUID, final String germplasmListId,
+	public Integer moveGermplasmListFolder(final String cropName, final String programUUID, final String folderId,
 		final String newParentFolderId, final boolean isCropList) {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
-		if (StringUtils.isEmpty(germplasmListId)) {
+		if (StringUtils.isEmpty(folderId)) {
 			this.errors.reject("list.folder.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -400,46 +400,48 @@ public class GermplasmListServiceImpl implements GermplamListService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (germplasmListId.equals(newParentFolderId)) {
+		if (folderId.equals(newParentFolderId)) {
 			this.errors.reject("list.move.id.same.values", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		this.validateProgram(cropName, programUUID);
 		this.validateNodeId(newParentFolderId, programUUID, ListNodeType.PARENT);
-		this.validateNodeId(germplasmListId, programUUID, ListNodeType.FOLDER);
+		this.validateNodeId(folderId, programUUID, ListNodeType.FOLDER);
 
-		final GermplasmList germplasmListToMove = this.germplasmListService.getGermplasmListById(Integer.parseInt(germplasmListId))
+		final GermplasmList germplasmListToMove = this.germplasmListService.getGermplasmListById(Integer.parseInt(folderId))
 			.orElseThrow(() -> {
 				this.errors.reject("list.folder.id.not.exist", "");
 				return new ApiRequestValidationException(this.errors.getAllErrors());
 			});
 
-		if(this.isSourceItemHasChildren(Integer.parseInt(germplasmListId), programUUID)) {
+		if(this.isSourceItemHasChildren(Integer.parseInt(folderId), programUUID)) {
 			this.errors.reject("list.folder.has.child", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final GermplasmList parentFolder = this.germplasmListService.getGermplasmListById(Integer.parseInt(germplasmListId))
-			.orElseThrow(() -> {
-				this.errors.reject("list.parent.id.not.exist", "");
-				return new ApiRequestValidationException(this.errors.getAllErrors());
-			});
+		Integer parent = this.getFolderIdAsInteger(newParentFolderId);
+		if (!Objects.isNull(parent)) {
+			final GermplasmList parentFolder = this.germplasmListService.getGermplasmListById(parent)
+				.orElseThrow(() -> {
+					this.errors.reject("list.parent.id.not.exist", "");
+					return new ApiRequestValidationException(this.errors.getAllErrors());
+				});
 
-		if (!parentFolder.isFolder()) {
-			this.errors.reject("list.move.list.another.list.not.allowed", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+			if (!parentFolder.isFolder()) {
+				this.errors.reject("list.move.list.another.list.not.allowed", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
 		}
 
 		//Validate if there is a folder with same name in parent folder
-		Integer parent = this.getFolderIdAsInteger(newParentFolderId);
 		this.germplasmListService.getGermplasmListByParentAndName(germplasmListToMove.getName(), parent, programUUID)
 			.ifPresent(germplasmList -> {
 				this.errors.reject("list.folder.name.exists", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			});
 
-		return this.germplasmListService.moveGermplasmListFolder(Integer.parseInt(germplasmListId), parent, isCropList,
+		return this.germplasmListService.moveGermplasmListFolder(Integer.parseInt(folderId), parent, isCropList,
 			programUUID);
 	}
 
