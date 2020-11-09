@@ -55,7 +55,7 @@ public class StudyEntryResource {
 
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm ids",
 		notes = "Create germplasm entries in study based on the specified germplasm ids")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
@@ -68,7 +68,7 @@ public class StudyEntryResource {
 
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list id",
 		notes = "Create germplasm entries in study based on the specified germplasm list id ")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation-list/{listId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation/{listId}", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
