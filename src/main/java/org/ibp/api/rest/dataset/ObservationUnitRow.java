@@ -24,6 +24,8 @@ public class ObservationUnitRow {
 
 	private String samplesCount;
 
+	private String stockId;
+
 	private Map<String, ObservationUnitData> variables;
 
 	// Contains variables added in Environment Details and Environment Conditions
@@ -103,6 +105,14 @@ public class ObservationUnitRow {
 
 	public void setTrialInstance(final Integer trialInstance) {
 		this.trialInstance = trialInstance;
+	}
+
+	public String getStockId() {
+		return this.stockId;
+	}
+
+	public void setStockId(final String stockId) {
+		this.stockId = stockId;
 	}
 
 	@Override

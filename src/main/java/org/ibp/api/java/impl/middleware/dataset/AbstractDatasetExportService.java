@@ -1,12 +1,16 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.io.Files;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -18,6 +22,7 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,9 +30,11 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public abstract class AbstractDatasetExportService {
@@ -62,6 +69,9 @@ public abstract class AbstractDatasetExportService {
 	@Resource
 	protected DatasetTypeService datasetTypeService;
 
+	@Autowired
+	private TransactionService transactionService;
+
 	private ZipUtil zipUtil = new ZipUtil();
 
 	protected void validate(final int studyId, final int datasetId, final Set<Integer> instanceIds) {
@@ -79,6 +89,15 @@ public abstract class AbstractDatasetExportService {
 
 		// Get all variables for the dataset
 		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId());
+		if (dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+			final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+			transactionsSearchDto.setTransactionStatus(Arrays.asList(0,1));
+			transactionsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
+			if (this.transactionService.countSearchTransactions(transactionsSearchDto) > 0) {
+				this.addStockIdColumn(columns);
+			}
+		}
+
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = this.getSelectedDatasetInstancesMap(
 			dataSet.getInstances(),
 			instanceIds);
@@ -182,6 +201,14 @@ public abstract class AbstractDatasetExportService {
 		return columns;
 	}
 
+	protected void addStockIdColumn(final List<MeasurementVariable> plotDataSetColumns) {
+		final Optional<MeasurementVariable>
+			designationColumn = plotDataSetColumns.stream().filter(measurementVariable ->
+			measurementVariable.getTermId() == TermId.DESIG.getId()).findFirst();
+		// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
+		plotDataSetColumns.add(plotDataSetColumns.indexOf(designationColumn.get()) + 1, addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR,null, true));
+	}
+
 	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
 
 	protected abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(
@@ -190,4 +217,15 @@ public abstract class AbstractDatasetExportService {
 	void setZipUtil(final ZipUtil zipUtil) {
 		this.zipUtil = zipUtil;
 	}
+
+	private MeasurementVariable addTermIdColumn(final TermId TermId, final VariableType VariableType, final String name, final boolean factor) {
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName(StringUtils.isBlank(name) ? TermId.name() : name);
+		measurementVariable.setAlias(TermId.name());
+		measurementVariable.setTermId(TermId.getId());
+		measurementVariable.setVariableType(VariableType);
+		measurementVariable.setFactor(factor);
+		return measurementVariable;
+	}
+
 }
