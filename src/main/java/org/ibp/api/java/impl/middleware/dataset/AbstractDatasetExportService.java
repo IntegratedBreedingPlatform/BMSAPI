@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.io.Files;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -204,7 +205,8 @@ public abstract class AbstractDatasetExportService {
 		final Optional<MeasurementVariable>
 			designationColumn = plotDataSetColumns.stream().filter(measurementVariable ->
 			measurementVariable.getTermId() == TermId.DESIG.getId()).findFirst();
-		plotDataSetColumns.add(plotDataSetColumns.indexOf(designationColumn.get()) + 1, buildStockIdColumn());
+		// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
+		plotDataSetColumns.add(plotDataSetColumns.indexOf(designationColumn.get()) + 1, addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR,null, true));
 	}
 
 	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
@@ -216,15 +218,14 @@ public abstract class AbstractDatasetExportService {
 		this.zipUtil = zipUtil;
 	}
 
-	private MeasurementVariable buildStockIdColumn() {
-		final MeasurementVariable stockIdColumn = new MeasurementVariable();
-		// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
-		stockIdColumn.setName(TermId.STOCK_ID.name());
-		stockIdColumn.setAlias(TermId.STOCK_ID.name());
-		stockIdColumn.setTermId(TermId.STOCK_ID.getId());
-		stockIdColumn.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-		stockIdColumn.setFactor(true);
-		return stockIdColumn;
+	private MeasurementVariable addTermIdColumn(final TermId TermId, final VariableType VariableType, final String name, final boolean factor) {
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName(StringUtils.isBlank(name) ? TermId.name() : name);
+		measurementVariable.setAlias(TermId.name());
+		measurementVariable.setTermId(TermId.getId());
+		measurementVariable.setVariableType(VariableType);
+		measurementVariable.setFactor(factor);
+		return measurementVariable;
 	}
 
 }
