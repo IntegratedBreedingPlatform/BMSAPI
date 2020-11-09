@@ -217,7 +217,6 @@ public class StudyEntryServiceImplTest {
 			final List<StudyEntryDto> studyEntryDtos = this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 			Assert.notNull(studyEntryDtos, "Duplicate gid in list should be accepted. ");
 		} catch (final Exception e) {
-			e.printStackTrace();
 			Assert.isNull(e, "Duplicate gid in list should be accepted, no exception");
 		}
 
