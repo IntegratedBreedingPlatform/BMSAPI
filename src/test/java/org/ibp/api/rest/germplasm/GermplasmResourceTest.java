@@ -21,12 +21,12 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 		germplasmUpdateDTO.setLocationAbbreviation("UKN");
 		germplasmUpdateDTO.setCreationDate("20200101");
 		germplasmUpdateDTO.setBreedingMethod("UBM");
-		germplasmUpdateDTO.getData().put("DRVNM", "Derivative Name");
-		germplasmUpdateDTO.getData().put("NOTE", "Note 1");
+		germplasmUpdateDTO.getNames().put("DRVNM", "Derivative Name");
+		germplasmUpdateDTO.getAttributes().put("NOTE", "Note 1");
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.put("/crops/{cropName}/germplasm", this.cropName)
+				.patch("/crops/{cropName}/germplasm", this.cropName)
 				.contentType(this.contentType).content(this.convertObjectToByte(Arrays.asList(germplasmUpdateDTO))))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());

@@ -3,13 +3,14 @@ package org.ibp.api.java.impl.middleware.common.validator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
+import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.UDTableType;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,9 +18,9 @@ import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,26 +48,32 @@ public class GermplasmUpdateValidator {
 
 	public void validateCodes(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
-		final Set<String> attributesAndNamesCodes = new HashSet<>(germplasmUpdateDTOList.get(0).getData().keySet());
+		final Set<String> nameCodes = new HashSet<>();
+		germplasmUpdateDTOList
+			.forEach(g -> nameCodes.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+		final List<String> existingNamesCode =
+			this.germplasmService.filterGermplasmNameTypes(nameCodes).stream().map(GermplasmNameTypeDTO::getCode).collect(
+				Collectors.toList());
 
-		final Set<String> attributeCodes =
-			this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				Collections.singleton(UDTableType.ATRIBUTS_ATTRIBUTE.getType()), attributesAndNamesCodes).stream().map(o -> o.getFcode())
-				.collect(Collectors.toSet());
-		final Set<String> nameCodes =
-			this.germplasmDataManager
-				.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
-					Collections.singleton(UDTableType.NAMES_NAME.getType()), attributesAndNamesCodes).stream().map(o -> o.getFcode())
-				.collect(Collectors.toSet());
+		final Set<String> attributesCode = new HashSet<>();
+		germplasmUpdateDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
+			.forEach(
+				g -> attributesCode.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+		final List<String> existingAttributesCode =
+			this.germplasmService.filterGermplasmAttributes(attributesCode).stream().map(AttributeDTO::getCode).collect(
+				Collectors.toList());
 
-		attributesAndNamesCodes.removeAll(attributeCodes);
-		attributesAndNamesCodes.removeAll(nameCodes);
+		nameCodes.removeAll(existingNamesCode);
+		attributesCode.removeAll(existingAttributesCode);
 
-		if (!attributesAndNamesCodes.isEmpty()) {
-			errors.reject("germplasm.update.invalid.attribute.or.name.code", new String[] {String.join(",", attributesAndNamesCodes)}, "");
+		if (!nameCodes.isEmpty()) {
+			errors.reject("germplasm.update.invalid.name.code", new String[] {String.join(",", nameCodes)}, "");
+		}
+		if (!attributesCode.isEmpty()) {
+			errors.reject("germplasm.update.invalid.attribute.code", new String[] {String.join(",", attributesCode)}, "");
 		}
 
-		final Collection<String> ambiguosCodes = CollectionUtils.intersection(attributeCodes, nameCodes);
+		final Collection<String> ambiguosCodes = CollectionUtils.intersection(attributesCode, nameCodes);
 		if (!ambiguosCodes.isEmpty()) {
 			errors.reject("germplasm.update.ambiguous.code", new String[] {String.join(",", ambiguosCodes)}, "");
 		}
@@ -82,7 +89,10 @@ public class GermplasmUpdateValidator {
 		}
 
 		final Set<Integer> gids = germplasmUpdateDTOList.stream().map(dto -> dto.getGid()).collect(Collectors.toSet());
-		final Set<String> germplasmUUIDs = germplasmUpdateDTOList.stream().map(dto -> dto.getGermplasmUUID()).collect(Collectors.toSet());
+		final Set<String> germplasmUUIDs =
+			germplasmUpdateDTOList.stream().map(dto -> StringUtils.isNotEmpty(dto.getGermplasmUUID()) ? dto.getGermplasmUUID() : null)
+				.filter(
+					Objects::nonNull).collect(Collectors.toSet());
 
 		final List<Germplasm> germplasmByGIDs = this.germplasmDataManager.getGermplasms(new ArrayList<>(gids));
 		final List<Germplasm> germplasmByUUIDs = this.germplasmDataManager.getGermplasmByUUIDs(germplasmUUIDs);
