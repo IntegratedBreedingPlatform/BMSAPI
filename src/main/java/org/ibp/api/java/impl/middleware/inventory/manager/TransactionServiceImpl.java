@@ -14,6 +14,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.brapi.v2.inventory.TransactionMapper;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
@@ -83,6 +84,9 @@ public class TransactionServiceImpl implements TransactionService {
 	private InventoryCommonValidator inventoryCommonValidator;
 
 	@Autowired
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
+
+	@Autowired
 	private LotInputValidator lotInputValidator;
 
 	@Override
@@ -133,7 +137,7 @@ public class TransactionServiceImpl implements TransactionService {
 	public void confirmPendingTransactions(final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
-		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 
 		final TransactionsSearchDto transactionsSearchDto = this.searchRequestDtoResolver.getTransactionsSearchDto(searchCompositeDto);
 
@@ -220,7 +224,7 @@ public class TransactionServiceImpl implements TransactionService {
 	public void cancelPendingTransactions(final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
-		this.inventoryCommonValidator.validateSearchCompositeDto(searchCompositeDto, errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchCompositeDto, errors);
 
 		final TransactionsSearchDto transactionsSearchDto = this.searchRequestDtoResolver.getTransactionsSearchDto(searchCompositeDto);
 
@@ -255,7 +259,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
 
-		this.inventoryCommonValidator.validateSearchCompositeDto(lotAdjustmentRequestDto.getSelectedLots(), errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(lotAdjustmentRequestDto.getSelectedLots(), errors);
 
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotAdjustmentRequestDto.getSelectedLots());
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);

@@ -10,6 +10,8 @@ import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
@@ -37,6 +39,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Api(value = "Germplasm Services")
@@ -162,4 +165,21 @@ public class GermplasmResource {
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
+	/**
+	 * Import a set of germplasm
+	 *
+	 * @return a map indicating the GID that was created per clientId, if null, no germplasm was created
+	 */
+	@ApiOperation(value = "Save a set of germplasm")
+	//FIXME: When removing current import germplasm, this preauthorize must be modified
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Map<Integer, GermplasmImportResponseDto>> importGermplasm(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmImportRequestDto germplasmImportRequestDto) {
+
+		return new ResponseEntity<>(this.germplasmService.importGermplasm(cropName, programUUID, germplasmImportRequestDto), HttpStatus.OK);
+	}
+
 }

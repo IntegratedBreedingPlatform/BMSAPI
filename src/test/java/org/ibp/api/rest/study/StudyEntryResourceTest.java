@@ -59,26 +59,22 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testCreateStudyGermplasmList() throws Exception {
+	public void testCreateStudyEntriesList() throws Exception {
 
 		final Random random = new Random();
 		final int studyId = random.nextInt();
-		final int germplasmListId = random.nextInt();
+		final int listId = random.nextInt();
 		final int entryId = random.nextInt();
 		final int gid = random.nextInt();
-
-		final GermplasmEntryRequestDto germplasmEntryRequestDto = new GermplasmEntryRequestDto();
-		germplasmEntryRequestDto.setGermplasmListId(germplasmListId);
 
 		final StudyEntryDto dto = new StudyEntryDto(entryId, 6, RandomStringUtils.randomAlphabetic(20), gid, RandomStringUtils.randomAlphabetic(20));
 		final List<StudyEntryDto> studyEntries = new ArrayList<>();
 		studyEntries.add(dto);
-		Mockito.doReturn(studyEntries).when(this.studyEntryService).createStudyEntries(studyId, germplasmEntryRequestDto.getGermplasmListId());
+		Mockito.doReturn(studyEntries).when(this.studyEntryService).createStudyEntries(studyId, listId);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation",
-				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, entryId)
-			.content(this.convertObjectToByte(germplasmEntryRequestDto))
+			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation?listId=" + listId,
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())

@@ -22,7 +22,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotImportRequestDtoValidator;
@@ -77,7 +77,7 @@ public class LotServiceImpl implements LotService {
 	private ExtendedLotListValidator extendedLotListValidator;
 
 	@Autowired
-	private InventoryCommonValidator inventoryCommonValidator;
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Autowired
 	private SearchRequestDtoResolver searchRequestDtoResolver;
@@ -95,12 +95,12 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
-		return lotService.searchLots(lotsSearchDto, pageable);
+		return this.lotService.searchLots(lotsSearchDto, pageable);
 	}
 
 	@Override
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
-		return lotService.countSearchLots(lotsSearchDto);
+		return this.lotService.countSearchLots(lotsSearchDto);
 	}
 
 	@Override
@@ -117,13 +117,13 @@ public class LotServiceImpl implements LotService {
 	public String saveLot(final String programUUID,
 		final LotGeneratorInputDto lotGeneratorInputDto) {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		lotInputValidator.validate(programUUID, lotGeneratorInputDto);
+		this.lotInputValidator.validate(programUUID, lotGeneratorInputDto);
 		if (lotGeneratorInputDto.getGenerateStock()) {
 			final String nextStockIDPrefix = this.resolveStockIdPrefix(lotGeneratorInputDto.getStockPrefix());
 			lotGeneratorInputDto.setStockId(nextStockIDPrefix + "1");
 		}
 
-		return lotService.saveLot(this.contextUtil.getProjectInContext().getCropType(), loggedInUser.getUserid(), lotGeneratorInputDto);
+		return this.lotService.saveLot(this.contextUtil.getProjectInContext().getCropType(), loggedInUser.getUserid(), lotGeneratorInputDto);
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class LotServiceImpl implements LotService {
 		// validations
 		final SearchCompositeDto<Integer, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
-		this.inventoryCommonValidator.validateSearchCompositeDto(searchComposite, errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
 		this.lotInputValidator.validate(programUUID, lotGeneratorBatchRequestDto);
 		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
 		this.germplasmValidator.validateGids(errors, gids);
@@ -196,15 +196,15 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public LotSearchMetadata getLotsSearchMetadata(final LotsSearchDto lotsSearchDto) {
-		return lotService.getLotSearchMetadata(lotsSearchDto);
+		return this.lotService.getLotSearchMetadata(lotsSearchDto);
 	}
 
 	@Override
 	public void closeLots(final LotsSearchDto searchDTO) {
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
-		extendedLotListValidator.validateClosedLots(lotDtos);
+		this.extendedLotListValidator.validateClosedLots(lotDtos);
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		lotService.closeLots(loggedInUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toList()));
+		this.lotService.closeLots(loggedInUser.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -231,13 +231,13 @@ public class LotServiceImpl implements LotService {
 		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(splitLotDtosSearchResult, new HashSet<>(lotUUIDs));
 
 		final ExtendedLotDto splitLotDto = splitLotDtosSearchResult.get(0);
-		LotSplitRequestDto.InitialLotDepositDto initialDeposit = lotSplitRequestDto.getInitialDeposit();
+		final LotSplitRequestDto.InitialLotDepositDto initialDeposit = lotSplitRequestDto.getInitialDeposit();
 		this.lotSplitValidator.validateSplitLot(programUUID, splitLotDto, lotSplitRequestDto.getNewLot(), lotSplitRequestDto.getInitialDeposit());
 
 		//Creates the new lot
 		final LotSplitRequestDto.NewLotSplitDto newLot = lotSplitRequestDto.getNewLot();
 		final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto(splitLotDto.getGid(), splitLotDto.getUnitId(), newLot);
-		lotInputValidator.validate(programUUID, lotGeneratorInputDto);
+		this.lotInputValidator.validate(programUUID, lotGeneratorInputDto);
 		if (lotGeneratorInputDto.getGenerateStock()) {
 			final String nextStockIDPrefix = this.resolveStockIdPrefix(lotGeneratorInputDto.getStockPrefix());
 			lotGeneratorInputDto.setStockId(nextStockIDPrefix + "1");
@@ -266,7 +266,7 @@ public class LotServiceImpl implements LotService {
 
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 		final Map<String, Double> depositsPerUnit = new HashMap() {{
-			put(splitLotDto.getUnitName(), initialDeposit.getAmount());
+			this.put(splitLotDto.getUnitName(), initialDeposit.getAmount());
 		}};
 		lotDepositRequestDto.setDepositsPerUnit(depositsPerUnit);
 		lotDepositRequestDto.setNotes(initialDeposit.getNotes());
@@ -277,7 +277,7 @@ public class LotServiceImpl implements LotService {
 			splitLotDto.getLotId());
 	}
 
-	private String resolveStockIdPrefix(String stockPrefix) {
+	private String resolveStockIdPrefix(final String stockPrefix) {
 		if (Objects.isNull(stockPrefix) || stockPrefix.isEmpty()) {
 			return this.stockService.calculateNextStockIDPrefix(DEFAULT_STOCKID_PREFIX, "-");
 		}

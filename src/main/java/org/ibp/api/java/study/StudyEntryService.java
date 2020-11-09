@@ -1,7 +1,7 @@
 package org.ibp.api.java.study;
 
-import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -14,7 +14,9 @@ public interface StudyEntryService {
 
 	StudyEntryDto replaceStudyEntry(Integer studyId, Integer entryId, StudyEntryDto studyEntryDto);
 
-	List<StudyEntryDto> createStudyEntries(Integer studyId, Integer germplasmListId);
+	List<StudyEntryDto> createStudyEntries(Integer studyId, StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto);
+
+	List<StudyEntryDto> createStudyEntries(Integer studyId, Integer listId);
 
 	List<StudyEntryDto> getStudyEntries(Integer studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 
@@ -31,5 +33,4 @@ public interface StudyEntryService {
 	StudyEntryMetadata getStudyEntriesMetadata(Integer studyId, String programUuid);
 
 	List<MeasurementVariable> getEntryDescriptorColumns(Integer studyId);
-
 }

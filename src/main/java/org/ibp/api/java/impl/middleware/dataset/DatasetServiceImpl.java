@@ -38,12 +38,12 @@ import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
-import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
@@ -130,7 +130,7 @@ public class DatasetServiceImpl implements DatasetService {
 	private StudyTransactionsService studyTransactionsService;
 
 	@Autowired
-	private InventoryCommonValidator inventoryCommonValidator;
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	static final String PLOT_DATASET_NAME = "Observations";
 
@@ -881,7 +881,7 @@ public class DatasetServiceImpl implements DatasetService {
 		BaseValidator.checkNotNull(request.getEntryId(), "param.null", new String[] {"entryId"});
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		this.inventoryCommonValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
 
 		this.studyValidator.validateStudyContainsEntry(studyId, request.getEntryId());
 
@@ -925,7 +925,7 @@ public class DatasetServiceImpl implements DatasetService {
 		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), SearchCompositeDto.class.getName());
-		this.inventoryCommonValidator.validateSearchCompositeDto(request, errors);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(request, errors);
 
 
 		this.processSearchComposite(request);

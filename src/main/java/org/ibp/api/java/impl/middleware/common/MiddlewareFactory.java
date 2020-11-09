@@ -22,6 +22,8 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitS
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
@@ -32,10 +34,38 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.LocationServiceImpl;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
-import org.generationcp.middleware.manager.*;
-import org.generationcp.middleware.manager.api.*;
-import org.generationcp.middleware.manager.ontology.*;
-import org.generationcp.middleware.manager.ontology.api.*;
+import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
+import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
+import org.generationcp.middleware.manager.GermplasmListManagerImpl;
+import org.generationcp.middleware.manager.InventoryDataManagerImpl;
+import org.generationcp.middleware.manager.LocationDataManagerImpl;
+import org.generationcp.middleware.manager.OntologyDataManagerImpl;
+import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
+import org.generationcp.middleware.manager.PresetServiceImpl;
+import org.generationcp.middleware.manager.SearchRequestServiceImpl;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
+import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.manager.api.PresetService;
+import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.TermDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
@@ -47,7 +77,15 @@ import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.MethodServiceImpl;
-import org.generationcp.middleware.service.api.*;
+import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.InventoryService;
+import org.generationcp.middleware.service.api.KeySequenceRegisterService;
+import org.generationcp.middleware.service.api.MethodService;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.SampleListService;
+import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
@@ -71,7 +109,11 @@ import org.generationcp.middleware.service.impl.inventory.LotServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl;
 import org.generationcp.middleware.service.impl.rpackage.RPackageServiceImpl;
-import org.generationcp.middleware.service.impl.study.*;
+import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
+import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyEntryServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.service.impl.study.germplasm.source.GermplasmStudySourceServiceImpl;
@@ -82,7 +124,11 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -521,6 +567,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmSearchService getGermplasmSearchService() {
 		return new GermplasmSearchServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmService getGermplasmService() {
+		return new GermplasmServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
