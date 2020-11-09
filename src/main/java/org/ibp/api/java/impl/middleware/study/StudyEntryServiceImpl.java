@@ -104,13 +104,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyEntryDto.class)).collect(Collectors.toList());
 
 		final Map<Integer, GermplasmListData> germplasmListDataMap =
-			germplasmList.getListData().stream().collect(Collectors.toMap(GermplasmListData::getGermplasmId, g -> g));
+			germplasmList.getListData().stream().collect(Collectors.toMap(GermplasmListData::getEntryId, g -> g));
 		final List<Integer> germplasmDescriptorIds = this.getEntryDescriptorColumns(studyId).stream()
 			.map(measurementVariable -> measurementVariable.getTermId()).collect(Collectors.toList());
 
 		for(final StudyEntryDto studyEntryDto: studyEntryDtoList) {
 			studyEntryDto.setProperties(
-				StudyEntryPropertiesMapper.map(germplasmListDataMap.get(studyEntryDto.getGid()), germplasmDescriptorIds));
+				StudyEntryPropertiesMapper.map(germplasmListDataMap.get(studyEntryDto.getEntryId()), germplasmDescriptorIds));
 		}
 
 		return this.middlewareStudyEntryService.saveStudyEntries(studyId, studyEntryDtoList);
@@ -165,7 +165,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<MeasurementVariable> getEntryDescriptorColumns(final Integer studyId) {
 		this.studyValidator.validate(studyId, false);
 		final Integer plotDatasetId =
-			datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+			this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 
 		final List<Integer> termsToRemove = Lists
 			.newArrayList(TermId.OBS_UNIT_ID.getId());
