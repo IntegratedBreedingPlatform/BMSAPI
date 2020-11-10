@@ -88,7 +88,7 @@ public class StudyEntryValidator {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		if (this.middlewareStudyEntryService.countStudyEntries(studyId) > 0) {
-			errors.reject("study.has.existing.study.entries");
+			this.errors.reject("study.has.existing.study.entries");
 		}
 
 		if (this.errors.hasErrors()) {

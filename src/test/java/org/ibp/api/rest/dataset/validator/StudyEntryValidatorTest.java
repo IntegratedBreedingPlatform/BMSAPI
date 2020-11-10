@@ -35,7 +35,7 @@ public class StudyEntryValidatorTest {
     private StudyValidator studyValidator;
 
     @InjectMocks
-    private StudyEntryValidator validator = new StudyEntryValidator();
+    private final StudyEntryValidator validator = new StudyEntryValidator();
 
     @Before
     public void setup() {
