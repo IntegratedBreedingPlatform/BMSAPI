@@ -83,6 +83,17 @@ public class StudyEntryValidator {
 
 	}
 
+	public void validateStudyAlreadyHasStudyEntries(final Integer studyId) {
+
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		if (this.middlewareStudyEntryService.countStudyEntries(studyId) > 0) {
+			this.errors.reject("study.has.existing.study.entries");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+	}
+
 	public void validateStudyEntryProperty(final Integer studyEntryPropertyDataId) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());

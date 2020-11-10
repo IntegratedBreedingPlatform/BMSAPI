@@ -192,6 +192,7 @@ public class StudyEntryServiceImplTest {
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
 		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
 
 	}
@@ -342,6 +343,7 @@ public class StudyEntryServiceImplTest {
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
 		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
 	}
 
