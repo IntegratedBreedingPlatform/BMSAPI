@@ -79,8 +79,7 @@ public class GermplasmUpdateValidator {
 		if (!attributesCode.isEmpty()) {
 			errors.reject("germplasm.update.invalid.attribute.code", new String[] {String.join(",", attributesCode)}, "");
 		}
-
-		final Collection<String> ambiguosCodes = CollectionUtils.intersection(attributesCode, nameCodes);
+		final List<String> ambiguosCodes = new ArrayList<>(CollectionUtils.intersection(existingNamesCode, existingAttributesCode));
 		if (!ambiguosCodes.isEmpty()) {
 			errors.reject("germplasm.update.ambiguous.code", new String[] {String.join(",", ambiguosCodes)}, "");
 		}
