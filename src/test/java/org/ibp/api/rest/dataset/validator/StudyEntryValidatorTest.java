@@ -54,6 +54,14 @@ public class StudyEntryValidatorTest {
     }
 
     @Test(expected = ApiRequestValidationException.class)
+    public void testValidateStudyAlreadyHasStudyEntries() {
+        final Random random = new Random();
+        final int studyId = random.nextInt();
+        Mockito.doReturn(new Long(5)).when(this.middlewareStudyEntryService).countStudyEntries(studyId);
+        this.validator.validateStudyAlreadyHasStudyEntries(studyId);
+    }
+
+    @Test(expected = ApiRequestValidationException.class)
     public void testValidate_StudyEntryHasSamples() {
         final Random random = new Random();
         final int studyId = random.nextInt();
