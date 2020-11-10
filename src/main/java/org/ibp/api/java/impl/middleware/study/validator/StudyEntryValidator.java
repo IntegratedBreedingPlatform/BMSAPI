@@ -89,9 +89,6 @@ public class StudyEntryValidator {
 
 		if (this.middlewareStudyEntryService.countStudyEntries(studyId) > 0) {
 			this.errors.reject("study.has.existing.study.entries");
-		}
-
-		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
