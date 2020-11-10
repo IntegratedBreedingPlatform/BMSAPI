@@ -94,7 +94,7 @@ public class GermplasmUpdateValidator {
 			errors.reject("germplasm.update.missing.gid.and.uuid", "");
 		}
 
-		final Set<Integer> gids = germplasmUpdateDTOList.stream().map(dto -> dto.getGid()).collect(Collectors.toSet());
+		final Set<Integer> gids = germplasmUpdateDTOList.stream().map(dto -> dto.getGid()).filter(Objects::nonNull).collect(Collectors.toSet());
 		final Set<String> germplasmUUIDs =
 			germplasmUpdateDTOList.stream().map(dto -> StringUtils.isNotEmpty(dto.getGermplasmUUID()) ? dto.getGermplasmUUID() : null)
 				.filter(
