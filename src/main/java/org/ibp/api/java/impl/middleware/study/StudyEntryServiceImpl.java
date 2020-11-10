@@ -153,6 +153,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		this.studyValidator.validate(studyId, true);
 
 		this.germplasmListValidator.validateGermplasmList(listId);
+		this.studyEntryValidator.validateStudyAlreadyHasStudyEntries(studyId);
 
 		final ModelMapper mapper = StudyEntryMapper.getInstance();
 		final List<StudyEntryDto> studyEntryDtoList =

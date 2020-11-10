@@ -35,7 +35,7 @@ public class StudyEntryValidatorTest {
     private StudyValidator studyValidator;
 
     @InjectMocks
-    private StudyEntryValidator validator = new StudyEntryValidator();
+    private final StudyEntryValidator validator = new StudyEntryValidator();
 
     @Before
     public void setup() {
@@ -51,6 +51,14 @@ public class StudyEntryValidatorTest {
         Mockito.doReturn(Collections.emptyList()).when(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         this.validator.validate(studyId, entryId, newGid);
+    }
+
+    @Test(expected = ApiRequestValidationException.class)
+    public void testValidateStudyAlreadyHasStudyEntries() {
+        final Random random = new Random();
+        final int studyId = random.nextInt();
+        Mockito.doReturn(new Long(5)).when(this.middlewareStudyEntryService).countStudyEntries(studyId);
+        this.validator.validateStudyAlreadyHasStudyEntries(studyId);
     }
 
     @Test(expected = ApiRequestValidationException.class)
