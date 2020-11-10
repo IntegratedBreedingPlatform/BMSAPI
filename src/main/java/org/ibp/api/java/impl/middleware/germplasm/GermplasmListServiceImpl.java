@@ -59,8 +59,10 @@ public class GermplasmListServiceImpl implements GermplamListService {
 
 	public static final String PROGRAM_LISTS = "LISTS";
 	public static final String CROP_LISTS = "CROPLISTS";
-	private static final String LEAD_CLASS = "lead";
 	public static final int BATCH_SIZE = 500;
+	public static final int NAME_MAX_LENGTH = 50;
+
+	private static final String LEAD_CLASS = "lead";
 
 	// List entry params
 	static final String ENTRY_CODE = "entryCode";
@@ -536,6 +538,11 @@ public class GermplasmListServiceImpl implements GermplamListService {
 	private void validateFolderName(final String folderName) {
 		if (StringUtils.isEmpty(folderName)) {
 			this.errors.reject("list.folder.empty", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (folderName.length() > NAME_MAX_LENGTH) {
+			this.errors.reject("list.folder.name.too.long", new Object[] { NAME_MAX_LENGTH }, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

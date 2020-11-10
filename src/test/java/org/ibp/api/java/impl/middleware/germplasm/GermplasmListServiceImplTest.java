@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
@@ -279,7 +280,7 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void shouldCreateGermplasmListFolderWithProgramListAsParent() {
 
-		final String folderName = "newFolderName";
+		final String folderName = StringUtils.repeat("a", GermplasmListServiceImpl.NAME_MAX_LENGTH);
 		final String parentId = GermplasmListServiceImpl.PROGRAM_LISTS;
 		final Integer newFolderId = new Random().nextInt(Integer.MAX_VALUE);
 
@@ -335,6 +336,24 @@ public class GermplasmListServiceImplTest {
 		} catch (Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.empty"));
+		}
+
+		Mockito.verifyZeroInteractions(this.programValidator);
+		Mockito.verifyZeroInteractions(this.germplasmListServiceMiddleware);
+	}
+
+	@Test
+	public void shouldFailCreateGermplasmWithTooLongFolderName() {
+
+		final String folderName = StringUtils.repeat("a", GermplasmListServiceImpl.NAME_MAX_LENGTH + 1);
+		final String parentId = String.valueOf(new Random().nextInt(Integer.MAX_VALUE));
+
+		try {
+			this.germplasmListService.createGermplasmListFolder(CROP, PROGRAM_UUID, folderName, parentId);
+			fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.name.too.long"));
 		}
 
 		Mockito.verifyZeroInteractions(this.programValidator);
@@ -398,7 +417,7 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void shouldUpdateGermplasmListFolder() {
 
-		final String folderName = "updatedFolderName";
+		final String folderName = StringUtils.repeat("a", GermplasmListServiceImpl.NAME_MAX_LENGTH);
 		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
 		final Integer parentId = new Random().nextInt(Integer.MAX_VALUE);
 
@@ -465,6 +484,25 @@ public class GermplasmListServiceImplTest {
 		Mockito.verifyZeroInteractions(this.programValidator);
 		Mockito.verifyZeroInteractions(this.germplasmListServiceMiddleware);
 	}
+
+	@Test
+	public void shouldFailUpdateGermplasmWithTooLongFolderName() {
+
+		final String folderName = StringUtils.repeat("a", GermplasmListServiceImpl.NAME_MAX_LENGTH + 1);
+		final String parentId = String.valueOf(new Random().nextInt(Integer.MAX_VALUE));
+
+		try {
+			this.germplasmListService.updateGermplasmListFolderName(CROP, PROGRAM_UUID, folderName, parentId);
+			fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.name.too.long"));
+		}
+
+		Mockito.verifyZeroInteractions(this.programValidator);
+		Mockito.verifyZeroInteractions(this.germplasmListServiceMiddleware);
+	}
+
 
 	@Test
 	public void shouldFailUpdateGermplasmListFolderIfParentNotExists() {
