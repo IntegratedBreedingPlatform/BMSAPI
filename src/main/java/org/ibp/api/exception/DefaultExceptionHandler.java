@@ -182,7 +182,7 @@ public class DefaultExceptionHandler {
 	public ErrorResponse handleMiddlewareRequestException(MiddlewareRequestException ex) {
 		LOG.error("Error executing the API call.", ex);
 		final ErrorResponse response = new ErrorResponse();
-		for (final Map.Entry<String, Object[]> error : ex.getErrorCodeParamsMap().entrySet()) {
+		for (final Map.Entry<String, Object[]> error : ex.getErrorCodeParamsMultiMap().entries()) {
 			response.addError(this.getMessage(error.getKey(), error.getValue()));
 		}
 		return response;
