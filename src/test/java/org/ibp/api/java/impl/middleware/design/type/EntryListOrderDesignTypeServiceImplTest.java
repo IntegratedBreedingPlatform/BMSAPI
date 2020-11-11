@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -18,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -67,11 +69,11 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		assertEquals(numberOfTreatments * trialInstancesForDesignGeneration.size(), result.size());
 		final Map<Integer, List<ObservationUnitRow>> instancesRowMap = new HashMap<>();
 		Integer currentTrialInstance = 1;
-		Integer index = 1;
-		Integer germplasmId = 100;
+		int index = 1;
+		int germplasmId = 100;
 		for (final ObservationUnitRow row : result) {
 			final Integer trialInstance = row.getTrialInstance();
-			if (currentTrialInstance != trialInstance) {
+			if (!currentTrialInstance.equals(trialInstance)) {
 				currentTrialInstance = trialInstance;
 				index = 1;
 				germplasmId = 100;
@@ -82,10 +84,11 @@ public class EntryListOrderDesignTypeServiceImplTest {
 			// Verify row values
 			assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
 				row.getVariables().get(String.valueOf(TermId.ENTRY_TYPE.getId())).getValue());
-			assertEquals(index, row.getEntryNumber());
+			assertEquals(new Integer(index), row.getEntryNumber());
 			assertEquals(row.getEntryNumber().toString(), row.getVariables().get(String.valueOf(TermId.ENTRY_NO.getId())).getValue());
 			assertEquals(row.getEntryNumber().toString(), row.getVariables().get(String.valueOf(TermId.PLOT_NO.getId())).getValue());
-			assertEquals(germplasmId.toString(),
+			assertEquals(
+				Integer.toString(germplasmId),
 				row.getVariables().get(String.valueOf(TermId.GID.getId())).getValue());
 			index++;
 			germplasmId++;
@@ -95,6 +98,31 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		assertEquals(numberOfTreatments, instancesRowMap.get(2).size());
 		assertEquals(numberOfTreatments, instancesRowMap.get(3).size());
 
+	}
+
+	@Test
+	public void testLoadChecksAndTestEntries() {
+		final int numberOfTreatments = 5;
+		final int numberOfControls = 3;
+		final List<StudyEntryDto> studyEntryDtoList =
+			StudyEntryTestDataGenerator.createStudyEntryDtoList(numberOfTreatments, numberOfControls);
+		//Reverse the study entries list by entry number
+		studyEntryDtoList.sort(Comparator.comparing(StudyEntryDto::getEntryNumber).reversed());
+		final List<StudyEntryDto> checkList = new ArrayList<>();
+		final List<StudyEntryDto> testEntryList = new ArrayList<>();
+
+		this.designTypeService.loadChecksAndTestEntries(studyEntryDtoList, checkList, testEntryList);
+
+		Assert.assertEquals(numberOfControls, checkList.size());
+		for(int i=1; i<=numberOfControls; i++) {
+			Assert.assertEquals(new Integer(i), checkList.get(i-1).getEntryNumber());
+		}
+
+		Assert.assertEquals(numberOfTreatments, testEntryList.size());
+		for(int i=1; i<=numberOfTreatments; i++) {
+			final Integer entryNumber = i + numberOfControls;
+			Assert.assertEquals(entryNumber, testEntryList.get(i-1).getEntryNumber());
+		}
 	}
 
 	@Test
@@ -146,7 +174,7 @@ public class EntryListOrderDesignTypeServiceImplTest {
 
 	}
 
-	List<MeasurementVariable> createMeasurementVariables() {
+	private List<MeasurementVariable> createMeasurementVariables() {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.PLOT_NO.getId(), PLOT_NO));
 		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), "ENTRY_TYPE"));

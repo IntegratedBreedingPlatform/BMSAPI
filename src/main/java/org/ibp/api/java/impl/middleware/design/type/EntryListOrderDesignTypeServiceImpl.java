@@ -86,7 +86,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 					EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput);
 	}
 
-	ObservationUnitRow createObservationUnitRow(final int instanceNumber, final StudyEntryDto studyEntry,
+	private ObservationUnitRow createObservationUnitRow(final int instanceNumber, final StudyEntryDto studyEntry,
 		final int plotNumber, final List<MeasurementVariable> measurementVariables) {
 		final ObservationUnitRow row = new ObservationUnitRow();
 		row.setTrialInstance(instanceNumber);
@@ -112,7 +112,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 		return row;
 	}
 
-	private void loadChecksAndTestEntries(final List<StudyEntryDto> studyEntryDtoList, final List<StudyEntryDto> checkList,
+	void loadChecksAndTestEntries(final List<StudyEntryDto> studyEntryDtoList, final List<StudyEntryDto> checkList,
 		final List<StudyEntryDto> testEntryList) {
 
 		// Sort Study Entry List by entry number
