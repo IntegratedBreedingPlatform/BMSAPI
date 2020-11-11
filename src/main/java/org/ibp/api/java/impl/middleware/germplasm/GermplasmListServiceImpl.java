@@ -391,12 +391,12 @@ public class GermplasmListServiceImpl implements GermplamListService {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
-		if (StringUtils.isEmpty(folderId)) {
+		if (StringUtils.isEmpty(folderId) ) {
 			this.errors.reject("list.folder.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (StringUtils.isEmpty(newParentFolderId)) {
+		if (StringUtils.isEmpty(newParentFolderId) || newParentFolderId.equals(CROP_LISTS)) {
 			this.errors.reject("list.parent.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}

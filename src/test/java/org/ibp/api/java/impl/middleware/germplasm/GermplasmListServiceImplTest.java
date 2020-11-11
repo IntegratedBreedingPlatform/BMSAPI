@@ -774,6 +774,23 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test
+	public void shouldFailMoveGermplasmToListToCropList() {
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		try {
+			this.germplasmListService.moveGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId), GermplasmListServiceImpl.CROP_LISTS);
+			fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.parent.id.invalid"));
+		}
+
+		Mockito.verifyZeroInteractions(this.programValidator);
+		Mockito.verifyZeroInteractions(this.germplasmListServiceMiddleware);
+		Mockito.verifyZeroInteractions(this.germplasmListManager);
+	}
+
+	@Test
 	public void shouldFailMoveGermplasmListIfCurrentFolderNotExists() {
 		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
 		final Integer newParentId = new Random().nextInt(Integer.MAX_VALUE);
