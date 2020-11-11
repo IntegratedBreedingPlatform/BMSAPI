@@ -100,10 +100,9 @@ public class GermplasmListResourceGroup {
 		@PathVariable final String crop,
 		@PathVariable final String folderId,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam final String newParentId,
-		@RequestParam final boolean isCropList) {
+		@RequestParam final String newParentId) {
 
-		final Integer movedFolderId = this.germplamListService.moveGermplasmListFolder(crop, programUUID, folderId, newParentId, isCropList);
+		final Integer movedFolderId = this.germplamListService.moveGermplasmListFolder(crop, programUUID, folderId, newParentId);
 		return new ResponseEntity<>(movedFolderId, HttpStatus.OK);
 	}
 
