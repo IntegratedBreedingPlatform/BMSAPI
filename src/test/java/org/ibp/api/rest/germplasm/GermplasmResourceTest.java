@@ -20,7 +20,7 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 		germplasmUpdateDTO.setPreferredName("DRVNM");
 		germplasmUpdateDTO.setLocationAbbreviation("UKN");
 		germplasmUpdateDTO.setCreationDate("20200101");
-		germplasmUpdateDTO.setBreedingMethod("UBM");
+		germplasmUpdateDTO.setBreedingMethodAbbr("UBM");
 		germplasmUpdateDTO.getNames().put("DRVNM", "Derivative Name");
 		germplasmUpdateDTO.getAttributes().put("NOTE", "Note 1");
 

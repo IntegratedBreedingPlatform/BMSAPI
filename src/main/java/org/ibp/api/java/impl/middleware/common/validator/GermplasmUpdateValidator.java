@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -141,8 +140,8 @@ public class GermplasmUpdateValidator {
 		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> breedingMethodsAbbrs =
-			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethod()))
-				.map(dto -> dto.getBreedingMethod()).collect(Collectors.toSet());
+			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
+				.map(dto -> dto.getBreedingMethodAbbr()).collect(Collectors.toSet());
 		final List<String> codes =
 			this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false).stream().map(loc -> loc.getCode())
 				.collect(

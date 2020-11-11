@@ -188,9 +188,9 @@ public class GermplasmResource {
 	@ResponseBody
 	public ResponseEntity<Void> importGermplasmUpdates(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+		@RequestBody final List<GermplasmUpdateDTO> germplasmList) {
 
-		this.germplasmService.importGermplasmUpdates(programUUID, germplasmUpdateDTOList);
+		this.germplasmService.importGermplasmUpdates(programUUID, germplasmList);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
