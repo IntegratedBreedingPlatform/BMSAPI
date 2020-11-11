@@ -115,6 +115,9 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 	private void loadChecksAndTestEntries(final List<StudyEntryDto> studyEntryDtoList, final List<StudyEntryDto> checkList,
 		final List<StudyEntryDto> testEntryList) {
 
+		// Sort Study Entry List by entry number
+		studyEntryDtoList.sort(Comparator.comparing(StudyEntryDto::getEntryNumber));
+
 		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
 			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
 			if (entryType.isPresent()) {
