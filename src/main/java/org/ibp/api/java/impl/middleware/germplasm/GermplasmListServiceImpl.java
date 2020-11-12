@@ -377,8 +377,13 @@ public class GermplasmListServiceImpl implements GermplamListService {
 		this.validateProgram(cropName, programUUID);
 		this.validateNodeId(folderId, programUUID, ListNodeType.FOLDER);
 
-		//Validate if there is a folder with same name in parent folder
 		final GermplasmList germplasmList = this.germplasmListService.getGermplasmListById(Integer.parseInt(folderId)).get();
+		if (!germplasmList.isFolder()) {
+			this.errors.reject("list.folder.id.not.exist", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		//Validate if there is a folder with same name in parent folder
 		this.validateNotSameFolderNameInParent(newFolderName, germplasmList.getParentId(), programUUID);
 
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();

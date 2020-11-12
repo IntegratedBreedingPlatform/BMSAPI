@@ -449,6 +449,7 @@ public class GermplasmListServiceImplTest {
 		final GermplasmList germplasmList = Mockito.mock(GermplasmList.class);
 		Mockito.when(germplasmList.getParentId()).thenReturn(parentId);
 		Mockito.when(germplasmList.getProgramUUID()).thenReturn(PROGRAM_UUID);
+		Mockito.when(germplasmList.isFolder()).thenReturn(true);
 
 		Mockito.doNothing().when(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByIdAndProgramUUID(folderId, PROGRAM_UUID))
@@ -595,6 +596,37 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test
+	public void shouldFailUpdateGermplasmListFolderIfNotFolder() {
+
+		final String folderName = "newFolderName";
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		Mockito.doNothing().when(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+
+		final GermplasmList germplasmList = Mockito.mock(GermplasmList.class);
+		Mockito.when(germplasmList.isFolder()).thenReturn(false);
+		Mockito.when(germplasmList.getProgramUUID()).thenReturn(PROGRAM_UUID);
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByIdAndProgramUUID(folderId, PROGRAM_UUID))
+			.thenReturn(Optional.of(germplasmList));
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(folderId))
+			.thenReturn(Optional.of(germplasmList));
+
+		try {
+			this.germplasmListService.updateGermplasmListFolderName(CROP, PROGRAM_UUID, folderName, String.valueOf(folderId));
+			fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.not.exist"));
+		}
+
+		Mockito.verify(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListByIdAndProgramUUID(folderId, PROGRAM_UUID);
+		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListById(folderId);
+		Mockito.verifyNoMoreInteractions(this.programValidator);
+		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
+	}
+
+	@Test
 	public void shouldFailUpdateGermplasmListFolderWithSameFolderNameInParent() {
 
 		final String folderName = "newFolderName";
@@ -604,6 +636,7 @@ public class GermplasmListServiceImplTest {
 		final GermplasmList germplasmList = Mockito.mock(GermplasmList.class);
 		Mockito.when(germplasmList.getParentId()).thenReturn(parentId);
 		Mockito.when(germplasmList.getProgramUUID()).thenReturn(PROGRAM_UUID);
+		Mockito.when(germplasmList.isFolder()).thenReturn(true);
 
 		Mockito.doNothing().when(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByIdAndProgramUUID(germplasmListId, PROGRAM_UUID))
