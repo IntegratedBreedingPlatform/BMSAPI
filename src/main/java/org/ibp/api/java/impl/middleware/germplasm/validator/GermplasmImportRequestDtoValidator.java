@@ -231,6 +231,14 @@ public class GermplasmImportRequestDtoValidator {
 			final List<String> existingGermplasmAttributes =
 				this.germplasmService.filterGermplasmAttributes(attributes).stream().map(AttributeDTO::getCode).collect(
 					Collectors.toList());
+			final Set<String> repeatedAttributes =
+				existingGermplasmAttributes.stream().filter(i -> Collections.frequency(existingGermplasmAttributes, i) > 1)
+					.collect(Collectors.toSet());
+			if (!repeatedAttributes.isEmpty()) {
+				errors.reject("germplasm.import.attributes.duplicated.found",
+					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(repeatedAttributes), 3)}, "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
 			if (existingGermplasmAttributes.size() != attributes.size()) {
 				attributes.removeAll(existingGermplasmAttributes);
 				errors.reject("germplasm.import.attributes.not.exist",
