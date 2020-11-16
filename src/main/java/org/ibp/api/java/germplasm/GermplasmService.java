@@ -23,8 +23,7 @@ public interface GermplasmService {
 
 	int searchGermplasmCount(String searchText);
 
-	List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
-		final String programUUID);
+	List<GermplasmSearchResponse> searchGermplasm(GermplasmSearchRequest germplasmSearchRequest, Pageable pageable, String programUUID);
 
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
@@ -34,9 +33,9 @@ public interface GermplasmService {
 
 	ProgenyDTO getProgeny(Integer germplasmDbId);
 
-	GermplasmDTO getGermplasmDTObyGID (Integer germplasmId);
+	GermplasmDTO getGermplasmDTObyGID(Integer germplasmId);
 
-	List<GermplasmDTO> searchGermplasmDTO (GermplasmSearchRequestDto germplasmSearchRequestDTO, Integer page, Integer pageSize);
+	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Integer page, Integer pageSize);
 
 	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
