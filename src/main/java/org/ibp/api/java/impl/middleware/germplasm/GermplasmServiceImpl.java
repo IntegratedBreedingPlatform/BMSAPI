@@ -351,7 +351,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
 		final List<GermplasmImportRequestDto> germplasmImportRequestDto) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-		germplasmImportRequestDtoValidator.validate(programUUID, germplasmImportRequestDto);
+		germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
 		return this.germplasmService.importGermplasm(user.getUserid(), cropName, germplasmImportRequestDto);
 	}
 

@@ -19,6 +19,7 @@ import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,9 @@ public class GermplasmResource {
 
 	@Autowired
 	private GermplasmTemplateExportService germplasmTemplateExportService;
+
+	@Autowired
+	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
 
 	@ApiOperation(value = "Search germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
@@ -191,6 +195,7 @@ public class GermplasmResource {
 	public ResponseEntity<Void> validateImportGermplasmData(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final List<ExtendedGermplasmImportRequestDto> germplasmList) {
+		germplasmImportRequestDtoValidator.validateImportLoadedData(programUUID, germplasmList);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
