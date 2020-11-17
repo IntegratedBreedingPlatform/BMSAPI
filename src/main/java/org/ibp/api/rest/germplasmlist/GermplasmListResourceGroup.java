@@ -54,7 +54,6 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplamListService.create(request), HttpStatus.CREATED);
 	}
 
-
 	@ApiOperation(value = "Get germplasm lists types", notes = "Get germplasm lists types")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-types", method = RequestMethod.GET)
 	@ResponseBody
@@ -65,5 +64,58 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(germplasmListTypes, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Create germplasm list folder", notes = "Create sample list folder.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity createGermplasmListFolder(
+		@PathVariable final String crop,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam final String folderName,
+		@RequestParam final String parentId) {
+
+		final Integer folderId = this.germplamListService.createGermplasmListFolder(crop, programUUID, folderName, parentId);
+		return new ResponseEntity<>(folderId, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Update germplasm list folder", notes = "Update germplasm list folder.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity updateGermplasmListFolderName(
+		@PathVariable final String crop,
+		@PathVariable final String folderId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam final String newFolderName) {
+
+		final Integer updatedFolderId = this.germplamListService.updateGermplasmListFolderName(crop, programUUID, newFolderName, folderId);
+		return new ResponseEntity<>(updatedFolderId, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Move germplasm list folder.", notes = "Move germplasm list folder.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}/move", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity moveGermplasmList(
+		@PathVariable final String crop,
+		@PathVariable final String folderId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam final String newParentId) {
+
+		final Integer movedFolderId = this.germplamListService.moveGermplasmListFolder(crop, programUUID, folderId, newParentId);
+		return new ResponseEntity<>(movedFolderId, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Delete germplasm list folder", notes = "Delete germplasm list folder.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity deleteGermplasmListFolder(
+		@PathVariable final String crop,
+		@PathVariable final String folderId,
+		@RequestParam(required = false) final String programUUID) {
+		this.germplamListService.deleteGermplasmListFolder(crop, programUUID, folderId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 
 }

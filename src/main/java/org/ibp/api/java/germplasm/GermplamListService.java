@@ -17,4 +17,12 @@ public interface GermplamListService {
 
 	List<GermplasmListTypeDTO> getGermplasmListTypes();
 
+	Integer createGermplasmListFolder(String cropName, String programUUID, String folderName, String parentId);
+
+	Integer updateGermplasmListFolderName(String cropName, String programUUID, String newFolderName, String folderId);
+
+	Integer moveGermplasmListFolder(String cropName, String programUUID, String folderId, String newParentFolderId);
+
+	void deleteGermplasmListFolder(String cropName, String programUUID, String folderId);
+
 }
