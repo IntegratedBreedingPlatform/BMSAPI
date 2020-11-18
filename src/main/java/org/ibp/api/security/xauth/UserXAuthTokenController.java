@@ -31,6 +31,7 @@ public class UserXAuthTokenController {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+	@Deprecated
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	@ApiIgnore
 	public Token authenticate(@RequestParam final String username, @RequestParam final String password) {
