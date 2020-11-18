@@ -185,9 +185,9 @@ public class GermplasmResource {
 	@ResponseBody
 	public ResponseEntity<Map<Integer, GermplasmImportResponseDto>> importGermplasm(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody final GermplasmImportRequestDto germplasmImportRequestDto) {
+		@RequestBody final List<GermplasmImportRequestDto> germplasmList) {
 
-		return new ResponseEntity<>(this.germplasmService.importGermplasm(cropName, programUUID, germplasmImportRequestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmService.importGermplasm(cropName, programUUID, germplasmList), HttpStatus.OK);
 	}
 
 	/**
