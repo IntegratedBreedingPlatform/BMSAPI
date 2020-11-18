@@ -22,7 +22,9 @@ import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
+import org.ibp.api.Util;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.location.LocationDto;
@@ -30,6 +32,7 @@ import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
@@ -65,6 +68,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -414,6 +418,65 @@ public class LotResource {
 			this.inventoryLock.unlockWrite();
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Returns lots with the given germplasm id", notes = "Returns lots with the given germplasm id.")
+	@RequestMapping(value = "/crops/{cropName}/lots/germplasm/{gid}", method = RequestMethod.GET)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "Results page you want to retrieve (0..N)"),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property(,asc|desc). " +
+				"Default sort order is ascending. " +
+				"Multiple sort criteria are supported.")
+	})
+
+	@ResponseBody
+	@JsonView(InventoryView.LotView.class)
+	public ResponseEntity<List<ExtendedLotDto>> getLotsByGId(
+		@PathVariable final String cropName,
+		@PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID,
+		@ApiIgnore final Pageable pageable) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
+		if (!Util.isPositiveInteger(String.valueOf(gid))) {
+			errors.reject("gid.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final LotsSearchDto searchDTO = new LotsSearchDto();
+		searchDTO.setGids(Arrays.asList(gid));
+		searchDTO.setStatus(LotStatus.ACTIVE.getIntValue());
+
+		final PagedResult<ExtendedLotDto> resultPage =
+			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<ExtendedLotDto>() {
+
+				@Override
+				public long getCount() {
+					return LotResource.this.lotService.countSearchLots(searchDTO);
+				}
+
+				@Override
+				public List<ExtendedLotDto> getResults(final PagedResult<ExtendedLotDto> pagedResult) {
+					try {
+						LotResource.this.inventoryLock.lockRead();
+						return LotResource.this.lotService.searchLots(searchDTO, pageable);
+					} finally {
+						LotResource.this.inventoryLock.unlockRead();
+					}
+				}
+			});
+
+		final List<ExtendedLotDto> extendedLotDtos = resultPage.getPageResults();
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
+
+		return new ResponseEntity<>(extendedLotDtos, headers, HttpStatus.OK);
+
 	}
 
 }

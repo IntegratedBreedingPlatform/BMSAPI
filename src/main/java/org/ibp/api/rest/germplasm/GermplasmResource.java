@@ -12,12 +12,16 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.ibp.api.Util;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +33,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +44,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -165,6 +172,7 @@ public class GermplasmResource {
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
+
 	/**
 	 * Import a set of germplasm
 	 *
@@ -180,6 +188,36 @@ public class GermplasmResource {
 		@RequestBody final GermplasmImportRequestDto germplasmImportRequestDto) {
 
 		return new ResponseEntity<>(this.germplasmService.importGermplasm(cropName, programUUID, germplasmImportRequestDto), HttpStatus.OK);
+	}
+
+	/**
+	 * Get a germplasm by the given id
+	 *
+	 * @return {@link GermplasmSearchResponse}
+	 */
+	@ApiOperation(value = "Save a set of germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<GermplasmSearchResponse> getGermplasmById(
+		@PathVariable final String cropName,
+		@PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
+		if (!Util.isPositiveInteger(String.valueOf(gid))) {
+			errors.reject("gid.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		germplasmSearchRequest.setGid(gid);
+		final List<GermplasmSearchResponse> germplasmSearchResponses =
+			germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
+		if (germplasmSearchResponses.isEmpty()) {
+			errors.reject("gids.invalid", new Integer[] {gid}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		return new ResponseEntity<>(germplasmSearchResponses.get(0), HttpStatus.OK);
 	}
 
 }
