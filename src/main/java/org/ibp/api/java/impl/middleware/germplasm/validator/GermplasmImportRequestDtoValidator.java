@@ -26,11 +26,12 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,11 @@ import java.util.stream.Collectors;
 public class GermplasmImportRequestDtoValidator {
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
-	private static Integer STOCK_ID_MAX_LENGTH = 35;
+	private static final Integer STOCK_ID_MAX_LENGTH = 35;
+	private static final Integer GUID_MAX_LENGTH = 36;
+	private static final Integer REFERENCE_MAX_LENGTH = 255;
+	private static final Integer NAME_MAX_LENGTH = 255;
+	private static final Integer ATTRIBUTE_MAX_LENGTH = 255;
 
 	private BindingResult errors;
 
@@ -69,7 +74,6 @@ public class GermplasmImportRequestDtoValidator {
 		boolean invalid = germplasmImportRequestDto.stream().anyMatch(g -> {
 
 			final Set<String> nameKeys = new HashSet<>();
-			final Set<String> attributeKeys = new HashSet<>();
 
 			if (g == null) {
 				errors.reject("germplasm.import.germplasm.null", "");
@@ -86,7 +90,7 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
-			if (!StringUtils.isEmpty(g.getReference()) && g.getReference().length() > 255) {
+			if (!StringUtils.isEmpty(g.getReference()) && g.getReference().length() > REFERENCE_MAX_LENGTH) {
 				errors.reject("germplasm.import.reference.length.error", "");
 				return true;
 			}
@@ -123,7 +127,7 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
-			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().length() > 36) {
+			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().length() > GUID_MAX_LENGTH) {
 				errors.reject("germplasm.import.guid.invalid.length", "");
 				return true;
 			}
@@ -139,39 +143,11 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
-			if (g.getAttributes() != null) {
-				g.getAttributes().keySet().forEach(attr -> attributeKeys.add(attr.toUpperCase()));
-				if (g.getAttributes().keySet().size() != attributeKeys.size()) {
-					errors.reject("germplasm.import.duplicated.attributes", new String[] {g.getClientId().toString()}, "");
-					return true;
-				}
-			}
-
-			if (g.getNames().values().stream().anyMatch(n -> {
-				if (StringUtils.isEmpty(n)) {
-					errors.reject("germplasm.import.name.type.value.null.empty", "");
-					return true;
-				}
-				if (n.length() > 255) {
-					errors.reject("germplasm.import.name.type.value.invalid.length", "");
-					return true;
-				}
-				return false;
-			})) {
+			if (areNameValuesInvalid(g.getNames().values())) {
 				return true;
 			}
 
-			if (g.getAttributes() != null && g.getAttributes().values().stream().anyMatch(n -> {
-				if (StringUtils.isEmpty(n)) {
-					errors.reject("germplasm.import.attribute.value.null.empty", "");
-					return true;
-				}
-				if (n.length() > 255) {
-					errors.reject("germplasm.import.attribute.value.invalid.length", "");
-					return true;
-				}
-				return false;
-			})) {
+			if (areAttributesInvalid(g.getClientId(), g.getAttributes())) {
 				return true;
 			}
 
@@ -198,17 +174,26 @@ public class GermplasmImportRequestDtoValidator {
 
 		BaseValidator.checkNotEmpty(germplasmImportRequestDto, "germplasm.import.list.null");
 
+		final Set<Integer> clientIds = new HashSet<>();
 		boolean invalid = germplasmImportRequestDto.stream().anyMatch(g -> {
 
 			final Set<String> nameKeys = new HashSet<>();
-			final Set<String> attributeKeys = new HashSet<>();
 
 			if (g == null) {
 				errors.reject("germplasm.import.germplasm.null", "");
 				return true;
 			}
 
-			if (!StringUtils.isEmpty(g.getReference()) && g.getReference().length() > 255) {
+			if (g.getClientId() != null) {
+				if (clientIds.contains(g.getClientId())) {
+					errors.reject("germplasm.import.client.id.duplicated", "");
+					return true;
+				}
+
+				clientIds.add(g.getClientId());
+			}
+
+			if (!StringUtils.isEmpty(g.getReference()) && g.getReference().length() > REFERENCE_MAX_LENGTH) {
 				errors.reject("germplasm.import.reference.length.error", "");
 				return true;
 			}
@@ -218,7 +203,7 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
-			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().length() > 36) {
+			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().length() > GUID_MAX_LENGTH) {
 				errors.reject("germplasm.import.guid.invalid.length", "");
 				return true;
 			}
@@ -230,47 +215,20 @@ public class GermplasmImportRequestDtoValidator {
 					return true;
 				}
 
-				if (StringUtils.isNotEmpty(g.getPreferredName()) && !nameKeys.contains(g.getPreferredName().toUpperCase())) {
-					errors.reject("germplasm.import.preferred.name.invalid", "");
-					return true;
-				}
-
-				if (g.getNames().values().stream().anyMatch(n -> {
-					if (StringUtils.isEmpty(n)) {
-						errors.reject("germplasm.import.name.type.value.null.empty", "");
-						return true;
-					}
-					if (n.length() > 255) {
-						errors.reject("germplasm.import.name.type.value.invalid.length", "");
-						return true;
-					}
-					return false;
-				})) {
+				if (areNameValuesInvalid(g.getNames().values())) {
 					return true;
 				}
 
 			}
 
-			if (g.getAttributes() != null) {
-				g.getAttributes().keySet().forEach(attr -> attributeKeys.add(attr.toUpperCase()));
-				if (g.getAttributes().keySet().size() != attributeKeys.size()) {
-					errors.reject("germplasm.import.duplicated.attributes", new String[] {g.getClientId().toString()}, "");
-					return true;
-				}
+			if (StringUtils.isNotEmpty(g.getPreferredName()) && (g.getNames() == null || !nameKeys
+				.contains(g.getPreferredName().toUpperCase()))) {
+				errors.reject("germplasm.import.preferred.name.invalid", "");
+				return true;
+			}
 
-				if (g.getAttributes().values().stream().anyMatch(n -> {
-					if (StringUtils.isEmpty(n)) {
-						errors.reject("germplasm.import.attribute.value.null.empty", "");
-						return true;
-					}
-					if (n.length() > 255) {
-						errors.reject("germplasm.import.attribute.value.invalid.length", "");
-						return true;
-					}
-					return false;
-				})) {
-					return true;
-				}
+			if (areAttributesInvalid(g.getClientId(), g.getAttributes())) {
+				return true;
 			}
 
 			if (g.getAmount() != null && g.getAmount() <= 0) {
@@ -318,7 +276,8 @@ public class GermplasmImportRequestDtoValidator {
 	private void validateAllBreedingMethodAbbreviationsExists(final String programUUID,
 		final List<? extends GermplasmImportRequestDto> germplasmDtos) {
 		final Set<String> breedingMethodsAbbrs =
-			germplasmDtos.stream().filter(Objects::nonNull).map(g -> g.getBreedingMethodAbbr().toUpperCase()).collect(
+			germplasmDtos.stream().filter(g -> StringUtils.isNotEmpty(g.getBreedingMethodAbbr()))
+				.map(g -> g.getBreedingMethodAbbr().toUpperCase()).collect(
 				Collectors.toSet());
 		if (!breedingMethodsAbbrs.isEmpty()) {
 			final List<String> existingBreedingMethods =
@@ -337,7 +296,8 @@ public class GermplasmImportRequestDtoValidator {
 	private void validateAllLocationAbbreviationsExists(final String programUUID,
 		final List<? extends GermplasmImportRequestDto> germplasmDtos) {
 		final Set<String> locationAbbrs =
-			germplasmDtos.stream().filter(Objects::nonNull).map(g -> g.getLocationAbbr().toUpperCase()).collect(Collectors.toSet());
+			germplasmDtos.stream().filter(g -> StringUtils.isNotEmpty(g.getLocationAbbr())).map(g -> g.getLocationAbbr().toUpperCase())
+				.collect(Collectors.toSet());
 		if (!locationAbbrs.isEmpty()) {
 			final List<String> existingLocations =
 				this.locationDataManager.getFilteredLocations(programUUID, null, null, new ArrayList<>(locationAbbrs), false).stream().map(
@@ -356,7 +316,7 @@ public class GermplasmImportRequestDtoValidator {
 		final List<ExtendedGermplasmImportRequestDto> germplasmDtos) {
 		final List<String> locationAbbreviations =
 			germplasmDtos.stream().filter(g -> StringUtils.isNotEmpty(g.getStorageLocationAbbr()))
-				.map(ExtendedGermplasmImportRequestDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
+				.map(g -> g.getStorageLocationAbbr().toUpperCase()).distinct().collect(Collectors.toList());
 		if (!locationAbbreviations.isEmpty()) {
 			final List<Location> existingLocations =
 				locationDataManager.getFilteredLocations(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, false);
@@ -455,6 +415,46 @@ public class GermplasmImportRequestDtoValidator {
 		if (!units.isEmpty()) {
 			this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(units), errors);
 		}
+	}
+
+	private boolean areNameValuesInvalid(final Collection<String> values) {
+		return values.stream().anyMatch(n -> {
+			if (StringUtils.isEmpty(n)) {
+				errors.reject("germplasm.import.name.type.value.null.empty", "");
+				return true;
+			}
+			if (n.length() > NAME_MAX_LENGTH) {
+				errors.reject("germplasm.import.name.type.value.invalid.length", "");
+				return true;
+			}
+			return false;
+		});
+	}
+
+	private boolean areAttributesInvalid(final Integer id, final Map<String, String> attributes) {
+		if (attributes != null) {
+			final Set<String> attributeKeys = new HashSet<>();
+			attributes.keySet().forEach(attr -> attributeKeys.add(attr.toUpperCase()));
+			if (attributes.keySet().size() != attributeKeys.size()) {
+				errors.reject("germplasm.import.duplicated.attributes", new String[] {id.toString()}, "");
+				return true;
+			}
+			if (attributes.values().stream().anyMatch(n -> {
+				if (StringUtils.isEmpty(n)) {
+					errors.reject("germplasm.import.attribute.value.null.empty", "");
+					return true;
+				}
+				if (n.length() > ATTRIBUTE_MAX_LENGTH) {
+					errors.reject("germplasm.import.attribute.value.invalid.length", "");
+					return true;
+				}
+				return false;
+			})) {
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 
 }
