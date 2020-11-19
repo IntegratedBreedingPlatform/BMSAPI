@@ -142,6 +142,15 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.filterGermplasmNameTypes(codes), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Search germplasm name types")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/name-types/search", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmNameTypeDTO>> searchNameTypes(@PathVariable final String cropName,
+															   @RequestParam(required = false) final String programUUID,
+															   @RequestParam final String query) {
+		return new ResponseEntity<>(this.germplasmService.searchNameTypes(query), HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Returns germplasm attributes filtered by a list of codes", notes = "Returns germplasm attributes filtered by a list of codes")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes", method = RequestMethod.GET)
 	@ResponseBody

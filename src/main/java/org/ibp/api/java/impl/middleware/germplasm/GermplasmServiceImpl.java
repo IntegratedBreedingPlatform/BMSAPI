@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
@@ -92,6 +93,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private AttributeService attributeService;
+
+	@Autowired
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	@Autowired
 	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmService;
@@ -182,6 +186,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(final String query) {
 		return this.attributeService.searchAttributes(query);
+	}
+
+	@Override
+	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(final String query) {
+		return this.germplasmNameTypeService.searchNameTypes(query);
 	}
 
 	@Override

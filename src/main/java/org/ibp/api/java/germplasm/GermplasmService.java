@@ -30,6 +30,8 @@ public interface GermplasmService {
 
 	List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(String name);
 
+	List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(String name);
+
 	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, Boolean includeSiblings);
 
 	ProgenyDTO getProgeny(Integer germplasmDbId);
