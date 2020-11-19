@@ -10,9 +10,11 @@ import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.importation.ExtendedGermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
@@ -196,6 +198,17 @@ public class GermplasmResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final List<ExtendedGermplasmImportRequestDto> germplasmList) {
 		germplasmImportRequestDtoValidator.validateImportLoadedData(programUUID, germplasmList);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get a list of germplasm given a set of germplasmUUIDs and names")
+	//FIXME: When removing current import germplasm, this preauthorize must be modified
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/matches", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<GermplasmDto> getGermplasmMatches(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmMatchRequestDto germplasmMatchRequestDto) {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
