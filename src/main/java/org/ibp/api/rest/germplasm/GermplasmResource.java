@@ -12,12 +12,11 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
-import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -191,11 +190,11 @@ public class GermplasmResource {
 	}
 
 	/**
-	 * Get a germplasm by the given id
+	 * Returns a germplasm by a given germplasm id
 	 *
 	 * @return {@link GermplasmSearchResponse}
 	 */
-	@ApiOperation(value = "Save a set of germplasm")
+	@ApiOperation(value = "Returns a germplasm by a given germplasm id")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<GermplasmSearchResponse> getGermplasmById(
@@ -205,8 +204,8 @@ public class GermplasmResource {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
 		if (!Util.isPositiveInteger(String.valueOf(gid))) {
-			errors.reject("gid.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			errors.reject("gids.invalid", new Integer[] {gid}, "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
@@ -215,7 +214,7 @@ public class GermplasmResource {
 			germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 		if (germplasmSearchResponses.isEmpty()) {
 			errors.reject("gids.invalid", new Integer[] {gid}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 		return new ResponseEntity<>(germplasmSearchResponses.get(0), HttpStatus.OK);
 	}
