@@ -387,8 +387,8 @@ public class TransactionResource {
 		}
 	}
 
-	@ApiOperation(value = "Returns all the transactions for the given lot id",
-		notes = "Returns all the transactions for the given lot id")
+	@ApiOperation(value = "Returns all the transactions for the given germplasm id",
+		notes = "Returns all the transactions for the given germplasm id")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/transactions", method = RequestMethod.GET)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
