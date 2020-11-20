@@ -10,9 +10,9 @@ import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
-import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.common.PagedResult;
@@ -166,6 +166,7 @@ public class GermplasmResource {
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
+
 	/**
 	 * Import a set of germplasm
 	 *
@@ -186,13 +187,10 @@ public class GermplasmResource {
 	@ApiOperation(value = "Import germplasm updates")
 	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<Void> importGermplasmUpdates(@PathVariable final String cropName,
+	public ResponseEntity<Set<Integer>> importGermplasmUpdates(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final List<GermplasmUpdateDTO> germplasmList) {
-
-		this.germplasmService.importGermplasmUpdates(programUUID, germplasmList);
-
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmService.importGermplasmUpdates(programUUID, germplasmList), HttpStatus.OK);
 	}
 
 }

@@ -50,7 +50,7 @@ public interface GermplasmService {
 
 	long countAttributesByGid(String gid, List<String> attributeDbIds);
 
-	void importGermplasmUpdates(String programUUID, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
+	Set<Integer> importGermplasmUpdates(String programUUID, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 

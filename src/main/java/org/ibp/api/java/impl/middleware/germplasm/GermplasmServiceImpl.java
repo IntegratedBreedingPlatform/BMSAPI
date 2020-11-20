@@ -321,7 +321,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public void importGermplasmUpdates(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public Set<Integer> importGermplasmUpdates(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		this.errors = new MapBindingResult(new HashMap<>(), AttributeDTO.class.getName());
 		this.germplasmUpdateValidator.validateEmptyList(this.errors, germplasmUpdateDTOList);
@@ -335,7 +335,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.germplasmService.importGermplasmUpdates(germplasmUpdateDTOList);
+		return this.germplasmService.importGermplasmUpdates(germplasmUpdateDTOList);
 
 	}
 
