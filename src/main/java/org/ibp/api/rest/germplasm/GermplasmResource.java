@@ -155,10 +155,11 @@ public class GermplasmResource {
 
 	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID) {
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final boolean updateFormat) {
 
 		final File file =
-			this.germplasmTemplateExportService.export(cropName, programUUID);
+			this.germplasmTemplateExportService.export(cropName, programUUID, updateFormat);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers

@@ -42,10 +42,12 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -57,25 +59,37 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 	private static final Set<Integer> LOCATION_TYPE = new HashSet<>(Arrays.asList(410, 405));
 
 	private static final String FILE_NAME = "GermplasmImportTemplate.xls";
-
-	private static final int OBSERVATION_SHEET_ENTRY_NO_COLUMN_INDEX = 0;
-	private static final int OBSERVATION_SHEET_LNAME_COLUMN_INDEX = 1;
-	private static final int OBSERVATION_SHEET_DRVNM_COLUMN_INDEX = 2;
-	private static final int OBSERVATION_SHEET_PREFERRED_NAME_COLUMN_INDEX = 3;
-	private static final int OBSERVATION_SHEET_ENTRY_CODE_COLUMN_INDEX = 4;
-	private static final int OBSERVATION_SHEET_LOCATION_ABBR_COLUMN_INDEX = 5;
-	private static final int OBSERVATION_SHEET_REFERENCE_COLUMN_INDEX = 6;
-	private static final int OBSERVATION_SHEET_CREATION_DATE_COLUMN_INDEX = 7;
-	private static final int OBSERVATION_SHEET_BREEDING_METHOD_COLUMN_INDEX = 8;
-	private static final int OBSERVATION_SHEET_NOTES_COLUMN_INDEX = 9;
-	private static final int OBSERVATION_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX = 10;
-	private static final int OBSERVATION_SHEET_UNITS_COLUMN_INDEX = 11;
-	private static final int OBSERVATION_SHEET_AMOUNT_COLUMN_INDEX = 12;
-	private static final int OBSERVATION_SHEET_STOCK_ID_COLUMN_INDEX = 13;
-	private static final int OBSERVATION_SHEET_GUID_COLUMN_INDEX = 14;
-
 	private static final int CODES_SHEET_FIRST_COLUMN_INDEX = 0;
 	private static final int CODES_SHEET_SECOND_COLUMN_INDEX = 1;
+
+	private static final List<String> IMPORT_HEADERS = new ArrayList<>(Arrays.asList(
+		"export.germplasm.list.template.entry.no.column",
+		"export.germplasm.list.template.lname.column",
+		"export.germplasm.list.template.drvnm.column",
+		"export.germplasm.list.template.preferred.name.column",
+		"export.germplasm.list.template.entry.code.column",
+		"export.germplasm.list.template.location.abbr.column",
+		"export.germplasm.list.template.reference.column",
+		"export.germplasm.list.template.creation.date.column",
+		"export.germplasm.list.template.breeding.method.column",
+		"export.germplasm.list.template.notes.column",
+		"export.germplasm.list.template.storage.location.abbr.column",
+		"export.germplasm.list.template.units.column",
+		"export.germplasm.list.template.amount.column",
+		"export.germplasm.list.template.stock.id.column",
+		"export.germplasm.list.template.guid.column"
+	));
+
+	private static final List<String> IMPORT_HEADERS_FOR_UPDATE = new ArrayList<>(Arrays.asList(
+		"export.germplasm.list.template.gid.column",
+		"export.germplasm.list.template.guid.column",
+		"export.germplasm.list.template.preferred.name.column",
+		"export.germplasm.list.template.location.abbr.column",
+		"export.germplasm.list.template.creation.date.column",
+		"export.germplasm.list.template.reference.column",
+		"export.germplasm.list.template.drvnm.column",
+		"export.germplasm.list.template.notes.column"
+	));
 
 	@Autowired
 	protected ResourceBundleMessageSource messageSource;
@@ -114,14 +128,14 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 	private HSSFWorkbook wb;
 
 	@Override
-	public File export(final String cropName, final String programUUID) {
+	public File export(final String cropName, final String programUUID, final boolean updateFormat) {
 
 		try {
 			final File temporaryFolder = Files.createTempDir();
 
 			final String fileNameFullPath =
 				temporaryFolder.getAbsolutePath() + File.separator + GermplasmExcelTemplateExportServiceImpl.FILE_NAME;
-			return this.generateTemplateFile(fileNameFullPath, cropName, programUUID);
+			return this.generateTemplateFile(fileNameFullPath, cropName, programUUID, updateFormat);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.export.as.xls.germplasm.template", "");
@@ -129,12 +143,12 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		}
 	}
 
-	private File generateTemplateFile(final String fileNamePath, final String cropName, final String programUUID) throws IOException {
+	private File generateTemplateFile(final String fileNamePath, final String cropName, final String programUUID, final boolean isUpdateFormat) throws IOException {
 		this.wb = new HSSFWorkbook();
 
 		final File file = new File(fileNamePath);
 		this.sheetStylesMap = createStyles();
-		this.writeObservationSheet();
+		this.writeObservationSheet(isUpdateFormat);
 		this.writeCodesSheet(cropName, programUUID);
 
 		try (final FileOutputStream fos = new FileOutputStream(file)) {
@@ -144,93 +158,27 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		return file;
 	}
 
-	private void writeObservationSheet() {
+	private void writeObservationSheet(final boolean isUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet observationSheet = this.wb.createSheet(this.getMessageSource().getMessage("export.germplasm.list.template.sheet.observation", null, locale));
 		observationSheet.setDefaultRowHeightInPoints(16);
-		this.writeObservationHeader(observationSheet);
+		this.writeObservationHeader(observationSheet, isUpdateFormat);
 	}
 
-	private void writeObservationHeader(final HSSFSheet observationSheet) {
+	private void writeObservationHeader(final HSSFSheet observationSheet, final boolean isUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
-		int currentRowNum = 0;
-		final HSSFRow row = observationSheet.createRow(currentRowNum);
+		final HSSFRow row = observationSheet.createRow(0);
 
-		HSSFCell cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_ENTRY_NO_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_YELLOW));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.entry.no.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_LNAME_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_YELLOW));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.lname.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_DRVNM_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_YELLOW));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.drvnm.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_PREFERRED_NAME_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_YELLOW));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.preferred.name.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_ENTRY_CODE_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_YELLOW));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.entry.code.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_LOCATION_ABBR_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_YELLOW));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.location.abbr.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_REFERENCE_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_YELLOW));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.reference.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_CREATION_DATE_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_YELLOW));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.creation.date.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_BREEDING_METHOD_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_YELLOW));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.breeding.method.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_NOTES_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_PALE_BLUE));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.notes.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_BLUE));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.storage.location.abbr.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_UNITS_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_BLUE));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.units.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_AMOUNT_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_BLUE));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.amount.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_STOCK_ID_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_BLUE));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.stock.id.column", null, locale));
-
-		cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_GUID_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_ORANGE));
-		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.guid.column", null, locale));
-
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_ENTRY_NO_COLUMN_INDEX, 13 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_LNAME_COLUMN_INDEX, 13 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_DRVNM_COLUMN_INDEX, 13 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_PREFERRED_NAME_COLUMN_INDEX, 20 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_ENTRY_CODE_COLUMN_INDEX, 16 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_LOCATION_ABBR_COLUMN_INDEX, 20 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_REFERENCE_COLUMN_INDEX, 13 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_CREATION_DATE_COLUMN_INDEX, 18 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_BREEDING_METHOD_COLUMN_INDEX, 22 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_NOTES_COLUMN_INDEX, 13 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX, 28 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_UNITS_COLUMN_INDEX, 13 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_AMOUNT_COLUMN_INDEX, 13 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_STOCK_ID_COLUMN_INDEX, 13 * 250);
-		observationSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.OBSERVATION_SHEET_GUID_COLUMN_INDEX, 13 * 250);
+		final List<String> headers = new ArrayList<>(isUpdateFormat ? IMPORT_HEADERS_FOR_UPDATE : IMPORT_HEADERS);
+		final ListIterator<String> iterator = headers.listIterator();
+		while (iterator.hasNext()) {
+			final int index = iterator.nextIndex();
+			final String header = iterator.next();
+			HSSFCell cell = row.createCell(index, CellType.STRING);
+			cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_YELLOW));
+			cell.setCellValue(this.getMessageSource().getMessage(header, null, locale));
+			observationSheet.setColumnWidth(index, 13 * 250);
+		}
 	}
 
 	private void writeCodesSheet(final String cropName, final String programUUID) {

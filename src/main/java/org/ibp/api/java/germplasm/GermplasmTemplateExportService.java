@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface GermplasmTemplateExportService {
 
-	File export(String cropName, String programUUID);
+	File export(String cropName, String programUUID, boolean updateFormat);
 
 }
