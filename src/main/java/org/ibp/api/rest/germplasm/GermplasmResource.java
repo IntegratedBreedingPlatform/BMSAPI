@@ -186,6 +186,7 @@ public class GermplasmResource {
 	}
 
 	@ApiOperation(value = "Import germplasm updates")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM_UPDATES')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity<Set<Integer>> importGermplasmUpdates(@PathVariable final String cropName,
