@@ -93,7 +93,8 @@ public class GermplasmUpdateValidator {
 			errors.reject("germplasm.update.missing.gid.and.uuid", "");
 		}
 
-		final Set<Integer> gids = germplasmUpdateDTOList.stream().map(dto -> dto.getGid()).filter(Objects::nonNull).collect(Collectors.toSet());
+		final Set<Integer> gids =
+			germplasmUpdateDTOList.stream().map(dto -> dto.getGid()).filter(Objects::nonNull).collect(Collectors.toSet());
 		final Set<String> germplasmUUIDs =
 			germplasmUpdateDTOList.stream().map(dto -> StringUtils.isNotEmpty(dto.getGermplasmUUID()) ? dto.getGermplasmUUID() : null)
 				.filter(
@@ -142,16 +143,20 @@ public class GermplasmUpdateValidator {
 		final Set<String> breedingMethodsAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
 				.map(dto -> dto.getBreedingMethodAbbr()).collect(Collectors.toSet());
-		final List<String> codes =
-			this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false).stream().map(loc -> loc.getCode())
-				.collect(
-					Collectors.toList());
-
-		breedingMethodsAbbrs.removeAll(codes);
+		//		final List<String> codes =
+		//			this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false).stream().map(loc -> loc.getCode())
+		//				.collect(
+		//					Collectors.toList());
 
 		if (!breedingMethodsAbbrs.isEmpty()) {
-			errors.reject("germplasm.update.invalid.breeding.method", new String[] {String.join(",", breedingMethodsAbbrs)}, "");
+			throw new UnsupportedOperationException("Updating Breeding Method is not yet supported.");
 		}
+
+		// TODO: Uncomment these line once breeding method is supported.
+		//breedingMethodsAbbrs.removeAll(codes);
+		//if (!breedingMethodsAbbrs.isEmpty()) {
+		//	errors.reject("germplasm.update.invalid.breeding.method", new String[] {String.join(",", breedingMethodsAbbrs)}, "");
+		//}
 
 	}
 

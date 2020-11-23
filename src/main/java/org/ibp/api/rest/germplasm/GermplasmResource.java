@@ -185,7 +185,7 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.importGermplasm(cropName, programUUID, germplasmList), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Import germplasm updates")
+	@ApiOperation(value = "Import germplasm updates. Updating Breeding Method is not yet supported.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM_UPDATES')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PATCH)
 	@ResponseBody
