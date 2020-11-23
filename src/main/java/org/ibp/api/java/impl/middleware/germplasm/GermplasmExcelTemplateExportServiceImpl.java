@@ -72,7 +72,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		"export.germplasm.list.template.reference.column",
 		"export.germplasm.list.template.creation.date.column",
 		"export.germplasm.list.template.breeding.method.column",
-		"export.germplasm.list.template.notes.column",
+		"export.germplasm.list.template.note.column",
 		"export.germplasm.list.template.storage.location.abbr.column",
 		"export.germplasm.list.template.units.column",
 		"export.germplasm.list.template.amount.column",
@@ -88,7 +88,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		"export.germplasm.list.template.creation.date.column",
 		"export.germplasm.list.template.reference.column",
 		"export.germplasm.list.template.drvnm.column",
-		"export.germplasm.list.template.notes.column"
+		"export.germplasm.list.template.note.column"
 	));
 
 	@Autowired
