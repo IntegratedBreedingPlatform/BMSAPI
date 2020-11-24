@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -210,6 +211,7 @@ public class GermplasmResource {
 
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		germplasmSearchRequest.setGid(gid);
+		germplasmSearchRequest.setAddedColumnsPropertyIds(Arrays.asList("PREFERRED NAME"));
 		final List<GermplasmSearchResponse> germplasmSearchResponses =
 			germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 		if (germplasmSearchResponses.isEmpty()) {
