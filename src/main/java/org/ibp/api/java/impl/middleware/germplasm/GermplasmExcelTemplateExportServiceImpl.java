@@ -59,6 +59,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 	private static final Set<Integer> LOCATION_TYPE = new HashSet<>(Arrays.asList(410, 405));
 
 	private static final String FILE_NAME = "GermplasmImportTemplate.xls";
+	private static final String FILE_NAME_FOR_IMPORT_UPDATE = "GermplasmUpdateTemplate.xls";
 	private static final int CODES_SHEET_FIRST_COLUMN_INDEX = 0;
 	private static final int CODES_SHEET_SECOND_COLUMN_INDEX = 1;
 
@@ -134,7 +135,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 			final File temporaryFolder = Files.createTempDir();
 
 			final String fileNameFullPath =
-				temporaryFolder.getAbsolutePath() + File.separator + GermplasmExcelTemplateExportServiceImpl.FILE_NAME;
+				temporaryFolder.getAbsolutePath() + File.separator + (updateFormat ? GermplasmExcelTemplateExportServiceImpl.FILE_NAME_FOR_IMPORT_UPDATE : GermplasmExcelTemplateExportServiceImpl.FILE_NAME);
 			return this.generateTemplateFile(fileNameFullPath, cropName, programUUID, updateFormat);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
