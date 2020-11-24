@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.fest.util.Strings;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -419,7 +420,7 @@ public class LotResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Returns lots with the given germplasm id", notes = "Returns lots with the given germplasm id.")
+	@ApiOperation(value = "Returns lots for the given germplasm id", notes = "Returns lots for the given germplasm id.")
 	@RequestMapping(value = "/crops/{cropName}/lots/germplasm/{gid}", method = RequestMethod.GET)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -438,6 +439,7 @@ public class LotResource {
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
 		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final String status,
 		@ApiIgnore final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
@@ -448,7 +450,10 @@ public class LotResource {
 
 		final LotsSearchDto searchDTO = new LotsSearchDto();
 		searchDTO.setGids(Arrays.asList(gid));
-		searchDTO.setStatus(LotStatus.ACTIVE.getIntValue());
+
+		if (!Strings.isEmpty(status)) {
+			searchDTO.setStatus(LotStatus.getIntValueByName(status));
+		}
 
 		final PagedResult<ExtendedLotDto> resultPage =
 			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<ExtendedLotDto>() {

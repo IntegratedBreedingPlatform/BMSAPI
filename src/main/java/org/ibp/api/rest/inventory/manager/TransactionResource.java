@@ -416,7 +416,7 @@ public class TransactionResource {
 		}
 
 		if (!Objects.isNull(lotId) && !Util.isPositiveInteger(String.valueOf(lotId))) {
-			errors.reject("lotsId.invalid", new Integer[] {lotId}, "");
+			errors.reject("lot.Ids.invalid", new Integer[] {lotId}, "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
