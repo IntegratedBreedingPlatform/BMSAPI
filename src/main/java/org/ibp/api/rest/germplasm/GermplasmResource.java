@@ -206,10 +206,44 @@ public class GermplasmResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/matches", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GermplasmDto> getGermplasmMatches(@PathVariable final String cropName,
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page. <b>Note:</b> this query may return additional records using some filters"),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. ")
+	})
+	public ResponseEntity<List<GermplasmDto>> getGermplasmMatches(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody final GermplasmMatchRequestDto germplasmMatchRequestDto) {
-		return new ResponseEntity<>(HttpStatus.OK);
+		@RequestBody final GermplasmMatchRequestDto germplasmMatchRequestDto,
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+
+		final PagedResult<GermplasmDto> result =
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmDto>() {
+
+				@Override
+				public long getCount() {
+					return germplasmService.countSearchGermplasm(null, null);
+				}
+
+				@Override
+				public long getFilteredCount() {
+					return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
+				}
+
+				@Override
+				public List<GermplasmDto> getResults(final PagedResult<GermplasmDto> pagedResult) {
+					return germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
+				}
+			});
+
+		final List<GermplasmDto> pageResults = result.getPageResults();
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(result.getTotalResults()));
+		headers.add("X-Filtered-Count", Long.toString(result.getFilteredResults()));
+
+		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
 	}
 
 }

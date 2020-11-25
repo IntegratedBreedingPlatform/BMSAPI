@@ -9,10 +9,12 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -27,10 +29,12 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
@@ -353,6 +357,28 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
 		return this.germplasmService.importGermplasm(user.getUserid(), cropName, germplasmImportRequestDto);
+	}
+
+	@Override
+	public long countGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto) {
+		BaseValidator.checkNotNull(germplasmMatchRequestDto, "germplasm.match.request.null");
+		if (!germplasmMatchRequestDto.isValid()) {
+			this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
+			errors.reject("germplasm.match.request.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
+	}
+
+	@Override
+	public List<GermplasmDto> findGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto, final Pageable pageable) {
+		BaseValidator.checkNotNull(germplasmMatchRequestDto, "germplasm.match.request.null");
+		if (!germplasmMatchRequestDto.isValid()) {
+			this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
+			errors.reject("germplasm.match.request.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		return germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
