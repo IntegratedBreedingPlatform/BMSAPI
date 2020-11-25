@@ -25,6 +25,7 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.TransactionExportService;
@@ -75,6 +76,9 @@ public class TransactionResource {
 
 	@Autowired
 	private TransactionExportService transactionExportServiceImpl;
+
+	@Autowired
+	private GermplasmValidator germplasmValidator;
 
 	@ApiOperation(value = "Get Transaction types")
 	@RequestMapping(value = "/crops/{cropName}/transaction-types", method = RequestMethod.GET)
@@ -417,6 +421,11 @@ public class TransactionResource {
 
 		if (!Objects.isNull(lotId) && !Util.isPositiveInteger(String.valueOf(lotId))) {
 			errors.reject("lot.Ids.invalid", new Integer[] {lotId}, "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
+		this.germplasmValidator.validateGermplasmId(errors, gid);
+		if (errors.hasErrors()) {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 

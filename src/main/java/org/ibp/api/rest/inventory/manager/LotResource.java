@@ -34,6 +34,7 @@ import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
@@ -112,6 +113,9 @@ public class LotResource {
 
 	@Autowired
 	private LotSplitValidator lotSplitValidator;
+
+	@Autowired
+	private GermplasmValidator germplasmValidator;
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
@@ -446,6 +450,11 @@ public class LotResource {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
 		if (!Util.isPositiveInteger(String.valueOf(gid))) {
 			errors.reject("gids.invalid", new Integer[] {gid}, "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
+		this.germplasmValidator.validateGermplasmId(errors, gid);
+		if (errors.hasErrors()) {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
