@@ -69,6 +69,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -439,7 +440,7 @@ public class LotResource {
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final String status,
+		@RequestParam(required = false) final LotStatus status,
 		@ApiIgnore final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
@@ -451,8 +452,8 @@ public class LotResource {
 		final LotsSearchDto searchDTO = new LotsSearchDto();
 		searchDTO.setGids(Arrays.asList(gid));
 
-		if (!Strings.isEmpty(status)) {
-			searchDTO.setStatus(LotStatus.getIntValueByName(status));
+		if (!Objects.isNull(status)) {
+			searchDTO.setStatus(status.getIntValue());
 		}
 
 		final PagedResult<ExtendedLotDto> resultPage =
