@@ -449,7 +449,7 @@ public class LotResource {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
 		if (!Util.isPositiveInteger(String.valueOf(gid))) {
-			errors.reject("gids.invalid", new Integer[] {gid}, "");
+			errors.reject("gids.invalid", new String[] {gid.toString()}, "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 

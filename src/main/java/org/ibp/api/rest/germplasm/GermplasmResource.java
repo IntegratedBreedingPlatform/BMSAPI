@@ -205,7 +205,7 @@ public class GermplasmResource {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
 		if (!Util.isPositiveInteger(String.valueOf(gid))) {
-			errors.reject("gids.invalid", new Integer[] {gid}, "");
+			errors.reject("gids.invalid", new String[] {gid.toString()}, "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
@@ -215,7 +215,7 @@ public class GermplasmResource {
 		final List<GermplasmSearchResponse> germplasmSearchResponses =
 			germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 		if (germplasmSearchResponses.isEmpty()) {
-			errors.reject("gids.invalid", new Integer[] {gid}, "");
+			errors.reject("gids.invalid", new String[] {gid.toString()}, "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 		return new ResponseEntity<>(germplasmSearchResponses.get(0), HttpStatus.OK);
