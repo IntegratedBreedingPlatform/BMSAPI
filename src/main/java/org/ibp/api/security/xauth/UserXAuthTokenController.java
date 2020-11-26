@@ -1,6 +1,7 @@
 
 package org.ibp.api.security.xauth;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +32,8 @@ public class UserXAuthTokenController {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+	@Deprecated
+	@ApiOperation(value = "Post authenticate", notes = "<b>DEPRECATED:</b> use /token ")
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	@ApiIgnore
 	public Token authenticate(@RequestParam final String username, @RequestParam final String password) {
