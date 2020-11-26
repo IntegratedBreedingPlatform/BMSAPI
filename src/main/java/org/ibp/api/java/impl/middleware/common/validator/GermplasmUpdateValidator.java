@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
@@ -54,7 +53,8 @@ public class GermplasmUpdateValidator {
 		germplasmUpdateDTOList
 			.forEach(g -> nameCodes.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		nameCodes.addAll(
-			germplasmUpdateDTOList.stream().map(o -> StringUtils.isNotEmpty(o.getPreferredName()) ? o.getPreferredName().toUpperCase() : null)
+			germplasmUpdateDTOList.stream()
+				.map(o -> StringUtils.isNotEmpty(o.getPreferredName()) ? o.getPreferredName().toUpperCase() : null)
 				.filter(Objects::nonNull).collect(
 				Collectors.toSet()));
 		final List<String> existingNamesCode =
@@ -77,10 +77,6 @@ public class GermplasmUpdateValidator {
 		}
 		if (!attributesCode.isEmpty()) {
 			errors.reject("germplasm.update.invalid.attribute.code", new String[] {String.join(",", attributesCode)}, "");
-		}
-		final List<String> ambiguosCodes = new ArrayList<>(CollectionUtils.intersection(existingNamesCode, existingAttributesCode));
-		if (!ambiguosCodes.isEmpty()) {
-			errors.reject("germplasm.update.ambiguous.code", new String[] {String.join(",", ambiguosCodes)}, "");
 		}
 
 	}
@@ -143,20 +139,10 @@ public class GermplasmUpdateValidator {
 		final Set<String> breedingMethodsAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
 				.map(dto -> dto.getBreedingMethodAbbr()).collect(Collectors.toSet());
-		//		final List<String> codes =
-		//			this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false).stream().map(loc -> loc.getCode())
-		//				.collect(
-		//					Collectors.toList());
 
 		if (!breedingMethodsAbbrs.isEmpty()) {
 			throw new UnsupportedOperationException("Updating Breeding Method is not yet supported.");
 		}
-
-		// TODO: Uncomment these line once breeding method is supported.
-		//breedingMethodsAbbrs.removeAll(codes);
-		//if (!breedingMethodsAbbrs.isEmpty()) {
-		//	errors.reject("germplasm.update.invalid.breeding.method", new String[] {String.join(",", breedingMethodsAbbrs)}, "");
-		//}
 
 	}
 
