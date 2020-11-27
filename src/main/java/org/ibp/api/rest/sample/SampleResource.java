@@ -29,7 +29,7 @@ import java.util.List;
 @Api(value = "Sample Services")
 @Controller
 @RequestMapping("/crops")
-@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'SAMPLE_LISTS')")
+@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 public class SampleResource {
 
 	@Autowired
