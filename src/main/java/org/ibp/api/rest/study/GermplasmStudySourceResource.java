@@ -8,12 +8,12 @@ import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.domain.study.GermplasmStudySourceTable;
 import org.ibp.api.java.study.GermplasmStudySourceService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,7 +50,7 @@ public class GermplasmStudySourceResource {
 		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
-	public ResponseEntity<GermplasmStudySourceTable> getGermplasmStudySourceTable(final @PathVariable String cropname,
+	public ResponseEntity<List<GermplasmStudySourceDto>> getGermplasmStudySourceTable(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest,
 		final @ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) Pageable pageable) {
@@ -79,11 +79,10 @@ public class GermplasmStudySourceResource {
 				}
 			});
 
-		final GermplasmStudySourceTable germplasmStudySourceTable = new GermplasmStudySourceTable();
-		germplasmStudySourceTable.setData(pageResult.getPageResults());
-		germplasmStudySourceTable.setRecordsTotal((int) pageResult.getTotalResults());
-		germplasmStudySourceTable.setRecordsFiltered((int) pageResult.getFilteredResults());
-		return new ResponseEntity<>(germplasmStudySourceTable, HttpStatus.OK);
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(pageResult.getFilteredResults()));
+		headers.add("X-Total-Pages", Long.toString(pageResult.getTotalPages()));
+		return new ResponseEntity<>(pageResult.getPageResults(), headers, HttpStatus.OK);
 
 	}
 
