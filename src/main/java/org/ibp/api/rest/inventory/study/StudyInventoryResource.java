@@ -86,8 +86,8 @@ public class StudyInventoryResource {
 		}
 
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Total-Count", Long.toString(pagedResult.getFilteredResults()));
-		headers.add("X-Total-Pages", Long.toString(pagedResult.getTotalPages()));
+		headers.add("X-Filtered-Count", Long.toString(pagedResult.getFilteredResults()));
+		headers.add("X-Total-Count", Long.toString(pagedResult.getTotalResults()));
 		return new ResponseEntity<>(pagedResult.getPageResults(), headers, HttpStatus.OK);
 
 	}
