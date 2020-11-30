@@ -390,7 +390,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.header().string("X-Total-Count","100"))
-			.andExpect(MockMvcResultMatchers.header().string("X-Total-Pages","1"))
+			.andExpect(MockMvcResultMatchers.header().string("X-Filtered-Count","100"))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].observationUnitId", is(obsDto.getObservationUnitId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].gid", is(obsDto.getGid())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].designation", is(obsDto.getDesignation())))

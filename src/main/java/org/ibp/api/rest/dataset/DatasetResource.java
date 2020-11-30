@@ -232,8 +232,8 @@ public class DatasetResource {
 			});
 
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Total-Count", Long.toString(pageResult.getFilteredResults()));
-		headers.add("X-Total-Pages", Long.toString(pageResult.getTotalPages()));
+		headers.add("X-Filtered-Count", Long.toString(pageResult.getFilteredResults()));
+		headers.add("X-Total-Count", Long.toString(pageResult.getTotalResults()));
 		return new ResponseEntity<>(pageResult.getPageResults(), headers, HttpStatus.OK);
 	}
 
