@@ -110,6 +110,8 @@ public class StudyResourceBrapi {
 		@RequestParam(value = "programDbId", required = false) final String programDbId,
 		@ApiParam(value = "Filter to only return studies associated with given location id")
 		@RequestParam(value = "locationDbId", required = false) final String locationDbId,
+		@ApiParam(value = "Filter to only return studies associated with given season id")
+		@RequestParam(value = "seasonDbId", required = false) final String seasonDbId,
 		@ApiParam(value = "Filter to only return study associated with given trial id")
 		@RequestParam(value = "trialDbId", required = false) final String trialDbId,
 		@ApiParam(value = "Filter to only return study associated with given study id")
@@ -140,7 +142,7 @@ public class StudyResourceBrapi {
 
 		final StudySearchFilter filter = new StudySearchFilter().withStudyTypeDbId(studyType).withProgramDbId(programDbId)
 			.withLocationDbId(locationDbId).withGermplasmDbid(germplasmDbid).withObservationVariableDbId(observationVariableDbId)
-			.withStudyDbId(studyDbId).withTrialDbId(trialDbId).withTrialName(trialName).withTrialPUI(studyPUI);
+			.withStudyDbId(studyDbId).withTrialDbId(trialDbId).withTrialName(trialName).withTrialPUI(studyPUI).withSeasonDbId(seasonDbId);
 
 		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -192,7 +194,7 @@ public class StudyResourceBrapi {
 	private String parameterValidation(final String crop, final String commonCropName, final Boolean active, final String sortBy,
 		final String sortOrder) {
 		final List<String> sortbyFields = ImmutableList.<String>builder().add("studyDbid").add("trialDbId").add("programDbId")
-			.add("locationDbId").add("studyType").add("trialName").add("programName").build();
+			.add("locationDbId").add("studyType").add("trialName").add("programName").add("seasonDbId").build();
 		final List<String> sortOrders = ImmutableList.<String>builder().add("asc")
 			.add("desc").build();
 
