@@ -17,7 +17,7 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setGid(1);
 		germplasmUpdateDTO.setGermplasmUUID("54c2a5cf-9b83-4f77-8b0d-c505b5c6e907");
-		germplasmUpdateDTO.setPreferredName("DRVNM");
+		germplasmUpdateDTO.setPreferredNameType("DRVNM");
 		germplasmUpdateDTO.setLocationAbbreviation("UKN");
 		germplasmUpdateDTO.setCreationDate("20200101");
 		germplasmUpdateDTO.setBreedingMethodAbbr("UBM");

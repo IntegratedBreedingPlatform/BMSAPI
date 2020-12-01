@@ -54,7 +54,7 @@ public class GermplasmUpdateValidator {
 			.forEach(g -> nameCodes.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		nameCodes.addAll(
 			germplasmUpdateDTOList.stream()
-				.map(o -> StringUtils.isNotEmpty(o.getPreferredName()) ? o.getPreferredName().toUpperCase() : null)
+				.map(o -> StringUtils.isNotEmpty(o.getPreferredNameType()) ? o.getPreferredNameType().toUpperCase() : null)
 				.filter(Objects::nonNull).collect(
 				Collectors.toSet()));
 		final List<String> existingNamesCode =
