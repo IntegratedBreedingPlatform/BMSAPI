@@ -34,6 +34,11 @@ public class StudySummariesDto {
 		return this;
 	}
 
+	public StudySummariesDto withMetadata(final Metadata metadata) {
+		this.metadata = metadata;
+		return this;
+	}
+
 	/**
 	 *
 	 * @return The result
@@ -49,6 +54,11 @@ public class StudySummariesDto {
 	 * @return this
 	 */
 	public StudySummariesDto setResult(final Result<StudySummaryDto> result) {
+		this.result = result;
+		return this;
+	}
+
+	public StudySummariesDto withResult(final Result<StudySummaryDto> result) {
 		this.result = result;
 		return this;
 	}
