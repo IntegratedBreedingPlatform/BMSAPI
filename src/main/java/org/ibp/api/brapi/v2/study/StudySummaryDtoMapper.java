@@ -1,9 +1,9 @@
 package org.ibp.api.brapi.v2.study;
 
 import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.ibp.api.brapi.v1.study.ContactConverter;
+import org.generationcp.middleware.service.api.user.UserDto;
+import org.ibp.api.brapi.v1.study.Contact;
 import org.ibp.api.brapi.v1.study.EnvironmentParameterConverter;
 import org.ibp.api.brapi.v1.study.ExperimentalDesignConverter;
 import org.ibp.api.brapi.v1.study.StudySummaryDto;
@@ -40,6 +40,19 @@ public class StudySummaryDtoMapper {
 				datasetSummaries.add(new DatasetSummary(dataset.getDatasetId(), dataset.getName(),dataset.getDatasetTypeId()));
 			}
 			return context.getMappingEngine().map(context.create(datasetSummaries, context.getDestinationType()));
+		}
+
+	}
+
+	public static class ContactConverter implements Converter<List<UserDto>, List<Contact>> {
+
+		@Override
+		public List<Contact> convert(final MappingContext<List<UserDto>, List<Contact>> context) {
+			final List<Contact> contacts = new ArrayList<>();
+			for (final UserDto userDto : context.getSource()) {
+				contacts.add(new Contact(userDto.getUserId(), userDto.getEmail(), userDto.getFirstName(),"Creator", ""));
+			}
+			return context.getMappingEngine().map(context.create(contacts, context.getDestinationType()));
 		}
 
 	}
