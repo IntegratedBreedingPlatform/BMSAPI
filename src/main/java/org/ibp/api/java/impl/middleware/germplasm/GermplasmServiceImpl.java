@@ -334,8 +334,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-
-		return this.germplasmService.importGermplasmUpdates(germplasmUpdateDTOList);
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		return this.germplasmService.importGermplasmUpdates(user.getUserid(), germplasmUpdateDTOList);
 
 	}
 
