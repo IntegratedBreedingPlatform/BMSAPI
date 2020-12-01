@@ -38,7 +38,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.validation.ObjectError;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -390,26 +389,26 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				datasetId).content(this.convertObjectToByte(searchDTO)).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsFiltered", is(100)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsTotal", is(100)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].observationUnitId", is(obsDto.getObservationUnitId())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].gid", is(obsDto.getGid())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].designation", is(obsDto.getDesignation())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].action", is(obsDto.getAction())))
+			.andExpect(MockMvcResultMatchers.header().string("X-Total-Count","100"))
+			.andExpect(MockMvcResultMatchers.header().string("X-Filtered-Count","100"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].observationUnitId", is(obsDto.getObservationUnitId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].gid", is(obsDto.getGid())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].designation", is(obsDto.getDesignation())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].action", is(obsDto.getAction())))
 			.andExpect(
 				MockMvcResultMatchers.jsonPath(
-					"$.data[0].variables[\"TEST1\"].observationId",
+					"$[0].variables[\"TEST1\"].observationId",
 					is(measurement.getObservationId())))
 			.andExpect(
 				MockMvcResultMatchers.jsonPath(
-					"$.data[0].variables[\"TEST1\"].categoricalValueId",
+					"$[0].variables[\"TEST1\"].categoricalValueId",
 					is(measurement.getCategoricalValueId())))
 			.andExpect(
 				MockMvcResultMatchers.jsonPath(
-					"$.data[0].variables[\"TEST1\"].value",
+					"$[0].variables[\"TEST1\"].value",
 					is(measurement.getValue())))
 			.andExpect(MockMvcResultMatchers.jsonPath(
-				"$.data[0].variables[\"TEST1\"].status",
+				"$[0].variables[\"TEST1\"].status",
 				is(measurement.getStatus().getName())))
 		;
 	}
