@@ -1,31 +1,50 @@
 package org.ibp.api.brapi.v2.study;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
+import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.brapi.v1.study.StudyDetails;
 import org.ibp.api.brapi.v1.study.StudyDetailsData;
 import org.ibp.api.brapi.v1.study.StudyMapper;
+import org.ibp.api.brapi.v1.study.StudySummariesDto;
+import org.ibp.api.brapi.v1.study.StudySummaryDto;
+import org.ibp.api.brapi.v1.trial.TrialSummary;
+import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.study.StudyService;
+import org.ibp.api.rest.common.PaginatedSearch;
+import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -41,7 +60,6 @@ public class StudyResourceBrapi {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
-
 
 	@ApiOperation(value = "Get the details for a specific Study", notes = "Get the details for a specific Study")
 	@RequestMapping(value = "/{crop}/brapi/v2/studies/{studyDbId}", method = RequestMethod.GET)
@@ -78,4 +96,119 @@ public class StudyResourceBrapi {
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		}
 	}
+
+	@ApiOperation(value = "Get a filtered list of Studies", notes = "Get a filtered list of Studies")
+	@RequestMapping(value = "/{crop}/brapi/v2/studies", method = RequestMethod.GET)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<StudySummariesDto> getStudies(@PathVariable final String crop,
+		@ApiParam(value = "Common name for the crop associated with study")
+		@RequestParam(value = "commonCropName", required = false) final String commonCropName,
+		@ApiParam(value = "Filter based on studies type unique identifier")
+		@RequestParam(value = "studyType", required = false) final String studyType,
+		@ApiParam(value = "Filter to only return studies associated with given program id")
+		@RequestParam(value = "programDbId", required = false) final String programDbId,
+		@ApiParam(value = "Filter to only return studies associated with given location id")
+		@RequestParam(value = "locationDbId", required = false) final String locationDbId,
+		@ApiParam(value = "Filter to only return study associated with given trial id")
+		@RequestParam(value = "trialDbId", required = false) final String trialDbId,
+		@ApiParam(value = "Filter to only return study associated with given study id")
+		@RequestParam(value = "studyDbId", required = false) final String studyDbId,
+		@ApiParam(value = "Filter to only return study associated with given study name")
+		@RequestParam(value = "trialName", required = false) final String trialName,
+		@ApiParam(value = "Filter to only return studies associated with given study PUI")
+		@RequestParam(value = "studyPUI", required = false) final String studyPUI,
+		@ApiParam(value = "Filter to only return studies associated with given germplasm id")
+		@RequestParam(value = "germplasmDbid", required = false) final Integer germplasmDbid,
+		@ApiParam(value = "Filter to only return studies associated with given observation variable id")
+		@RequestParam(value = "observationVariableDbId", required = false) final Integer observationVariableDbId,
+		@ApiParam(value = "Filter active status true/false") @RequestParam(value = "active", required = false) final Boolean active,
+		@ApiParam(value = "Sort order. Name of the field to sort by.") @RequestParam(value = "sortBy", required = false)
+		final String sortBy,
+		@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder", required = false) final String sortOrder,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION) @RequestParam(value = "page", required = false) final Integer page,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(value = "pageSize", required = false)
+		final Integer pageSize
+		) {
+		final String validationError = this.parameterValidation(crop, commonCropName, active, sortBy, sortOrder);
+		if (!StringUtils.isBlank(validationError)) {
+			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
+			final Metadata metadata = new Metadata(null, status);
+			final StudySummariesDto studySummariesDto = new StudySummariesDto().withMetadata(metadata).withResult(new Result<StudySummaryDto>());
+			return new ResponseEntity<>(studySummariesDto, HttpStatus.BAD_REQUEST);
+		}
+
+		final StudySearchFilter filter = new StudySearchFilter().withStudyTypeDbId(studyType).withProgramDbId(programDbId)
+			.withLocationDbId(locationDbId).withGermplasmDbid(germplasmDbid).withObservationVariableDbId(observationVariableDbId)
+			.withStudyDbId(studyDbId).withTrialDbId(trialDbId).withTrialName(trialName).withTrialPUI(studyPUI);
+
+		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
+		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+
+		final PageRequest pageRequest;
+		if (StringUtils.isNotEmpty(sortBy) && StringUtils.isNotEmpty(sortOrder)) {
+			pageRequest = new PageRequest(finalPageNumber, finalPageSize, new Sort(Sort.Direction.fromString(sortOrder), sortBy));
+		} else {
+			pageRequest = new PageRequest(finalPageNumber, finalPageSize);
+		}
+
+		final PagedResult<StudyDetailsDto> resultPage =
+			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<StudyDetailsDto>() {
+
+				@Override
+				public long getCount() {
+					return StudyResourceBrapi.this.studyService.countStudyInstances(filter);
+				}
+
+				@Override
+				public List<StudyDetailsDto> getResults(final PagedResult<StudyDetailsDto> pagedResult) {
+					return StudyResourceBrapi.this.studyService.getStudyDetails(filter, pageRequest);
+				}
+			});
+
+		final List<StudySummaryDto> studySummaryDtoList = this.translateResults(resultPage, crop);
+		final Result<StudySummaryDto> results = new Result<StudySummaryDto>().withData(studySummaryDtoList);
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+		final StudySummariesDto studySummariesDto = new StudySummariesDto().withMetadata(metadata).withResult(results);
+
+		return new ResponseEntity<>(studySummariesDto, HttpStatus.OK);
+	}
+
+	private List<StudySummaryDto> translateResults(final PagedResult<StudyDetailsDto> resultPage, final String crop) {
+		final ModelMapper modelMapper = StudySummaryDtoMapper.getInstance();
+		final List<StudySummaryDto> studySummaryDtoList = new ArrayList<>();
+
+		for (final StudyDetailsDto mwStudy : resultPage.getPageResults()) {
+			final StudySummaryDto studySummaryDto = modelMapper.map(mwStudy, StudySummaryDto.class);
+			studySummaryDto.setCommonCropName(crop);
+			studySummaryDtoList.add(studySummaryDto);
+		}
+		return studySummaryDtoList;
+	}
+
+	private String parameterValidation(final String crop, final String commonCropName, final Boolean active, final String sortBy,
+		final String sortOrder) {
+		final List<String> sortbyFields = ImmutableList.<String>builder().add("studyDbid").add("trialDbId").add("programDbId")
+			.add("locationDbId").add("studyType").add("trialName").add("programName").build();
+		final List<String> sortOrders = ImmutableList.<String>builder().add("asc")
+			.add("desc").build();
+
+		if (!StringUtils.isEmpty(commonCropName) && !crop.equals(commonCropName)) {
+			return "Invalid commonCropName value";
+		}
+		if (active != null && !active) {
+			return "No inactive studies found.";
+		}
+		if (!StringUtils.isBlank(sortBy) && !sortbyFields.contains(sortBy)) {
+			return "sortBy bad filter, expect " + StringUtils.join(sortbyFields, "/");
+		}
+		if (!StringUtils.isBlank(sortOrder) && !sortOrders.contains(sortOrder.toLowerCase())) {
+			return "sortOrder bad filter, expect asc/desc";
+		}
+		return "";
+	}
+
 }

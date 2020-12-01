@@ -40,6 +40,8 @@ public interface StudyService {
 
 	StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId);
 
+	List<StudyDetailsDto> getStudyDetails(StudySearchFilter studySearchFilter, Pageable pageable);
+
 	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	long countStudies(StudySearchFilter studySearchFilter);

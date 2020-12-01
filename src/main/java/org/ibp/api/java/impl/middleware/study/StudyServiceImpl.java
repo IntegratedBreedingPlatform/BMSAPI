@@ -146,6 +146,11 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
+	public List<StudyDetailsDto> getStudyDetails(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		return this.middlewareStudyService.getStudyDetails(studySearchFilter, pageable);
+	}
+
+	@Override
 	public List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final StudySearchFilter studySearchFilter,
 		final Pageable pageable) {
 		return this.middlewareStudyService.getStudies(studySearchFilter, pageable);
