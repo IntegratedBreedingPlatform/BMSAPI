@@ -17,7 +17,7 @@ public class ObservationLevel {
 	}
 
 	public String getLevelName() {
-		return levelName;
+		return this.levelName;
 	}
 
 	public void setLevelName(final String levelName) {
@@ -25,7 +25,7 @@ public class ObservationLevel {
 	}
 
 	public Integer getLevelOrder() {
-		return levelOrder;
+		return this.levelOrder;
 	}
 
 	public void setLevelOrder(final Integer levelOrder) {

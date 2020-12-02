@@ -106,7 +106,7 @@ public class StudySummaryDto {
 	 * @return The study db id
 	 */
 	public Integer getStudyDbId() {
-		return studyDbId;
+		return this.studyDbId;
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class StudySummaryDto {
 	 * @param studyDbId
 	 * @return this
 	 */
-	public StudySummaryDto setStudyDbId(Integer studyDbId) {
+	public StudySummaryDto setStudyDbId(final Integer studyDbId) {
 		this.studyDbId = studyDbId;
 		return this;
 	}
@@ -124,7 +124,7 @@ public class StudySummaryDto {
 	 * @return The studyName
 	 */
 	public String getStudyName() {
-		return studyName;
+		return this.studyName;
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class StudySummaryDto {
 	 * @return The study type
 	 */
 	public String getStudyType() {
-		return studyType;
+		return this.studyType;
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class StudySummaryDto {
 	 * @return The list of years
 	 */
 	public List<String> getYears() {
-		return years;
+		return this.years;
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class StudySummaryDto {
 	 * @return The list of seasons
 	 */
 	public List<String> getSeasons() {
-		return seasons;
+		return this.seasons;
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class StudySummaryDto {
 	 * @return The location db id
 	 */
 	public String getLocationDbId() {
-		return locationDbId;
+		return this.locationDbId;
 	}
 
 	/**
@@ -213,7 +213,7 @@ public class StudySummaryDto {
 		return this.locationName;
 	}
 
-	public StudySummaryDto setLocationName(String locationName) {
+	public StudySummaryDto setLocationName(final String locationName) {
 		this.locationName = locationName;
 		return this;
 	}
@@ -223,7 +223,7 @@ public class StudySummaryDto {
 	 * @return The program db id
 	 */
 	public String getProgramDbId() {
-		return programDbId;
+		return this.programDbId;
 	}
 
 	/**
@@ -241,7 +241,7 @@ public class StudySummaryDto {
 	 * @return The map with the optional info
 	 */
 	public Map<String, String> getOptionalInfo() {
-		return optionalInfo;
+		return this.optionalInfo;
 	}
 
 	/**
@@ -252,7 +252,7 @@ public class StudySummaryDto {
 	 *            Value of the optional info
 	 */
 	public void setOptionalInfo(final String name, final String value) {
-		optionalInfo.put(name, value);
+		this.optionalInfo.put(name, value);
 	}
 
 	/**
@@ -264,7 +264,7 @@ public class StudySummaryDto {
 	 * @return this
 	 */
 	public StudySummaryDto addOptionalInfo(final String name, final String value) {
-		optionalInfo.put(name, value);
+		this.optionalInfo.put(name, value);
 		return this;
 	}
 
@@ -279,7 +279,7 @@ public class StudySummaryDto {
 	}
 
 	public String getCommonCropName() {
-		return commonCropName;
+		return this.commonCropName;
 	}
 
 	public void setCommonCropName(final String commonCropName) {
@@ -287,7 +287,7 @@ public class StudySummaryDto {
 	}
 
 	public String isActive() {
-		return active;
+		return this.active;
 	}
 
 	public void setActive(final String active) {
@@ -295,7 +295,7 @@ public class StudySummaryDto {
 	}
 
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
@@ -303,7 +303,7 @@ public class StudySummaryDto {
 	}
 
 	public List<Contact> getContacts() {
-		return contacts;
+		return this.contacts;
 	}
 
 	public void setContacts(final List<Contact> contacts) {
@@ -311,7 +311,7 @@ public class StudySummaryDto {
 	}
 
 	public String getCulturalPractices() {
-		return culturalPractices;
+		return this.culturalPractices;
 	}
 
 	public void setCulturalPractices(final String culturalPractices) {
@@ -319,7 +319,7 @@ public class StudySummaryDto {
 	}
 
 	public List<String> getDataLinks() {
-		return dataLinks;
+		return this.dataLinks;
 	}
 
 	public void setDataLinks(final List<String> dataLinks) {
@@ -327,7 +327,7 @@ public class StudySummaryDto {
 	}
 
 	public String getDocumentationURL() {
-		return documentationURL;
+		return this.documentationURL;
 	}
 
 	public void setDocumentationURL(final String documentationURL) {
@@ -335,7 +335,7 @@ public class StudySummaryDto {
 	}
 
 	public List<EnvironmentParameter> getEnvironmentParameters() {
-		return environmentParameters;
+		return this.environmentParameters;
 	}
 
 	public void setEnvironmentParameters(final List<EnvironmentParameter> environmentParameters) {
@@ -343,7 +343,7 @@ public class StudySummaryDto {
 	}
 
 	public ExperimentalDesign getExperimentalDesign() {
-		return experimentalDesign;
+		return this.experimentalDesign;
 	}
 
 	public void setExperimentalDesign(final ExperimentalDesign experimentalDesign) {
@@ -351,7 +351,7 @@ public class StudySummaryDto {
 	}
 
 	public List<String> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<String> externalReferences) {
@@ -359,7 +359,7 @@ public class StudySummaryDto {
 	}
 
 	public String getGrowthFacility() {
-		return growthFacility;
+		return this.growthFacility;
 	}
 
 	public void setGrowthFacility(final String growthFacility) {
@@ -367,7 +367,7 @@ public class StudySummaryDto {
 	}
 
 	public Map<String, String> getLastUpdate() {
-		return lastUpdate;
+		return this.lastUpdate;
 	}
 
 	public void setLastUpdate(final Map<String, String> lastUpdate) {
@@ -375,7 +375,7 @@ public class StudySummaryDto {
 	}
 
 	public String getLicense() {
-		return license;
+		return this.license;
 	}
 
 	public void setLicense(final String license) {
@@ -383,7 +383,7 @@ public class StudySummaryDto {
 	}
 
 	public String getObservationUnitsDescription() {
-		return observationUnitsDescription;
+		return this.observationUnitsDescription;
 	}
 
 	public void setObservationUnitsDescription(final String observationUnitsDescription) {
@@ -391,7 +391,7 @@ public class StudySummaryDto {
 	}
 
 	public Date getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	public void setStartDate(final Date startDate) {
@@ -399,7 +399,7 @@ public class StudySummaryDto {
 	}
 
 	public String getStudyCode() {
-		return studyCode;
+		return this.studyCode;
 	}
 
 	public void setStudyCode(final String studyCode) {
@@ -407,7 +407,7 @@ public class StudySummaryDto {
 	}
 
 	public String getStudyDescription() {
-		return studyDescription;
+		return this.studyDescription;
 	}
 
 	public void setStudyDescription(final String studyDescription) {
@@ -415,7 +415,7 @@ public class StudySummaryDto {
 	}
 
 	public String getStudyPUI() {
-		return studyPUI;
+		return this.studyPUI;
 	}
 
 	public void setStudyPUI(final String studyPUI) {
@@ -423,7 +423,7 @@ public class StudySummaryDto {
 	}
 
 	public Integer getTrialDbid() {
-		return trialDbid;
+		return this.trialDbid;
 	}
 
 	public void setTrialDbid(final Integer trialDbid) {
@@ -431,7 +431,7 @@ public class StudySummaryDto {
 	}
 
 	public String getTrialName() {
-		return trialName;
+		return this.trialName;
 	}
 
 	public void setTrialName(final String trialName) {
@@ -439,11 +439,11 @@ public class StudySummaryDto {
 	}
 
 	public String getActive() {
-		return active;
+		return this.active;
 	}
 
 	public List<ObservationLevel> getObservationLevels() {
-		return observationLevels;
+		return this.observationLevels;
 	}
 
 	public void setObservationLevels(final List<ObservationLevel> observationLevels) {
@@ -461,7 +461,7 @@ public class StudySummaryDto {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 

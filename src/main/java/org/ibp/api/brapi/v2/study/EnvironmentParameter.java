@@ -37,7 +37,7 @@ public class EnvironmentParameter {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 
@@ -47,7 +47,7 @@ public class EnvironmentParameter {
 	}
 
 	public String getParameterName() {
-		return parameterName;
+		return this.parameterName;
 	}
 
 	public EnvironmentParameter setParameterName(final String parameterName) {
@@ -56,7 +56,7 @@ public class EnvironmentParameter {
 	}
 
 	public String getParameterPUI() {
-		return parameterPUI;
+		return this.parameterPUI;
 	}
 
 	public EnvironmentParameter setParameterPUI(final String parameterPUI) {
@@ -65,7 +65,7 @@ public class EnvironmentParameter {
 	}
 
 	public String getUnit() {
-		return unit;
+		return this.unit;
 	}
 
 	public EnvironmentParameter setUnit(final String unit) {
@@ -74,7 +74,7 @@ public class EnvironmentParameter {
 	}
 
 	public Integer getUnitPUI() {
-		return unitPUI;
+		return this.unitPUI;
 	}
 
 	public EnvironmentParameter setUnitPUI(final Integer unitPUI) {
@@ -83,7 +83,7 @@ public class EnvironmentParameter {
 	}
 
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public EnvironmentParameter setValue(final String value) {
@@ -92,7 +92,7 @@ public class EnvironmentParameter {
 	}
 
 	public String getValuePUI() {
-		return valuePUI;
+		return this.valuePUI;
 	}
 
 	public EnvironmentParameter setValuePUI(final String valuePUI) {
