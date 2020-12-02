@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.common.validator;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
-import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -33,9 +32,6 @@ public class GermplasmUpdateValidator {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
-
-	@Autowired
-	private BreedingMethodService breedingMethodService;
 
 	public void validateEmptyList(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		if (germplasmUpdateDTOList == null || germplasmUpdateDTOList.isEmpty()) {
