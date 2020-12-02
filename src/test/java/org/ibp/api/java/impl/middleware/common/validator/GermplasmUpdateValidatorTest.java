@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
-import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -38,13 +37,7 @@ public class GermplasmUpdateValidatorTest {
 	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmMiddlewareService;
 
 	@Mock
-	private GermplasmDataManager germplasmDataManager;
-
-	@Mock
 	private LocationDataManager locationDataManager;
-
-	@Mock
-	private BreedingMethodService breedingMethodService;
 
 	@InjectMocks
 	private GermplasmUpdateValidator germplasmUpdateValidator;
@@ -76,7 +69,7 @@ public class GermplasmUpdateValidatorTest {
 			.thenReturn(Arrays.asList(new GermplasmNameTypeDTO(null, "DRVNM", null), new GermplasmNameTypeDTO(null, "LNAME", null)));
 		when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet()))
 			.thenReturn(Arrays.asList(new AttributeDTO(null, "NOTE", null), new AttributeDTO(null, "ACQ_DATE", null)));
-		when(this.germplasmDataManager.getGermplasms(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
+		when(this.germplasmMiddlewareService.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 		when(this.germplasmMiddlewareService.getGermplasmByGUIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 		when(this.locationDataManager
 			.getFilteredLocations(programUUID, null, null, new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())),
@@ -85,10 +78,10 @@ public class GermplasmUpdateValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		this.germplasmUpdateValidator.validateEmptyList(errors, germplasmUpdateList);
-		this.germplasmUpdateValidator.validateCodes(errors, germplasmUpdateList);
+		this.germplasmUpdateValidator.validateAttributeAndNameCodes(errors, germplasmUpdateList);
 		this.germplasmUpdateValidator.validateGermplasmIdAndGermplasmUUID(errors, germplasmUpdateList);
 		this.germplasmUpdateValidator.validateLocationAbbreviation(errors, programUUID, germplasmUpdateList);
-		this.germplasmUpdateValidator.validateBreedingMethod(errors, programUUID, germplasmUpdateList);
+		this.germplasmUpdateValidator.validateBreedingMethod(germplasmUpdateList);
 		this.germplasmUpdateValidator.validateCreationDate(errors, germplasmUpdateList);
 
 		assertFalse(errors.hasErrors());
@@ -103,7 +96,7 @@ public class GermplasmUpdateValidatorTest {
 	}
 
 	@Test
-	public void testValidate_InvalidCodes() {
+	public void testValidate_InvalidAttributeAndNameCodes() {
 
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.getNames().put("DRVNM", "");
@@ -119,7 +112,7 @@ public class GermplasmUpdateValidatorTest {
 			.thenReturn(Arrays.asList(new AttributeDTO(null, "NOTE", null)));
 
 		final BindingResult errors = Mockito.mock(BindingResult.class);
-		this.germplasmUpdateValidator.validateCodes(errors, germplasmUpdateList);
+		this.germplasmUpdateValidator.validateAttributeAndNameCodes(errors, germplasmUpdateList);
 		Mockito.verify(errors).reject("germplasm.update.invalid.name.code", new String[] {"LNAME"}, "");
 		Mockito.verify(errors).reject("germplasm.update.invalid.attribute.code", new String[] {"ACQ_DATE"}, "");
 	}
@@ -141,7 +134,7 @@ public class GermplasmUpdateValidatorTest {
 
 		final Germplasm germplasm = new Germplasm(2);
 
-		when(this.germplasmDataManager.getGermplasms(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
+		when(this.germplasmMiddlewareService.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 		when(this.germplasmMiddlewareService.getGermplasmByGUIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
@@ -170,12 +163,11 @@ public class GermplasmUpdateValidatorTest {
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void testValidate_BreedingMethod() {
-		final String programUUID = RandomStringUtils.random(10);
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setBreedingMethodAbbr("UAC");
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);
-		this.germplasmUpdateValidator.validateBreedingMethod(errors, programUUID, germplasmUpdateList);
+		this.germplasmUpdateValidator.validateBreedingMethod(germplasmUpdateList);
 	}
 
 	@Test

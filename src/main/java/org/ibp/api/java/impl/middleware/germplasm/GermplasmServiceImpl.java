@@ -325,10 +325,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		this.errors = new MapBindingResult(new HashMap<>(), AttributeDTO.class.getName());
 		this.germplasmUpdateValidator.validateEmptyList(this.errors, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateCodes(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateAttributeAndNameCodes(this.errors, germplasmUpdateDTOList);
 		this.germplasmUpdateValidator.validateGermplasmIdAndGermplasmUUID(this.errors, germplasmUpdateDTOList);
 		this.germplasmUpdateValidator.validateLocationAbbreviation(this.errors, programUUID, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateBreedingMethod(this.errors, programUUID, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateBreedingMethod(germplasmUpdateDTOList);
 		this.germplasmUpdateValidator.validateCreationDate(this.errors, germplasmUpdateDTOList);
 
 		if (this.errors.hasErrors()) {

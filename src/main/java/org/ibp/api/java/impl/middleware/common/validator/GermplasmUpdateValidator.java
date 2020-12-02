@@ -6,7 +6,6 @@ import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
@@ -33,9 +32,6 @@ public class GermplasmUpdateValidator {
 	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmMiddlewareService;
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
 	private LocationDataManager locationDataManager;
 
 	@Autowired
@@ -47,7 +43,7 @@ public class GermplasmUpdateValidator {
 		}
 	}
 
-	public void validateCodes(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public void validateAttributeAndNameCodes(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> nameCodes = new HashSet<>();
 		germplasmUpdateDTOList
@@ -57,35 +53,36 @@ public class GermplasmUpdateValidator {
 				.map(o -> StringUtils.isNotEmpty(o.getPreferredNameType()) ? o.getPreferredNameType().toUpperCase() : null)
 				.filter(Objects::nonNull).collect(
 				Collectors.toSet()));
-		final List<String> existingNamesCode =
+		final Set<String> existingNamesCodes =
 			this.germplasmService.filterGermplasmNameTypes(nameCodes).stream().map(GermplasmNameTypeDTO::getCode).collect(
-				Collectors.toList());
+				Collectors.toSet());
 
-		final Set<String> attributesCode = new HashSet<>();
+		final Set<String> attributesCodes = new HashSet<>();
 		germplasmUpdateDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
 			.forEach(
-				g -> attributesCode.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
-		final List<String> existingAttributesCode =
-			this.germplasmService.filterGermplasmAttributes(attributesCode).stream().map(AttributeDTO::getCode).collect(
-				Collectors.toList());
+				g -> attributesCodes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+		final Set<String> existingAttributesCodes =
+			this.germplasmService.filterGermplasmAttributes(attributesCodes).stream().map(AttributeDTO::getCode).collect(
+				Collectors.toSet());
 
-		nameCodes.removeAll(existingNamesCode);
-		attributesCode.removeAll(existingAttributesCode);
-
-		if (!nameCodes.isEmpty()) {
-			errors.reject("germplasm.update.invalid.name.code", new String[] {String.join(",", nameCodes)}, "");
+		if (!nameCodes.equals(existingNamesCodes)) {
+			errors.reject("germplasm.update.invalid.name.code", new String[] {
+				String.join(",", nameCodes.stream().filter((name) -> !existingNamesCodes.contains(name)).collect(
+					Collectors.toList()))}, "");
 		}
-		if (!attributesCode.isEmpty()) {
-			errors.reject("germplasm.update.invalid.attribute.code", new String[] {String.join(",", attributesCode)}, "");
+		if (!attributesCodes.equals(existingAttributesCodes)) {
+			errors.reject("germplasm.update.invalid.attribute.code", new String[] {
+				String.join(",", attributesCodes.stream().filter((attribute) -> !existingAttributesCodes.contains(attribute)).collect(
+					Collectors.toList()))}, "");
 		}
 
 	}
 
 	public void validateGermplasmIdAndGermplasmUUID(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		// Find rows (GermplasmUpdateDTO) with blank GID and UUID.
-		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
+		final Optional<GermplasmUpdateDTO> germplasmWithNoIdentifier =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isEmpty(dto.getGermplasmUUID()) && dto.getGid() == null).findAny();
-		if (optionalGermplasmUpdateDTO.isPresent()) {
+		if (germplasmWithNoIdentifier.isPresent()) {
 			errors.reject("germplasm.update.missing.gid.and.uuid", "");
 		}
 
@@ -96,20 +93,20 @@ public class GermplasmUpdateValidator {
 				.filter(
 					Objects::nonNull).collect(Collectors.toSet());
 
-		final List<Germplasm> germplasmByGIDs = this.germplasmDataManager.getGermplasms(new ArrayList<>(gids));
+		final List<Germplasm> germplasmByGIDs = this.germplasmMiddlewareService.getGermplasmByGIDs(new ArrayList<>(gids));
 		final List<Germplasm> germplasmByUUIDs = this.germplasmMiddlewareService.getGermplasmByGUIDs(new ArrayList<>(germplasmUUIDs));
 
-		gids.removeAll(germplasmByGIDs.stream().map(dto -> dto.getGid()).collect(Collectors.toSet()));
-		germplasmUUIDs.removeAll(germplasmByUUIDs.stream().map(dto -> dto.getGermplasmUUID()).collect(Collectors.toSet()));
-
-		if (!gids.isEmpty()) {
+		final Set<Integer> existingGids = germplasmByGIDs.stream().map(Germplasm::getGid).collect(Collectors.toSet());
+		if (!gids.containsAll(existingGids)) {
 			errors.reject("germplasm.update.invalid.gid", new String[] {
-				String.join(",", gids.stream().map(o -> String.valueOf(o)).collect(
+				String.join(",", gids.stream().filter((gid) -> !existingGids.contains(gid)).map(o -> String.valueOf(o)).collect(
 					Collectors.toSet()))}, "");
 		}
-
-		if (!germplasmUUIDs.isEmpty()) {
-			errors.reject("germplasm.update.invalid.uuid", new String[] {String.join(",", germplasmUUIDs)}, "");
+		final Set<String> existingUUIDs = germplasmByUUIDs.stream().map(Germplasm::getGermplasmUUID).collect(Collectors.toSet());
+		if (!germplasmUUIDs.containsAll(germplasmByUUIDs.stream().map(Germplasm::getGermplasmUUID).collect(Collectors.toSet()))) {
+			errors.reject("germplasm.update.invalid.uuid", new String[] {
+				String.join(",", germplasmUUIDs.stream().filter((uuid) -> !existingUUIDs.contains(uuid)).collect(
+					Collectors.toList()))}, "");
 		}
 
 	}
@@ -133,8 +130,7 @@ public class GermplasmUpdateValidator {
 
 	}
 
-	public void validateBreedingMethod(final BindingResult errors, final String programUUID,
-		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public void validateBreedingMethod(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> breedingMethodsAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
