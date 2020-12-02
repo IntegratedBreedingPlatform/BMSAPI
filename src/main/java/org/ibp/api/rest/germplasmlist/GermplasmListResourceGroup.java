@@ -4,8 +4,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,19 @@ public class GermplasmListResourceGroup {
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID) {
 		final List<GermplasmListTypeDTO> germplasmListTypes = this.germplamListService.getGermplasmListTypes();
 		return new ResponseEntity<>(germplasmListTypes, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Add germplasm entries to an existing list")
+	@RequestMapping(value = "/crops/{crop}/germplasm-list/{germplasmListId}/entries", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> addGermplasmEntriesToList(
+		@ApiParam(required = true) @PathVariable final String crop,
+		@PathVariable final Integer germplasmListId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite
+	) {
+		this.germplamListService.addGermplasmEntriesToList(germplasmListId, searchComposite, programUUID);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create germplasm list folder", notes = "Create sample list folder.")

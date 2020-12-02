@@ -1181,9 +1181,11 @@ public class GermplasmListServiceImplTest {
 		final List<GermplasmListGeneratorDTO.GermplasmEntryDTO> entries = new ArrayList<>();
 		final GermplasmListGeneratorDTO.GermplasmEntryDTO entry1 = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
 		entry1.setGid(GID1);
+		entry1.setSeedSource(RandomStringUtils.random(255));
 		entries.add(entry1);
 		final GermplasmListGeneratorDTO.GermplasmEntryDTO entry2 = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
 		entry2.setGid(GID2);
+		entry2.setSeedSource(RandomStringUtils.random(255));
 		entries.add(entry2);
 		list.setEntries(entries);
 		return list;
