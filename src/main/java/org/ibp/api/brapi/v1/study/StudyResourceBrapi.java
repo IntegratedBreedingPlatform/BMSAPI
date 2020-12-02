@@ -76,6 +76,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -363,7 +364,8 @@ public class StudyResourceBrapi {
 			required = false) final Integer pageSize) throws BrapiNotFoundException {
 
 		// Resolve the datasetId in which StudyDbId belongs to. (In BRAPI, studyDbId is nd_geolocation_id)
-		final Integer datasetId = this.studyInstanceService.instanceHasGivenDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		final Optional<Integer> hasGivenDatasetType = this.studyInstanceService.instanceHasGivenDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		final Integer datasetId = hasGivenDatasetType.isPresent() ? hasGivenDatasetType.get() : null;
 		if (datasetId == null) {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
 		}
