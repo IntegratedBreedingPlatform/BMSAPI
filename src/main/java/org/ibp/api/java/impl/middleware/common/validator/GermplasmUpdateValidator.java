@@ -93,13 +93,13 @@ public class GermplasmUpdateValidator {
 		final List<Germplasm> germplasmByUUIDs = this.germplasmMiddlewareService.getGermplasmByGUIDs(new ArrayList<>(germplasmUUIDs));
 
 		final Set<Integer> existingGids = germplasmByGIDs.stream().map(Germplasm::getGid).collect(Collectors.toSet());
-		if (!gids.containsAll(existingGids)) {
+		if (!gids.equals(existingGids)) {
 			errors.reject("germplasm.update.invalid.gid", new String[] {
 				String.join(",", gids.stream().filter((gid) -> !existingGids.contains(gid)).map(o -> String.valueOf(o)).collect(
 					Collectors.toSet()))}, "");
 		}
 		final Set<String> existingUUIDs = germplasmByUUIDs.stream().map(Germplasm::getGermplasmUUID).collect(Collectors.toSet());
-		if (!germplasmUUIDs.containsAll(germplasmByUUIDs.stream().map(Germplasm::getGermplasmUUID).collect(Collectors.toSet()))) {
+		if (!germplasmUUIDs.equals(germplasmByUUIDs.stream().map(Germplasm::getGermplasmUUID).collect(Collectors.toSet()))) {
 			errors.reject("germplasm.update.invalid.uuid", new String[] {
 				String.join(",", germplasmUUIDs.stream().filter((uuid) -> !existingUUIDs.contains(uuid)).collect(
 					Collectors.toList()))}, "");
