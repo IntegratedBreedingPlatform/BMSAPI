@@ -4,6 +4,6 @@ import java.io.File;
 
 public interface GermplasmTemplateExportService {
 
-	File export(String cropName, String programUUID, boolean updateFormat);
+	File export(String cropName, String programUUID, boolean isGermplasmUpdateFormat);
 
 }

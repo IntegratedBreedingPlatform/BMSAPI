@@ -161,13 +161,13 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.filterGermplasmAttributes(codes), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls/{isGermplasmUpdateFormat}", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final boolean updateFormat) {
+		@PathVariable final boolean isGermplasmUpdateFormat,
+		@RequestParam(required = false) final String programUUID) {
 
 		final File file =
-			this.germplasmTemplateExportService.export(cropName, programUUID, updateFormat);
+			this.germplasmTemplateExportService.export(cropName, programUUID, isGermplasmUpdateFormat);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers
@@ -199,7 +199,8 @@ public class GermplasmResource {
 	@ResponseBody
 	public ResponseEntity<Set<Integer>> importGermplasmUpdates(@PathVariable final String cropName,
 		@RequestBody final List<GermplasmUpdateDTO> germplasmList) {
-		return new ResponseEntity<>(this.germplasmService.importGermplasmUpdates(ContextHolder.getCurrentProgram(), germplasmList), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmService.importGermplasmUpdates(ContextHolder.getCurrentProgram(), germplasmList),
+			HttpStatus.OK);
 	}
 
 	/**
