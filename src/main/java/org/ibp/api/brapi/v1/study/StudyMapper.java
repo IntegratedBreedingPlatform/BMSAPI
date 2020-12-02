@@ -38,7 +38,7 @@ public class StudyMapper {
 				this.map().setTrialDbId(String.valueOf(this.source.getMetadata().getTrialDbId()));
 				this.map().setStudyDescription(this.source.getMetadata().getStudyDescription());
 				this.map().setLastUpdate(this.source.getMetadata().getLastUpdate());
-				this.using(new ExperimentalDesignConverter()).map(this.source.getMetadata().getExperimentalDesign()).setExperimentalDesign(null);
+				this.using(new ExperimentalDesignConverter()).map(this.source.getMetadata()).setExperimentalDesign(null);
 				this.using(new ContactConverter()).map(this.source.getContacts()).setContacts(null);
 				this.using(new EnvironmentParameterConverter()).map(this.source.getEnvironmentParameters()).setEnvironmentParameters(null);
 			}

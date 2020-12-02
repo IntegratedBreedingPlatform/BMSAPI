@@ -14,7 +14,9 @@ import org.modelmapper.PropertyMap;
 import org.modelmapper.spi.MappingContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StudySummaryDtoMapper {
 	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
@@ -31,13 +33,13 @@ public class StudySummaryDtoMapper {
 		return StudySummaryDtoMapper.applicationWideModelMapper;
 	}
 
-	private static class DatasetSummaryConverter implements Converter<List<DatasetDTO>, List<DatasetSummary>> {
+	private static class DatasetSummaryConverter implements Converter<List<DatasetDTO>, List<ObservationLevel>> {
 
 		@Override
-		public List<DatasetSummary> convert(final MappingContext<List<DatasetDTO>, List<DatasetSummary>> context) {
-			final List<DatasetSummary> datasetSummaries = new ArrayList<>();
+		public List<ObservationLevel> convert(final MappingContext<List<DatasetDTO>, List<ObservationLevel>> context) {
+			final List<ObservationLevel> datasetSummaries = new ArrayList<>();
 			for (final DatasetDTO dataset : context.getSource()) {
-				datasetSummaries.add(new DatasetSummary(dataset.getDatasetId(), dataset.getName(),dataset.getDatasetTypeId()));
+				datasetSummaries.add(new ObservationLevel(dataset.getDatasetTypeId(), dataset.getName()));
 			}
 			return context.getMappingEngine().map(context.create(datasetSummaries, context.getDestinationType()));
 		}
@@ -57,6 +59,18 @@ public class StudySummaryDtoMapper {
 
 	}
 
+	public static class LastUpdateConverter implements Converter<String, Map<String, String>> {
+
+		@Override
+		public Map<String, String> convert(final MappingContext<String, Map<String, String>> context) {
+			final Map<String, String> lastUpdate = new HashMap<>();
+			lastUpdate.put("timeStamp", context.getSource());
+			lastUpdate.put("version", "1.0");
+			return context.getMappingEngine().map(context.create(lastUpdate, context.getDestinationType()));
+		}
+
+	}
+
 	private static void addStudySummaryDtoMapping(final ModelMapper mapper) {
 		mapper.addMappings(new PropertyMap<StudyDetailsDto, StudySummaryDto>() {
 
@@ -70,13 +84,13 @@ public class StudySummaryDtoMapper {
 				this.map().setStudyType(this.source.getMetadata().getStudyType());
 				this.map().setTrialName(this.source.getMetadata().getTrialName());
 				this.map().setStudyDescription(this.source.getMetadata().getStudyDescription());
-				this.map().setLastUpdate(this.source.getMetadata().getLastUpdate());
+				this.using(new LastUpdateConverter()).map(this.source.getMetadata().getLastUpdate()).setLastUpdate(null);
 				this.map().setLocationDbId(String.valueOf(this.source.getMetadata().getLocationId()));
 				this.map().setLocationName(String.valueOf(this.source.getMetadata().getLocationName()));
 				this.map().setStudyCode(this.source.getMetadata().getStudyCode());
 				this.map().setStudyPUI(this.source.getMetadata().getStudyPUI());
 				this.map().setTrialDbid(this.source.getMetadata().getNurseryOrTrialId());
-				this.using(new ExperimentalDesignConverter()).map(this.source.getMetadata().getExperimentalDesign()).setExperimentalDesign(null);
+				this.using(new ExperimentalDesignConverter()).map(this.source.getMetadata()).setExperimentalDesign(null);
 				this.using(new ContactConverter()).map(this.source.getContacts()).setContacts(null);
 				this.using(new EnvironmentParameterConverter()).map(this.source.getEnvironmentParameters()).setEnvironmentParameters(null);
 				this.using(new DatasetSummaryConverter()).map(this.source.getDatasets()).setObservationLevels(null);

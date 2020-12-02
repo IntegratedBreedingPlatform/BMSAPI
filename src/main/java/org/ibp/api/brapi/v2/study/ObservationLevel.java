@@ -1,0 +1,36 @@
+package org.ibp.api.brapi.v2.study;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.pojomatic.annotations.AutoProperty;
+
+@AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ObservationLevel {
+
+	private String levelName;
+
+	private Integer levelOrder;
+
+	public ObservationLevel(final Integer levelOrder, final String levelName){
+		this.levelOrder = levelOrder;
+		this.levelName = levelName;
+	}
+
+	public String getLevelName() {
+		return levelName;
+	}
+
+	public void setLevelName(final String levelName) {
+		this.levelName = levelName;
+	}
+
+	public Integer getLevelOrder() {
+		return levelOrder;
+	}
+
+	public void setLevelOrder(final Integer levelOrder) {
+		this.levelOrder = levelOrder;
+	}
+
+
+}

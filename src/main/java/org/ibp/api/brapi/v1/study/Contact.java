@@ -2,6 +2,8 @@ package org.ibp.api.brapi.v1.study;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.apache.commons.lang.StringUtils;
+import org.generationcp.middleware.util.StringUtil;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -18,9 +20,9 @@ public class Contact {
 
 	private String type;
 
-	private String orcid;
+	private String orcid = StringUtils.EMPTY;
 
-	private String instituteName;
+	private String instituteName = StringUtils.EMPTY;
 
 	/**
 	 * Empty constructor

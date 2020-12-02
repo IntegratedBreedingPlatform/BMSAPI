@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.ibp.api.brapi.v2.study.DatasetSummary;
+import org.ibp.api.brapi.v2.study.ObservationLevel;
 import org.ibp.api.brapi.v2.study.EnvironmentParameter;
 import org.ibp.api.brapi.v2.study.ExperimentalDesign;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -36,7 +36,7 @@ public class StudySummaryDto {
 	private String culturalPractices;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private List<String> dataLinks;
+	private List<String> dataLinks = new ArrayList<>();
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String documentationURL;
@@ -54,13 +54,13 @@ public class StudySummaryDto {
 	private String growthFacility;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private String lastUpdate;
+	private Map<String, String> lastUpdate;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String license;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private String observationUnitsDescription;
+	private String observationUnitsDescription = StringUtils.EMPTY;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private Date startDate;
@@ -95,7 +95,7 @@ public class StudySummaryDto {
 	private String locationName;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private List<DatasetSummary> observationLevels;
+	private List<ObservationLevel> observationLevels;
 
 	private String programDbId;
 
@@ -366,11 +366,11 @@ public class StudySummaryDto {
 		this.growthFacility = growthFacility;
 	}
 
-	public String getLastUpdate() {
+	public Map<String, String> getLastUpdate() {
 		return lastUpdate;
 	}
 
-	public void setLastUpdate(final String lastUpdate) {
+	public void setLastUpdate(final Map<String, String> lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
 
@@ -442,11 +442,11 @@ public class StudySummaryDto {
 		return active;
 	}
 
-	public List<DatasetSummary> getObservationLevels() {
+	public List<ObservationLevel> getObservationLevels() {
 		return observationLevels;
 	}
 
-	public void setObservationLevels(final List<DatasetSummary> observationLevels) {
+	public void setObservationLevels(final List<ObservationLevel> observationLevels) {
 		this.observationLevels = observationLevels;
 	}
 

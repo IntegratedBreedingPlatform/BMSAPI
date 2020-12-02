@@ -105,7 +105,7 @@ public class StudyResourceBrapi {
 		@ApiParam(value = "Common name for the crop associated with study")
 		@RequestParam(value = "commonCropName", required = false) final String commonCropName,
 		@ApiParam(value = "Filter based on studies type unique identifier")
-		@RequestParam(value = "studyType", required = false) final String studyType,
+		@RequestParam(value = "studyTypeId", required = false) final String studyTypeId,
 		@ApiParam(value = "Filter to only return studies associated with given program id")
 		@RequestParam(value = "programDbId", required = false) final String programDbId,
 		@ApiParam(value = "Filter to only return studies associated with given location id")
@@ -140,9 +140,9 @@ public class StudyResourceBrapi {
 			return new ResponseEntity<>(studySummariesDto, HttpStatus.BAD_REQUEST);
 		}
 
-		final StudySearchFilter filter = new StudySearchFilter().withStudyTypeDbId(studyType).withProgramDbId(programDbId)
+		final StudySearchFilter filter = new StudySearchFilter().withStudyTypeDbId(studyTypeId).withProgramDbId(programDbId)
 			.withLocationDbId(locationDbId).withGermplasmDbid(germplasmDbid).withObservationVariableDbId(observationVariableDbId)
-			.withStudyDbId(studyDbId).withTrialDbId(trialDbId).withTrialName(trialName).withTrialPUI(studyPUI).withSeasonDbId(seasonDbId);
+			.withStudyDbId(studyDbId).withTrialDbId(trialDbId).withTrialName(trialName).withStudyPUI(studyPUI).withSeasonDbId(seasonDbId);
 
 		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -193,8 +193,8 @@ public class StudyResourceBrapi {
 
 	private String parameterValidation(final String crop, final String commonCropName, final Boolean active, final String sortBy,
 		final String sortOrder) {
-		final List<String> sortbyFields = ImmutableList.<String>builder().add("studyDbid").add("trialDbId").add("programDbId")
-			.add("locationDbId").add("studyType").add("trialName").add("programName").add("seasonDbId").build();
+		final List<String> sortbyFields = ImmutableList.<String>builder().add("studyDbId").add("trialDbId").add("programDbId")
+			.add("locationDbId").add("studyTypeId").add("trialName").add("programName").add("seasonDbId").build();
 		final List<String> sortOrders = ImmutableList.<String>builder().add("asc")
 			.add("desc").build();
 

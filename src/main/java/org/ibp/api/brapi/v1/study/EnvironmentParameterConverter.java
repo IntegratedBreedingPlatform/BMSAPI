@@ -18,6 +18,8 @@ public class EnvironmentParameterConverter implements Converter<List<Measurement
 			environmentParameter.setValue(variable.getValue());
 			environmentParameter.setUnit(variable.getScale());
 			environmentParameter.setParameterName(variable.getName());
+			environmentParameter.setParameterPUI(String.valueOf(variable.getTermId()));
+			environmentParameter.setUnitPUI(variable.getScaleId());
 			environmentParameters.add(environmentParameter);
 		}
 		return context.getMappingEngine().map(context.create(environmentParameters, context.getDestinationType()));
