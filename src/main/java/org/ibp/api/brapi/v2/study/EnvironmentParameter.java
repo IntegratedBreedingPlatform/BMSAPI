@@ -16,7 +16,7 @@ public class EnvironmentParameter {
 
 	private String unit;
 
-	private String unitPUI;
+	private Integer unitPUI;
 
 	private String value;
 
@@ -26,7 +26,7 @@ public class EnvironmentParameter {
 	}
 
 	public EnvironmentParameter(final String description, final String parameterName, final String parameterPUI, final String unit,
-		final String unitPUI, final String value, final String valuePUI) {
+		final Integer unitPUI, final String value, final String valuePUI) {
 		this.description = description;
 		this.parameterName = parameterName;
 		this.parameterPUI = parameterPUI;
@@ -73,11 +73,11 @@ public class EnvironmentParameter {
 		return this;
 	}
 
-	public String getUnitPUI() {
+	public Integer getUnitPUI() {
 		return unitPUI;
 	}
 
-	public EnvironmentParameter setUnitPUI(final String unitPUI) {
+	public EnvironmentParameter setUnitPUI(final Integer unitPUI) {
 		this.unitPUI = unitPUI;
 		return this;
 	}
