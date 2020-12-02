@@ -364,8 +364,8 @@ public class StudyResourceBrapi {
 			required = false) final Integer pageSize) throws BrapiNotFoundException {
 
 		// Resolve the datasetId in which StudyDbId belongs to. (In BRAPI, studyDbId is nd_geolocation_id)
-		final Optional<Integer> hasGivenDatasetType = this.studyInstanceService.instanceHasGivenDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
-		final Integer datasetId = hasGivenDatasetType.isPresent() ? hasGivenDatasetType.get() : null;
+		final Optional<Integer> datasetIdForInstance = this.studyInstanceService.getDatasetIdForInstanceIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		final Integer datasetId = datasetIdForInstance.isPresent() ? datasetIdForInstance.get() : null;
 		if (datasetId == null) {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
 		}
