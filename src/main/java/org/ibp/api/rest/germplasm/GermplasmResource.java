@@ -11,6 +11,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.importation.ExtendedGermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
@@ -91,8 +92,7 @@ public class GermplasmResource {
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmSearchRequest germplasmSearchRequest,
-		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE)
-		final Pageable pageable
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
 	) {
 
 		BaseValidator.checkNotNull(germplasmSearchRequest, "param.null", new String[] {"germplasmSearchDTO"});
@@ -134,6 +134,7 @@ public class GermplasmResource {
 
 	/**
 	 * Simple search to feed autocomplete features
+	 *
 	 * @return a limited set of results matching the query criteria
 	 */
 	@ApiOperation(value = "Search germplasm attributes")
@@ -166,12 +167,13 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.filterGermplasmAttributes(codes), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls/{isGermplasmUpdateFormat}", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
+		@PathVariable final boolean isGermplasmUpdateFormat,
 		@RequestParam(required = false) final String programUUID) {
 
 		final File file =
-			this.germplasmTemplateExportService.export(cropName, programUUID);
+			this.germplasmTemplateExportService.export(cropName, programUUID, isGermplasmUpdateFormat);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers
@@ -197,6 +199,17 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.importGermplasm(cropName, programUUID, germplasmList), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Import germplasm updates. Updating Breeding Method is not yet supported.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM_UPDATES')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PATCH)
+	@ResponseBody
+	public ResponseEntity<Set<Integer>> importGermplasmUpdates(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final List<GermplasmUpdateDTO> germplasmList) {
+		return new ResponseEntity<>(this.germplasmService.importGermplasmUpdates(programUUID, germplasmList),
+			HttpStatus.OK);
+	}
+
 	/**
 	 * Returns a germplasm by a given germplasm id
 	 *
@@ -217,7 +230,7 @@ public class GermplasmResource {
 		}
 
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
-		germplasmSearchRequest.setGid(gid);
+		germplasmSearchRequest.setGids(Arrays.asList(gid));
 		germplasmSearchRequest.setAddedColumnsPropertyIds(Arrays.asList("PREFERRED NAME"));
 		final List<GermplasmSearchResponse> germplasmSearchResponses =
 			germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
