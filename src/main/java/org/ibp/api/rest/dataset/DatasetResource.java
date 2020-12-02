@@ -199,12 +199,11 @@ public class DatasetResource {
 		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
-	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname, @PathVariable final String programUUID,
+	public ResponseEntity<List<ObservationUnitRow>> getObservationUnitTable(@PathVariable final String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
 		@RequestBody final ObservationUnitsSearchDTO searchDTO,
 		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
-
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 		Preconditions
 			.checkArgument(Collections.isEmpty(searchDTO.getFilterColumns()), "filterColumns should be null or empty");
@@ -232,12 +231,10 @@ public class DatasetResource {
 				}
 			});
 
-		final ObservationUnitTable observationUnitTable = new ObservationUnitTable();
-		observationUnitTable.setData(pageResult.getPageResults());
-		observationUnitTable.setDraw(searchDTO.getDraw());
-		observationUnitTable.setRecordsTotal((int) pageResult.getTotalResults());
-		observationUnitTable.setRecordsFiltered((int) pageResult.getFilteredResults());
-		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Filtered-Count", Long.toString(pageResult.getFilteredResults()));
+		headers.add("X-Total-Count", Long.toString(pageResult.getTotalResults()));
+		return new ResponseEntity<>(pageResult.getPageResults(), headers, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve all the observation units in a simple JSON array table format",

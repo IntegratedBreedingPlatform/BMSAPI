@@ -17,6 +17,7 @@ import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,7 +51,7 @@ public class StudyInventoryResource {
 		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
-	public ResponseEntity<StudyInventoryTable> searchStudyTransactions(
+	public ResponseEntity<List<StudyTransactionsDto>> searchStudyTransactions(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
@@ -84,13 +85,11 @@ public class StudyInventoryResource {
 			inventoryLock.unlockRead();
 		}
 
-		final StudyInventoryTable studyInventoryTable = new StudyInventoryTable();
-		studyInventoryTable.setData(pagedResult.getPageResults());
-		studyInventoryTable.setDraw(studyTransactionsRequest.getDraw());
-		studyInventoryTable.setRecordsTotal((int) pagedResult.getTotalResults());
-		studyInventoryTable.setRecordsFiltered((int) pagedResult.getFilteredResults());
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Filtered-Count", Long.toString(pagedResult.getFilteredResults()));
+		headers.add("X-Total-Count", Long.toString(pagedResult.getTotalResults()));
+		return new ResponseEntity<>(pagedResult.getPageResults(), headers, HttpStatus.OK);
 
-		return new ResponseEntity<>(studyInventoryTable, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Cancel pending Study Transactions", notes = "Cancel any transaction with pending status")
