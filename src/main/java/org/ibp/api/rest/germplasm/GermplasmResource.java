@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
@@ -198,8 +197,9 @@ public class GermplasmResource {
 	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity<Set<Integer>> importGermplasmUpdates(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@RequestBody final List<GermplasmUpdateDTO> germplasmList) {
-		return new ResponseEntity<>(this.germplasmService.importGermplasmUpdates(ContextHolder.getCurrentProgram(), germplasmList),
+		return new ResponseEntity<>(this.germplasmService.importGermplasmUpdates(programUUID, germplasmList),
 			HttpStatus.OK);
 	}
 
