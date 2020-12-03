@@ -67,7 +67,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Add germplasm entries to an existing list")
-	@RequestMapping(value = "/crops/{crop}/germplasm-list/{germplasmListId}/entries", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> addGermplasmEntriesToList(
 		@ApiParam(required = true) @PathVariable final String crop,
