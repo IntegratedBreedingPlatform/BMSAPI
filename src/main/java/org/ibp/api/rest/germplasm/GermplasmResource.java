@@ -264,7 +264,7 @@ public class GermplasmResource {
 		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
 			value = "Number of records per page. <b>Note:</b> this query may return additional records using some filters"),
 		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
-			value = "Sorting criteria in the format: property,asc|desc. ")
+			value = "Sorting criteria in the format: property,asc|desc. Sorting by names is not allowed.")
 	})
 	public ResponseEntity<List<GermplasmDto>> getGermplasmMatches(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
@@ -281,7 +281,9 @@ public class GermplasmResource {
 
 				@Override
 				public long getFilteredCount() {
-					return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
+					//					return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
+					// Not counting filtered germplasms for performance reasons
+					return 0;
 				}
 
 				@Override
