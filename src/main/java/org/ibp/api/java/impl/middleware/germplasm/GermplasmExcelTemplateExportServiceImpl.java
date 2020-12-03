@@ -20,7 +20,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
-import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.MethodService;
 import org.ibp.api.domain.location.LocationDto;
