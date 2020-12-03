@@ -359,7 +359,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		if (!Util.isPositiveInteger(String.valueOf(germplasmListId))) {
-			errors.reject("list.ids.invalid", new String[] {germplasmListId.toString()}, "");
+			errors.reject("list.id.invalid", new String[] {germplasmListId.toString()}, "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
@@ -367,7 +367,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 
 		final GermplasmList germplasmList = this.germplasmListService.getGermplasmListById(germplasmListId)
 			.orElseThrow(() -> {
-				errors.reject("list.ids.invalid", new String[] {germplasmListId.toString()}, "");
+				errors.reject("list.id.invalid", new String[] {germplasmListId.toString()}, "");
 				return new ResourceNotFoundException(errors.getAllErrors().get(0));
 			});
 
