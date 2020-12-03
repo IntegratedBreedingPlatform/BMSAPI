@@ -4,10 +4,11 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
-import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -103,6 +104,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private AttributeService attributeService;
 
 	@Autowired
+	private GermplasmNameTypeService germplasmNameTypeService;
+
+	@Autowired
 	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmService;
 
 	@Autowired
@@ -191,6 +195,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(final String query) {
 		return this.attributeService.searchAttributes(query);
+	}
+
+	@Override
+	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(final String query) {
+		return this.germplasmNameTypeService.searchNameTypes(query);
 	}
 
 	@Override

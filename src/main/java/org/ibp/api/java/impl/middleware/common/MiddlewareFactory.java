@@ -32,6 +32,8 @@ import org.generationcp.middleware.api.inventory.study.StudyTransactionsService;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsServiceImpl;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.LocationServiceImpl;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
@@ -579,6 +581,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public AttributeService getAttributeService() {
 		return new AttributeServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmNameTypeService getGermplasmNameTypeService() {
+		return new GermplasmNameTypeServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

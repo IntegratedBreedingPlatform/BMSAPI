@@ -1,9 +1,10 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
-import org.generationcp.middleware.api.germplasm.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -70,6 +71,10 @@ public class GermplasmUpdateValidator {
 			errors.reject("germplasm.update.invalid.attribute.code", new String[] {
 				String.join(",", attributesCodes.stream().filter((attribute) -> !existingAttributesCodes.contains(attribute)).collect(
 					Collectors.toList()))}, "");
+		}
+		final List<String> ambiguosCodes = new ArrayList<>(CollectionUtils.intersection(existingNamesCodes, existingAttributesCodes));
+		if (!ambiguosCodes.isEmpty()) {
+			errors.reject("germplasm.update.code.is.defined.as.name.and.attribute", new String[] {String.join(",", ambiguosCodes)}, "");
 		}
 
 	}
