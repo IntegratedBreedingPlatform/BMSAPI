@@ -8,9 +8,9 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.ibp.api.brapi.v2.study.ObservationLevel;
-import org.ibp.api.brapi.v2.study.EnvironmentParameter;
-import org.ibp.api.brapi.v2.study.ExperimentalDesign;
+import org.generationcp.middleware.service.api.study.ObservationLevel;
+import org.generationcp.middleware.service.api.study.EnvironmentParameter;
+import org.generationcp.middleware.service.api.study.ExperimentalDesign;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 

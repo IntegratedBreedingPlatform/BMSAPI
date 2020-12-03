@@ -1,7 +1,7 @@
 package org.ibp.api.brapi.v1.study;
 
 import org.generationcp.middleware.service.api.study.StudyMetadata;
-import org.ibp.api.brapi.v2.study.ExperimentalDesign;
+import org.generationcp.middleware.service.api.study.ExperimentalDesign;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;
 

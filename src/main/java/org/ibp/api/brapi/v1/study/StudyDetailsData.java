@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.location.Location;
-import org.ibp.api.brapi.v2.study.EnvironmentParameter;
-import org.ibp.api.brapi.v2.study.ExperimentalDesign;
+import org.generationcp.middleware.service.api.study.EnvironmentParameter;
+import org.generationcp.middleware.service.api.study.ExperimentalDesign;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 

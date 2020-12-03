@@ -104,12 +104,11 @@ public class StudyTestDataProvider {
 		final SeasonDto seasonDto = new SeasonDto("Dry Season", String.valueOf(TermId.SEASON_DRY.getId()));
 		studyInstanceDto.setSeasons(Arrays.asList(seasonDto));
 
-		studyInstanceDto.setStudyDbId("1");
 		studyInstanceDto.setStudyName("Study1");
-		studyInstanceDto.setTrialDbId("2");
+		studyInstanceDto.setTrialDbId(2);
 		studyInstanceDto.setStudyTypeDbId("6");
 		studyInstanceDto.setStudyTypeName("Trial");
-		studyInstanceDto.setStudyDbId("6");
+		studyInstanceDto.setStudyDbId(6);
 		studyInstanceDto.setTrialName("Trial1");
 		return studyInstanceDto;
 	}

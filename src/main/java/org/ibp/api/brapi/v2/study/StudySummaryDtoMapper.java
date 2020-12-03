@@ -1,6 +1,7 @@
 package org.ibp.api.brapi.v2.study;
 
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.service.api.study.ObservationLevel;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.brapi.v1.study.Contact;

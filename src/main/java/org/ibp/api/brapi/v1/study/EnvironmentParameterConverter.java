@@ -1,7 +1,7 @@
 package org.ibp.api.brapi.v1.study;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.ibp.api.brapi.v2.study.EnvironmentParameter;
+import org.generationcp.middleware.service.api.study.EnvironmentParameter;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;
 

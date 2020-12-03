@@ -13,8 +13,10 @@ import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -101,11 +103,11 @@ public class StudyResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/studies", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<StudySummariesDto> getStudies(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<StudyInstanceDto>> getStudies(@PathVariable final String crop,
 		@ApiParam(value = "Common name for the crop associated with study")
 		@RequestParam(value = "commonCropName", required = false) final String commonCropName,
 		@ApiParam(value = "Filter based on studies type unique identifier")
-		@RequestParam(value = "studyTypeId", required = false) final String studyTypeId,
+		@RequestParam(value = "studyTypeDbId", required = false) final String studyTypeDbId,
 		@ApiParam(value = "Filter to only return studies associated with given program id")
 		@RequestParam(value = "programDbId", required = false) final String programDbId,
 		@ApiParam(value = "Filter to only return studies associated with given location id")
@@ -136,11 +138,12 @@ public class StudyResourceBrapi {
 		if (!StringUtils.isBlank(validationError)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
 			final Metadata metadata = new Metadata(null, status);
-			final StudySummariesDto studySummariesDto = new StudySummariesDto().withMetadata(metadata).withResult(new Result<StudySummaryDto>());
-			return new ResponseEntity<>(studySummariesDto, HttpStatus.BAD_REQUEST);
+			final EntityListResponse<StudyInstanceDto> entityListResponse = new EntityListResponse<>(metadata, new Result<StudyInstanceDto>());
+
+			return new ResponseEntity<>(entityListResponse, HttpStatus.BAD_REQUEST);
 		}
 
-		final StudySearchFilter filter = new StudySearchFilter().withStudyTypeDbId(studyTypeId).withProgramDbId(programDbId)
+		final StudySearchFilter filter = new StudySearchFilter().withStudyTypeDbId(studyTypeDbId).withProgramDbId(programDbId)
 			.withLocationDbId(locationDbId).withGermplasmDbid(germplasmDbid).withObservationVariableDbId(observationVariableDbId)
 			.withStudyDbId(studyDbId).withTrialDbId(trialDbId).withTrialName(trialName).withStudyPUI(studyPUI).withSeasonDbId(seasonDbId);
 
@@ -154,8 +157,8 @@ public class StudyResourceBrapi {
 			pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 		}
 
-		final PagedResult<StudyDetailsDto> resultPage =
-			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<StudyDetailsDto>() {
+		final PagedResult<StudyInstanceDto> resultPage =
+			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<StudyInstanceDto>() {
 
 				@Override
 				public long getCount() {
@@ -163,38 +166,27 @@ public class StudyResourceBrapi {
 				}
 
 				@Override
-				public List<StudyDetailsDto> getResults(final PagedResult<StudyDetailsDto> pagedResult) {
-					return StudyResourceBrapi.this.studyService.getStudyDetails(filter, pageRequest);
+				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
+					return StudyResourceBrapi.this.studyService.getStudyInstanceDtoListWithTrialData(filter, pageRequest);
 				}
 			});
 
-		final List<StudySummaryDto> studySummaryDtoList = this.translateResults(resultPage, crop);
-		final Result<StudySummaryDto> results = new Result<StudySummaryDto>().withData(studySummaryDtoList);
+		final List<StudyInstanceDto> summaryDtoList = resultPage.getPageResults();
+
+		final Result<StudyInstanceDto> result = new Result<StudyInstanceDto>().withData(summaryDtoList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
-		final StudySummariesDto studySummariesDto = new StudySummariesDto().withMetadata(metadata).withResult(results);
+		final EntityListResponse<StudyInstanceDto> entityListResponse = new EntityListResponse<>(metadata, result);
 
-		return new ResponseEntity<>(studySummariesDto, HttpStatus.OK);
-	}
-
-	private List<StudySummaryDto> translateResults(final PagedResult<StudyDetailsDto> resultPage, final String crop) {
-		final ModelMapper modelMapper = StudySummaryDtoMapper.getInstance();
-		final List<StudySummaryDto> studySummaryDtoList = new ArrayList<>();
-
-		for (final StudyDetailsDto mwStudy : resultPage.getPageResults()) {
-			final StudySummaryDto studySummaryDto = modelMapper.map(mwStudy, StudySummaryDto.class);
-			studySummaryDto.setCommonCropName(crop);
-			studySummaryDtoList.add(studySummaryDto);
-		}
-		return studySummaryDtoList;
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
 	private String parameterValidation(final String crop, final String commonCropName, final Boolean active, final String sortBy,
 		final String sortOrder) {
 		final List<String> sortbyFields = ImmutableList.<String>builder().add("studyDbId").add("trialDbId").add("programDbId")
-			.add("locationDbId").add("studyTypeId").add("trialName").add("programName").add("seasonDbId").build();
+			.add("locationDbId").add("studyTypeDbId").add("trialName").add("programName").add("seasonDbId").build();
 		final List<String> sortOrders = ImmutableList.<String>builder().add("asc")
 			.add("desc").build();
 
