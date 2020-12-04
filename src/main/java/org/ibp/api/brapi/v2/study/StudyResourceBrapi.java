@@ -52,6 +52,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Api(value = "BrAPI v2 Study Services")
 @Controller(value = "StudyResourceBrapiV2")
@@ -171,9 +172,10 @@ public class StudyResourceBrapi {
 				}
 			});
 
-		final List<StudyInstanceDto> summaryDtoList = resultPage.getPageResults();
+		final List<StudyInstanceDto> studyInstanceDtoList = resultPage.getPageResults().stream()
+			.peek(studyInstanceDto -> {studyInstanceDto.setCommonCropName(crop);}).collect(Collectors.toList());
 
-		final Result<StudyInstanceDto> result = new Result<StudyInstanceDto>().withData(summaryDtoList);
+		final Result<StudyInstanceDto> result = new Result<StudyInstanceDto>().withData(studyInstanceDtoList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
