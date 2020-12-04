@@ -20,7 +20,7 @@ public class StudySummariesDto {
 	 * @return Metadata
 	 */
 	public Metadata getMetadata() {
-		return this.metadata;
+		return metadata;
 	}
 
 	/**
@@ -34,17 +34,12 @@ public class StudySummariesDto {
 		return this;
 	}
 
-	public StudySummariesDto withMetadata(final Metadata metadata) {
-		this.metadata = metadata;
-		return this;
-	}
-
 	/**
 	 *
 	 * @return The result
 	 */
 	public Result<StudySummaryDto> getResult() {
-		return this.result;
+		return result;
 	}
 
 	/**
@@ -54,11 +49,6 @@ public class StudySummariesDto {
 	 * @return this
 	 */
 	public StudySummariesDto setResult(final Result<StudySummaryDto> result) {
-		this.result = result;
-		return this;
-	}
-
-	public StudySummariesDto withResult(final Result<StudySummaryDto> result) {
 		this.result = result;
 		return this;
 	}
@@ -74,7 +64,7 @@ public class StudySummariesDto {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
+	public boolean equals(Object o) {
 		return Pojomatic.equals(this, o);
 	}
 
