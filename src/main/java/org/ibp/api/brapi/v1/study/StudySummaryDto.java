@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "studyDbId", "studyName", "studyType", "years", "seasons", "locationDbId", "locationName", "programDbId",
-		"optionalInfo" })
+	"optionalInfo" })
 public class StudySummaryDto {
 
 	private Integer studyDbId;
