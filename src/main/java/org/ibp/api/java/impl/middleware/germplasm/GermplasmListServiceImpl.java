@@ -6,12 +6,12 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
-import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.Operation;
@@ -31,7 +31,9 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplamListService;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -110,6 +112,15 @@ public class GermplasmListServiceImpl implements GermplamListService {
 
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
+
+	@Autowired
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
+
+	@Autowired
+	private GermplasmValidator germplasmValidator;
+
+	@Autowired
+	private GermplasmService germplasmService;
 
 	private BindingResult errors;
 
@@ -300,7 +311,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 			}
 
 			if (isBlank(entry.getSeedSource())) {
-				entry.setSeedSource(GermplasmListDataDAO.SOURCE_UNKNOWN);
+				entry.setSeedSource(this.germplasmService.getPlotCodeValue(gid));
 				hasSeedSourceEmpty = true;
 			} else {
 				hasSeedSource = true;
@@ -341,6 +352,41 @@ public class GermplasmListServiceImpl implements GermplamListService {
 			})
 			.collect(Collectors.toList());
 	}
+
+	@Override
+	public void addGermplasmEntriesToList(final Integer germplasmListId,
+		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite, final String programUUID) {
+
+		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		if (!Util.isPositiveInteger(String.valueOf(germplasmListId))) {
+			errors.reject("list.id.invalid", new String[] {germplasmListId.toString()}, "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
+
+		final GermplasmList germplasmList = this.germplasmListService.getGermplasmListById(germplasmListId)
+			.orElseThrow(() -> {
+				errors.reject("list.id.invalid", new String[] {germplasmListId.toString()}, "");
+				return new ResourceNotFoundException(errors.getAllErrors().get(0));
+			});
+
+		if (germplasmList.isFolder()) {
+			this.errors.reject("list.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (germplasmList.isLockedList()) {
+			this.errors.reject("list.locked", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (!CollectionUtils.isEmpty(searchComposite.getItemIds())) {
+			this.germplasmValidator.validateGids(this.errors, new ArrayList<>(searchComposite.getItemIds()));
+		}
+
+		this.germplasmListService.addGermplasmEntriesToList(germplasmListId, searchComposite, programUUID);
+}
 
 	@Override
 	public Integer createGermplasmListFolder(final String cropName, final String programUUID, final String folderName,
