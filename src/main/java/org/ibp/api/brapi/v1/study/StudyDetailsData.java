@@ -147,7 +147,7 @@ public class StudyDetailsData {
 	 * @return the studyDdId
 	 */
 	public String getStudyDbId() {
-		return studyDbId;
+		return this.studyDbId;
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class StudyDetailsData {
 	 * @return the Study name
 	 */
 	public String getStudyName() {
-		return studyName;
+		return this.studyName;
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class StudyDetailsData {
 	 * @return the Study type
 	 */
 	public String getStudyType() {
-		return studyType;
+		return this.studyType;
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class StudyDetailsData {
 	 * @return the Study PUI
 	 */
 	public String getStudyPUI() {
-		return studyPUI;
+		return this.studyPUI;
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class StudyDetailsData {
 	 * @return the list of seasons
 	 */
 	public List<String> getSeasons() {
-		return seasons;
+		return this.seasons;
 	}
 
 	/**
@@ -227,7 +227,7 @@ public class StudyDetailsData {
 	 * @return the TrialDbId
 	 */
 	public String getTrialDbId() {
-		return trialDbId;
+		return this.trialDbId;
 	}
 
 	/**
@@ -243,7 +243,7 @@ public class StudyDetailsData {
 	 * @return the additional info
 	 */
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	/**
@@ -259,7 +259,7 @@ public class StudyDetailsData {
 	 * @return the list of contacts
 	 */
 	public List<Contact> getContacts() {
-		return contacts;
+		return this.contacts;
 	}
 
 	/**
@@ -275,7 +275,7 @@ public class StudyDetailsData {
 	 * @return active status
 	 */
 	public String getActive() {
-		return active;
+		return this.active;
 	}
 
 	/**
@@ -291,7 +291,7 @@ public class StudyDetailsData {
 	 * @return the location
 	 */
 	public Location getLocation() {
-		return location;
+		return this.location;
 	}
 
 	/**
@@ -307,7 +307,7 @@ public class StudyDetailsData {
 	 * @return the end date
 	 */
 	public Date getEndDate() {
-		return endDate;
+		return this.endDate;
 	}
 
 	/**
@@ -323,7 +323,7 @@ public class StudyDetailsData {
 	 * @return the start date
 	 */
 	public Date getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	/**
@@ -339,7 +339,7 @@ public class StudyDetailsData {
 	 * @return the trial name
 	 */
 	public String getTrialName() {
-		return trialName;
+		return this.trialName;
 	}
 
 	/**
@@ -352,7 +352,7 @@ public class StudyDetailsData {
 	}
 
 	public String getStudyDescription() {
-		return studyDescription;
+		return this.studyDescription;
 	}
 
 	public StudyDetailsData setStudyDescription(final String studyDescription) {
@@ -361,7 +361,7 @@ public class StudyDetailsData {
 	}
 
 	public String getCulturalPractices() {
-		return culturalPractices;
+		return this.culturalPractices;
 	}
 
 	public StudyDetailsData setCulturalPractices(final String culturalPractices) {
@@ -370,7 +370,7 @@ public class StudyDetailsData {
 	}
 
 	public List<String> getDataLinks() {
-		return dataLinks;
+		return this.dataLinks;
 	}
 
 	public StudyDetailsData setDataLinks(final List<String> dataLinks) {
@@ -379,7 +379,7 @@ public class StudyDetailsData {
 	}
 
 	public String getDocumentationURL() {
-		return documentationURL;
+		return this.documentationURL;
 	}
 
 	public StudyDetailsData setDocumentationURL(final String documentationURL) {
@@ -388,7 +388,7 @@ public class StudyDetailsData {
 	}
 
 	public List<EnvironmentParameter> getEnvironmentParameters() {
-		return environmentParameters;
+		return this.environmentParameters;
 	}
 
 	public StudyDetailsData setEnvironmentParameters(final List<EnvironmentParameter> environmentParameters) {
@@ -397,7 +397,7 @@ public class StudyDetailsData {
 	}
 
 	public ExperimentalDesign getExperimentalDesign() {
-		return experimentalDesign;
+		return this.experimentalDesign;
 	}
 
 	public StudyDetailsData setExperimentalDesign(final ExperimentalDesign experimentalDesign) {
@@ -406,7 +406,7 @@ public class StudyDetailsData {
 	}
 
 	public List<String> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public StudyDetailsData setExternalReferences(final List<String> externalReferences) {
@@ -415,7 +415,7 @@ public class StudyDetailsData {
 	}
 
 	public String getGrowthFacility() {
-		return growthFacility;
+		return this.growthFacility;
 	}
 
 	public StudyDetailsData setGrowthFacility(final String growthFacility) {
@@ -424,7 +424,7 @@ public class StudyDetailsData {
 	}
 
 	public String getLastUpdate() {
-		return lastUpdate;
+		return this.lastUpdate;
 	}
 
 	public StudyDetailsData setLastUpdate(final String lastUpdate) {
@@ -433,7 +433,7 @@ public class StudyDetailsData {
 	}
 
 	public String getCommonCropName() {
-		return commonCropName;
+		return this.commonCropName;
 	}
 
 	public StudyDetailsData setCommonCropName(final String commonCropName) {
@@ -442,7 +442,7 @@ public class StudyDetailsData {
 	}
 
 	public String getLicense() {
-		return license;
+		return this.license;
 	}
 
 	public StudyDetailsData setLicense(final String license) {
@@ -451,7 +451,7 @@ public class StudyDetailsData {
 	}
 
 	public String getObservationUnitsDescription() {
-		return observationUnitsDescription;
+		return this.observationUnitsDescription;
 	}
 
 	public StudyDetailsData setObservationUnitsDescription(final String observationUnitsDescription) {
@@ -490,7 +490,7 @@ public class StudyDetailsData {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 
