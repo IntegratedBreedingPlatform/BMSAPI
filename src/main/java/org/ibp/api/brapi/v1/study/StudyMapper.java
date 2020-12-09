@@ -1,10 +1,10 @@
 package org.ibp.api.brapi.v1.study;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.service.api.study.EnvironmentParameter;
+import org.generationcp.middleware.service.api.study.ExperimentalDesign;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.ibp.api.brapi.v2.study.EnvironmentParameter;
-import org.ibp.api.brapi.v2.study.ExperimentalDesign;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;

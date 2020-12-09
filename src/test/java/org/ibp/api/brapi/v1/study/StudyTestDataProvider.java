@@ -27,7 +27,7 @@ import java.util.UUID;
 public class StudyTestDataProvider {
 
 	public static UserDto getUserDto() {
-		UserDto user = new UserDto();
+		final UserDto user = new UserDto();
 		user.setUserId(1);
 		user.setEmail("a@a.com");
 		user.setFirstName("admin");
@@ -57,7 +57,7 @@ public class StudyTestDataProvider {
 	}
 
 	public static Map<String, String> getStudyProperties() {
-		Map<String, String> properties = new HashMap<>();
+		final Map<String, String> properties = new HashMap<>();
 		properties.put("prop1", "val1");
 		return properties;
 	}
@@ -70,7 +70,7 @@ public class StudyTestDataProvider {
 	}
 
 	public static StudyDetailsDto getStudyDetailsDto() throws ParseException {
-		StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
+		final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
 		studyDetailsDto.setMetadata(StudyTestDataProvider.getStudyMetadata());
 		studyDetailsDto.setContacts(Lists.newArrayList(StudyTestDataProvider.getUserDto()));
 		studyDetailsDto.setAdditionalInfo(StudyTestDataProvider.getStudyProperties());
@@ -79,13 +79,13 @@ public class StudyTestDataProvider {
 	}
 
 	public static LocationDetailsDto getLocationDetailsDto() {
-		LocationDetailsDto locationDetailsDto =
+		final LocationDetailsDto locationDetailsDto =
 			new LocationDetailsDto(2, "Breeding Location", "New Zealand", "NZL", "NZL", "NZ", 156.2, 58.6, 5.2);
 		return locationDetailsDto;
 	}
 
 	public static List<LocationDetailsDto> getListLocationDetailsDto() {
-		List<LocationDetailsDto> locationDetailsDtoList = new ArrayList<>();
+		final List<LocationDetailsDto> locationDetailsDtoList = new ArrayList<>();
 		locationDetailsDtoList.add(StudyTestDataProvider.getLocationDetailsDto());
 		return locationDetailsDtoList;
 	}
@@ -104,7 +104,6 @@ public class StudyTestDataProvider {
 		final SeasonDto seasonDto = new SeasonDto("Dry Season", String.valueOf(TermId.SEASON_DRY.getId()));
 		studyInstanceDto.setSeasons(Arrays.asList(seasonDto));
 
-		studyInstanceDto.setStudyDbId("1");
 		studyInstanceDto.setStudyName("Study1");
 		studyInstanceDto.setTrialDbId("2");
 		studyInstanceDto.setStudyTypeDbId("6");
