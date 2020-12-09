@@ -226,11 +226,11 @@ public class LotInputValidator {
 			.stream()
 			.map(LotMultiUpdateRequestDto.LotUpdateDto::getNewLotUID)
 			.forEach(newLotUID -> {
-				if (!Objects.isNull(newLotUID) && newLotUID.length() > NEW_LOT_UID_MAX_LENGTH) {
+				if (!StringUtils.isBlank(newLotUID) && newLotUID.length() > NEW_LOT_UID_MAX_LENGTH) {
 					invalidNewLotUIDs.add(newLotUID);
 				}
 
-				if (!Objects.isNull(newLotUID) && !newLotUIDs.add(newLotUID)) {
+				if (!StringUtils.isBlank(newLotUID) && !newLotUIDs.add(newLotUID)) {
 					duplicatedNewLotUIDs.add(newLotUID);
 				}
 			});
