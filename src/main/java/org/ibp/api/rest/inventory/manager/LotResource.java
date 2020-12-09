@@ -135,10 +135,12 @@ public class LotResource {
 		if (lotsSearchDto.getStudyId() != null) {
 			final GermplasmStudySourceSearchRequest studySourceSearchRequest = new GermplasmStudySourceSearchRequest();
 			studySourceSearchRequest.setStudyId(Integer.valueOf(lotsSearchDto.getStudyId()));
-			List<GermplasmStudySourceDto> gids = this.germplasmStudySourceService.getGermplasmStudySources(studySourceSearchRequest,null);
+			final List<GermplasmStudySourceDto> gids = this.germplasmStudySourceService.getGermplasmStudySources(studySourceSearchRequest,null);
 			if (gids != null) {
 				lotsSearchDto.setGids(gids.stream().map(GermplasmStudySourceDto::getGid).collect(Collectors.toList()));
 			}
+			// Removing studyId value to match gidsearchdto
+			lotsSearchDto.setStudyId(null);
 		}
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(lotsSearchDto, LotsSearchDto.class).toString();
