@@ -1,8 +1,10 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
+import liquibase.util.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSingleUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
@@ -10,6 +12,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
+import org.hamcrest.MatcherAssert;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
@@ -31,6 +34,12 @@ import org.springframework.validation.BindingResult;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LotInputValidatorTest {
@@ -181,6 +190,71 @@ public class LotInputValidatorTest {
 		Assert.assertTrue("No exception, existing unit id is not valid and can be updated.", pass);
 	}
 
+	@Test
+	public void testValidate_ValidNewLotUIDs_OK() {
+		final List<ExtendedLotDto> lotDtos = Arrays.asList(this.getExtendedlotDto(""));
+
+		Mockito.doNothing().when(this.extendedLotListValidator).validateClosedLots(lotDtos);
+
+		final LotMultiUpdateRequestDto lotMultiUpdateRequestDto = new LotMultiUpdateRequestDto();
+		lotMultiUpdateRequestDto.setLotList(Arrays.asList(this.createDummyLotUpdateDto(UUID.randomUUID().toString())));
+
+		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
+		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
+
+		this.lotInputValidator.validate(null, lotDtos, lotUpdateRequestDto);
+
+		Mockito.verifyZeroInteractions(this.locationValidator);
+		Mockito.verifyZeroInteractions(this.inventoryUnitValidator);
+		Mockito.verifyZeroInteractions(this.germplasmValidator);
+		Mockito.verifyZeroInteractions(this.inventoryCommonValidator);
+		Mockito.verifyZeroInteractions(this.transactionService);
+	}
+
+	@Test
+	public void testValidate_DuplicatedAndInvalidNewLotUIDs_FAIL() {
+		final List<ExtendedLotDto> lotDtos = Arrays.asList(this.getExtendedlotDto(""));
+
+		Mockito.doNothing().when(this.extendedLotListValidator).validateClosedLots(lotDtos);
+
+		final String newLotUID = UUID.randomUUID().toString();
+		final LotMultiUpdateRequestDto.LotUpdateDto dummyLotUpdateDto = this.createDummyLotUpdateDto(newLotUID);
+		final LotMultiUpdateRequestDto.LotUpdateDto duplicatedDummyLotUpdateDto = this.createDummyLotUpdateDto(newLotUID);
+
+		final String invalidNewLotUID = StringUtils.repeat("0", LotInputValidator.NEW_LOT_UID_MAX_LENGTH + 1);
+		final LotMultiUpdateRequestDto.LotUpdateDto invalidLotUpdateDto = this.createDummyLotUpdateDto(invalidNewLotUID);
+
+		final LotMultiUpdateRequestDto lotMultiUpdateRequestDto = new LotMultiUpdateRequestDto();
+		lotMultiUpdateRequestDto.setLotList(Arrays.asList(dummyLotUpdateDto, duplicatedDummyLotUpdateDto, invalidLotUpdateDto));
+
+		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
+		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
+
+		try {
+			this.lotInputValidator.validate(null, lotDtos, lotUpdateRequestDto);
+			Assert.fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			final ApiRequestValidationException exception = (ApiRequestValidationException) e;
+			assertThat(exception.getErrors(), hasSize(2));
+
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getCodes()), hasItem("lot.update.duplicated.new.lot.uids"));
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getArguments()), hasSize(1));
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getArguments()[0]), hasItem("[" + newLotUID + "]"));
+
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(1).getCodes()), hasItem("lot.update.invalid.new.lot.uids"));
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(1).getArguments()), hasSize(2));
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(1).getArguments()[0]), hasItem("[" + invalidNewLotUID + "]"));
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(1).getArguments()[1]), hasItem(String.valueOf(LotInputValidator.NEW_LOT_UID_MAX_LENGTH)));
+		}
+
+		Mockito.verifyZeroInteractions(this.locationValidator);
+		Mockito.verifyZeroInteractions(this.inventoryUnitValidator);
+		Mockito.verifyZeroInteractions(this.germplasmValidator);
+		Mockito.verifyZeroInteractions(this.inventoryCommonValidator);
+		Mockito.verifyZeroInteractions(this.transactionService);
+	}
+
 	private ExtendedLotDto getExtendedlotDto(final String unitname) {
 		final int unitId = unitname == null ? 0 : UNIT_ID;
 		final ExtendedLotDto extendedLotDto = new ExtendedLotDto();
@@ -219,4 +293,12 @@ public class LotInputValidatorTest {
 		transactionDto.setNotes(COMMENTS);
 		return Arrays.asList(transactionDto);
 	}
+
+	private LotMultiUpdateRequestDto.LotUpdateDto createDummyLotUpdateDto(final String newLotUID) {
+		final LotMultiUpdateRequestDto.LotUpdateDto lotUpdateDto = new LotMultiUpdateRequestDto.LotUpdateDto();
+		lotUpdateDto.setLotUID(UUID.randomUUID().toString());
+		lotUpdateDto.setNewLotUID(newLotUID);
+		return lotUpdateDto;
+	}
+
 }

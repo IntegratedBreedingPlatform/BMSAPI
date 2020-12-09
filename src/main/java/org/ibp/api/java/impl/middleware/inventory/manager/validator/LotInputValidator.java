@@ -14,6 +14,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -25,13 +26,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class LotInputValidator {
 
+	public static final int NEW_LOT_UID_MAX_LENGTH = 36;
+
+	private static final Integer STOCK_ID_MAX_LENGTH = 35;
 
 	@Autowired
 	private LocationValidator locationValidator;
@@ -55,8 +63,6 @@ public class LotInputValidator {
 	private InventoryCommonValidator inventoryCommonValidator;
 
 	private BindingResult errors;
-
-	private static final Integer STOCK_ID_MAX_LENGTH = 35;
 
 	public LotInputValidator() {
 	}
@@ -144,6 +150,8 @@ public class LotInputValidator {
 			if (!Collections.isEmpty(lotUUids)) {
 				this.validateNoConfirmedTransactions(lotUUids);
 			}
+
+			this.validateNewLotUIDs(lotUpdateRequestDto.getMultiInput().getLotList());
 		}
 
 		if (this.errors.hasErrors()) {
@@ -209,4 +217,30 @@ public class LotInputValidator {
 		}
 
 	}
+
+	private void validateNewLotUIDs(final List<LotMultiUpdateRequestDto.LotUpdateDto> lotList) {
+		Set<String> newLotUIDs = new HashSet<>();
+		Set<String> duplicatedNewLotUIDs = new HashSet<>();
+		Set<String> invalidNewLotUIDs = new HashSet<>();
+		lotList
+			.stream()
+			.map(LotMultiUpdateRequestDto.LotUpdateDto::getNewLotUID)
+			.forEach(newLotUID -> {
+				if (!Objects.isNull(newLotUID) && newLotUID.length() > NEW_LOT_UID_MAX_LENGTH) {
+					invalidNewLotUIDs.add(newLotUID);
+				}
+
+				if (!Objects.isNull(newLotUID) && !newLotUIDs.add(newLotUID)) {
+					duplicatedNewLotUIDs.add(newLotUID);
+				}
+			});
+
+		if (!Collections.isEmpty(duplicatedNewLotUIDs)) {
+			this.errors.reject("lot.update.duplicated.new.lot.uids", new String[] {Util.buildErrorMessageFromList(Arrays.asList(duplicatedNewLotUIDs), 3)}, "");
+		}
+		if (!Collections.isEmpty(invalidNewLotUIDs)) {
+			this.errors.reject("lot.update.invalid.new.lot.uids", new String[] {Util.buildErrorMessageFromList(Arrays.asList(invalidNewLotUIDs), 3), String.valueOf(NEW_LOT_UID_MAX_LENGTH)}, "");
+		}
+	}
+
 }
