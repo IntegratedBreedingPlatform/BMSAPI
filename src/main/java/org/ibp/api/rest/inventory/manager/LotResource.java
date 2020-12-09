@@ -25,6 +25,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.ibp.api.Util;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
@@ -45,6 +47,7 @@ import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
 import org.ibp.api.java.ontology.VariableService;
+import org.ibp.api.java.study.GermplasmStudySourceService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +120,9 @@ public class LotResource {
 	@Autowired
 	private GermplasmValidator germplasmValidator;
 
+	@Autowired
+	private GermplasmStudySourceService germplasmStudySourceService;
+
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')" + PermissionsEnum.HAS_CREATE_LOTS_BATCH)
@@ -125,6 +131,15 @@ public class LotResource {
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final LotsSearchDto lotsSearchDto) {
+
+		if (lotsSearchDto.getStudyId() != null) {
+			final GermplasmStudySourceSearchRequest studySourceSearchRequest = new GermplasmStudySourceSearchRequest();
+			studySourceSearchRequest.setStudyId(Integer.valueOf(lotsSearchDto.getStudyId()));
+			List<GermplasmStudySourceDto> gids = this.germplasmStudySourceService.getGermplasmStudySources(studySourceSearchRequest,null);
+			if (gids != null) {
+				lotsSearchDto.setGids(gids.stream().map(GermplasmStudySourceDto::getGid).collect(Collectors.toList()));
+			}
+		}
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(lotsSearchDto, LotsSearchDto.class).toString();
 
