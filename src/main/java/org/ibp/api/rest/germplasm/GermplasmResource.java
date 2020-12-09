@@ -4,17 +4,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -64,9 +61,6 @@ public class GermplasmResource {
 	private GermplasmService germplasmService;
 
 	@Autowired
-	private UserService userService;
-
-	@Autowired
 	private GermplasmTemplateExportService germplasmTemplateExportService;
 
 	@ApiOperation(value = "Search germplasm")
@@ -89,14 +83,6 @@ public class GermplasmResource {
 	) {
 
 		BaseValidator.checkNotNull(germplasmSearchRequest, "param.null", new String[] {"germplasmSearchDTO"});
-
-		final String userName = SecurityUtil.getLoggedInUserName();
-		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUUID);
-
-		// TODO Move to dao method, so it cannot be bypassed? IBP-4166
-		if (user.hasOnlyProgramRoles(cropName)) {
-			germplasmSearchRequest.setInProgramListOnly(true);
-		}
 
 		final PagedResult<GermplasmSearchResponse> result =
 			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmSearchResponse>() {
