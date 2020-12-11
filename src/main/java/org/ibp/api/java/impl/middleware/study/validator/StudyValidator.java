@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
@@ -16,6 +17,8 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -29,7 +32,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class StudyValidator {
-
 	@Autowired
 	private SecurityService securityService;
 
@@ -88,6 +90,23 @@ public class StudyValidator {
 
 		if (studyEntries.isEmpty()) {
 			errors.reject("invalid.entryid");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validateStudyContainsEntries(final Integer studyId, final List<Integer> entryIds) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setEntryIds(entryIds);
+		final List<StudyEntryDto> studyEntries =
+			this.studyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+
+		if (studyEntries.size() != entryIds.size()) {
+			final List<Integer> studyEntryIds = studyEntries.stream().map(studyEntry -> studyEntry.getEntryId())
+				.collect(Collectors.toList());
+			final List<Integer> invalidEntryIds = entryIds.stream().filter(entryId -> !studyEntryIds.contains(entryId))
+				.collect(Collectors.toList());
+			errors.reject("invalid.entryids", new String[]{StringUtils.join(invalidEntryIds, ", ")}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

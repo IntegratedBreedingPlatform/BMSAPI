@@ -1,10 +1,12 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -19,7 +21,6 @@ import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class StudyEntryValidator {
@@ -94,14 +95,12 @@ public class StudyEntryValidator {
 
 	}
 
-	public void validateStudyEntryProperty(final Integer studyEntryPropertyDataId) {
+	public void validateStudyEntriesForUpdate(final StudyEntryPropertyDataUpdateRequestDto requestDto) {
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-
-		final Optional<StudyEntryPropertyData> studyEntryPropertyData =
-			this.middlewareStudyEntryService.getStudyEntryPropertyData(studyEntryPropertyDataId);
-		if (!studyEntryPropertyData.isPresent()) {
-			this.errors.reject("invalid.study.entry.property.data.id");
+		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		final List<Integer> entriesWithPlot = this.middlewareStudyEntryService.hasPlotEntries(requestDto.getEntryIds());
+		if(!CollectionUtils.isEmpty(entriesWithPlot)) {
+			this.errors.reject("study.entry.existing.plot.error", new String[] {StringUtils.join(entriesWithPlot, ", ")}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
