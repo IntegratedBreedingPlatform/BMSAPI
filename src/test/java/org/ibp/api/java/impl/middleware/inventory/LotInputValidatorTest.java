@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto
 import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSingleUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -24,13 +25,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +44,9 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,6 +58,7 @@ public class LotInputValidatorTest {
 	public static final String STOCK_ID = "ABCD";
 	public static final String COMMENTS = "Comments";
 	public static final String STOCK_PREFIX = "123";
+
 	@InjectMocks
 	private LotInputValidator lotInputValidator;
 
@@ -75,6 +84,9 @@ public class LotInputValidatorTest {
 
 	@Mock
 	private InventoryCommonValidator inventoryCommonValidator;
+
+	@Captor
+	private ArgumentCaptor<LotsSearchDto> lotsSearchDtoArgumentCaptor;
 
 	@Before
 	public void setup() {
@@ -192,17 +204,22 @@ public class LotInputValidatorTest {
 
 	@Test
 	public void testValidate_ValidNewLotUIDs_OK() {
+		final String newLotUID = UUID.randomUUID().toString();
 		final List<ExtendedLotDto> lotDtos = Arrays.asList(this.getExtendedlotDto(""));
 
 		Mockito.doNothing().when(this.extendedLotListValidator).validateClosedLots(lotDtos);
 
+		Mockito.when(this.lotService.searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull())).thenReturn(new ArrayList<>());
+
 		final LotMultiUpdateRequestDto lotMultiUpdateRequestDto = new LotMultiUpdateRequestDto();
-		lotMultiUpdateRequestDto.setLotList(Arrays.asList(this.createDummyLotUpdateDto(UUID.randomUUID().toString())));
+		lotMultiUpdateRequestDto.setLotList(Arrays.asList(this.createDummyLotUpdateDto(newLotUID)));
 
 		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
 		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
 
 		this.lotInputValidator.validate(null, lotDtos, lotUpdateRequestDto);
+
+		this.verifySearchLots(newLotUID);
 
 		Mockito.verifyZeroInteractions(this.locationValidator);
 		Mockito.verifyZeroInteractions(this.inventoryUnitValidator);
@@ -212,20 +229,19 @@ public class LotInputValidatorTest {
 	}
 
 	@Test
-	public void testValidate_DuplicatedAndInvalidNewLotUIDs_FAIL() {
+	public void testValidate_DuplicatedNewLotUIDs_FAIL() {
 		final List<ExtendedLotDto> lotDtos = Arrays.asList(this.getExtendedlotDto(""));
 
 		Mockito.doNothing().when(this.extendedLotListValidator).validateClosedLots(lotDtos);
+
+		Mockito.when(this.lotService.searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull())).thenReturn(new ArrayList<>());
 
 		final String newLotUID = UUID.randomUUID().toString();
 		final LotMultiUpdateRequestDto.LotUpdateDto dummyLotUpdateDto = this.createDummyLotUpdateDto(newLotUID);
 		final LotMultiUpdateRequestDto.LotUpdateDto duplicatedDummyLotUpdateDto = this.createDummyLotUpdateDto(newLotUID);
 
-		final String invalidNewLotUID = StringUtils.repeat("0", LotInputValidator.NEW_LOT_UID_MAX_LENGTH + 1);
-		final LotMultiUpdateRequestDto.LotUpdateDto invalidLotUpdateDto = this.createDummyLotUpdateDto(invalidNewLotUID);
-
 		final LotMultiUpdateRequestDto lotMultiUpdateRequestDto = new LotMultiUpdateRequestDto();
-		lotMultiUpdateRequestDto.setLotList(Arrays.asList(dummyLotUpdateDto, duplicatedDummyLotUpdateDto, invalidLotUpdateDto));
+		lotMultiUpdateRequestDto.setLotList(Arrays.asList(dummyLotUpdateDto, duplicatedDummyLotUpdateDto));
 
 		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
 		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
@@ -236,17 +252,95 @@ public class LotInputValidatorTest {
 		} catch (Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			final ApiRequestValidationException exception = (ApiRequestValidationException) e;
-			assertThat(exception.getErrors(), hasSize(2));
+			assertThat(exception.getErrors(), hasSize(1));
 
 			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getCodes()), hasItem("lot.update.duplicated.new.lot.uids"));
 			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getArguments()), hasSize(1));
 			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getArguments()[0]), hasItem("[" + newLotUID + "]"));
-
-			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(1).getCodes()), hasItem("lot.update.invalid.new.lot.uids"));
-			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(1).getArguments()), hasSize(2));
-			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(1).getArguments()[0]), hasItem("[" + invalidNewLotUID + "]"));
-			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(1).getArguments()[1]), hasItem(String.valueOf(LotInputValidator.NEW_LOT_UID_MAX_LENGTH)));
 		}
+
+		this.verifySearchLots(newLotUID);
+
+		Mockito.verifyZeroInteractions(this.locationValidator);
+		Mockito.verifyZeroInteractions(this.inventoryUnitValidator);
+		Mockito.verifyZeroInteractions(this.germplasmValidator);
+		Mockito.verifyZeroInteractions(this.inventoryCommonValidator);
+		Mockito.verifyZeroInteractions(this.transactionService);
+	}
+
+	@Test
+	public void testValidate_InvalidNewLotUIDs_FAIL() {
+		final List<ExtendedLotDto> lotDtos = Arrays.asList(this.getExtendedlotDto(""));
+
+		Mockito.doNothing().when(this.extendedLotListValidator).validateClosedLots(lotDtos);
+
+		Mockito.when(this.lotService.searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull())).thenReturn(new ArrayList<>());
+
+		final String invalidNewLotUID = StringUtils.repeat("0", LotInputValidator.NEW_LOT_UID_MAX_LENGTH + 1);
+		final LotMultiUpdateRequestDto.LotUpdateDto invalidLotUpdateDto = this.createDummyLotUpdateDto(invalidNewLotUID);
+
+		final LotMultiUpdateRequestDto lotMultiUpdateRequestDto = new LotMultiUpdateRequestDto();
+		lotMultiUpdateRequestDto.setLotList(Arrays.asList(invalidLotUpdateDto));
+
+		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
+		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
+
+		try {
+			this.lotInputValidator.validate(null, lotDtos, lotUpdateRequestDto);
+			Assert.fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			final ApiRequestValidationException exception = (ApiRequestValidationException) e;
+			assertThat(exception.getErrors(), hasSize(1));
+
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getCodes()), hasItem("lot.update.invalid.new.lot.uids"));
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getArguments()), hasSize(2));
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getArguments()[0]), hasItem("[" + invalidNewLotUID + "]"));
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getArguments()[1]), hasItem(String.valueOf(LotInputValidator.NEW_LOT_UID_MAX_LENGTH)));
+		}
+
+		this.verifySearchLots(invalidNewLotUID);
+
+		Mockito.verifyZeroInteractions(this.locationValidator);
+		Mockito.verifyZeroInteractions(this.inventoryUnitValidator);
+		Mockito.verifyZeroInteractions(this.germplasmValidator);
+		Mockito.verifyZeroInteractions(this.inventoryCommonValidator);
+		Mockito.verifyZeroInteractions(this.transactionService);
+		Mockito.verifyZeroInteractions(this.lotService);
+	}
+
+	@Test
+	public void testValidate_ExistingLotsForGivenNewLotUIDs_FAIL() {
+		final String newLotUID = UUID.randomUUID().toString();
+		final List<ExtendedLotDto> lotDtos = Arrays.asList(this.getExtendedlotDto(""));
+
+		Mockito.doNothing().when(this.extendedLotListValidator).validateClosedLots(lotDtos);
+
+		final ExtendedLotDto extendedLotDto = Mockito.mock(ExtendedLotDto.class);
+		Mockito.when(extendedLotDto.getLotUUID()).thenReturn(newLotUID);
+		Mockito.when(this.lotService.searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull()))
+			.thenReturn(Arrays.asList(extendedLotDto));
+
+		final LotMultiUpdateRequestDto lotMultiUpdateRequestDto = new LotMultiUpdateRequestDto();
+		lotMultiUpdateRequestDto.setLotList(Arrays.asList(this.createDummyLotUpdateDto(newLotUID)));
+
+		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
+		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
+
+		try {
+			this.lotInputValidator.validate(null, lotDtos, lotUpdateRequestDto);
+			Assert.fail("Should has failed");
+		} catch (Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			final ApiRequestValidationException exception = (ApiRequestValidationException) e;
+			assertThat(exception.getErrors(), hasSize(1));
+
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getCodes()), hasItem("lot.update.existing.new.lot.uids"));
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getArguments()), hasSize(1));
+			MatcherAssert.assertThat(Arrays.asList((exception).getErrors().get(0).getArguments()[0]), hasItem(newLotUID));
+		}
+
+		this.verifySearchLots(newLotUID);
 
 		Mockito.verifyZeroInteractions(this.locationValidator);
 		Mockito.verifyZeroInteractions(this.inventoryUnitValidator);
@@ -300,5 +394,16 @@ public class LotInputValidatorTest {
 		lotUpdateDto.setNewLotUID(newLotUID);
 		return lotUpdateDto;
 	}
+
+	private void verifySearchLots(final String givenLotUID) {
+		Mockito.verify(this.lotService).searchLots(this.lotsSearchDtoArgumentCaptor.capture(), ArgumentMatchers.isNull());
+		final LotsSearchDto actualLotsSearchDto = this.lotsSearchDtoArgumentCaptor.getValue();
+		assertNotNull(actualLotsSearchDto);
+		final List<String> actualLotUUIDs = actualLotsSearchDto.getLotUUIDs();
+		assertFalse(CollectionUtils.isEmpty(actualLotUUIDs));
+		assertThat(actualLotUUIDs, hasSize(1));
+		assertThat(actualLotUUIDs.get(0), is(givenLotUID));
+	}
+
 
 }

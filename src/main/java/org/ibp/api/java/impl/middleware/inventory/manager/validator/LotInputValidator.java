@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
@@ -23,14 +24,15 @@ import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -241,6 +243,20 @@ public class LotInputValidator {
 		if (!Collections.isEmpty(invalidNewLotUIDs)) {
 			this.errors.reject("lot.update.invalid.new.lot.uids", new String[] {Util.buildErrorMessageFromList(Arrays.asList(invalidNewLotUIDs), 3), String.valueOf(NEW_LOT_UID_MAX_LENGTH)}, "");
 		}
+
+		if (!CollectionUtils.isEmpty(newLotUIDs)) {
+			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+			lotsSearchDto.setLotUUIDs(new ArrayList<>(newLotUIDs));
+			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+			if (!CollectionUtils.isEmpty(extendedLotDtos)) {
+				final List<String> existingLotUIDs = extendedLotDtos
+					.stream()
+					.map(LotDto::getLotUUID)
+					.collect(Collectors.toList());
+				this.errors.reject("lot.update.existing.new.lot.uids", new String[] {Util.buildErrorMessageFromList(existingLotUIDs, 3)}, "");
+			}
+		}
+
 	}
 
 }
