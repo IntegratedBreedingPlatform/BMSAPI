@@ -30,6 +30,7 @@ import org.ibp.api.brapi.v1.study.StudySummaryDto;
 import org.ibp.api.brapi.v1.trial.TrialSummary;
 import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -40,6 +41,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -52,6 +55,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Api(value = "BrAPI v2 Study Services")
@@ -71,33 +75,34 @@ public class StudyResourceBrapi {
 	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
-
-		if (mwStudyDetails != null) {
-			final StudyDetails studyDetails = new StudyDetails();
-			final Metadata metadata = new Metadata();
-			final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
-			metadata.setPagination(pagination);
-			metadata.setStatus(Collections.singletonList(new HashMap<>()));
-			studyDetails.setMetadata(metadata);
-			final ModelMapper studyMapper = StudyMapper.getInstance();
-			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
-			if (mwStudyDetails.getMetadata().getLocationId() != null) {
-				final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
-				filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
-				final List<LocationDetailsDto> locations = this.locationDataManager.getLocationsByFilter(0, 1, filters);
-				if (!locations.isEmpty()) {
-					final ModelMapper locationMapper = LocationMapper.getInstance();
-					final Location location = locationMapper.map(locations.get(0), Location.class);
-					result.setLocation(location);
-				}
-			}
-			result.setCommonCropName(crop);
-			studyDetails.setResult(result);
-
-			return ResponseEntity.ok(studyDetails);
-		} else {
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		if (Objects.isNull(mwStudyDetails)) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());;
+			errors.reject("studydbid.invalid", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
+
+		final StudyDetails studyDetails = new StudyDetails();
+		final Metadata metadata = new Metadata();
+		final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
+		metadata.setPagination(pagination);
+		metadata.setStatus(Collections.singletonList(new HashMap<>()));
+		studyDetails.setMetadata(metadata);
+		final ModelMapper studyMapper = StudyMapper.getInstance();
+		final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
+		if (mwStudyDetails.getMetadata().getLocationId() != null) {
+			final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
+			filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
+			final List<LocationDetailsDto> locations = this.locationDataManager.getLocationsByFilter(0, 1, filters);
+			if (!locations.isEmpty()) {
+				final ModelMapper locationMapper = LocationMapper.getInstance();
+				final Location location = locationMapper.map(locations.get(0), Location.class);
+				result.setLocation(location);
+			}
+		}
+		result.setCommonCropName(crop);
+		studyDetails.setResult(result);
+
+		return ResponseEntity.ok(studyDetails);
 	}
 
 	@ApiOperation(value = "Get a filtered list of Studies", notes = "Get a filtered list of Studies")
