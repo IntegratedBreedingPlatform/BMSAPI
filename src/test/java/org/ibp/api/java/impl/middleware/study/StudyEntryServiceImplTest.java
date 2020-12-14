@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
+import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -250,17 +251,15 @@ public class StudyEntryServiceImplTest {
 		final Integer studyId = this.random.nextInt();
 		final Integer entryId = this.random.nextInt();
 		final Integer variableId = this.random.nextInt();
-		final Integer studyEntryPropertyId = this.random.nextInt();
-		final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
-		studyEntryPropertyData.setVariableId(variableId);
-		studyEntryPropertyData.setStudyEntryPropertyId(studyEntryPropertyId);
-		this.studyEntryService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
+		final StudyEntryPropertyDataUpdateRequestDto requestDto = new StudyEntryPropertyDataUpdateRequestDto(
+			Collections.singletonList(entryId), variableId, String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
+		this.studyEntryService.updateStudyEntriesProperty(studyId, requestDto);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.studyValidator).validateStudyContainsEntry(studyId, entryId);
+		Mockito.verify(this.studyValidator).validateStudyContainsEntries(studyId, requestDto.getEntryIds());
 		Mockito.verify(this.termValidator).validate(variableId);
-		Mockito.verify(this.studyEntryValidator).validateStudyEntryProperty(studyEntryPropertyId);
-		Mockito.verify(this.middlewareStudyEntryService).updateStudyEntryProperty(studyId, studyEntryPropertyData);
+		Mockito.verify(this.studyEntryValidator).validateStudyEntriesForUpdate(requestDto.getEntryIds());
+		Mockito.verify(this.middlewareStudyEntryService).updateStudyEntriesProperty(requestDto);
 	}
 
 	@Test

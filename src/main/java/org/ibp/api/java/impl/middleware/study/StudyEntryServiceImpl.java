@@ -186,7 +186,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		this.studyValidator.validate(studyId, true);
 		this.studyValidator.validateStudyContainsEntries(studyId, studyEntryPropertyDataUpdateRequestDto.getEntryIds());
 		this.termValidator.validate(studyEntryPropertyDataUpdateRequestDto.getVariableId());
-		this.studyEntryValidator.validateStudyEntriesForUpdate(studyEntryPropertyDataUpdateRequestDto);
+		this.studyEntryValidator.validateStudyEntriesForUpdate(studyEntryPropertyDataUpdateRequestDto.getEntryIds());
 		this.middlewareStudyEntryService.updateStudyEntriesProperty(studyEntryPropertyDataUpdateRequestDto);
 	}
 

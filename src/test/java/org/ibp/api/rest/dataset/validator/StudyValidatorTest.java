@@ -3,6 +3,7 @@ package org.ibp.api.rest.dataset.validator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -30,6 +31,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -216,6 +218,25 @@ public class StudyValidatorTest {
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("invalid.entryid"));
+		}
+	}
+
+	@Test
+	public void testValidateStudyContainsEntries_ThrowsRightException() {
+		final Random ran = new Random();
+		final int studyId = ran.nextInt();
+		final List<Integer> entryIds = Collections.singletonList(ran.nextInt());
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setEntryIds(entryIds);
+		Mockito.doReturn(Collections.emptyList()).when(this.studyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
+			ArgumentMatchers.eq(filter), ArgumentMatchers.any());
+
+		try {
+			this.studyValidator.validateStudyContainsEntries(studyId, entryIds);
+			Assert.fail("Expected validation exception to be thrown but was not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("invalid.entryids"));
 		}
 	}
 

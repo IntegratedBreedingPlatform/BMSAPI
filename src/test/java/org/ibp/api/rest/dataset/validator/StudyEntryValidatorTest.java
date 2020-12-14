@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.mockito.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class StudyEntryValidatorTest {
@@ -113,5 +114,12 @@ public class StudyEntryValidatorTest {
         Mockito.doReturn(Collections.emptyList()).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.CONFIRMED);
         this.validator.validate(studyId, entryId, newGid);
         Mockito.verify(this.germplasmValidator).validateGermplasmId(ArgumentMatchers.any(), ArgumentMatchers.eq(newGid));
+    }
+
+    @Test(expected = ApiRequestValidationException.class)
+    public void testValidateStudyEntriesForUpdate() {
+        final List<Integer> entryIds = Collections.singletonList(1);
+        Mockito.doReturn(entryIds).when(this.middlewareStudyEntryService).hasPlotEntries(entryIds);
+        this.validator.validateStudyEntriesForUpdate(entryIds);
     }
 }

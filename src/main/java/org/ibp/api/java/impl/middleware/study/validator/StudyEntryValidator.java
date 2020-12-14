@@ -95,10 +95,10 @@ public class StudyEntryValidator {
 
 	}
 
-	public void validateStudyEntriesForUpdate(final StudyEntryPropertyDataUpdateRequestDto requestDto) {
+	public void validateStudyEntriesForUpdate(final List<Integer> entryIds) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		final List<Integer> entriesWithPlot = this.middlewareStudyEntryService.hasPlotEntries(requestDto.getEntryIds());
+		final List<Integer> entriesWithPlot = this.middlewareStudyEntryService.hasPlotEntries(entryIds);
 		if(!CollectionUtils.isEmpty(entriesWithPlot)) {
 			this.errors.reject("study.entry.existing.plot.error", new String[] {StringUtils.join(entriesWithPlot, ", ")}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
