@@ -3,6 +3,7 @@ package org.ibp.api.rest.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -106,15 +107,13 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 
 		final Random random = new Random();
 		final int studyId = random.nextInt();
-		final int entryId = random.nextInt();
-		final int propertyId = random.nextInt();
 
-		final StudyEntryPropertyData studyEntryPropertyData = new StudyEntryPropertyData();
+		final StudyEntryPropertyDataUpdateRequestDto requestDto = new StudyEntryPropertyDataUpdateRequestDto();
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}/properties/{propertyId}",
-				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, entryId, propertyId)
-			.content(this.convertObjectToByte(studyEntryPropertyData))
+			.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/properties",
+				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+			.content(this.convertObjectToByte(requestDto))
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNoContent());
