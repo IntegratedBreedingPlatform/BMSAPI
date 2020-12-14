@@ -161,7 +161,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final File file = new File(fileNamePath);
 		this.sheetStylesMap = createStyles();
 		this.writeObservationSheet(isGermplasmUpdateFormat);
-		this.writeCodesSheet(cropName, programUUID);
+		this.writeCodesSheet(cropName, programUUID, isGermplasmUpdateFormat);
 
 		try (final FileOutputStream fos = new FileOutputStream(file)) {
 			this.wb.write(fos);
@@ -195,7 +195,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		}
 	}
 
-	private void writeCodesSheet(final String cropName, final String programUUID) {
+	private void writeCodesSheet(final String cropName, final String programUUID, final boolean isGermplasmUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet codesSheet =
 			this.wb.createSheet(this.getMessageSource().getMessage("export.germplasm.list.template.sheet.codes", null, locale));
@@ -238,17 +238,18 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		currentRowNum = this.writeNameSection(codesSheet, currentRowNum, germplasmNames);
 		codesSheet.createRow(currentRowNum++);
 
-		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.storage.location.abbr.column");
-		currentRowNum = this.writeLocationAbbrSection(codesSheet, currentRowNum, storageLocations);
-		codesSheet.createRow(currentRowNum++);
+		if (!isGermplasmUpdateFormat) {
+			this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.storage.location.abbr.column");
+			currentRowNum = this.writeLocationAbbrSection(codesSheet, currentRowNum, storageLocations);
+			codesSheet.createRow(currentRowNum++);
 
-		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.units.column");
-		currentRowNum = this.writeUnitsSection(codesSheet, currentRowNum, units);
-		codesSheet.createRow(currentRowNum++);
+			this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.units.column");
+			currentRowNum = this.writeUnitsSection(codesSheet, currentRowNum, units);
+			codesSheet.createRow(currentRowNum++);
+		}
 
 		codesSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, 34 * 250);
 		codesSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_SECOND_COLUMN_INDEX, 65 * 250);
-
 	}
 
 	private int writeNameSection(final HSSFSheet codesSheet, final int currentRowNum, final List<GermplasmNameTypeDTO> germplasmNames) {
