@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.fest.util.Strings;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -25,8 +24,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
-import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
-import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.ibp.api.Util;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
@@ -47,7 +44,6 @@ import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
 import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.java.study.GermplasmStudySourceService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,9 +115,6 @@ public class LotResource {
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
-
-	@Autowired
-	private GermplasmStudySourceService germplasmStudySourceService;
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
