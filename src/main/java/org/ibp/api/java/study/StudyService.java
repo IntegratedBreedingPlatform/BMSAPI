@@ -60,6 +60,8 @@ public interface StudyService {
 
 	List<StudyInstanceDto> getStudyInstances(StudySearchFilter studySearchFilter, Pageable pageable);
 
+	List<StudyInstanceDto> getStudyInstancesWithMetadata(StudySearchFilter studySearchFilter, Pageable pageable);
+
 	List<TreeNode> getStudyTree(String parentKey, String programUUID);
 
 	Integer getEnvironmentDatasetId(Integer studyId);

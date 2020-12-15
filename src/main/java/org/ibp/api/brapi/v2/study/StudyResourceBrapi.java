@@ -173,7 +173,7 @@ public class StudyResourceBrapi {
 
 				@Override
 				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
-					return StudyResourceBrapi.this.studyService.getStudyInstances(filter, pageRequest);
+					return StudyResourceBrapi.this.studyService.getStudyInstancesWithMetadata(filter, pageRequest);
 				}
 			});
 

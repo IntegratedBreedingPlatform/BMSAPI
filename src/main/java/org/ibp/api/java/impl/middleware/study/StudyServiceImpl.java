@@ -210,6 +210,11 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
+	public List<StudyInstanceDto> getStudyInstancesWithMetadata(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		return this.middlewareStudyService.getStudyInstancesWithMetadata(studySearchFilter, pageable);
+	}
+
+	@Override
 	public List<TreeNode> getStudyTree(final String parentKey, final String programUUID) {
 		List<TreeNode> nodes = new ArrayList<>();
 		if (StringUtils.isBlank(parentKey)) {
