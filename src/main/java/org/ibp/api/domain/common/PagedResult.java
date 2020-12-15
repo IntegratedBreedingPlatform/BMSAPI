@@ -46,7 +46,6 @@ public class PagedResult<T> {
 	public PagedResult(final int pageNumber, final int pageSize, final long totalResults, final long filteredResults) {
 		this.totalResults = totalResults;
 		this.filteredResults = filteredResults;
-		Preconditions.checkArgument(this.filteredResults <= totalResults, "Filtered results must be less than or equal to total results");
 
 		if (pageSize < 1 || pageSize > PagedResult.MAX_PAGE_SIZE) {
 			throw new IllegalArgumentException("Page size must between 0 and " + PagedResult.MAX_PAGE_SIZE + ".");

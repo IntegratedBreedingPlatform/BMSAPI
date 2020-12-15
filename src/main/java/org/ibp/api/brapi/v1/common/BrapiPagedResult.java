@@ -22,7 +22,6 @@ public class BrapiPagedResult<T> extends PagedResult<T> {
 		} else {
 			this.filteredResults = filteredResults;
 		}
-		Preconditions.checkArgument(this.filteredResults <= totalResults, "Filtered results must be less than or equal to total results");
 
 		if (pageSize < 1 || pageSize > BrapiPagedResult.MAX_PAGE_SIZE) {
 			throw new IllegalArgumentException("Page size must between 1 and " + BrapiPagedResult.MAX_PAGE_SIZE + ".");

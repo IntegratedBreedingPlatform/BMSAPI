@@ -63,7 +63,7 @@ public class GermplasmResource {
 	@Autowired
 	private GermplasmTemplateExportService germplasmTemplateExportService;
 
-	@ApiOperation(value = "Search germplasm")
+	@ApiOperation(value = "Search germplasm. <b>Note:</b> Total count is not available for this query.")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + HAS_GERMPLASM_SEARCH)
 	@ApiImplicitParams({
@@ -89,7 +89,11 @@ public class GermplasmResource {
 
 				@Override
 				public long getCount() {
-					return germplasmService.countSearchGermplasm(null, programUUID);
+					/**
+					 * Excluding total count improves overall search from ~15s to 1s in wheat,brachiaria (~7M records)
+					 * excluding deleted germplasm in query being the main bottleneck
+					 */
+					return 0;
 				}
 
 				@Override
@@ -105,7 +109,6 @@ public class GermplasmResource {
 
 		final List<GermplasmSearchResponse> pageResults = result.getPageResults();
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Total-Count", Long.toString(result.getTotalResults()));
 		headers.add("X-Filtered-Count", Long.toString(result.getFilteredResults()));
 
 		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
