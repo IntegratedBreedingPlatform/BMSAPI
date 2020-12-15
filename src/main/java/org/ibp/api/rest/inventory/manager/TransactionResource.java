@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
@@ -411,6 +412,7 @@ public class TransactionResource {
 		@PathVariable final Integer gid,
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Integer lotId,
+		@RequestParam(required = false) final LotStatus lotStatus,
 		@ApiIgnore final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
@@ -433,6 +435,9 @@ public class TransactionResource {
 		searchDTO.setGids(Arrays.asList(gid));
 		if(!Objects.isNull(lotId)) {
 			searchDTO.setLotIds(Arrays.asList(lotId));
+		}
+		if (!Objects.isNull(lotStatus)) {
+			searchDTO.setLotStatus(lotStatus.getIntValue());
 		}
 
 		final PagedResult<TransactionDto> resultPage =

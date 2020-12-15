@@ -41,6 +41,7 @@ import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.BrapiNotFoundException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.ontology.VariableService;
@@ -56,6 +57,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,8 +77,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -243,38 +248,38 @@ public class StudyResourceBrapi {
 	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
-
-		if (mwStudyDetails != null) {
-			//Add environment parameters to addtionalInfo
-			final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
-				Collectors.toMap(MeasurementVariable::getDescription, MeasurementVariable::getValue));
-			mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
-
-			final StudyDetails studyDetails = new StudyDetails();
-			final Metadata metadata = new Metadata();
-			final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
-			metadata.setPagination(pagination);
-			studyDetails.setMetadata(metadata);
-			final ModelMapper studyMapper = StudyMapper.getInstance();
-			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
-
-			if (mwStudyDetails.getMetadata().getLocationId() != null) {
-				final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
-				filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
-				final List<LocationDetailsDto> locations = this.locationDataManager.getLocationsByFilter(0, 1, filters);
-				if (!locations.isEmpty()) {
-					final ModelMapper locationMapper = LocationMapper.getInstance();
-					final Location location = locationMapper.map(locations.get(0), Location.class);
-					result.setLocation(location);
-				}
-			}
-			studyDetails.setResult(result);
-
-			return ResponseEntity.ok(studyDetails);
-		} else {
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		if (Objects.isNull(mwStudyDetails)) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());;
+			errors.reject("studydbid.invalid", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
+		//Add environment parameters to addtionalInfo
+		final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
+			Collectors.toMap(MeasurementVariable::getDescription, MeasurementVariable::getValue));
+		mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
+
+		final StudyDetails studyDetails = new StudyDetails();
+		final Metadata metadata = new Metadata();
+		final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
+		metadata.setPagination(pagination);
+		studyDetails.setMetadata(metadata);
+		final ModelMapper studyMapper = StudyMapper.getInstance();
+		final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
+
+		if (mwStudyDetails.getMetadata().getLocationId() != null) {
+			final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
+			filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
+			final List<LocationDetailsDto> locations = this.locationDataManager.getLocationsByFilter(0, 1, filters);
+			if (!locations.isEmpty()) {
+				final ModelMapper locationMapper = LocationMapper.getInstance();
+				final Location location = locationMapper.map(locations.get(0), Location.class);
+				result.setLocation(location);
+			}
+		}
+		studyDetails.setResult(result);
+
+		return ResponseEntity.ok(studyDetails);
 	}
 
 	@ApiOperation(value = "", hidden = true)

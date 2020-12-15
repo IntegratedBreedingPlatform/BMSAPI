@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
@@ -14,6 +15,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -22,16 +24,24 @@ import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class LotInputValidator {
 
+	public static final int NEW_LOT_UID_MAX_LENGTH = 36;
+
+	private static final Integer STOCK_ID_MAX_LENGTH = 35;
 
 	@Autowired
 	private LocationValidator locationValidator;
@@ -55,8 +65,6 @@ public class LotInputValidator {
 	private InventoryCommonValidator inventoryCommonValidator;
 
 	private BindingResult errors;
-
-	private static final Integer STOCK_ID_MAX_LENGTH = 35;
 
 	public LotInputValidator() {
 	}
@@ -144,6 +152,8 @@ public class LotInputValidator {
 			if (!Collections.isEmpty(lotUUids)) {
 				this.validateNoConfirmedTransactions(lotUUids);
 			}
+
+			this.validateNewLotUIDs(lotUpdateRequestDto.getMultiInput().getLotList());
 		}
 
 		if (this.errors.hasErrors()) {
@@ -209,4 +219,44 @@ public class LotInputValidator {
 		}
 
 	}
+
+	private void validateNewLotUIDs(final List<LotMultiUpdateRequestDto.LotUpdateDto> lotList) {
+		Set<String> newLotUIDs = new HashSet<>();
+		Set<String> duplicatedNewLotUIDs = new HashSet<>();
+		Set<String> invalidNewLotUIDs = new HashSet<>();
+		lotList
+			.stream()
+			.map(LotMultiUpdateRequestDto.LotUpdateDto::getNewLotUID)
+			.forEach(newLotUID -> {
+				if (!StringUtils.isBlank(newLotUID) && newLotUID.length() > NEW_LOT_UID_MAX_LENGTH) {
+					invalidNewLotUIDs.add(newLotUID);
+				}
+
+				if (!StringUtils.isBlank(newLotUID) && !newLotUIDs.add(newLotUID)) {
+					duplicatedNewLotUIDs.add(newLotUID);
+				}
+			});
+
+		if (!Collections.isEmpty(duplicatedNewLotUIDs)) {
+			this.errors.reject("lot.update.duplicated.new.lot.uids", new String[] {Util.buildErrorMessageFromList(Arrays.asList(duplicatedNewLotUIDs), 3)}, "");
+		}
+		if (!Collections.isEmpty(invalidNewLotUIDs)) {
+			this.errors.reject("lot.update.invalid.new.lot.uids", new String[] {Util.buildErrorMessageFromList(Arrays.asList(invalidNewLotUIDs), 3), String.valueOf(NEW_LOT_UID_MAX_LENGTH)}, "");
+		}
+
+		if (!CollectionUtils.isEmpty(newLotUIDs)) {
+			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+			lotsSearchDto.setLotUUIDs(new ArrayList<>(newLotUIDs));
+			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+			if (!CollectionUtils.isEmpty(extendedLotDtos)) {
+				final List<String> existingLotUIDs = extendedLotDtos
+					.stream()
+					.map(LotDto::getLotUUID)
+					.collect(Collectors.toList());
+				this.errors.reject("lot.update.existing.new.lot.uids", new String[] {Util.buildErrorMessageFromList(existingLotUIDs, 3)}, "");
+			}
+		}
+
+	}
+
 }
