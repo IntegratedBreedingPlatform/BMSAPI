@@ -23,6 +23,7 @@ import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
+import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
@@ -137,8 +138,8 @@ public class LotServiceImpl implements LotService {
 	public List<String> createLots(final String programUUID, final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
 		// validations
 		final SearchCompositeDto<Integer, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
-		final List<Integer> gids;
-		if (lotGeneratorBatchRequestDto.getStudyId() != null) {
+		List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
+		if (Util.isEmpty(gids) && lotGeneratorBatchRequestDto.getStudyId() != null) {
 			final GermplasmStudySourceSearchRequest searchRequest = new GermplasmStudySourceSearchRequest();
 			searchRequest.setStudyId(Integer.valueOf(lotGeneratorBatchRequestDto.getStudyId()));
 			gids = this.germplasmStudySourceService.getGermplasmStudySources(searchRequest, null).stream().map(
@@ -147,7 +148,6 @@ public class LotServiceImpl implements LotService {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
 			this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
 			this.lotInputValidator.validate(programUUID, lotGeneratorBatchRequestDto);
-			gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
 			this.germplasmValidator.validateGids(errors, gids);
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(errors.getAllErrors());
