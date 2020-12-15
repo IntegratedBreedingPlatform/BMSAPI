@@ -190,8 +190,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 			cell.setCellStyle(this.sheetStylesMap.get(entry.getValue()));
 			final String headerColumn = this.getMessageSource().getMessage(entry.getKey(), null, locale);
 			cell.setCellValue(headerColumn);
-
-			switch (entry.getKey()){
+			switch (entry.getKey()) {
 				case "export.germplasm.list.template.preferred.name.column":
 				case "export.germplasm.list.template.location.abbr.column":
 					observationSheet.setColumnWidth(index, 20 * 250);
