@@ -138,6 +138,7 @@ public class LotServiceImpl implements LotService {
 	public List<String> createLots(final String programUUID, final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
 		// validations
 		final SearchCompositeDto<Integer, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
+		this.lotInputValidator.validate(programUUID, lotGeneratorBatchRequestDto);
 		List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
 		if (Util.isEmpty(gids) && lotGeneratorBatchRequestDto.getStudyId() != null) {
 			final GermplasmStudySourceSearchRequest searchRequest = new GermplasmStudySourceSearchRequest();
@@ -147,7 +148,6 @@ public class LotServiceImpl implements LotService {
 		} else {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
 			this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
-			this.lotInputValidator.validate(programUUID, lotGeneratorBatchRequestDto);
 			this.germplasmValidator.validateGids(errors, gids);
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(errors.getAllErrors());
