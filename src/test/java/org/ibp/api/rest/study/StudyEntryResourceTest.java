@@ -103,7 +103,7 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testUpdateStudyEntryProperty() throws Exception {
+	public void testUpdateStudyEntriesProperty() throws Exception {
 
 		final Random random = new Random();
 		final int studyId = random.nextInt();
