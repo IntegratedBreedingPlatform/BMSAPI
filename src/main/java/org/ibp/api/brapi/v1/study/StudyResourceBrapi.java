@@ -256,7 +256,7 @@ public class StudyResourceBrapi {
 
 		//Add environment parameters to addtionalInfo
 		final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
-			Collectors.toMap(MeasurementVariable::getDescription, MeasurementVariable::getValue));
+				Collectors.toMap(MeasurementVariable::getName, MeasurementVariable::getValue));
 		mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
 
 		final StudyDetails studyDetails = new StudyDetails();

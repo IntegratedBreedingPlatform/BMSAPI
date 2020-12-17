@@ -72,15 +72,15 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		IMPORT_HEADERS.put("export.germplasm.list.template.drvnm.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.preferred.name.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.entry.code.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
-		IMPORT_HEADERS.put("export.germplasm.list.template.location.abbr.column", ExcelCellStyle.HEADING_STYLE_BLUE);
+		IMPORT_HEADERS.put("export.germplasm.list.template.location.abbr.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.reference.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.creation.date.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.breeding.method.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.note.column", ExcelCellStyle.HEADING_STYLE_PALE_BLUE);
-		IMPORT_HEADERS.put("export.germplasm.list.template.storage.location.abbr.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_HEADERS.put("export.germplasm.list.template.storage.location.abbr.column", ExcelCellStyle.HEADING_STYLE_BLUE);
 		IMPORT_HEADERS.put("export.germplasm.list.template.units.column", ExcelCellStyle.HEADING_STYLE_BLUE);
 		IMPORT_HEADERS.put("export.germplasm.list.template.amount.column", ExcelCellStyle.HEADING_STYLE_BLUE);
-		IMPORT_HEADERS.put("export.germplasm.list.template.stock.id.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_HEADERS.put("export.germplasm.list.template.stock.id.column", ExcelCellStyle.HEADING_STYLE_BLUE);
 		IMPORT_HEADERS.put("export.germplasm.list.template.guid.column", ExcelCellStyle.HEADING_STYLE_ORANGE);
 	}
 
@@ -89,12 +89,12 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 	static {
 		IMPORT_HEADERS_FOR_UPDATE = new LinkedHashMap<>();
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.gid.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
-		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.guid.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.guid.column", ExcelCellStyle.HEADING_STYLE_ORANGE);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.preferred.name.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.location.abbr.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.creation.date.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.reference.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
-		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.drvnm.column", ExcelCellStyle.HEADING_STYLE_PALE_BLUE);
+		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.drvnm.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.note.column", ExcelCellStyle.HEADING_STYLE_PALE_BLUE);
 	}
 
@@ -131,7 +131,6 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER,
 	}
 
-
 	private Map<ExcelCellStyle, CellStyle> sheetStylesMap;
 
 	private HSSFWorkbook wb;
@@ -161,7 +160,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final File file = new File(fileNamePath);
 		this.sheetStylesMap = createStyles();
 		this.writeObservationSheet(isGermplasmUpdateFormat);
-		this.writeCodesSheet(cropName, programUUID);
+		this.writeCodesSheet(cropName, programUUID, isGermplasmUpdateFormat);
 
 		try (final FileOutputStream fos = new FileOutputStream(file)) {
 			this.wb.write(fos);
@@ -189,13 +188,34 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 			Map.Entry<String, ExcelCellStyle> entry = iterator.next();
 			HSSFCell cell = row.createCell(index, CellType.STRING);
 			cell.setCellStyle(this.sheetStylesMap.get(entry.getValue()));
-			cell.setCellValue(this.getMessageSource().getMessage(entry.getKey(), null, locale));
-			observationSheet.setColumnWidth(index, 13 * 250);
+			final String headerColumn = this.getMessageSource().getMessage(entry.getKey(), null, locale);
+			cell.setCellValue(headerColumn);
+			switch (entry.getKey()) {
+				case "export.germplasm.list.template.preferred.name.column":
+				case "export.germplasm.list.template.location.abbr.column":
+					observationSheet.setColumnWidth(index, 20 * 250);
+					break;
+				case "export.germplasm.list.template.entry.code.column":
+					observationSheet.setColumnWidth(index, 16 * 250);
+					break;
+				case "export.germplasm.list.template.creation.date.column":
+					observationSheet.setColumnWidth(index, 18 * 250);
+					break;
+				case "export.germplasm.list.template.breeding.method.column":
+					observationSheet.setColumnWidth(index, 22 * 250);
+					break;
+				case "export.germplasm.list.template.storage.location.abbr.column":
+					observationSheet.setColumnWidth(index, 28 * 250);
+					break;
+				default:
+					observationSheet.setColumnWidth(index, 13 * 250);
+					break;
+			}
 			index++;
 		}
 	}
 
-	private void writeCodesSheet(final String cropName, final String programUUID) {
+	private void writeCodesSheet(final String cropName, final String programUUID, final boolean isGermplasmUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet codesSheet =
 			this.wb.createSheet(this.getMessageSource().getMessage("export.germplasm.list.template.sheet.codes", null, locale));
@@ -238,17 +258,18 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		currentRowNum = this.writeNameSection(codesSheet, currentRowNum, germplasmNames);
 		codesSheet.createRow(currentRowNum++);
 
-		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.storage.location.abbr.column");
-		currentRowNum = this.writeLocationAbbrSection(codesSheet, currentRowNum, storageLocations);
-		codesSheet.createRow(currentRowNum++);
+		if (!isGermplasmUpdateFormat) {
+			this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.storage.location.abbr.column");
+			currentRowNum = this.writeLocationAbbrSection(codesSheet, currentRowNum, storageLocations);
+			codesSheet.createRow(currentRowNum++);
 
-		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.units.column");
-		currentRowNum = this.writeUnitsSection(codesSheet, currentRowNum, units);
-		codesSheet.createRow(currentRowNum++);
+			this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.units.column");
+			currentRowNum = this.writeUnitsSection(codesSheet, currentRowNum, units);
+			codesSheet.createRow(currentRowNum++);
+		}
 
 		codesSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, 34 * 250);
 		codesSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_SECOND_COLUMN_INDEX, 65 * 250);
-
 	}
 
 	private int writeNameSection(final HSSFSheet codesSheet, final int currentRowNum, final List<GermplasmNameTypeDTO> germplasmNames) {
