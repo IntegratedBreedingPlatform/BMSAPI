@@ -10,12 +10,17 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
+
+import static org.hamcrest.CoreMatchers.hasItem;
 
 public class StudyEntryValidatorTest {
 
@@ -113,5 +118,21 @@ public class StudyEntryValidatorTest {
         Mockito.doReturn(Collections.emptyList()).when(this.plantingService).getPlantingTransactionsByStudyAndEntryId(studyId, entryId, TransactionStatus.CONFIRMED);
         this.validator.validate(studyId, entryId, newGid);
         Mockito.verify(this.germplasmValidator).validateGermplasmId(ArgumentMatchers.any(), ArgumentMatchers.eq(newGid));
+    }
+
+    @Test
+    public void testValidateStudyContainsEntries_ThrowsRightException() {
+        final Random ran = new Random();
+        final int studyId = ran.nextInt();
+        final List<Integer> entryIds = Collections.singletonList(ran.nextInt());
+
+        try {
+            this.validator.validateStudyContainsEntries(studyId, entryIds);
+            Assert.fail("Expected validation exception to be thrown but was not.");
+        } catch (final ApiRequestValidationException e) {
+            Assert.assertThat(
+                Arrays.asList(e.getErrors().get(0).getCodes()),
+                hasItem("invalid.entryids"));
+        }
     }
 }

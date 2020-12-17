@@ -53,11 +53,11 @@ public class SampleValidatorTest {
 		samples.add(sampleDTO3);
 
 		// Some SampleIds do not exist in DB
-		Mockito.when(sampleListServiceMW.countSamplesByUIDs(Mockito.<String>anySet(), Mockito.anyInt())).thenReturn(1l);
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.<String>anySet(), Mockito.anyInt())).thenReturn(1l);
 
 
 		try {
-			validator.validateSamplesForImportPlate(listId, samples);
+			this.validator.validateSamplesForImportPlate(listId, samples);
 			Assert.fail("Expcected to throw ApiRequestValidationException");
 		} catch (final ApiRequestValidationException e) {
 			final List<String> codes = new ArrayList<>();
@@ -94,10 +94,10 @@ public class SampleValidatorTest {
 		samples.add(sampleDTO);
 		samples.add(sampleDTO2);
 
-		Mockito.when(sampleListServiceMW.countSamplesByUIDs(Mockito.<String>anySet(), Mockito.anyInt())).thenReturn(Long.valueOf(samples.size()));
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.<String>anySet(), Mockito.anyInt())).thenReturn(Long.valueOf(samples.size()));
 
 		try {
-			validator.validateSamplesForImportPlate(listId, samples);
+			this.validator.validateSamplesForImportPlate(listId, samples);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Expcected to NOT throw ApiRequestValidationException");
 		}
