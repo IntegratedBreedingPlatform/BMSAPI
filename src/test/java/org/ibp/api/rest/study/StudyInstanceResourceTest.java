@@ -14,9 +14,6 @@ import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -35,17 +32,6 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
-
-
-	@Configuration
-	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public StudyInstanceService studyInstanceService() {
-			return Mockito.mock(StudyInstanceService.class);
-		}
-	}
 
 	private final Random random = new Random();
 
