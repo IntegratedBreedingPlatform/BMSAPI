@@ -203,38 +203,6 @@ public class StudyValidatorTest {
 	}
 
 	@Test
-	public void testStudyContainsEntry_ThrowsRightException() {
-		final Random ran = new Random();
-		final int studyId = ran.nextInt();
-		final int entryId = ran.nextInt();
-		Mockito.doReturn(Collections.emptyList()).when(this.studyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
-				ArgumentMatchers.any(), ArgumentMatchers.any());
-
-		try {
-			this.studyValidator.validateStudyContainsEntry(studyId, entryId);
-			Assert.fail("Expected validation exception to be thrown but was not.");
-		} catch (final ApiRequestValidationException e) {
-			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("invalid.entryid"));
-		}
-	}
-
-	@Test
-	public void testValidateStudyContainsEntries_ThrowsRightException() {
-		final Random ran = new Random();
-		final int studyId = ran.nextInt();
-		final List<Integer> entryIds = Collections.singletonList(ran.nextInt());
-
-		try {
-			this.studyValidator.validateStudyContainsEntries(studyId, entryIds);
-			Assert.fail("Expected validation exception to be thrown but was not.");
-		} catch (final ApiRequestValidationException e) {
-			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("invalid.entryids"));
-		}
-	}
-
-	@Test
 	public void testValidateHasNoCrossesOrSelections() {
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();

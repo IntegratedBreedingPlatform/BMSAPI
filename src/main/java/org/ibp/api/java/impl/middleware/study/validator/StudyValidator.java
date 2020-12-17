@@ -1,15 +1,11 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -18,12 +14,10 @@ import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,9 +32,6 @@ public class StudyValidator {
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
-
-	@Autowired
-	private StudyEntryService studyEntryService;
 
 	@Autowired
 	private StudyService studyService;
@@ -75,36 +66,6 @@ public class StudyValidator {
 		}
 		if (!programUUID.equals(study.getProgramUUID())) {
 			this.errors.reject("invalid.program.uuid.study", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-	}
-
-	public void validateStudyContainsEntry(final Integer studyId, final Integer entryId) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
-		filter.setEntryIds(Collections.singletonList(entryId));
-		final List<StudyEntryDto> studyEntries =
-			this.studyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
-
-		if (studyEntries.isEmpty()) {
-			errors.reject("invalid.entryid");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-	}
-
-	public void validateStudyContainsEntries(final Integer studyId, final List<Integer> entryIds) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
-		filter.setEntryIds(entryIds);
-		final List<StudyEntryDto> studyEntries =
-			this.studyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
-
-		if (studyEntries.size() != entryIds.size()) {
-			final List<Integer> studyEntryIds = studyEntries.stream().map(studyEntry -> studyEntry.getEntryId())
-				.collect(Collectors.toList());
-			final List<Integer> invalidEntryIds = entryIds.stream().filter(entryId -> !studyEntryIds.contains(entryId))
-				.collect(Collectors.toList());
-			errors.reject("invalid.entryids", new String[]{StringUtils.join(invalidEntryIds, ", ")}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

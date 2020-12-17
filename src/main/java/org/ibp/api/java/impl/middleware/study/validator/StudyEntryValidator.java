@@ -1,8 +1,7 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
+import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.SampleService;
@@ -21,6 +20,7 @@ import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class StudyEntryValidator {
@@ -36,6 +36,9 @@ public class StudyEntryValidator {
 
 	@Autowired
 	private StudyValidator studyValidator;
+
+	@Autowired
+	private StudyEntryService studyEntryService;
 
 	@Resource
 	private StudyEntryService middlewareStudyEntryService;
@@ -84,23 +87,29 @@ public class StudyEntryValidator {
 
 	}
 
+	public void validateStudyContainsEntries(final Integer studyId, final List<Integer> entryIds) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setEntryIds(entryIds);
+		final List<StudyEntryDto> studyEntries =
+			this.studyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+
+		if (studyEntries.size() != entryIds.size()) {
+			final List<Integer> studyEntryIds = studyEntries.stream().map(studyEntry -> studyEntry.getEntryId())
+				.collect(Collectors.toList());
+			final List<Integer> invalidEntryIds = entryIds.stream().filter(entryId -> !studyEntryIds.contains(entryId))
+				.collect(Collectors.toList());
+			errors.reject("invalid.entryids", new String[]{StringUtils.join(invalidEntryIds, ", ")}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
 	public void validateStudyAlreadyHasStudyEntries(final Integer studyId) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		if (this.middlewareStudyEntryService.countStudyEntries(studyId) > 0) {
 			this.errors.reject("study.has.existing.study.entries");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-	}
-
-	public void validateStudyEntriesForUpdate(final List<Integer> entryIds) {
-
-		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		final List<Integer> entriesWithPlot = this.middlewareStudyEntryService.hasPlotEntries(entryIds);
-		if(!CollectionUtils.isEmpty(entriesWithPlot)) {
-			this.errors.reject("study.entry.existing.plot.error", new String[] {StringUtils.join(entriesWithPlot, ", ")}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 

@@ -11,7 +11,7 @@ import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
-import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
+import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -20,7 +20,6 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.MatcherAssert;
@@ -251,14 +250,15 @@ public class StudyEntryServiceImplTest {
 		final Integer studyId = this.random.nextInt();
 		final Integer entryId = this.random.nextInt();
 		final Integer variableId = this.random.nextInt();
-		final StudyEntryPropertyDataUpdateRequestDto requestDto = new StudyEntryPropertyDataUpdateRequestDto(
-			Collections.singletonList(entryId), variableId, String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
+		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
+		searchCompositeDto.setItemIds(new HashSet(Collections.singletonList(entryId)));
+		final StudyEntryPropertyBatchUpdateRequest requestDto = new StudyEntryPropertyBatchUpdateRequest( searchCompositeDto,
+			variableId, String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		this.studyEntryService.updateStudyEntriesProperty(studyId, requestDto);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.studyValidator).validateStudyContainsEntries(studyId, requestDto.getEntryIds());
+		Mockito.verify(this.studyEntryValidator).validateStudyContainsEntries(studyId, new ArrayList<>(searchCompositeDto.getItemIds()));
 		Mockito.verify(this.termValidator).validate(variableId);
-		Mockito.verify(this.studyEntryValidator).validateStudyEntriesForUpdate(requestDto.getEntryIds());
 		Mockito.verify(this.middlewareStudyEntryService).updateStudyEntriesProperty(requestDto);
 	}
 

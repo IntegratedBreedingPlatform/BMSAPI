@@ -9,7 +9,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
-import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
+import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -20,7 +20,6 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.germplasm.GermplamListService;
@@ -44,6 +43,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -182,12 +182,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public void updateStudyEntriesProperty(final Integer studyId,
-		final StudyEntryPropertyDataUpdateRequestDto studyEntryPropertyDataUpdateRequestDto) {
+		final StudyEntryPropertyBatchUpdateRequest batchUpdateRequest) {
 		this.studyValidator.validate(studyId, true);
-		this.studyValidator.validateStudyContainsEntries(studyId, studyEntryPropertyDataUpdateRequestDto.getEntryIds());
-		this.termValidator.validate(studyEntryPropertyDataUpdateRequestDto.getVariableId());
-		this.studyEntryValidator.validateStudyEntriesForUpdate(studyEntryPropertyDataUpdateRequestDto.getEntryIds());
-		this.middlewareStudyEntryService.updateStudyEntriesProperty(studyEntryPropertyDataUpdateRequestDto);
+		this.studyValidator.validateStudyShouldNotHaveObservation(studyId);
+		this.studyEntryValidator.validateStudyContainsEntries(studyId, new ArrayList<>(batchUpdateRequest.getSearchComposite().getItemIds()));
+		this.termValidator.validate(batchUpdateRequest.getVariableId());
+		this.middlewareStudyEntryService.updateStudyEntriesProperty(batchUpdateRequest);
 	}
 
 	@Override

@@ -2,10 +2,9 @@ package org.ibp.api.java.study;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
-import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
+import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.java.impl.middleware.study.StudyEntryMetadata;
 import org.springframework.data.domain.Pageable;
 
@@ -23,7 +22,7 @@ public interface StudyEntryService {
 
 	void deleteStudyEntries(Integer studyId);
 
-	void updateStudyEntriesProperty(Integer studyId, StudyEntryPropertyDataUpdateRequestDto studyEntryPropertyDataUpdateRequestDto);
+	void updateStudyEntriesProperty(Integer studyId, StudyEntryPropertyBatchUpdateRequest studyEntryPropertyBatchUpdateRequest);
 
 	long countAllStudyEntries(Integer studyId);
 

@@ -3,7 +3,7 @@ package org.ibp.api.rest.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.study.StudyEntryPropertyDataUpdateRequestDto;
+import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -108,7 +108,7 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 		final Random random = new Random();
 		final int studyId = random.nextInt();
 
-		final StudyEntryPropertyDataUpdateRequestDto requestDto = new StudyEntryPropertyDataUpdateRequestDto();
+		final StudyEntryPropertyBatchUpdateRequest requestDto = new StudyEntryPropertyBatchUpdateRequest();
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/properties",
