@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -36,9 +35,6 @@ public class StudyEntryValidator {
 
 	@Autowired
 	private StudyValidator studyValidator;
-
-	@Autowired
-	private StudyEntryService studyEntryService;
 
 	@Resource
 	private StudyEntryService middlewareStudyEntryService;
@@ -92,7 +88,7 @@ public class StudyEntryValidator {
 		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
 		filter.setEntryIds(entryIds);
 		final List<StudyEntryDto> studyEntries =
-			this.studyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
 
 		if (studyEntries.size() != entryIds.size()) {
 			final List<Integer> studyEntryIds = studyEntries.stream().map(studyEntry -> studyEntry.getEntryId())
