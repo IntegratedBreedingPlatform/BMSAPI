@@ -1,8 +1,6 @@
 package org.ibp.api.java.impl.middleware.design.runner;
 
-import org.ibp.api.domain.design.DesignLicenseInfo;
 import org.ibp.api.domain.design.License;
-import org.ibp.api.exception.BVLicenseParseException;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
