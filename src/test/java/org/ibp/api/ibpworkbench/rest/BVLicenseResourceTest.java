@@ -33,7 +33,7 @@ public class BVLicenseResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testCountExpiryDays() throws Exception {
-		final License license = new License("Succesful license checkout", "73", "31-DEC-2030");
+		final License license = new License("Successful license checkout", "73", "31-DEC-2030");
 		Mockito.when(this.designLicenseService.getLicenseInfo()).thenReturn(license);
 
 		this.mockMvc
