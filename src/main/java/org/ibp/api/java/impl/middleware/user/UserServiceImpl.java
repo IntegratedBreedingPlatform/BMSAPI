@@ -7,7 +7,6 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.domain.user.UserMapper;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -18,33 +17,19 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
-import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-// TODO IBP-2778
-//  make Transactional
-//  remove try/catchs and translateErrorToMap,
-//  let the exception bubble up and be handled by DefaultExceptionHandler
-//  Remove messageSource
 @Service
 public class UserServiceImpl implements UserService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
-	private static final String USER_NAME = "User";
-	private static final String ERROR = "ERROR";
 
 	@Autowired
 	private org.generationcp.middleware.service.api.user.UserService userService;
@@ -55,13 +40,10 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	protected SecurityService securityService;
 
-	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-	@Autowired
-	private ResourceBundleMessageSource messageSource;
-
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	@Override
 	public List<UserDetailDto> getAllUsersSortedByLastName() {
@@ -77,60 +59,21 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Map<String, Object> createUser(final UserDetailDto user) {
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
-		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
-		mapResponse.put("id", String.valueOf(0));
+	public Integer createUser(final UserDetailDto user) {
+		this.userValidator.validate(user, true);
 
-		this.userValidator.validate(user, errors, true);
-		if (errors.hasErrors()) {
-			this.translateErrorToMap(errors, mapResponse);
+		final UserDto userdto = this.translateUserDetailsDtoToUserDto(user);
+		userdto.setPassword(this.passwordEncoder.encode(userdto.getUsername()));
 
-		} else {
-
-			final UserDto userdto = this.translateUserDetailsDtoToUserDto(user);
-			userdto.setPassword(this.passwordEncoder.encode(userdto.getUsername()));
-
-			try {
-				final Integer newUserId = this.userService.createUser(userdto);
-				mapResponse.put("id", String.valueOf(newUserId));
-
-			} catch (final MiddlewareQueryException e) {
-				LOG.info("Error on userService.createUser ", e);
-				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
-				this.translateErrorToMap(errors, mapResponse);
-			}
-		}
-
-		return mapResponse;
+		return this.userService.createUser(userdto);
 	}
 
 	@Override
-	public Map<String, Object> updateUser(final UserDetailDto user) {
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
-		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
-		mapResponse.put("id", String.valueOf(0));
+	public Integer updateUser(final UserDetailDto user) {
+		this.userValidator.validate(user, false);
 
-		this.userValidator.validate(user, errors, false);
-		if (errors.hasErrors()) {
-			LOG.debug("UserValidator returns errors");
-			this.translateErrorToMap(errors, mapResponse);
-
-		} else {
-
-			final UserDto userdto = this.translateUserDetailsDtoToUserDto(user);
-
-			try {
-				final Integer updateUserId = this.userService.updateUser(userdto);
-				mapResponse.put("id", String.valueOf(updateUserId));
-			} catch (final MiddlewareQueryException e) {
-				LOG.info("Error on userService.updateUser", e);
-				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
-				this.translateErrorToMap(errors, mapResponse);
-			}
-		}
-
-		return mapResponse;
+		final UserDto userdto = this.translateUserDetailsDtoToUserDto(user);
+		return this.userService.updateUser(userdto);
 	}
 
 	@Override
@@ -203,96 +146,6 @@ public class UserServiceImpl implements UserService {
 
 	public void setPasswordEncoder(final PasswordEncoder passwordEncoder) {
 		this.passwordEncoder = passwordEncoder;
-	}
-
-	public void setMessageSource(final ResourceBundleMessageSource messageSource) {
-		this.messageSource = messageSource;
-	}
-
-	private void translateErrorToMap(final BindingResult errors, final HashMap<String, Object> mapErrors) {
-		final ErrorResponse errResponse = new ErrorResponse();
-
-		if (errors.getFieldErrorCount(UserValidator.FIRST_NAME) != 0) {
-			final String errorName = errors.getFieldError(UserValidator.FIRST_NAME).getCode();
-			errResponse.addError(this.translateCodeErrorValidator(errorName), UserValidator.FIRST_NAME);
-		}
-
-		if (errors.getFieldErrorCount(UserValidator.LAST_NAME) != 0) {
-			final String errorLastName = errors.getFieldError(UserValidator.LAST_NAME).getCode();
-			errResponse.addError(this.translateCodeErrorValidator(errorLastName), UserValidator.LAST_NAME);
-		}
-
-		if (errors.getFieldErrorCount(UserValidator.USERNAME) != 0) {
-			final String errorUserName = errors.getFieldError(UserValidator.USERNAME).getCode();
-			errResponse.addError(this.translateCodeErrorValidator(errorUserName), UserValidator.USERNAME);
-		}
-
-		if (errors.getFieldErrorCount(UserValidator.EMAIL) != 0) {
-			final String errorEmail = errors.getFieldError(UserValidator.EMAIL).getCode();
-			errResponse.addError(this.translateCodeErrorValidator(errorEmail), UserValidator.EMAIL);
-		}
-
-		if (errors.getFieldErrorCount(UserValidator.ROLE) != 0) {
-			final String errorRole = errors.getFieldError(UserValidator.ROLE).getCode();
-			errResponse.addError(this.translateCodeErrorValidator(errorRole), UserValidator.ROLE);
-		}
-
-		if (errors.getFieldErrorCount(UserValidator.STATUS) != 0) {
-			final String errorStatus = errors.getFieldError(UserValidator.STATUS).getCode();
-			errResponse.addError(this.translateCodeErrorValidator(errorStatus), UserValidator.STATUS);
-		}
-
-		if (errors.getFieldErrorCount(UserValidator.USER_ID) != 0) {
-			final String errorUserId = errors.getFieldError(UserValidator.USER_ID).getCode();
-			errResponse.addError(this.translateCodeErrorValidator(errorUserId), UserValidator.USER_ID);
-		}
-
-		if (errors.getGlobalErrorCount() != 0) {
-			final List<ObjectError> globalErrors = errors.getGlobalErrors();
-			for (final ObjectError globalError : globalErrors) {
-				errResponse.addError(this.getMessage(globalError.getCode(), globalError.getArguments()));
-			}
-		}
-
-		mapErrors.put(ERROR, errResponse);
-	}
-
-	// TODO move to properties and let the exception handler do the translation
-	private String translateCodeErrorValidator(final String codeError) {
-
-		if (UserValidator.SIGNUP_FIELD_INVALID_EMAIL_FORMAT.equals(codeError)) {
-			return "invalid format";
-		}
-		if (UserValidator.SIGNUP_FIELD_REQUIRED.equals(codeError)) {
-			return "field required";
-		}
-		if (UserValidator.SIGNUP_FIELD_LENGTH_EXCEED.equals(codeError)) {
-			return "lentgh exceed";
-		}
-		if (UserValidator.SIGNUP_FIELD_EMAIL_EXISTS.equals(codeError)) {
-			return "exists";
-		}
-		if (UserValidator.SIGNUP_FIELD_USERNAME_EXISTS.equals(codeError)) {
-			return "exists";
-		}
-		if (UserValidator.SIGNUP_FIELD_INVALID_ROLE.equals(codeError)) {
-			return "invalid";
-		}
-		if (UserValidator.DATABASE_ERROR.equals(codeError)) {
-			return "DB error";
-		}
-		if (UserValidator.SIGNUP_FIELD_INVALID_USER_ID.equals(codeError)) {
-			return "invalid";
-		}
-		return "";
-	}
-
-	private String getMessage(final String code) {
-		return this.messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
-	}
-
-	private String getMessage(final String code, final Object[] args) {
-		return this.messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
 	}
 
 	public void setUserService(final org.generationcp.middleware.service.api.user.UserService userService) {
