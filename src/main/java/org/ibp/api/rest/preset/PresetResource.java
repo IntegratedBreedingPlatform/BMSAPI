@@ -22,7 +22,7 @@ import java.util.List;
 @Api(value = "Preset Services")
 @PreAuthorize("hasAnyAuthority("
 	+ "'ADMIN',"
-	+ "'BREEDING_ACTIVITIES',"
+	+ "'STUDIES',"
 	+ "'MANAGE_STUDIES',"
 	+ "'CROP_MANAGEMENT',"
 	+ "'MANAGE_INVENTORY',"

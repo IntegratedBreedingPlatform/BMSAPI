@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
@@ -20,16 +20,7 @@ import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -56,7 +47,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
-		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final String programUUID, final List<StudyEntryDto> studyEntryDtoList) {
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -64,18 +55,18 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 
 		// Generate experiment design parameters input to design runner
 		final Map<BreedingViewDesignParameter, List<ListItem>> listItems =
-			this.createReplicationListItems(studyGermplasmDtoList, experimentalDesignInput.getReplicationPercentage(),
+			this.createReplicationListItems(studyEntryDtoList, experimentalDesignInput.getReplicationPercentage(),
 				experimentalDesignInput.getReplicationsCount());
 		experimentalDesignInput.setNumberOfBlocks(experimentalDesignInput.getBlockSize());
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.generate(experimentalDesignInput, this.getBreedingViewVariablesMap(standardVariablesMap), studyGermplasmDtoList.size(), null,
+			.generate(experimentalDesignInput, this.getBreedingViewVariablesMap(standardVariablesMap), studyEntryDtoList.size(), null,
 				listItems);
 
 		// Generate observation unit rows
 		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor
-			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
+			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyEntryDtoList, mainDesign,
 				entryNumberName, null,
 				new HashMap<>());
 	}
@@ -111,7 +102,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 	}
 
 	Map<BreedingViewDesignParameter, List<ListItem>> createReplicationListItems(
-		final List<StudyGermplasmDto> studyGermplasmDtoList, final float replicationPercentage, final int replicationNumber) {
+			final List<StudyEntryDto> studyEntryDtoList, final float replicationPercentage, final int replicationNumber) {
 
 		// Count how many test entries we have in the studyGermplasmDto list.
 		int testEntryCount = 0;
@@ -119,10 +110,11 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 		// Determine which of the studyGermplasmDto entries are test entries
 		final List<Integer> testEntryNumbers = new ArrayList<>();
 
-		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() == studyGermplasmDto.getCheckType()) {
+		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
+			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
+			if (entryType.isPresent() && SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() == Integer.valueOf(entryType.get())) {
 				testEntryCount++;
-				testEntryNumbers.add(studyGermplasmDto.getEntryNumber());
+				testEntryNumbers.add(studyEntryDto.getEntryNumber());
 			}
 		}
 
@@ -135,11 +127,12 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 		}
 
 		final List<ListItem> replicationListItem = new LinkedList<>();
-		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() != studyGermplasmDto.getCheckType()) {
+		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
+			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
+			if (entryType.isPresent() && SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() != Integer.valueOf(entryType.get())) {
 				// All Check Entries in the list should be replicated
 				replicationListItem.add(new ListItem(String.valueOf(replicationNumber)));
-			} else if (randomTestEntryNumbers.contains(studyGermplasmDto.getEntryNumber())) {
+			} else if (randomTestEntryNumbers.contains(studyEntryDto.getEntryNumber())) {
 				// Randomized Test Entries should be replicated
 				replicationListItem.add(new ListItem(String.valueOf(replicationNumber)));
 			} else {

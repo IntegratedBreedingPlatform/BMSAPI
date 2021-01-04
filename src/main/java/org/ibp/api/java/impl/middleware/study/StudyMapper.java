@@ -1,23 +1,21 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.spi.MappingContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudyMapper {
 
@@ -35,7 +33,6 @@ public class StudyMapper {
 	 */
 	static {
 		StudyMapper.addObservationMapper(StudyMapper.applicationWideModelMapper);
-		StudyMapper.addStudyGermplasmDtoMapping(StudyMapper.applicationWideModelMapper);
 	}
 
 	public static ModelMapper getInstance() {
@@ -76,23 +73,6 @@ public class StudyMapper {
 				this.map().setReplicationNumber(this.source.getRepitionNumber());
 				this.map().setEntryCode(this.source.getEntryCode());
 				this.using(new MeasurementDtoConverter()).map(this.source.getVariableMeasurements()).setMeasurements(null);
-			}
-		});
-	}
-
-	private static void addStudyGermplasmDtoMapping(final ModelMapper mapper) {
-		mapper.addMappings(new PropertyMap<StudyGermplasmDto, StudyGermplasm>() {
-
-			@Override
-			protected void configure() {
-				this.map().setEntryNumber(this.source.getEntryNumber());
-				this.map().setEntryType(this.source.getEntryType());
-				this.map().setPosition(this.source.getPosition());
-				this.map().getGermplasmListEntrySummary().setGid(this.source.getGermplasmId());
-				this.map().getGermplasmListEntrySummary().setCross(this.source.getCross());
-				this.map().getGermplasmListEntrySummary().setDesignation(this.source.getDesignation());
-				this.map().getGermplasmListEntrySummary().setEntryCode(this.source.getEntryCode());
-				this.map().getGermplasmListEntrySummary().setSeedSource(this.source.getSeedSource());
 			}
 		});
 	}

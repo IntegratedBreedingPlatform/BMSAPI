@@ -9,23 +9,31 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.PreconditionFailedException;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
+import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
+import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
+import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
@@ -40,20 +48,25 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 
 public class DatasetServiceImplTest {
 
@@ -83,6 +96,9 @@ public class DatasetServiceImplTest {
 	private StudyValidator studyValidator;
 
 	@Mock
+	private StudyEntryValidator studyEntryValidator;
+
+	@Mock
 	private DatasetValidator datasetValidator;
 
 	@Mock
@@ -90,6 +106,9 @@ public class DatasetServiceImplTest {
 
 	@Spy
 	private ObservationsTableValidator observationsTableValidator;
+
+	@Mock
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Mock
 	private InstanceValidator instanceValidator;
@@ -102,6 +121,15 @@ public class DatasetServiceImplTest {
 
 	@Mock
 	private MeasurementVariableTransformer measurementVariableTransformer;
+
+	@Mock
+	private InventoryCommonValidator inventoryCommonValidator;
+
+	@Mock
+	private StudyTransactionsService studyTransactionsService;
+
+	@Mock
+	private StudyService studyService;
 
 	@InjectMocks
 	private DatasetServiceImpl studyDatasetService;
@@ -253,9 +281,10 @@ public class DatasetServiceImplTest {
 		final List<ObservationUnitRow> observationDtoTestData = this.mockObservationUnitRowList();
 
 		Mockito.doReturn(observationDtoTestData).when(this.middlewareDatasetService)
-			.getObservationUnitRows(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.any());
+			.getObservationUnitRows(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.any(), ArgumentMatchers.any());
 		final List<org.ibp.api.rest.dataset.ObservationUnitRow> actualObservations =
-			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO());
+			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO(), Mockito.mock(
+				PageRequest.class));
 
 		Assert.assertEquals(this.mapObservationUnitRows(observationDtoTestData), actualObservations);
 
@@ -266,7 +295,7 @@ public class DatasetServiceImplTest {
 		final List<Map<String, Object>> listOfMap = new ArrayList<>();
 
 		Mockito.doReturn(listOfMap).when(this.middlewareDatasetService)
-			.getObservationUnitRowsAsMapList(ArgumentMatchers.eq(TEST_STUDY_IDENTIFIER), ArgumentMatchers.eq(1), ArgumentMatchers.any(ObservationUnitsSearchDTO.class));
+			.getObservationUnitRowsAsMapList(ArgumentMatchers.eq(TEST_STUDY_IDENTIFIER), ArgumentMatchers.eq(1), ArgumentMatchers.any(ObservationUnitsSearchDTO.class), ArgumentMatchers.isNull());
 		final List<Map<String, Object>> result =
 			this.studyDatasetService.getObservationUnitRowsAsMapList(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO());
 
@@ -516,6 +545,155 @@ public class DatasetServiceImplTest {
 		}
 	}
 
+	@Test
+	public void testImportDataset_ValidDateFormat() {
+		final Integer studyId = 1;
+		final Integer datasetId = 3;
+		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A", "KSU_Date");
+		final List<String> row1 = Arrays.asList("1", "1", "5/9/20");
+		final List<String> row2 = Arrays.asList("2", "1", "20201201");
+		data.add(header);
+		data.add(row1);
+		data.add(row2);
+
+		observationsPutRequestInput.setData(data);
+		observationsPutRequestInput.setProcessWarnings(true);
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setAlias("A");
+		measurementVariable.setDataTypeId(TermId.CHARACTER_VARIABLE.getId());
+		measurementVariable.setDataType("Numeric");
+		final MeasurementVariable dateMV = new MeasurementVariable();
+		dateMV.setAlias("KSU_Date");
+		dateMV.setName("KSU_Date");
+		dateMV.setDataType("Date");
+		dateMV.setDataTypeId(TermId.DATE_VARIABLE.getId());
+		measurementVariables.add(measurementVariable);
+		measurementVariables.add(dateMV);
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
+		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		observationUnitDataMap.put("KSU_Date", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		observationUnitRow.setObservationUnitId(1);
+		observationUnitRow.setVariables(observationUnitDataMap);
+		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow2 = new ObservationUnitRow();
+		observationUnitRow.setObservationUnitId(2);
+		observationUnitRow.setVariables(observationUnitDataMap);
+		storedData.put("1", observationUnitRow);
+		storedData.put("2", observationUnitRow);
+		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
+		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1", "2")))
+			.thenReturn(storedData);
+		try {
+			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
+		} catch (final PreconditionFailedException e) {
+			e.printStackTrace();
+			Assert.fail("yyyyMMdd and d/M/yy should be supported");
+			throw e;
+		}
+	}
+
+
+	@Test
+	public void testImportDataset_ImportKSUDateFormat() {
+		final Integer studyId = 1;
+		final Integer datasetId = 3;
+		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A", "KSU_Date");
+		final List<String> row1 = Arrays.asList("1", "1", "5/9/20");
+
+		data.add(header);
+		data.add(row1);
+
+		observationsPutRequestInput.setData(data);
+		observationsPutRequestInput.setProcessWarnings(true);
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setAlias("A");
+		measurementVariable.setDataTypeId(TermId.CHARACTER_VARIABLE.getId());
+		measurementVariable.setDataType("Numeric");
+		final MeasurementVariable dateMV = new MeasurementVariable();
+		dateMV.setAlias("KSU_Date");
+		dateMV.setName("KSU_Date");
+		dateMV.setDataType("Date");
+		dateMV.setDataTypeId(TermId.DATE_VARIABLE.getId());
+		measurementVariables.add(measurementVariable);
+		measurementVariables.add(dateMV);
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
+		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		observationUnitDataMap.put("KSU_Date", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		observationUnitRow.setObservationUnitId(1);
+		observationUnitRow.setVariables(observationUnitDataMap);
+		storedData.put("1", observationUnitRow);
+		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
+		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+			.thenReturn(storedData);
+		try {
+			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
+		} catch (final Exception e) {
+			Assert.fail("KSU Date format supported: d/M/yy");
+		}
+
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testImportDataset_ImportInvalidDateFormat() {
+		final Integer studyId = 1;
+		final Integer datasetId = 3;
+		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A", "KSU_Date");
+		final List<String> row1 = Arrays.asList("1", "1", "5/19/12");
+
+		data.add(header);
+		data.add(row1);
+
+		observationsPutRequestInput.setData(data);
+		observationsPutRequestInput.setProcessWarnings(true);
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setAlias("A");
+		measurementVariable.setDataTypeId(TermId.CHARACTER_VARIABLE.getId());
+		measurementVariable.setDataType("Numeric");
+		final MeasurementVariable dateMV = new MeasurementVariable();
+		dateMV.setAlias("KSU_Date");
+		dateMV.setName("KSU_Date");
+		dateMV.setDataType("Date");
+		dateMV.setDataTypeId(TermId.DATE_VARIABLE.getId());
+		measurementVariables.add(measurementVariable);
+		measurementVariables.add(dateMV);
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
+		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		observationUnitDataMap.put("KSU_Date", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		observationUnitRow.setObservationUnitId(1);
+		observationUnitRow.setVariables(observationUnitDataMap);
+		storedData.put("1", observationUnitRow);
+		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
+		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+			.thenReturn(storedData);
+		try {
+			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
+		} catch (final PreconditionFailedException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalid.cell.date.value"));
+			throw e;
+		}
+
+	}
+
 	private List<org.ibp.api.rest.dataset.ObservationUnitRow> mapObservationUnitRows(
 		final List<ObservationUnitRow> observationDtoTestData) {
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
@@ -584,11 +762,6 @@ public class DatasetServiceImplTest {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
 
 		paramDTO.setObservationUnitsSearchDTO(searchDTO);
@@ -615,11 +788,6 @@ public class DatasetServiceImplTest {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
 
 		paramDTO.setObservationUnitsSearchDTO(searchDTO);
@@ -693,31 +861,37 @@ public class DatasetServiceImplTest {
 
 		final List<MeasurementVariable> variables = new ArrayList<>();
 		final MeasurementVariable var1 = new MeasurementVariable();
+		var1.setAlias("Alias 1");
 		var1.setName("Var 1");
 		var1.setTermId(24);
 		var1.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
 		variables.add(var1);
 		final MeasurementVariable var2 = new MeasurementVariable();
+		var2.setAlias("Alias 2");
 		var2.setName("Var 2");
 		var2.setTermId(25);
 		var2.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
 		variables.add(var2);
 		final MeasurementVariable var3 = new MeasurementVariable();
+		var3.setAlias("Alias 3");
 		var3.setName("Var 3");
 		var3.setTermId(27);
 		var3.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
 		variables.add(var3);
 		final MeasurementVariable var4 = new MeasurementVariable();
+		var4.setAlias("Alias 4");
 		var4.setName("Var 4");
 		var4.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
 		var4.setTermId(28);
 		variables.add(var4);
 		final MeasurementVariable var5 = new MeasurementVariable();
+		var1.setAlias("Alias 5");
 		var5.setName("Var 5");
 		var5.setDataTypeId(DataType.DATE_TIME_VARIABLE.getId());
 		var5.setTermId(29);
 		variables.add(var5);
 		final MeasurementVariable var6 = new MeasurementVariable();
+		var6.setAlias("Alias 6");
 		var6.setName("Var 6");
 		var6.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
 		var6.setTermId(30);
@@ -734,6 +908,192 @@ public class DatasetServiceImplTest {
 		Assert.assertThat(data.get(2).get(4), is("missing"));
 		Assert.assertThat(data.get(2).get(5), is(""));
 		Assert.assertThat(data.get(2).get(6), is("missing"));
+
+		final List<String> header = data.get(0);
+		Assert.assertEquals(7, header.size());
+		Assert.assertTrue(header.contains(OBS_UNIT_ID));
+		Assert.assertTrue(header.contains(var1.getAlias()));
+		Assert.assertTrue(header.contains(var2.getAlias()));
+		Assert.assertTrue(header.contains(var3.getAlias()));
+		Assert.assertTrue(header.contains(var4.getAlias()));
+		Assert.assertTrue(header.contains(var5.getAlias()));
+		Assert.assertTrue(header.contains(var6.getAlias()));
+	}
+
+	@Test
+	public void getObservationUnitsMetadata() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final int obsUnitId1 = random.nextInt();
+		final int obsUnitId2 = random.nextInt();
+		final int obsUnitId3 = random.nextInt();
+		final int obsUnitId4 = random.nextInt();
+
+		final ObservationUnitRow observationUnitRow1 = new ObservationUnitRow();
+		observationUnitRow1.setObservationUnitId(obsUnitId1);
+		observationUnitRow1.setTrialInstance(1);
+		observationUnitRow1.setVariables(new HashMap<>());
+		observationUnitRow1.setEnvironmentVariables(new HashMap<>());
+
+		final ObservationUnitRow observationUnitRow2 = new ObservationUnitRow();
+		observationUnitRow2.setObservationUnitId(obsUnitId2);
+		observationUnitRow2.setTrialInstance(1);
+		observationUnitRow2.setVariables(new HashMap<>());
+		observationUnitRow2.setEnvironmentVariables(new HashMap<>());
+
+		final ObservationUnitRow observationUnitRow3 = new ObservationUnitRow();
+		observationUnitRow3.setObservationUnitId(obsUnitId3);
+		observationUnitRow3.setTrialInstance(2);
+		observationUnitRow3.setVariables(new HashMap<>());
+		observationUnitRow3.setEnvironmentVariables(new HashMap<>());
+
+		final ObservationUnitRow observationUnitRow4 = new ObservationUnitRow();
+		observationUnitRow4.setObservationUnitId(obsUnitId4);
+		observationUnitRow4.setTrialInstance(3);
+		observationUnitRow4.setVariables(new HashMap<>());
+		observationUnitRow4.setEnvironmentVariables(new HashMap<>());
+
+		final List<ObservationUnitRow> selectedRows =
+			Lists.newArrayList(observationUnitRow1, observationUnitRow2, observationUnitRow3, observationUnitRow4);
+		final Set<Integer> itemIds = Sets.newHashSet(obsUnitId1, obsUnitId2, obsUnitId3, obsUnitId4);
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
+		searchCompositeDto.setItemIds(itemIds);
+
+		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
+			.thenReturn(selectedRows);
+
+		final ObservationUnitsMetadata metadata =
+			this.studyDatasetService.getObservationUnitsMetadata(studyId, datasetId, searchCompositeDto);
+		Assert.assertEquals(metadata.getInstancesCount(), Long.valueOf(3));
+		Assert.assertEquals(metadata.getObservationUnitsCount(), Long.valueOf(selectedRows.size()));
+	}
+
+	@Test
+	public void testGetReplaceObservationUnitsEntry_NoObservationSelected() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+
+		final Set<Integer> itemIds = Sets.newHashSet(random.nextInt(), random.nextInt(), random.nextInt(), random.nextInt());
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
+		searchCompositeDto.setItemIds(itemIds);
+
+		final ObservationUnitEntryReplaceRequest observationUnitEntryReplaceRequest = new ObservationUnitEntryReplaceRequest();
+		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
+		observationUnitEntryReplaceRequest.setEntryId(random.nextInt());
+
+		Mockito.when(this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
+			.thenReturn(new ArrayList<>());
+
+		try {
+			this.studyDatasetService.replaceObservationUnitsEntry(studyId, datasetId, observationUnitEntryReplaceRequest);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("study.entry.replace.empty.units"));
+		}
+	}
+
+	@Test
+	public void testGetReplaceObservationUnitsEntry_SamplesFound() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final int obsUnitId1 = random.nextInt();
+		final ObservationUnitRow observationUnitRow1 = new ObservationUnitRow();
+		observationUnitRow1.setObservationUnitId(obsUnitId1);
+		observationUnitRow1.setTrialInstance(1);
+		observationUnitRow1.setVariables(new HashMap<>());
+		observationUnitRow1.setEnvironmentVariables(new HashMap<>());
+		observationUnitRow1.setSamplesCount("6");
+
+		final Set<Integer> itemIds = Sets.newHashSet(obsUnitId1);
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
+		searchCompositeDto.setItemIds(itemIds);
+
+		final ObservationUnitEntryReplaceRequest observationUnitEntryReplaceRequest = new ObservationUnitEntryReplaceRequest();
+		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
+		observationUnitEntryReplaceRequest.setEntryId(random.nextInt());
+
+		Mockito.when(this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
+			.thenReturn(Collections.singletonList(observationUnitRow1));
+
+		try {
+			this.studyDatasetService.replaceObservationUnitsEntry(studyId, datasetId, observationUnitEntryReplaceRequest);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("study.entry.replace.samples.found"));
+		}
+
+	}
+
+	@Test
+	public void testGetReplaceObservationUnitsEntry_TransactionsFound() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final int obsUnitId1 = random.nextInt();
+		final ObservationUnitRow observationUnitRow1 = new ObservationUnitRow();
+		observationUnitRow1.setObservationUnitId(obsUnitId1);
+		observationUnitRow1.setTrialInstance(1);
+		observationUnitRow1.setVariables(new HashMap<>());
+		observationUnitRow1.setEnvironmentVariables(new HashMap<>());
+		observationUnitRow1.setSamplesCount("-");
+
+		final Set<Integer> itemIds = Sets.newHashSet(obsUnitId1);
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
+		searchCompositeDto.setItemIds(itemIds);
+
+		final ObservationUnitEntryReplaceRequest observationUnitEntryReplaceRequest = new ObservationUnitEntryReplaceRequest();
+		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
+		observationUnitEntryReplaceRequest.setEntryId(random.nextInt());
+
+		Mockito.when(this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
+			.thenReturn(Collections.singletonList(observationUnitRow1));
+		Mockito.when(this.studyTransactionsService.countStudyTransactions(eq(studyId), Mockito.any())).thenReturn(1L);
+
+		try {
+			this.studyDatasetService.replaceObservationUnitsEntry(studyId, datasetId, observationUnitEntryReplaceRequest);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("study.entry.replace.transactions.found"));
+		}
+	}
+
+	@Test
+	public void testGetReplaceObservationUnitsEntry_Ok() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final int obsUnitId1 = random.nextInt();
+		final int newEntryId = random.nextInt();
+		final ObservationUnitRow observationUnitRow1 = new ObservationUnitRow();
+		observationUnitRow1.setObservationUnitId(obsUnitId1);
+		observationUnitRow1.setTrialInstance(1);
+		observationUnitRow1.setVariables(new HashMap<>());
+		observationUnitRow1.setEnvironmentVariables(new HashMap<>());
+		observationUnitRow1.setSamplesCount("-");
+
+		final List<Integer> itemIds = Lists.newArrayList(obsUnitId1);
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
+		searchCompositeDto.setItemIds(Sets.newHashSet(itemIds));
+
+		final ObservationUnitEntryReplaceRequest observationUnitEntryReplaceRequest = new ObservationUnitEntryReplaceRequest();
+		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
+		observationUnitEntryReplaceRequest.setEntryId(newEntryId);
+
+		Mockito.when(this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Boolean.FALSE);
+		Mockito.when(this.studyService.hasCrossesOrSelections(studyId)).thenReturn(Boolean.FALSE);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
+			.thenReturn(Collections.singletonList(observationUnitRow1));
+		Mockito.when(this.studyTransactionsService.countStudyTransactions(eq(studyId), Mockito.any())).thenReturn(0L);
+
+		this.studyDatasetService.replaceObservationUnitsEntry(studyId, datasetId, observationUnitEntryReplaceRequest);
+
+		Mockito.verify(this.middlewareDatasetService, times(1)).replaceObservationUnitEntry(eq(itemIds), eq(newEntryId));
 	}
 
 }

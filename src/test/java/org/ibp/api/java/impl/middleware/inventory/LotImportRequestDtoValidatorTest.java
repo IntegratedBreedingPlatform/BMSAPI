@@ -59,7 +59,7 @@ public class LotImportRequestDtoValidatorTest {
 	@Test
 	public void testValidateRequestIsNull() {
 		try {
-			this.lotImportRequestDtoValidator.validate(null);
+			this.lotImportRequestDtoValidator.validate(null, null);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.import.request.null"));
 
@@ -71,7 +71,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 			lotImportRequestDto.setLotList(null);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.null"));
 		}
@@ -82,7 +82,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 			lotImportRequestDto.setStockIdPrefix(RandomStringUtils.randomAlphabetic(16));
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.stock.prefix.invalid.length"));
 		}
@@ -93,7 +93,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 			lotImportRequestDto.setStockIdPrefix(RandomStringUtils.randomAlphanumeric(14).concat(RandomStringUtils.randomNumeric(1)));
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.stock.prefix.invalid.pattern"));
 		}
@@ -105,7 +105,7 @@ public class LotImportRequestDtoValidatorTest {
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 		lotImportRequestDto.setLotList(lotList);
 		try {
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.no.items"));
 		}
@@ -118,7 +118,7 @@ public class LotImportRequestDtoValidatorTest {
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 		lotImportRequestDto.setLotList(lotList);
 		try {
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.item.null"));
 		}
@@ -133,7 +133,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			lotItemDto.setGid(null);
 			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.gid.null"));
 		}
@@ -151,7 +151,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			lotItemDto.setStorageLocationAbbr("");
 			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.location.abbreviation.null.or.empty"));
 		}
@@ -168,7 +168,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			lotItemDto.setStorageLocationAbbr("");
 			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.location.abbreviation.null.or.empty"));
 		}
@@ -183,7 +183,8 @@ public class LotImportRequestDtoValidatorTest {
 		final Location seedStorageLocation = new Location();
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
-		Mockito.when(this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any()))
+		Mockito.when(
+			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
 			.thenReturn(existingLocations);
 
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
@@ -192,7 +193,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			lotItemDto.setUnitName(null);
 			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.units.null.or.empty"));
 		}
@@ -207,7 +208,8 @@ public class LotImportRequestDtoValidatorTest {
 		final Location seedStorageLocation = new Location();
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
-		Mockito.when(this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any()))
+		Mockito.when(
+			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
 			.thenReturn(existingLocations);
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
@@ -221,7 +223,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			lotItemDto.setUnitName("Amount");
 			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.invalid.units"));
 		}
@@ -236,7 +238,8 @@ public class LotImportRequestDtoValidatorTest {
 		final Location seedStorageLocation = new Location();
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
-		Mockito.when(this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any()))
+		Mockito.when(
+			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
@@ -248,7 +251,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			lotItemDto.setStockId(RandomStringUtils.randomAlphabetic(256));
 			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.stock.id.length.higher.than.maximum"));
 		}
@@ -264,7 +267,8 @@ public class LotImportRequestDtoValidatorTest {
 		final Location seedStorageLocation = new Location();
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
-		Mockito.when(this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any()))
+		Mockito.when(
+			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
@@ -277,7 +281,7 @@ public class LotImportRequestDtoValidatorTest {
 			lotItemDto1.setGid(2);
 			lotList.add(lotItemDto);
 			lotList.add(lotItemDto1);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.stock.ids.duplicated"));
 		}
@@ -292,7 +296,8 @@ public class LotImportRequestDtoValidatorTest {
 		final Location seedStorageLocation = new Location();
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
-		Mockito.when(this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any()))
+		Mockito.when(
+			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
@@ -303,7 +308,7 @@ public class LotImportRequestDtoValidatorTest {
 
 		try {
 			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.stock.ids.invalid"));
 		}
@@ -320,7 +325,8 @@ public class LotImportRequestDtoValidatorTest {
 		final Location seedStorageLocation = new Location();
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
-		Mockito.when(this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any()))
+		Mockito.when(
+			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
 			.thenReturn(existingLocations);
 
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
@@ -329,7 +335,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			lotItemDto.setInitialBalance(null);
 			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.initial.balances.null"));
 
@@ -348,7 +354,8 @@ public class LotImportRequestDtoValidatorTest {
 		final Location seedStorageLocation = new Location();
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
-		Mockito.when(this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any()))
+		Mockito.when(
+			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
 			.thenReturn(existingLocations);
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 		lotImportRequestDto.setLotList(lotList);
@@ -357,7 +364,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			lotItemDto.setInitialBalance((double) -11);
 			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.input.list.initial.balances.negative.values"));
 
@@ -373,7 +380,8 @@ public class LotImportRequestDtoValidatorTest {
 		final Location seedStorageLocation = new Location();
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
-		Mockito.when(this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any()))
+		Mockito.when(
+			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
@@ -385,7 +393,7 @@ public class LotImportRequestDtoValidatorTest {
 		try {
 			lotItemDto.setNotes(RandomStringUtils.randomAlphabetic(256));
 			lotList.add(lotItemDto);
-			this.lotImportRequestDtoValidator.validate(lotImportRequestDto);
+			this.lotImportRequestDtoValidator.validate(null, lotImportRequestDto);
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lot.notes.length"));
 		}

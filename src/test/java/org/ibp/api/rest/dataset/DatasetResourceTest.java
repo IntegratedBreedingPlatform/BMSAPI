@@ -9,7 +9,6 @@ import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -39,7 +38,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.validation.ObjectError;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -367,8 +365,12 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			org.mockito.Matchers.anyInt(),
 			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean()))
 			.thenReturn(100);
+		Mockito.when(this.studyDatasetService.countFilteredObservationUnitsForDataset(
+			org.mockito.Matchers.anyInt(),
+			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean(), ArgumentMatchers.any()))
+			.thenReturn(100L);
 		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-			ArgumentMatchers.any()))
+			ArgumentMatchers.any(), ArgumentMatchers.any()))
 			.thenReturn(Lists.newArrayList(obsDto));
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
@@ -377,10 +379,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 		searchDTO.setInstanceId(instanceId);
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.post(
@@ -391,26 +389,26 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				datasetId).content(this.convertObjectToByte(searchDTO)).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsFiltered", is(100)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsTotal", is(100)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].observationUnitId", is(obsDto.getObservationUnitId())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].gid", is(obsDto.getGid())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].designation", is(obsDto.getDesignation())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].action", is(obsDto.getAction())))
+			.andExpect(MockMvcResultMatchers.header().string("X-Total-Count","100"))
+			.andExpect(MockMvcResultMatchers.header().string("X-Filtered-Count","100"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].observationUnitId", is(obsDto.getObservationUnitId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].gid", is(obsDto.getGid())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].designation", is(obsDto.getDesignation())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].action", is(obsDto.getAction())))
 			.andExpect(
 				MockMvcResultMatchers.jsonPath(
-					"$.data[0].variables[\"TEST1\"].observationId",
+					"$[0].variables[\"TEST1\"].observationId",
 					is(measurement.getObservationId())))
 			.andExpect(
 				MockMvcResultMatchers.jsonPath(
-					"$.data[0].variables[\"TEST1\"].categoricalValueId",
+					"$[0].variables[\"TEST1\"].categoricalValueId",
 					is(measurement.getCategoricalValueId())))
 			.andExpect(
 				MockMvcResultMatchers.jsonPath(
-					"$.data[0].variables[\"TEST1\"].value",
+					"$[0].variables[\"TEST1\"].value",
 					is(measurement.getValue())))
 			.andExpect(MockMvcResultMatchers.jsonPath(
-				"$.data[0].variables[\"TEST1\"].status",
+				"$[0].variables[\"TEST1\"].status",
 				is(measurement.getStatus().getName())))
 		;
 	}
@@ -845,10 +843,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
 
 		paramDTO.setObservationUnitsSearchDTO(searchDTO);
@@ -874,11 +868,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-
-		final SortedPageRequest sortedRequest = new SortedPageRequest();
-		sortedRequest.setPageNumber(1);
-		sortedRequest.setPageSize(100);
-		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
 		searchDTO.setDatasetId(datasetId);
 

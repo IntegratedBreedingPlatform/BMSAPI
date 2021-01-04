@@ -4,10 +4,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -187,7 +188,8 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<LocationDetailsDto> locations = StudyTestDataProvider.getListLocationDetailsDto();
 		final LocationDetailsDto location = locations.get(0);
 
-		Mockito.when(this.studyServiceMW.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId())).thenReturn(studyDetailsDto);
+		Mockito.when(this.studyServiceMW.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId()))
+			.thenReturn(studyDetailsDto);
 		Mockito.when(this.locationDataManager.getLocationsByFilter(0, 1, filters)).thenReturn(locations);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}")
@@ -332,11 +334,12 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testGetStudies() throws Exception {
 
-		final List<StudyDto> studyDtos = StudyTestDataProvider.getListStudyDto();
-		final StudyDto studyDto = studyDtos.get(0);
+		final List<StudyInstanceDto> studyInstanceDtos = StudyTestDataProvider.getListStudyDto();
+		final StudyInstanceDto studyInstanceDto = studyInstanceDtos.get(0);
 
-		Mockito.when(this.studyServiceMW.getStudies(Mockito.any(StudySearchFilter.class))).thenReturn(studyDtos);
-		Mockito.when(this.studyServiceMW.countStudies(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
+		Mockito.when(this.studyServiceMW.getStudyInstances(Mockito.any(StudySearchFilter.class), Mockito.any(PageRequest.class)))
+			.thenReturn(studyInstanceDtos);
+		Mockito.when(this.studyServiceMW.countStudyInstances(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies")
 			.build().encode();
@@ -346,23 +349,23 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print())
-			.andExpect(jsonPath("$.result.data[0].active", is(studyDto.getActive())))
-			.andExpect(jsonPath("$.result.data[0].commonCropName", is(studyDto.getCommonCropName())))
-			.andExpect(jsonPath("$.result.data[0].startDate", is(simpleDateFormat.format(studyDto.getStartDate()))))
-			.andExpect(jsonPath("$.result.data[0].endDate", is(simpleDateFormat.format(studyDto.getEndDate()))))
-			.andExpect(jsonPath("$.result.data[0].studyDbId", is(studyDto.getStudyDbId())))
-			.andExpect(jsonPath("$.result.data[0].studyName", is(studyDto.getStudyName())))
+			.andExpect(jsonPath("$.result.data[0].active", is(studyInstanceDto.getActive())))
+			.andExpect(jsonPath("$.result.data[0].commonCropName", is(studyInstanceDto.getCommonCropName())))
+			.andExpect(jsonPath("$.result.data[0].startDate", is(simpleDateFormat.format(studyInstanceDto.getStartDate()))))
+			.andExpect(jsonPath("$.result.data[0].endDate", is(simpleDateFormat.format(studyInstanceDto.getEndDate()))))
+			.andExpect(jsonPath("$.result.data[0].studyDbId", is(studyInstanceDto.getStudyDbId())))
+			.andExpect(jsonPath("$.result.data[0].studyName", is(studyInstanceDto.getStudyName())))
 			.andExpect(jsonPath("$.result.data[0].studyType").doesNotExist())
-			.andExpect(jsonPath("$.result.data[0].studyTypeDbId", is(studyDto.getStudyTypeDbId())))
-			.andExpect(jsonPath("$.result.data[0].studyTypeName", is(studyDto.getStudyTypeName())))
-			.andExpect(jsonPath("$.result.data[0].seasons[0].seasonDbId", is(studyDto.getSeasons().get(0).getSeasonDbId())))
-			.andExpect(jsonPath("$.result.data[0].seasons[0].season", is(studyDto.getSeasons().get(0).getSeason())))
-			.andExpect(jsonPath("$.result.data[0].locationDbId", is(studyDto.getLocationDbId())))
-			.andExpect(jsonPath("$.result.data[0].locationName", is(studyDto.getLocationName())))
-			.andExpect(jsonPath("$.result.data[0].programDbId", is(studyDto.getProgramDbId())))
-			.andExpect(jsonPath("$.result.data[0].programName", is(studyDto.getProgramName())))
-			.andExpect(jsonPath("$.result.data[0].trialName", is(studyDto.getTrialName())))
-			.andExpect(jsonPath("$.result.data[0].trialDbId", is(studyDto.getTrialDbId())))
+			.andExpect(jsonPath("$.result.data[0].studyTypeDbId", is(studyInstanceDto.getStudyTypeDbId())))
+			.andExpect(jsonPath("$.result.data[0].studyTypeName", is(studyInstanceDto.getStudyTypeName())))
+			.andExpect(jsonPath("$.result.data[0].seasons[0].seasonDbId", is(studyInstanceDto.getSeasons().get(0).getSeasonDbId())))
+			.andExpect(jsonPath("$.result.data[0].seasons[0].season", is(studyInstanceDto.getSeasons().get(0).getSeason())))
+			.andExpect(jsonPath("$.result.data[0].locationDbId", is(studyInstanceDto.getLocationDbId())))
+			.andExpect(jsonPath("$.result.data[0].locationName", is(studyInstanceDto.getLocationName())))
+			.andExpect(jsonPath("$.result.data[0].programDbId", is(studyInstanceDto.getProgramDbId())))
+			.andExpect(jsonPath("$.result.data[0].programName", is(studyInstanceDto.getProgramName())))
+			.andExpect(jsonPath("$.result.data[0].trialName", is(studyInstanceDto.getTrialName())))
+			.andExpect(jsonPath("$.result.data[0].trialDbId", is(studyInstanceDto.getTrialDbId())))
 			.andExpect(jsonPath("$.result.data[0].optionalInfo").doesNotExist());
 
 	}

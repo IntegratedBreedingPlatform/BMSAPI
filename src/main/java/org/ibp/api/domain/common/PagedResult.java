@@ -32,7 +32,7 @@ public class PagedResult<T> {
 
 	public static int MAX_PAGE_SIZE;
 	public static final int DEFAULT_PAGE_SIZE = 1000;
-	public static final int DEFAULT_PAGE_NUMBER = 1;
+	public static final int DEFAULT_PAGE_NUMBER = 0;
 
 	public static final String CURRENT_PAGE_DESCRIPTION = "Page number to retrieve in case of multi paged results. Defaults to "
 			+ PagedResult.DEFAULT_PAGE_NUMBER + " (first page) if not supplied.";
@@ -45,15 +45,10 @@ public class PagedResult<T> {
 
 	public PagedResult(final int pageNumber, final int pageSize, final long totalResults, final long filteredResults) {
 		this.totalResults = totalResults;
-		if (filteredResults == 0) {
-			this.filteredResults = totalResults;
-		} else {
-			this.filteredResults = filteredResults;
-		}
-		Preconditions.checkArgument(this.filteredResults <= totalResults, "Filtered results must be less than or equal to total results");
+		this.filteredResults = filteredResults;
 
 		if (pageSize < 1 || pageSize > PagedResult.MAX_PAGE_SIZE) {
-			throw new IllegalArgumentException("Page size must between 1 and " + PagedResult.MAX_PAGE_SIZE + ".");
+			throw new IllegalArgumentException("Page size must between 0 and " + PagedResult.MAX_PAGE_SIZE + ".");
 		}
 		this.pageSize = pageSize;
 

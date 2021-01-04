@@ -5,7 +5,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewVariableParameter;
@@ -53,14 +53,14 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentalDes
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
-		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final String programUUID, final List<StudyEntryDto> studyEntryDtoList) {
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
 				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
 
 		// Generate experiment design parameters input to design runner
-		final int nTreatments = studyGermplasmDtoList.size();
+		final int nTreatments = studyEntryDtoList.size();
 		ExperimentalDesignUtil.setReplatinGroups(experimentalDesignInput);
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
@@ -71,7 +71,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentalDes
 		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor
-			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
+			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyEntryDtoList, mainDesign,
 				entryNumberName, null,
 				new HashMap<>());
 	}

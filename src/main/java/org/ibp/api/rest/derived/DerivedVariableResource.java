@@ -34,7 +34,7 @@ public class DerivedVariableResource {
 	private DerivedVariableService derivedVariableService;
 
 	@ApiOperation(value = "Execute Derived Variable", notes = "Execute the formula of a derived variable for each observation of specified instances.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> calculate(
 		@PathVariable final String crop,
@@ -58,7 +58,7 @@ public class DerivedVariableResource {
 
 	@ApiOperation(value = "Get Missing Formula Variables", notes =
 		"Gets the list of formula variables that are not yet added in study.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/missing", method = RequestMethod.GET)
 	public ResponseEntity<Set<FormulaVariable>> missingFormulaVariables(
@@ -73,7 +73,7 @@ public class DerivedVariableResource {
 
 	@ApiOperation(value = "Get All Formula Variables", notes =
 		"Gets the list of formula variables in study.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/formula-variables", method = RequestMethod.GET)
 	public ResponseEntity<Set<FormulaVariable>> formulaVariables(
@@ -86,7 +86,7 @@ public class DerivedVariableResource {
 	}
 
 	@ApiOperation(value = "Count Calculated Traits", notes = "Count the calculated traits (derived traits) in a specified dataset(s)")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_PREPARE_PLANTING)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/derived-variables", method = RequestMethod.HEAD)
 	public ResponseEntity<String> countCalculatedVariables(
@@ -101,7 +101,7 @@ public class DerivedVariableResource {
 	}
 
 	@ApiOperation(value = "Get a map of formula variables and dataset(s) from where they belong to", notes = "")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/dataset-map", method = RequestMethod.GET)
 	public ResponseEntity<Map<Integer, VariableDatasetsDTO>> getFormulaVariableDatasetMap(

@@ -70,4 +70,19 @@ public class ExtendedLotListValidatorTest {
 		}
 	}
 
+	@Test
+	public void testValidatevalidateLotUUIDsDuplicated() {
+		try {
+			final ExtendedLotDto extendedLotDto = new ExtendedLotDto();
+			extendedLotDto.setLotId(1);
+			final List<ExtendedLotDto> lotDtoList = Arrays.asList(extendedLotDto);
+			final List<String> lotUUIDs =
+				Arrays.asList(RandomStringUtils.randomAlphabetic(38), RandomStringUtils.randomAlphabetic(38));
+			this.extendedLotListValidator.validateLotUUIDsDuplicated(lotDtoList, lotUUIDs);
+		} catch (ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("lots.duplicated"));
+		}
+	}
+
+
 }

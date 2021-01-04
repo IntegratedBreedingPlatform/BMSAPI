@@ -5,21 +5,31 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -28,12 +38,18 @@ import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
+import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
+import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
+import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -42,8 +58,12 @@ import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -51,11 +71,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -76,6 +100,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private StudyValidator studyValidator;
+
+	@Autowired
+	private StudyEntryValidator studyEntryValidator;
 
 	@Autowired
 	private DatasetValidator datasetValidator;
@@ -101,6 +128,21 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private DatasetTypeService datasetTypeService;
 
+	@Autowired
+	private OntologyDataManager ontologyDataManager;
+
+	@Autowired
+	private StudyService studyService;
+
+	@Autowired
+	private StudyTransactionsService studyTransactionsService;
+
+	@Autowired
+	private SearchCompositeDtoValidator searchCompositeDtoValidator;
+
+	@Autowired
+	private LotService lotService;
+
 	static final String PLOT_DATASET_NAME = "Observations";
 
 	@Override
@@ -111,7 +153,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.datasetValidator.validateDataset(studyId, datasetId);
 
-		return this.middlewareDatasetService.getObservationSetColumns(datasetId, draftMode);
+		return this.middlewareDatasetService.getObservationSetColumns(studyId, datasetId, draftMode);
 	}
 
 	@Override
@@ -311,7 +353,21 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
+
+		Pageable convertedPageable = null;
+		if (pageable != null && pageable.getSort() != null) {
+			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+			if (iterator.hasNext()) {
+				// Convert the sort property name from termid to actual term name.
+				final Sort.Order sort = iterator.next();
+				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
+				final String sortProperty = Objects.isNull(term) ? sort.getProperty() : term.getName();
+				pageable.getSort().and(new Sort(sort.getDirection(), sortProperty));
+				convertedPageable =
+					new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(), sortProperty);
+			}
+		}
 
 		List<Integer> instanceIds = null;
 		if (searchDTO.getInstanceId() != null) {
@@ -320,7 +376,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
 
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
-			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO);
+			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO, convertedPageable);
 
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
@@ -340,7 +396,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
 
-		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO);
+		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO, null);
 	}
 
 	@Override
@@ -443,6 +499,8 @@ public class DatasetServiceImpl implements DatasetService {
 				table.row(obsUnitId).clear();
 			}
 		}
+		// Convert date values if necessary
+		this.correctKSUDateFormatIfNecessary(table, datasetMeasurementVariables);
 
 		// Check for data issues
 		this.observationsTableValidator.validateObservationsValuesDataTypes(table, datasetMeasurementVariables);
@@ -538,7 +596,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Set<Integer> variableIds =
 			new TreeSet(observations.stream().map(ObservationDTO::getObservationVariableDbId).collect(Collectors.toSet()));
 		final List<String> variableNames =
-			variableIds.stream().map(termId -> varMap.get(termId).getName()).collect(Collectors.toList());
+			variableIds.stream().map(termId -> varMap.get(termId).getAlias()).collect(Collectors.toList());
 
 		/* tree -> {
 		 *     obsUnit1 -> {
@@ -763,7 +821,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariable> environmentDetailAndConditionVariables = this.middlewareDatasetService
 			.getObservationSetVariables(environmentDatasetId, Lists.newArrayList(
 				VariableType.ENVIRONMENT_DETAIL.getId(),
-				VariableType.STUDY_CONDITION.getId()));
+				VariableType.ENVIRONMENT_CONDITION.getId()));
 		this.addLocationIdVariable(environmentDetailAndConditionVariables);
 		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
 		Collections.sort(environmentDetailAndConditionVariables, new Comparator<MeasurementVariable>() {
@@ -819,5 +877,113 @@ public class DatasetServiceImpl implements DatasetService {
 		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
 		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);
 		environmentDetailAndConditionVariables.add(0, locationIdVariable);
+	}
+
+	@Override
+	public void replaceObservationUnitsEntry(final int studyId, final int datasetId, final ObservationUnitEntryReplaceRequest request) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		this.datasetValidator.validatePlotDatasetType(datasetId);
+		this.studyValidator.validateStudyHasNoMeansDataset(studyId);
+
+		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
+		BaseValidator.checkNotNull(request.getSearchRequest(), "param.null", new String[] {"searchRequest"});
+		BaseValidator.checkNotNull(request.getEntryId(), "param.null", new String[] {"entryId"});
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
+
+		this.studyEntryValidator.validateStudyContainsEntries(studyId, Collections.singletonList(request.getEntryId()));
+
+		this.studyValidator.validateHasNoCrossesOrSelections(studyId);
+
+		this.processSearchComposite(request.getSearchRequest());
+
+		// observation units
+		final List<ObservationUnitRow> observationUnitRows =
+			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest().getSearchRequest(),null);
+		if (observationUnitRows.isEmpty()) {
+			errors.reject("study.entry.replace.empty.units", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		if (observationUnitRows.stream().anyMatch(o -> !o.getSamplesCount().equals("-"))) {
+			errors.reject("study.entry.replace.samples.found", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final List<Integer> observationUnitIds = observationUnitRows.stream().map(ObservationUnitRow::getObservationUnitId).collect(
+			Collectors.toList());
+		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
+		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+		transactionsSearchDto.setTransactionStatus(Lists.newArrayList(TransactionStatus.PENDING.getIntValue(),TransactionStatus.CONFIRMED.getIntValue()));
+		studyTransactionsRequest.setTransactionsSearch(transactionsSearchDto);
+		studyTransactionsRequest.setObservationUnitIds(observationUnitIds);
+
+		if (this.studyTransactionsService.countStudyTransactions(studyId, studyTransactionsRequest) > 0) {
+			errors.reject("study.entry.replace.transactions.found", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		this.middlewareDatasetService.replaceObservationUnitEntry(observationUnitIds, request.getEntryId());
+	}
+
+	@Override
+	public ObservationUnitsMetadata getObservationUnitsMetadata(final int studyId, final int datasetId,
+		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> request) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), SearchCompositeDto.class.getName());
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(request, errors);
+
+
+		this.processSearchComposite(request);
+
+		final List<ObservationUnitRow> observationUnitRows =
+			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest(),null);
+
+		final ObservationUnitsMetadata observationUnitsMetadata = new ObservationUnitsMetadata();
+		observationUnitsMetadata.setObservationUnitsCount(Long.valueOf(observationUnitRows.size()));
+		observationUnitsMetadata.setInstancesCount(observationUnitRows.stream().map(i -> i.getTrialInstance()).distinct().count());
+		return observationUnitsMetadata;
+	}
+
+	@Override
+	public Long countObservationUnits(final Integer datasetId) {
+		return this.middlewareDatasetService.countObservationUnits(datasetId);
+
+	}
+
+	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
+		if (searchDTO.getItemIds() != null && !searchDTO.getItemIds().isEmpty()) {
+			final ObservationUnitsSearchDTO searchRequest = new ObservationUnitsSearchDTO();
+			final ObservationUnitsSearchDTO.Filter filter = searchRequest.new Filter();
+			filter.setFilteredNdExperimentIds(searchDTO.getItemIds());
+			searchRequest.setFilter(filter);
+			searchDTO.setSearchRequest(searchRequest);
+		}
+	}
+
+	private void correctKSUDateFormatIfNecessary(final Table<String, String, String> table,
+		final List<MeasurementVariable> measurementVariables) {
+		final List<String> dateVariables = measurementVariables.stream().filter(
+			measurementVariable -> measurementVariable.getDataTypeId() != null
+				&& measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId())
+			.map(measurementVariable -> measurementVariable.getName()).collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(dateVariables)) {
+			for (final String colVariable : table.columnKeySet()) {
+				if (dateVariables.contains(colVariable)) {
+					for (final String obsUnit : table.rowKeySet()) {
+						String value = table.get(obsUnit, colVariable);
+						final Date ksuParsed = Util.tryParseDate(value, Util.DATE_AS_NUMBER_FORMAT_KSU);
+						if (ksuParsed != null) {
+							value = Util.formatDateAsStringValue(ksuParsed, Util.DATE_AS_NUMBER_FORMAT);
+							table.put(obsUnit, colVariable, value);
+						}
+					}
+				}
+			}
+		}
 	}
 }

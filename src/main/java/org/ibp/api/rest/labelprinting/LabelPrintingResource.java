@@ -187,7 +187,7 @@ public class LabelPrintingResource {
 			case OBSERVATION_DATASET:
 			case SUBOBSERVATION_DATASET:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
-					|| this.request.isUserInRole(PermissionsEnum.BREEDING_ACTIVITIES.name())
+					|| this.request.isUserInRole(PermissionsEnum.STUDIES.name())
 					|| this.request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name());
 			case LOT:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())

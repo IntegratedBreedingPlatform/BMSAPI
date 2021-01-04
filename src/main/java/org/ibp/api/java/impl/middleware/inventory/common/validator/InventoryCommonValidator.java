@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.common.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.Util;
@@ -23,9 +24,9 @@ public class InventoryCommonValidator {
 
 	private static final String STOCK_ID_PREFIX_REGEXP = "[a-zA-Z0-9]{1,14}[a-zA-Z]";
 
-	private static Integer TRANSACTION_NOTES_MAX_LENGTH = 255;
+	private static final Integer TRANSACTION_NOTES_MAX_LENGTH = 255;
 
-	private static Integer LOT_NOTES_MAX_LENGTH = 255;
+	private static final Integer LOT_NOTES_MAX_LENGTH = 255;
 
 	@Autowired
 	private VariableService variableService;
@@ -38,17 +39,6 @@ public class InventoryCommonValidator {
 
 		if (!StringUtils.isEmpty(stockIdPrefix) && !stockIdPrefix.matches(STOCK_ID_PREFIX_REGEXP)) {
 			errors.reject("lot.stock.prefix.invalid.pattern", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-	}
-
-	public void validateSearchCompositeDto(
-		final SearchCompositeDto searchCompositeDto,
-		final BindingResult errors) {
-
-		// Validate that searchId or list of elements are provided
-		if (searchCompositeDto == null || !searchCompositeDto.isValid()) {
-			errors.reject("search.composite.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
@@ -81,4 +71,17 @@ public class InventoryCommonValidator {
 		}
 	}
 
+	public void validateLotNotes(final List<String> notes, final BindingResult errors) {
+		if (notes.stream().filter(s -> StringUtils.isBlank(s)).findAny().isPresent()) {
+			errors.reject("lot.input.list.notes.null.or.empty", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final List<String> filteredNotes =
+			notes.stream().filter(loteNotes -> loteNotes.length() > LOT_NOTES_MAX_LENGTH).map(s -> s).collect(Collectors.toList());
+		if (!Collections.isEmpty(filteredNotes)) {
+			errors.reject("lot.notes.length", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
 }

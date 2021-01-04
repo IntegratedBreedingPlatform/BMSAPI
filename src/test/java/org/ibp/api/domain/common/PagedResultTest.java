@@ -30,8 +30,8 @@ public class PagedResultTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testInitPageNumberLessThanMin() {
-		new PagedResult<>(0, PagedResult.MAX_PAGE_SIZE, 200, 0);
-		Assert.fail("Expected validation failure when page number is less than 1.");
+		new PagedResult<>(-1, PagedResult.MAX_PAGE_SIZE, 200, 0);
+		Assert.fail("Expected validation failure when page number is less than 0.");
 	}
 
 	@Test(expected = IllegalArgumentException.class)

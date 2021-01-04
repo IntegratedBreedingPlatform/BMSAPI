@@ -22,8 +22,6 @@ public class StudyGermplasm {
 	@NotNull
 	private Integer entryNumber;
 
-	@NotBlank
-	private String position;
 
 	/**
 	 * @return the entryType
@@ -48,20 +46,6 @@ public class StudyGermplasm {
 	}
 
 	/**
-	 * @return the position
-	 */
-	public String getPosition() {
-		return this.position;
-	}
-
-	/**
-	 * @param position the position to set
-	 */
-	public void setPosition(final String position) {
-		this.position = position;
-	}
-
-	/**
 	 * @return the germplasmListEntrySummary
 	 */
 	@JsonUnwrapped
@@ -83,13 +67,13 @@ public class StudyGermplasm {
 		}
 		final StudyGermplasm castOther = (StudyGermplasm) other;
 		return new EqualsBuilder().append(this.entryType, castOther.entryType).append(this.entryNumber, castOther.entryNumber)
-				.append(this.position, castOther.position).append(this.germplasmListEntrySummary, castOther.germplasmListEntrySummary)
+				.append(this.germplasmListEntrySummary, castOther.germplasmListEntrySummary)
 				.isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.entryType).append(this.entryNumber).append(this.position)
+		return new HashCodeBuilder().append(this.entryType).append(this.entryNumber)
 				.append(this.germplasmListEntrySummary).toHashCode();
 	}
 

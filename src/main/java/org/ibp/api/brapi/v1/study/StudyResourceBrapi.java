@@ -20,14 +20,14 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -41,6 +41,7 @@ import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.BrapiNotFoundException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.ontology.VariableService;
@@ -50,10 +51,14 @@ import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,14 +72,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -108,10 +115,13 @@ public class StudyResourceBrapi {
 	@Autowired
 	private InstanceValidator instanceValidator;
 
+	@Autowired
+	private StudyInstanceService studyInstanceService;
+
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<EntityListResponse<StudyDto>> listStudies(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<StudyInstanceDto>> listStudies(@PathVariable final String crop,
 		@ApiParam(value = "Common name for the crop associated with this study.") @RequestParam(value = "commonCropName", required = false)
 		final String commonCropName,
 		@ApiParam(value = "Filter based on study type unique identifier") @RequestParam(value = "studyTypeDbId", required = false)
@@ -137,35 +147,42 @@ public class StudyResourceBrapi {
 		final boolean isSortOrderValid = "ASC".equals(sortOrder) || "DESC".equals(sortOrder) || StringUtils.isEmpty(sortOrder);
 		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
 
-		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage + 1;
+		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 
-		final SortedPageRequest sortedPageRequest = new SortedPageRequest(finalPageNumber, finalPageSize, sortBy, sortOrder);
-		final StudySearchFilter studySearchFilter =
-			new StudySearchFilter(studyTypeDbId, programDbId, locationDbId, seasonDbId, trialDbId, studyDbId, active, sortedPageRequest);
+		final PageRequest pageRequest;
 
-		final PagedResult<StudyDto> resultPage =
-			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudyDto>() {
+		if (StringUtils.isNotEmpty(sortBy) && StringUtils.isNotEmpty(sortOrder)) {
+			pageRequest = new PageRequest(finalPageNumber, finalPageSize, new Sort(Sort.Direction.fromString(sortOrder), sortBy));
+		} else {
+			pageRequest = new PageRequest(finalPageNumber, finalPageSize);
+		}
+
+		final StudySearchFilter studySearchFilter =
+			new StudySearchFilter(studyTypeDbId, programDbId, locationDbId, seasonDbId, trialDbId, studyDbId, active);
+
+		final PagedResult<StudyInstanceDto> resultPage =
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudyInstanceDto>() {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyService.countStudies(studySearchFilter);
+					return StudyResourceBrapi.this.studyService.countStudyInstances(studySearchFilter);
 				}
 
 				@Override
-				public List<StudyDto> getResults(final PagedResult<StudyDto> pagedResult) {
-					return StudyResourceBrapi.this.studyService.getStudies(studySearchFilter);
+				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
+					return StudyResourceBrapi.this.studyService.getStudyInstances(studySearchFilter, pageRequest);
 				}
 			});
 
-		final List<StudyDto> summaryDtoList = resultPage.getPageResults();
+		final List<StudyInstanceDto> summaryDtoList = resultPage.getPageResults();
 
-		final Result<StudyDto> result = new Result<StudyDto>().withData(summaryDtoList);
+		final Result<StudyInstanceDto> result = new Result<StudyInstanceDto>().withData(summaryDtoList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
-		final EntityListResponse<StudyDto> entityListResponse = new EntityListResponse<>(metadata, result);
+		final EntityListResponse<StudyInstanceDto> entityListResponse = new EntityListResponse<>(metadata, result);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
@@ -231,38 +248,38 @@ public class StudyResourceBrapi {
 	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
-
-		if (mwStudyDetails != null) {
-			//Add environment parameters to addtionalInfo
-			final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
-				Collectors.toMap(MeasurementVariable::getDescription, MeasurementVariable::getValue));
-			mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
-
-			final StudyDetails studyDetails = new StudyDetails();
-			final Metadata metadata = new Metadata();
-			final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
-			metadata.setPagination(pagination);
-			studyDetails.setMetadata(metadata);
-			final ModelMapper studyMapper = StudyMapper.getInstance();
-			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
-
-			if (mwStudyDetails.getMetadata().getLocationId() != null) {
-				final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
-				filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
-				final List<LocationDetailsDto> locations = this.locationDataManager.getLocationsByFilter(0, 1, filters);
-				if (!locations.isEmpty()) {
-					final ModelMapper locationMapper = LocationMapper.getInstance();
-					final Location location = locationMapper.map(locations.get(0), Location.class);
-					result.setLocation(location);
-				}
-			}
-			studyDetails.setResult(result);
-
-			return ResponseEntity.ok(studyDetails);
-		} else {
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		if (Objects.isNull(mwStudyDetails)) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());;
+			errors.reject("studydbid.invalid", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
+		//Add environment parameters to addtionalInfo
+		final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
+				Collectors.toMap(MeasurementVariable::getName, MeasurementVariable::getValue));
+		mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
+
+		final StudyDetails studyDetails = new StudyDetails();
+		final Metadata metadata = new Metadata();
+		final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
+		metadata.setPagination(pagination);
+		studyDetails.setMetadata(metadata);
+		final ModelMapper studyMapper = StudyMapper.getInstance();
+		final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
+
+		if (mwStudyDetails.getMetadata().getLocationId() != null) {
+			final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
+			filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
+			final List<LocationDetailsDto> locations = this.locationDataManager.getLocationsByFilter(0, 1, filters);
+			if (!locations.isEmpty()) {
+				final ModelMapper locationMapper = LocationMapper.getInstance();
+				final Location location = locationMapper.map(locations.get(0), Location.class);
+				result.setLocation(location);
+			}
+		}
+		studyDetails.setResult(result);
+
+		return ResponseEntity.ok(studyDetails);
 	}
 
 	@ApiOperation(value = "", hidden = true)
@@ -332,7 +349,7 @@ public class StudyResourceBrapi {
 		final String sanitizedFilename = FileUtils.sanitizeFileName(filename);
 
 		respHeaders.set(StudyResourceBrapi.CONTENT_TYPE, String.format("%s;charset=utf-8", mimeType));
-		respHeaders.set(StudyResourceBrapi.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"; filename*=utf-8\'\'%s",
+		respHeaders.set(StudyResourceBrapi.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"; filename*=utf-8''%s",
 			sanitizedFilename, FileUtils.encodeFilenameForDownload(sanitizedFilename)));
 
 		return new ResponseEntity<>(fileSystemResource, respHeaders, HttpStatus.OK);
@@ -352,7 +369,8 @@ public class StudyResourceBrapi {
 			required = false) final Integer pageSize) throws BrapiNotFoundException {
 
 		// Resolve the datasetId in which StudyDbId belongs to. (In BRAPI, studyDbId is nd_geolocation_id)
-		final Integer datasetId = this.studyDataManager.getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		final Optional<Integer> datasetIdForInstance = this.studyInstanceService.getDatasetIdForInstanceIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		final Integer datasetId = datasetIdForInstance.isPresent() ? datasetIdForInstance.get() : null;
 		if (datasetId == null) {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
 		}

@@ -1,27 +1,23 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
 import org.apache.commons.lang3.SerializationUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
+import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTypeService {
@@ -40,13 +36,13 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
-		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
+		final String programUUID, final List<StudyEntryDto> studyEntryDtoList) {
 
-		final List<StudyGermplasmDto> checkList = new LinkedList<>();
+		final List<StudyEntryDto> checkList = new LinkedList<>();
 
-		final List<StudyGermplasmDto> testEntryList = new LinkedList<>();
+		final List<StudyEntryDto> testEntryList = new LinkedList<>();
 
-		this.loadChecksAndTestEntries(studyGermplasmDtoList, checkList, testEntryList);
+		this.loadChecksAndTestEntries(studyEntryDtoList, checkList, testEntryList);
 
 		final Integer startingPosition = experimentalDesignInput.getCheckStartingPosition();
 
@@ -54,7 +50,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 
 		final Integer insertionManner = experimentalDesignInput.getCheckInsertionManner();
 
-		final List<StudyGermplasmDto> mergedGermplasmList =
+		final List<StudyEntryDto> mergedGermplasmList =
 			this.mergeTestAndCheckEntries(testEntryList, checkList, startingPosition, spacing, insertionManner);
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
@@ -62,7 +58,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 		for (final Integer instanceNumber : experimentalDesignInput.getTrialInstancesForDesignGeneration()) {
 			int plotNumber = experimentalDesignInput.getStartingPlotNo();
 
-			for (final StudyGermplasmDto germplasm : mergedGermplasmList) {
+			for (final StudyEntryDto germplasm : mergedGermplasmList) {
 				final ObservationUnitRow observationUnitRow =
 					this.createObservationUnitRow(instanceNumber, germplasm, plotNumber++, measurementVariables);
 				observationUnitRows.add(observationUnitRow);
@@ -90,7 +86,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 					EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput);
 	}
 
-	ObservationUnitRow createObservationUnitRow(final int instanceNumber, final StudyGermplasmDto germplasm,
+	ObservationUnitRow createObservationUnitRow(final int instanceNumber, final StudyEntryDto studyEntry,
 		final int plotNumber, final List<MeasurementVariable> measurementVariables) {
 		final ObservationUnitRow row = new ObservationUnitRow();
 		row.setTrialInstance(instanceNumber);
@@ -102,33 +98,12 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 		observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 		for (final MeasurementVariable var : measurementVariables) {
 			final Integer termId = var.getTermId();
-			if (termId == TermId.ENTRY_NO.getId()) {
-				final Integer entryNumber = germplasm.getEntryNumber();
-				observationUnitData = new ObservationUnitData(termId, String.valueOf(entryNumber));
-				row.setEntryNumber(entryNumber);
-			} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
-				observationUnitData = new ObservationUnitData(termId, germplasm.getSeedSource() != null ? germplasm.getSeedSource() : StringUtils.EMPTY);
-			} else if (termId == TermId.GROUPGID.getId()) {
-				observationUnitData = new ObservationUnitData(termId,
-					germplasm.getGroupId() != null ? germplasm.getGroupId().toString() : StringUtils.EMPTY);
-			} else if (termId == TermId.STOCKID.getId()) {
-				observationUnitData = new ObservationUnitData(termId, germplasm.getStockIds() != null ? germplasm.getStockIds() : StringUtils.EMPTY);
-			} else if (termId == TermId.CROSS.getId()) {
-				observationUnitData = new ObservationUnitData(termId, germplasm.getCross());
-			} else if (termId == TermId.DESIG.getId()) {
-				observationUnitData = new ObservationUnitData(termId, germplasm.getDesignation());
-			} else if (termId == TermId.GID.getId()) {
-				observationUnitData = new ObservationUnitData(termId, String.valueOf(germplasm.getGermplasmId()));
-			} else if (termId == TermId.ENTRY_CODE.getId()) {
-				observationUnitData = new ObservationUnitData(termId, germplasm.getEntryCode());
-			} else if (termId == TermId.PLOT_NO.getId()) {
+			if (termId == TermId.PLOT_NO.getId()) {
 				observationUnitData = new ObservationUnitData(termId, Integer.toString(plotNumber));
-			} else if (termId == TermId.ENTRY_TYPE.getId()) {
-				observationUnitData = new ObservationUnitData(termId, Integer.toString(germplasm.getCheckType()));
 			} else {
-				// meaning non factor
-				observationUnitData = new ObservationUnitData(termId, StringUtils.EMPTY);
+				observationUnitData = ExperimentalDesignUtil.getObservationUnitData(row, termId, studyEntry);
 			}
+
 			observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 		}
 
@@ -137,19 +112,22 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 		return row;
 	}
 
-	private void loadChecksAndTestEntries(final List<StudyGermplasmDto> studyGermplasmDtoList, final List<StudyGermplasmDto> checkList,
-		final List<StudyGermplasmDto> testEntryList) {
+	private void loadChecksAndTestEntries(final List<StudyEntryDto> studyEntryDtoList, final List<StudyEntryDto> checkList,
+		final List<StudyEntryDto> testEntryList) {
 
-		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())) {
-				testEntryList.add(studyGermplasmDto);
-			} else {
-				checkList.add(studyGermplasmDto);
+		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
+			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
+			if (entryType.isPresent()) {
+				if (SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() == Integer.valueOf(entryType.get())) {
+					testEntryList.add(studyEntryDto);
+				} else {
+					checkList.add(studyEntryDto);
+				}
 			}
 		}
 	}
 
-	private boolean isThereSomethingToMerge(final List<StudyGermplasmDto> entriesList, final List<StudyGermplasmDto> checkList,
+	private boolean isThereSomethingToMerge(final List<StudyEntryDto> entriesList, final List<StudyEntryDto> checkList,
 		final Integer startEntry, final Integer interval) {
 		Boolean isThereSomethingToMerge = Boolean.TRUE;
 		if (checkList == null || checkList.isEmpty()) {
@@ -162,36 +140,36 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 		return isThereSomethingToMerge;
 	}
 
-	private List<StudyGermplasmDto> generateChecksToInsert(final List<StudyGermplasmDto> checkList, final Integer checkIndex,
+	private List<StudyEntryDto> generateChecksToInsert(final List<StudyEntryDto> checkList, final Integer checkIndex,
 		final Integer insertionManner) {
-		final List<StudyGermplasmDto> newList = new ArrayList<>();
+		final List<StudyEntryDto> newList = new ArrayList<>();
 		if (insertionManner.equals(InsertionMannerItem.INSERT_ALL_CHECKS.getId())) {
-			for (final StudyGermplasmDto checkGermplasm : checkList) {
+			for (final StudyEntryDto checkGermplasm : checkList) {
 				newList.add(SerializationUtils.clone(checkGermplasm));
 			}
 		} else {
 			final int checkListIndex = checkIndex % checkList.size();
-			final StudyGermplasmDto checkGermplasm = checkList.get(checkListIndex);
+			final StudyEntryDto checkGermplasm = checkList.get(checkListIndex);
 			newList.add(SerializationUtils.clone(checkGermplasm));
 		}
 		return newList;
 	}
 
-	private List<StudyGermplasmDto> mergeTestAndCheckEntries(final List<StudyGermplasmDto> testEntryList,
-		final List<StudyGermplasmDto> checkList, final Integer startingIndex, final Integer spacing, final Integer insertionManner) {
+	private List<StudyEntryDto> mergeTestAndCheckEntries(final List<StudyEntryDto> testEntryList,
+		final List<StudyEntryDto> checkList, final Integer startingIndex, final Integer spacing, final Integer insertionManner) {
 
 		if (!this.isThereSomethingToMerge(testEntryList, checkList, startingIndex, spacing)) {
 			return testEntryList;
 		}
 
-		final List<StudyGermplasmDto> newList = new ArrayList<>();
+		final List<StudyEntryDto> newList = new ArrayList<>();
 
 		int primaryEntry = 1;
 		boolean isStarted = Boolean.FALSE;
 		boolean shouldInsert = Boolean.FALSE;
 		int checkIndex = 0;
 		int intervalEntry = 0;
-		for (final StudyGermplasmDto primaryGermplasm : testEntryList) {
+		for (final StudyEntryDto primaryGermplasm : testEntryList) {
 			if (primaryEntry == startingIndex || intervalEntry == spacing) {
 				isStarted = Boolean.TRUE;
 				shouldInsert = Boolean.TRUE;
@@ -204,12 +182,13 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 
 			if (shouldInsert) {
 				shouldInsert = Boolean.FALSE;
-				final List<StudyGermplasmDto> checks = this.generateChecksToInsert(checkList, checkIndex, insertionManner);
+				final List<StudyEntryDto> checks = this.generateChecksToInsert(checkList, checkIndex, insertionManner);
 				checkIndex++;
 				newList.addAll(checks);
 			}
-			final StudyGermplasmDto primaryNewGermplasm = SerializationUtils.clone(primaryGermplasm);
-			primaryNewGermplasm.setCheckType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+			final StudyEntryDto primaryNewGermplasm = SerializationUtils.clone(primaryGermplasm);
+			primaryNewGermplasm.getProperties().put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
+					String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
 
 			newList.add(primaryNewGermplasm);
 

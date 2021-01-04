@@ -17,13 +17,18 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
+import org.ibp.api.Util;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
+import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.TransactionExportService;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -35,6 +40,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +52,10 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Api(value = "Transaction Services")
 @RestController
@@ -67,6 +77,9 @@ public class TransactionResource {
 
 	@Autowired
 	private TransactionExportService transactionExportServiceImpl;
+
+	@Autowired
+	private GermplasmValidator germplasmValidator;
 
 	@ApiOperation(value = "Get Transaction types")
 	@RequestMapping(value = "/crops/{cropName}/transaction-types", method = RequestMethod.GET)
@@ -269,9 +282,11 @@ public class TransactionResource {
 	@ApiOperation(value = "Create Pending Deposits", notes = "Create new deposits with pending status for a set of filtered lots")
 	@RequestMapping(value = "/crops/{cropName}/transactions/pending-deposits/generation", method = RequestMethod.POST)
 	@ResponseBody
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_PENDING_DEPOSITS')")
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('DEPOSIT_INVENTORY', 'CREATE_PENDING_DEPOSITS')"
+		+ PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	public ResponseEntity<Void> generatePendingDeposits(
 		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
 		try {
@@ -376,4 +391,81 @@ public class TransactionResource {
 			inventoryLock.unlockWrite();
 		}
 	}
+
+	@ApiOperation(value = "Returns all the transactions for the given germplasm id",
+		notes = "Returns all the transactions for the given germplasm id")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/transactions", method = RequestMethod.GET)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "Results page you want to retrieve (0..N)"),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property(,asc|desc). " +
+				"Default sort order is ascending. " +
+				"Multiple sort criteria are supported.")
+	})
+	@ResponseBody
+	@JsonView(InventoryView.TransactionView.class)
+	public ResponseEntity<List<TransactionDto>> getTransactionsByGermplasmId(
+		@PathVariable final String cropName,
+		@PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final Integer lotId,
+		@RequestParam(required = false) final LotStatus lotStatus,
+		@ApiIgnore final Pageable pageable) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotService.class.getName());
+		if (!Util.isPositiveInteger(String.valueOf(gid))) {
+			errors.reject("gids.invalid", new String[] {gid.toString()}, "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
+		if (!Objects.isNull(lotId) && !Util.isPositiveInteger(String.valueOf(lotId))) {
+			errors.reject("lot.Ids.invalid", new String[] {lotId.toString()}, "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
+		this.germplasmValidator.validateGermplasmId(errors, gid);
+		if (errors.hasErrors()) {
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
+		final TransactionsSearchDto searchDTO = new TransactionsSearchDto();
+		searchDTO.setGids(Arrays.asList(gid));
+		if(!Objects.isNull(lotId)) {
+			searchDTO.setLotIds(Arrays.asList(lotId));
+		}
+		if (!Objects.isNull(lotStatus)) {
+			searchDTO.setLotStatus(lotStatus.getIntValue());
+		}
+
+		final PagedResult<TransactionDto> resultPage =
+			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<TransactionDto>() {
+
+				@Override
+				public long getCount() {
+					return TransactionResource.this.transactionService.countSearchTransactions(searchDTO);
+				}
+
+				@Override
+				public List<TransactionDto> getResults(final PagedResult<TransactionDto> pagedResult) {
+					try {
+						inventoryLock.lockRead();
+						return TransactionResource.this.transactionService.searchTransactions(searchDTO, pageable);
+					} finally {
+						inventoryLock.unlockRead();
+					}
+				}
+			});
+
+		final List<TransactionDto> transactionDtos = resultPage.getPageResults();
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
+
+		return new ResponseEntity<>(transactionDtos, headers, HttpStatus.OK);
+
+	}
+
 }

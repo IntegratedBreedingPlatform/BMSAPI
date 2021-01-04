@@ -1,8 +1,18 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import org.generationcp.middleware.domain.germplasm.AttributeDTO;
+import org.generationcp.middleware.api.attribute.AttributeService;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
@@ -12,25 +22,40 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UDTableType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.ibp.api.domain.germplasm.*;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +67,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private AttributeValidator attributeValidator;
+
+	@Autowired
+	private GermplasmUpdateValidator germplasmUpdateValidator;
 
 	private BindingResult errors;
 
@@ -66,90 +94,111 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Autowired
 	private InstanceValidator instanceValidator;
 
-	@Override
-	public List<GermplasmSummary> searchGermplasm(final String searchText, final int pageNumber, final int pageSize) {
-		final List<GermplasmSummary> results = new ArrayList<GermplasmSummary>();
-		try {
-			final GermplasmSearchParameter searchParams = new GermplasmSearchParameter(searchText, Operation.LIKE);
-			final int start = pageSize * (pageNumber - 1);
-			final int numOfRows = pageSize;
-			searchParams.setStartingRow(start);
-			searchParams.setNumberOfEntries(numOfRows);
-			final List<Germplasm> searchResults = this.germplasmDataManager.searchForGermplasm(searchParams);
-			for (final Germplasm germplasm : searchResults) {
-				results.add(this.populateGermplasmSummary(germplasm));
-			}
-		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
-		}
-		return results;
-	}
+	@Autowired
+	private GermplasmSearchService germplasmSearchService;
 
-	private GermplasmSummary populateGermplasmSummary(final Germplasm germplasm) throws MiddlewareQueryException {
-		if (germplasm == null) {
-			return null;
-		}
-		final GermplasmSummary summary = new GermplasmSummary();
-		summary.setGermplasmId(germplasm.getGid().toString());
-		summary.setParent1Id(germplasm.getGpid1() != null && germplasm.getGpid1() != 0 ? germplasm.getGpid1().toString() : "Unknown");
-		summary.setParent2Id(germplasm.getGpid2() != null && germplasm.getGpid2() != 0 ? germplasm.getGpid2().toString() : "Unknown");
+	@Autowired
+	private AttributeService attributeService;
 
-		summary.setPedigreeString(this.pedigreeService.getCrossExpansion(germplasm.getGid(), this.crossExpansionProperties));
+	@Autowired
+	private GermplasmNameTypeService germplasmNameTypeService;
 
-		// FIXME - select in a loop ... Middleware service should handle all this in main query.
-		final List<Name> namesByGID = this.germplasmDataManager.getNamesByGID(new Integer(germplasm.getGid()), null, null);
-		final List<GermplasmName> names = new ArrayList<GermplasmName>();
-		for (final Name gpName : namesByGID) {
-			final GermplasmName germplasmName = new GermplasmName();
-			germplasmName.setName(gpName.getNval());
-			final UserDefinedField nameType = this.germplasmDataManager.getUserDefinedFieldByID(gpName.getTypeId());
-			if (nameType != null) {
-				germplasmName.setNameTypeCode(nameType.getFcode());
-				germplasmName.setNameTypeDescription(nameType.getFname());
-			}
-			names.add(germplasmName);
-		}
-		summary.addNames(names);
+	@Autowired
+	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmService;
 
-		final Method germplasmMethod = this.germplasmDataManager.getMethodByID(germplasm.getMethodId());
-		if (germplasmMethod != null && germplasmMethod.getMname() != null) {
-			summary.setBreedingMethod(germplasmMethod.getMname());
-		}
+	@Autowired
+	private SecurityService securityService;
 
-		final Location germplasmLocation = this.locationDataManger.getLocationByID(germplasm.getLocationId());
-		if (germplasmLocation != null && germplasmLocation.getLname() != null) {
-			summary.setLocation(germplasmLocation.getLname());
-		}
-		return summary;
-	}
+	@Autowired
+	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
 
 	@Override
-	public GermplasmSummary getGermplasm(final String germplasmId) {
-		final Germplasm germplasm;
-		try {
-			germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
-			return this.populateGermplasmSummary(germplasm);
-		} catch (final NumberFormatException | MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
+	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
+		final String programUUID) {
+
+		final List<GermplasmSearchResponse> responseList =
+			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageable, programUUID);
+
+		if (responseList == null || responseList.isEmpty()) {
+			return responseList;
+		}
+
+		final Map<Integer, GermplasmSearchResponse> responseMap
+			= responseList.stream().collect(Collectors.toMap(GermplasmSearchResponse::getGid, Function.identity()));
+
+		final Map<Integer, String> pedigreeStringMap =
+			this.pedigreeService.getCrossExpansions(new HashSet<>(responseMap.keySet()), null, this.crossExpansionProperties);
+
+		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
+			final Integer gid = entry.getKey();
+			final GermplasmSearchResponse response = entry.getValue();
+			response.setPedigreeString(pedigreeStringMap.get(gid));
+		}
+
+		this.addParentsFromPedigreeTable(responseMap, germplasmSearchRequest);
+
+		return responseList;
+	}
+
+	private void addParentsFromPedigreeTable(final Map<Integer, GermplasmSearchResponse> responseMap,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+
+		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+
+		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
+			|| !(addedColumnsPropertyIds.contains(ColumnLabels.FGID.getName())
+			|| addedColumnsPropertyIds.contains(ColumnLabels.CROSS_FEMALE_PREFERRED_NAME.getName())
+			|| addedColumnsPropertyIds.contains(ColumnLabels.MGID.getName())
+			|| addedColumnsPropertyIds.contains(ColumnLabels.CROSS_MALE_PREFERRED_NAME.getName()))) {
+			return;
+		}
+
+		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
+		/**
+		 * TODO Investigate sql approach.
+		 *  See {@link org.generationcp.middleware.dao.GermplasmSearchDAO#retrievePedigreeGids(List, GermplasmSearchRequest)}
+		 *  -> 1000 results, 10 levels of pedigree => ~10 sec
+		 *  pedigreeDataManager.generatePedigreeTable:
+		 *  -> 1000 results, 1 level of pedigree => ~1 min
+		 */
+		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
+			this.pedigreeDataManager.generatePedigreeTable(responseMap.keySet(), level, false);
+
+		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
+			final Integer gid = entry.getKey();
+			final GermplasmSearchResponse response = entry.getValue();
+
+			final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
+			final Optional<Germplasm> maleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.MGID.getName());
+
+			if (femaleParent.isPresent()) {
+				final Germplasm germplasm = femaleParent.get();
+				response.setFemaleParentGID(germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN);
+				response.setFemaleParentPreferredName(germplasm.getPreferredName().getNval());
+			}
+			if (maleParent.isPresent()) {
+				final Germplasm germplasm = maleParent.get();
+				response.setMaleParentGID(germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN);
+				response.setMaleParentPreferredName(germplasm.getPreferredName().getNval());
+			}
 		}
 	}
 
-	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
-		this.germplasmDataManager = germplasmDataManager;
+	@Override
+	public long countSearchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+		return this.germplasmSearchService.countSearchGermplasm(germplasmSearchRequest, programUUID);
 	}
 
-	void setPedigreeService(final PedigreeService pedigreeService) {
-		this.pedigreeService = pedigreeService;
+	@Override
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(final String query) {
+		return this.attributeService.searchAttributes(query);
 	}
 
-	void setLocationDataManger(final LocationDataManager locationDataManger) {
-		this.locationDataManger = locationDataManger;
+	@Override
+	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(final String query) {
+		return this.germplasmNameTypeService.searchNameTypes(query);
 	}
 
-	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
-		this.crossExpansionProperties = crossExpansionProperties;
-	}
-	
 	@Override
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		final PedigreeDTO pedigreeDTO;
@@ -176,65 +225,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public PedigreeTree getPedigreeTree(final String germplasmId, Integer levels) {
-
-		if (levels == null) {
-			levels = DEFAULT_PEDIGREE_LEVELS;
-		}
-		final GermplasmPedigreeTree mwTree = this.pedigreeDataManager.generatePedigreeTree(Integer.valueOf(germplasmId), levels);
-
-		final PedigreeTree pedigreeTree = new PedigreeTree();
-		pedigreeTree.setRoot(this.traversePopulate(mwTree.getRoot()));
-
-		return pedigreeTree;
-	}
-
-	@Override
-	public DescendantTree getDescendantTree(final String germplasmId) {
-		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
-		final GermplasmPedigreeTree mwTree = this.germplasmGroupingService.getDescendantTree(germplasm);
-
-		final DescendantTree descendantTree = new DescendantTree();
-		descendantTree.setRoot(this.traversePopulateDescendatTree(mwTree.getRoot()));
-
-		return descendantTree;
-	}
-
-	private DescendantTreeTreeNode traversePopulateDescendatTree(final GermplasmPedigreeTreeNode mwTreeNode) {
-		final DescendantTreeTreeNode treeNode = new DescendantTreeTreeNode();
-		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid());
-		treeNode.setProgenitors(mwTreeNode.getGermplasm().getGnpgs());
-		treeNode.setMethodId(mwTreeNode.getGermplasm().getMethodId());
-		treeNode.setParent1Id(mwTreeNode.getGermplasm().getGpid1());
-		treeNode.setParent2Id(mwTreeNode.getGermplasm().getGpid2());
-		treeNode.setManagementGroupId(mwTreeNode.getGermplasm().getMgid());
-
-		final Name preferredName = mwTreeNode.getGermplasm().findPreferredName();
-		treeNode.setName(preferredName != null ? preferredName.getNval() : null);
-
-		final List<DescendantTreeTreeNode> nodeChildren = new ArrayList<>();
-		for (final GermplasmPedigreeTreeNode mwChild : mwTreeNode.getLinkedNodes()) {
-			nodeChildren.add(this.traversePopulateDescendatTree(mwChild));
-		}
-		treeNode.setChildren(nodeChildren);
-		return treeNode;
-	}
-
-	private PedigreeTreeNode traversePopulate(final GermplasmPedigreeTreeNode mwTreeNode) {
-		final PedigreeTreeNode treeNode = new PedigreeTreeNode();
-		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid().toString());
-		treeNode.setName(mwTreeNode.getGermplasm().getPreferredName() != null ? mwTreeNode.getGermplasm().getPreferredName().getNval()
-				: null);
-
-		final List<PedigreeTreeNode> nodeParents = new ArrayList<>();
-		for (final GermplasmPedigreeTreeNode mwParent : mwTreeNode.getLinkedNodes()) {
-			nodeParents.add(this.traversePopulate(mwParent));
-		}
-		treeNode.setParents(nodeParents);
-		return treeNode;
-	}
-
-	@Override
 	public int searchGermplasmCount(final String searchText) {
 
 		final GermplasmSearchParameter searchParameter = new GermplasmSearchParameter(searchText, Operation.LIKE, false, false, false);
@@ -243,7 +233,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public GermplasmDTO getGermplasmDTObyGID (final Integer germplasmId) {
+	public GermplasmDTO getGermplasmDTObyGID(final Integer germplasmId) {
 		final GermplasmDTO germplasmDTO;
 		try {
 			germplasmDTO = this.germplasmDataManager.getGermplasmDTOByGID(germplasmId);
@@ -309,17 +299,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private void populateGermplasmPedigreeAndSynonyms(final List<GermplasmDTO> germplasmDTOList) {
 		final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
-				.collect(Collectors.toSet());
+			.collect(Collectors.toSet());
 		final Map<Integer, String> crossExpansionsMap =
-				this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
-		final Map<Integer, List<Name>> gidNamesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(new ArrayList<>(gids), Collections.emptyList());
+			this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
+		final Map<Integer, List<Name>> gidNamesMap =
+			this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(new ArrayList<>(gids), Collections.emptyList());
 		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
 			final Integer gid = Integer.valueOf(germplasmDTO.getGermplasmDbId());
 			// Set as synonyms other names, other than the preferred name, found for germplasm
 			final String defaultName = germplasmDTO.getGermplasmName();
 			final List<Name> names = gidNamesMap.get(gid);
-			if (!CollectionUtils.isEmpty(names)){
-				germplasmDTO.setSynonyms(names.stream().filter(n-> !defaultName.equalsIgnoreCase(n.getNval())).map(Name::getNval).collect(Collectors.toList()));
+			if (!CollectionUtils.isEmpty(names)) {
+				germplasmDTO.setSynonyms(
+					names.stream().filter(n -> !defaultName.equalsIgnoreCase(n.getNval())).map(Name::getNval).collect(Collectors.toList()));
 			}
 			germplasmDTO.setPedigree(crossExpansionsMap.get(gid));
 		}
@@ -337,6 +329,68 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.germplasmDataManager.countAttributesByGid(gid, attributeDbIds);
 	}
 
+	@Override
+	public Set<Integer> importGermplasmUpdates(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+
+		this.errors = new MapBindingResult(new HashMap<>(), AttributeDTO.class.getName());
+		this.germplasmUpdateValidator.validateEmptyList(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateAttributeAndNameCodes(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateGermplasmIdAndGermplasmUUID(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateLocationAbbreviation(this.errors, programUUID, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateBreedingMethod(germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateCreationDate(this.errors, germplasmUpdateDTOList);
+
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		return this.germplasmService.importGermplasmUpdates(user.getUserid(), germplasmUpdateDTOList);
+
+	}
+
+	@Override
+	public List<GermplasmNameTypeDTO> filterGermplasmNameTypes(final Set<String> codes) {
+
+		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
+			.stream()
+			.map(userDefinedField -> {
+				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
+				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
+				germplasmNameTypeDTO.setName(userDefinedField.getFname());
+				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
+				return germplasmNameTypeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(final Set<String> codes) {
+
+		final Set<String> types = new HashSet<>();
+		types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
+		types.add(UDTableType.ATRIBUTS_PASSPORT.getType());
+		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
+			.stream()
+			.map(userDefinedField -> {
+				final org.generationcp.middleware.api.attribute.AttributeDTO attributeDTO =
+					new org.generationcp.middleware.api.attribute.AttributeDTO();
+				attributeDTO.setId(userDefinedField.getFldno());
+				attributeDTO.setName(userDefinedField.getFname());
+				attributeDTO.setCode(userDefinedField.getFcode());
+				return attributeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
+		final List<GermplasmImportRequestDto> germplasmImportRequestDto) {
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		germplasmImportRequestDtoValidator.validate(programUUID, germplasmImportRequestDto);
+		return this.germplasmService.importGermplasm(user.getUserid(), cropName, germplasmImportRequestDto);
+	}
+
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
 		this.germplasmValidator.validateGermplasmId(this.errors, Integer.valueOf(gid));
@@ -348,4 +402,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 	}
+
+	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
+		this.germplasmDataManager = germplasmDataManager;
+	}
+
+	void setPedigreeService(final PedigreeService pedigreeService) {
+		this.pedigreeService = pedigreeService;
+	}
+
+	void setLocationDataManger(final LocationDataManager locationDataManger) {
+		this.locationDataManger = locationDataManger;
+	}
+
+	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
+		this.crossExpansionProperties = crossExpansionProperties;
+	}
+
 }

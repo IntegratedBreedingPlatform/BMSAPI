@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -31,6 +30,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.ibp.api.Util;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -168,25 +168,27 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		int currentColNum = 0;
 
 		for (final MeasurementVariable column : columns) {
-			final ObservationUnitData observationUnitData = dataRow.getVariables().get(column.getName());
+			final ObservationUnitData observationUnitData = Util.getObservationUnitData(dataRow.getVariables(), column);
 
-			final String dataCell = observationUnitData.getValue();
-			final HSSFCell cell = row.createCell(currentColNum++);
-			if (dataCell != null) {
-				if (column.getPossibleValues() != null && !column.getPossibleValues()
-					.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
-					&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
-					.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
-					cell.setCellValue(DatasetExcelGenerator.getCategoricalCellValue(dataCell, column.getPossibleValues()));
-				} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
-					if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
-						cell.setCellType(CellType.BLANK);
-						cell.setCellType(CellType.NUMERIC);
-						cell.setCellValue(Double.valueOf(dataCell));
+			if (!Util.isNullOrEmpty(observationUnitData)) {
+				final String dataCell = observationUnitData.getValue();
+				final HSSFCell cell = row.createCell(currentColNum++);
+				if (dataCell != null) {
+					if (column.getPossibleValues() != null && !column.getPossibleValues()
+						.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
+						&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
+						.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
+						cell.setCellValue(DatasetExcelGenerator.getCategoricalCellValue(dataCell, column.getPossibleValues()));
+					} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
+						if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
+							cell.setCellType(CellType.BLANK);
+							cell.setCellType(CellType.NUMERIC);
+							cell.setCellValue(Double.valueOf(dataCell));
+						}
+					} else {
+						cell.setCellType(CellType.STRING);
+						cell.setCellValue(dataCell);
 					}
-				} else {
-					cell.setCellType(CellType.STRING);
-					cell.setCellValue(dataCell);
 				}
 			}
 		}
@@ -254,7 +256,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 				.getMeasurementVariables(
 					environmentDatasetId, Lists
 						.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-							VariableType.STUDY_CONDITION.getId()));
+							VariableType.ENVIRONMENT_CONDITION.getId()));
 
 		final List<MeasurementVariable> plotVariables =
 			this.datasetService.getMeasurementVariables(plotDatasetId, Lists
@@ -316,7 +318,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			filterByVariableType(environmentConditions, VariableType.STUDY_CONDITION), ENVIRONMENT);
+			filterByVariableType(environmentConditions, VariableType.ENVIRONMENT_CONDITION), ENVIRONMENT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.descriptors",
@@ -407,7 +409,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	List<MeasurementVariable> getEnvironmentalConditions(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentConditions =
-			filterByVariableType(environmentVariables, VariableType.STUDY_CONDITION);
+			filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_CONDITION);
 		final Map<Integer, String> environmentConditionMap =
 			this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, instance.getInstanceId());
 		for (final MeasurementVariable variable : environmentConditions) {
@@ -678,13 +680,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	private static List<MeasurementVariable> filterByVariableType(
 		final List<MeasurementVariable> measurementVariables, final VariableType variableType) {
-		final Collection<MeasurementVariable> variablesByType = CollectionUtils.select(measurementVariables, new Predicate() {
-
-			@Override
-			public boolean evaluate(final Object o) {
-				final MeasurementVariable measurementVariable = (MeasurementVariable) o;
-				return measurementVariable.getVariableType().equals(variableType);
-			}
+		final Collection<MeasurementVariable> variablesByType = CollectionUtils.select(measurementVariables, o -> {
+			final MeasurementVariable measurementVariable = (MeasurementVariable) o;
+			return measurementVariable.getVariableType().equals(variableType);
 		});
 		return Lists.newArrayList(variablesByType);
 	}

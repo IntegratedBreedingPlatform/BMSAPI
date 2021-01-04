@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Create new study instances",
 		notes = "Create new study instances")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<StudyInstance>> createStudyInstances(final @PathVariable String cropname,
@@ -44,7 +45,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Delete study instances",
 		notes = "Delete study instances")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<Void> deleteStudyInstances(final @PathVariable String cropname, @PathVariable final String programUUID,
@@ -55,7 +56,8 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "List all study instances with basic metadata.",
 		notes = "Returns list of all study instances with basic metadata.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES','INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES','BROWSE_STUDIES')"
+		+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
@@ -72,7 +74,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Get study instance with basic metadata.",
 		notes = "Get study instances with basic metadata.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<StudyInstance> getStudyInstance(final @PathVariable String cropname, @PathVariable final String programUUID,
@@ -84,7 +86,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Add study instance observation (ENVIRONMENT CONDITION)",
 		notes = "Add study instance observation")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/observations", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<InstanceObservationData> addInstanceObservation(final @PathVariable String cropname,
@@ -97,7 +99,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Update study instance data (ENVIRONMENT CONDITION)",
 		notes = "Update study instance observation")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/observations/{observationDataId}", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity<InstanceObservationData> updateInstanceObservation(final @PathVariable String cropname,
@@ -111,7 +113,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Add study instance descriptor (ENVIRONMENT DETAIL)",
 		notes = "Add study instance descriptor")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/descriptors", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<InstanceDescriptorData> addInstanceDescriptor(final @PathVariable String cropname, @PathVariable final String programUUID,
@@ -123,7 +125,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Update study instance descriptor (ENVIRONMENT DETAIL)",
 		notes = "Update study instance descriptor")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/descriptors/{descriptorDataId}", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity<InstanceDescriptorData> updateInstanceDescriptor(final @PathVariable String cropname,

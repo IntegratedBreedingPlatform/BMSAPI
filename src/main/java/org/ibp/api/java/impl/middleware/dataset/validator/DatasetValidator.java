@@ -25,15 +25,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class DatasetValidator {
 
 	private static final List<VariableType> OBSERVATION_DATASET_VALID_VAR_TYPES =
-		Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD);
+		Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.GERMPLASM_DESCRIPTOR);
 
 	private static final List<VariableType> ENVIRONMENT_DATASET_VALID_VAR_TYPES =
-		Arrays.asList(VariableType.STUDY_CONDITION, VariableType.ENVIRONMENT_DETAIL);
+		Arrays.asList(VariableType.ENVIRONMENT_CONDITION, VariableType.ENVIRONMENT_DETAIL);
 
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
@@ -84,12 +87,18 @@ public class DatasetValidator {
 
 		// Validate if variable exists and of supported variable type for given dataset type
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
-		final VariableType variableType = this.validateDatasetVariableType(datasetType, datasetVariable.getVariableTypeId());
+		final boolean studyHasExperimentDesign = dataSet.getInstances().stream().anyMatch(i -> i.isHasExperimentalDesign() == Boolean.TRUE);
+		final VariableType variableType =
+			this.validateDatasetVariableType(datasetType, datasetVariable.getVariableTypeId(), studyHasExperimentDesign);
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable standardVariable =
 			this.ontologyDataManager.getStandardVariable(variableId, ContextHolder.getCurrentProgram());
+
+		final Map<Integer, MeasurementVariable> measurementVariableMap =
+			dataSet.getVariables().stream().collect(Collectors.toMap(MeasurementVariable::getTermId, Function.identity()));
+
 		this.validateVariable(standardVariable, variableType);
-		this.validateIfDatasetVariableAlreadyExists(variableId, shouldBeDatasetVariable, dataSet, datasetType);
+		this.validateIfDatasetVariableAlreadyExists(variableId, shouldBeDatasetVariable, measurementVariableMap, datasetType);
 
 		return standardVariable;
 	}
@@ -102,42 +111,48 @@ public class DatasetValidator {
 
 		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
+		final boolean studyHasExperimentDesign = dataSet.getInstances().stream().anyMatch(i -> i.isHasExperimentalDesign() == Boolean.TRUE);
+
+		final Map<Integer, MeasurementVariable> measurementVariableMap =
+			dataSet.getVariables().stream().collect(Collectors.toMap(MeasurementVariable::getTermId, Function.identity()));
 
 		for (final Integer variableId : variableIds) {
 			// If the variable does not exist, MiddlewareQueryException will be thrown
 			this.ontologyDataManager.getStandardVariable(variableId, ContextHolder.getCurrentProgram());
-			this.validateIfDatasetVariableAlreadyExists(variableId, true, dataSet, datasetType);
+			this.validateIfDatasetVariableAlreadyExists(variableId, true, measurementVariableMap, datasetType);
+			this.validateDatasetVariableType(datasetType, measurementVariableMap.get(variableId).getVariableType().getId(),
+				studyHasExperimentDesign);
 		}
 
 	}
 
 	void validateIfDatasetVariableAlreadyExists(
 		final Integer variableId, final Boolean shouldAlreadyBeDatasetVariable,
-		final DatasetDTO dataSet, final DatasetTypeDTO datasetType) {
+		final Map<Integer, MeasurementVariable> measurementVariableMap, final DatasetTypeDTO datasetType) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final List<MeasurementVariable> datasetVariables = dataSet.getVariables();
-		if (datasetVariables == null && shouldAlreadyBeDatasetVariable) {
+
+		if (measurementVariableMap.isEmpty() && shouldAlreadyBeDatasetVariable) {
 			this.errors.reject("variable.not.dataset.variable", new Integer[] {variableId}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		boolean isDatasetVariable = false;
-		for (final MeasurementVariable datasetVariable : datasetVariables) {
-			if (variableId.equals(datasetVariable.getTermId())) {
-				isDatasetVariable = true;
-				final VariableType variableType = datasetVariable.getVariableType();
-				// Add Variable Scenario
-				if (!shouldAlreadyBeDatasetVariable) {
-					this.errors.reject("variable.already.dataset.variable", new Object[] {String.valueOf(variableId)}, "");
-					throw new ApiRequestValidationException(this.errors.getAllErrors());
 
-					// If variable was found, check it is a supported variable type for dataset
-				} else if (this.isInvalidVariableTypeForDatasetType(datasetType, variableType)) {
-					this.errors
-						.reject("dataset.variable.cannot.be.deleted", new Object[] {String.valueOf(variableId), variableType.getName()},
-							"");
-					throw new NotSupportedException(this.errors.getAllErrors().get(0));
-				}
+		if (measurementVariableMap.containsKey(variableId)) {
+			isDatasetVariable = true;
+			final MeasurementVariable measurementVariable = measurementVariableMap.get(variableId);
+			final VariableType variableType = measurementVariable.getVariableType();
+			// Add Variable Scenario
+			if (!shouldAlreadyBeDatasetVariable) {
+				this.errors.reject("variable.already.dataset.variable", new Object[] {String.valueOf(variableId)}, "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+
+				// If variable was found, check it is a supported variable type for dataset
+			} else if (this.isInvalidVariableTypeForDatasetType(datasetType, variableType)) {
+				this.errors
+					.reject("dataset.variable.cannot.be.deleted", new Object[] {String.valueOf(variableId), variableType.getName()},
+						"");
+				throw new NotSupportedException(this.errors.getAllErrors().get(0));
 			}
 		}
 
@@ -158,7 +173,8 @@ public class DatasetValidator {
 		}
 	}
 
-	private VariableType validateDatasetVariableType(final DatasetTypeDTO datasetType, final Integer variableTypeId) {
+	private VariableType validateDatasetVariableType(final DatasetTypeDTO datasetType, final Integer variableTypeId,
+		final Boolean studyHasExperimentDesign) {
 		final VariableType variableType = VariableType.getById(variableTypeId);
 		if (variableType == null) {
 			this.errors.reject("variable.type.does.not.exist", "");
@@ -168,6 +184,13 @@ public class DatasetValidator {
 		if (this.isInvalidVariableTypeForDatasetType(datasetType, variableType)) {
 			this.errors.reject("variable.type.not.supported", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));
+		}
+
+		// Do not allow germplasm descriptor to be added or removed if study has experiment design.
+		if (VariableType.GERMPLASM_DESCRIPTOR.equals(variableType) && studyHasExperimentDesign) {
+			this.errors
+				.reject("dataset.germplasm.descriptor.cannot.be.added.or.removed.study.has.experiment.design", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		return variableType;

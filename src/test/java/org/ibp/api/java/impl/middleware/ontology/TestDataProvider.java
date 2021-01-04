@@ -1,6 +1,25 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
+import org.apache.commons.lang.math.RandomUtils;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.ibp.api.domain.ontology.MetadataDetails;
+import org.ibp.api.domain.ontology.MethodDetails;
+import org.ibp.api.domain.ontology.PropertyDetails;
+import org.ibp.api.domain.ontology.ScaleDetails;
+import org.ibp.api.domain.ontology.VariableDetails;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -8,21 +27,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-
-import org.apache.commons.lang.math.RandomUtils;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermSummary;
-import org.generationcp.middleware.domain.ontology.FormulaDto;
-import org.generationcp.middleware.domain.ontology.FormulaVariable;
-import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.domain.ontology.Property;
-import org.generationcp.middleware.domain.ontology.Scale;
-import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.ibp.api.domain.ontology.*;
 
 public class TestDataProvider {
 
@@ -70,8 +74,9 @@ public class TestDataProvider {
     public static final org.ibp.api.domain.ontology.VariableType ANALYSIS_VARIABLE = new org.ibp.api.domain.ontology.VariableType(VariableType.ANALYSIS.getId().toString(),
             VariableType.ANALYSIS.getName(), VariableType.ANALYSIS.getDescription());
 
-    public static final org.ibp.api.domain.ontology.VariableType STUDY_CONDITION_VARIABLE = new org.ibp.api.domain.ontology.VariableType(VariableType.STUDY_CONDITION.getId().toString(),
-            VariableType.STUDY_CONDITION.getName(), VariableType.STUDY_CONDITION.getDescription());
+    public static final org.ibp.api.domain.ontology.VariableType STUDY_CONDITION_VARIABLE = new org.ibp.api.domain.ontology.VariableType(VariableType.ENVIRONMENT_CONDITION
+		.getId().toString(),
+            VariableType.ENVIRONMENT_CONDITION.getName(), VariableType.ENVIRONMENT_CONDITION.getDescription());
 
 	public static Term getMethodTerm() {
 		return new Term(TestDataProvider.METHOD_ID, TestDataProvider.METHOD_NAME, TestDataProvider.METHOD_DESCRIPTION, CvId.METHODS.getId(),null);

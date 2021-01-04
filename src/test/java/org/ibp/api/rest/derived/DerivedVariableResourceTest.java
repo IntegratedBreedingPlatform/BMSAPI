@@ -71,37 +71,6 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testCalculateInvalidRequest() throws Exception {
-
-		final CalculateVariableRequest calculateVariableRequest = new CalculateVariableRequest();
-		calculateVariableRequest.setVariableId(RandomUtils.nextInt());
-		calculateVariableRequest.setOverwriteExistingData(false);
-		calculateVariableRequest.setGeoLocationIds(Arrays.asList(RandomUtils.nextInt()));
-
-		final ObjectError objectError =
-			new ObjectError("", new String[] {DerivedVariableServiceImpl.STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION}, new Object[] {}, "");
-		final ApiRequestValidationException exception = new ApiRequestValidationException(Arrays.asList(objectError));
-
-		when(this.derivedVariableService
-			.execute(100, 102, calculateVariableRequest.getVariableId(), calculateVariableRequest.getGeoLocationIds(),
-				calculateVariableRequest.getInputVariableDatasetMap(),
-				calculateVariableRequest.isOverwriteExistingData())).thenThrow(exception);
-
-		this.mockMvc
-			.perform(MockMvcRequestBuilders
-				.post(
-					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", this.cropName, this.programUuid, 100,
-					102)
-				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
-			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isBadRequest())
-			.andExpect(MockMvcResultMatchers.jsonPath(
-				"$.errors[0].message",
-				is("The system was unable to execute this formula; one or more date values may be invalid. Date values should follow yyyymmdd format.")));
-
-	}
-
-	@Test
 	public void testCalculateOverwriteWarning() throws Exception {
 
 		final CalculateVariableRequest calculateVariableRequest = new CalculateVariableRequest();

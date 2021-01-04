@@ -1,6 +1,8 @@
 package org.ibp.api.rest.sample;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.sample.SampleDTO;
@@ -20,26 +22,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
 @Api(value = "Sample Services")
 @Controller
 @RequestMapping("/crops")
-@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES','INFORMATION_MANAGEMENT')")
+@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 public class SampleResource {
 
 	@Autowired
 	public SampleService sampleService;
 
 	@ApiOperation(value = "Get samples", notes = "Get samples")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "Results page you want to retrieve (0..N)"),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property(,asc|desc). " +
+				"Default sort order is ascending. " +
+				"Multiple sort criteria are supported.")
+	})
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/samples", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<SampleDTO>> filter(@PathVariable final String crop, @PathVariable final String programUUID,
         @RequestParam(required = false) @ApiParam(value = "The observation unit to which the samples belong") final String obsUnitId,
         @RequestParam(required = false) @ApiParam(value = "The list to which the samples belong") final Integer listId,
-		// TODO describe in swagger?
-		final Pageable pageable) {
+		@ApiIgnore final Pageable pageable) {
 
 		final PagedResult<SampleDTO> resultPage =
 			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<SampleDTO>() {

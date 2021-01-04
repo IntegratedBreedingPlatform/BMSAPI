@@ -5,7 +5,6 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.After;
 import org.junit.Assert;
@@ -27,9 +26,6 @@ public class SecurityServiceImplTest {
 
 	@Mock
 	private UserService userService;
-
-	@Mock
-	private HttpServletRequest httpServletRequest;
 
 	@InjectMocks
 	private final SecurityServiceImpl securityServiceImpl = new SecurityServiceImpl();
@@ -68,72 +64,6 @@ public class SecurityServiceImplTest {
 		SecurityContextHolder.getContext().setAuthentication(null);
 	}
 
-	/**
-	 * Case 1 Study in a program that logged in user is member of.
-	 */
-	@Test
-	public void testIsAccessibleStudySummaryMine() {
-
-		final StudySummary summaryStudy = new StudySummary();
-		summaryStudy.setProgramUUID(this.programUUID);
-
-		final Project summaryStudyProgram = new Project();
-		summaryStudyProgram.setProjectId(2L);
-		summaryStudyProgram.setUniqueID(summaryStudy.getProgramUUID());
-
-		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(summaryStudy.getProgramUUID(), this.cropname))
-			.thenReturn(summaryStudyProgram);
-
-		// Logged in user = me is a the member
-		Mockito.when(this.userService.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
-			Lists.newArrayList(this.me));
-
-		// Hence accessible
-		Assert.assertTrue(
-			"Studies that are part of programs created by me, or I am a meber of, should be accessible to me.",
-			this.securityServiceImpl.isAccessible(summaryStudy, this.cropname));
-	}
-
-	/**
-	 * Case 2 Study in a program that logged in user is NOT member of.
-	 */
-	@Test
-	public void testIsAccessibleStudySummaryOthers() {
-
-		final StudySummary summaryStudy = new StudySummary();
-		summaryStudy.setProgramUUID(this.programUUID);
-
-		final Project summaryStudyProgram = new Project();
-		summaryStudyProgram.setProjectId(2L);
-		summaryStudyProgram.setUniqueID(summaryStudy.getProgramUUID());
-
-		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(summaryStudy.getProgramUUID(), this.cropname))
-			.thenReturn(summaryStudyProgram);
-
-		// Logged in user = me is not the member, some other breeder is
-		Mockito.when(this.userService.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
-
-			Lists.newArrayList(this.otherBreeder));
-
-		// Hence not accessible
-		Assert.assertFalse(
-			"Studies that are part of programs I have not created nor I am a member of,  should not be accessible to me.",
-			this.securityServiceImpl.isAccessible(summaryStudy, this.cropname));
-	}
-
-	/**
-	 * Case 3 Study templates case where there is no program uuid
-	 */
-	@Test
-	public void testIsAccessibleStudySummaryTemplates() {
-		final StudySummary summary = new StudySummary();
-		summary.setProgramUUID(null);
-
-		// Accessible to all
-		Assert.assertTrue(
-			"Studies with no pgoram reference (e.g. Templates) should be accessible to all.",
-			this.securityServiceImpl.isAccessible(summary, this.cropname));
-	}
 
 	@Test
 	public void testGetCurrentlyLoggedInUser() {

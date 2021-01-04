@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.validator;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeServicePostProcessor;
 import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
@@ -36,7 +36,7 @@ public class ExperimentalDesignTypeServicePostProcessorTest {
 			@Override
 			public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentDesignInput,
 				final String programUUID,
-				final List<StudyGermplasmDto> studyGermplasmDtoList) {
+				final List<StudyEntryDto> studyEntryDtoList) {
 				return null;
 			}
 

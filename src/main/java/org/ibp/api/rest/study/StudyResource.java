@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 @Api(value = "Study Services")
@@ -32,13 +30,10 @@ public class StudyResource {
 	@Autowired
 	private StudyService studyService;
 
-	@Autowired
-	private StudyDataManager studyDataManager;
-
 	@ApiOperation(value = "Check if a study is sampled.",
 			notes = "Returns boolean indicating if there are samples associated to the study.")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/sampled", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'INFORMATION_MANAGEMENT', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<Boolean> hasSamples(final @PathVariable String cropName, @PathVariable final String programUUID,
 			@PathVariable final Integer studyId) {
@@ -49,7 +44,7 @@ public class StudyResource {
 	@ApiOperation(value = "Partially modifies a study",
 			notes = "As of now, it only allows to update the status")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}", method = RequestMethod.PATCH)
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<Void> patchStudy (final @PathVariable String cropName, @PathVariable final String programUUID,
 			@PathVariable final Integer studyId, @RequestBody final Study study) {
@@ -61,7 +56,7 @@ public class StudyResource {
 
 	@ApiOperation(value = "Get the study tree")
 	@RequestMapping(value = "/{cropName}/studies/tree", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES')" + PermissionsEnum.HAS_INVENTORY_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')" + PermissionsEnum.HAS_INVENTORY_VIEW)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getStudyTree(final @PathVariable String cropName,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
@@ -70,4 +65,5 @@ public class StudyResource {
 		final List<TreeNode> studyTree = this.studyService.getStudyTree(parentFolderId, programUUID);
 		return new ResponseEntity<>(studyTree, HttpStatus.OK);
 	}
+
 }

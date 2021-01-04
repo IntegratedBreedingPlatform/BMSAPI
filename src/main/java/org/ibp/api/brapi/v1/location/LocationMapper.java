@@ -3,7 +3,7 @@ package org.ibp.api.brapi.v1.location;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;

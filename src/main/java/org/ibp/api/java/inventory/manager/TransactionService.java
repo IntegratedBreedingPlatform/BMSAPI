@@ -16,7 +16,7 @@ import java.util.List;
 
 public interface TransactionService {
 
-	List<TransactionDto> searchTransactions(TransactionsSearchDto lotsSearchDto, Pageable pageable);
+	List<TransactionDto> searchTransactions(TransactionsSearchDto transactionsSearchDto, Pageable pageable);
 
 	long countSearchTransactions(TransactionsSearchDto transactionsSearchDto);
 

@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
+import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -23,15 +24,20 @@ public interface LotService {
 
 	Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(LotsSearchDto searchDto);
 
-	String saveLot(LotGeneratorInputDto lotGeneratorInputDto);
+	String saveLot(String programUUID, LotGeneratorInputDto lotGeneratorInputDto);
 
-	List<String> createLots(LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto);
+	List<String> createLots(final String programUUID, LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto);
 
-	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest);
+	void updateLots(String programUUID, List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest);
 
-	void importLotsWithInitialTransaction(LotImportRequestDto lotImportRequestDto);
+	void importLotsWithInitialTransaction(String programUUID, LotImportRequestDto lotImportRequestDto);
 
 	LotSearchMetadata getLotsSearchMetadata(LotsSearchDto lotsSearchDto);
 
 	void closeLots(LotsSearchDto lotsSearchDto);
+
+	void mergeLots(String keepLotUUID, LotsSearchDto lotsSearchDto);
+
+	void splitLot(String programUUID, LotSplitRequestDto lotSplitRequestDto);
+
 }

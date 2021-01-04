@@ -10,6 +10,7 @@ import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ public class SampleListResource {
 	public CsvExportSampleListService csvExportSampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES','INFORMATION_MANAGEMENT')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestParam final String programUUID, @RequestBody final SampleListDto dto) {
@@ -78,7 +79,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Create sample list folder", notes = "Create sample list folder. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID, @RequestParam final String folderName,
@@ -97,7 +98,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Update sample list folder", notes = "Update sample list folder. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders/{folderId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateSampleListFolderName(@PathVariable final String crop, @PathVariable final String programUUID,
@@ -115,7 +116,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Move sample list folder", notes = "Move sample list folder. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders/{folderId}/move", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity moveSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID,
@@ -134,7 +135,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Delete sample list folder", notes = "Delete sample list folder. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders/{folderId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer folderId) {
@@ -150,7 +151,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Search Sample List", notes = "Search Sample List")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES','INFORMATION_MANAGEMENT')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists/search", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<org.generationcp.middleware.pojos.SampleList>> search(@PathVariable final String crop,
@@ -163,7 +164,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Download Sample List as CSV file", notes = "Download Sample List as CSV file")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES','INFORMATION_MANAGEMENT')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists/{listId}/download", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> download(@PathVariable final String crop, @PathVariable final Integer listId, @RequestParam final String programUUID,
 		@RequestParam final String listName) throws IOException {
@@ -190,7 +191,7 @@ public class SampleListResource {
 
 	//TODO: Is necessary make a refactor in the future with this service for do it more generic to import samples not only Plate Id and well.
 	@ApiOperation(value = "Import Plate Information", notes = "Current implementation only supports patch on plateId and well attributes")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists/{listId}/samples", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity saveSamplePlateInformation(
@@ -200,7 +201,8 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Get sample lists given a tree parent node folder", notes = "Get sample lists given a tree parent node folder")
-	@PreAuthorize("hasAnyAuthority('ADMIN','BREEDING_ACTIVITIES','MANAGE_STUDIES', 'MANAGE_SAMPLES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')"
+		+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/sample-lists/tree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getSampleListByParentFolderId(
