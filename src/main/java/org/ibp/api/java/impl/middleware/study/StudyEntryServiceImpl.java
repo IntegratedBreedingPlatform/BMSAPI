@@ -191,6 +191,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
+	public long countFilteredStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter) {
+		return this.middlewareStudyEntryService.countFilteredStudyEntries(studyId, filter);
+	}
+
+	@Override
 	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 		this.studyValidator.validate(studyId, false);
 

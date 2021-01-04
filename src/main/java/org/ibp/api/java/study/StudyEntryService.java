@@ -20,6 +20,8 @@ public interface StudyEntryService {
 
 	List<StudyEntryDto> getStudyEntries(Integer studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 
+	long countFilteredStudyEntries(Integer studyId, StudyEntrySearchDto.Filter filter);
+
 	void deleteStudyEntries(Integer studyId);
 
 	void updateStudyEntriesProperty(Integer studyId, StudyEntryPropertyBatchUpdateRequest studyEntryPropertyBatchUpdateRequest);
