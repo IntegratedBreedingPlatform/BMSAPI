@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.program;
 
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -13,6 +14,7 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,9 @@ public class ProgramServiceImpl implements ProgramService {
 	@Autowired
 	@Lazy
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private org.generationcp.middleware.api.program.ProgramService programService;
 
 	@Autowired
 	private UserService userService;
@@ -52,6 +57,28 @@ public class ProgramServiceImpl implements ProgramService {
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
+	}
+
+	@Override
+	public List<ProgramDTO> listPrograms(final Pageable pageable) {
+		return this.programService.listPrograms(pageable);
+	}
+
+	@Override
+	public List<ProgramDTO> listProgramsByUser(final Pageable pageable, final WorkbenchUser user) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public long countPrograms() {
+		return this.programService.countPrograms();
+	}
+
+	@Override
+	public long countProgramsByUser(final WorkbenchUser currentlyLoggedInUser) {
+		// TODO
+		return 0;
 	}
 
 	List<ProgramSummary> convertToProgramSummaries(final List<Project> workbenchProgramList) {

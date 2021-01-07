@@ -34,6 +34,8 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.LocationServiceImpl;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
+import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.api.program.ProgramServiceImpl;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
@@ -359,6 +361,13 @@ public class MiddlewareFactory {
 	public UserService getUserService() {
 		return new UserServiceImpl(this.getWorkbenchSessionProvider());
 	}
+
+	@Bean
+	@DependsOn("WORKBENCH_SessionFactory")
+	public ProgramService getProgramService() {
+		return new ProgramServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
 
 	@Bean
 	@DependsOn("WORKBENCH_SessionFactory")
