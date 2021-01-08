@@ -183,8 +183,7 @@ public class SampleListResource {
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", exportInfo.getDownloadFileName()));
-		headers.add(HttpHeaders.CONTENT_TYPE, FileUtils.detectMimeType(exportInfo.getDownloadFileName()));
-
+		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(exportInfo.getDownloadFileName())));
 		final File file = new File(exportInfo.getFilePath());
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 
