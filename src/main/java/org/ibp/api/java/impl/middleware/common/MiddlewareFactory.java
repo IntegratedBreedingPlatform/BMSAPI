@@ -258,7 +258,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public MeasurementVariableTransformer getMeasurementVariableTransformer() {
-		return new MeasurementVariableTransformer(this.getCropDatabaseSessionProvider());
+		return new MeasurementVariableTransformer();
 	}
 
 	@Bean
@@ -406,7 +406,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StandardVariableTransformer standardVariableTransformer() {
-		return new StandardVariableTransformer(this.getCropDatabaseSessionProvider());
+		return new StandardVariableTransformer();
 	}
 
 	@Bean

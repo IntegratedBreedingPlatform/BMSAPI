@@ -23,10 +23,6 @@ public interface StudyService {
 
 	Observation getSingleObservation(Integer studyId, Integer obeservationId);
 
-	Observation updateObservation(final Integer studyIdentifier, Observation observation);
-
-	List<Observation> updateObservations(final Integer studyIdentifier, List<Observation> observation);
-
 	TrialObservationTable getTrialObservationTable(final int studyIdentifier);
 
 	/**
