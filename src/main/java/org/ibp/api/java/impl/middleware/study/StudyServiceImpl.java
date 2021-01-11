@@ -17,12 +17,10 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.ibp.api.domain.study.Observation;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyService;
@@ -57,27 +55,6 @@ public class StudyServiceImpl implements StudyService {
 
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
-	}
-
-	@Override
-	public List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize,
-		final String sortBy, final String sortOrder) {
-		final List<ObservationDto> studyMeasurements =
-			this.middlewareStudyService.getObservations(studyId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
-		final List<Observation> observations = new ArrayList<>();
-		for (final ObservationDto measurement : studyMeasurements) {
-			observations.add(this.mapObservationDtoToObservation(measurement));
-		}
-		return observations;
-	}
-
-	@Override
-	public Observation getSingleObservation(final Integer studyId, final Integer obeservationId) {
-		final List<ObservationDto> singleObservation = this.middlewareStudyService.getSingleObservation(studyId, obeservationId);
-		if (!singleObservation.isEmpty()) {
-			return this.mapObservationDtoToObservation(singleObservation.get(0));
-		}
-		return new Observation();
 	}
 
 	@Override
@@ -189,11 +166,6 @@ public class StudyServiceImpl implements StudyService {
 		} else {
 			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
 		}
-	}
-
-	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
-		return StudyMapper.getInstance()
-			.map(measurement, Observation.class);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {

@@ -11,19 +11,13 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.ibp.api.domain.study.Observation;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface StudyService {
 
-	List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize,
-		final String sortBy, final String sortOrder);
-
-	Observation getSingleObservation(Integer studyId, Integer obeservationId);
-
-	TrialObservationTable getTrialObservationTable(final int studyIdentifier);
+	TrialObservationTable getTrialObservationTable(int studyIdentifier);
 
 	/**
 	 * @param studyIdentifier id for the study (Nursery / Trial)
@@ -34,23 +28,23 @@ public interface StudyService {
 
 	String getProgramUUID(Integer studyIdentifier);
 
-	StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId);
+	StudyDetailsDto getStudyDetailsByGeolocation(Integer geolocationId);
 
 	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	long countStudies(StudySearchFilter studySearchFilter);
 
-	List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO);
+	List<PhenotypeSearchDTO> searchPhenotypes(Integer pageSize, Integer pageNumber, PhenotypeSearchRequestDTO requestDTO);
 
-	long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO);
+	long countPhenotypes(PhenotypeSearchRequestDTO requestDTO);
 
-	Boolean isSampled(final Integer studyId);
+	Boolean isSampled(Integer studyId);
 
 	List<StudyTypeDto> getStudyTypes();
 
-	StudyReference getStudyReference(final Integer studyId);
+	StudyReference getStudyReference(Integer studyId);
 
-	void updateStudy(final Study study);
+	void updateStudy(Study study);
 
 	long countStudyInstances(StudySearchFilter studySearchFilter);
 

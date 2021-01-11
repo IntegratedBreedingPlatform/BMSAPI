@@ -2,7 +2,6 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -13,7 +12,6 @@ import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -26,10 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StudyServiceImplTest {
-
-	private static final int TEST_STUDY_IDENTIFIER = 2013;
-
-	private static final int TEST_OBSERVATION_IDENTIFIER = 5;
 
 	private StudyServiceImpl studyServiceImpl;
 
@@ -59,35 +53,6 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
 		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
 		this.studyServiceImpl.setStudyValidator(this.studyValidator);
-	}
-
-	@Test
-	public void testGetObservations() {
-		final List<ObservationDto> observationDtoTestData =
-				Lists.newArrayList(this.factory.manufacturePojo(ObservationDto.class), this.factory.manufacturePojo(ObservationDto.class));
-		Mockito.when(this.mockMiddlewareStudyService.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, 1, 1, 100, null, null))
-				.thenReturn(
-				observationDtoTestData);
-
-		final List<Observation> actualObservations =
-				this.studyServiceImpl.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, 1, 1, 100, null, null);
-
-		Assert.assertEquals(Lists.transform(observationDtoTestData, this.observationTransformFunction), actualObservations);
-	}
-
-	@Test
-	public void testGetSingleObservations() {
-		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(this.factory.manufacturePojo(ObservationDto.class));
-		Mockito.when(
-				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
-						StudyServiceImplTest.TEST_OBSERVATION_IDENTIFIER)).thenReturn(observationDtoTestData);
-
-		final Observation actualObservations =
-				this.studyServiceImpl.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
-						StudyServiceImplTest.TEST_OBSERVATION_IDENTIFIER);
-
-		Assert.assertEquals(Lists.transform(observationDtoTestData, this.observationTransformFunction).get(0), actualObservations);
-
 	}
 
 	@Test
