@@ -10,6 +10,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -49,7 +50,7 @@ public class LocationResourceBrapi {
 	@ApiOperation(value = "List locations", notes = "Get a list of locations.")
 	@RequestMapping(value = "/{crop}/brapi/v1/locations", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Locations> listLocations(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<Location>> listLocations(@PathVariable final String crop,
 			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 					required = false) final Integer currentPage,
 			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
@@ -94,15 +95,13 @@ public class LocationResourceBrapi {
 					.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 			final Metadata metadata = new Metadata().withPagination(pagination);
-			final Locations locationList = new Locations().withMetadata(metadata).withResult(results);
-			return new ResponseEntity<>(locationList, HttpStatus.OK);
+			return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 
 		} else {
 
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", "not found locations"));
 			final Metadata metadata = new Metadata(null, status);
-			final Locations locationList = new Locations().withMetadata(metadata);
-			return new ResponseEntity<>(locationList, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new EntityListResponse().withMetadata(metadata), HttpStatus.NOT_FOUND);
 		}
 	}
 

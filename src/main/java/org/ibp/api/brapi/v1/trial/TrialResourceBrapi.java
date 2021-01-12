@@ -13,9 +13,11 @@ import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -56,7 +58,7 @@ public class TrialResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
-	public ResponseEntity<TrialSummaries> listTrialSummaries(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<TrialSummary>> listTrialSummaries(@PathVariable final String crop,
 		@ApiParam(value = "Program filter to only return studies associated with given program id.") @RequestParam(value = "programDbId",
 			required = false) final String programDbId,
 		@ApiParam(value = "Location filter to only return studies associated with given location id.") @RequestParam(value = "locationDbId",
@@ -76,8 +78,7 @@ public class TrialResourceBrapi {
 		if (!StringUtils.isBlank(validationError)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
 			final Metadata metadata = new Metadata(null, status);
-			final TrialSummaries trialSummaries = new TrialSummaries().withMetadata(metadata).withResult(new Result<TrialSummary>());
-			return new ResponseEntity<>(trialSummaries, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new EntityListResponse<>(metadata, new Result<>()), HttpStatus.NOT_FOUND);
 		}
 
 		final StudySearchFilter filter = new StudySearchFilter().withProgramDbId(programDbId).withLocationDbId(locationDbId);
@@ -111,9 +112,7 @@ public class TrialResourceBrapi {
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
-		final TrialSummaries trialSummaries = new TrialSummaries().withMetadata(metadata).withResult(results);
-
-		return new ResponseEntity<>(trialSummaries, HttpStatus.OK);
+		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 
 	}
 
@@ -151,7 +150,7 @@ public class TrialResourceBrapi {
 		+ "<p><strong>Note: </strong> non-standard BrAPI call</p>")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials/{trialDbId}/table", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<TrialObservations> getTrialObservationsAsTable(@PathVariable final String crop,
+	public ResponseEntity<SingleEntityResponse<org.ibp.api.brapi.v1.trial.TrialObservationTable>> getTrialObservationsAsTable(@PathVariable final String crop,
 		@PathVariable final Integer trialDbId) {
 
 		org.ibp.api.brapi.v1.trial.TrialObservationTable trialObservationsTable = new org.ibp.api.brapi.v1.trial.TrialObservationTable();
@@ -178,7 +177,6 @@ public class TrialResourceBrapi {
 			new Pagination().withPageNumber(1).withPageSize(resultNumber).withTotalCount((long) resultNumber).withTotalPages(1);
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
-		final TrialObservations trialObservations = new TrialObservations().setMetadata(metadata).setResult(trialObservationsTable);
-		return new ResponseEntity<>(trialObservations, HttpStatus.OK);
+		return new ResponseEntity<>(new SingleEntityResponse<>(metadata, trialObservationsTable), HttpStatus.OK);
 	}
 }
