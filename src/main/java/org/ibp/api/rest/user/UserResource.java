@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Controller
@@ -46,26 +45,17 @@ public class UserResource {
 	@RequestMapping(value = "/users", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
-	public ResponseEntity<Map<String, Object>> createUser(@RequestBody final
+	public ResponseEntity<Integer> createUser(@RequestBody final
 	UserDetailDto user) {
-		final Map<String, Object> map = this.userService.createUser(user);
-
-		if (map.get("ERROR") != null) {
-			return new ResponseEntity<>(map, HttpStatus.CONFLICT);
-		}
-		return new ResponseEntity<>(map, HttpStatus.CREATED);
+		return new ResponseEntity<>(this.userService.createUser(user), HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Update user", notes = "Update user in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
-	public ResponseEntity<Map<String, Object>> updateUser(final @PathVariable
+	public ResponseEntity<Integer> updateUser(final @PathVariable
 	String id, @RequestBody final UserDetailDto user) {
-		final Map<String, Object> map = this.userService.updateUser(user);
-		if (map.get("ERROR") != null) {
-			return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<>(map, HttpStatus.OK);
+		return new ResponseEntity<>(this.userService.updateUser(user), HttpStatus.OK);
 	}
 }
