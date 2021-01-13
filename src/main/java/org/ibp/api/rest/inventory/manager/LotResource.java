@@ -283,7 +283,7 @@ public class LotResource {
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
 		final List<LocationDto> locations =
-			this.locationService.getLocations(cropName, programUUID, LotResource.STORAGE_LOCATION_TYPE, null, null, false);
+			this.locationService.getLocations(cropName, programUUID, LotResource.STORAGE_LOCATION_TYPE, null, null, false, null, null);
 
 		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
 		final HttpHeaders headers = new HttpHeaders();

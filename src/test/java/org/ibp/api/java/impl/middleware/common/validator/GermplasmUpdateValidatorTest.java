@@ -73,7 +73,7 @@ public class GermplasmUpdateValidatorTest {
 		when(this.germplasmMiddlewareService.getGermplasmByGUIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 		when(this.locationDataManager
 			.getFilteredLocations(programUUID, null, null, new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())),
-				false)).thenReturn(Arrays.asList(location));
+				false, null, null)).thenReturn(Arrays.asList(location));
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
@@ -153,7 +153,7 @@ public class GermplasmUpdateValidatorTest {
 
 		when(this.locationDataManager
 			.getFilteredLocations(programUUID, null, null, new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())),
-				false)).thenReturn(Arrays.asList(new Location()));
+				false, null, null)).thenReturn(Arrays.asList(new Location()));
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);

@@ -1,15 +1,25 @@
 package org.ibp.api.rest.location;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.java.location.LocationService;
+import org.ibp.api.rest.common.PaginatedSearch;
+import org.ibp.api.rest.common.SearchSpec;
+import org.ibp.api.rest.dataset.DatasetResource;
+import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 import java.util.Set;
@@ -53,7 +64,12 @@ public class LocationResource {
 		return new ResponseEntity<>(this.locationService.getLocationTypes(), HttpStatus.OK);
 	}
 
-
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "Results page you want to retrieve (0..N)"),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page.")
+	})
 	@ApiOperation(value = "List locations", notes = "Get a list of locations filter by types")
 	@RequestMapping(value = "/crops/{cropname}/locations", method = RequestMethod.GET)
 	@ResponseBody
@@ -63,10 +79,33 @@ public class LocationResource {
 		@ApiParam(value = "list of location types")
 		@RequestParam(required = false) final Set<Integer> locationTypes,
 		@ApiParam(value = "isFavoriteLocation", required = true)
-		@RequestParam final boolean favoriteLocations) {
+		@RequestParam final boolean favoriteLocations,
+		@RequestParam(required = false) final String name,
+		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
 
-		return new ResponseEntity<>(locationService.getLocations(cropname, programUUID, locationTypes, null, null, favoriteLocations),
-			HttpStatus.OK);
+		final PagedResult<LocationDto> pageResult =
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<LocationDto>() {
+
+				@Override
+				public long getCount() {
+					return locationService.countLocations(cropname, programUUID, null, null, null, false, null);
+				}
+
+				@Override
+				public long getFilteredCount() {
+					return locationService.countLocations(cropname, programUUID, locationTypes, null, null, favoriteLocations, name);
+				}
+
+				@Override
+				public List<LocationDto> getResults(final PagedResult<LocationDto> pagedResult) {
+					return locationService.getLocations(cropname, programUUID, locationTypes, null, null, favoriteLocations, name, pageable);
+				}
+			});
+
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Filtered-Count", Long.toString(pageResult.getFilteredResults()));
+		return new ResponseEntity<List<LocationDto>>(pageResult.getPageResults(), headers, HttpStatus.OK);
 
 	}
 }

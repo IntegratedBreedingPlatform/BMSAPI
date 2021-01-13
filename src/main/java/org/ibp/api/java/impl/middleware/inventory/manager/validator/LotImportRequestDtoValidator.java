@@ -100,7 +100,7 @@ public class LotImportRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		final List<Location> existingLocations =
-			locationDataManager.getFilteredLocations(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, false);
+			locationDataManager.getFilteredLocations(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, false, null, null);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 			final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
 			final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);

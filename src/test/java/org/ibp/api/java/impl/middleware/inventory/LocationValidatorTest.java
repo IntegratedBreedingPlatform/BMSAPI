@@ -146,7 +146,7 @@ public class LocationValidatorTest {
 		final List<Location> locationList = Lists.newArrayList(location);
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");
 
-		Mockito.when(this.locationDataManager.getFilteredLocations(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, false))
+		Mockito.when(this.locationDataManager.getFilteredLocations(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, false, null, null))
 			.thenReturn(locationList);
 		this.locationValidator.validateSeedLocationAbbr(this.errors, null, locationAbbrList);
 
@@ -159,7 +159,7 @@ public class LocationValidatorTest {
 		final List<Location> locationList = Collections.emptyList();
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");;
 
-		Mockito.when(this.locationDataManager.getFilteredLocations(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, false))
+		Mockito.when(this.locationDataManager.getFilteredLocations(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, false, null, null))
 			.thenReturn(locationList);
 		this.locationValidator.validateSeedLocationAbbr(this.errors, null, locationAbbrList);
 

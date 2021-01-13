@@ -42,7 +42,7 @@ public class LocationServiceImplTest {
 	@Test
 	public void testGetLocations_MissingProgramUUIDWhenFavoritesAreRequired() {
 		try {
-			this.locationService.getLocations(CROP, null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), true);
+			this.locationService.getLocations(CROP, null, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), true, null, null);
 		} catch (Exception e) {
 			assertThat(e, instanceOf(ApiRequestValidationException.class));
 			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
@@ -53,7 +53,7 @@ public class LocationServiceImplTest {
 	@Test
 	public void testGetLocations_InvalidProgram() {
 		try {
-			this.locationService.getLocations(CROP, "", new HashSet<>(), new ArrayList<>(), new ArrayList<>(), false);
+			this.locationService.getLocations(CROP, "", new HashSet<>(), new ArrayList<>(), new ArrayList<>(), false, null, null);
 		} catch (Exception e) {
 			assertThat(e, instanceOf(ApiRequestValidationException.class));
 			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("program.does.not.exist"));
@@ -70,12 +70,12 @@ public class LocationServiceImplTest {
 		locationMw.setLabbr(locationAbbreviation);
 
 		Mockito.when(locationDataManager
-			.getFilteredLocations(Mockito.eq(programUUID), Mockito.anySet(), Mockito.anyList(), Mockito.anyList(), Mockito.anyBoolean()))
+			.getFilteredLocations(Mockito.eq(programUUID), Mockito.anySet(), Mockito.anyList(), Mockito.anyList(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.any()))
 			.thenReturn(
 				Collections.singletonList(locationMw));
 
 		final List<LocationDto> locationList =
-			this.locationService.getLocations(CROP, programUUID, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), false);
+			this.locationService.getLocations(CROP, programUUID, new HashSet<>(), new ArrayList<>(), new ArrayList<>(), false, "", null);
 
 		assertThat(locationList, hasSize(1));
 		assertThat(locationList.get(0).getName(), equalTo(locationName));

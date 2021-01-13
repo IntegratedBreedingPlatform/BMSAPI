@@ -119,7 +119,7 @@ public class GermplasmUpdateValidator {
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getLocationAbbreviation()))
 				.map(dto -> dto.getLocationAbbreviation().toUpperCase()).collect(Collectors.toSet());
 		final List<String> abbreviations =
-			this.locationDataManager.getFilteredLocations(programUUID, null, null, new ArrayList<>(locationAbbrs), false).stream()
+			this.locationDataManager.getFilteredLocations(programUUID, null, null, new ArrayList<>(locationAbbrs), false, null, null).stream()
 				.map(Location::getLabbr).collect(
 				Collectors.toList());
 

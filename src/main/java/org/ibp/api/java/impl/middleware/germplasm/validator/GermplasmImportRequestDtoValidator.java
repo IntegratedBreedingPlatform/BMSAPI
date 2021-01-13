@@ -212,7 +212,7 @@ public class GermplasmImportRequestDtoValidator {
 		final Set<String> locationAbbrs =
 			germplasmDtos.stream().map(g -> g.getLocationAbbr().toUpperCase()).collect(Collectors.toSet());
 		final List<String> existingLocations =
-			this.locationDataManager.getFilteredLocations(programUUID, null, null, new ArrayList<>(locationAbbrs), false).stream().map(
+			this.locationDataManager.getFilteredLocations(programUUID, null, null, new ArrayList<>(locationAbbrs), false, null, null).stream().map(
 				Location::getLabbr).collect(
 				Collectors.toList());
 		if (locationAbbrs.size() != existingLocations.size()) {

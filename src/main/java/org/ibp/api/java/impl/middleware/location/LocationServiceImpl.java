@@ -12,6 +12,7 @@ import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.location.LocationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -46,9 +47,30 @@ public class LocationServiceImpl implements LocationService {
 	private BindingResult errors;
 
 	@Override
+	public long countLocations(final String crop, final String programUUID, final Set<Integer> locationTypes,
+		final List<Integer> locationIds, final List<String> locationAbbreviations, final boolean favoriteLocations, final String locationName) {
+
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		if (favoriteLocations && StringUtils.isEmpty(programUUID)) {
+			this.errors.reject("locations.favorite.requires.program", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (programUUID != null) {
+			this.programValidator.validate(new ProgramSummary(crop, programUUID), errors);
+			if (errors.hasErrors()) {
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
+
+		return locationDataManager.countFilteredLocations(programUUID, locationTypes, locationIds, locationAbbreviations, favoriteLocations, locationName);
+	}
+
+	@Override
 	public List<LocationDto> getLocations(final String crop, final String programUUID, final Set<Integer> locationTypes,
 		final List<Integer> locationIds,
-		final List<String> locationAbbreviations, final boolean favoriteLocations) {
+		final List<String> locationAbbreviations, final boolean favoriteLocations, final String locationName, final Pageable pageable) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
@@ -65,7 +87,7 @@ public class LocationServiceImpl implements LocationService {
 		}
 
 		final List<org.generationcp.middleware.pojos.Location> locations =
-			locationDataManager.getFilteredLocations(programUUID, locationTypes, locationIds, locationAbbreviations, favoriteLocations);
+			locationDataManager.getFilteredLocations(programUUID, locationTypes, locationIds, locationAbbreviations, favoriteLocations, locationName, pageable);
 
 		final ModelMapper mapper = LocationMapper.getInstance();
 		final List<LocationDto> locationList = locations.stream().map(o -> mapper.map(o, LocationDto.class)).collect(Collectors.toList());

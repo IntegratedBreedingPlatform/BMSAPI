@@ -229,11 +229,11 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 
 		final List<LocationDto> storageLocations =
 			this.locationService
-				.getLocations(cropName, programUUID, GermplasmExcelTemplateExportServiceImpl.STORAGE_LOCATION_TYPE, null, null, false);
+				.getLocations(cropName, programUUID, GermplasmExcelTemplateExportServiceImpl.STORAGE_LOCATION_TYPE, null, null, false, null, null);
 
 		final List<LocationDto> locations =
 			this.locationService
-				.getLocations(cropName, programUUID, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, false);
+				.getLocations(cropName, programUUID, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, false, null, null);
 
 		final List<AttributeDTO> attributeDTOs =
 			this.germplasmService.filterGermplasmAttributes(null);
