@@ -5,15 +5,14 @@ import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.user.UserDetailDto;
 
 import java.util.List;
-import java.util.Map;
 
 public interface UserService {
 
 	List<UserDetailDto> getAllUsersSortedByLastName();
 
-	Map<String, Object> createUser(final UserDetailDto user);
+	Integer createUser(final UserDetailDto user);
 
-	Map<String, Object> updateUser(final UserDetailDto user);
+	Integer updateUser(final UserDetailDto user);
 
 	List<UserDetailDto> getUsersByProjectUUID(final String projectUUID);
 

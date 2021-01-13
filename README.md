@@ -136,21 +136,4 @@ In standalone mode, application uses the embeded Tomcat from Spring-Boot and aut
 #### General Notes ####
 The default database connection parameters BMS API uses are the same as the default BMS MySQL database parameters (localhost, port 43306 with user name root and no password). If you are running BMS API alongside your BMS installation, make sure that BMS is started first (mainly so that the BMS MySQL database is up). 
 
-If you have not installed BMS with default database settings, create `application.properties` file in same directory as the BMS API executable war file and update db.* property values as per your environment:
-
-```
-server.port=19080
-server.contextPath=/bmsapi
-
-spring.thymeleaf.cache=false
-
-db.host=<YourBMSMySQLHost>
-db.port=<YourBMSMySQLPort>
-db.username=<YourBMSMySQLUserName>
-db.password=<YourBMSMySQLPassword>
-
-db.workbench.name=workbench
-```
-then run with the usual `java -jar bmsapi.war` and BMS API will pick up the `application.properties` file from local directory and override the defaults.
-
 [BMS Manual setup]: https://github.com/IntegratedBreedingPlatform/Documentation/wiki/Manual-setup
