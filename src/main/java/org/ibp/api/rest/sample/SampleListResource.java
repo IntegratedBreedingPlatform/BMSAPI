@@ -7,6 +7,7 @@ import org.generationcp.commons.pojo.FileExportInfo;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -182,7 +183,7 @@ public class SampleListResource {
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", exportInfo.getDownloadFileName()));
-
+		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(exportInfo.getDownloadFileName())));
 		final File file = new File(exportInfo.getFilePath());
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 
