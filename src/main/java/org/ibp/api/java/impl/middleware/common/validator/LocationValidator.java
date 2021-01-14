@@ -34,7 +34,7 @@ public class LocationValidator {
 			errors.reject("location.invalid", "");
 			return;
 		}
-		if (!StringUtils.isEmpty(programUUID) && location.getUniqueID() != null && !location.getUniqueID().equals(programUUID)) {
+		if (!StringUtils.isEmpty(programUUID) && location.getProgramUUID() != null && !location.getProgramUUID().equals(programUUID)) {
 			errors.reject("location.belongs.to.another.program", "");
 			return;
 		}

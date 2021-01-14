@@ -7,10 +7,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
@@ -20,15 +19,11 @@ import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
-import org.ibp.api.brapi.v1.study.StudyDetails;
 import org.ibp.api.brapi.v1.study.StudyDetailsData;
 import org.ibp.api.brapi.v1.study.StudyMapper;
-import org.ibp.api.brapi.v1.study.StudySummariesDto;
-import org.ibp.api.brapi.v1.study.StudySummaryDto;
-import org.ibp.api.brapi.v1.trial.TrialSummary;
-import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.study.StudyService;
@@ -49,7 +44,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -72,7 +66,7 @@ public class StudyResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/studies/{studyDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
+	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
@@ -81,12 +75,10 @@ public class StudyResourceBrapi {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
-		final StudyDetails studyDetails = new StudyDetails();
 		final Metadata metadata = new Metadata();
 		final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 		metadata.setPagination(pagination);
 		metadata.setStatus(Collections.singletonList(new HashMap<>()));
-		studyDetails.setMetadata(metadata);
 		final ModelMapper studyMapper = StudyMapper.getInstance();
 		final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
 		if (mwStudyDetails.getMetadata().getLocationId() != null) {
@@ -100,9 +92,8 @@ public class StudyResourceBrapi {
 			}
 		}
 		result.setCommonCropName(crop);
-		studyDetails.setResult(result);
 
-		return ResponseEntity.ok(studyDetails);
+		return ResponseEntity.ok(new SingleEntityResponse<>(metadata, result));
 	}
 
 	@ApiOperation(value = "Get a filtered list of Studies", notes = "Get a filtered list of Studies")
