@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.api.brapi.v1.observation.NewObservationRequest;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -21,7 +22,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -36,6 +36,7 @@ import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
@@ -190,7 +191,7 @@ public class StudyResourceBrapi {
 	@ApiOperation(value = "Get study observation details as table", notes = "Get study observation details as table")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<StudyObservations> getStudyObservationsAsTable(final HttpServletResponse response,
+	public ResponseEntity<SingleEntityResponse<StudyObservationTable>> getStudyObservationsAsTable(final HttpServletResponse response,
 		@PathVariable final String crop, @PathVariable final int studyDbId,
 		@ApiParam(value = "The format parameter will cause the data to be dumped to a file in the specified format",
 			required = false) @RequestParam(value = "format", required = false) final String format)
@@ -208,14 +209,14 @@ public class StudyResourceBrapi {
 			} else {
 				final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", "Incorrect format"));
 				final Metadata metadata = new Metadata(null, status);
-				final StudyObservations observations = new StudyObservations().setMetadata(metadata);
-				return new ResponseEntity<>(observations, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(new SingleEntityResponse(metadata), HttpStatus.NOT_FOUND);
 			}
 		}
+
 		return new ResponseEntity<>(this.getStudyObservations(studyDbId), HttpStatus.OK);
 	}
 
-	private StudyObservations getStudyObservations(final int studyDbId) throws Exception {
+	private SingleEntityResponse<StudyObservationTable> getStudyObservations(final int studyDbId) throws Exception {
 		StudyObservationTable studyObservationsTable = new StudyObservationTable();
 
 		final Integer trialDbId = this.studyDataManager.getProjectIdByStudyDbId(studyDbId);
@@ -237,15 +238,14 @@ public class StudyResourceBrapi {
 			new Pagination().withPageNumber(1).withPageSize(resultNumber).withTotalCount((long) resultNumber).withTotalPages(1);
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
-		final StudyObservations studyObservations = new StudyObservations().setMetadata(metadata).setResult(studyObservationsTable);
 
-		return studyObservations;
+		return new SingleEntityResponse<>(metadata, studyObservationsTable);
 	}
 
 	@ApiOperation(value = "Get study details", notes = "Get study details")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV1_3.class)
-	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
+	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
@@ -259,11 +259,9 @@ public class StudyResourceBrapi {
 				Collectors.toMap(MeasurementVariable::getName, MeasurementVariable::getValue));
 		mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
 
-		final StudyDetails studyDetails = new StudyDetails();
 		final Metadata metadata = new Metadata();
 		final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 		metadata.setPagination(pagination);
-		studyDetails.setMetadata(metadata);
 		final ModelMapper studyMapper = StudyMapper.getInstance();
 		final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
 
@@ -277,9 +275,8 @@ public class StudyResourceBrapi {
 				result.setLocation(location);
 			}
 		}
-		studyDetails.setResult(result);
 
-		return ResponseEntity.ok(studyDetails);
+		return ResponseEntity.ok(new SingleEntityResponse<>(metadata, result));
 	}
 
 	@ApiOperation(value = "", hidden = true)

@@ -53,7 +53,6 @@ public class UserMapperTest {
 		this.userValidator.setWorkbenchDataManager(this.workbenchDataManager);
 		this.userServiceImpl.setUserValidator(this.userValidator);
 		this.userServiceImpl.setSecurityService(this.securityService);
-		this.userServiceImpl.setMessageSource(this.messageSource);
 		this.userServiceImpl.setUserService(this.middlewareUserService);
 
 		final CropType cropType = new CropType("maize");

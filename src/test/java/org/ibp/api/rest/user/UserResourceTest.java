@@ -5,7 +5,9 @@ import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.domain.user.UserDetailDto;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
+import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.user.UserService;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -15,6 +17,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -118,18 +122,17 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testCreateUser() throws Exception {
-		final String id = "10";
+		final Integer id = 10;
 		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
-		final HashMap<String, Object> mapResponse = this.initializeResponse(id);
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/users").build().encode();
 
-		Mockito.when(this.userService.createUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
+		Mockito.when(this.userService.createUser(Mockito.any(UserDetailDto.class))).thenReturn(id);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
 						.content(this.convertObjectToByte(user)))
 				.andExpect(MockMvcResultMatchers.status().isCreated()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(id)));
+				.andExpect(MockMvcResultMatchers.content().string(Matchers.is(id.toString())));
 	}
 
 	/**
@@ -140,19 +143,19 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testCreateUserError() throws Exception {
 		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
-		final HashMap<String, Object> mapResponse = this.initializeResponseError("email", "exists");
-
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/users").build().encode();
 
-		Mockito.when(this.userService.createUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserValidator.class.getName());
+		errors.reject(UserValidator.SIGNUP_FIELD_INVALID_EMAIL_FORMAT, "");
+		Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(this.userService)
+			.createUser(Mockito.any(UserDetailDto.class));
 
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
-						.content(this.convertObjectToByte(user)))
-				.andExpect(MockMvcResultMatchers.status().isConflict()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.ERROR.errors.[0].fieldNames.[0]", Matchers.is("email")))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.ERROR.errors.[0].message", Matchers.is("exists")))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is((String) mapResponse.get("id"))));
+			.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
+				.content(this.convertObjectToByte(user)))
+			.andExpect(MockMvcResultMatchers.status().isBadRequest()).andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors.[0].message",
+				Matchers.is("Email is invalid.")));
 	}
 
 	/**
@@ -162,38 +165,38 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testUpdateUser() throws Exception {
-		final String id = "7";
+		final Integer id = 7;
 		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
-		final HashMap<String, Object> mapResponse = this.initializeResponse(id);
 
-		Mockito.when(this.userService.updateUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
+		Mockito.when(this.userService.updateUser(Mockito.any(UserDetailDto.class))).thenReturn(id);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.put("/users/{id}", id).contentType(this.contentType)
 						.content(this.convertObjectToByte(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(id)));
+				.andExpect(MockMvcResultMatchers.content().string(Matchers.is(id.toString())));
 	}
 
 	/**
-	 * Should respond with 404 and return the id 0, because happened a error during the creation user. * *
+	 * Should respond with 404 and return the id 0, because happened a error during updating the user. * *
 	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void testUpdateUserError() throws Exception {
-		final String id = "7";
+		final Integer id = 7;
 		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
-		final HashMap<String, Object> mapResponse = this.initializeResponseError("username", "exists");
-		Mockito.when(this.userService.updateUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
 
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserValidator.class.getName());
+		errors.reject(UserValidator.SIGNUP_FIELD_INVALID_EMAIL_FORMAT, "");
+		Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(this.userService)
+			.updateUser(Mockito.any(UserDetailDto.class));
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.put("/users/{id}", id).contentType(this.contentType)
 						.content(this.convertObjectToByte(user)))
-				.andExpect(MockMvcResultMatchers.status().isNotFound()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.ERROR.errors.[0].fieldNames.[0]", Matchers.is("username")))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.ERROR.errors.[0].message", Matchers.is("exists")))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("0")));
+			.andExpect(MockMvcResultMatchers.status().isBadRequest()).andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors.[0].message",
+				Matchers.is("Email is invalid.")));
 	}
 
 	/**

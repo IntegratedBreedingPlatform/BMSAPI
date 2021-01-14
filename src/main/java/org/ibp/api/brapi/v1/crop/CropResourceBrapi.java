@@ -3,6 +3,7 @@ package org.ibp.api.brapi.v1.crop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -41,27 +42,24 @@ public class CropResourceBrapi {
 	@ApiOperation(value = "List of available crops.", notes = "Get a list of available crops.")
 	@RequestMapping(value = "/brapi/v1/crops", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<CropDto> listAvailableCrops() {
-
-		final CropDto cropDto = new CropDto();
+	public ResponseEntity<EntityListResponse<String>> listAvailableCrops() {
 
 		// The response doesn't require pagination. The value for the "pagination" key is returned with all the keys set to zero.
 		final Metadata metadata = new Metadata();
 		metadata.withDatafiles(new URL[0]);
 		metadata.withStatus(Collections.singletonList(new HashMap<>()));
 		metadata.withPagination(new Pagination(0, 0, 0l, 0));
-		cropDto.setMetadata(metadata);
 
+		final Result<String> results;
 		if (request.isUserInRole(PermissionsEnum.ADMIN.name())
 			|| request.isUserInRole(PermissionsEnum.ADMINISTRATION.name())
 			|| request.isUserInRole(PermissionsEnum.SITE_ADMIN.name())) {
-			cropDto.setResult(new Result<>(this.cropService.getInstalledCrops()));
+			results = new Result<>(this.cropService.getInstalledCrops());
 		} else {
-			cropDto.setResult(
-				new Result<>(this.cropService.getAvailableCropsForUser(this.securityService.getCurrentlyLoggedInUser().getUserid())));
+			results = new Result<>(this.cropService.getAvailableCropsForUser(this.securityService.getCurrentlyLoggedInUser().getUserid()));
 		}
 
-		return new ResponseEntity<>(cropDto, HttpStatus.OK);
+		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 
 	}
 

@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -36,7 +37,7 @@ public class PhenotypeSearchResource {
 	@RequestMapping(value = "/{crop}/brapi/v1/phenotypes-search", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_2.class)
-	public ResponseEntity<PhenotypeSearchSummariesDto> searchPhenotypes(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> searchPhenotypes(@PathVariable final String crop,
 		@RequestBody final PhenotypeSearchRequestDTO requestDTO) {
 
 
@@ -66,9 +67,7 @@ public class PhenotypeSearchResource {
 			.withTotalPages(resultPage.getTotalPages());
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
-		final PhenotypeSearchSummariesDto summaries = new PhenotypeSearchSummariesDto().setMetadata(metadata).setResult(results);
-
-		return new ResponseEntity<>(summaries, HttpStatus.OK);
+		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 	}
 
 

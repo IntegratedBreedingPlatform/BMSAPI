@@ -4,9 +4,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -39,6 +41,7 @@ import org.springframework.validation.MapBindingResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -93,6 +96,9 @@ public class GermplasmListServiceImplTest {
 	@Mock
 	private GermplasmValidator germplasmValidator;
 
+	@Mock
+	private GermplasmService germplasmService;
+
 	@Before
 	public void init() {
 		MockitoAnnotations.initMocks(this);
@@ -108,6 +114,11 @@ public class GermplasmListServiceImplTest {
 		germplasms.add(new Germplasm(GID1));
 		germplasms.add(new Germplasm(GID2));
 		Mockito.when(this.germplasmDataManager.getGermplasms(ArgumentMatchers.anyList())).thenReturn(germplasms);
+
+		final HashMap<Integer, String> plotCodeValuesByGids = new HashMap<>();
+		plotCodeValuesByGids.put(GID1, GermplasmListDataDAO.SOURCE_UNKNOWN);
+		plotCodeValuesByGids.put(GID2, GermplasmListDataDAO.SOURCE_UNKNOWN);
+		Mockito.when(this.germplasmService.getPlotCodeValues(ArgumentMatchers.anySet())).thenReturn(plotCodeValuesByGids);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)

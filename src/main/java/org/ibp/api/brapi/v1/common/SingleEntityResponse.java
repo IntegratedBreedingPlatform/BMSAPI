@@ -22,6 +22,11 @@ public class SingleEntityResponse<T> {
 		this.result = result;
 	}
 
+	public SingleEntityResponse(final Metadata metadata, final T result) {
+		this.metadata = metadata;
+		this.result = result;
+	}
+
 	public SingleEntityResponse withMetadata(final Metadata metadata) {
 		this.metadata = metadata;
 		return this;

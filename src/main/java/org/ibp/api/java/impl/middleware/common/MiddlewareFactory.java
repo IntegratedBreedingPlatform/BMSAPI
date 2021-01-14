@@ -205,13 +205,13 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public FieldbookService getFieldbookService() {
-		return new FieldbookServiceImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
+		return new FieldbookServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public MethodService getMethodService() {
-		return new MethodServiceImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
+		return new MethodServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
@@ -260,7 +260,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public MeasurementVariableTransformer getMeasurementVariableTransformer() {
-		return new MeasurementVariableTransformer(this.getCropDatabaseSessionProvider());
+		return new MeasurementVariableTransformer();
 	}
 
 	@Bean
@@ -278,13 +278,13 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmListManager getGermplasmListManager() {
-		return new GermplasmListManagerImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
+		return new GermplasmListManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmDataManager getGermplasmDataManager() {
-		return new GermplasmDataManagerImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
+		return new GermplasmDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
@@ -415,7 +415,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StandardVariableTransformer standardVariableTransformer() {
-		return new StandardVariableTransformer(this.getCropDatabaseSessionProvider());
+		return new StandardVariableTransformer();
 	}
 
 	@Bean
