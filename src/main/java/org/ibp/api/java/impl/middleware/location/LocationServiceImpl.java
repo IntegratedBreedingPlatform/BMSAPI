@@ -44,27 +44,15 @@ public class LocationServiceImpl implements LocationService {
 	@Autowired
 	private ProgramValidator programValidator;
 
-	private BindingResult errors;
-
 	@Override
 	public long countLocations(final String crop, final String programUUID, final Set<Integer> locationTypes,
-		final List<Integer> locationIds, final List<String> locationAbbreviations, final boolean favoriteLocations, final String locationName) {
+		final List<Integer> locationIds, final List<String> locationAbbreviations, final boolean favoriteLocations,
+		final String locationName) {
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.validate(crop, programUUID, favoriteLocations);
 
-		if (favoriteLocations && StringUtils.isEmpty(programUUID)) {
-			this.errors.reject("locations.favorite.requires.program", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-		if (programUUID != null) {
-			this.programValidator.validate(new ProgramSummary(crop, programUUID), errors);
-			if (errors.hasErrors()) {
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
-		}
-
-		return locationDataManager.countFilteredLocations(programUUID, locationTypes, locationIds, locationAbbreviations, favoriteLocations, locationName);
+		return this.locationDataManager
+			.countFilteredLocations(programUUID, locationTypes, locationIds, locationAbbreviations, favoriteLocations, locationName);
 	}
 
 	@Override
@@ -72,26 +60,30 @@ public class LocationServiceImpl implements LocationService {
 		final List<Integer> locationIds,
 		final List<String> locationAbbreviations, final boolean favoriteLocations, final String locationName, final Pageable pageable) {
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.validate(crop, programUUID, favoriteLocations);
+
+		final List<org.generationcp.middleware.pojos.Location> locations =
+			this.locationDataManager
+				.getFilteredLocations(programUUID, locationTypes, locationIds, locationAbbreviations, favoriteLocations, locationName,
+					pageable);
+
+		final ModelMapper mapper = LocationMapper.getInstance();
+		return locations.stream().map(o -> mapper.map(o, LocationDto.class)).collect(Collectors.toList());
+	}
+
+	private void validate(final String crop, final String programUUID, final boolean favoriteLocations) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
 		if (favoriteLocations && StringUtils.isEmpty(programUUID)) {
-			this.errors.reject("locations.favorite.requires.program", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+			errors.reject("locations.favorite.requires.program", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		if (programUUID != null) {
 			this.programValidator.validate(new ProgramSummary(crop, programUUID), errors);
 			if (errors.hasErrors()) {
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
+				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 		}
-
-		final List<org.generationcp.middleware.pojos.Location> locations =
-			locationDataManager.getFilteredLocations(programUUID, locationTypes, locationIds, locationAbbreviations, favoriteLocations, locationName, pageable);
-
-		final ModelMapper mapper = LocationMapper.getInstance();
-		final List<LocationDto> locationList = locations.stream().map(o -> mapper.map(o, LocationDto.class)).collect(Collectors.toList());
-
-		return locationList;
 	}
 }

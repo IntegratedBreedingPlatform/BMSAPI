@@ -8,14 +8,11 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.java.location.LocationService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
-import org.ibp.api.rest.dataset.DatasetResource;
-import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -70,10 +67,10 @@ public class LocationResource {
 		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
 			value = "Number of records per page.")
 	})
-	@ApiOperation(value = "List locations", notes = "Get a list of locations filter by types")
+	@ApiOperation(value = "List locations", notes = "Get a list of locations filter by types, favorites, abbreviations and location name.")
 	@RequestMapping(value = "/crops/{cropname}/locations", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<LocationDto>> listFavoriteLocations(
+	public ResponseEntity<List<LocationDto>> listLocations(
 		@PathVariable final String cropname,
 		@RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "list of location types")
@@ -88,20 +85,21 @@ public class LocationResource {
 
 				@Override
 				public long getCount() {
-					return locationService.countLocations(cropname, programUUID, null, null, null, false, null);
+					return LocationResource.this.locationService.countLocations(cropname, programUUID, null, null, null, false, null);
 				}
 
 				@Override
 				public long getFilteredCount() {
-					return locationService.countLocations(cropname, programUUID, locationTypes, null, null, favoriteLocations, name);
+					return LocationResource.this.locationService
+						.countLocations(cropname, programUUID, locationTypes, null, null, favoriteLocations, name);
 				}
 
 				@Override
 				public List<LocationDto> getResults(final PagedResult<LocationDto> pagedResult) {
-					return locationService.getLocations(cropname, programUUID, locationTypes, null, null, favoriteLocations, name, pageable);
+					return LocationResource.this.locationService
+						.getLocations(cropname, programUUID, locationTypes, null, null, favoriteLocations, name, pageable);
 				}
 			});
-
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add("X-Filtered-Count", Long.toString(pageResult.getFilteredResults()));
