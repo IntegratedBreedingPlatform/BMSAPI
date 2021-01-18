@@ -2,6 +2,8 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -39,6 +41,9 @@ public class GermplasmUpdateValidatorTest {
 	@Mock
 	private LocationDataManager locationDataManager;
 
+	@Mock
+	private LocationService locationService;
+
 	@InjectMocks
 	private GermplasmUpdateValidator germplasmUpdateValidator;
 
@@ -71,9 +76,11 @@ public class GermplasmUpdateValidatorTest {
 			.thenReturn(Arrays.asList(new AttributeDTO(null, "NOTE", null), new AttributeDTO(null, "ACQ_DATE", null)));
 		when(this.germplasmMiddlewareService.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 		when(this.germplasmMiddlewareService.getGermplasmByGUIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
-		when(this.locationDataManager
-			.getFilteredLocations(programUUID, null, null, new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())),
-				false, null, null)).thenReturn(Arrays.asList(location));
+
+		when(this.locationService
+			.getFilteredLocations(new LocationSearchRequest(programUUID, null, null,
+				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null, false), null))
+			.thenReturn(Arrays.asList(location));
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
@@ -151,9 +158,10 @@ public class GermplasmUpdateValidatorTest {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setLocationAbbreviation("AFG");
 
-		when(this.locationDataManager
-			.getFilteredLocations(programUUID, null, null, new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())),
-				false, null, null)).thenReturn(Arrays.asList(new Location()));
+		when(this.locationService
+			.getFilteredLocations(new LocationSearchRequest(programUUID, null, null,
+				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null, false), null))
+			.thenReturn(Arrays.asList(new Location()));
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);

@@ -4,9 +4,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.location.LocationDto;
@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
-import java.util.Set;
 
 @Api(value = "Location Services")
 @RestController
@@ -68,16 +68,11 @@ public class LocationResource {
 			value = "Number of records per page.")
 	})
 	@ApiOperation(value = "List locations", notes = "Get a list of locations filter by types, favorites, abbreviations and location name.")
-	@RequestMapping(value = "/crops/{cropname}/locations", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropname}/locations", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<LocationDto>> listLocations(
 		@PathVariable final String cropname,
-		@RequestParam(required = false) final String programUUID,
-		@ApiParam(value = "list of location types")
-		@RequestParam(required = false) final Set<Integer> locationTypes,
-		@ApiParam(value = "isFavoriteLocation", required = true)
-		@RequestParam final boolean favoriteLocations,
-		@RequestParam(required = false) final String name,
+		@RequestBody(required = false) final LocationSearchRequest locationSearchRequest,
 		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
 
 		final PagedResult<LocationDto> pageResult =
@@ -85,19 +80,19 @@ public class LocationResource {
 
 				@Override
 				public long getCount() {
-					return LocationResource.this.locationService.countLocations(cropname, programUUID, null, null, null, false, null);
+					return LocationResource.this.locationService.countLocations(cropname, locationSearchRequest);
 				}
 
 				@Override
 				public long getFilteredCount() {
 					return LocationResource.this.locationService
-						.countLocations(cropname, programUUID, locationTypes, null, null, favoriteLocations, name);
+						.countLocations(cropname, locationSearchRequest);
 				}
 
 				@Override
 				public List<LocationDto> getResults(final PagedResult<LocationDto> pagedResult) {
 					return LocationResource.this.locationService
-						.getLocations(cropname, programUUID, locationTypes, null, null, favoriteLocations, name, pageable);
+						.getLocations(cropname, locationSearchRequest, pageable);
 				}
 			});
 

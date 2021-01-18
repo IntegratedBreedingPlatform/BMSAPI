@@ -4,9 +4,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -32,7 +33,7 @@ public class GermplasmUpdateValidator {
 	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmMiddlewareService;
 
 	@Autowired
-	private LocationDataManager locationDataManager;
+	private LocationService locationService;
 
 	public void validateEmptyList(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		if (germplasmUpdateDTOList == null || germplasmUpdateDTOList.isEmpty()) {
@@ -118,8 +119,11 @@ public class GermplasmUpdateValidator {
 		final Set<String> locationAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getLocationAbbreviation()))
 				.map(dto -> dto.getLocationAbbreviation().toUpperCase()).collect(Collectors.toSet());
+
 		final List<String> abbreviations =
-			this.locationDataManager.getFilteredLocations(programUUID, null, null, new ArrayList<>(locationAbbrs), false, null, null).stream()
+			this.locationService
+				.getFilteredLocations(new LocationSearchRequest(programUUID, null, null, new ArrayList<>(locationAbbrs), null, false), null)
+				.stream()
 				.map(Location::getLabbr).collect(
 				Collectors.toList());
 

@@ -1,10 +1,10 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -42,7 +42,7 @@ public class LotImportRequestDtoValidatorTest {
 	private GermplasmValidator germplasmValidator;
 
 	@Mock
-	private LocationDataManager locationDataManager;
+	private LocationService locationService;
 
 	@Mock
 	private LotService lotService;
@@ -144,7 +144,6 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 		lotImportRequestDto.setLotList(lotList);
 
@@ -184,7 +183,8 @@ public class LotImportRequestDtoValidatorTest {
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any()))
+			this.locationService
+				.getFilteredLocations(Mockito.any(), Mockito.any()))
 			.thenReturn(existingLocations);
 
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
@@ -209,7 +209,7 @@ public class LotImportRequestDtoValidatorTest {
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any()))
+			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
 			.thenReturn(existingLocations);
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
@@ -239,7 +239,7 @@ public class LotImportRequestDtoValidatorTest {
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any()))
+			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
@@ -258,7 +258,7 @@ public class LotImportRequestDtoValidatorTest {
 	}
 
 	@Test
-	public void testValidateStockIdsDuplicated() {	
+	public void testValidateStockIdsDuplicated() {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 		final LotItemDto lotItemDto1 = createLotItemDto();
@@ -268,7 +268,7 @@ public class LotImportRequestDtoValidatorTest {
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any()))
+			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
@@ -297,7 +297,7 @@ public class LotImportRequestDtoValidatorTest {
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any()))
+			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
@@ -326,7 +326,7 @@ public class LotImportRequestDtoValidatorTest {
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any()))
+			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
 			.thenReturn(existingLocations);
 
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
@@ -355,11 +355,10 @@ public class LotImportRequestDtoValidatorTest {
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any()))
+			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
 			.thenReturn(existingLocations);
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 		lotImportRequestDto.setLotList(lotList);
-
 
 		try {
 			lotItemDto.setInitialBalance((double) -11);
@@ -381,7 +380,8 @@ public class LotImportRequestDtoValidatorTest {
 		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationDataManager.getFilteredLocations(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any()))
+			this.locationService
+				.getFilteredLocations(Mockito.any(), Mockito.any()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
