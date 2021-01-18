@@ -279,6 +279,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 			.stream().collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
 		final Map<Integer, String> crossExpansions =
 			this.pedigreeService.getCrossExpansionsBulk(new HashSet<>(gids), null, this.crossExpansionProperties);
+		final Map<Integer, String> plotCodeValuesByGIDs = this.germplasmService.getPlotCodeValues(new HashSet<>(gids));
 
 		int entryNo = 1;
 		boolean hasEntryNo = false;
@@ -311,7 +312,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 			}
 
 			if (isBlank(entry.getSeedSource())) {
-				entry.setSeedSource(this.germplasmService.getPlotCodeValue(gid));
+				entry.setSeedSource(plotCodeValuesByGIDs.get(gid));
 				hasSeedSourceEmpty = true;
 			} else {
 				hasSeedSource = true;

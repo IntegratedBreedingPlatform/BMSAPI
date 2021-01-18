@@ -20,6 +20,10 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
+import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
@@ -46,6 +50,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,6 +96,9 @@ public class LotServiceImpl implements LotService {
 	@Autowired
 	private TransactionService transactionService;
 
+	@Autowired
+	private GermplasmStudySourceService germplasmStudySourceService;
+
 	private static final String DEFAULT_STOCKID_PREFIX = "SID";
 
 	@Override
@@ -130,14 +138,22 @@ public class LotServiceImpl implements LotService {
 	public List<String> createLots(final String programUUID, final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
 		// validations
 		final SearchCompositeDto<Integer, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
-		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
 		this.lotInputValidator.validate(programUUID, lotGeneratorBatchRequestDto);
-		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
-		this.germplasmValidator.validateGids(errors, gids);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
+		List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
+		if (Util.isEmpty(gids) && lotGeneratorBatchRequestDto.getStudyId() != null) {
+			final GermplasmStudySourceSearchRequest searchRequest = new GermplasmStudySourceSearchRequest();
+			searchRequest.setStudyId(Integer.valueOf(lotGeneratorBatchRequestDto.getStudyId()));
+			gids = this.germplasmStudySourceService.getGermplasmStudySources(searchRequest, null).stream().map(
+				GermplasmStudySourceDto::getGid).collect(Collectors.toList());
+		} else {
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
+			this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
+			this.germplasmValidator.validateGids(errors, gids);
+			if (errors.hasErrors()) {
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
 		}
+
 
 		final LotGeneratorInputDto lotGeneratorInput = lotGeneratorBatchRequestDto.getLotGeneratorInput();
 

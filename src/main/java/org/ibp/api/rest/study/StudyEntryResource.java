@@ -7,9 +7,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
+import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.study.StudyEntryMetadata;
 import org.ibp.api.java.study.StudyEntryService;
@@ -93,16 +93,14 @@ public class StudyEntryResource {
 
 	}
 
-	@ApiOperation(value = "Update germplasm entry property",
-		notes = "Update germplasm entry property")
-	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}/properties/{propertyId}", method = RequestMethod.PUT)
+	@ApiOperation(value = "Update germplasm entries property",
+		notes = "Update germplasm entries property")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/properties", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateStudyEntryProperty(final @PathVariable String cropname,
-		@PathVariable final String programUUID,
-		@PathVariable final Integer studyId, @PathVariable final Integer entryId, @PathVariable final Integer propertyId,
-		@RequestBody final StudyEntryPropertyData studyEntryPropertyData) {
+	public ResponseEntity updateStudyEntriesProperty(final @PathVariable String cropname, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @RequestBody final StudyEntryPropertyBatchUpdateRequest updateRequestDto) {
 
-		this.studyEntryService.updateStudyEntryProperty(studyId, entryId, studyEntryPropertyData);
+		this.studyEntryService.updateStudyEntriesProperty(studyId, updateRequestDto);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
@@ -129,12 +127,18 @@ public class StudyEntryResource {
 		@RequestBody(required = false) final StudyEntrySearchDto searchDTO,
 		@ApiIgnore final Pageable pageable) {
 
-		final PagedResult<StudyEntryDto> resultPage =
-			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<StudyEntryDto>() {
+		final PagedResult<StudyEntryDto> pageResult =
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<StudyEntryDto>() {
 
 				@Override
 				public long getCount() {
 					return StudyEntryResource.this.studyEntryService.countAllStudyEntries(studyId);
+				}
+
+				@Override
+				public long getFilteredCount() {
+					final StudyEntrySearchDto.Filter filter = (Objects.isNull(searchDTO) ? null : searchDTO.getFilter());
+					return StudyEntryResource.this.studyEntryService.countFilteredStudyEntries(studyId, filter);
 				}
 
 				@Override
@@ -145,9 +149,9 @@ public class StudyEntryResource {
 			});
 
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
-		headers.add("X-Total-Pages", Long.toString(resultPage.getTotalPages()));
-		return new ResponseEntity<>(resultPage.getPageResults(), headers, HttpStatus.OK);
+		headers.add("X-Filtered-Count", Long.toString(pageResult.getFilteredResults()));
+		headers.add("X-Total-Count", Long.toString(pageResult.getTotalResults()));
+		return new ResponseEntity<>(pageResult.getPageResults(), headers, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get Entry Descriptors as Columns", notes = "Retrieves ALL MeasurementVariables associated to the entry plus "

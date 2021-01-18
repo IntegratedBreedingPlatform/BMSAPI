@@ -30,7 +30,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
+import java.util.List;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -200,23 +200,6 @@ public class StudyValidatorTest {
 		Mockito.when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		this.studyValidator.validate(studyId, ran.nextBoolean(), false);
 		Mockito.verifyZeroInteractions(this.studyInstanceService);
-	}
-
-	@Test
-	public void testStudyContainsEntry_ThrowsRightException() {
-		final Random ran = new Random();
-		final int studyId = ran.nextInt();
-		final int entryId = ran.nextInt();
-		Mockito.doReturn(Collections.emptyList()).when(this.studyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
-				ArgumentMatchers.any(), ArgumentMatchers.any());
-
-		try {
-			this.studyValidator.validateStudyContainsEntry(studyId, entryId);
-			Assert.fail("Expected validation exception to be thrown but was not.");
-		} catch (final ApiRequestValidationException e) {
-			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("invalid.entryid"));
-		}
 	}
 
 	@Test

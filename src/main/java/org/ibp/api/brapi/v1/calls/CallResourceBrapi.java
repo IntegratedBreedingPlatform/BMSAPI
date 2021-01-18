@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -40,7 +41,7 @@ public class CallResourceBrapi {
 	@ApiOperation(value = "List of available calls", notes = "Get a list of available calls.")
 	@RequestMapping(value = "/brapi/v1/calls", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<BrapiCalls> listAvailableCalls(
+	public ResponseEntity<EntityListResponse<Map<String, Object>>> listAvailableCalls(
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
@@ -54,7 +55,7 @@ public class CallResourceBrapi {
 	@ApiOperation(value = "List of available calls", notes = "Get a list of available calls with crop name.")
 	@RequestMapping(value = "/{crop}/brapi/v1/calls", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<BrapiCalls> listAvailableCallsWithCrop(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<Map<String, Object>>> listAvailableCallsWithCrop(@PathVariable final String crop,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
@@ -66,7 +67,7 @@ public class CallResourceBrapi {
 		return getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
 	}
 
-	private ResponseEntity<BrapiCalls> getBrapiCallsResponseEntity(
+	private ResponseEntity<EntityListResponse<Map<String, Object>>> getBrapiCallsResponseEntity(
 		@RequestParam(value = "page", required = false)
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) final Integer currentPage,
 		@RequestParam(value = "pageSize", required = false)
@@ -96,15 +97,13 @@ public class CallResourceBrapi {
 				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 			final Metadata metadata = new Metadata().withPagination(pagination);
-			final BrapiCalls brapiCalls = new BrapiCalls().withMetadata(metadata).withResult(results);
-			return new ResponseEntity<>(brapiCalls, HttpStatus.OK);
+			return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 
 		} else {
 
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", "not found calls"));
 			final Metadata metadata = new Metadata(null, status);
-			final BrapiCalls brapiCalls = new BrapiCalls().withMetadata(metadata);
-			return new ResponseEntity<>(brapiCalls, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new EntityListResponse().withMetadata(metadata), HttpStatus.NOT_FOUND);
 		}
 	}
 

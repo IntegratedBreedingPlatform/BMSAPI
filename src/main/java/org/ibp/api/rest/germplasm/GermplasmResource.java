@@ -4,20 +4,17 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.importation.ExtendedGermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -68,15 +65,12 @@ public class GermplasmResource {
 	private GermplasmService germplasmService;
 
 	@Autowired
-	private UserService userService;
-
-	@Autowired
 	private GermplasmTemplateExportService germplasmTemplateExportService;
 
 	@Autowired
 	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
 
-	@ApiOperation(value = "Search germplasm")
+	@ApiOperation(value = "Search germplasm. <b>Note:</b> Total count is not available for this query.")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + HAS_GERMPLASM_SEARCH)
 	@ApiImplicitParams({
@@ -97,20 +91,16 @@ public class GermplasmResource {
 
 		BaseValidator.checkNotNull(germplasmSearchRequest, "param.null", new String[] {"germplasmSearchDTO"});
 
-		final String userName = SecurityUtil.getLoggedInUserName();
-		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUUID);
-
-		// TODO Move to dao method, so it cannot be bypassed? IBP-4166
-		if (user.hasOnlyProgramRoles(cropName)) {
-			germplasmSearchRequest.setInProgramListOnly(true);
-		}
-
 		final PagedResult<GermplasmSearchResponse> result =
 			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmSearchResponse>() {
 
 				@Override
 				public long getCount() {
-					return germplasmService.countSearchGermplasm(null, programUUID);
+					/**
+					 * Excluding total count improves overall search from ~15s to 1s in wheat,brachiaria (~7M records)
+					 * excluding deleted germplasm in query being the main bottleneck
+					 */
+					return 0;
 				}
 
 				@Override
@@ -126,7 +116,6 @@ public class GermplasmResource {
 
 		final List<GermplasmSearchResponse> pageResults = result.getPageResults();
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Total-Count", Long.toString(result.getTotalResults()));
 		headers.add("X-Filtered-Count", Long.toString(result.getFilteredResults()));
 
 		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
@@ -187,6 +176,7 @@ public class GermplasmResource {
 		final HttpHeaders headers = new HttpHeaders();
 		headers
 			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(file.getName())));
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}

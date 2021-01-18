@@ -33,6 +33,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValid
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
+import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
@@ -93,6 +94,9 @@ public class DatasetServiceImplTest {
 
 	@Mock
 	private StudyValidator studyValidator;
+
+	@Mock
+	private StudyEntryValidator studyEntryValidator;
 
 	@Mock
 	private DatasetValidator datasetValidator;

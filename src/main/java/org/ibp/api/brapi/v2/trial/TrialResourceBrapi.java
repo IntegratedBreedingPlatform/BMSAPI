@@ -12,10 +12,10 @@ import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
-import org.ibp.api.brapi.v1.trial.TrialSummaries;
 import org.ibp.api.brapi.v1.trial.TrialSummary;
 import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
 import org.ibp.api.domain.common.PagedResult;
@@ -53,7 +53,7 @@ public class TrialResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<TrialSummaries> getTrials(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<TrialSummary>> getTrials(@PathVariable final String crop,
 		@ApiParam(value = "Filter active status true/false") @RequestParam(value = "active", required = false) final Boolean active,
 		@ApiParam(value = "Common name for the crop associated with trial") @RequestParam(value = "commonCropName", required = false)
 		final String commonCropName,
@@ -90,8 +90,7 @@ public class TrialResourceBrapi {
 		if (!StringUtils.isBlank(validationError)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
 			final Metadata metadata = new Metadata(null, status);
-			final TrialSummaries trialSummaries = new TrialSummaries().withMetadata(metadata).withResult(new Result<TrialSummary>());
-			return new ResponseEntity<>(trialSummaries, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new EntityListResponse<>(metadata, new Result<>()), HttpStatus.BAD_REQUEST);
 		}
 
 		final StudySearchFilter filter = new StudySearchFilter().withProgramDbId(programDbId).withLocationDbId(locationDbId)
@@ -127,9 +126,7 @@ public class TrialResourceBrapi {
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
-		final TrialSummaries trialSummaries = new TrialSummaries().withMetadata(metadata).withResult(results);
-
-		return new ResponseEntity<>(trialSummaries, HttpStatus.OK);
+		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 
 	}
 

@@ -47,6 +47,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
+import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.rest.dataset.DatasetDTO;
@@ -99,6 +100,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private StudyValidator studyValidator;
+
+	@Autowired
+	private StudyEntryValidator studyEntryValidator;
 
 	@Autowired
 	private DatasetValidator datasetValidator;
@@ -889,7 +893,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
 
-		this.studyValidator.validateStudyContainsEntry(studyId, request.getEntryId());
+		this.studyEntryValidator.validateStudyContainsEntries(studyId, Collections.singletonList(request.getEntryId()));
 
 		this.studyValidator.validateHasNoCrossesOrSelections(studyId);
 

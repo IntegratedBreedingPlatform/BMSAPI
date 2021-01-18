@@ -11,6 +11,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -53,7 +54,7 @@ public class ProgramResourceBrapi {
 	@ApiOperation(value = "List Programs", notes = "Get a list of programs.")
 	@RequestMapping(value = "/{crop}/brapi/v1/programs", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Programs> listPrograms(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<ProgramDetailsDto>> listPrograms(@PathVariable final String crop,
 			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 					required = false) final Integer currentPage,
 			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
@@ -70,8 +71,7 @@ public class ProgramResourceBrapi {
 		if (filters.get(ProgramFilters.CROP_TYPE) == null) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "crop " + crop + " doesn't exist"));
 			final Metadata metadata = new Metadata(null, status);
-			final Programs programList = new Programs().withMetadata(metadata);
-			return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new EntityListResponse().withMetadata(metadata), HttpStatus.NOT_FOUND);
 		}
 
 		/**
@@ -109,13 +109,12 @@ public class ProgramResourceBrapi {
 					.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 			final Metadata metadata = new Metadata().withPagination(pagination);
-			final Programs programList = new Programs().withMetadata(metadata).withResult(results);
-			return new ResponseEntity<>(programList, HttpStatus.OK);
+			return new ResponseEntity<>(new EntityListResponse(metadata, results), HttpStatus.OK);
 		}
 		final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "program not found."));
 		final Metadata metadata = new Metadata(null, status);
-		final Programs programList = new Programs().withMetadata(metadata);
-		return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);
+
+		return new ResponseEntity<>(new EntityListResponse().withMetadata(metadata), HttpStatus.NOT_FOUND);
 	}
 
 	private void setFilters(final Map<ProgramFilters, Object> filters, final String crop, final String programName) {

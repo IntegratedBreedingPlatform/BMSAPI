@@ -25,11 +25,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -74,7 +84,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 
 	@Test
 	public void testGenerateDesign() {
-		final MeasurementVariableTransformer transformer = new MeasurementVariableTransformer(this.sessionProvider);
+		final MeasurementVariableTransformer transformer = new MeasurementVariableTransformer();
 		this.designTypeService.setMeasurementVariableTransformer(transformer);
 
 		final MainDesign mainDesign = new MainDesign();
