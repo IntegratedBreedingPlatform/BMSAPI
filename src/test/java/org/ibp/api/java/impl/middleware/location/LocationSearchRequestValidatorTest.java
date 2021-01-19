@@ -31,7 +31,7 @@ public class LocationSearchRequestValidatorTest {
 	@Test
 	public void testValidate_MissingProgramUUIDWhenFavoritesAreRequired() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setFavourites(true);
+		locationSearchRequest.setFavoritesOnly(true);
 		try {
 			this.validator.validate("maize", locationSearchRequest);
 		} catch (Exception e) {
@@ -45,7 +45,7 @@ public class LocationSearchRequestValidatorTest {
 	public void testValidate_InvalidProgram() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setProgramUUID(UUID.randomUUID().toString());
-		locationSearchRequest.setFavourites(false);
+		locationSearchRequest.setFavoritesOnly(false);
 		try {
 			Mockito.doAnswer(invocation -> {
 				Object[] args = invocation.getArguments();
