@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
@@ -137,22 +138,21 @@ public class LotResource {
 	@ApiOperation(value = "It will retrieve lots that matches search conditions", notes = "It will retrieve lots that matches search conditions")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.GET)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
-					value = "Results page you want to retrieve (0..N)"),
-			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
-					value = "Number of records per page."),
-			@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
-					value = "Sorting criteria in the format: property(,asc|desc). " +
-							"Default sort order is ascending. " +
-							"Multiple sort criteria are supported.")
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "Results page you want to retrieve (0..N)"),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property(,asc|desc). " +
+				"Default sort order is ascending. " +
+				"Multiple sort criteria are supported.")
 	})
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')" + PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	@ResponseBody
 	@JsonView(InventoryView.LotView.class)
 	public ResponseEntity<List<ExtendedLotDto>> getLots(@PathVariable final String cropName, //
 		@RequestParam(required = false) final String programUUID,//
-		@RequestParam final Integer searchRequestId, @ApiIgnore
-	final Pageable pageable) {
+		@RequestParam final Integer searchRequestId, @ApiIgnore final Pageable pageable) {
 
 		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
 			.getSearchRequest(searchRequestId, LotsSearchDto.class);
@@ -225,7 +225,7 @@ public class LotResource {
 		List<ExtendedLotDto> extendedLotDtos = null;
 
 		if ((lotRequest.getSingleInput() == null && lotRequest.getMultiInput() == null) || //
-		 	(lotRequest.getSingleInput() != null && lotRequest.getMultiInput() != null)) {
+			(lotRequest.getSingleInput() != null && lotRequest.getMultiInput() != null)) {
 			errors.reject("lot.update.invalid.input", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -242,7 +242,8 @@ public class LotResource {
 			}
 		} else {
 			final List<String> lotUIDs =
-				lotRequest.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getLotUID).collect(Collectors.toList());
+				lotRequest.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getLotUID)
+					.collect(Collectors.toList());
 			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 			lotsSearchDto.setLotUUIDs(lotUIDs);
 			extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
@@ -283,7 +284,9 @@ public class LotResource {
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
 		final List<LocationDto> locations =
-			this.locationService.getLocations(cropName, programUUID, LotResource.STORAGE_LOCATION_TYPE, null, null, false);
+			this.locationService
+				.getLocations(cropName, new LocationSearchRequest(programUUID, LotResource.STORAGE_LOCATION_TYPE, null, null, null, false),
+					null);
 
 		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
 		final HttpHeaders headers = new HttpHeaders();
@@ -351,7 +354,8 @@ public class LotResource {
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
 	@ResponseBody
 	@JsonView(InventoryView.LotView.class)
-	public ResponseEntity<ExtendedLotDto> getLot(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
+	public ResponseEntity<ExtendedLotDto> getLot(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@PathVariable final String lotUUID) {
 
 		final LotsSearchDto searchDTO = new LotsSearchDto();
@@ -374,12 +378,12 @@ public class LotResource {
 	@RequestMapping(value = "/crops/{cropName}/lots/merge", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize(HAS_MANAGE_LOTS
-			+ " or hasAnyAuthority('MERGE_LOTS')")
+		+ " or hasAnyAuthority('MERGE_LOTS')")
 	public ResponseEntity<Void> mergeLots(
-			@PathVariable final String cropName, //
-			@ApiParam("Lot template for merge action."
-					+ "SearchComposite is a list of UUIDs or a search id (internal usage) ")
-			@RequestBody final LotMergeRequestDto lotMergeRequestDto) {
+		@PathVariable final String cropName, //
+		@ApiParam("Lot template for merge action."
+			+ "SearchComposite is a list of UUIDs or a search id (internal usage) ")
+		@RequestBody final LotMergeRequestDto lotMergeRequestDto) {
 
 		try {
 			this.inventoryLock.lockWrite();

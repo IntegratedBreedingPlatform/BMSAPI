@@ -2,6 +2,8 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.ibp.api.Util;
@@ -23,6 +25,9 @@ public class LocationValidator {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
+
+	@Autowired
+	private LocationService locationService;
 
 	public void validateSeedLocationId(final BindingResult errors, final String programUUID, final Integer locationId) {
 		if (locationId == null) {
@@ -52,7 +57,8 @@ public class LocationValidator {
 		}
 
 		final List<Location> existingLocations =
-			locationDataManager.getFilteredLocations(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, false);
+			this.locationService.getFilteredLocations(
+				new LocationSearchRequest(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null, false), null);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 
 			final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
