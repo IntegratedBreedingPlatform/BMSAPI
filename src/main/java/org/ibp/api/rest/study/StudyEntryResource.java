@@ -127,12 +127,18 @@ public class StudyEntryResource {
 		@RequestBody(required = false) final StudyEntrySearchDto searchDTO,
 		@ApiIgnore final Pageable pageable) {
 
-		final PagedResult<StudyEntryDto> resultPage =
-			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<StudyEntryDto>() {
+		final PagedResult<StudyEntryDto> pageResult =
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<StudyEntryDto>() {
 
 				@Override
 				public long getCount() {
 					return StudyEntryResource.this.studyEntryService.countAllStudyEntries(studyId);
+				}
+
+				@Override
+				public long getFilteredCount() {
+					final StudyEntrySearchDto.Filter filter = (Objects.isNull(searchDTO) ? null : searchDTO.getFilter());
+					return StudyEntryResource.this.studyEntryService.countFilteredStudyEntries(studyId, filter);
 				}
 
 				@Override
@@ -143,9 +149,9 @@ public class StudyEntryResource {
 			});
 
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
-		headers.add("X-Total-Pages", Long.toString(resultPage.getTotalPages()));
-		return new ResponseEntity<>(resultPage.getPageResults(), headers, HttpStatus.OK);
+		headers.add("X-Filtered-Count", Long.toString(pageResult.getFilteredResults()));
+		headers.add("X-Total-Count", Long.toString(pageResult.getTotalResults()));
+		return new ResponseEntity<>(pageResult.getPageResults(), headers, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get Entry Descriptors as Columns", notes = "Retrieves ALL MeasurementVariables associated to the entry plus "
