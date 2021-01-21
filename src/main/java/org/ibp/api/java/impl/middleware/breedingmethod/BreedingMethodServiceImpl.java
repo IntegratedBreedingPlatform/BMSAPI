@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.breedingmethod;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -13,7 +14,6 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class BreedingMethodServiceImpl implements BreedingMethodService {
@@ -35,11 +35,11 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
-	public List<BreedingMethodDTO> getBreedingMethods(final String cropName, final String programUUID, final Set<String> abbreviations,
-		final boolean favoriteMethods) {
+	public List<BreedingMethodDTO> getBreedingMethods(final String cropName, final BreedingMethodSearchRequest searchRequest) {
 		final MapBindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (favoriteMethods && StringUtils.isEmpty(programUUID)) {
+		final String programUUID = searchRequest.getProgramUUID();
+		if (searchRequest.isFavoritesOnly() && StringUtils.isEmpty(programUUID)) {
 			errors.reject("breeding.methods.favorite.requires.program", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -51,7 +51,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 			}
 		}
 
-		return this.breedingMethodService.getBreedingMethods(programUUID, abbreviations, favoriteMethods);
+		return this.breedingMethodService.getBreedingMethods(searchRequest);
 	}
 
 }

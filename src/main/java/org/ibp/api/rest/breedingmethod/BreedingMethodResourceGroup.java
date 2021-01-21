@@ -3,6 +3,7 @@ package org.ibp.api.rest.breedingmethod;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 import org.generationcp.middleware.pojos.MethodGroup;
 import org.generationcp.middleware.pojos.MethodType;
@@ -73,11 +74,10 @@ public class BreedingMethodResourceGroup {
 	public ResponseEntity<List<BreedingMethodDTO>> getBreedingMethods(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam final boolean favoriteMethods
+		final BreedingMethodSearchRequest searchRequest
 	) {
-		//TODO we can expose breeding method codes as filters
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, programUUID, null,
-			favoriteMethods);
+		searchRequest.setProgramUUID(programUUID);
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, searchRequest);
 		return new ResponseEntity<>(breedingMethods, HttpStatus.OK);
 	}
 
