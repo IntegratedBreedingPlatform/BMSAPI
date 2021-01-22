@@ -74,9 +74,16 @@ public class BreedingMethodResourceGroup {
 	public ResponseEntity<List<BreedingMethodDTO>> getBreedingMethods(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		final BreedingMethodSearchRequest searchRequest
-	) {
+		@RequestParam(required = false) final List<String> methodTypes,
+		@RequestParam(required = false) final Boolean favoritesOnly
+		) {
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
 		searchRequest.setProgramUUID(programUUID);
+		searchRequest.setMethodTypes(methodTypes);
+		if (favoritesOnly != null) {
+			searchRequest.setFavoritesOnly(favoritesOnly);
+		}
+
 		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, searchRequest);
 		return new ResponseEntity<>(breedingMethods, HttpStatus.OK);
 	}
