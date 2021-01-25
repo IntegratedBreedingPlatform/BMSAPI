@@ -1,10 +1,11 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.Util;
@@ -32,7 +33,7 @@ public class LotImportRequestDtoValidator {
 	private BindingResult errors;
 
 	@Autowired
-	private LocationDataManager locationDataManager;
+	private LocationService locationService;
 
 	@Autowired
 	private LotService lotService;
@@ -94,13 +95,15 @@ public class LotImportRequestDtoValidator {
 
 	private void validateStorageLocations(final String programUUID, final List<LotItemDto> lotList) {
 		final List<String> locationAbbreviations =
-				lotList.stream().map(LotItemDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
-		if (Util.countNullOrEmptyStrings(locationAbbreviations)>0) {
+			lotList.stream().map(LotItemDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
+		if (Util.countNullOrEmptyStrings(locationAbbreviations) > 0) {
 			errors.reject("lot.input.list.location.abbreviation.null.or.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+
 		final List<Location> existingLocations =
-			locationDataManager.getFilteredLocations(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, false);
+			this.locationService.getFilteredLocations(
+				new LocationSearchRequest(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null, false),null);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 			final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
 			final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);
@@ -108,10 +111,10 @@ public class LotImportRequestDtoValidator {
 			errors.reject("lot.input.invalid.abbreviations", new String[] {Util.buildErrorMessageFromList(invalidAbbreviations, 3)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		
+
 	}
 
-	private void validateUnitNames(final List<LotItemDto> lotList){
+	private void validateUnitNames(final List<LotItemDto> lotList) {
 		final List<String> unitNames = lotList.stream().map(LotItemDto::getUnitName).distinct().collect(Collectors.toList());
 		if (Util.countNullOrEmptyStrings(unitNames) > 0) {
 			errors.reject("lot.input.list.units.null.or.empty", "");
@@ -125,17 +128,17 @@ public class LotImportRequestDtoValidator {
 			lotList.stream().map(LotItemDto::getStockId).filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
 
 		if (uniqueNotNullStockIds.stream().filter(c -> c.length() > STOCK_ID_MAX_LENGTH).count() > 0) {
-			errors.reject("lot.stock.id.length.higher.than.maximum", new String[]{String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
+			errors.reject("lot.stock.id.length.higher.than.maximum", new String[] {String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		final List<String> allStockIds =
 			lotList.stream().map(LotItemDto::getStockId).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
 		if (allStockIds.size() != uniqueNotNullStockIds.size()) {
-			errors.reject("lot.input.list.stock.ids.duplicated","");
+			errors.reject("lot.input.list.stock.ids.duplicated", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		final List<LotDto> existingLotDtos = this.lotService.getLotsByStockIds(uniqueNotNullStockIds);
-		if (!existingLotDtos.isEmpty()){
+		if (!existingLotDtos.isEmpty()) {
 			final List<String> existingStockIds = existingLotDtos.stream().map(LotDto::getStockId).collect(Collectors.toList());
 			errors.reject("lot.input.list.stock.ids.invalid", new String[] {Util.buildErrorMessageFromList(existingStockIds, 3)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -149,7 +152,7 @@ public class LotImportRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		final long negativeOrZeroValues = initialBalances.stream().filter(d -> d <= 0).count();
-		if (negativeOrZeroValues>0) {
+		if (negativeOrZeroValues > 0) {
 			errors.reject("lot.input.list.initial.balances.negative.values", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}

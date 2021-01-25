@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.MethodService;
@@ -131,6 +132,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER,
 	}
 
+
 	private Map<ExcelCellStyle, CellStyle> sheetStylesMap;
 
 	private HSSFWorkbook wb;
@@ -229,11 +231,15 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 
 		final List<LocationDto> storageLocations =
 			this.locationService
-				.getLocations(cropName, programUUID, GermplasmExcelTemplateExportServiceImpl.STORAGE_LOCATION_TYPE, null, null, false);
+				.getLocations(cropName,
+					new LocationSearchRequest(programUUID, GermplasmExcelTemplateExportServiceImpl.STORAGE_LOCATION_TYPE, null, null, null,
+						false), null);
 
 		final List<LocationDto> locations =
 			this.locationService
-				.getLocations(cropName, programUUID, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, false);
+				.getLocations(cropName,
+					new LocationSearchRequest(programUUID, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, null, false),
+					null);
 
 		final List<AttributeDTO> attributeDTOs =
 			this.germplasmService.filterGermplasmAttributes(null);

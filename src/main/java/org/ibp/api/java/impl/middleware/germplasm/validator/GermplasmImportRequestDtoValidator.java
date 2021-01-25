@@ -5,9 +5,10 @@ import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.util.StringUtil;
@@ -43,7 +44,7 @@ public class GermplasmImportRequestDtoValidator {
 	private BreedingMethodService breedingMethodService;
 
 	@Autowired
-	private LocationDataManager locationDataManager;
+	private LocationService locationService;
 
 	public void validate(final String programUUID, final List<GermplasmImportRequestDto> germplasmImportRequestDto) {
 		errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequestDto.class.getName());
@@ -211,8 +212,11 @@ public class GermplasmImportRequestDtoValidator {
 		final List<GermplasmImportRequestDto> germplasmDtos) {
 		final Set<String> locationAbbrs =
 			germplasmDtos.stream().map(g -> g.getLocationAbbr().toUpperCase()).collect(Collectors.toSet());
+
 		final List<String> existingLocations =
-			this.locationDataManager.getFilteredLocations(programUUID, null, null, new ArrayList<>(locationAbbrs), false).stream().map(
+			this.locationService
+				.getFilteredLocations(new LocationSearchRequest(programUUID, null, null, new ArrayList<>(locationAbbrs), null, false), null)
+				.stream().map(
 				Location::getLabbr).collect(
 				Collectors.toList());
 		if (locationAbbrs.size() != existingLocations.size()) {
