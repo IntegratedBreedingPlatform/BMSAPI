@@ -2,9 +2,9 @@
 package org.ibp.api.java.germplasm;
 
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
@@ -59,6 +59,6 @@ public interface GermplasmService {
 	List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(Set<String> codes);
 
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(String cropName, String programUUID,
-		List<GermplasmImportRequestDto> germplasmImportRequestDto);
+		GermplasmImportRequestDto germplasmImportRequestDto);
 
 }

@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,13 +47,14 @@ public class GermplasmImportRequestDtoValidator {
 	@Autowired
 	private LocationService locationService;
 
-	public void validate(final String programUUID, final List<GermplasmImportRequestDto> germplasmImportRequestDto) {
+	public void validate(final String programUUID, final GermplasmImportRequestDto germplasmImportRequestDto) {
 		errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequestDto.class.getName());
 
-		BaseValidator.checkNotEmpty(germplasmImportRequestDto, "germplasm.import.list.null");
+		BaseValidator.checkNotNull(germplasmImportRequestDto, "germplasm.import.request.null");
+		BaseValidator.checkNotEmpty(germplasmImportRequestDto.getGermplasmList(), "germplasm.import.list.null");
 
 		final Set<Integer> clientIds = new HashSet<>();
-		boolean invalid = germplasmImportRequestDto.stream().anyMatch(g -> {
+		boolean invalid = germplasmImportRequestDto.getGermplasmList().stream().anyMatch(g -> {
 
 			final Set<String> nameKeys = new HashSet<>();
 			final Set<String> attributeKeys = new HashSet<>();
@@ -114,6 +116,11 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
+			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().equals("0")) {
+				errors.reject("germplasm.import.guid.invalid.zero", "");
+				return true;
+			}
+
 			g.getNames().keySet().forEach(name -> nameKeys.add(name.toUpperCase()));
 			if (g.getNames().keySet().size() != nameKeys.size()) {
 				errors.reject("germplasm.import.duplicated.name.types", new String[] {g.getClientId().toString()}, "");
@@ -161,6 +168,27 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
+			if (germplasmImportRequestDto.getConnectUsing() != GermplasmImportRequestDto.PedigreeConnectionType.NONE) {
+				if ((StringUtils.isNotEmpty(g.getProgenitor1()) && StringUtils.isEmpty(g.getProgenitor2())) || (
+					StringUtils.isNotEmpty(g.getProgenitor2()) && StringUtils.isEmpty(g.getProgenitor1()))) {
+					errors.reject("germplasm.import.invalid.progenitors.combination", "");
+					return true;
+				}
+			} else {
+				if ((StringUtils.isNotEmpty(g.getProgenitor1()) || StringUtils.isNotEmpty(g.getProgenitor2()))) {
+					errors.reject("germplasm.import.progenitors.must.be.empty", "");
+					return true;
+				}
+			}
+
+			if (germplasmImportRequestDto.getConnectUsing() == GermplasmImportRequestDto.PedigreeConnectionType.GID) {
+				if ((StringUtils.isNotEmpty(g.getProgenitor1()) && !StringUtils.isNumeric(g.getProgenitor1())) || (
+					StringUtils.isNotEmpty(g.getProgenitor2()) && !StringUtils.isNumeric(g.getProgenitor2()))) {
+					errors.reject("germplasm.import.progenitor.must.be.numeric.when.connecting.by.gid", "");
+					return true;
+				}
+			}
+
 			return false;
 
 		});
@@ -169,15 +197,14 @@ public class GermplasmImportRequestDtoValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		this.validateGUIDNotExists(germplasmImportRequestDto);
-		this.validateAllBreedingMethodAbbreviationsExists(programUUID, germplasmImportRequestDto);
-		this.validateAllLocationAbbreviationsExists(programUUID, germplasmImportRequestDto);
-		this.validateAllNameTypesExists(germplasmImportRequestDto);
-		this.validateAllAttributesExists(germplasmImportRequestDto);
-
+		this.validateGUIDNotExists(germplasmImportRequestDto.getGermplasmList());
+		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmImportRequestDto);
+		this.validateAllLocationAbbreviationsExists(programUUID, germplasmImportRequestDto.getGermplasmList());
+		this.validateAllNameTypesExists(germplasmImportRequestDto.getGermplasmList());
+		this.validateAllAttributesExists(germplasmImportRequestDto.getGermplasmList());
 	}
 
-	private void validateAllNameTypesExists(final List<GermplasmImportRequestDto> germplasmDtos) {
+	private void validateAllNameTypesExists(final List<GermplasmImportRequestDto.GermplasmDTO> germplasmDtos) {
 		final Set<String> nameTypes = new HashSet<>();
 		germplasmDtos.forEach(g -> nameTypes.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		final List<String> existingGermplasmNameTypes =
@@ -191,25 +218,39 @@ public class GermplasmImportRequestDtoValidator {
 		}
 	}
 
-	private void validateAllBreedingMethodAbbreviationsExists(final String programUUID,
-		final List<GermplasmImportRequestDto> germplasmDtos) {
+	private void validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(final String programUUID,
+		final GermplasmImportRequestDto germplasmImportRequestDto) {
+		final List<GermplasmImportRequestDto.GermplasmDTO> germplasmDtos = germplasmImportRequestDto.getGermplasmList();
 		final Set<String> breedingMethodsAbbrs =
 			germplasmDtos.stream().map(g -> g.getBreedingMethodAbbr().toUpperCase()).collect(
 				Collectors.toSet());
-		final List<String> existingBreedingMethods =
-			this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false).stream().map(
-				BreedingMethodDTO::getCode).collect(Collectors.toList());
+		final List<BreedingMethodDTO> existingBreedingMethods =
+			this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false);
 		if (breedingMethodsAbbrs.size() != existingBreedingMethods.size()) {
-			breedingMethodsAbbrs.removeAll(existingBreedingMethods);
+			final List<String> existingBreedingMethodsCodes =
+				existingBreedingMethods.stream().map(
+					BreedingMethodDTO::getCode).collect(Collectors.toList());
+			breedingMethodsAbbrs.removeAll(existingBreedingMethodsCodes);
 			errors.reject("germplasm.import.breeding.methods.not.exist",
 				new String[] {Util.buildErrorMessageFromList(new ArrayList<>(breedingMethodsAbbrs), 3)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		if (germplasmImportRequestDto.getConnectUsing() != GermplasmImportRequestDto.PedigreeConnectionType.NONE) {
+			final Map<String, BreedingMethodDTO> methodsMapByAbbreviation =
+				existingBreedingMethods.stream().collect(Collectors.toMap(BreedingMethodDTO::getCode, bm -> bm));
+			if (germplasmImportRequestDto.getGermplasmList().stream().anyMatch(
+				g -> StringUtils.isNotEmpty(g.getProgenitor1()) && StringUtils.isNotEmpty(g.getProgenitor2()) && Integer.valueOf(1)
+					.equals(methodsMapByAbbreviation
+						.get(g.getBreedingMethodAbbr()).getNumberOfProgenitors()))) {
+				errors.reject("germplasm.import.mutation.not.supported.when.saving.progenitors", "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
 		}
 
 	}
 
 	private void validateAllLocationAbbreviationsExists(final String programUUID,
-		final List<GermplasmImportRequestDto> germplasmDtos) {
+		final List<GermplasmImportRequestDto.GermplasmDTO> germplasmDtos) {
 		final Set<String> locationAbbrs =
 			germplasmDtos.stream().map(g -> g.getLocationAbbr().toUpperCase()).collect(Collectors.toSet());
 
@@ -227,7 +268,7 @@ public class GermplasmImportRequestDtoValidator {
 		}
 	}
 
-	private void validateAllAttributesExists(final List<GermplasmImportRequestDto> germplasmDtos) {
+	private void validateAllAttributesExists(final List<GermplasmImportRequestDto.GermplasmDTO> germplasmDtos) {
 		final Set<String> attributes = new HashSet<>();
 		germplasmDtos.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
 			.forEach(g -> attributes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
@@ -252,9 +293,10 @@ public class GermplasmImportRequestDtoValidator {
 		}
 	}
 
-	private void validateGUIDNotExists(final List<GermplasmImportRequestDto> germplasmDtos) {
+	private void validateGUIDNotExists(final List<GermplasmImportRequestDto.GermplasmDTO> germplasmDtos) {
 		final List<String> guidsList =
-			germplasmDtos.stream().filter(g -> !StringUtils.isEmpty(g.getGermplasmUUID())).map(GermplasmImportRequestDto::getGermplasmUUID)
+			germplasmDtos.stream().filter(g -> !StringUtils.isEmpty(g.getGermplasmUUID()))
+				.map(GermplasmImportRequestDto.GermplasmDTO::getGermplasmUUID)
 				.collect(
 					Collectors.toList());
 		if (!guidsList.stream().filter(i -> Collections.frequency(guidsList, i) > 1)

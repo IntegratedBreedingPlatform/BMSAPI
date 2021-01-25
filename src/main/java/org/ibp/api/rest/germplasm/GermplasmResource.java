@@ -186,9 +186,9 @@ public class GermplasmResource {
 	@ResponseBody
 	public ResponseEntity<Map<Integer, GermplasmImportResponseDto>> importGermplasm(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody final List<GermplasmImportRequestDto> germplasmList) {
+		@RequestBody final GermplasmImportRequestDto germplasmImportRequestDto) {
 
-		return new ResponseEntity<>(this.germplasmService.importGermplasm(cropName, programUUID, germplasmList), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmService.importGermplasm(cropName, programUUID, germplasmImportRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Import germplasm updates. Updating Breeding Method is not yet supported.")
