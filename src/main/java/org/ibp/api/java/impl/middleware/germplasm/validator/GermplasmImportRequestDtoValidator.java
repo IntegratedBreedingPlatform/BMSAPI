@@ -299,8 +299,8 @@ public class GermplasmImportRequestDtoValidator {
 
 	private void validateAllLocationAbbreviationsExists(final String programUUID,
 		final List<? extends GermplasmImportRequestDto> germplasmDtos) {
-		final Set<String> locationAbbrs =
-			germplasmDtos.stream().map(g -> g.getLocationAbbr().toUpperCase()).collect(Collectors.toSet());
+		final Set<String> locationAbbrs = germplasmDtos.stream().filter(g -> StringUtils.isNotEmpty(g.getLocationAbbr()))
+			.map(g -> g.getLocationAbbr().toUpperCase()).collect(Collectors.toSet());
 		if (!locationAbbrs.isEmpty()) {
 			final List<String> existingLocations =
 				this.locationService
