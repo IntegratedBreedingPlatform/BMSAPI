@@ -4,6 +4,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +29,8 @@ import java.util.stream.Collectors;
 @Component
 public class GermplasmUpdateValidator {
 
+	public static final String PROGENITOR_1 = "PROGENITOR 1";
+	public static final String PROGENITOR_2 = "PROGENITOR 2";
 	@Autowired
 	private GermplasmService germplasmService;
 
@@ -34,6 +39,9 @@ public class GermplasmUpdateValidator {
 
 	@Autowired
 	private LocationService locationService;
+
+	@Autowired
+	private BreedingMethodService breedingMethodService;
 
 	public void validateEmptyList(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		if (germplasmUpdateDTOList == null || germplasmUpdateDTOList.isEmpty()) {
@@ -135,14 +143,21 @@ public class GermplasmUpdateValidator {
 
 	}
 
-	public void validateBreedingMethod(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public void validateBreedingMethod(final BindingResult errors, final String programUUID,
+		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> breedingMethodsAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
 				.map(dto -> dto.getBreedingMethodAbbr()).collect(Collectors.toSet());
 
+		final List<String> abbreviations = this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false).stream()
+			.map(BreedingMethodDTO::getCode).collect(
+				Collectors.toList());
+
+		breedingMethodsAbbrs.removeAll(abbreviations);
+
 		if (!breedingMethodsAbbrs.isEmpty()) {
-			throw new UnsupportedOperationException("Updating Breeding Method is not yet supported.");
+			errors.reject("germplasm.update.invalid.breeding.method", new String[] {String.join(",", breedingMethodsAbbrs)}, "");
 		}
 
 	}
@@ -155,6 +170,42 @@ public class GermplasmUpdateValidator {
 
 		if (optionalGermplasmUpdateDTOWithInvalidDate.isPresent()) {
 			errors.reject("germplasm.update.invalid.creation.date", "");
+		}
+
+	}
+
+	public void validateProgenitorsGids(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+
+		try {
+			final Set<Integer> progenitorGids =
+				germplasmUpdateDTOList.stream().map(dto -> dto.getProgenitors().values()).flatMap(Collection::stream)
+					.filter(value -> StringUtils.isNotEmpty(value)).map(value -> Integer.parseInt(value))
+					.collect(Collectors.toSet());
+			final List<Germplasm> germplasmByGIDs = this.germplasmMiddlewareService.getGermplasmByGIDs(new ArrayList<>(progenitorGids));
+			final Set<Integer> existingGids = germplasmByGIDs.stream().map(Germplasm::getGid).collect(Collectors.toSet());
+			if (!progenitorGids.equals(existingGids)) {
+				errors.reject("germplasm.update.invalid.progenitors.gids", new String[] {
+					String.join(",",
+						progenitorGids.stream().filter((gid) -> !existingGids.contains(gid)).map(o -> String.valueOf(o)).collect(
+							Collectors.toSet()))}, "");
+			}
+		} catch (final NumberFormatException numberFormatException) {
+			errors.reject("germplasm.update.invalid.progenitors.should.be.numeric", "");
+		}
+
+	}
+
+	public void validateProgenitorsBothMustBeSpecified(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+		final long
+			progenitorsWithEmptyValuesCount =
+			germplasmUpdateDTOList.stream().filter(dto -> {
+				final String progenitor1 = dto.getProgenitors().getOrDefault(PROGENITOR_1, null);
+				final String progenitor2 = dto.getProgenitors().getOrDefault(PROGENITOR_2, null);
+				return (StringUtils.isNotEmpty(progenitor1) && StringUtils.isEmpty(progenitor2)) || (StringUtils.isEmpty(progenitor1)
+					&& StringUtils.isNotEmpty(progenitor2));
+			}).count();
+		if (progenitorsWithEmptyValuesCount > 0) {
+			errors.reject("germplasm.update.invalid.progenitors", "");
 		}
 
 	}

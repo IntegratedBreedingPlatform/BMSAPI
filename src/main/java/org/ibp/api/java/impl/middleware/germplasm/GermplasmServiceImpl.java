@@ -337,8 +337,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.germplasmUpdateValidator.validateAttributeAndNameCodes(this.errors, germplasmUpdateDTOList);
 		this.germplasmUpdateValidator.validateGermplasmIdAndGermplasmUUID(this.errors, germplasmUpdateDTOList);
 		this.germplasmUpdateValidator.validateLocationAbbreviation(this.errors, programUUID, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateBreedingMethod(germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateBreedingMethod(this.errors, programUUID, germplasmUpdateDTOList);
 		this.germplasmUpdateValidator.validateCreationDate(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateProgenitorsBothMustBeSpecified(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateValidator.validateProgenitorsGids(this.errors, germplasmUpdateDTOList);
 
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
