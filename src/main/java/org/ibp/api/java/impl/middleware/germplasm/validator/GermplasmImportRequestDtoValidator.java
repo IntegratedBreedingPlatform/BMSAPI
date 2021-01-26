@@ -12,8 +12,6 @@ import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.importation.ExtendedGermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
-import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
@@ -282,8 +280,9 @@ public class GermplasmImportRequestDtoValidator {
 		final Set<String> breedingMethodsAbbrs =
 			germplasmDtos.stream().filter(g -> StringUtils.isNotEmpty(g.getBreedingMethodAbbr()))
 				.map(g -> g.getBreedingMethodAbbr().toUpperCase()).collect(
-				Collectors.toList());
-		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, breedingMethodsAbbrs, false);
+				Collectors.toSet());
+		final BreedingMethodSearchRequest searchRequest =
+			new BreedingMethodSearchRequest(programUUID, new ArrayList<>(breedingMethodsAbbrs), false);
 		if (!breedingMethodsAbbrs.isEmpty()) {
 			final List<String> existingBreedingMethods =
 				this.breedingMethodService.getBreedingMethods(searchRequest).stream().map(
@@ -301,11 +300,13 @@ public class GermplasmImportRequestDtoValidator {
 	private void validateAllLocationAbbreviationsExists(final String programUUID,
 		final List<? extends GermplasmImportRequestDto> germplasmDtos) {
 		final Set<String> locationAbbrs =
-			germplasmDtos.stream().filter(g -> StringUtils.isNotEmpty(g.getLocationAbbr())).map(g -> g.getLocationAbbr().toUpperCase())
-				.collect(Collectors.toSet());
+			germplasmDtos.stream().map(g -> g.getLocationAbbr().toUpperCase()).collect(Collectors.toSet());
 		if (!locationAbbrs.isEmpty()) {
 			final List<String> existingLocations =
-				this.locationDataManager.getFilteredLocations(programUUID, null, null, new ArrayList<>(locationAbbrs), false).stream().map(
+				this.locationService
+					.getFilteredLocations(new LocationSearchRequest(programUUID, null, null, new ArrayList<>(locationAbbrs), null, false),
+						null)
+					.stream().map(
 					Location::getLabbr).collect(
 					Collectors.toList());
 			if (locationAbbrs.size() != existingLocations.size()) {
@@ -314,19 +315,6 @@ public class GermplasmImportRequestDtoValidator {
 					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(locationAbbrs), 3)}, "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
-			germplasmDtos.stream().map(g -> g.getLocationAbbr().toUpperCase()).collect(Collectors.toSet());
-
-		final List<String> existingLocations =
-			this.locationService
-				.getFilteredLocations(new LocationSearchRequest(programUUID, null, null, new ArrayList<>(locationAbbrs), null, false), null)
-				.stream().map(
-				Location::getLabbr).collect(
-				Collectors.toList());
-		if (locationAbbrs.size() != existingLocations.size()) {
-			locationAbbrs.removeAll(existingLocations);
-			errors.reject("germplasm.import.location.abbreviations.not.exist",
-				new String[] {Util.buildErrorMessageFromList(new ArrayList<>(locationAbbrs), 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
@@ -337,7 +325,9 @@ public class GermplasmImportRequestDtoValidator {
 				.map(g -> g.getStorageLocationAbbr().toUpperCase()).distinct().collect(Collectors.toList());
 		if (!locationAbbreviations.isEmpty()) {
 			final List<Location> existingLocations =
-				locationDataManager.getFilteredLocations(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, false);
+				locationService.getFilteredLocations(
+					new LocationSearchRequest(programUUID, STORAGE_LOCATION_TYPE, null, new ArrayList<>(locationAbbreviations), null,
+						false), null);
 			if (existingLocations.size() != locationAbbreviations.size()) {
 				final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
 				final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);
