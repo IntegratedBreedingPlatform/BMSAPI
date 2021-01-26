@@ -84,8 +84,7 @@ public class BreedingMethodServiceImplTest {
 	@Test
 	public void shouldFailGetBreedingMethodsFilteringFavoritesWithoutProgramUUID() {
 		try {
-			final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, false);
-			searchRequest.setMethodTypes(Collections.singletonList("ABC"));
+			final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, true);
 			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
 			fail("Should have failed.");
 		} catch (Exception e) {
@@ -101,8 +100,8 @@ public class BreedingMethodServiceImplTest {
 	@Test
 	public void shouldFailGetBreedingMethodsInvalidMethodType() {
 		try {
-			final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, true);
-
+			final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, false);
+			searchRequest.setMethodTypes(Collections.singletonList("ABC"));
 			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
 			fail("Should have failed.");
 		} catch (Exception e) {
