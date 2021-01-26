@@ -1,75 +1,59 @@
 package org.ibp.api.java.impl.middleware.location;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
-import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.location.LocationMapper;
-import org.ibp.api.domain.program.ProgramSummary;
-import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
+import org.ibp.api.java.impl.middleware.location.validator.LocationSearchRequestValidator;
 import org.ibp.api.java.location.LocationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class LocationServiceImpl implements LocationService {
 
 	@Autowired
-	private LocationDataManager locationDataManager;
+	private org.generationcp.middleware.api.location.LocationService locationMiddlewareService;
 
 	@Autowired
-	private org.generationcp.middleware.api.location.LocationService locationService;
+	private LocationSearchRequestValidator locationSearchRequestValidator;
 
 	@Override
 	public LocationDTO getLocation(final Integer locationId) {
-		return this.locationService.getLocation(locationId);
+		return this.locationMiddlewareService.getLocation(locationId);
 	}
 
 	@Override
 	public List<LocationTypeDTO> getLocationTypes() {
-		return this.locationService.getLocationTypes();
+		return this.locationMiddlewareService.getLocationTypes();
 	}
 
-	@Autowired
-	private ProgramValidator programValidator;
+	@Override
+	public long countLocations(final String crop, final LocationSearchRequest locationSearchRequest) {
 
-	private BindingResult errors;
+		this.locationSearchRequestValidator.validate(crop, locationSearchRequest);
+
+		return this.locationMiddlewareService
+			.countFilteredLocations(locationSearchRequest);
+	}
 
 	@Override
-	public List<LocationDto> getLocations(final String crop, final String programUUID, final Set<Integer> locationTypes,
-		final List<Integer> locationIds,
-		final List<String> locationAbbreviations, final boolean favoriteLocations) {
+	public List<LocationDto> getLocations(final String crop, final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-
-		if (favoriteLocations && StringUtils.isEmpty(programUUID)) {
-			this.errors.reject("locations.favorite.requires.program", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-		if (programUUID != null) {
-			this.programValidator.validate(new ProgramSummary(crop, programUUID), errors);
-			if (errors.hasErrors()) {
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
-		}
+		this.locationSearchRequestValidator.validate(crop, locationSearchRequest);
 
 		final List<org.generationcp.middleware.pojos.Location> locations =
-			locationDataManager.getFilteredLocations(programUUID, locationTypes, locationIds, locationAbbreviations, favoriteLocations);
+			this.locationMiddlewareService
+				.getFilteredLocations(locationSearchRequest,
+					pageable);
 
 		final ModelMapper mapper = LocationMapper.getInstance();
-		final List<LocationDto> locationList = locations.stream().map(o -> mapper.map(o, LocationDto.class)).collect(Collectors.toList());
-
-		return locationList;
+		return locations.stream().map(o -> mapper.map(o, LocationDto.class)).collect(Collectors.toList());
 	}
 }
