@@ -4,16 +4,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
+import org.generationcp.middleware.pojos.MethodType;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BreedingMethodServiceImpl implements BreedingMethodService {
@@ -41,14 +45,23 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		final String programUUID = searchRequest.getProgramUUID();
 		if (searchRequest.isFavoritesOnly() && StringUtils.isEmpty(programUUID)) {
 			errors.reject("breeding.methods.favorite.requires.program", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		if (programUUID != null) {
 			this.programValidator.validate(new ProgramSummary(cropName, programUUID), errors);
-			if (errors.hasErrors()) {
-				throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (!CollectionUtils.isEmpty(searchRequest.getMethodTypes()) ) {
+			final List<String> allMethodTypes = Arrays.stream(MethodType.values()).map(MethodType::getCode).collect(
+				Collectors.toList());
+			final boolean hasInvalidMethodType = searchRequest.getMethodTypes().stream().anyMatch(type -> !allMethodTypes.contains(type));
+			if (hasInvalidMethodType) {
+				errors.reject("invalid.breeding.method.type", "");
 			}
+		}
+
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		return this.breedingMethodService.getBreedingMethods(searchRequest);
