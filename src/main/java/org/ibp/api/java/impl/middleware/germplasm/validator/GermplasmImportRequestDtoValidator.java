@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
@@ -224,8 +225,9 @@ public class GermplasmImportRequestDtoValidator {
 		final Set<String> breedingMethodsAbbrs =
 			germplasmDtos.stream().map(g -> g.getBreedingMethodAbbr().toUpperCase()).collect(
 				Collectors.toSet());
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, breedingMethodsAbbrs, false);
 		final List<BreedingMethodDTO> existingBreedingMethods =
-			this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false);
+			this.breedingMethodService.getBreedingMethods(searchRequest);
 		if (breedingMethodsAbbrs.size() != existingBreedingMethods.size()) {
 			final List<String> existingBreedingMethodsCodes =
 				existingBreedingMethods.stream().map(
