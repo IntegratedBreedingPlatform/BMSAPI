@@ -3,30 +3,30 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
-import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -34,6 +34,7 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
@@ -84,12 +85,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
-
-	@Autowired
-	private LocationDataManager locationDataManger;
-
-	@Autowired
-	private GermplasmGroupingService germplasmGroupingService;
 
 	@Autowired
 	private InstanceValidator instanceValidator;
@@ -387,8 +382,30 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-		germplasmImportRequestDtoValidator.validate(programUUID, germplasmImportRequestDto);
+		germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
 		return this.germplasmService.importGermplasm(user.getUserid(), cropName, germplasmImportRequestDto);
+	}
+
+	@Override
+	public long countGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto) {
+		BaseValidator.checkNotNull(germplasmMatchRequestDto, "germplasm.match.request.null");
+		if (!germplasmMatchRequestDto.isValid()) {
+			this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
+			errors.reject("germplasm.match.request.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
+	}
+
+	@Override
+	public List<GermplasmDto> findGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto, final Pageable pageable) {
+		BaseValidator.checkNotNull(germplasmMatchRequestDto, "germplasm.match.request.null");
+		if (!germplasmMatchRequestDto.isValid()) {
+			this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
+			errors.reject("germplasm.match.request.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		return germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
@@ -409,10 +426,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	void setPedigreeService(final PedigreeService pedigreeService) {
 		this.pedigreeService = pedigreeService;
-	}
-
-	void setLocationDataManger(final LocationDataManager locationDataManger) {
-		this.locationDataManger = locationDataManger;
 	}
 
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {

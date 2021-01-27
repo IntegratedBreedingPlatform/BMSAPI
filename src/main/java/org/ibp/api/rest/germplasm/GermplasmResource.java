@@ -9,15 +9,19 @@ import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
-import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -62,6 +66,9 @@ public class GermplasmResource {
 
 	@Autowired
 	private GermplasmTemplateExportService germplasmTemplateExportService;
+
+	@Autowired
+	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
 
 	@ApiOperation(value = "Search germplasm. <b>Note:</b> Total count is not available for this query.")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
@@ -179,7 +186,7 @@ public class GermplasmResource {
 	 *
 	 * @return a map indicating the GID that was created per clientId, if null, no germplasm was created
 	 */
-	@ApiOperation(value = "Save a set of germplasm")
+	@ApiOperation(value = "Import a list of germplasm with pedigree information", notes = "connectUsing = NONE if any progenitors are specified. Otherwise use GID or GUID ")
 	//FIXME: When removing current import germplasm, this preauthorize must be modified
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.POST)
@@ -231,6 +238,65 @@ public class GermplasmResource {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 		return new ResponseEntity<>(germplasmSearchResponses.get(0), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Validate the list of germplasm to be imported")
+	//FIXME: When removing current import germplasm, this preauthorize must be modified
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/validation", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> validateImportGermplasmData(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final List<GermplasmInventoryImportDTO> germplasmDTOList) {
+		germplasmImportRequestDtoValidator.validateImportLoadedData(programUUID, germplasmDTOList);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get a list of germplasm given a set of germplasmUUIDs and names")
+	//FIXME: When removing current import germplasm, this preauthorize must be modified
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/matches", method = RequestMethod.POST)
+	@ResponseBody
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page. <b>Note:</b> this query may return additional records using some filters"),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. Sorting by names is not allowed.")
+	})
+	public ResponseEntity<List<GermplasmDto>> getGermplasmMatches(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmMatchRequestDto germplasmMatchRequestDto,
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+
+		final PagedResult<GermplasmDto> result =
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmDto>() {
+
+				@Override
+				public long getCount() {
+					return germplasmService.countSearchGermplasm(null, null);
+				}
+
+				@Override
+				public long getFilteredCount() {
+					//					return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
+					// Not counting filtered germplasms for performance reasons
+					return 0;
+				}
+
+				@Override
+				public List<GermplasmDto> getResults(final PagedResult<GermplasmDto> pagedResult) {
+					return germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
+				}
+			});
+
+		final List<GermplasmDto> pageResults = result.getPageResults();
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(result.getTotalResults()));
+		headers.add("X-Filtered-Count", Long.toString(result.getFilteredResults()));
+
+		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
 	}
 
 }
