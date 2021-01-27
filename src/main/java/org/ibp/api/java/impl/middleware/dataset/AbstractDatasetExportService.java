@@ -206,7 +206,8 @@ public abstract class AbstractDatasetExportService {
 			designationColumn = plotDataSetColumns.stream().filter(measurementVariable ->
 			measurementVariable.getTermId() == TermId.DESIG.getId()).findFirst();
 		// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
-		plotDataSetColumns.add(plotDataSetColumns.indexOf(designationColumn.get()) + 1, addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR,null, true));
+		plotDataSetColumns.add(plotDataSetColumns.indexOf(designationColumn.get()) + 1,
+			this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR,null, true));
 	}
 
 	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
