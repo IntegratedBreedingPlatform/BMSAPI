@@ -114,9 +114,9 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD);
 
-		DEFAULT_TRANSACTION_DETAILS_FIELDS = ObservationLabelPrintingHelper.buildTransactionDetailsFields(messageSource);
+		DEFAULT_TRANSACTION_DETAILS_FIELDS = ObservationLabelPrintingHelper.buildTransactionDetailsFields(this.messageSource);
 
-		DEFAULT_LOT_DETAILS_FIELDS = ObservationLabelPrintingHelper.buildLotDetailsFields(messageSource);
+		DEFAULT_LOT_DETAILS_FIELDS = ObservationLabelPrintingHelper.buildLotDetailsFields(this.messageSource);
 
 		STATIC_LOT_FIELD_IDS = DEFAULT_LOT_DETAILS_FIELDS.stream().map(Field::getId).collect(Collectors.toList());
 		STATIC_TRANSACTION_FIELD_IDS = DEFAULT_TRANSACTION_DETAILS_FIELDS.stream().map(Field::getId).collect(Collectors.toList());
@@ -256,7 +256,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		datasetDetailsFields.addAll(ObservationLabelPrintingHelper.transform(datasetVariables));
 		datasetDetailsFields.add(PARENTAGE_FIELD);
 
-		if (studyDetailsFields.indexOf(SEASON_FIELD) == -1) {
+		if (!studyDetailsFields.contains(SEASON_FIELD)) {
 			studyDetailsFields.add(SEASON_FIELD);
 		}
 		datasetDetailsLabelType.setFields(datasetDetailsFields);
@@ -282,7 +282,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		studyTransactionsRequest.setTransactionsSearch(transactionsSearch);
 
 		final List<StudyTransactionsDto> studyTransactionsDtos =
-			studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest, null);
+			this.studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest, null);
 
 		final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap = new HashMap<>();
 		studyTransactionsDtos.forEach(studyTransactionsDto -> studyTransactionsDto.getObservationUnits().forEach(
