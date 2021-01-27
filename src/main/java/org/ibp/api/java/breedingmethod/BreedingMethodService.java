@@ -1,6 +1,7 @@
 package org.ibp.api.java.breedingmethod;
 
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 
 import java.util.List;
@@ -12,6 +13,6 @@ public interface BreedingMethodService {
 
 	BreedingMethodDTO getBreedingMethod(Integer breedingMethodDbId);
 
-	List<BreedingMethodDTO> getBreedingMethods(String cropName, String programUUID, Set<String> abbreviations, boolean favoriteMethods);
+	List<BreedingMethodDTO> getBreedingMethods(String cropName, BreedingMethodSearchRequest searchRequest);
 
 }
