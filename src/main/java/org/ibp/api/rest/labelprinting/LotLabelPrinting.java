@@ -1,6 +1,7 @@
 package org.ibp.api.rest.labelprinting;
 
 import org.generationcp.commons.util.DateUtil;
+import org.generationcp.commons.util.ExportFileName;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -197,7 +198,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput) {
-		final String fileName = "lot-labels-".concat(DateUtil.getCurrentDateAsStringValue());
+		final String fileName = ExportFileName.getInstance().generateFileName("lot-labels");
 		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
 	}
 

@@ -116,8 +116,7 @@ public abstract class ObservationLabelPrintingHelper {
 	}
 
 	public static String getDefaultFileName(final StudyDetails studyDetails, final DatasetDTO datasetDTO) {
-		final String fileName = "Labels-for-".concat(studyDetails.getStudyName()).concat("-").concat(datasetDTO.getName())
-			.concat("-").concat(DateUtil.getCurrentDateAsStringValue());
+		final String fileName = "Labels-for-".concat(studyDetails.getStudyName()).concat("-").concat(datasetDTO.getName());
 		return FileUtils.cleanFileName(fileName);
 	}
 

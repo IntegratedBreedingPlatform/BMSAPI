@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.generationcp.commons.util.ExportFileName;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.inventory.manager.TransactionExportService;
@@ -62,7 +63,7 @@ public class TransactionExportServiceImpl implements TransactionExportService {
 	public File export(final List<TransactionDto> transactionDtoList) {
 		try {
 			final File temporaryFolder = Files.createTempDir();
-			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + TransactionExportServiceImpl.FILE_NAME;
+			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + ExportFileName.getInstance().generateFileName(TransactionExportServiceImpl.FILE_NAME);
 			return this.generateTemplateFile(fileNameFullPath, transactionDtoList);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());

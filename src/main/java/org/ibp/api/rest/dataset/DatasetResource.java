@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.fest.util.Collections;
+import org.generationcp.commons.util.ExportFileName;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -344,10 +345,11 @@ public class DatasetResource {
 	}
 
 	private ResponseEntity<FileSystemResource> getFileSystemResourceResponseEntity(final File file) {
+		final String outFileName = ExportFileName.getInstance().generateFileName(file.getName());
 		final HttpHeaders headers = new HttpHeaders();
 		headers
-			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
-		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(file.getName())));
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(outFileName)));
+		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(outFileName)));
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}

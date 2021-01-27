@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.io.Files;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.util.ExportFileName;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -127,7 +128,8 @@ public abstract class AbstractDatasetExportService {
 		final File temporaryFolder = Files.createTempDir();
 		final String dataSetName =
 			DatasetTypeEnum.PLOT_DATA.getId() == dataSet.getDatasetTypeId() ? DatasetServiceImpl.PLOT_DATASET_NAME : dataSet.getName();
-		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s_%s.%s", study.getName(), dataSetName, fileExtension));
+		final String fileName = String.format("%s_%s", study.getName(), dataSetName);
+		final String sanitizedFileName = FileUtils.sanitizeFileName(ExportFileName.getInstance().generateFileName(fileName, fileExtension));
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
 		return generator.generateMultiInstanceFile(observationUnitRowMap, columns, fileNameFullPath);
@@ -164,12 +166,13 @@ public abstract class AbstractDatasetExportService {
 		for (final Integer instanceDBID : observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
-			final String sanitizedFileName = FileUtils.sanitizeFileName(String
+			final String fileName = ExportFileName.getInstance().generateFileName(String
 				.format(
-					"%s_%s_%s_%s." + fileExtension,
+					"%s_%s_%s_%s",
 					study.getName() + "-" + selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(),
 					selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(),
-					datasetTypeMap.get(dataSetDto.getDatasetTypeId()).getName(), dataSetDto.getName()));
+					datasetTypeMap.get(dataSetDto.getDatasetTypeId()).getName(), dataSetDto.getName()), fileExtension);
+			final String sanitizedFileName = FileUtils.sanitizeFileName(fileName);
 			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 			files.add(
 				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID),
