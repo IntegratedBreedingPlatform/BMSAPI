@@ -2,7 +2,9 @@ package org.ibp.api.rest.breedingmethod;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 import org.generationcp.middleware.pojos.MethodGroup;
 import org.generationcp.middleware.pojos.MethodType;
@@ -73,11 +75,14 @@ public class BreedingMethodResourceGroup {
 	public ResponseEntity<List<BreedingMethodDTO>> getBreedingMethods(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam final boolean favoriteMethods
-	) {
-		//TODO we can expose breeding method codes as filters
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, programUUID, null,
-			favoriteMethods);
+		@ApiParam(value = "method types to retrieve: GEN, DER, MAN")
+		@RequestParam(required = false) final List<String> methodTypes,
+		@ApiParam(value = "retrieve favorite locations only", required = true)
+		@RequestParam final boolean favoritesOnly
+		) {
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, favoritesOnly);
+		searchRequest.setMethodTypes(methodTypes);
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, searchRequest);
 		return new ResponseEntity<>(breedingMethods, HttpStatus.OK);
 	}
 
