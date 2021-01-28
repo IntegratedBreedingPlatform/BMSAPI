@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.io.Files;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -170,7 +171,7 @@ public abstract class AbstractDatasetExportService {
 					study.getName() + "-" + selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(),
 					selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(),
 					datasetTypeMap.get(dataSetDto.getDatasetTypeId()).getName(), dataSetDto.getName()));
-			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
+			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedFileName);
 			files.add(
 				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID),
 					fileNameFullPath, selectedDatasetInstancesMap.get(instanceDBID)));
