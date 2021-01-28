@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
@@ -146,12 +147,14 @@ public class GermplasmUpdateValidator {
 	public void validateBreedingMethod(final BindingResult errors, final String programUUID,
 		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
-		final Set<String> breedingMethodsAbbrs =
+		final List<String> breedingMethodsAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
-				.map(dto -> dto.getBreedingMethodAbbr()).collect(Collectors.toSet());
+				.map(dto -> dto.getBreedingMethodAbbr()).collect(Collectors.toList());
 
-		final List<String> abbreviations = this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false).stream()
-			.map(BreedingMethodDTO::getCode).collect(
+		final List<String> abbreviations =
+			this.breedingMethodService.getBreedingMethods(new BreedingMethodSearchRequest(programUUID, breedingMethodsAbbrs, false))
+				.stream()
+				.map(BreedingMethodDTO::getCode).collect(
 				Collectors.toList());
 
 		breedingMethodsAbbrs.removeAll(abbreviations);
