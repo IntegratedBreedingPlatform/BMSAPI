@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.common.validator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
@@ -186,7 +187,7 @@ public class GermplasmUpdateValidatorTest {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setBreedingMethodAbbr("UAC");
 
-		when(this.breedingMethodService.getBreedingMethods(Mockito.anyString(), Mockito.anySet(), Mockito.anyBoolean()))
+		when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class)))
 			.thenReturn(Arrays.asList(new BreedingMethodDTO()));
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
