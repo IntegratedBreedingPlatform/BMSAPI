@@ -5,12 +5,12 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
-        <version>17.0</version>
+	<version>17.0</version>
 	<name>BMS API</name>
 
 	<properties>
-		<spring-boot-version>1.2.4.RELEASE</spring-boot-version>
-		<spring-security-version>4.0.2.RELEASE</spring-security-version>
+		<spring-boot-version>1.4.5.RELEASE</spring-boot-version>
+		<spring-security-version>4.1.4.RELEASE</spring-security-version>
 		<tomcat.version>7.0.50</tomcat.version>
 		<ibpcommons.version>${project.version}</ibpcommons.version>
 		<jsonpath.version>2.4.0</jsonpath.version>
@@ -108,19 +108,19 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
-			<version>4.1.6.RELEASE</version>
+			<version>4.3.7.RELEASE</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>4.1.6.RELEASE</version>
+			<version>4.3.7.RELEASE</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
-			<version>1.8.2.RELEASE</version>
+			<version>1.13.1.RELEASE</version>
 		</dependency>
 
 		<dependency>
