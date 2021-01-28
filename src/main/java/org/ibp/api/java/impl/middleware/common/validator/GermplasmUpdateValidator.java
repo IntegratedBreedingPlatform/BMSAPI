@@ -177,9 +177,11 @@ public class GermplasmUpdateValidator {
 	public void validateProgenitorsGids(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		try {
+
+			// Get the gids from progenitors.
 			final Set<Integer> progenitorGids =
 				germplasmUpdateDTOList.stream().map(dto -> dto.getProgenitors().values()).flatMap(Collection::stream)
-					.filter(value -> StringUtils.isNotEmpty(value)).map(value -> Integer.parseInt(value))
+					.filter(value -> StringUtils.isNotEmpty(value) && !"0".equals(value)).map(value -> Integer.parseInt(value))
 					.collect(Collectors.toSet());
 			final List<Germplasm> germplasmByGIDs = this.germplasmMiddlewareService.getGermplasmByGIDs(new ArrayList<>(progenitorGids));
 			final Set<Integer> existingGids = germplasmByGIDs.stream().map(Germplasm::getGid).collect(Collectors.toSet());
