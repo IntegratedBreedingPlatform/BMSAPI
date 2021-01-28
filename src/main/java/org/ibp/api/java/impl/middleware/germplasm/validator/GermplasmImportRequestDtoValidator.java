@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
@@ -193,11 +194,12 @@ public class GermplasmImportRequestDtoValidator {
 
 	private void validateAllBreedingMethodAbbreviationsExists(final String programUUID,
 		final List<GermplasmImportRequestDto> germplasmDtos) {
-		final Set<String> breedingMethodsAbbrs =
+		final List<String> breedingMethodsAbbrs =
 			germplasmDtos.stream().map(g -> g.getBreedingMethodAbbr().toUpperCase()).collect(
-				Collectors.toSet());
+				Collectors.toList());
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, breedingMethodsAbbrs, false);
 		final List<String> existingBreedingMethods =
-			this.breedingMethodService.getBreedingMethods(programUUID, breedingMethodsAbbrs, false).stream().map(
+			this.breedingMethodService.getBreedingMethods(searchRequest).stream().map(
 				BreedingMethodDTO::getCode).collect(Collectors.toList());
 		if (breedingMethodsAbbrs.size() != existingBreedingMethods.size()) {
 			breedingMethodsAbbrs.removeAll(existingBreedingMethods);
