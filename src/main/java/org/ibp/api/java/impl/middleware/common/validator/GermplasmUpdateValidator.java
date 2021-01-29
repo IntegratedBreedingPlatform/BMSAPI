@@ -179,23 +179,17 @@ public class GermplasmUpdateValidator {
 
 	public void validateProgenitorsGids(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
-		try {
-
-			// Get the gids from progenitors.
-			final Set<Integer> progenitorGids =
-				germplasmUpdateDTOList.stream().map(dto -> dto.getProgenitors().values()).flatMap(Collection::stream)
-					.filter(value -> StringUtils.isNotEmpty(value) && !"0".equals(value)).map(value -> Integer.parseInt(value))
-					.collect(Collectors.toSet());
-			final List<Germplasm> germplasmByGIDs = this.germplasmMiddlewareService.getGermplasmByGIDs(new ArrayList<>(progenitorGids));
-			final Set<Integer> existingGids = germplasmByGIDs.stream().map(Germplasm::getGid).collect(Collectors.toSet());
-			if (!progenitorGids.equals(existingGids)) {
-				errors.reject("germplasm.update.invalid.progenitors.gids", new String[] {
-					String.join(",",
-						progenitorGids.stream().filter((gid) -> !existingGids.contains(gid)).map(o -> String.valueOf(o)).collect(
-							Collectors.toSet()))}, "");
-			}
-		} catch (final NumberFormatException numberFormatException) {
-			errors.reject("germplasm.update.invalid.progenitors.should.be.numeric", "");
+		// Get the gids from progenitors.
+		final Set<Integer> progenitorGids =
+			germplasmUpdateDTOList.stream().map(dto -> dto.getProgenitors().values()).flatMap(Collection::stream)
+				.filter(value -> value != null && value != 0).collect(Collectors.toSet());
+		final List<Germplasm> germplasmByGIDs = this.germplasmMiddlewareService.getGermplasmByGIDs(new ArrayList<>(progenitorGids));
+		final Set<Integer> existingGids = germplasmByGIDs.stream().map(Germplasm::getGid).collect(Collectors.toSet());
+		if (!progenitorGids.equals(existingGids)) {
+			errors.reject("germplasm.update.invalid.progenitors.gids", new String[] {
+				String.join(",",
+					progenitorGids.stream().filter((gid) -> !existingGids.contains(gid)).map(o -> String.valueOf(o)).collect(
+						Collectors.toSet()))}, "");
 		}
 
 	}
@@ -204,10 +198,10 @@ public class GermplasmUpdateValidator {
 		final long
 			progenitorsWithEmptyValuesCount =
 			germplasmUpdateDTOList.stream().filter(dto -> {
-				final String progenitor1 = dto.getProgenitors().getOrDefault(PROGENITOR_1, null);
-				final String progenitor2 = dto.getProgenitors().getOrDefault(PROGENITOR_2, null);
-				return (StringUtils.isNotEmpty(progenitor1) && StringUtils.isEmpty(progenitor2)) || (StringUtils.isEmpty(progenitor1)
-					&& StringUtils.isNotEmpty(progenitor2));
+				final Integer progenitor1 = dto.getProgenitors().getOrDefault(PROGENITOR_1, null);
+				final Integer progenitor2 = dto.getProgenitors().getOrDefault(PROGENITOR_2, null);
+				return (progenitor1 != null && progenitor2 == null) || (progenitor1 == null
+					&& progenitor2 != null);
 			}).count();
 		if (progenitorsWithEmptyValuesCount > 0) {
 			errors.reject("germplasm.update.invalid.progenitors", "");

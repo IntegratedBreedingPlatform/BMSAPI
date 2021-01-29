@@ -73,8 +73,8 @@ public class GermplasmUpdateValidatorTest {
 		germplasmUpdateDTO.getNames().put("LNAME", "");
 		germplasmUpdateDTO.getAttributes().put("NOTE", "");
 		germplasmUpdateDTO.getAttributes().put("ACQ_DATE", "");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, "3");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, "4");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, 3);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, 4);
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 
@@ -211,12 +211,12 @@ public class GermplasmUpdateValidatorTest {
 	public void testValidateProgenitorsBothMustBeSpecified_OneOfProgenitorsIsNotSpecified() {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, null);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, "1");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, 1);
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);
 		this.germplasmUpdateValidator.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateList);
 
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, "1");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, 1);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, null);
 		this.germplasmUpdateValidator.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateList);
 
@@ -226,8 +226,8 @@ public class GermplasmUpdateValidatorTest {
 	@Test
 	public void testValidateProgenitorsBothMustBeSpecified_Valid() {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, "1");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, "2");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, 2);
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);
 		this.germplasmUpdateValidator.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateList);
@@ -237,8 +237,8 @@ public class GermplasmUpdateValidatorTest {
 	@Test
 	public void testValidate_ProgenitorsGid_GidsDoNotExist() {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, "1");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, "2");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, 2);
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);
 
@@ -250,21 +250,10 @@ public class GermplasmUpdateValidatorTest {
 	}
 
 	@Test
-	public void testValidate_ProgenitorsGid_GidsAreNotNumeric() {
-		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, "HELLO");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, "WORLD");
-		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
-		final BindingResult errors = Mockito.mock(BindingResult.class);
-		this.germplasmUpdateValidator.validateProgenitorsGids(errors, germplasmUpdateList);
-		Mockito.verify(errors).reject("germplasm.update.invalid.progenitors.should.be.numeric", "");
-	}
-
-	@Test
 	public void testValidate_ProgenitorsGid_Valid() {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, "1");
-		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, "2");
+		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmUpdateValidator.PROGENITOR_2, 2);
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);
 
