@@ -75,7 +75,7 @@ public class GermplasmImportRequestDtoValidator {
 		BaseValidator.checkNotEmpty(germplasmImportRequestDto.getGermplasmList(), "germplasm.import.list.null");
 
 		if (germplasmImportRequestDto.getConnectUsing() == null) {
-			errors.reject("germplasm.import.connect.using.null.errorin"
+			errors.reject("germplasm.import.connect.using.null.error"
 				+ "", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
