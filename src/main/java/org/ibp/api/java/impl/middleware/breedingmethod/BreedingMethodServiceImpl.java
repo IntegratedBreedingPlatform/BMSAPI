@@ -67,4 +67,9 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		return this.breedingMethodService.getBreedingMethods(searchRequest);
 	}
 
+	@Override
+	public List<BreedingMethodDTO> getAllBreedingMethods() {
+		return this.breedingMethodService.getAllBreedingMethods();
+	}
+
 }
