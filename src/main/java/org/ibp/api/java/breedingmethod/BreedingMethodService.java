@@ -15,6 +15,6 @@ public interface BreedingMethodService {
 
 	List<BreedingMethodDTO> getBreedingMethods(String cropName, BreedingMethodSearchRequest searchRequest);
 
-	List<BreedingMethodDTO> getAllBreedingMethods();
+	Integer countBreedingMethod(BreedingMethodSearchRequest searchRequest);
 
 }

@@ -68,8 +68,8 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
-	public List<BreedingMethodDTO> getAllBreedingMethods() {
-		return this.breedingMethodService.getAllBreedingMethods();
+	public Integer countBreedingMethod(final BreedingMethodSearchRequest searchRequest) {
+		return this.breedingMethodService.countBreedingMethods(searchRequest);
 	}
 
 }

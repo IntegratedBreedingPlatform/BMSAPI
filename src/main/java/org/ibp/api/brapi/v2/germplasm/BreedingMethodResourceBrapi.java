@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -14,6 +15,7 @@ import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,30 +45,27 @@ public class BreedingMethodResourceBrapi {
 	@RequestParam(value = "page", required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
-		final PagedResult<BreedingMethod> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize,
-			new SearchSpec<BreedingMethod>() {
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
+		final PagedResult<BreedingMethodDTO> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize,
+			new SearchSpec<BreedingMethodDTO>() {
 
 				@Override
 				public long getCount() {
-					return BreedingMethodResourceBrapi.this.breedingMethodService.getAllBreedingMethods().size();
+					return BreedingMethodResourceBrapi.this.breedingMethodService.countBreedingMethod(searchRequest);
 				}
 
 				@Override
-				public List<BreedingMethod> getResults(final PagedResult<BreedingMethod> pagedResult) {
-					final List<BreedingMethod> results = new ArrayList<>();
-					final List<BreedingMethodDTO> breedingMethodDTOS = BreedingMethodResourceBrapi.this.breedingMethodService.getAllBreedingMethods();
-					for (final BreedingMethodDTO dto : breedingMethodDTOS) {
-						final BreedingMethod method = new BreedingMethod();
-						method.setAbbreviation(dto.getCode());
-						method.setBreedingMethodDbId(String.valueOf(dto.getMid()));
-						method.setBreedingMethodName(dto.getName());
-						method.setDescription(dto.getDescription());
-						results.add(method);
-					}
-					return results;
+				public List<BreedingMethodDTO> getResults(final PagedResult<BreedingMethodDTO> pagedResult) {
+					return BreedingMethodResourceBrapi.this.breedingMethodService.getBreedingMethods(crop, searchRequest);
 				}
 			});
-		final Result<BreedingMethod> result = new Result<BreedingMethod>().withData(resultPage.getPageResults());
+
+		final ModelMapper modelMapper = BreedingMethodMapper.getInstance();
+		final List<BreedingMethod> breedingMethods = new ArrayList<>();
+		for (final BreedingMethodDTO dto : resultPage.getPageResults()) {
+			breedingMethods.add(modelMapper.map(dto, BreedingMethod.class));
+		}
+		final Result<BreedingMethod> result = new Result<BreedingMethod>().withData(breedingMethods);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 		final Metadata metadata = new Metadata().withPagination(pagination);
@@ -81,13 +80,9 @@ public class BreedingMethodResourceBrapi {
 		@PathVariable final String crop,
 		@PathVariable final Integer breedingMethodDbId) {
 
-
 		final BreedingMethodDTO breedingMethodDTOS = this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
-		final BreedingMethod method = new BreedingMethod();
-		method.setAbbreviation(breedingMethodDTOS.getCode());
-		method.setBreedingMethodDbId(String.valueOf(breedingMethodDTOS.getMid()));
-		method.setBreedingMethodName(breedingMethodDTOS.getName());
-		method.setDescription(breedingMethodDTOS.getDescription());
+		final ModelMapper modelMapper = BreedingMethodMapper.getInstance();
+		final BreedingMethod method = modelMapper.map(breedingMethodDTOS, BreedingMethod.class);
 		final Metadata metadata = new Metadata();
 		final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 		metadata.setPagination(pagination);
