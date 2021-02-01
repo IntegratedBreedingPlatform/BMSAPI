@@ -37,7 +37,7 @@ public class BreedingMethodResourceBrapi {
 	private BreedingMethodService breedingMethodService;
 
 	@ApiOperation(value = "Get the Breeding Methods", notes = "Get the list of germplasm breeding methods available in a system.")
-	@RequestMapping(value = "{crop}/brapi/v2/breedingmethods", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v2/breedingmethods", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<BreedingMethod>> getAllBreedingMethods(@PathVariable final String crop, @ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)
 	@RequestParam(value = "page", required = false) final Integer currentPage,
@@ -75,7 +75,7 @@ public class BreedingMethodResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get the details of a specific Breeding Method used to produce Germplasm", notes = "Get the details of a specific Breeding Method")
-	@RequestMapping(value = "{crop}/brapi/v2/breedingmethod/{breedingMethodDbId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v2/breedingmethod/{breedingMethodDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<BreedingMethod>> getBreedingMethodById(
 		@PathVariable final String crop,
