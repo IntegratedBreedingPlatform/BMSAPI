@@ -1,6 +1,7 @@
 package org.ibp.api.brapi.v2.germplasm;
 
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.hamcrest.CoreMatchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
@@ -57,7 +58,7 @@ public class BreedingMethodResourceBrapiTest extends ApiUnitTestBase {
 		method.setMid(1);
 		list.add(method);
 
-		Mockito.doReturn(list).when(this.breedingMethodService).getAllBreedingMethods();
+		Mockito.doReturn(list).when(this.breedingMethodService).getBreedingMethods(Matchers.anyString(), Matchers.any(BreedingMethodSearchRequest.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/{cropName}/brapi/v2/breedingmethods", this.cropName).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
