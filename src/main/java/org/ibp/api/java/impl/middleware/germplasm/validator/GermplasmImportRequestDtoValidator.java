@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,11 +43,11 @@ import java.util.stream.Collectors;
 public class GermplasmImportRequestDtoValidator {
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
-	private static final Integer STOCK_ID_MAX_LENGTH = 35;
-	private static final Integer GUID_MAX_LENGTH = 36;
-	private static final Integer REFERENCE_MAX_LENGTH = 255;
-	private static final Integer NAME_MAX_LENGTH = 255;
-	private static final Integer ATTRIBUTE_MAX_LENGTH = 255;
+	public static final Integer STOCK_ID_MAX_LENGTH = 35;
+	public static final Integer GUID_MAX_LENGTH = 36;
+	public static final Integer REFERENCE_MAX_LENGTH = 255;
+	public static final Integer NAME_MAX_LENGTH = 255;
+	public static final Integer ATTRIBUTE_MAX_LENGTH = 255;
 
 	private BindingResult errors;
 
@@ -75,7 +76,7 @@ public class GermplasmImportRequestDtoValidator {
 		BaseValidator.checkNotEmpty(germplasmImportRequestDto.getGermplasmList(), "germplasm.import.list.null");
 
 		if (germplasmImportRequestDto.getConnectUsing() == null) {
-			errors.reject("germplasm.import.connect.using.null.error"
+			errors.reject("germplasm.import.connect.using.null"
 				+ "", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -149,6 +150,11 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
+			if (g.getNames().keySet().stream().anyMatch(Objects::isNull)) {
+				errors.reject("germplasm.import.null.name.types", new String[] {g.getClientId().toString()}, "");
+				return true;
+			}
+
 			g.getNames().keySet().forEach(name -> nameKeys.add(name.toUpperCase()));
 			if (g.getNames().keySet().size() != nameKeys.size()) {
 				errors.reject("germplasm.import.duplicated.name.types", new String[] {g.getClientId().toString()}, "");
@@ -197,7 +203,9 @@ public class GermplasmImportRequestDtoValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		this.validateGUIDNotExists(germplasmImportDTOList);
+		if (!germplasmImportRequestDto.isSkipIfExists()) {
+			this.validateGUIDNotExists(germplasmImportDTOList);
+		}
 		this.validateNotDuplicatedGUID(germplasmImportDTOList);
 		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmImportDTOList);
 		this.validateAllLocationAbbreviationsExists(programUUID, germplasmImportDTOList);
@@ -254,7 +262,8 @@ public class GermplasmImportRequestDtoValidator {
 			if (g.getNames() != null) {
 				g.getNames().keySet().forEach(name -> nameKeys.add(name.toUpperCase()));
 				if (g.getNames().keySet().size() != nameKeys.size()) {
-					errors.reject("germplasm.import.duplicated.name.types", new String[] {g.getClientId().toString()}, "");
+					errors.reject("germplasm.import.duplicated.name.types",
+						new String[] {(g.getClientId() != null) ? String.valueOf(g.getClientId()) : "unknown"}, "");
 					return true;
 				}
 
@@ -328,9 +337,9 @@ public class GermplasmImportRequestDtoValidator {
 			germplasmImportDTOList.stream().filter(g -> StringUtils.isNotEmpty(g.getBreedingMethodAbbr()))
 				.map(g -> g.getBreedingMethodAbbr().toUpperCase()).collect(
 				Collectors.toSet());
-		final BreedingMethodSearchRequest searchRequest =
-			new BreedingMethodSearchRequest(programUUID, new ArrayList<>(breedingMethodsAbbrs), false);
 		if (!breedingMethodsAbbrs.isEmpty()) {
+			final BreedingMethodSearchRequest searchRequest =
+				new BreedingMethodSearchRequest(programUUID, new ArrayList<>(breedingMethodsAbbrs), false);
 			final List<BreedingMethodDTO> existingBreedingMethods =
 				this.breedingMethodService.getBreedingMethods(searchRequest);
 			if (breedingMethodsAbbrs.size() != existingBreedingMethods.size()) {
@@ -504,9 +513,14 @@ public class GermplasmImportRequestDtoValidator {
 	private boolean areAttributesInvalid(final Integer id, final Map<String, String> attributes) {
 		if (attributes != null) {
 			final Set<String> attributeKeys = new HashSet<>();
+
+			if (attributes.keySet().stream().anyMatch(Objects::isNull)) {
+				errors.reject("germplasm.import.null.attributes", new String[] {(id != null) ? String.valueOf(id) : "Unknown"}, "");
+				return true;
+			}
 			attributes.keySet().forEach(attr -> attributeKeys.add(attr.toUpperCase()));
 			if (attributes.keySet().size() != attributeKeys.size()) {
-				errors.reject("germplasm.import.duplicated.attributes", new String[] {id.toString()}, "");
+				errors.reject("germplasm.import.duplicated.attributes", new String[] {(id != null) ? String.valueOf(id) : "Unknown"}, "");
 				return true;
 			}
 			if (attributes.values().stream().anyMatch(n -> {
