@@ -51,7 +51,7 @@ public class BreedingMethodResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return BreedingMethodResourceBrapi.this.breedingMethodService.countBreedingMethod(searchRequest);
+					return BreedingMethodResourceBrapi.this.breedingMethodService.countBreedingMethods(searchRequest);
 				}
 
 				@Override
