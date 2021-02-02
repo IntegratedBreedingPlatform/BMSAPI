@@ -25,25 +25,6 @@ public class BreedingMethodMapper {
 		return BreedingMethodMapper.applicationWideModelMapper;
 	}
 
-
-	private static class AdditionalInfoConverter implements Converter<BreedingMethodDTO, Map<String, Object>> {
-
-		@Override
-		public Map<String, Object> convert(final MappingContext<BreedingMethodDTO, Map<String, Object>> context) {
-			final Map<String, Object> additionalInfo = new HashMap<>();
-			final BreedingMethodDTO breedingMethodDTO = context.getSource();
-			additionalInfo.put("code", breedingMethodDTO.getCode());
-			additionalInfo.put("description", breedingMethodDTO.getDescription());
-			additionalInfo.put("group", breedingMethodDTO.getGroup());
-			additionalInfo.put("methodClass", breedingMethodDTO.getMethodClass());
-			additionalInfo.put("mid", breedingMethodDTO.getMid());
-			additionalInfo.put("name", breedingMethodDTO.getName());
-			additionalInfo.put("type", breedingMethodDTO.getType());
-			additionalInfo.put("class", breedingMethodDTO.getCode());
-			return context.getMappingEngine().map(context.create(additionalInfo, context.getDestinationType()));
-		}
-
-	}
 	private static void addBreedingMethodDtoDataMapping(final ModelMapper mapper) {
 		mapper.addMappings(new PropertyMap<BreedingMethodDTO, BreedingMethod>() {
 
