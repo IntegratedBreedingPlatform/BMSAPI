@@ -58,7 +58,7 @@ public class BreedingMethodResourceBrapiTest extends ApiUnitTestBase {
 		method.setMid(1);
 		list.add(method);
 
-		Mockito.doReturn(list).when(this.breedingMethodService).getBreedingMethods(Matchers.anyString(), Matchers.any(BreedingMethodSearchRequest.class));
+		Mockito.doReturn(list).when(this.breedingMethodService).getBreedingMethods(Matchers.anyString(), Matchers.any(BreedingMethodSearchRequest.class), Matchers.any(Pageable.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/{cropName}/brapi/v2/breedingmethods", this.cropName).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
@@ -72,7 +72,7 @@ public class BreedingMethodResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testGetAllBreedingMethodByDbId() throws Exception {
+	public void testGetBreedingMethodByDbId() throws Exception {
 		final Pageable pageable = Mockito.mock(Pageable.class);
 		Mockito.when(pageable.getPageSize()).thenReturn(20);
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);

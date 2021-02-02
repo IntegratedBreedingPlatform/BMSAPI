@@ -46,8 +46,12 @@ public class BreedingMethodResourceBrapi {
 	@RequestParam(value = "page", required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
+
+		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
-		final PagedResult<BreedingMethodDTO> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize,
+		final PagedResult<BreedingMethodDTO> resultPage = new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize,
 			new SearchSpec<BreedingMethodDTO>() {
 
 				@Override
@@ -57,7 +61,7 @@ public class BreedingMethodResourceBrapi {
 
 				@Override
 				public List<BreedingMethodDTO> getResults(final PagedResult<BreedingMethodDTO> pagedResult) {
-					return BreedingMethodResourceBrapi.this.breedingMethodService.getBreedingMethods(crop, searchRequest, new PageRequest(currentPage, pageSize));
+					return BreedingMethodResourceBrapi.this.breedingMethodService.getBreedingMethods(crop, searchRequest, new PageRequest(finalPageNumber, finalPageSize));
 				}
 			});
 
