@@ -10,6 +10,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.MapBindingResult;
@@ -40,6 +41,12 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 
 	@Override
 	public List<BreedingMethodDTO> getBreedingMethods(final String cropName, final BreedingMethodSearchRequest searchRequest) {
+		return this.getBreedingMethods(cropName, searchRequest, null);
+	}
+
+	@Override
+	public List<BreedingMethodDTO> getBreedingMethods(final String cropName, final BreedingMethodSearchRequest searchRequest,
+		final Pageable pageable) {
 		final MapBindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final String programUUID = searchRequest.getProgramUUID();
@@ -64,7 +71,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		return this.breedingMethodService.getBreedingMethods(searchRequest);
+		return this.breedingMethodService.getBreedingMethods(searchRequest, pageable);
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public class BreedingMethodServiceImplTest {
 		final boolean favorites = true;
 		final List<BreedingMethodDTO> mockedBreedingMethod = Mockito.mock(List.class);
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(PROGRAM_UUID, null, favorites);
-		Mockito.when(this.middlewareBreedingMethodService.getBreedingMethods(searchRequest))
+		Mockito.when(this.middlewareBreedingMethodService.getBreedingMethods(searchRequest, null))
 			.thenReturn(mockedBreedingMethod);
 
 		List<BreedingMethodDTO> actualBreedingMethods =
@@ -62,7 +62,7 @@ public class BreedingMethodServiceImplTest {
 		assertThat(actualBreedingMethods, is(mockedBreedingMethod));
 
 		Mockito.verify(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any(Errors.class));
-		Mockito.verify(this.middlewareBreedingMethodService).getBreedingMethods(searchRequest);
+		Mockito.verify(this.middlewareBreedingMethodService).getBreedingMethods(searchRequest, null);
 	}
 
 	@Test
@@ -70,7 +70,7 @@ public class BreedingMethodServiceImplTest {
 		final List<BreedingMethodDTO> mockedBreedingMethod = Mockito.mock(List.class);
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
 		searchRequest.setMethodTypes(Arrays.asList(MethodType.DERIVATIVE.getCode(), MethodType.MAINTENANCE.getCode()));
-		Mockito.when(this.middlewareBreedingMethodService.getBreedingMethods(searchRequest)).thenReturn(mockedBreedingMethod);
+		Mockito.when(this.middlewareBreedingMethodService.getBreedingMethods(searchRequest, null)).thenReturn(mockedBreedingMethod);
 
 
 		List<BreedingMethodDTO> actualBreedingMethods = this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
@@ -78,7 +78,7 @@ public class BreedingMethodServiceImplTest {
 		assertThat(actualBreedingMethods, is(mockedBreedingMethod));
 
 		Mockito.verifyZeroInteractions(this.programValidator);
-		Mockito.verify(this.middlewareBreedingMethodService).getBreedingMethods(searchRequest);
+		Mockito.verify(this.middlewareBreedingMethodService).getBreedingMethods(searchRequest, null);
 	}
 
 	@Test

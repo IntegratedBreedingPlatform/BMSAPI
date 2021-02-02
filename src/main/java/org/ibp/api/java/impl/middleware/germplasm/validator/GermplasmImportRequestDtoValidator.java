@@ -199,7 +199,7 @@ public class GermplasmImportRequestDtoValidator {
 				Collectors.toList());
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, breedingMethodsAbbrs, false);
 		final List<String> existingBreedingMethods =
-			this.breedingMethodService.getBreedingMethods(searchRequest).stream().map(
+			this.breedingMethodService.getBreedingMethods(searchRequest, null).stream().map(
 				BreedingMethodDTO::getCode).collect(Collectors.toList());
 		if (breedingMethodsAbbrs.size() != existingBreedingMethods.size()) {
 			breedingMethodsAbbrs.removeAll(existingBreedingMethods);
