@@ -1,6 +1,7 @@
 package org.ibp.api.brapi.v2.germplasm;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
@@ -41,5 +42,20 @@ public class BreedingMethod {
 
 	public void setDescription(final String description) {
 		this.description = description;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		return Pojomatic.equals(this, obj);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
 	}
 }

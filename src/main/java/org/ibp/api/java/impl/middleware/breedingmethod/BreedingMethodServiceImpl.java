@@ -68,7 +68,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
-	public Integer countBreedingMethod(final BreedingMethodSearchRequest searchRequest) {
+	public Long countBreedingMethods(final BreedingMethodSearchRequest searchRequest) {
 		return this.breedingMethodService.countBreedingMethods(searchRequest);
 	}
 
