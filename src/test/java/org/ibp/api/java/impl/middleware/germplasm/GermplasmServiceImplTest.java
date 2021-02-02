@@ -48,9 +48,6 @@ public class GermplasmServiceImplTest {
 	private PedigreeService pedigreeService;
 
 	@Mock
-	private LocationDataManager locationDataManger;
-
-	@Mock
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Captor
@@ -62,7 +59,6 @@ public class GermplasmServiceImplTest {
 		this.germplasmServiceImpl = new GermplasmServiceImpl();
 		this.germplasmServiceImpl.setGermplasmDataManager(this.germplasmDataManager);
 		this.germplasmServiceImpl.setPedigreeService(this.pedigreeService);
-		this.germplasmServiceImpl.setLocationDataManger(this.locationDataManger);
 		this.germplasmServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
 	}
 

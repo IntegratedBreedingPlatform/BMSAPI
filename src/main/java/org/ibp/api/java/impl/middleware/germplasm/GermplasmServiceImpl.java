@@ -3,10 +3,10 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
@@ -20,13 +20,11 @@ import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearc
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -84,12 +82,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
-
-	@Autowired
-	private LocationDataManager locationDataManger;
-
-	@Autowired
-	private GermplasmGroupingService germplasmGroupingService;
 
 	@Autowired
 	private InstanceValidator instanceValidator;
@@ -234,16 +226,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public GermplasmDTO getGermplasmDTObyGID(final Integer germplasmId) {
-		final GermplasmDTO germplasmDTO;
-		try {
-			germplasmDTO = this.germplasmDataManager.getGermplasmDTOByGID(germplasmId);
-			if (germplasmDTO != null) {
-				germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmId, this.crossExpansionProperties));
-			}
-		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to get a germplasm", e);
+		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmDataManager.getGermplasmDTOByGID(germplasmId);
+		if (germplasmDTOOptional.isPresent()) {
+			final GermplasmDTO germplasmDTO = germplasmDTOOptional.get();
+			germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmId, this.crossExpansionProperties));
+			return germplasmDTO;
+		} else {
+			throw new ApiRuntimeException("Invalid Germplasm Id");
 		}
-		return germplasmDTO;
+
+
 	}
 
 	@Override
@@ -258,7 +250,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to search germplasms", e);
+			throw new ApiRuntimeException("An error has occurred when trying to search germplasm", e);
 		}
 	}
 
@@ -267,7 +259,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		try {
 			return this.germplasmDataManager.countGermplasmDTOs(germplasmSearchRequestDTO);
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to count germplasms", e);
+			throw new ApiRuntimeException("An error has occurred when trying to count germplasm", e);
 		}
 	}
 
@@ -409,10 +401,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	void setPedigreeService(final PedigreeService pedigreeService) {
 		this.pedigreeService = pedigreeService;
-	}
-
-	void setLocationDataManger(final LocationDataManager locationDataManger) {
-		this.locationDataManger = locationDataManger;
 	}
 
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
