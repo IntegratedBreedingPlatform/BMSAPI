@@ -56,7 +56,7 @@ public class BreedingMethodServiceImplTest {
 		Mockito.when(this.middlewareBreedingMethodService.getBreedingMethods(searchRequest, null))
 			.thenReturn(mockedBreedingMethod);
 
-		List<BreedingMethodDTO> actualBreedingMethods =
+		final List<BreedingMethodDTO> actualBreedingMethods =
 			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
 		assertNotNull(actualBreedingMethods);
 		assertThat(actualBreedingMethods, is(mockedBreedingMethod));
@@ -73,7 +73,7 @@ public class BreedingMethodServiceImplTest {
 		Mockito.when(this.middlewareBreedingMethodService.getBreedingMethods(searchRequest, null)).thenReturn(mockedBreedingMethod);
 
 
-		List<BreedingMethodDTO> actualBreedingMethods = this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
+		final List<BreedingMethodDTO> actualBreedingMethods = this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
 		assertNotNull(actualBreedingMethods);
 		assertThat(actualBreedingMethods, is(mockedBreedingMethod));
 
@@ -87,7 +87,7 @@ public class BreedingMethodServiceImplTest {
 			final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, true);
 			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
 			fail("Should have failed.");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("breeding.methods.favorite.requires.program"));
@@ -104,7 +104,7 @@ public class BreedingMethodServiceImplTest {
 			searchRequest.setMethodTypes(Collections.singletonList("ABC"));
 			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
 			fail("Should have failed.");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("invalid.breeding.method.type"));
