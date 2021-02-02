@@ -12,6 +12,7 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -21,6 +22,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Api(value = "BrAPI Germplasm Services")
 @Controller
@@ -86,6 +90,12 @@ public class BreedingMethodResourceBrapi {
 		@PathVariable final Integer breedingMethodDbId) {
 
 		final BreedingMethodDTO breedingMethodDTOS = this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
+		if (Objects.isNull(breedingMethodDTOS)) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());;
+			errors.reject("methoddbid.invalid", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
 		final ModelMapper modelMapper = BreedingMethodMapper.getInstance();
 		final BreedingMethod method = modelMapper.map(breedingMethodDTOS, BreedingMethod.class);
 		final Metadata metadata = new Metadata();
