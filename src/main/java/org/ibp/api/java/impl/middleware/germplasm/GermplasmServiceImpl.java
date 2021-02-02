@@ -246,7 +246,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
 				.searchGermplasmDTO(germplasmSearchRequestDTO, page, pageSize);
 			if (germplasmDTOList != null) {
-				this.populateGermplasmPedigreeAndSynonyms(germplasmDTOList);
+				this.populateGermplasmPedigree(germplasmDTOList);
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
@@ -281,7 +281,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
 				.getGermplasmByStudy(studyDbId, pageNumber, pageSize);
 			if (germplasmDTOList != null) {
-				this.populateGermplasmPedigreeAndSynonyms(germplasmDTOList);
+				this.populateGermplasmPedigree(germplasmDTOList);
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
@@ -289,22 +289,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void populateGermplasmPedigreeAndSynonyms(final List<GermplasmDTO> germplasmDTOList) {
+	private void populateGermplasmPedigree(final List<GermplasmDTO> germplasmDTOList) {
 		final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
 			.collect(Collectors.toSet());
 		final Map<Integer, String> crossExpansionsMap =
 			this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
-		final Map<Integer, List<Name>> gidNamesMap =
-			this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(new ArrayList<>(gids), Collections.emptyList());
 		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
 			final Integer gid = Integer.valueOf(germplasmDTO.getGermplasmDbId());
-			// Set as synonyms other names, other than the preferred name, found for germplasm
-			final String defaultName = germplasmDTO.getGermplasmName();
-			final List<Name> names = gidNamesMap.get(gid);
-			if (!CollectionUtils.isEmpty(names)) {
-				germplasmDTO.setSynonyms(
-					names.stream().filter(n -> !defaultName.equalsIgnoreCase(n.getNval())).map(Name::getNval).collect(Collectors.toList()));
-			}
 			germplasmDTO.setPedigree(crossExpansionsMap.get(gid));
 		}
 	}
