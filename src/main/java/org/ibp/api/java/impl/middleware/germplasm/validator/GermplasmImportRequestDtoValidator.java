@@ -203,7 +203,7 @@ public class GermplasmImportRequestDtoValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		if (!germplasmImportRequestDto.isSkipCreationWhenMatches()) {
+		if (!germplasmImportRequestDto.isSkipIfExists()) {
 			this.validateGUIDNotExists(germplasmImportDTOList);
 		}
 		this.validateNotDuplicatedGUID(germplasmImportDTOList);
