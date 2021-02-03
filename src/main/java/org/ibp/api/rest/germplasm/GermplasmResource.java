@@ -194,7 +194,6 @@ public class GermplasmResource {
 	public ResponseEntity<Map<Integer, GermplasmImportResponseDto>> importGermplasm(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmImportRequestDto germplasmImportRequestDto) {
-
 		return new ResponseEntity<>(this.germplasmService.importGermplasm(cropName, programUUID, germplasmImportRequestDto), HttpStatus.OK);
 	}
 
@@ -241,7 +240,6 @@ public class GermplasmResource {
 	}
 
 	@ApiOperation(value = "Validate the list of germplasm to be imported")
-	//FIXME: When removing current import germplasm, this preauthorize must be modified
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/validation", method = RequestMethod.POST)
 	@ResponseBody
@@ -253,7 +251,6 @@ public class GermplasmResource {
 	}
 
 	@ApiOperation(value = "Get a list of germplasm given a set of germplasmUUIDs and names")
-	//FIXME: When removing current import germplasm, this preauthorize must be modified
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/matches", method = RequestMethod.POST)
 	@ResponseBody
@@ -261,9 +258,7 @@ public class GermplasmResource {
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
 			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
 		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
-			value = "Number of records per page. <b>Note:</b> this query may return additional records using some filters"),
-		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
-			value = "Sorting criteria in the format: property,asc|desc. Sorting by names is not allowed.")
+			value = "Number of records per page. <b>Note:</b> this query may return additional records using some filters")
 	})
 	public ResponseEntity<List<GermplasmDto>> getGermplasmMatches(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
