@@ -7,19 +7,23 @@ import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -28,10 +32,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class GermplasmUpdateValidator {
+public class GermplasmUpdateDtoValidator {
 
-	public static final String PROGENITOR_1 = "PROGENITOR 1";
-	public static final String PROGENITOR_2 = "PROGENITOR 2";
 	@Autowired
 	private GermplasmService germplasmService;
 
@@ -44,13 +46,32 @@ public class GermplasmUpdateValidator {
 	@Autowired
 	private BreedingMethodService breedingMethodService;
 
-	public void validateEmptyList(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public void validate(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmUpdateDTO.class.getName());
+
+		this.validateEmptyList(errors, germplasmUpdateDTOList);
+		this.validateAttributeAndNameCodes(errors, germplasmUpdateDTOList);
+		this.validateGermplasmIdAndGermplasmUUID(errors, germplasmUpdateDTOList);
+		this.validateLocationAbbreviation(errors, programUUID, germplasmUpdateDTOList);
+		this.validateBreedingMethod(errors, programUUID, germplasmUpdateDTOList);
+		this.validateCreationDate(errors, germplasmUpdateDTOList);
+		this.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateDTOList);
+		this.validateProgenitorsGids(errors, germplasmUpdateDTOList);
+
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+	}
+
+	protected void validateEmptyList(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		if (germplasmUpdateDTOList == null || germplasmUpdateDTOList.isEmpty()) {
 			errors.reject("germplasm.update.empty.list", "");
 		}
 	}
 
-	public void validateAttributeAndNameCodes(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateAttributeAndNameCodes(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> nameCodes = new HashSet<>();
 		germplasmUpdateDTOList
@@ -89,7 +110,7 @@ public class GermplasmUpdateValidator {
 
 	}
 
-	public void validateGermplasmIdAndGermplasmUUID(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateGermplasmIdAndGermplasmUUID(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		// Find rows (GermplasmUpdateDTO) with blank GID and UUID.
 		final Optional<GermplasmUpdateDTO> germplasmWithNoIdentifier =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isEmpty(dto.getGermplasmUUID()) && dto.getGid() == null).findAny();
@@ -122,7 +143,7 @@ public class GermplasmUpdateValidator {
 
 	}
 
-	public void validateLocationAbbreviation(final BindingResult errors, final String programUUID,
+	protected void validateLocationAbbreviation(final BindingResult errors, final String programUUID,
 		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> locationAbbrs =
@@ -144,12 +165,12 @@ public class GermplasmUpdateValidator {
 
 	}
 
-	public void validateBreedingMethod(final BindingResult errors, final String programUUID,
+	protected void validateBreedingMethod(final BindingResult errors, final String programUUID,
 		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final List<String> breedingMethodsAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
-				.map(dto -> dto.getBreedingMethodAbbr()).collect(Collectors.toList());
+				.map(GermplasmUpdateDTO::getBreedingMethodAbbr).collect(Collectors.toList());
 
 		final List<String> abbreviations =
 			this.breedingMethodService.getBreedingMethods(new BreedingMethodSearchRequest(programUUID, breedingMethodsAbbrs, false))
@@ -165,7 +186,7 @@ public class GermplasmUpdateValidator {
 
 	}
 
-	public void validateCreationDate(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateCreationDate(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTOWithInvalidDate =
 			germplasmUpdateDTOList.stream()
@@ -177,7 +198,7 @@ public class GermplasmUpdateValidator {
 
 	}
 
-	public void validateProgenitorsGids(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateProgenitorsGids(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		// Get the gids from progenitors.
 		final Set<Integer> progenitorGids =
@@ -194,12 +215,13 @@ public class GermplasmUpdateValidator {
 
 	}
 
-	public void validateProgenitorsBothMustBeSpecified(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateProgenitorsBothMustBeSpecified(final BindingResult errors,
+		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		final long
 			progenitorsWithEmptyValuesCount =
 			germplasmUpdateDTOList.stream().filter(dto -> {
-				final Integer progenitor1 = dto.getProgenitors().getOrDefault(PROGENITOR_1, null);
-				final Integer progenitor2 = dto.getProgenitors().getOrDefault(PROGENITOR_2, null);
+				final Integer progenitor1 = dto.getProgenitors().getOrDefault(GermplasmServiceImpl.PROGENITOR_1, null);
+				final Integer progenitor2 = dto.getProgenitors().getOrDefault(GermplasmServiceImpl.PROGENITOR_2, null);
 				return (progenitor1 != null && progenitor2 == null) || (progenitor1 == null
 					&& progenitor2 != null);
 			}).count();

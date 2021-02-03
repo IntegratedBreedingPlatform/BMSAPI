@@ -34,7 +34,7 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
-import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateDtoValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
@@ -69,7 +69,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private AttributeValidator attributeValidator;
 
 	@Autowired
-	private GermplasmUpdateValidator germplasmUpdateValidator;
+	private GermplasmUpdateDtoValidator germplasmUpdateDtoValidator;
 
 	private BindingResult errors;
 
@@ -332,19 +332,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public Set<Integer> importGermplasmUpdates(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
-		this.errors = new MapBindingResult(new HashMap<>(), AttributeDTO.class.getName());
-		this.germplasmUpdateValidator.validateEmptyList(this.errors, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateAttributeAndNameCodes(this.errors, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateGermplasmIdAndGermplasmUUID(this.errors, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateLocationAbbreviation(this.errors, programUUID, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateBreedingMethod(this.errors, programUUID, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateCreationDate(this.errors, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateProgenitorsBothMustBeSpecified(this.errors, germplasmUpdateDTOList);
-		this.germplasmUpdateValidator.validateProgenitorsGids(this.errors, germplasmUpdateDTOList);
+		this.germplasmUpdateDtoValidator.validate(programUUID, germplasmUpdateDTOList);
 
-		if (this.errors.hasErrors()) {
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		return this.germplasmService.importGermplasmUpdates(user.getUserid(), germplasmUpdateDTOList);
 
