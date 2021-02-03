@@ -77,7 +77,7 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO =
-			this.getGermplasmSearchRequestDto(germplasmPUI, germplasmName, accessionNumber, studyDbId, synonym, parentDbId, progenyDbId);
+			this.getGermplasmSearchRequestDto(germplasmPUI, germplasmName, accessionNumber, studyDbId, synonym, genus, parentDbId, progenyDbId);
 
 		try {
 			if (germplasmDbId != null) {
@@ -116,7 +116,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	private GermplasmSearchRequestDto getGermplasmSearchRequestDto(final String germplasmPUI, final String germplasmName,
-		final String accessionNumber, final String studyDbId, final String synonym, final String parentDbId, final String progenyDbId) {
+		final String accessionNumber, final String studyDbId, final String synonym, final String genus, final String parentDbId, final String progenyDbId) {
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDTO.setPreferredName(germplasmName);
 		germplasmSearchRequestDTO.setStudyDbId(studyDbId);
@@ -125,8 +125,8 @@ public class GermplasmResourceBrapi {
 		}
 		germplasmSearchRequestDTO.setParentDbId(parentDbId);
 		germplasmSearchRequestDTO.setProgenyDbId(progenyDbId);
-		if (accessionNumber != null){
-			germplasmSearchRequestDTO.setGermplasmGenus(Lists.newArrayList());
+		if (genus != null){
+			germplasmSearchRequestDTO.setGermplasmGenus(Lists.newArrayList(genus));
 		}
 		if (accessionNumber != null){
 			germplasmSearchRequestDTO.setAccessionNumbers(Lists.newArrayList(accessionNumber));
