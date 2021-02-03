@@ -96,6 +96,9 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		IMPORT_HEADERS_FOR_UPDATE = new LinkedHashMap<>();
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.gid.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.guid.column", ExcelCellStyle.HEADING_STYLE_ORANGE);
+		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.breeding.method.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.progenitor1.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.progenitor2.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.preferred.name.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.location.abbr.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.creation.date.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
