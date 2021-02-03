@@ -187,8 +187,7 @@ public class GermplasmResource {
 	 * @return a map indicating the GID that was created per clientId, if null, no germplasm was created
 	 */
 	@ApiOperation(value = "Import a list of germplasm with pedigree information", notes = "connectUsing = NONE if any progenitors are specified. Otherwise use GID or GUID ")
-	//FIXME: When removing current import germplasm, this preauthorize must be modified
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Map<Integer, GermplasmImportResponseDto>> importGermplasm(@PathVariable final String cropName,
