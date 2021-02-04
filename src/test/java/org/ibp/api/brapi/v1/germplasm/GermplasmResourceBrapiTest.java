@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -40,15 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	private static final Locale locale = Locale.getDefault();
-
-	@Configuration
-	public static class TestConfiguration {
-		@Bean
-		@Primary
-		public GermplasmService germplasmService() {
-			return Mockito.mock(GermplasmService.class);
-		}
-	}
 
 	@Autowired
 	private SearchRequestService searchRequestService;
@@ -116,7 +108,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 		doReturn(germplasmSearchRequestDTO).when(this.searchRequestService).getSearchRequest(searchResultsDbid, GermplasmSearchRequestDto.class);
 		doReturn(list).when(this.germplasmService)
-			.searchGermplasmDTO(germplasmSearchRequestDTO, BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE);
+			.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/search/germplasm/" + searchResultsDbid)
 			.contentType(this.contentType)
@@ -140,8 +132,8 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 		when(this.germplasmService.countGermplasmDTOs(any(GermplasmSearchRequestDto.class))).thenReturn(1L);
 		when(this.germplasmService
-			.searchGermplasmDTO(any(GermplasmSearchRequestDto.class), Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER),
-				Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE)))
+			.searchGermplasmDTO(any(GermplasmSearchRequestDto.class), Mockito.eq(new PageRequest(BrapiPagedResult.DEFAULT_PAGE_NUMBER,
+				BrapiPagedResult.DEFAULT_PAGE_SIZE))))
 			.thenReturn(list);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm-search")

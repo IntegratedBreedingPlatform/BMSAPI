@@ -3,10 +3,10 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
@@ -20,13 +20,11 @@ import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearc
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -43,11 +41,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,12 +80,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
-
-	@Autowired
-	private LocationDataManager locationDataManger;
-
-	@Autowired
-	private GermplasmGroupingService germplasmGroupingService;
 
 	@Autowired
 	private InstanceValidator instanceValidator;
@@ -234,31 +224,31 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public GermplasmDTO getGermplasmDTObyGID(final Integer germplasmId) {
-		final GermplasmDTO germplasmDTO;
-		try {
-			germplasmDTO = this.germplasmDataManager.getGermplasmDTOByGID(germplasmId);
-			if (germplasmDTO != null) {
-				germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmId, this.crossExpansionProperties));
-			}
-		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to get a germplasm", e);
+		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmDataManager.getGermplasmDTOByGID(germplasmId);
+		if (germplasmDTOOptional.isPresent()) {
+			final GermplasmDTO germplasmDTO = germplasmDTOOptional.get();
+			germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmId, this.crossExpansionProperties));
+			return germplasmDTO;
+		} else {
+			throw new ApiRuntimeException("Invalid Germplasm Id");
 		}
-		return germplasmDTO;
+
+
 	}
 
 	@Override
 	public List<GermplasmDTO> searchGermplasmDTO(
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Integer page, final Integer pageSize) {
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
 		try {
 
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
-				.searchGermplasmDTO(germplasmSearchRequestDTO, page, pageSize);
+				.searchGermplasmDTO(germplasmSearchRequestDTO, pageable);
 			if (germplasmDTOList != null) {
-				this.populateGermplasmPedigreeAndSynonyms(germplasmDTOList);
+				this.populateGermplasmPedigree(germplasmDTOList);
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to search germplasms", e);
+			throw new ApiRuntimeException("An error has occurred when trying to search germplasm", e);
 		}
 	}
 
@@ -267,7 +257,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		try {
 			return this.germplasmDataManager.countGermplasmDTOs(germplasmSearchRequestDTO);
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to count germplasms", e);
+			throw new ApiRuntimeException("An error has occurred when trying to count germplasm", e);
 		}
 	}
 
@@ -281,15 +271,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<GermplasmDTO> getGermplasmByStudy(final int studyDbId, final int pageSize, final int pageNumber) {
+	public List<GermplasmDTO> getGermplasmByStudy(final int studyDbId, final Pageable pageable) {
 		try {
 
 			this.instanceValidator.validateStudyDbId(studyDbId);
 
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
-				.getGermplasmByStudy(studyDbId, pageNumber, pageSize);
+				.getGermplasmByStudy(studyDbId, pageable);
 			if (germplasmDTOList != null) {
-				this.populateGermplasmPedigreeAndSynonyms(germplasmDTOList);
+				this.populateGermplasmPedigree(germplasmDTOList);
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
@@ -297,22 +287,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void populateGermplasmPedigreeAndSynonyms(final List<GermplasmDTO> germplasmDTOList) {
+	private void populateGermplasmPedigree(final List<GermplasmDTO> germplasmDTOList) {
 		final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
 			.collect(Collectors.toSet());
 		final Map<Integer, String> crossExpansionsMap =
 			this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
-		final Map<Integer, List<Name>> gidNamesMap =
-			this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(new ArrayList<>(gids), Collections.emptyList());
 		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
 			final Integer gid = Integer.valueOf(germplasmDTO.getGermplasmDbId());
-			// Set as synonyms other names, other than the preferred name, found for germplasm
-			final String defaultName = germplasmDTO.getGermplasmName();
-			final List<Name> names = gidNamesMap.get(gid);
-			if (!CollectionUtils.isEmpty(names)) {
-				germplasmDTO.setSynonyms(
-					names.stream().filter(n -> !defaultName.equalsIgnoreCase(n.getNval())).map(Name::getNval).collect(Collectors.toList()));
-			}
 			germplasmDTO.setPedigree(crossExpansionsMap.get(gid));
 		}
 	}
@@ -400,10 +381,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	void setPedigreeService(final PedigreeService pedigreeService) {
 		this.pedigreeService = pedigreeService;
-	}
-
-	void setLocationDataManger(final LocationDataManager locationDataManger) {
-		this.locationDataManger = locationDataManger;
 	}
 
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
