@@ -168,7 +168,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		this.wb = new HSSFWorkbook();
 
 		final File file = new File(fileNamePath);
-		this.sheetStylesMap = createStyles();
+		this.sheetStylesMap = this.createStyles();
 		this.writeObservationSheet(isGermplasmUpdateFormat);
 		this.writeCodesSheet(cropName, programUUID, isGermplasmUpdateFormat);
 
@@ -195,8 +195,8 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final Iterator<Map.Entry<String, ExcelCellStyle>> iterator = headers.entrySet().iterator();
 		int index = 0;
 		while (iterator.hasNext()) {
-			Map.Entry<String, ExcelCellStyle> entry = iterator.next();
-			HSSFCell cell = row.createCell(index, CellType.STRING);
+			final Map.Entry<String, ExcelCellStyle> entry = iterator.next();
+			final HSSFCell cell = row.createCell(index, CellType.STRING);
 			cell.setCellStyle(this.sheetStylesMap.get(entry.getValue()));
 			final String headerColumn = this.getMessageSource().getMessage(entry.getKey(), null, locale);
 			cell.setCellValue(headerColumn);
@@ -232,7 +232,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final List<AttributeDTO> attributeDTOs =
 			this.germplasmService.filterGermplasmAttributes(null);
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, false);
-		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest);
+		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 
 		final List<GermplasmNameTypeDTO> germplasmNames = this.germplasmService.filterGermplasmNameTypes(null);
 

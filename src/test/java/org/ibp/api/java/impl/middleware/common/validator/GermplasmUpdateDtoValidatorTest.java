@@ -184,7 +184,7 @@ public class GermplasmUpdateDtoValidatorTest {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setBreedingMethodAbbr("UAC");
 
-		when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class)))
+		when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
 			.thenReturn(Arrays.asList(new BreedingMethodDTO()));
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);

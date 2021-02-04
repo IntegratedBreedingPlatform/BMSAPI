@@ -40,13 +40,13 @@ public interface GermplasmService {
 
 	GermplasmDTO getGermplasmDTObyGID(Integer germplasmId);
 
-	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Integer page, Integer pageSize);
+	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
 
 	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
 	long countGermplasmByStudy(Integer studyDbId);
 
-	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, int pageSize, int pageNumber);
+	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, Pageable pageable);
 
 	List<AttributeDTO> getAttributesByGid(
 		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNUmber);
