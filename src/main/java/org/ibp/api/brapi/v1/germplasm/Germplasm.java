@@ -76,7 +76,7 @@ public class Germplasm {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date acquisitionDate;
 
-	@JsonView(BrapiView.BrapiV1_3.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String breedingMethodDbId;
 
 	@JsonView(BrapiView.BrapiV1_3.class)

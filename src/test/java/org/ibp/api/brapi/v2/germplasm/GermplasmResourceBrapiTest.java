@@ -10,6 +10,7 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -52,7 +53,8 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		list.add(germplasmDTO);
 
 		doReturn(list).when(this.germplasmService)
-			.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE));
+			.searchGermplasmDTO(Mockito.any(GermplasmSearchRequestDto.class), Mockito
+				.eq(new PageRequest(BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE)));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v2/germplasm")
 			.contentType(this.contentType))
@@ -87,7 +89,6 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 				Matchers.hasValue(germplasmDTO.getAdditionalInfo().get(attributeType))))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms[0]",
 				Matchers.is(germplasmDTO.getSynonyms().get(0))));
-
 
 	}
 
