@@ -2,6 +2,8 @@ package org.ibp.api.rest.labelprinting;
 
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.util.FileNameGenerator;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -182,8 +184,8 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput) {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
 		final DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
-
-		final String defaultFileName = ObservationLabelPrintingHelper.getDefaultFileName(study, datasetDTO);
+		final String tempFileName = "Labels-for-".concat(study.getStudyName()).concat("-").concat(datasetDTO.getName());
+		final String defaultFileName = FileNameGenerator.generateFileName(FileUtils.cleanFileName(tempFileName));
 
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
 		resultsMap.put(this.getMessage("label.printing.name"), study.getStudyName());

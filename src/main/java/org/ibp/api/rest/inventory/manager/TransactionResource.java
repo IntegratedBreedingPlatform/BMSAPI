@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
@@ -149,10 +150,10 @@ public class TransactionResource {
 				@Override
 				public List<TransactionDto> getResults(final PagedResult<TransactionDto> pagedResult) {
 					try {
-						inventoryLock.lockRead();
+						TransactionResource.this.inventoryLock.lockRead();
 						return TransactionResource.this.transactionService.searchTransactions(searchDTO, pageable);
 					} finally {
-						inventoryLock.unlockRead();
+						TransactionResource.this.inventoryLock.unlockRead();
 					}
 				}
 			});
@@ -175,11 +176,11 @@ public class TransactionResource {
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.PENDING);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 	}
 
@@ -192,11 +193,11 @@ public class TransactionResource {
 			@ApiParam("Inventory to be reserved per unit")
 			@RequestBody final LotWithdrawalInputDto lotWithdrawalInputDto) {
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.transactionService.saveWithdrawals(lotWithdrawalInputDto, TransactionStatus.CONFIRMED);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 	}
 
@@ -209,11 +210,11 @@ public class TransactionResource {
 		@ApiParam("List of transactions to be confirmed, use a searchId or a list of transaction ids")
 		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.transactionService.confirmPendingTransactions(searchCompositeDto);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 	}
 
@@ -250,13 +251,14 @@ public class TransactionResource {
 		final TransactionsSearchDto searchDTO = (TransactionsSearchDto) this.searchRequestService
 			.getSearchRequest(searchRequestId, TransactionsSearchDto.class);
 
-		final List<TransactionDto> transactionDtoList = TransactionResource.this.transactionService.searchTransactions(searchDTO, null);
+		final List<TransactionDto> transactionDtoList = this.transactionService.searchTransactions(searchDTO, null);
 
 		final File file = this.transactionExportServiceImpl.export(transactionDtoList);
 		final HttpHeaders headers = new HttpHeaders();
+		final String fileName = FileNameGenerator.generateFileName(file.getName());
 		headers
-			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
-		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(file.getName())));
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(fileName)));
+		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(fileName)));
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
@@ -271,12 +273,12 @@ public class TransactionResource {
 		@ApiParam("New amount or New Available Balance and Notes to be updated per transaction")
 		@RequestBody final List<TransactionUpdateRequestDto> transactionUpdateInputDtos) {
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.transactionService.updatePendingTransactions(transactionUpdateInputDtos);
 
 			return new ResponseEntity<>(HttpStatus.OK);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 	}
 
@@ -291,11 +293,11 @@ public class TransactionResource {
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.PENDING);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 	}
 
@@ -308,11 +310,11 @@ public class TransactionResource {
 		@ApiParam("Deposit amount per Lot")
 		@RequestBody final List<LotDepositDto> lotDepositDtos) {
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.transactionService.saveDeposits(lotDepositDtos, TransactionStatus.PENDING);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 	}
 
@@ -328,12 +330,12 @@ public class TransactionResource {
 		@ApiParam("Deposit amount per unit")
 		@RequestBody final LotDepositRequestDto lotDepositRequestDto) {
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.transactionService.saveDeposits(lotDepositRequestDto, TransactionStatus.CONFIRMED);
 
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 	}
 
@@ -348,12 +350,12 @@ public class TransactionResource {
 		@ApiParam("Deposit amount per Lot")
 		@RequestBody final List<LotDepositDto> lotDepositDtos) {
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.transactionService.saveDeposits(lotDepositDtos, TransactionStatus.CONFIRMED);
 
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 	}
 
@@ -366,11 +368,11 @@ public class TransactionResource {
 		@ApiParam("List of transactions to be cancelled, use a searchId or a list of transaction ids")
 		@RequestBody final SearchCompositeDto<Integer, Integer> searchCompositeDto) {
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.transactionService.cancelPendingTransactions(searchCompositeDto);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 	}
 
@@ -385,11 +387,11 @@ public class TransactionResource {
 		@ApiParam("New balance for lots and transaction notes")
 		@RequestBody final LotAdjustmentRequestDto lotAdjustmentRequestDto) {
 		try {
-			inventoryLock.lockWrite();
+			this.inventoryLock.lockWrite();
 			this.transactionService.saveLotBalanceAdjustment(lotAdjustmentRequestDto);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 		} finally {
-			inventoryLock.unlockWrite();
+			this.inventoryLock.unlockWrite();
 		}
 	}
 
@@ -452,10 +454,10 @@ public class TransactionResource {
 				@Override
 				public List<TransactionDto> getResults(final PagedResult<TransactionDto> pagedResult) {
 					try {
-						inventoryLock.lockRead();
+						TransactionResource.this.inventoryLock.lockRead();
 						return TransactionResource.this.transactionService.searchTransactions(searchDTO, pageable);
 					} finally {
-						inventoryLock.unlockRead();
+						TransactionResource.this.inventoryLock.unlockRead();
 					}
 				}
 			});
