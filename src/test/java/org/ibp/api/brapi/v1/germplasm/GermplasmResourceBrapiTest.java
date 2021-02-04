@@ -42,15 +42,6 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	private static final Locale locale = Locale.getDefault();
 
-	@Configuration
-	public static class TestConfiguration {
-		@Bean
-		@Primary
-		public GermplasmService germplasmService() {
-			return Mockito.mock(GermplasmService.class);
-		}
-	}
-
 	@Autowired
 	private SearchRequestService searchRequestService;
 

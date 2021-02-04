@@ -44,7 +44,7 @@ public class GermplasmResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<Germplasm>> getGermplasms(
+	public ResponseEntity<EntityListResponse<Germplasm>> getGermplasm(
 		@PathVariable final String crop,
 		@ApiParam(value = "Permanent unique identifier (DOI, URI, etc.)")
 		@RequestParam(value = "germplasmPUI", required = false) final String germplasmPUI,
