@@ -90,12 +90,6 @@ public class BreedingMethodResourceBrapi {
 		@PathVariable final Integer breedingMethodDbId) {
 
 		final BreedingMethodDTO breedingMethodDTOS = this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
-		if (Objects.isNull(breedingMethodDTOS)) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());;
-			errors.reject("methoddbid.invalid", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
-		}
-
 		final ModelMapper modelMapper = BreedingMethodMapper.getInstance();
 		final BreedingMethod method = modelMapper.map(breedingMethodDTOS, BreedingMethod.class);
 		final Metadata metadata = new Metadata();

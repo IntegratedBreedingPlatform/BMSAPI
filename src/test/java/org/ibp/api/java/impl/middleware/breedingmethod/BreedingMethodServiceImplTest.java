@@ -57,7 +57,7 @@ public class BreedingMethodServiceImplTest {
 			.thenReturn(mockedBreedingMethod);
 
 		final List<BreedingMethodDTO> actualBreedingMethods =
-			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
+			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest, null);
 		assertNotNull(actualBreedingMethods);
 		assertThat(actualBreedingMethods, is(mockedBreedingMethod));
 
@@ -73,7 +73,7 @@ public class BreedingMethodServiceImplTest {
 		Mockito.when(this.middlewareBreedingMethodService.getBreedingMethods(searchRequest, null)).thenReturn(mockedBreedingMethod);
 
 
-		final List<BreedingMethodDTO> actualBreedingMethods = this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
+		final List<BreedingMethodDTO> actualBreedingMethods = this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest, null);
 		assertNotNull(actualBreedingMethods);
 		assertThat(actualBreedingMethods, is(mockedBreedingMethod));
 
@@ -85,7 +85,7 @@ public class BreedingMethodServiceImplTest {
 	public void shouldFailGetBreedingMethodsFilteringFavoritesWithoutProgramUUID() {
 		try {
 			final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, true);
-			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
+			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest, null);
 			fail("Should have failed.");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
@@ -102,7 +102,7 @@ public class BreedingMethodServiceImplTest {
 		try {
 			final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, false);
 			searchRequest.setMethodTypes(Collections.singletonList("ABC"));
-			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest);
+			this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest, null);
 			fail("Should have failed.");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));

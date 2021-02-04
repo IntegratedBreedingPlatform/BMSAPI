@@ -18,6 +18,7 @@ import org.springframework.validation.MapBindingResult;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,12 +37,13 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 
 	@Override
 	public BreedingMethodDTO getBreedingMethod(final Integer breedingMethodDbId) {
-		return this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
-	}
-
-	@Override
-	public List<BreedingMethodDTO> getBreedingMethods(final String cropName, final BreedingMethodSearchRequest searchRequest) {
-		return this.getBreedingMethods(cropName, searchRequest, null);
+		final Optional<BreedingMethodDTO> breedingMethodDTO =  this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
+		if (!breedingMethodDTO.isPresent()) {
+			final MapBindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			errors.reject("methoddbid.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		return breedingMethodDTO.get();
 	}
 
 	@Override

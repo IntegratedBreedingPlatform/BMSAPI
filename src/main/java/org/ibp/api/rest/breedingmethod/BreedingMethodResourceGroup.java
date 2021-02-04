@@ -82,7 +82,7 @@ public class BreedingMethodResourceGroup {
 		) {
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, favoritesOnly);
 		searchRequest.setMethodTypes(methodTypes);
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, searchRequest);
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, searchRequest, null);
 		return new ResponseEntity<>(breedingMethods, HttpStatus.OK);
 	}
 
