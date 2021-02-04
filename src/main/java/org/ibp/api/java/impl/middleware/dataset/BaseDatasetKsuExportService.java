@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
@@ -72,7 +73,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 				"%s_%s_%s.trt", study.getName(), datasetType.getName(),
 				dataSetDto.getName()));
 		final String traitsAndSelectionFilename =
-			temporaryFolder.getAbsolutePath() + File.separator + sanitizedTraitsAndSelectionFilename;
+			temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedTraitsAndSelectionFilename);
 		final List<MeasurementVariable> traitAndSelectionVariables = this.getTraitAndSelectionVariables(dataSetDto.getDatasetId());
 		files.add(
 			generator.generateTraitAndSelectionVariablesFile(this.convertTraitAndSelectionVariablesData(traitAndSelectionVariables),
