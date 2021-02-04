@@ -41,11 +41,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -240,11 +238,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public List<GermplasmDTO> searchGermplasmDTO(
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Integer page, final Integer pageSize) {
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
 		try {
 
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
-				.searchGermplasmDTO(germplasmSearchRequestDTO, page, pageSize);
+				.searchGermplasmDTO(germplasmSearchRequestDTO, pageable);
 			if (germplasmDTOList != null) {
 				this.populateGermplasmPedigree(germplasmDTOList);
 			}
@@ -273,13 +271,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<GermplasmDTO> getGermplasmByStudy(final int studyDbId, final int pageSize, final int pageNumber) {
+	public List<GermplasmDTO> getGermplasmByStudy(final int studyDbId, final Pageable pageable) {
 		try {
 
 			this.instanceValidator.validateStudyDbId(studyDbId);
 
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
-				.getGermplasmByStudy(studyDbId, pageNumber, pageSize);
+				.getGermplasmByStudy(studyDbId, pageable);
 			if (germplasmDTOList != null) {
 				this.populateGermplasmPedigree(germplasmDTOList);
 			}

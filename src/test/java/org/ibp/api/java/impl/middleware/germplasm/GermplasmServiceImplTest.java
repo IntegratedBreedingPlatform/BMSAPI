@@ -21,6 +21,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,15 +74,15 @@ public class GermplasmServiceImplTest {
 		germplasmDTO.setGermplasmSeedSource("AF07A-412-201");
 		final List<GermplasmDTO> germplasmDTOList = Lists.newArrayList(germplasmDTO);
 
-		Mockito.when(this.germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE)).thenReturn(germplasmDTOList);
+		Mockito.when(this.germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE))).thenReturn(germplasmDTOList);
 		final int gid = Integer.parseInt(germplasmDTO.getGermplasmDbId());
 		Mockito.when(this.pedigreeService.getCrossExpansions(Collections.singleton(gid), null, this.crossExpansionProperties))
 			.thenReturn(Collections.singletonMap(gid, "CB1"));
 
-		this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE);
+		this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE));
 		Assert.assertEquals("CB1", germplasmDTOList.get(0).getPedigree());
 
-		Mockito.verify(this.germplasmDataManager, Mockito.times(1)).searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE);
+		Mockito.verify(this.germplasmDataManager, Mockito.times(1)).searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE));
 	}
 
 	@Test
