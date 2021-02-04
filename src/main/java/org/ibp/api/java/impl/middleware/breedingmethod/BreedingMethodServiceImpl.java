@@ -10,6 +10,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.MapBindingResult;
@@ -17,6 +18,7 @@ import org.springframework.validation.MapBindingResult;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,11 +37,18 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 
 	@Override
 	public BreedingMethodDTO getBreedingMethod(final Integer breedingMethodDbId) {
-		return this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
+		final Optional<BreedingMethodDTO> breedingMethodDTO =  this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
+		if (!breedingMethodDTO.isPresent()) {
+			final MapBindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			errors.reject("methoddbid.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		return breedingMethodDTO.get();
 	}
 
 	@Override
-	public List<BreedingMethodDTO> getBreedingMethods(final String cropName, final BreedingMethodSearchRequest searchRequest) {
+	public List<BreedingMethodDTO> getBreedingMethods(final String cropName, final BreedingMethodSearchRequest searchRequest,
+		final Pageable pageable) {
 		final MapBindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final String programUUID = searchRequest.getProgramUUID();
@@ -64,7 +73,12 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		return this.breedingMethodService.getBreedingMethods(searchRequest);
+		return this.breedingMethodService.getBreedingMethods(searchRequest, pageable);
+	}
+
+	@Override
+	public Long countBreedingMethods(final BreedingMethodSearchRequest searchRequest) {
+		return this.breedingMethodService.countBreedingMethods(searchRequest);
 	}
 
 }

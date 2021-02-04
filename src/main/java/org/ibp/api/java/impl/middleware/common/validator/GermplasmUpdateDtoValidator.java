@@ -173,7 +173,7 @@ public class GermplasmUpdateDtoValidator {
 				.map(GermplasmUpdateDTO::getBreedingMethodAbbr).collect(Collectors.toList());
 
 		final List<String> abbreviations =
-			this.breedingMethodService.getBreedingMethods(new BreedingMethodSearchRequest(programUUID, breedingMethodsAbbrs, false))
+			this.breedingMethodService.getBreedingMethods(new BreedingMethodSearchRequest(programUUID, breedingMethodsAbbrs, false), null)
 				.stream()
 				.map(BreedingMethodDTO::getCode).collect(
 				Collectors.toList());
