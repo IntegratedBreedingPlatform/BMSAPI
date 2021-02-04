@@ -3,7 +3,7 @@ package org.ibp.api.brapi.v2.germplasm;
 import com.google.common.collect.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
