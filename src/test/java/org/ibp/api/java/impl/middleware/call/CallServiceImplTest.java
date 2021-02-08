@@ -34,7 +34,7 @@ public class CallServiceImplTest {
 
 	@Test
 	public void testGetAllCalls() throws IOException {
-		final int totalCalls = 27;
+		final int totalCalls = 24;
 
 		final List<Map<String, Object>> result = this.callService.getAllCalls(null, 10, 0);
 		Assert.assertEquals("First page should contain 10 records", 10, result.size());
