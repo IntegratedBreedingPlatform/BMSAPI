@@ -87,7 +87,7 @@ public class BreedingMethodResourceBrapiTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(method).when(this.breedingMethodService).getBreedingMethod(30);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/{cropName}/brapi/v2/breedingmethod/{breedingMethodDbId}", this.cropName, 30).contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/{cropName}/brapi/v2/breedingmethods/{breedingMethodDbId}", this.cropName, 30).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$.result.abbreviation", CoreMatchers.is(method.getCode())))
