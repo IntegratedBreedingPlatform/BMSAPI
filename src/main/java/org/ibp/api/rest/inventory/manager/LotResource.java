@@ -265,7 +265,7 @@ public class LotResource {
 	@RequestMapping(
 		value = "/crops/{cropName}/lot-lists",
 		method = RequestMethod.POST)
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS') " + PermissionsEnum.HAS_IMPORT_GERMPLASM)
 	public ResponseEntity<Void> importLotsWithInitialBalance(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID, @RequestBody final LotImportRequestDto lotImportRequestDto) {
 		this.lotService.importLotsWithInitialTransaction(programUUID, lotImportRequestDto);

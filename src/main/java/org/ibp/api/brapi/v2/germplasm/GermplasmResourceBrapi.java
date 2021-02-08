@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
