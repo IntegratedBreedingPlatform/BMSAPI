@@ -353,11 +353,12 @@ public class GermplasmImportRequestDtoValidator {
 			}
 
 			final Map<String, BreedingMethodDTO> methodsMapByAbbreviation =
-				existingBreedingMethods.stream().collect(Collectors.toMap(BreedingMethodDTO::getCode, bm -> bm));
+				existingBreedingMethods.stream().collect(Collectors.toMap(bm -> bm.getCode().toUpperCase(), bm -> bm));
 			if (germplasmImportDTOList.stream().anyMatch(
-				g -> StringUtils.isNotEmpty(g.getProgenitor1()) && StringUtils.isNotEmpty(g.getProgenitor2()) && Integer.valueOf(1)
+				g -> StringUtils.isNotEmpty(g.getProgenitor1()) && StringUtils.isNotEmpty(g.getProgenitor2()) && StringUtils
+					.isNotEmpty(g.getBreedingMethodAbbr()) && Integer.valueOf(1)
 					.equals(methodsMapByAbbreviation
-						.get(g.getBreedingMethodAbbr()).getNumberOfProgenitors()))) {
+						.get(g.getBreedingMethodAbbr().toUpperCase()).getNumberOfProgenitors()))) {
 				errors.reject("germplasm.import.mutation.not.supported.when.saving.progenitors", "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
