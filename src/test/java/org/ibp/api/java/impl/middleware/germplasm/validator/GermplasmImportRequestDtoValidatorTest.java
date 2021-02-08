@@ -663,8 +663,10 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 				"20201212", null, null)));
+			final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO();
+			breedingMethodDTO.setCode(RandomStringUtils.randomAlphabetic(3).toUpperCase());
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
-				.thenReturn(Collections.singletonList(new BreedingMethodDTO()));
+				.thenReturn(Collections.singletonList(breedingMethodDTO));
 			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
 				.thenReturn(Collections.emptyList());
 			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
@@ -684,8 +686,10 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "INVAME", names, null,
 				"20201212", null, null)));
+			final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO();
+			breedingMethodDTO.setCode(RandomStringUtils.randomAlphabetic(3).toUpperCase());
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
-				.thenReturn(Collections.singletonList(new BreedingMethodDTO()));
+				.thenReturn(Collections.singletonList(breedingMethodDTO));
 			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
 				.thenReturn(Collections.singletonList(new Location()));
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet())).thenReturn(Collections.emptyList());
@@ -708,8 +712,10 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, attributes,
 				"20201212", null, null)));
+			final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO();
+			breedingMethodDTO.setCode(RandomStringUtils.randomAlphabetic(3).toUpperCase());
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
-				.thenReturn(Collections.singletonList(new BreedingMethodDTO()));
+				.thenReturn(Collections.singletonList(breedingMethodDTO));
 			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
 				.thenReturn(Collections.singletonList(new Location()));
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
@@ -739,8 +745,10 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, attributes,
 				"20201212", null, null)));
+			final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO();
+			breedingMethodDTO.setCode(RandomStringUtils.randomAlphabetic(3).toUpperCase());
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
-				.thenReturn(Collections.singletonList(new BreedingMethodDTO()));
+				.thenReturn(Collections.singletonList(breedingMethodDTO));
 			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
 				.thenReturn(Collections.singletonList(new Location()));
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
