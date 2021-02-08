@@ -2,6 +2,8 @@ package org.ibp.api.rest.labelprinting;
 
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.util.FileNameGenerator;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -113,9 +115,9 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD);
 
-		DEFAULT_TRANSACTION_DETAILS_FIELDS = ObservationLabelPrintingHelper.buildTransactionDetailsFields(messageSource);
+		DEFAULT_TRANSACTION_DETAILS_FIELDS = ObservationLabelPrintingHelper.buildTransactionDetailsFields(this.messageSource);
 
-		DEFAULT_LOT_DETAILS_FIELDS = ObservationLabelPrintingHelper.buildLotDetailsFields(messageSource);
+		DEFAULT_LOT_DETAILS_FIELDS = ObservationLabelPrintingHelper.buildLotDetailsFields(this.messageSource);
 
 		STATIC_LOT_FIELD_IDS = DEFAULT_LOT_DETAILS_FIELDS.stream().map(Field::getId).collect(Collectors.toList());
 		STATIC_TRANSACTION_FIELD_IDS = DEFAULT_TRANSACTION_DETAILS_FIELDS.stream().map(Field::getId).collect(Collectors.toList());
@@ -184,8 +186,8 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput) {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
 		final DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
-
-		final String defaultFileName = ObservationLabelPrintingHelper.getDefaultFileName(study, datasetDTO);
+		final String tempFileName = "Labels-for-".concat(study.getStudyName()).concat("-").concat(datasetDTO.getName());
+		final String defaultFileName = FileNameGenerator.generateFileName(FileUtils.cleanFileName(tempFileName));
 
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
 		resultsMap.put(this.getMessage("label.printing.name"), study.getStudyName());
@@ -255,7 +257,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		datasetDetailsFields.addAll(ObservationLabelPrintingHelper.transform(datasetVariables));
 		datasetDetailsFields.add(PARENTAGE_FIELD);
 
-		if (studyDetailsFields.indexOf(SEASON_FIELD) == -1) {
+		if (!studyDetailsFields.contains(SEASON_FIELD)) {
 			studyDetailsFields.add(SEASON_FIELD);
 		}
 		datasetDetailsLabelType.setFields(datasetDetailsFields);
@@ -281,7 +283,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		studyTransactionsRequest.setTransactionsSearch(transactionsSearch);
 
 		final List<StudyTransactionsDto> studyTransactionsDtos =
-			studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest, null);
+			this.studyTransactionsService.searchStudyTransactions(labelsGeneratorInput.getStudyId(), studyTransactionsRequest, null);
 
 		final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap = new HashMap<>();
 		studyTransactionsDtos.forEach(studyTransactionsDto -> studyTransactionsDto.getObservationUnits().forEach(

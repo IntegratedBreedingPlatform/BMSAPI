@@ -10,6 +10,7 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @AutoProperty
@@ -40,14 +41,26 @@ public class Germplasm {
 
 	private Integer biologicalStatusOfAccessionCode;
 
+	@JsonView(BrapiView.BrapiV2.class)
+	private String biologicalStatusOfAccessionDescription;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String collection;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String germplasmOrigin;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String germplasmPreProcessing;
+
 	private String countryOfOriginCode;
 
 	private List<String> typeOfGermplasmStorageCode = new ArrayList<>();
 
-	@JsonView(BrapiView.BrapiV1_2.class)
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV2.class})
 	private String genus;
 
-	@JsonView(BrapiView.BrapiV1_2.class)
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV2.class})
 	private String species;
 
 	private List<Taxon> taxonIds = new ArrayList<>();
@@ -63,7 +76,7 @@ public class Germplasm {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date acquisitionDate;
 
-	@JsonView(BrapiView.BrapiV1_3.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String breedingMethodDbId;
 
 	@JsonView(BrapiView.BrapiV1_3.class)
@@ -72,10 +85,13 @@ public class Germplasm {
 	@JsonView(BrapiView.BrapiV1_3.class)
 	private String germplasmSpecies;
 
-	@JsonView(BrapiView.BrapiV1_3.class)
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String seedSource;
 
-	@JsonView(BrapiView.BrapiV1_3.class)
+	@JsonView(BrapiView.BrapiV2.class)
+	private String seedSourceDescription;
+
+	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private final static String documentationURL = null;
 
 	@JsonView(BrapiView.BrapiV1_3.class)
@@ -89,6 +105,15 @@ public class Germplasm {
 
 	@JsonView(BrapiView.BrapiV1_3.class)
 	private String sourceName;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private Map<String, String> additionalInfo;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<String> externalReferences;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<String> storageTypes;
 
 	public Germplasm() {
 	}
@@ -335,6 +360,70 @@ public class Germplasm {
 
 	public void setSourceName(final String sourceName) {
 		this.sourceName = sourceName;
+	}
+
+	public String getBiologicalStatusOfAccessionDescription() {
+		return this.biologicalStatusOfAccessionDescription;
+	}
+
+	public void setBiologicalStatusOfAccessionDescription(final String biologicalStatusOfAccessionDescription) {
+		this.biologicalStatusOfAccessionDescription = biologicalStatusOfAccessionDescription;
+	}
+
+	public String getCollection() {
+		return this.collection;
+	}
+
+	public void setCollection(final String collection) {
+		this.collection = collection;
+	}
+
+	public String getGermplasmOrigin() {
+		return this.germplasmOrigin;
+	}
+
+	public void setGermplasmOrigin(final String germplasmOrigin) {
+		this.germplasmOrigin = germplasmOrigin;
+	}
+
+	public String getGermplasmPreProcessing() {
+		return this.germplasmPreProcessing;
+	}
+
+	public void setGermplasmPreProcessing(final String germplasmPreProcessing) {
+		this.germplasmPreProcessing = germplasmPreProcessing;
+	}
+
+	public String getSeedSourceDescription() {
+		return this.seedSourceDescription;
+	}
+
+	public void setSeedSourceDescription(final String seedSourceDescription) {
+		this.seedSourceDescription = seedSourceDescription;
+	}
+
+	public Map<String, String> getAdditionalInfo() {
+		return this.additionalInfo;
+	}
+
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
+		this.additionalInfo = additionalInfo;
+	}
+
+	public List<String> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<String> externalReferences) {
+		this.externalReferences = externalReferences;
+	}
+
+	public List<String> getStorageTypes() {
+		return this.storageTypes;
+	}
+
+	public void setStorageTypes(final List<String> storageTypes) {
+		this.storageTypes = storageTypes;
 	}
 
 	@Override

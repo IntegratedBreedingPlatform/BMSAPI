@@ -19,6 +19,7 @@ import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Debug;
 import org.ibp.api.java.design.runner.DesignRunner;
+import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.ibp.api.java.rpackage.RPackageService;
@@ -204,6 +205,13 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public org.generationcp.middleware.service.api.study.StudyInstanceService studyInstanceMiddlewareService() {
 			return Mockito.mock(org.generationcp.middleware.service.api.study.StudyInstanceService.class);
+		}
+
+		@Bean
+		@Primary
+		public GermplasmService germplasmService() {
+			return Mockito.mock(GermplasmService.class);
+
 		}
 	}
 

@@ -92,6 +92,9 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		IMPORT_HEADERS_FOR_UPDATE = new LinkedHashMap<>();
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.gid.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.guid.column", ExcelCellStyle.HEADING_STYLE_ORANGE);
+		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.breeding.method.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.progenitor1.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.progenitor2.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.preferred.name.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.location.abbr.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS_FOR_UPDATE.put("export.germplasm.list.template.creation.date.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
@@ -161,7 +164,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		this.wb = new HSSFWorkbook();
 
 		final File file = new File(fileNamePath);
-		this.sheetStylesMap = createStyles();
+		this.sheetStylesMap = this.createStyles();
 		this.writeObservationSheet(isGermplasmUpdateFormat);
 		this.writeCodesSheet(cropName, programUUID, isGermplasmUpdateFormat);
 
@@ -188,8 +191,8 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final Iterator<Map.Entry<String, ExcelCellStyle>> iterator = headers.entrySet().iterator();
 		int index = 0;
 		while (iterator.hasNext()) {
-			Map.Entry<String, ExcelCellStyle> entry = iterator.next();
-			HSSFCell cell = row.createCell(index, CellType.STRING);
+			final Map.Entry<String, ExcelCellStyle> entry = iterator.next();
+			final HSSFCell cell = row.createCell(index, CellType.STRING);
 			cell.setCellStyle(this.sheetStylesMap.get(entry.getValue()));
 			final String headerColumn = this.getMessageSource().getMessage(entry.getKey(), null, locale);
 			cell.setCellValue(headerColumn);
@@ -245,7 +248,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final List<AttributeDTO> attributeDTOs =
 			this.germplasmService.filterGermplasmAttributes(null);
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, false);
-		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest);
+		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 
 		final List<GermplasmNameTypeDTO> germplasmNames = this.germplasmService.filterGermplasmNameTypes(null);
 
