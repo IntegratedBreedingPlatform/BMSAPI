@@ -239,7 +239,7 @@ public class GermplasmResource {
 	}
 
 	@ApiOperation(value = "Validate the list of germplasm to be imported")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/validation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> validateImportGermplasmData(@PathVariable final String cropName,
@@ -250,7 +250,7 @@ public class GermplasmResource {
 	}
 
 	@ApiOperation(value = "Get a list of germplasm given a set of germplasmUUIDs and names")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'IMPORT_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/matches", method = RequestMethod.POST)
 	@ResponseBody
 	@ApiImplicitParams({
