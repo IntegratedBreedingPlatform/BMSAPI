@@ -83,7 +83,7 @@ public class BreedingMethodResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get the details of a specific Breeding Method used to produce Germplasm", notes = "Get the details of a specific Breeding Method")
-	@RequestMapping(value = "/{crop}/brapi/v2/breedingmethod/{breedingMethodDbId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v2/breedingmethods/{breedingMethodDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<BreedingMethod>> getBreedingMethodById(
 		@PathVariable final String crop,
