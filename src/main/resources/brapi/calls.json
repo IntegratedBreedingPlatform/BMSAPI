@@ -448,6 +448,51 @@
       "versions": [
         "2.0"
       ]
+    },
+    {
+      "call": "breedingmethods",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "versions": [
+        "2.0"
+      ]
+    },
+    {
+      "call": "breedingmethods/{breedingMethodDbId}",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "versions": [
+        "2.0"
+      ]
+    },
+    {
+      "call": "germplasm",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "versions": [
+        "2.0"
+      ]
     }
   ]
 }
