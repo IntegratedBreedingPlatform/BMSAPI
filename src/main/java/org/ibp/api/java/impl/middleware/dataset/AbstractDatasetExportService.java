@@ -129,7 +129,8 @@ public abstract class AbstractDatasetExportService {
 		final String dataSetName =
 			DatasetTypeEnum.PLOT_DATA.getId() == dataSet.getDatasetTypeId() ? DatasetServiceImpl.PLOT_DATASET_NAME : dataSet.getName();
 		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s_%s.%s", study.getName(), dataSetName, fileExtension));
-		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
+		final String formattedFileName = FileNameGenerator.generateFileName(sanitizedFileName);
+		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + formattedFileName;
 
 		return generator.generateMultiInstanceFile(observationUnitRowMap, columns, fileNameFullPath);
 	}
