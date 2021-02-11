@@ -64,6 +64,8 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 	private static final String FILE_NAME_FOR_IMPORT_UPDATE = "GermplasmUpdateTemplate.xls";
 	private static final int CODES_SHEET_FIRST_COLUMN_INDEX = 0;
 	private static final int CODES_SHEET_SECOND_COLUMN_INDEX = 1;
+	private static final int COLUMN_WIDTH_PADDING = 6;
+	private static final int CHARACTER_WIDTH = 250;
 
 	private static final Map<String, ExcelCellStyle> IMPORT_HEADERS;
 
@@ -78,6 +80,8 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		IMPORT_HEADERS.put("export.germplasm.list.template.reference.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.creation.date.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.breeding.method.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_HEADERS.put("export.germplasm.list.template.progenitor1.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_HEADERS.put("export.germplasm.list.template.progenitor2.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.note.column", ExcelCellStyle.HEADING_STYLE_PALE_BLUE);
 		IMPORT_HEADERS.put("export.germplasm.list.template.storage.location.abbr.column", ExcelCellStyle.HEADING_STYLE_BLUE);
 		IMPORT_HEADERS.put("export.germplasm.list.template.units.column", ExcelCellStyle.HEADING_STYLE_BLUE);
@@ -196,27 +200,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 			cell.setCellStyle(this.sheetStylesMap.get(entry.getValue()));
 			final String headerColumn = this.getMessageSource().getMessage(entry.getKey(), null, locale);
 			cell.setCellValue(headerColumn);
-			switch (entry.getKey()) {
-				case "export.germplasm.list.template.preferred.name.column":
-				case "export.germplasm.list.template.location.abbr.column":
-					observationSheet.setColumnWidth(index, 20 * 250);
-					break;
-				case "export.germplasm.list.template.entry.code.column":
-					observationSheet.setColumnWidth(index, 16 * 250);
-					break;
-				case "export.germplasm.list.template.creation.date.column":
-					observationSheet.setColumnWidth(index, 18 * 250);
-					break;
-				case "export.germplasm.list.template.breeding.method.column":
-					observationSheet.setColumnWidth(index, 22 * 250);
-					break;
-				case "export.germplasm.list.template.storage.location.abbr.column":
-					observationSheet.setColumnWidth(index, 28 * 250);
-					break;
-				default:
-					observationSheet.setColumnWidth(index, 13 * 250);
-					break;
-			}
+			observationSheet.setColumnWidth(index, (headerColumn.length() + COLUMN_WIDTH_PADDING) * CHARACTER_WIDTH);
 			index++;
 		}
 	}
