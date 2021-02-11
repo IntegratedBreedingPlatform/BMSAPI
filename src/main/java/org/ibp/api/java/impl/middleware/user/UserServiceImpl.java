@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -109,7 +110,15 @@ public class UserServiceImpl implements UserService {
 		final String userName = SecurityUtil.getLoggedInUserName();
 		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUuid);
 		final ModelMapper userMapper = UserMapper.getInstance();
-		return userMapper.map(user, UserDto.class);
+		final UserDto userDto = userMapper.map(user, UserDto.class);
+
+		final Project lastOpenedProject = this.workbenchDataManager.getLastOpenedProject(user.getUserid());
+		if (!Objects.isNull(lastOpenedProject)) {
+			userDto.setSelectedCropName(lastOpenedProject.getCropType().getCropName());
+			userDto.setSelectedProgramUUID(lastOpenedProject.getUniqueID());
+		}
+
+		return userDto;
 	}
 
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
