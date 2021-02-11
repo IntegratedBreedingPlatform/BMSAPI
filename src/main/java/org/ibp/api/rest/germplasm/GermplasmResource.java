@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmDeleteResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
@@ -291,6 +292,14 @@ public class GermplasmResource {
 		headers.add("X-Filtered-Count", Long.toString(result.getFilteredResults()));
 
 		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Delete germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity<GermplasmDeleteResponse> deleteGermplasm(@PathVariable final String cropName,
+		@RequestParam final List<Integer> gids) {
+		return new ResponseEntity<>(this.germplasmService.deleteGermplasm(gids), HttpStatus.OK);
 	}
 
 }
