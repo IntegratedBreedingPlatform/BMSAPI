@@ -186,8 +186,18 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput) {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
 		final DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
-		final String tempFileName = "Labels-for-".concat(study.getStudyName()).concat("-").concat(datasetDTO.getName());
-		final String defaultFileName = FileNameGenerator.generateFileName(FileUtils.cleanFileName(tempFileName));
+		final String tempFileName =
+				FileNameGenerator.generateFileName(
+						null,
+						"",
+						"Labels-for-",
+						study.getStudyName(),
+						"-",
+						datasetDTO.getName()
+
+				);
+
+		final String defaultFileName = FileUtils.cleanFileName(tempFileName);
 
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
 		resultsMap.put(this.getMessage("label.printing.name"), study.getStudyName());
