@@ -348,7 +348,7 @@ public class DatasetResource {
 		final String outFileName = file.getName();
 		final HttpHeaders headers = new HttpHeaders();
 		headers
-			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename='%s'", FileUtils.sanitizeFileName(outFileName)));
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(outFileName)));
 		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(outFileName)));
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
