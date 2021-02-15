@@ -345,7 +345,7 @@ public class DatasetResource {
 	}
 
 	private ResponseEntity<FileSystemResource> getFileSystemResourceResponseEntity(final File file) {
-		final String outFileName = file.getName();
+		final String outFileName = FileNameGenerator.generateFileName(file.getName());
 		final HttpHeaders headers = new HttpHeaders();
 		headers
 			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(outFileName)));
