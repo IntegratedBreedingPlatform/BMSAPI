@@ -1,6 +1,7 @@
 package org.ibp.api.brapi.v2.germplasm;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
@@ -47,7 +48,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		germplasmDTO.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(20));
 		germplasmDTO.setGermplasmPUI(RandomStringUtils.randomAlphabetic(20));
 		germplasmDTO.setSeedSource(RandomStringUtils.randomAlphabetic(20));
-		germplasmDTO.setSynonyms(Lists.newArrayList(RandomStringUtils.randomAlphabetic(20)));
+		germplasmDTO.setSynonyms(Collections.singletonMap(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20)));
 		final String attributeType = "PLOTCODE";
 		germplasmDTO.setAdditionalInfo(Collections.singletonMap(attributeType, RandomStringUtils.randomAlphabetic(20)));
 		list.add(germplasmDTO);
