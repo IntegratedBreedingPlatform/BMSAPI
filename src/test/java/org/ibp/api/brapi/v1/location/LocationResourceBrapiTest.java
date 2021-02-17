@@ -11,6 +11,7 @@ import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -51,12 +52,12 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 
 		final List<Location> mwLocations = Lists.newArrayList(location);
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationId(location.getLocationDbId());
-		Mockito.when(this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10))).thenReturn(mwLocations);
-		Mockito.when(this.locationService.countLocations(locationSearchRequest)).thenReturn(1L);
+		locationSearchRequest.setLocationType(locType);
+		Mockito.when(this.locationService.getLocations(ArgumentMatchers.eq(locationSearchRequest),ArgumentMatchers.any(PageRequest.class))).thenReturn(mwLocations);
+		Mockito.when(this.locationService.countLocations(ArgumentMatchers.eq(locationSearchRequest))).thenReturn(1L);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(LocationResourceBrapiTest.MAIZE_BRAPI_V1_LOCATIONS)
-				.queryParam("locationType", "country").build().encode();
+				.queryParam("locationType", locType).build().encode();
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
 				.andDo(MockMvcResultHandlers.print()) //
