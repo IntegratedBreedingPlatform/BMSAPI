@@ -51,10 +51,8 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 		final Location location = new Location("156", locType, "New Zealand", "NZL", "NZL", "NZ", 156.2, 58.6, 5.2, null, null);
 
 		final List<Location> mwLocations = Lists.newArrayList(location);
-		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationType(locType);
-		Mockito.when(this.locationService.getLocations(ArgumentMatchers.eq(locationSearchRequest),ArgumentMatchers.any(PageRequest.class))).thenReturn(mwLocations);
-		Mockito.when(this.locationService.countLocations(ArgumentMatchers.eq(locationSearchRequest))).thenReturn(1L);
+		Mockito.when(this.locationService.getLocations(ArgumentMatchers.any(LocationSearchRequest.class), ArgumentMatchers.any(PageRequest.class))).thenReturn(mwLocations);
+		Mockito.when(this.locationService.countLocations(ArgumentMatchers.any(LocationSearchRequest.class))).thenReturn(1L);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(LocationResourceBrapiTest.MAIZE_BRAPI_V1_LOCATIONS)
 				.queryParam("locationType", locType).build().encode();
@@ -80,5 +78,16 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalCount", Matchers.is(1))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalPages", Matchers.is(1))) //
 		;
+	}
+
+	@Test
+	public void testListLocationsBadlocationType() throws Exception {
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(LocationResourceBrapiTest.MAIZE_BRAPI_V1_LOCATIONS)
+			.queryParam("locationType", "countryy").build().encode();
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
+			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("not found locations"))); //
+
 	}
 }
