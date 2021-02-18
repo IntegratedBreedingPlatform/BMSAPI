@@ -2,11 +2,10 @@
 package org.ibp.api.java.program;
 
 import java.util.List;
-import java.util.Map;
 
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
-import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.ibp.api.domain.program.ProgramSummary;
 
 public interface ProgramService {
@@ -15,9 +14,9 @@ public interface ProgramService {
 
 	List<ProgramSummary> listProgramsByCropNameAndUser(WorkbenchUser user, String cropName);
 
-	List<ProgramDetailsDto> getProgramsByFilter(final int pageNumber, final int pageSize, final Map<ProgramFilters, Object> filters);
+	List<ProgramDetailsDto> getProgramsByFilter(final int pageNumber, final int pageSize, final ProgramSearchRequest programSearchRequest);
 
-	long countProgramsByFilter(final Map<ProgramFilters, Object> filter);
+	long countProgramsByFilter(final ProgramSearchRequest programSearchRequest);
 
 	ProgramSummary getByUUIDAndCrop(String crop, String programUUID);
 }

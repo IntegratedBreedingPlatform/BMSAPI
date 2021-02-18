@@ -15,7 +15,7 @@ public class ProgramMapperTest {
 	@Test
 	public void programDetailsMapperTest() {
 		final ModelMapper mapper = ProgramMapper.getInstance();
-		ProgramDetailsDto programDetailsDto = new ProgramDetailsDto(PROGRAM_UUID, "Wheat", null, null, null);
+		ProgramDetailsDto programDetailsDto = new ProgramDetailsDto(PROGRAM_UUID, "Wheat", null, null, null, null, null, null);
 		Program program = mapper.map(programDetailsDto, Program.class);
 
 		assertThat(program.getProgramDbId(), equalTo(programDetailsDto.getProgramDbId()));
