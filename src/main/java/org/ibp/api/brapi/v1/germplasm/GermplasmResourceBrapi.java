@@ -310,7 +310,6 @@ public class GermplasmResourceBrapi {
 			final ModelMapper mapper = new ModelMapper();
 			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
 				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasm.setCommonCropName(crop);
 				germplasmList.add(germplasm);
 			}
 		}
@@ -385,7 +384,6 @@ public class GermplasmResourceBrapi {
 			final ModelMapper mapper = new ModelMapper();
 			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
 				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasm.setCommonCropName(crop);
 				germplasmList.add(germplasm);
 			}
 		}
