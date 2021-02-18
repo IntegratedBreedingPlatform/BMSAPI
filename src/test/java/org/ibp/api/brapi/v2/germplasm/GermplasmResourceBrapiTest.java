@@ -41,6 +41,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		germplasmDTO.setGermplasmDbId(germplasmDbId);
 		germplasmDTO.setAccessionNumber(RandomStringUtils.randomAlphabetic(20));
 		germplasmDTO.setBreedingMethodDbId(RandomStringUtils.randomAlphabetic(20));
+		germplasmDTO.setCommonCropName(RandomStringUtils.randomAlphabetic(20));
 		germplasmDTO.setCountryOfOriginCode(RandomStringUtils.randomAlphabetic(20));
 		germplasmDTO.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(20));
 		germplasmDTO.setGenus(RandomStringUtils.randomAlphabetic(20));
@@ -48,7 +49,8 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		germplasmDTO.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(20));
 		germplasmDTO.setGermplasmPUI(RandomStringUtils.randomAlphabetic(20));
 		germplasmDTO.setSeedSource(RandomStringUtils.randomAlphabetic(20));
-		germplasmDTO.setSynonyms(Collections.singletonMap(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20)));
+		final String nameType = "ACCNO";
+		germplasmDTO.setSynonyms(Collections.singletonMap(nameType, RandomStringUtils.randomAlphabetic(20)));
 		final String attributeType = "PLOTCODE";
 		germplasmDTO.setAdditionalInfo(Collections.singletonMap(attributeType, RandomStringUtils.randomAlphabetic(20)));
 		list.add(germplasmDTO);
@@ -71,7 +73,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].countryOfOriginCode",
 				Matchers.is(germplasmDTO.getCountryOfOriginCode())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].commonCropName",
-				Matchers.is("maize")))
+				Matchers.is(germplasmDTO.getCommonCropName())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].defaultDisplayName",
 				Matchers.is(germplasmDTO.getDefaultDisplayName())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].genus",
@@ -88,8 +90,10 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 				Matchers.hasKey(attributeType)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].additionalInfo",
 				Matchers.hasValue(germplasmDTO.getAdditionalInfo().get(attributeType))))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms[0]",
-				Matchers.is(germplasmDTO.getSynonyms().get(0))));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms",
+				Matchers.hasKey(nameType)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms",
+				Matchers.hasValue(germplasmDTO.getSynonyms().get(nameType))));
 
 	}
 
