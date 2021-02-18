@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.service.api.BrapiView;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -53,8 +54,10 @@ public class LocationResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationId(locationDbId);
-		locationSearchRequest.setLocationType(locationType);
+		if(!StringUtil.isEmpty(locationDbId)) {
+			locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(locationDbId)));
+		}
+		locationSearchRequest.setLocationTypeName(locationType);
 
 		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;

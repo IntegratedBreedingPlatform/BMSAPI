@@ -28,6 +28,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.concurrent.ThreadLocalRandom.current;
@@ -182,7 +183,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 		final StudyDetailsDto studyDetailsDto = StudyTestDataProvider.getStudyDetailsDto();
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationId(String.valueOf(studyDetailsDto.getMetadata().getLocationId()));
+		locationSearchRequest.setLocationIds(Collections.singletonList(studyDetailsDto.getMetadata().getLocationId()));
 		final List<Location> locations = StudyTestDataProvider.getLocationList();
 		final Location location = locations.get(0);
 

@@ -60,7 +60,7 @@ public class LocationResourceBrapi {
 
 		PagedResult<Location> resultPage = null;
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationType(locationType);
+		locationSearchRequest.setLocationTypeName(locationType);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
