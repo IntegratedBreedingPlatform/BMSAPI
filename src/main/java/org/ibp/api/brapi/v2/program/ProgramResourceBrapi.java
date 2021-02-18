@@ -70,8 +70,8 @@ public class ProgramResourceBrapi {
                 }
 
                 @Override
-                public List<ProgramDetailsDto> getResults(PagedResult<ProgramDetailsDto> pagedResult) {
-                    int currPage = pagedResult.getPageNumber() + 1;
+                public List<ProgramDetailsDto> getResults(final PagedResult<ProgramDetailsDto> pagedResult) {
+                    final int currPage = pagedResult.getPageNumber() + 1;
                     return ProgramResourceBrapi.this.programService.getProgramsByFilter(currPage, pagedResult.getPageSize(), programSearchRequest);
                 }
             });

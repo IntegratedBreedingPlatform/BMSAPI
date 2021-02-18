@@ -54,42 +54,42 @@ public class Program {
 	}
 
 	public String getProgramDbId() {
-		return programDbId;
+		return this.programDbId;
 	}
 
-	public void setProgramDbId(String programDbId) {
+	public void setProgramDbId(final String programDbId) {
 		this.programDbId = programDbId;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	public String getAbbreviation() {
-		return abbreviation;
+		return this.abbreviation;
 	}
 
-	public void setAbbreviation(String abbreviation) {
+	public void setAbbreviation(final String abbreviation) {
 		this.abbreviation = abbreviation;
 	}
 
 	public String getObjective() {
-		return objective;
+		return this.objective;
 	}
 
-	public void setObjective(String objective) {
+	public void setObjective(final String objective) {
 		this.objective = objective;
 	}
 
 	public String getLeadPerson() {
-		return leadPerson;
+		return this.leadPerson;
 	}
 
-	public void setLeadPerson(String leadPerson) {
+	public void setLeadPerson(final String leadPerson) {
 		this.leadPerson = leadPerson;
 	}
 

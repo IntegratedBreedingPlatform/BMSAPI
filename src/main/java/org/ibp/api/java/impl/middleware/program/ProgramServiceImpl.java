@@ -38,7 +38,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public List<ProgramSummary> listProgramsByCropName(final String cropName) {
 		try {
-			return convertToProgramSummaries(this.workbenchDataManager.getProjectsByCropName(cropName));
+			return this.convertToProgramSummaries(this.workbenchDataManager.getProjectsByCropName(cropName));
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
@@ -47,7 +47,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public List<ProgramSummary> listProgramsByCropNameAndUser(final WorkbenchUser user, final String cropName) {
 		try {
-			return convertToProgramSummaries(this.workbenchDataManager.getProjectsByUser(user, cropName));
+			return this.convertToProgramSummaries(this.workbenchDataManager.getProjectsByUser(user, cropName));
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
