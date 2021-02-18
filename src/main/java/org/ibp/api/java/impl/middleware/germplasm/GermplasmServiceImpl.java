@@ -50,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -402,7 +403,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			gids.stream().filter(gid -> !invalidGidsForDeletion.contains(gid)).collect(Collectors.toSet());
 
 		if (!CollectionUtils.isEmpty(validGermplasmForDeletion)) {
-			this.germplasmService.deleteGermplasm(gids);
+			this.germplasmService.deleteGermplasm(new ArrayList<>(validGermplasmForDeletion));
 		}
 
 		return new GermplasmDeleteResponse(invalidGidsForDeletion, validGermplasmForDeletion);
