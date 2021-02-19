@@ -190,6 +190,32 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
 
     }
 
+    @Test
+    public void testListProgramFilterByProgramId() throws Exception {
+        Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
+                .thenReturn(1L);
+
+        final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
+        programDetailsDtoList
+                .add(new ProgramDetailsDto(ProgramResourceBrapiv2Test.PROGRAM_UUID_RICE, ProgramResourceBrapiv2Test.RICE, null, null, null, null, null, null));
+        final List<Project> projectList = new ArrayList<>();
+        projectList.add(this.getProject(11L, ProgramResourceBrapiv2Test.PROGRAM_UUID_RICE, ProgramResourceBrapiv2Test.RICE, ProgramResourceBrapiv2Test.RICE));
+
+        Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+                org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
+
+        final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiv2Test.MAIZE_BRAPI_V2_PROGRAMS)
+                .queryParam("programDbId", ProgramResourceBrapiv2Test.PROGRAM_UUID_RICE).build().encode();
+        this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
+                .andExpect(MockMvcResultMatchers.status().isOk()) //
+                .andDo(MockMvcResultHandlers.print()) //
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId",
+                        Matchers.is(ProgramResourceBrapiv2Test.PROGRAM_UUID_RICE))) //
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programName", Matchers.is(ProgramResourceBrapiv2Test.RICE))) //
+        ;
+    }
+
     private List<ProgramDetailsDto> getProgramDetails() {
         final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
         programDetailsDtoList
