@@ -227,7 +227,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public GermplasmDTO getGermplasmDTObyGID(final Integer germplasmId) {
-		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmDataManager.getGermplasmDTOByGID(germplasmId);
+		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmService.getGermplasmDTOByGID(germplasmId);
 		if (germplasmDTOOptional.isPresent()) {
 			final GermplasmDTO germplasmDTO = germplasmDTOOptional.get();
 			germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmId, this.crossExpansionProperties));
@@ -244,8 +244,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
 		try {
 
-			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
-				.searchGermplasmDTO(germplasmSearchRequestDTO, pageable);
+			final List<GermplasmDTO> germplasmDTOList = this.germplasmService.searchFilteredGermplasm(germplasmSearchRequestDTO, pageable);
 			if (germplasmDTOList != null) {
 				this.populateGermplasmPedigree(germplasmDTOList);
 			}
@@ -258,7 +257,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countGermplasmDTOs(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		try {
-			return this.germplasmDataManager.countGermplasmDTOs(germplasmSearchRequestDTO);
+			return this.germplasmService.countFilteredGermplasm(germplasmSearchRequestDTO);
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("An error has occurred when trying to count germplasm", e);
 		}
@@ -267,7 +266,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countGermplasmByStudy(final Integer studyDbId) {
 		try {
-			return this.germplasmDataManager.countGermplasmByStudy(studyDbId);
+			return this.germplasmService.countGermplasmByStudy(studyDbId);
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("An error has occurred when trying to count germplasms", e);
 		}
@@ -279,8 +278,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			this.instanceValidator.validateStudyDbId(studyDbId);
 
-			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
-				.getGermplasmByStudy(studyDbId, pageable);
+			final List<GermplasmDTO> germplasmDTOList = this.germplasmService.getGermplasmByStudy(studyDbId, pageable);
 			if (germplasmDTOList != null) {
 				this.populateGermplasmPedigree(germplasmDTOList);
 			}

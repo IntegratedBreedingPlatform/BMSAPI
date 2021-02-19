@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -47,6 +48,9 @@ public class GermplasmServiceImplTest {
 	private GermplasmDataManager germplasmDataManager;
 
 	@Mock
+	private GermplasmService middlewareGermplasmService;
+
+	@Mock
 	private PedigreeService pedigreeService;
 
 	@Mock
@@ -76,7 +80,7 @@ public class GermplasmServiceImplTest {
 		germplasmDTO.setGermplasmSeedSource("AF07A-412-201");
 		final List<GermplasmDTO> germplasmDTOList = Lists.newArrayList(germplasmDTO);
 
-		Mockito.when(this.germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE))).thenReturn(germplasmDTOList);
+		Mockito.when(this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE))).thenReturn(germplasmDTOList);
 		final int gid = Integer.parseInt(germplasmDTO.getGid());
 		Mockito.when(this.pedigreeService.getCrossExpansions(Collections.singleton(gid), null, this.crossExpansionProperties))
 			.thenReturn(Collections.singletonMap(gid, "CB1"));
@@ -84,7 +88,7 @@ public class GermplasmServiceImplTest {
 		this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE));
 		Assert.assertEquals("CB1", germplasmDTOList.get(0).getPedigree());
 
-		Mockito.verify(this.germplasmDataManager, Mockito.times(1)).searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE));
+		Mockito.verify(this.middlewareGermplasmService, Mockito.times(1)).searchFilteredGermplasm(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE));
 	}
 
 	@Test
