@@ -15,6 +15,7 @@ import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -61,17 +62,13 @@ public class ProgramResourceBrapi {
 			@ApiParam(value = "Filter by program abbreviation. Exact match.", required = false) @RequestParam(value = "abbreviation",
 					required = false) final String abbreviation) {
 
-		PagedResult<ProgramDetailsDto> resultPage = null;
-		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-		programSearchRequest.setProgramName(programName);
-		programSearchRequest.setCommonCropName(crop);
+		try {
+			final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+			programSearchRequest.setProgramName(programName);
+			programSearchRequest.setCommonCropName(crop);
+			programSearchRequest.setAbbreviation(abbreviation);
 
-		/**
-		 * At the moment we don't have the abbreviation field. When this filter is used will be returned "not found programs".
-		 **/
-		if (StringUtils.isBlank(abbreviation)) {
-
-			resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<ProgramDetailsDto>() {
+			final PagedResult<ProgramDetailsDto> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<ProgramDetailsDto>() {
 
 				@Override
 				public long getCount() {
@@ -85,14 +82,11 @@ public class ProgramResourceBrapi {
 					return ProgramResourceBrapi.this.programService.getProgramsByFilter(pageNumber, pagedResult.getPageSize(), programSearchRequest);
 				}
 			});
-		}
 
-		if (resultPage != null && resultPage.getTotalResults() > 0) {
 			return new ProgramEntityResponse().getEntityListResponseResponseEntity(resultPage);
+		} catch (final ApiRuntimeException apiRuntimeException) {
+			return new ProgramEntityResponse().getEntityListResponseResponseEntityNotFound(apiRuntimeException.getMessage());
 		}
-		final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "program not found."));
-		final Metadata metadata = new Metadata(null, status);
 
-		return new ResponseEntity<>(new EntityListResponse().withMetadata(metadata), HttpStatus.NOT_FOUND);
 	}
 }

@@ -8,8 +8,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.ibp.api.brapi.v1.common.VersioningProperties;
-import org.ibp.api.brapi.v1.common.VersioningProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"programDbId", "name", "programName", "abbreviation", "objective", "leadPerson"})

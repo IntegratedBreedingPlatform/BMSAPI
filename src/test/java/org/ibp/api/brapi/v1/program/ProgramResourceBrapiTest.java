@@ -4,16 +4,20 @@ package org.ibp.api.brapi.v1.program;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -36,10 +40,17 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
 	private List<CropType> crops = new ArrayList<>();
 
+	@Autowired
+	private UserService userService;
+
 	@Before
 	public void setup() {
 		this.crops = this.getAllCrops();
 		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(this.crops);
+		final WorkbenchUser user = new WorkbenchUser();
+		user.setName(RandomStringUtils.randomAlphabetic(10));
+		user.setUserid(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
+		Mockito.when(this.userService.getUserById(Mockito.anyInt())).thenReturn(user);
 	}
 
 	@Test
@@ -51,7 +62,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message",
-						Matchers.is("crop " + ProgramResourceBrapiTest.INVALID_CROP + " doesn't exist"))); //
+						Matchers.is("Crop " + ProgramResourceBrapiTest.INVALID_CROP + " doesn't exist."))); //
 
 	}
 
@@ -157,7 +168,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("program not found.")));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("Program not found.")));
 
 	}
 
@@ -201,6 +212,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		project.setProjectId(id);
 		project.setProjectName(projectName);
 		project.setUniqueID(programUniqueID);
+		project.setCropType(this.getCropType("maize", "ibdbv2_maize_merged", "4.0.0"));
 		return project;
 	}
 }

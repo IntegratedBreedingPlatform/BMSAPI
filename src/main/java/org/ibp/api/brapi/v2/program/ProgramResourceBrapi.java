@@ -13,6 +13,7 @@ import org.ibp.api.Util;
 import org.ibp.api.brapi.v1.common.*;
 import org.ibp.api.brapi.v1.program.ProgramEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -33,7 +34,7 @@ public class ProgramResourceBrapi {
     @Autowired
     private ProgramService programService;
 
-    @ApiOperation(value = "List Programs", notes = "Get a list of programs.")
+    @ApiOperation(value = "Get filtered list of breeding Programs", notes = "Get a filtered list of breeding Programs. This list can be filtered by common crop name to narrow results to a specific crop.")
     @RequestMapping(value = "/{commonCropName}/brapi/v2/programs", method = RequestMethod.GET)
     @ResponseBody
     @JsonView(BrapiView.BrapiV2.class)
@@ -52,18 +53,17 @@ public class ProgramResourceBrapi {
                     required = false) final Integer pageSize) {
 
 
-        final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
-        final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+        try {
+            final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+            final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 
-        final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-        programSearchRequest.setProgramDbId(programDbId);
-        programSearchRequest.setProgramName(programName);
-        programSearchRequest.setCommonCropName(commonCropName);
+            final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+            programSearchRequest.setProgramDbId(programDbId);
+            programSearchRequest.setProgramName(programName);
+            programSearchRequest.setCommonCropName(commonCropName);
+            programSearchRequest.setAbbreviation(abbreviation);
 
-
-        PagedResult<ProgramDetailsDto> pagedResult = null;
-        if (StringUtils.isBlank(abbreviation)) {
-            pagedResult = new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<ProgramDetailsDto>() {
+            final PagedResult<ProgramDetailsDto> pagedResult = new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<ProgramDetailsDto>() {
                 @Override
                 public long getCount() {
                     return ProgramResourceBrapi.this.programService.countProgramsByFilter(programSearchRequest);
@@ -75,15 +75,11 @@ public class ProgramResourceBrapi {
                     return ProgramResourceBrapi.this.programService.getProgramsByFilter(currPage, pagedResult.getPageSize(), programSearchRequest);
                 }
             });
-        }
-
-        if (!Util.isNullOrEmpty(pagedResult) && pagedResult.getTotalResults() > 0) {
             return new ProgramEntityResponse().getEntityListResponseResponseEntity(pagedResult);
+        } catch (final ApiRuntimeException apiRuntimeException) {
+            return new ProgramEntityResponse().getEntityListResponseResponseEntityNotFound(apiRuntimeException.getMessage());
         }
-        final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "program not found."));
-        final Metadata metadata = new Metadata(null, status);
 
-        return new ResponseEntity<>(new EntityListResponse().withMetadata(metadata), HttpStatus.NOT_FOUND);
     }
 
 

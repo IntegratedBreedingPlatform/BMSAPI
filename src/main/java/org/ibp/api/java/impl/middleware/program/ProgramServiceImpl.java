@@ -1,6 +1,8 @@
 
 package org.ibp.api.java.impl.middleware.program;
 
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -15,12 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -80,20 +84,22 @@ public class ProgramServiceImpl implements ProgramService {
 
 	public List<ProgramDetailsDto> getProgramsByFilter(final int pageNumber, final int pageSize,
 		final ProgramSearchRequest programSearchRequest) {
+		this.validateProgramSearchRequest(programSearchRequest);
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
 		final List<Project> projectList = this.workbenchDataManager.getProjects(pageNumber, pageSize, programSearchRequest);
-
 		if (!projectList.isEmpty()) {
 			for (final Project project : projectList) {
 				final WorkbenchUser user = this.userService.getUserById(project.getUserId());
 				final ProgramDetailsDto programDetailsDto = new ProgramDetailsDto();
-				programDetailsDto.setProgramDbId(String.valueOf(project.getProjectId()));
+				programDetailsDto.setProgramDbId(project.getUniqueID());
 				programDetailsDto.setName(project.getProjectName());
 				programDetailsDto.setLeadPerson(user.getName());
 				programDetailsDto.setLeadPersonDbId(String.valueOf(project.getUserId()));
 				programDetailsDto.setCropName(project.getCropType().getCropName());
 				programDetailsDtoList.add(programDetailsDto);
 			}
+		} else {
+			throw new ApiRuntimeException("Program not found.");
 		}
 
 		return programDetailsDtoList;
@@ -135,5 +141,18 @@ public class ProgramServiceImpl implements ProgramService {
 			throw new ApiRuntimeException("Error!", e);
 		}
 
+	}
+
+	private void validateProgramSearchRequest(final ProgramSearchRequest programSearchRequest) {
+
+		if (!StringUtils.isBlank(programSearchRequest.getAbbreviation())) {
+			throw new ApiRuntimeException("Program not found.");
+		}
+		final List<CropType> cropTypeList = this.workbenchDataManager.getInstalledCropDatabses().stream().filter(cropType -> {
+			return cropType.getCropName().equalsIgnoreCase(programSearchRequest.getCommonCropName());
+		}).collect(Collectors.toList());
+		if (CollectionUtils.isEmpty(cropTypeList)) {
+			throw new ApiRuntimeException("Crop " + programSearchRequest.getCommonCropName() + " doesn't exist.");
+		}
 	}
 }
