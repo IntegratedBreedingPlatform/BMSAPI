@@ -7,6 +7,7 @@ import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.ibp.api.domain.program.ProgramSummary;
+import org.springframework.data.domain.Pageable;
 
 public interface ProgramService {
 
@@ -14,7 +15,7 @@ public interface ProgramService {
 
 	List<ProgramSummary> listProgramsByCropNameAndUser(WorkbenchUser user, String cropName);
 
-	List<ProgramDetailsDto> getProgramsByFilter(final int pageNumber, final int pageSize, final ProgramSearchRequest programSearchRequest);
+	List<ProgramDetailsDto> getProgramsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
 
 	long countProgramsByFilter(final ProgramSearchRequest programSearchRequest);
 

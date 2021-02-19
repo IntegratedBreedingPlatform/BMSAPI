@@ -14,12 +14,15 @@ import org.ibp.api.brapi.v1.common.*;
 import org.ibp.api.brapi.v1.program.ProgramEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,13 +37,16 @@ public class ProgramResourceBrapi {
     @Autowired
     private ProgramService programService;
 
+    @Autowired
+    private SecurityService securityService;
+
     @ApiOperation(value = "Get filtered list of breeding Programs", notes = "Get a filtered list of breeding Programs. This list can be filtered by common crop name to narrow results to a specific crop.")
-    @RequestMapping(value = "/{commonCropName}/brapi/v2/programs", method = RequestMethod.GET)
+    @RequestMapping(value = "/brapi/v2/programs", method = RequestMethod.GET)
     @ResponseBody
     @JsonView(BrapiView.BrapiV2.class)
     public ResponseEntity<EntityListResponse<ProgramDetailsDto>> listPrograms(
-            @ApiParam(value = "Filter by the common crop name. Exact match.")
-            @PathVariable final String commonCropName,
+            @ApiParam(value = "Filter by the common crop name. Exact match.", required = false)
+            @RequestParam(value = "commonCropName", required = false) final String commonCropName,
             @ApiParam(value = "Program filter to only return trials associated with given program id.", required = false)
             @RequestParam(value="programDbId", required = false) final String programDbId,
             @ApiParam(value = "Filter by program name. Exact match.", required = false) @RequestParam(value = "programName",
@@ -60,8 +66,9 @@ public class ProgramResourceBrapi {
             final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
             programSearchRequest.setProgramDbId(programDbId);
             programSearchRequest.setProgramName(programName);
-            programSearchRequest.setCommonCropName(commonCropName);
+            programSearchRequest.addCommonCropName(commonCropName);
             programSearchRequest.setAbbreviation(abbreviation);
+            programSearchRequest.setLoggedInUserId(this.securityService.getCurrentlyLoggedInUser().getUserid());
 
             final PagedResult<ProgramDetailsDto> pagedResult = new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<ProgramDetailsDto>() {
                 @Override
@@ -72,11 +79,11 @@ public class ProgramResourceBrapi {
                 @Override
                 public List<ProgramDetailsDto> getResults(final PagedResult<ProgramDetailsDto> pagedResult) {
                     final int currPage = pagedResult.getPageNumber() + 1;
-                    return ProgramResourceBrapi.this.programService.getProgramsByFilter(currPage, pagedResult.getPageSize(), programSearchRequest);
+                    return ProgramResourceBrapi.this.programService.getProgramsByFilter(new PageRequest(currPage, pagedResult.getPageSize()), programSearchRequest);
                 }
             });
             return new ProgramEntityResponse().getEntityListResponseResponseEntity(pagedResult);
-        } catch (final ApiRuntimeException apiRuntimeException) {
+        } catch (final ApiRuntimeException | AccessDeniedException apiRuntimeException) {
             return new ProgramEntityResponse().getEntityListResponseResponseEntityNotFound(apiRuntimeException.getMessage());
         }
 

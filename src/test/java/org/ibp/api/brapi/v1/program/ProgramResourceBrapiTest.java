@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -72,7 +73,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
 				.thenReturn(new Long(this.crops.size()));
 		final List<Project> projectList = this.getProjectList();
-		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
 				org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
 		final UriComponents uriComponents =
@@ -106,7 +107,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
 				.thenReturn(new Long(this.crops.size()));
 		final List<Project> projectList = this.getProjectList();
-		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
 				org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
 		final int page = 1;
@@ -143,7 +144,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		final List<Project> projectList = new ArrayList<>();
 		projectList.add(this.getProject(11L, ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE));
 
-		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
 				org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS)

@@ -20,6 +20,7 @@ import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -65,7 +66,7 @@ public class ProgramResourceBrapi {
 		try {
 			final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 			programSearchRequest.setProgramName(programName);
-			programSearchRequest.setCommonCropName(crop);
+			programSearchRequest.addCommonCropName(crop);
 			programSearchRequest.setAbbreviation(abbreviation);
 
 			final PagedResult<ProgramDetailsDto> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<ProgramDetailsDto>() {
@@ -79,7 +80,7 @@ public class ProgramResourceBrapi {
 				public List<ProgramDetailsDto> getResults(final PagedResult<ProgramDetailsDto> pagedResult) {
 					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
 					final int pageNumber = pagedResult.getPageNumber() + 1;
-					return ProgramResourceBrapi.this.programService.getProgramsByFilter(pageNumber, pagedResult.getPageSize(), programSearchRequest);
+					return ProgramResourceBrapi.this.programService.getProgramsByFilter(new PageRequest(pageNumber, pagedResult.getPageSize()), programSearchRequest);
 				}
 			});
 

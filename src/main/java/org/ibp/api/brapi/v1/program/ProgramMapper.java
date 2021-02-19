@@ -9,7 +9,6 @@ import org.modelmapper.PropertyMap;
 public class ProgramMapper {
 
 	private static ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
-	private static JacksonAnnotationIntrospector annotationIntrospector;
 
 	private ProgramMapper() {
 

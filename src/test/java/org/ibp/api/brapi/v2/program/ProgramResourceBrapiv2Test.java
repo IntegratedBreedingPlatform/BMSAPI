@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -13,10 +14,12 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -31,8 +34,8 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
     private static final String RICE = "Rice";
     private static final String MAIZE = "Maize";
     private static final String INVALID_CROP = "maize2";
-    private static final String INVALID_BRAPI_V2_PROGRAMS = "/" + ProgramResourceBrapiv2Test.INVALID_CROP + "/brapi/v2/programs";
-    private static final String MAIZE_BRAPI_V2_PROGRAMS = "/maize/brapi/v2/programs";
+    private static final String INVALID_BRAPI_V2_PROGRAMS = "/brapi/v2/programs";
+    private static final String MAIZE_BRAPI_V2_PROGRAMS = "/brapi/v2/programs";
     final static String PROGRAM_UUID_RICE = "92c47f83-4427-44c9-982f-b611b8917a2d";
     final static String PROGRAM_UUID_WHEAT = "2ca55832-5c5d-404f-b05c-bc6e305c8b76";
     final static String PROGRAM_UUID_MAIZE = "d1a052d0-65eb-4d0e-8813-6c770d10f253";
@@ -42,21 +45,30 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private SecurityService securityService;
+
     final WorkbenchUser user = new WorkbenchUser();
     @Before
     public void setup() {
         this.crops = this.getAllCrops();
         Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(this.crops);
 
+        Mockito.when(this.workbenchDataManager.getAvailableCropsForUser(Mockito.anyInt())).thenReturn(this.crops);
+
         this.user.setName(RandomStringUtils.randomAlphabetic(10));
         this.user.setUserid(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
         Mockito.when(this.userService.getUserById(Mockito.anyInt())).thenReturn(this.user);
+
+        Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
+
     }
 
     @Test
     public void testListProgramsBadCrop() throws Exception {
         final UriComponents uriComponents =
-                UriComponentsBuilder.newInstance().path(ProgramResourceBrapiv2Test.INVALID_BRAPI_V2_PROGRAMS).build().encode();
+                UriComponentsBuilder.newInstance().path(ProgramResourceBrapiv2Test.INVALID_BRAPI_V2_PROGRAMS)
+                        .queryParam("commonCropName", ProgramResourceBrapiv2Test.INVALID_CROP).build().encode();
 
         this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
                 .andExpect(MockMvcResultMatchers.status().isNotFound()) //
@@ -72,7 +84,7 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
         Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
                 .thenReturn(new Long(this.crops.size()));
         final List<Project> projectList = this.getProjectList();
-        Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+        Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
                 org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
         final UriComponents uriComponents =
@@ -106,7 +118,7 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
         Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
                 .thenReturn(new Long(this.crops.size()));
         final List<Project> projectList = this.getProjectList();
-        Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+        Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
                 org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
         final int page = 1;
@@ -161,7 +173,7 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
         final List<Project> projectList = new ArrayList<>();
         projectList.add(this.getProject(11L, ProgramResourceBrapiv2Test.PROGRAM_UUID_RICE, ProgramResourceBrapiv2Test.RICE, ProgramResourceBrapiv2Test.RICE));
 
-        Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+        Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
                 org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
         final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiv2Test.MAIZE_BRAPI_V2_PROGRAMS)
@@ -201,7 +213,7 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
         final List<Project> projectList = new ArrayList<>();
         projectList.add(this.getProject(11L, ProgramResourceBrapiv2Test.PROGRAM_UUID_RICE, ProgramResourceBrapiv2Test.RICE, ProgramResourceBrapiv2Test.RICE));
 
-        Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+        Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
                 org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
         final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiv2Test.MAIZE_BRAPI_V2_PROGRAMS)

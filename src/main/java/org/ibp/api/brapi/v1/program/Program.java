@@ -9,33 +9,44 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.generationcp.middleware.service.api.BrapiView;
 
+import java.util.Map;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"programDbId", "name", "programName", "abbreviation", "objective", "leadPerson"})
 public class Program {
 
 	private String programDbId;
+
 	private String abbreviation;
+
 	private String objective;
 
 	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String name;
+
 	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String leadPerson;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String programName;
+
 	@JsonView(BrapiView.BrapiV2.class)
 	private String leadPersonDbId;
+
 	@JsonView(BrapiView.BrapiV2.class)
 	private String leadPersonName;
+
 	@JsonView(BrapiView.BrapiV2.class)
 	private String documentationURL;
+
 	@JsonView(BrapiView.BrapiV2.class)
 	private String externalReferences;
+
 	@JsonView(BrapiView.BrapiV2.class)
 	private String commonCropName;
+
 	@JsonView(BrapiView.BrapiV2.class)
-	private ProgramAdditionalInfo additionalInfo;
+	private Map<String, String> additionalInfo;
 
 	public Program() {
 
@@ -139,11 +150,11 @@ public class Program {
 		this.commonCropName = commonCropName;
 	}
 
-	public ProgramAdditionalInfo getAdditionalInfo() {
+	public Map<String, String> getAdditionalInfo() {
 		return this.additionalInfo;
 	}
 
-	public void setAdditionalInfo(final ProgramAdditionalInfo additionalInfo) {
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 		this.additionalInfo = additionalInfo;
 	}
 
