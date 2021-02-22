@@ -156,7 +156,7 @@ public class ProgramServiceImpl implements ProgramService {
 
 		if (!StringUtils.isEmpty(programSearchRequest.getCommonCropName())) {
 			final List<CropType> cropTypeList = this.workbenchDataManager.getInstalledCropDatabses().stream().filter(cropType -> {
-				return programSearchRequest.getCommonCropName().contains(cropType.getCropName());
+				return programSearchRequest.getCommonCropName().equalsIgnoreCase(cropType.getCropName());
 			}).collect(Collectors.toList());
 
 			if (CollectionUtils.isEmpty(cropTypeList)) {
@@ -166,7 +166,7 @@ public class ProgramServiceImpl implements ProgramService {
 			if (!Util.isNullOrEmpty(programSearchRequest.getLoggedInUserId())) {
 				final List<CropType> authorizedCrop = this.workbenchDataManager.getAvailableCropsForUser(programSearchRequest
 						.getLoggedInUserId()).stream().filter(cropType -> {return programSearchRequest.getCommonCropName()
-						.contains(cropType.getCropName());
+						.equalsIgnoreCase(cropType.getCropName());
 				}).collect(Collectors.toList());
 
 				if (CollectionUtils.isEmpty(authorizedCrop)) {

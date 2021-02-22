@@ -14,6 +14,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -44,14 +45,19 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private SecurityService securityService;
+
 	@Before
 	public void setup() {
 		this.crops = this.getAllCrops();
 		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(this.crops);
+		Mockito.when(this.workbenchDataManager.getAvailableCropsForUser(Mockito.anyInt())).thenReturn(this.crops);
 		final WorkbenchUser user = new WorkbenchUser();
 		user.setName(RandomStringUtils.randomAlphabetic(10));
 		user.setUserid(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
 		Mockito.when(this.userService.getUserById(Mockito.anyInt())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 	}
 
 	@Test
