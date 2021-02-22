@@ -69,7 +69,7 @@ public class ProgramResourceBrapi {
             programSearchRequest.setAbbreviation(abbreviation);
             programSearchRequest.setLoggedInUserId(this.securityService.getCurrentlyLoggedInUser().getUserid());
             if (!StringUtils.isBlank(commonCropName)) {
-                programSearchRequest.addCommonCropName(commonCropName);
+                programSearchRequest.setCommonCropName(commonCropName);
             }
             final PagedResult<ProgramDetailsDto> pagedResult = new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<ProgramDetailsDto>() {
                 @Override

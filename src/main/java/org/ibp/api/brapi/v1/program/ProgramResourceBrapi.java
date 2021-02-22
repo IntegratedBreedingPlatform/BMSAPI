@@ -16,6 +16,7 @@ import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -49,6 +50,9 @@ public class ProgramResourceBrapi {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	private SecurityService securityService;
+
 	@ApiOperation(value = "List Programs", notes = "Get a list of programs.")
 	@RequestMapping(value = "/{crop}/brapi/v1/programs", method = RequestMethod.GET)
 	@ResponseBody
@@ -66,8 +70,9 @@ public class ProgramResourceBrapi {
 		try {
 			final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 			programSearchRequest.setProgramName(programName);
-			programSearchRequest.addCommonCropName(crop);
+			programSearchRequest.setCommonCropName(crop);
 			programSearchRequest.setAbbreviation(abbreviation);
+			programSearchRequest.setLoggedInUserId(this.securityService.getCurrentlyLoggedInUser().getUserid());
 
 			final PagedResult<ProgramDetailsDto> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<ProgramDetailsDto>() {
 

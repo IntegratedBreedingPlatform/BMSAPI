@@ -154,20 +154,13 @@ public class ProgramServiceImpl implements ProgramService {
 			throw new ApiRuntimeException("Program not found.");
 		}
 
-		if (!CollectionUtils.isEmpty(programSearchRequest.getCommonCropName())) {
+		if (!StringUtils.isEmpty(programSearchRequest.getCommonCropName())) {
 			final List<CropType> cropTypeList = this.workbenchDataManager.getInstalledCropDatabses().stream().filter(cropType -> {
 				return programSearchRequest.getCommonCropName().contains(cropType.getCropName());
 			}).collect(Collectors.toList());
 
 			if (CollectionUtils.isEmpty(cropTypeList)) {
-				final StringBuilder sb = new StringBuilder();
-				programSearchRequest.getCommonCropName().forEach(s -> {
-					if (sb.toString().length() > 1) {
-						sb.append(",");
-					}
-					sb.append(s);
-				});
-				throw new ApiRuntimeException("Crop " + sb.toString() + " doesn't exist.");
+				throw new ApiRuntimeException("Crop " + programSearchRequest.getCommonCropName() + " doesn't exist.");
 			}
 
 			if (!Util.isNullOrEmpty(programSearchRequest.getLoggedInUserId())) {
@@ -180,12 +173,6 @@ public class ProgramServiceImpl implements ProgramService {
 					throw new AccessDeniedException("Access Denied: User is not authorized for crop.");
 				}
 			}
-		} else if (CollectionUtils.isEmpty(programSearchRequest.getCommonCropName())
-				&& !Util.isNullOrEmpty(programSearchRequest.getLoggedInUserId())) {
-			// Set available crop for user
-			final List<String> authorizedCrop = this.workbenchDataManager.getAvailableCropsForUser(programSearchRequest
-					.getLoggedInUserId()).stream().map(CropType::getCropName).collect(Collectors.toList());
-			programSearchRequest.setCommonCropName(authorizedCrop);
 		}
 
 	}
