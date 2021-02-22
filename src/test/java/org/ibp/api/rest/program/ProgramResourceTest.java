@@ -103,7 +103,7 @@ public class ProgramResourceTest extends ApiUnitTestBase {
         final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
         programSearchRequest.setLoggedInUserId(me.getUserid());
         programSearchRequest.setCommonCropName(CROP_NAME);
-        Mockito.doReturn(programList).when(this.workbenchDataManager).getProjects(null, Mockito.eq(programSearchRequest));
+        Mockito.doReturn(programList).when(this.workbenchDataManager).getProjects(Mockito.eq(null), Mockito.eq(programSearchRequest));
         Mockito.when(this.request.isUserInRole(ArgumentMatchers.anyString())).thenReturn(false);
         verifyReturnValues(program1, program1Date, program2, program2Date);
     }
