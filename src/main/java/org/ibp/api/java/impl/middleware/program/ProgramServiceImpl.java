@@ -55,9 +55,9 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public List<ProgramSummary> listProgramsByCropNameAndUser(final WorkbenchUser user, final String cropName) {
+	public List<ProgramSummary> listProgramsByCropNameAndUser(final ProgramSearchRequest programSearchRequest) {
 		try {
-			return this.convertToProgramSummaries(this.workbenchDataManager.getProjectsByUser(user, cropName));
+			return this.convertToProgramSummaries(this.workbenchDataManager.getProjects(null, programSearchRequest ));
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

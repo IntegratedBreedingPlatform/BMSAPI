@@ -13,7 +13,7 @@ public interface ProgramService {
 
 	List<ProgramSummary> listProgramsByCropName(final String cropName);
 
-	List<ProgramSummary> listProgramsByCropNameAndUser(WorkbenchUser user, String cropName);
+	List<ProgramSummary> listProgramsByCropNameAndUser(ProgramSearchRequest programSearchRequest);
 
 	List<ProgramDetailsDto> getProgramsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
 
