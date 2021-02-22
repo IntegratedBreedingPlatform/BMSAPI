@@ -160,7 +160,14 @@ public class ProgramServiceImpl implements ProgramService {
 			}).collect(Collectors.toList());
 
 			if (CollectionUtils.isEmpty(cropTypeList)) {
-				throw new ApiRuntimeException("Crop " + programSearchRequest.getCommonCropName() + " doesn't exist.");
+				final StringBuilder sb = new StringBuilder();
+				programSearchRequest.getCommonCropName().forEach(s -> {
+					if (sb.toString().length() > 1) {
+						sb.append(",");
+					}
+					sb.append(s);
+				});
+				throw new ApiRuntimeException("Crop " + sb.toString() + " doesn't exist.");
 			}
 
 			if (!Util.isNullOrEmpty(programSearchRequest.getLoggedInUserId())) {
