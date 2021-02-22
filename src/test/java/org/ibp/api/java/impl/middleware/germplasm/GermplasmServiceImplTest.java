@@ -2,9 +2,10 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
-import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -21,6 +22,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,9 +50,6 @@ public class GermplasmServiceImplTest {
 	private PedigreeService pedigreeService;
 
 	@Mock
-	private LocationDataManager locationDataManger;
-
-	@Mock
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Captor
@@ -62,7 +61,6 @@ public class GermplasmServiceImplTest {
 		this.germplasmServiceImpl = new GermplasmServiceImpl();
 		this.germplasmServiceImpl.setGermplasmDataManager(this.germplasmDataManager);
 		this.germplasmServiceImpl.setPedigreeService(this.pedigreeService);
-		this.germplasmServiceImpl.setLocationDataManger(this.locationDataManger);
 		this.germplasmServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
 	}
 
@@ -72,20 +70,21 @@ public class GermplasmServiceImplTest {
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
-		germplasmDTO.setGermplasmDbId("1");
+		germplasmDTO.setGermplasmDbId(RandomStringUtils.randomAlphabetic(20));
+		germplasmDTO.setGid("1");
 		germplasmDTO.setGermplasmName("CB1");
 		germplasmDTO.setGermplasmSeedSource("AF07A-412-201");
 		final List<GermplasmDTO> germplasmDTOList = Lists.newArrayList(germplasmDTO);
 
-		Mockito.when(this.germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE)).thenReturn(germplasmDTOList);
-		final int gid = Integer.parseInt(germplasmDTO.getGermplasmDbId());
+		Mockito.when(this.germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE))).thenReturn(germplasmDTOList);
+		final int gid = Integer.parseInt(germplasmDTO.getGid());
 		Mockito.when(this.pedigreeService.getCrossExpansions(Collections.singleton(gid), null, this.crossExpansionProperties))
 			.thenReturn(Collections.singletonMap(gid, "CB1"));
 
-		this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE);
+		this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE));
 		Assert.assertEquals("CB1", germplasmDTOList.get(0).getPedigree());
 
-		Mockito.verify(this.germplasmDataManager, Mockito.times(1)).searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE);
+		Mockito.verify(this.germplasmDataManager, Mockito.times(1)).searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE));
 	}
 
 	@Test
