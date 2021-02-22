@@ -52,7 +52,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 
 		final List<Location> mwLocations = Lists.newArrayList(location);
 		Mockito.when(this.locationService.getLocations(ArgumentMatchers.any(LocationSearchRequest.class), ArgumentMatchers.any(PageRequest.class))).thenReturn(mwLocations);
-		Mockito.when(this.locationService.countLocations(ArgumentMatchers.any(LocationSearchRequest.class))).thenReturn(1L);
+		Mockito.when(this.locationService.countFilteredLocations(ArgumentMatchers.any(LocationSearchRequest.class))).thenReturn(1L);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(LocationResourceBrapiTest.MAIZE_BRAPI_V1_LOCATIONS)
 				.queryParam("locationType", locType).build().encode();
