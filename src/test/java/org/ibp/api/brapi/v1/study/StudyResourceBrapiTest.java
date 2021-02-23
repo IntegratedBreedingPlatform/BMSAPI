@@ -2,10 +2,10 @@ package org.ibp.api.brapi.v1.study;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.api.location.Location;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
-import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -28,9 +28,8 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -59,14 +58,14 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public LocationDataManager locationDataManager() {
-			return Mockito.mock(LocationDataManager.class);
+		public LocationService locationService() {
+			return Mockito.mock(LocationService.class);
 		}
 	}
 
 
 	@Autowired
-	private LocationDataManager locationDataManager;
+	private LocationService locationService;
 
 	@Test
 	public void testGetStudyObservationsAsTable() throws Exception {
@@ -183,14 +182,14 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 	public void testGetStudyDetails() throws Exception {
 
 		final StudyDetailsDto studyDetailsDto = StudyTestDataProvider.getStudyDetailsDto();
-		final Map<LocationFilters, Object> filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_ID, String.valueOf(studyDetailsDto.getMetadata().getLocationId()));
-		final List<LocationDetailsDto> locations = StudyTestDataProvider.getListLocationDetailsDto();
-		final LocationDetailsDto location = locations.get(0);
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationIds(Collections.singletonList(studyDetailsDto.getMetadata().getLocationId()));
+		final List<Location> locations = StudyTestDataProvider.getLocationList();
+		final Location location = locations.get(0);
 
 		Mockito.when(this.studyServiceMW.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId()))
 			.thenReturn(studyDetailsDto);
-		Mockito.when(this.locationDataManager.getLocationsByFilter(0, 1, filters)).thenReturn(locations);
+		Mockito.when(this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10))).thenReturn(locations);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}")
 			.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDetailsDto.getMetadata().getStudyDbId()).build())
