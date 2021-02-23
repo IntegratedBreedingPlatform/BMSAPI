@@ -23,14 +23,18 @@ public class SampleListValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (sampleListDto.getInstanceIds() == null) {
-			this.errors.reject("sample.list.instance.list.must.not.be.null","The Instance List must not be null");
-		}
-		if (sampleListDto.getInstanceIds() != null && sampleListDto.getInstanceIds().isEmpty()) {
-			this.errors.reject("sample.list.instance.list.must.not.empty","The Instance List must not be empty");
-		}
-		if (sampleListDto.getSelectionVariableId() == null) {
-			this.errors.reject("sample.list.selection.variable.id.must.not.empty", "The Selection Variable Id must not be empty");
+		if (!sampleListDto.getEntries().isEmpty()) {
+			// TODO IBP-4375 validate sample ids
+		} else {
+			if (sampleListDto.getInstanceIds() == null) {
+				this.errors.reject("sample.list.instance.list.must.not.be.null","The Instance List must not be null");
+			}
+			if (sampleListDto.getInstanceIds() != null && sampleListDto.getInstanceIds().isEmpty()) {
+				this.errors.reject("sample.list.instance.list.must.not.empty","The Instance List must not be empty");
+			}
+			if (sampleListDto.getSelectionVariableId() == null) {
+				this.errors.reject("sample.list.selection.variable.id.must.not.empty", "The Selection Variable Id must not be empty");
+			}
 		}
 		if (StringUtils.isBlank(sampleListDto.getListName())) {
 			this.errors.reject("sample.list.listname.must.not.empty","The List Name must not be empty");
