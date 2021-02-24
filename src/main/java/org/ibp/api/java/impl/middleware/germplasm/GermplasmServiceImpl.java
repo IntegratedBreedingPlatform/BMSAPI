@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -397,12 +398,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmDTO> createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList) {
 		// Remove germplasm that fails any validation. They will be excluded from creation
 		this.germplasmImportValidator.pruneGermplasmInvalidForImport(germplasmImportRequestList);
-		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-		final List<GermplasmDTO> germplasmDTOList = germplasmService.createGermplasm(user.getUserid(), cropName, germplasmImportRequestList);
-		if (germplasmDTOList != null) {
-			this.populateGermplasmPedigree(germplasmDTOList);
+		if (!CollectionUtils.isEmpty(germplasmImportRequestList)) {
+			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+			final List<GermplasmDTO> germplasmDTOList = germplasmService.createGermplasm(user.getUserid(), cropName, germplasmImportRequestList);
+			if (!CollectionUtils.isEmpty(germplasmDTOList)) {
+				this.populateGermplasmPedigree(germplasmDTOList);
+			}
+			return germplasmDTOList;
 		}
-		return germplasmDTOList;
+		return Collections.emptyList();
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
