@@ -2,25 +2,20 @@ package org.ibp.api.brapi.v2.germplasm;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.service.api.inventory.LotService;
+import org.generationcp.middleware.util.Util;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -32,18 +27,10 @@ import java.util.stream.Collectors;
 @Component
 public class GermplasmImportRequestValidator {
 
-	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 	public static final Integer STOCK_ID_MAX_LENGTH = 35;
-	public static final Integer GUID_MAX_LENGTH = 36;
 	public static final Integer REFERENCE_MAX_LENGTH = 255;
 	public static final Integer NAME_MAX_LENGTH = 255;
 	public static final Integer ATTRIBUTE_MAX_LENGTH = 255;
-
-	@Autowired
-	private GermplasmService germplasmService;
-
-	@Autowired
-	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmServiceMw;
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
@@ -51,17 +38,9 @@ public class GermplasmImportRequestValidator {
 	@Autowired
 	private LocationService locationService;
 
-	@Autowired
-	private InventoryCommonValidator inventoryCommonValidator;
-
-	@Autowired
-	private LotService lotService;
-
 	public void pruneGermplasmInvalidForImport(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
 		BaseValidator.checkNotEmpty(germplasmImportRequestDtoList, "germplasm.import.list.null");
 
-		final List<String> validAttributeTypes = this.getValidAttributeTypes(germplasmImportRequestDtoList);
-		final List<String> validNameTypes = this.getValidNameTypes(germplasmImportRequestDtoList);
 		final List<String> validBreedingMethodIds = this.getValidBreedingMethodDbIds(germplasmImportRequestDtoList);
 		final List<String> validLocationAbbreviations = this.getValidLocationAbbreviations(germplasmImportRequestDtoList);
 
@@ -72,10 +51,10 @@ public class GermplasmImportRequestValidator {
 			if (StringUtils.isEmpty(g.getDefaultDisplayName())) {
 				return true;
 			}
-			if (g.getAcquisitionDate() == null) {
+			if (StringUtils.isEmpty(g.getAcquisitionDate())) {
 				return true;
 			}
-			if (!DateUtil.isValidDate(g.getAcquisitionDate().toString())) {
+			if (Util.tryParseDate(g.getAcquisitionDate(), Util.FRONTEND_DATE_FORMAT) == null) {
 				return true;
 			}
 			if (StringUtils.isEmpty(g.getBreedingMethodDbId()) || !validBreedingMethodIds.contains(g.getBreedingMethodDbId())) {
@@ -90,7 +69,7 @@ public class GermplasmImportRequestValidator {
 				return true;
 			}
 			g.getSynonyms().stream().map(Synonym::getType).forEach(name -> nameKeys.add(name.toUpperCase()));
-			if (g.getSynonyms().size() != nameKeys.size() || !validNameTypes.containsAll(nameKeys)) {
+			if (g.getSynonyms().size() != nameKeys.size()) {
 				return true;
 			}
 			if (areNameValuesInvalid(g.getSynonyms().stream().map(Synonym::getSynonym).collect(Collectors.toList()))) {
@@ -99,7 +78,7 @@ public class GermplasmImportRequestValidator {
 
 			// Validations on attributes
 			g.getAdditionalInfo().keySet().stream().forEach(key -> attributeTypes.add(key.toUpperCase()));
-			if (g.getAdditionalInfo().size() != attributeTypes.size() || !validAttributeTypes.containsAll(attributeTypes)) {
+			if (g.getAdditionalInfo().size() != attributeTypes.size()) {
 				return true;
 			}
 
@@ -110,18 +89,6 @@ public class GermplasmImportRequestValidator {
 			return false;
 		});
 
-	}
-
-
-
-	private List<String> getValidNameTypes(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
-		final Set<String> nameTypes = new HashSet<>();
-		germplasmImportRequestDtoList.forEach(g -> {
-			if (CollectionUtils.isEmpty(g.getSynonyms()))
-				nameTypes.addAll(g.getSynonyms().stream().map(n -> n.getType().toUpperCase()).collect(Collectors.toList()));
-		});
-		return this.germplasmService.filterGermplasmNameTypes(nameTypes).stream().map(GermplasmNameTypeDTO::getCode).collect(
-			Collectors.toList());
 	}
 
 	private List<String> getValidBreedingMethodDbIds(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
@@ -151,16 +118,6 @@ public class GermplasmImportRequestValidator {
 				Collectors.toList());
 
 	}
-
-	private List<String> getValidAttributeTypes(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
-		final Set<String> attributes = new HashSet<>();
-		germplasmImportRequestDtoList.stream().filter(germ -> germ.getAdditionalInfo() != null).collect(Collectors.toList())
-			.forEach(g -> attributes.addAll(g.getAdditionalInfo().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
-		return this.germplasmService.filterGermplasmAttributes(attributes).stream().map(AttributeDTO::getCode).collect(
-			Collectors.toList());
-	}
-
-
 
 	private boolean areNameValuesInvalid(final Collection<String> values) {
 		return values.stream().anyMatch(n -> {
