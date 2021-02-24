@@ -13,16 +13,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.api.brapi.v1.observation.NewObservationRequest;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
+import org.generationcp.middleware.api.location.Location;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
@@ -37,8 +37,6 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
-import org.ibp.api.brapi.v1.location.Location;
-import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.brapi.v1.observation.ObservationVariableResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.BrapiNotFoundException;
@@ -77,7 +75,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,7 +105,7 @@ public class StudyResourceBrapi {
 	private VariableService variableService;
 
 	@Autowired
-	private LocationDataManager locationDataManager;
+	private LocationService locationService;
 
 	@Autowired
 	private DatasetService studyDatasetService;
@@ -266,13 +263,11 @@ public class StudyResourceBrapi {
 		final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
 
 		if (mwStudyDetails.getMetadata().getLocationId() != null) {
-			final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
-			filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
-			final List<LocationDetailsDto> locations = this.locationDataManager.getLocationsByFilter(0, 1, filters);
+			final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+			locationSearchRequest.setLocationIds(Collections.singletonList(mwStudyDetails.getMetadata().getLocationId()));
+			final List<Location> locations = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
 			if (!locations.isEmpty()) {
-				final ModelMapper locationMapper = LocationMapper.getInstance();
-				final Location location = locationMapper.map(locations.get(0), Location.class);
-				result.setLocation(location);
+				result.setLocation(locations.get(0));
 			}
 		}
 
