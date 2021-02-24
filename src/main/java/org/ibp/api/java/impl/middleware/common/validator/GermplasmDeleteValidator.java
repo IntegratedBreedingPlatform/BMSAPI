@@ -13,15 +13,15 @@ import java.util.Set;
 public class GermplasmDeleteValidator {
 
 	@Resource
-	private GermplasmService germplasmService;
+	private GermplasmService germplasmMiddlewareService;
 
 	public Set<Integer> checkInvalidGidsForDeletion(final List<Integer> gids) {
 
-		final Set<Integer> codeFixedGermplasms = this.germplasmService.getCodeFixedGidsByGidList(gids);
-		final Set<Integer> germplasmWithDescendants = this.germplasmService.getGidsOfGermplasmWithDescendants(gids);
-		final Set<Integer> germplasmUsedInStudies = this.germplasmService.getGermplasmUsedInStudies(gids);
-		final Set<Integer> germplasmWithOpenLots = this.germplasmService.getGidsWithOpenLots(gids);
-		final Set<Integer> germplasmInOneOrMoreLists = this.germplasmService.getGermplasmUsedInOneOrMoreList(gids);
+		final Set<Integer> codeFixedGermplasms = this.germplasmMiddlewareService.getCodeFixedGidsByGidList(gids);
+		final Set<Integer> germplasmWithDescendants = this.germplasmMiddlewareService.getGidsOfGermplasmWithDescendants(gids);
+		final Set<Integer> germplasmUsedInStudies = this.germplasmMiddlewareService.getGermplasmUsedInStudies(gids);
+		final Set<Integer> germplasmWithOpenLots = this.germplasmMiddlewareService.getGidsWithOpenLots(gids);
+		final Set<Integer> germplasmInOneOrMoreLists = this.germplasmMiddlewareService.getGermplasmUsedInOneOrMoreList(gids);
 
 		return Sets.newHashSet(Iterables
 			.concat(codeFixedGermplasms, germplasmWithDescendants, germplasmUsedInStudies, germplasmWithOpenLots,
