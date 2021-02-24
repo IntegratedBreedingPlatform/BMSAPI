@@ -1,11 +1,11 @@
 package org.ibp.api.brapi.v1.study;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.api.brapi.v1.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
@@ -78,16 +78,16 @@ public class StudyTestDataProvider {
 		return studyDetailsDto;
 	}
 
-	public static LocationDetailsDto getLocationDetailsDto() {
-		final LocationDetailsDto locationDetailsDto =
-			new LocationDetailsDto(2, "Breeding Location", "New Zealand", "NZL", "NZL", "NZ", 156.2, 58.6, 5.2);
-		return locationDetailsDto;
+	public static Location getLocation() {
+		final Location location =
+			new Location("2", "Breeding Location", "New Zealand", "NZL", "NZL", "NZ", 156.2, 58.6, 5.2, null, null);
+		return location;
 	}
 
-	public static List<LocationDetailsDto> getListLocationDetailsDto() {
-		final List<LocationDetailsDto> locationDetailsDtoList = new ArrayList<>();
-		locationDetailsDtoList.add(StudyTestDataProvider.getLocationDetailsDto());
-		return locationDetailsDtoList;
+	public static List<Location> getLocationList() {
+		final List<Location> locationList = new ArrayList<>();
+		locationList.add(StudyTestDataProvider.getLocation());
+		return locationList;
 	}
 
 	public static StudyInstanceDto getStudyDto() {

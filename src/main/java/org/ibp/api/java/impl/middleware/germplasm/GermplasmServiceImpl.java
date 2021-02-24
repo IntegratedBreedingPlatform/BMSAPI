@@ -291,12 +291,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void populateGermplasmPedigree(final List<GermplasmDTO> germplasmDTOList) {
-		final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
+		final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGid()))
 			.collect(Collectors.toSet());
 		final Map<Integer, String> crossExpansionsMap =
 			this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
 		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
-			final Integer gid = Integer.valueOf(germplasmDTO.getGermplasmDbId());
+			final Integer gid = Integer.valueOf(germplasmDTO.getGid());
 			germplasmDTO.setPedigree(crossExpansionsMap.get(gid));
 		}
 	}
