@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -39,6 +40,7 @@ import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateDtoValid
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
+import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -104,6 +106,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
+
+	@Autowired
+	private GermplasmImportRequestValidator germplasmImportValidator;
+
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -384,6 +390,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		return germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
+	}
+
+
+	@Override
+	public List<GermplasmDTO> createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList) {
+		// Remove germplasm that fails any validation. They will be excluded from creation
+		this.germplasmImportValidator.pruneGermplasmInvalidForImport(germplasmImportRequestList);
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		final List<GermplasmDTO> germplasmDTOList = germplasmService.createGermplasm(user.getUserid(), cropName, germplasmImportRequestList);
+		if (germplasmDTOList != null) {
+			this.populateGermplasmPedigree(germplasmDTOList);
+		}
+		return germplasmDTOList;
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {

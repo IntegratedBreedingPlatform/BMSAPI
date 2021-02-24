@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -17,6 +18,7 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.germplasm.Germplasm;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -26,12 +28,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Api(value = "BrAPI v2 Gerplasm Services")
@@ -88,15 +92,7 @@ public class GermplasmResourceBrapi {
 		}
 
 		final PagedResult<GermplasmDTO> resultPage = this.getGermplasmDTOPagedResult(germplasmSearchRequestDTO, currentPage, pageSize);
-
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		if (resultPage.getPageResults() != null) {
-			final ModelMapper mapper = new ModelMapper();
-			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
-				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasmList.add(germplasm);
-			}
-		}
+		final List<Germplasm> germplasmList = this.mapGermplasm(resultPage.getPageResults());
 
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
@@ -108,6 +104,37 @@ public class GermplasmResourceBrapi {
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 
+	}
+
+	private List<Germplasm> mapGermplasm(final List<GermplasmDTO> germplasmDTOList) {
+		final List<Germplasm> germplasmList = new ArrayList<>();
+		final ModelMapper mapper = new ModelMapper();
+		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+			final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+			germplasmList.add(germplasm);
+		}
+		return germplasmList;
+	}
+
+	@ApiOperation(value = "Create new Germplasm entities on this server", notes = "Create new Germplasm entities on this server")
+	@RequestMapping(value = "/{crop}/brapi/v2/germplasm", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<EntityListResponse<Germplasm>> getGermplasm(@PathVariable final String crop,
+		@RequestBody final List<GermplasmImportRequest> germplasmImportRequestList) {
+		BaseValidator.checkNotNull(germplasmImportRequestList, "germplasm.import.list.null");
+		final Integer originalListSize = germplasmImportRequestList.size();
+
+		final List<GermplasmDTO> createdGermplasm = this.germplasmService.createGermplasm(crop, germplasmImportRequestList);
+		final List<Germplasm> germplasmList = this.mapGermplasm(createdGermplasm);
+		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
+
+		final Integer createdGermplasmCount = germplasmList.size();
+		final Metadata metadata = new Metadata().withStatus(Lists.newArrayList(
+			Collections.singletonMap("INFO", createdGermplasmCount + " out of " + originalListSize + " germplasm created successfully.")));
+		final EntityListResponse<Germplasm> entityListResponse = new EntityListResponse<>(metadata, results);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
 	private GermplasmSearchRequestDto getGermplasmSearchRequestDto(final String germplasmPUI, final String germplasmName,
