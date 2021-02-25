@@ -3,24 +3,33 @@ package org.ibp.api.java.impl.middleware.tool;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.domain.workbench.ToolDTO;
 import org.generationcp.middleware.domain.workbench.ToolLinkDTO;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.workbench.WorkbenchService;
+import org.ibp.api.domain.program.ProgramSummary;
+import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.tool.ToolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -38,8 +47,20 @@ public class ToolServiceImpl implements ToolService {
 	@Autowired
 	private WorkbenchService workbenchService;
 
+	@Autowired
+	public ProgramValidator programValidator;
+
+	@Autowired
+	public WorkbenchDataManager workbenchDataManager;
+
+	private BindingResult errors;
+
 	@Override
 	public List<ToolDTO> getTools(final String cropName, final Integer programId) {
+
+		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+
+		this.validateProgram(cropName, programId);
 
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 
@@ -82,6 +103,24 @@ public class ToolServiceImpl implements ToolService {
 
 				return new ToolDTO(e.getKey().getSidebarCategorylabel(), toolLinkDTOS);
 		}).collect(Collectors.toList());
+	}
+
+	private void validateProgram(final String cropName, final Integer programId) {
+		if (Objects.isNull(programId)) {
+			this.errors.reject("program.does.not.exist", "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+
+		final Project project = this.workbenchDataManager.getProjectById(programId.longValue());
+		if (Objects.isNull(project)) {
+			this.errors.reject("program.does.not.exist", "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+
+		this.programValidator.validate(new ProgramSummary(cropName, project.getUniqueID()), this.errors);
+		if (this.errors.hasErrors()) {
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
 	}
 
 }
