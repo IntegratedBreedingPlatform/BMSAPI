@@ -1,5 +1,4 @@
-
-package org.ibp.api.brapi.v1.location;
+package org.ibp.api.brapi.v2.location;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.ImmutableMap;
@@ -7,9 +6,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.location.Location;
-import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.service.api.BrapiView;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -33,59 +32,57 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Location services.
- *
- * @author Naymesh Mistry
- *
- */
-@Api(value = "BrAPI Location Services")
-@Controller
+@Api(value = "BrAPI v2 Location Services")
+@Controller(value = "LocationResourceBrapiV2")
 public class LocationResourceBrapi {
 
 	@Autowired
-	private LocationService locationService;
+	private org.generationcp.middleware.api.location.LocationService locationMiddlewareService;
 
-	@ApiOperation(value = "List locations", notes = "Get a list of locations.")
-	@RequestMapping(value = "/{crop}/brapi/v1/locations", method = RequestMethod.GET)
-	@JsonView(BrapiView.BrapiV1_3.class)
+	@ApiOperation(value = "Get a filtered list of Locations", notes = "Get a list of locations.")
+	@RequestMapping(value = "/{crop}/brapi/v2/locations", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<EntityListResponse<Location>> listLocations(@PathVariable final String crop,
-			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
-					required = false) final Integer currentPage,
-			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
-					required = false) final Integer pageSize,
-			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
-					required = false) final String locationType) {
-
-		PagedResult<Location> resultPage = null;
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<EntityListResponse<Location>> listLocations(
+		@PathVariable final String crop,
+		@ApiParam(value = "Filter by location type specified.")
+		@RequestParam(value = "locationType", required = false) final String locationType,
+		@ApiParam(value = "Internal database identifier")
+		@RequestParam(value = "locationDbId", required = false) final String locationDbId,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)
+		@RequestParam(value = "page", required = false) final Integer page,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
+		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		if(!StringUtil.isEmpty(locationDbId)) {
+			locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(locationDbId)));
+		}
 		locationSearchRequest.setLocationTypeName(locationType);
 
-		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 
 		final PageRequest pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 
-		resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<Location>() {
-			@Override
-			public long getCount() {
-				return LocationResourceBrapi.this.locationService.countFilteredLocations(locationSearchRequest);
-			}
+		final PagedResult<Location> resultPage =
+			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<Location>() {
 
-			@Override
-			public List<Location> getResults(final PagedResult<Location> pagedResult) {
+				@Override
+				public long getCount() {
+					return LocationResourceBrapi.this.locationMiddlewareService.countFilteredLocations(locationSearchRequest);
+				}
 
-				return LocationResourceBrapi.this.locationService.getLocations(locationSearchRequest, pageRequest);
-			}
-		});
-
+				@Override
+				public List<Location> getResults(final PagedResult<Location> pagedResult) {
+					return LocationResourceBrapi.this.locationMiddlewareService.getLocations(locationSearchRequest, pageRequest);
+				}
+			});
 
 		if (resultPage != null && resultPage.getTotalResults() > 0) {
 
 			final Result<Location> results = new Result<Location>().withData(resultPage.getPageResults());
 			final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-					.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 			final Metadata metadata = new Metadata().withPagination(pagination);
 			return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
@@ -96,5 +93,6 @@ public class LocationResourceBrapi {
 			final Metadata metadata = new Metadata(null, status);
 			return new ResponseEntity<>(new EntityListResponse().withMetadata(metadata), HttpStatus.NOT_FOUND);
 		}
+
 	}
 }

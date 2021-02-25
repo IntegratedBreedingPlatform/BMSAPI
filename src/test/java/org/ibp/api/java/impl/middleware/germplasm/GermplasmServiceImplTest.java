@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
@@ -74,14 +75,15 @@ public class GermplasmServiceImplTest {
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
-		germplasmDTO.setGermplasmDbId("1");
+		germplasmDTO.setGermplasmDbId(RandomStringUtils.randomAlphabetic(20));
+		germplasmDTO.setGid("1");
 		germplasmDTO.setGermplasmName("CB1");
 		germplasmDTO.setGermplasmSeedSource("AF07A-412-201");
 		final List<GermplasmDTO> germplasmDTOList = Lists.newArrayList(germplasmDTO);
 
 		Mockito.when(this.germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE)))
 			.thenReturn(germplasmDTOList);
-		final int gid = Integer.parseInt(germplasmDTO.getGermplasmDbId());
+		final int gid = Integer.parseInt(germplasmDTO.getGid());
 		Mockito.when(this.pedigreeService.getCrossExpansions(Collections.singleton(gid), null, this.crossExpansionProperties))
 			.thenReturn(Collections.singletonMap(gid, "CB1"));
 
