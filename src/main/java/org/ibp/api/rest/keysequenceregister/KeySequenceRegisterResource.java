@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import java.util.List;
 
-@Api(value = "Germplasm Key Sequence Register Services")
+@Api(value = "Key Sequence Register Services")
 @Controller
-public class GermplasmKeySequenceRegisterResource {
+public class KeySequenceRegisterResource {
 
 	@Resource
 	private KeySequenceRegisterService keySequenceRegisterService;
