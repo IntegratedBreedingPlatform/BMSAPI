@@ -6,6 +6,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
@@ -99,7 +100,10 @@ public class ProgramResourceTest extends ApiUnitTestBase {
                 Lists.newArrayList(this.me, this.myBreedingBuddy));
         verifyReturnValues(program1, program1Date, program2, program2Date);
 
-        Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByUser(Mockito.eq(me), Mockito.eq(ProgramResourceTest.CROP_NAME));
+        final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+        programSearchRequest.setLoggedInUserId(me.getUserid());
+        programSearchRequest.setCommonCropName(CROP_NAME);
+        Mockito.doReturn(programList).when(this.workbenchDataManager).getProjects(Mockito.eq(null), Mockito.eq(programSearchRequest));
         Mockito.when(this.request.isUserInRole(ArgumentMatchers.anyString())).thenReturn(false);
         verifyReturnValues(program1, program1Date, program2, program2Date);
     }

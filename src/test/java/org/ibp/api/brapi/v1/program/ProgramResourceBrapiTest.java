@@ -4,16 +4,22 @@ package org.ibp.api.brapi.v1.program;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
-import org.generationcp.middleware.service.api.program.ProgramFilters;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -36,10 +42,22 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
 	private List<CropType> crops = new ArrayList<>();
 
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private SecurityService securityService;
+
 	@Before
 	public void setup() {
 		this.crops = this.getAllCrops();
 		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(this.crops);
+		Mockito.when(this.workbenchDataManager.getAvailableCropsForUser(Mockito.anyInt())).thenReturn(this.crops);
+		final WorkbenchUser user = new WorkbenchUser();
+		user.setName(RandomStringUtils.randomAlphabetic(10));
+		user.setUserid(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
+		Mockito.when(this.userService.getUserById(Mockito.anyInt())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 	}
 
 	@Test
@@ -51,18 +69,18 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message",
-						Matchers.is("crop " + ProgramResourceBrapiTest.INVALID_CROP + " doesn't exist"))); //
+						Matchers.is("Crop " + ProgramResourceBrapiTest.INVALID_CROP + " doesn't exist."))); //
 
 	}
 
 	@Test
 	public void testListProgramsNoAdditionalInfo() throws Exception {
 		final List<ProgramDetailsDto> programDetailsDtoList = this.getProgramDetails();
-		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.anyMapOf(ProgramFilters.class, Object.class)))
+		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
 				.thenReturn(new Long(this.crops.size()));
 		final List<Project> projectList = this.getProjectList();
-		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-				org.mockito.Matchers.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(projectList);
+		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
+				org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
 		final UriComponents uriComponents =
 				UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS).build().encode();
@@ -92,11 +110,11 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testListProgramsWithPaging() throws Exception {
 		final List<ProgramDetailsDto> programDetailsDtoList = this.getProgramDetails();
-		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.anyMapOf(ProgramFilters.class, Object.class)))
+		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
 				.thenReturn(new Long(this.crops.size()));
 		final List<Project> projectList = this.getProjectList();
-		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-				org.mockito.Matchers.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(projectList);
+		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
+				org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
 		final int page = 1;
 		final int pageSize = 2;
@@ -123,17 +141,17 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
 	@Test
 	public void testListProgramFilterByName() throws Exception {
-		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.anyMapOf(ProgramFilters.class, Object.class)))
+		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
 				.thenReturn(1L);
 
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
 		programDetailsDtoList
-				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE, null, null, null));
+				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE, null, null, null, null, null, null));
 		final List<Project> projectList = new ArrayList<>();
 		projectList.add(this.getProject(11L, ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE));
 
-		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-				org.mockito.Matchers.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(projectList);
+		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
+				org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS)
 				.queryParam("programName", ProgramResourceBrapiTest.RICE).build().encode();
@@ -149,7 +167,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
 	@Test
 	public void testListProgramFilterByAbbreviation() throws Exception {
-		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.anyMapOf(ProgramFilters.class, Object.class)))
+		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
 				.thenReturn(1L);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS)
@@ -157,18 +175,18 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("program not found.")));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("Program not found.")));
 
 	}
 
 	private List<ProgramDetailsDto> getProgramDetails() {
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
 		programDetailsDtoList
-				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_MAIZE, ProgramResourceBrapiTest.MAIZE, null, null, null));
+				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_MAIZE, ProgramResourceBrapiTest.MAIZE, null, null, null, null, null, null));
 		programDetailsDtoList
-				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE, null, null, null));
+				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE, null, null, null, null, null, null));
 		programDetailsDtoList
-				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_WHEAT, ProgramResourceBrapiTest.WHEAT, null, null, null));
+				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_WHEAT, ProgramResourceBrapiTest.WHEAT, null, null, null, null, null, null));
 		return programDetailsDtoList;
 	}
 
@@ -201,6 +219,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		project.setProjectId(id);
 		project.setProjectName(projectName);
 		project.setUniqueID(programUniqueID);
+		project.setCropType(this.getCropType("maize", "ibdbv2_maize_merged", "4.0.0"));
 		return project;
 	}
 }
