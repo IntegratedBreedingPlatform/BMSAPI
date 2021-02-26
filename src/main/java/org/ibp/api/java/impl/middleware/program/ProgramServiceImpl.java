@@ -75,8 +75,7 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public List<ProgramDTO> listProgramsByUser(final Pageable pageable, final WorkbenchUser user) {
-		// TODO
-		return null;
+		return this.programService.getProgramsByUser(user, pageable);
 	}
 
 	@Override
@@ -86,8 +85,7 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public long countProgramsByUser(final WorkbenchUser currentlyLoggedInUser) {
-		// TODO
-		return 0;
+		return this.programService.countProgramsByUser(currentlyLoggedInUser);
 	}
 
 	List<ProgramSummary> convertToProgramSummaries(final List<Project> workbenchProgramList) {
