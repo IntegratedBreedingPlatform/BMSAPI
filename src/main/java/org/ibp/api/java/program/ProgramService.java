@@ -1,14 +1,14 @@
 
 package org.ibp.api.java.program;
 
-import java.util.List;
-
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface ProgramService {
 
@@ -18,11 +18,7 @@ public interface ProgramService {
 
 	List<ProgramDetailsDto> getProgramsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
 
-	List<ProgramDTO> listPrograms(Pageable pageable);
-
 	List<ProgramDTO> listProgramsByUser(Pageable pageable, WorkbenchUser user);
-
-	long countPrograms();
 
 	long countProgramsByUser(WorkbenchUser currentlyLoggedInUser);
 

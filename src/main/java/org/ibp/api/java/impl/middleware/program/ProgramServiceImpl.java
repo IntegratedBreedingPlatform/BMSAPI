@@ -2,31 +2,27 @@
 package org.ibp.api.java.impl.middleware.program;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.commons.security.SecurityUtil;
-import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.Util;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -69,18 +65,8 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public List<ProgramDTO> listPrograms(final Pageable pageable) {
-		return this.programService.listPrograms(pageable);
-	}
-
-	@Override
 	public List<ProgramDTO> listProgramsByUser(final Pageable pageable, final WorkbenchUser user) {
 		return this.programService.getProgramsByUser(user, pageable);
-	}
-
-	@Override
-	public long countPrograms() {
-		return this.programService.countPrograms();
 	}
 
 	@Override
