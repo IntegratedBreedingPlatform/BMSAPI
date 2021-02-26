@@ -106,12 +106,12 @@ public class GermplasmResource {
 
 				@Override
 				public long getFilteredCount() {
-					return germplasmService.countSearchGermplasm(germplasmSearchRequest, programUUID);
+					return GermplasmResource.this.germplasmService.countSearchGermplasm(germplasmSearchRequest, programUUID);
 				}
 
 				@Override
 				public List<GermplasmSearchResponse> getResults(final PagedResult<GermplasmSearchResponse> pagedResult) {
-					return germplasmService.searchGermplasm(germplasmSearchRequest, pageable, programUUID);
+					return GermplasmResource.this.germplasmService.searchGermplasm(germplasmSearchRequest, pageable, programUUID);
 				}
 			});
 
@@ -231,7 +231,7 @@ public class GermplasmResource {
 		germplasmSearchRequest.setGids(Arrays.asList(gid));
 		germplasmSearchRequest.setAddedColumnsPropertyIds(Arrays.asList("PREFERRED NAME"));
 		final List<GermplasmSearchResponse> germplasmSearchResponses =
-			germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
+			this.germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 		if (germplasmSearchResponses.isEmpty()) {
 			errors.reject("gids.invalid", new String[] {gid.toString()}, "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
@@ -246,7 +246,7 @@ public class GermplasmResource {
 	public ResponseEntity<Void> validateImportGermplasmData(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final List<GermplasmInventoryImportDTO> germplasmDTOList) {
-		germplasmImportRequestDtoValidator.validateImportLoadedData(programUUID, germplasmDTOList);
+		this.germplasmImportRequestDtoValidator.validateImportLoadedData(programUUID, germplasmDTOList);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -270,7 +270,7 @@ public class GermplasmResource {
 
 				@Override
 				public long getCount() {
-					return germplasmService.countSearchGermplasm(null, null);
+					return GermplasmResource.this.germplasmService.countSearchGermplasm(null, null);
 				}
 
 				@Override
@@ -282,7 +282,7 @@ public class GermplasmResource {
 
 				@Override
 				public List<GermplasmDto> getResults(final PagedResult<GermplasmDto> pagedResult) {
-					return germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
+					return GermplasmResource.this.germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
 				}
 			});
 

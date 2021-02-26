@@ -368,7 +368,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-		germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+		this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
 		return this.germplasmService.importGermplasm(user.getUserid(), cropName, germplasmImportRequestDto);
 	}
 
@@ -377,10 +377,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 		BaseValidator.checkNotNull(germplasmMatchRequestDto, "germplasm.match.request.null");
 		if (!germplasmMatchRequestDto.isValid()) {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
-			errors.reject("germplasm.match.request.invalid", "");
+			this.errors.reject("germplasm.match.request.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
+		return this.germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
 	}
 
 	@Override
@@ -388,10 +388,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 		BaseValidator.checkNotNull(germplasmMatchRequestDto, "germplasm.match.request.null");
 		if (!germplasmMatchRequestDto.isValid()) {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
-			errors.reject("germplasm.match.request.invalid", "");
+			this.errors.reject("germplasm.match.request.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		return germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
+		return this.germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
 	}
 
 	@Override
