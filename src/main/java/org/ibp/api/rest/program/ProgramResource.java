@@ -8,7 +8,6 @@ import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -39,7 +38,7 @@ public class ProgramResource {
     private SecurityService securityService;
 
     @RequestMapping(value = "/crops/{cropName}/programs", method = RequestMethod.GET)
-    public ResponseEntity<List<ProgramSummary>> listProgramsByCrop(@PathVariable final String cropName) {
+    public ResponseEntity<List<ProgramDTO>> listProgramsByCrop(@PathVariable final String cropName) {
 		//TODO Review if this IF condition is required
         if (this.hasAdmin()) {
             return new ResponseEntity<>(this.programService.listProgramsByCropName(cropName), HttpStatus.OK);
@@ -75,7 +74,7 @@ public class ProgramResource {
                 @Override
                 public List<ProgramDTO> getResults(final PagedResult<ProgramDTO> pagedResult) {
                         return ProgramResource.this.programService
-                            .filterPrograms(pageable, programSearchRequest);
+                            .getFilteredPrograms(pageable, programSearchRequest);
                 }
             });
 

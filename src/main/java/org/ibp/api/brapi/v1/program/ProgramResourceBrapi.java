@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.domain.common.PagedResult;
@@ -79,7 +79,8 @@ public class ProgramResourceBrapi {
 				public List<ProgramDetailsDto> getResults(final PagedResult<ProgramDetailsDto> pagedResult) {
 					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
 					final int pageNumber = pagedResult.getPageNumber() + 1;
-					return ProgramResourceBrapi.this.programService.getProgramsByFilter(new PageRequest(pageNumber, pagedResult.getPageSize()), programSearchRequest);
+					return ProgramResourceBrapi.this.programService
+						.getProgramDetailsByFilter(new PageRequest(pageNumber, pagedResult.getPageSize()), programSearchRequest);
 				}
 			});
 

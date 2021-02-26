@@ -1,13 +1,11 @@
 
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import java.util.HashMap;
-
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +15,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+
+import java.util.HashMap;
 
 public class ProgramValidatorTest {
 
@@ -42,7 +42,7 @@ public class ProgramValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
 
-		ProgramSummary program = new ProgramSummary();
+		ProgramDTO program = new ProgramDTO();
 		program.setCrop("maize");
 		program.setUniqueID("");
 
@@ -57,7 +57,7 @@ public class ProgramValidatorTest {
 		String programId = "uuid";
 		String cropname = "maize";
 
-		ProgramSummary program = new ProgramSummary();
+		ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropname);
 		program.setUniqueID(programId);
 
@@ -75,7 +75,7 @@ public class ProgramValidatorTest {
 		String programId = "uuid";
 		String cropname = "maize";
 
-		ProgramSummary program = new ProgramSummary();
+		ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropname);
 		program.setUniqueID(programId);
 
@@ -99,7 +99,7 @@ public class ProgramValidatorTest {
 		String programId = "uuid";
 		String cropname = "maize";
 
-		ProgramSummary program = new ProgramSummary();
+		ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropname);
 		program.setUniqueID(programId);
 

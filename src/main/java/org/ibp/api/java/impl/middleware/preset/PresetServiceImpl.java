@@ -1,12 +1,8 @@
 package org.ibp.api.java.impl.middleware.preset;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -18,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class PresetServiceImpl implements PresetService {
@@ -83,7 +83,7 @@ public class PresetServiceImpl implements PresetService {
 	}
 
 	private void validateUserIsAProgramMember(final String crop, final String username, final String programUUID){
-		final ProgramSummary program = programService.getByUUIDAndCrop(crop, programUUID);
+		final ProgramDTO program = programService.getByUUIDAndCrop(crop, programUUID);
 		if (!program.getMembers().contains(username)) {
 			errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
 			errors.reject("preset.user.not.a.program.member", "");

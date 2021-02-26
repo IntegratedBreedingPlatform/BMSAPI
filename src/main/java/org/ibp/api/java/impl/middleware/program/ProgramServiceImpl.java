@@ -12,7 +12,6 @@ import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.Util;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,7 @@ public class ProgramServiceImpl implements ProgramService {
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	@Override
-	public List<ProgramSummary> listProgramsByCropName(final String cropName) {
+	public List<ProgramDTO> listProgramsByCropName(final String cropName) {
 		try {
 			return this.convertToProgramSummaries(this.workbenchDataManager.getProjectsByCropName(cropName));
 		} catch (final MiddlewareQueryException e) {
@@ -56,8 +55,9 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public List<ProgramSummary> listProgramsByCropNameAndUser(final ProgramSearchRequest programSearchRequest) {
+	public List<ProgramDTO> listProgramsByCropNameAndUser(final ProgramSearchRequest programSearchRequest) {
 		try {
+			//FIXME Should use programService instead
 			return this.convertToProgramSummaries(this.workbenchDataManager.getProjects(null, programSearchRequest ));
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
@@ -65,12 +65,7 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public List<ProgramDTO> filterPrograms(final Pageable pageable, ProgramSearchRequest programSearchRequest) {
-		return this.programService.filterPrograms(programSearchRequest, pageable);
-	}
-
-	@Override
-	public List<ProgramDetailsDto> getProgramsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
+	public List<ProgramDetailsDto> getProgramDetailsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
 		this.validateProgramSearchRequest(programSearchRequest);
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
 		final List<Project> projectList = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
@@ -94,15 +89,20 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public long countProgramsByFilter(final ProgramSearchRequest programSearchRequest) {
-		return this.workbenchDataManager.countProjectsByFilter(programSearchRequest);
+		return this.programService.countFilteredPrograms(programSearchRequest);
 	}
 
 	@Override
-	public ProgramSummary getByUUIDAndCrop(final String crop, final String programUUID) {
+	public List<ProgramDTO> getFilteredPrograms(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
+		return this.programService.filterPrograms(programSearchRequest, pageable);
+	}
+
+	@Override
+	public ProgramDTO getByUUIDAndCrop(final String crop, final String programUUID) {
 		try {
 			final Project workbenchProgram = this.workbenchDataManager.getProjectByUuidAndCrop(programUUID, crop);
 			if (workbenchProgram != null) {
-				final ProgramSummary programSummary = new ProgramSummary();
+				final ProgramDTO programSummary = new ProgramDTO();
 				programSummary.setId(workbenchProgram.getProjectId().toString());
 				programSummary.setName(workbenchProgram.getProjectName());
 				if (workbenchProgram.getCropType() != null) {
@@ -131,11 +131,11 @@ public class ProgramServiceImpl implements ProgramService {
 
 	}
 
-	List<ProgramSummary> convertToProgramSummaries(final List<Project> workbenchProgramList) {
-		final List<ProgramSummary> programSummaries = new ArrayList<>();
+	List<ProgramDTO> convertToProgramSummaries(final List<Project> workbenchProgramList) {
+		final List<ProgramDTO> programSummaries = new ArrayList<>();
 		for (final Project workbenchProgram : workbenchProgramList) {
-			final ProgramSummary programSummary =
-				new ProgramSummary(workbenchProgram.getProjectId().toString(), workbenchProgram.getUniqueID(),
+			final ProgramDTO programSummary =
+				new ProgramDTO(workbenchProgram.getProjectId().toString(), workbenchProgram.getUniqueID(),
 					workbenchProgram.getProjectName(), workbenchProgram.getCropType().getCropName());
 
 			final WorkbenchUser workbenchUser = this.userService.getUserById(workbenchProgram.getUserId());

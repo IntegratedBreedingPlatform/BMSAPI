@@ -4,11 +4,11 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
@@ -143,7 +143,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setToolSection(this.toolSection);
 		presetDTO.setType(this.type);
 		presetDTO.setProgramUUID(this.programUUID);
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		this.presetDTOValidator.validate(CROP_NAME, presetDTO);
 	}
 
@@ -157,7 +157,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setProgramUUID(this.programUUID);
 
 		final List<ProgramPreset> programPresets = Arrays.asList(new ProgramPreset());
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(programPresets).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -174,7 +174,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setName(this.name);
 		presetDTO.setProgramUUID(this.programUUID);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -191,7 +191,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setName(this.name);
 		presetDTO.setProgramUUID(this.programUUID);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -209,7 +209,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setProgramUUID(this.programUUID);
 		presetDTO.setFileConfiguration(this.filePresetConfigurationDTO);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -228,7 +228,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setFileConfiguration(this.filePresetConfigurationDTO);
 		presetDTO.setBarcodeSetting(this.barcodeSetting);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -252,7 +252,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(null).when(this.variableService).getVariableById(CROP_NAME, presetDTO.getProgramUUID(), "-1");
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -282,7 +282,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 				new LabelPrintingPresetDTO.BarcodeSetting(true, true, Arrays.asList(1));
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -312,7 +312,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 				new LabelPrintingPresetDTO.BarcodeSetting(true, false, new ArrayList<>());
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -344,7 +344,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -373,7 +373,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(false, true, null);
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -403,7 +403,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 				new LabelPrintingPresetDTO.BarcodeSetting(false, false, Arrays.asList(1));
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -433,7 +433,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(false, false, null);
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -464,7 +464,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(false, false, null);
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());
@@ -495,7 +495,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(false, false, null);
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 						presetDTO.getToolSection());

@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.tool;
 
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.domain.workbench.ToolDTO;
 import org.generationcp.middleware.domain.workbench.ToolLinkDTO;
@@ -11,7 +12,6 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.workbench.WorkbenchService;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -117,7 +117,7 @@ public class ToolServiceImpl implements ToolService {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 
-		this.programValidator.validate(new ProgramSummary(cropName, project.getUniqueID()), this.errors);
+		this.programValidator.validate(new ProgramDTO(cropName, project.getUniqueID()), this.errors);
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
