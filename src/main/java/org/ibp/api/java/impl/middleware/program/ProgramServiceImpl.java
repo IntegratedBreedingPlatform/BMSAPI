@@ -74,31 +74,7 @@ public class ProgramServiceImpl implements ProgramService {
 		return this.programService.countProgramsByUser(currentlyLoggedInUser);
 	}
 
-	List<ProgramSummary> convertToProgramSummaries(final List<Project> workbenchProgramList) {
-		final List<ProgramSummary> programSummaries = new ArrayList<>();
-		for (final Project workbenchProgram : workbenchProgramList) {
-			final ProgramSummary programSummary =
-				new ProgramSummary(workbenchProgram.getProjectId().toString(), workbenchProgram.getUniqueID(),
-					workbenchProgram.getProjectName(), workbenchProgram.getCropType().getCropName());
-
-			final WorkbenchUser workbenchUser = this.userService.getUserById(workbenchProgram.getUserId());
-			programSummary.setCreatedBy(workbenchUser.getName());
-
-			final List<WorkbenchUser> workbenchUsers = this.userService
-				.getUsersByProjectId(workbenchProgram.getProjectId());
-			final Set<String> members = new HashSet<>();
-			for (final WorkbenchUser member : workbenchUsers) {
-				members.add(member.getName());
-			}
-			programSummary.setMembers(members);
-			if (workbenchProgram.getStartDate() != null) {
-				programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
-			}
-			programSummaries.add(programSummary);
-		}
-		return programSummaries;
-	}
-
+	@Override
 	public List<ProgramDetailsDto> getProgramsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
 		this.validateProgramSearchRequest(programSearchRequest);
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
@@ -121,6 +97,7 @@ public class ProgramServiceImpl implements ProgramService {
 		return programDetailsDtoList;
 	}
 
+	@Override
 	public long countProgramsByFilter(final ProgramSearchRequest programSearchRequest) {
 		return this.workbenchDataManager.countProjectsByFilter(programSearchRequest);
 	}
@@ -159,6 +136,31 @@ public class ProgramServiceImpl implements ProgramService {
 
 	}
 
+	List<ProgramSummary> convertToProgramSummaries(final List<Project> workbenchProgramList) {
+		final List<ProgramSummary> programSummaries = new ArrayList<>();
+		for (final Project workbenchProgram : workbenchProgramList) {
+			final ProgramSummary programSummary =
+				new ProgramSummary(workbenchProgram.getProjectId().toString(), workbenchProgram.getUniqueID(),
+					workbenchProgram.getProjectName(), workbenchProgram.getCropType().getCropName());
+
+			final WorkbenchUser workbenchUser = this.userService.getUserById(workbenchProgram.getUserId());
+			programSummary.setCreatedBy(workbenchUser.getName());
+
+			final List<WorkbenchUser> workbenchUsers = this.userService
+				.getUsersByProjectId(workbenchProgram.getProjectId());
+			final Set<String> members = new HashSet<>();
+			for (final WorkbenchUser member : workbenchUsers) {
+				members.add(member.getName());
+			}
+			programSummary.setMembers(members);
+			if (workbenchProgram.getStartDate() != null) {
+				programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
+			}
+			programSummaries.add(programSummary);
+		}
+		return programSummaries;
+	}
+
 	private void validateProgramSearchRequest(final ProgramSearchRequest programSearchRequest) {
 		// Currently doesn't support Abbreviation
 		if (!StringUtils.isBlank(programSearchRequest.getAbbreviation())) {
@@ -187,6 +189,5 @@ public class ProgramServiceImpl implements ProgramService {
 		}
 
 	}
-
 
 }
