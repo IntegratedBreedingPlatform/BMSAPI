@@ -3,6 +3,7 @@ package org.ibp.api.rest.program;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
@@ -46,6 +47,8 @@ public class ProgramResource {
     }
 
     @RequestMapping(value = "/programs", method = RequestMethod.GET)
+	@ApiOperation(value = "List Programs",
+		notes = "Returns the list of programs that the logged in user have access to")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)"),
         @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.")
@@ -57,22 +60,14 @@ public class ProgramResource {
 
                 @Override
                 public long getCount() {
-                    if (ProgramResource.this.hasAdmin()) {
-                        return ProgramResource.this.programService.countPrograms();
-                    } else {
                         return ProgramResource.this.programService
                             .countProgramsByUser(ProgramResource.this.securityService.getCurrentlyLoggedInUser());
-                    }
                 }
 
                 @Override
                 public List<ProgramDTO> getResults(final PagedResult<ProgramDTO> pagedResult) {
-                    if (ProgramResource.this.hasAdmin()) {
-                        return ProgramResource.this.programService.listPrograms(pageable);
-                    } else {
                         return ProgramResource.this.programService
                             .listProgramsByUser(pageable, ProgramResource.this.securityService.getCurrentlyLoggedInUser());
-                    }
                 }
             });
 
