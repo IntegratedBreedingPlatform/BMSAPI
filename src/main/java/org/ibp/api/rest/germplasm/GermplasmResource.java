@@ -295,6 +295,7 @@ public class GermplasmResource {
 	}
 
 	@ApiOperation(value = "Delete germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<GermplasmDeleteResponse> deleteGermplasm(@PathVariable final String cropName,
