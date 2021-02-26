@@ -26,8 +26,6 @@ public interface ProgramService {
 
 	long countProgramsByUser(WorkbenchUser currentlyLoggedInUser);
 
-	List<ProgramDetailsDto> getProgramsByFilter(final int pageNumber, final int pageSize, final Map<ProgramFilters, Object> filters);
-
 	long countProgramsByFilter(final ProgramSearchRequest programSearchRequest);
 
 	ProgramSummary getByUUIDAndCrop(String crop, String programUUID);
