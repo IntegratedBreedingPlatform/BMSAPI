@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -41,7 +42,10 @@ public class ProgramResource {
         if (this.hasAdmin()) {
             return new ResponseEntity<>(this.programService.listProgramsByCropName(cropName), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(this.programService.listProgramsByCropNameAndUser(this.securityService.getCurrentlyLoggedInUser(), cropName), HttpStatus.OK);
+            final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+            programSearchRequest.setLoggedInUserId(this.securityService.getCurrentlyLoggedInUser().getUserid());
+            programSearchRequest.setCommonCropName(cropName);
+            return new ResponseEntity<>(this.programService.listProgramsByCropNameAndUser(programSearchRequest), HttpStatus.OK);
         }
     }
 
