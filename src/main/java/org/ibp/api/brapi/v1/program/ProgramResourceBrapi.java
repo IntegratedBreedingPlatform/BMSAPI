@@ -2,18 +2,15 @@
 package org.ibp.api.brapi.v1.program;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
-import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -22,7 +19,6 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Location services.
@@ -57,7 +51,7 @@ public class ProgramResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/programs", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
-	public ResponseEntity<EntityListResponse<ProgramDetailsDto>> listPrograms(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<Program>> listPrograms(@PathVariable final String crop,
 			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 					required = false) final Integer currentPage,
 			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
@@ -89,9 +83,9 @@ public class ProgramResourceBrapi {
 				}
 			});
 
-			return new ProgramEntityResponse().getEntityListResponseResponseEntity(resultPage);
+			return ProgramEntityResponseBuilder.getEntityListResponseResponseEntity(resultPage);
 		} catch (final ApiRuntimeException apiRuntimeException) {
-			return new ProgramEntityResponse().getEntityListResponseResponseEntityNotFound(apiRuntimeException.getMessage());
+			return ProgramEntityResponseBuilder.getEntityListResponseResponseEntityNotFound(apiRuntimeException.getMessage());
 		}
 
 	}

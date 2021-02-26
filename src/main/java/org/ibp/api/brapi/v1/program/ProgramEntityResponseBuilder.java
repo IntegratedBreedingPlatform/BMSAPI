@@ -17,8 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class ProgramEntityResponse {
-    public ResponseEntity<EntityListResponse<ProgramDetailsDto>> getEntityListResponseResponseEntity(final PagedResult<ProgramDetailsDto> pagedResult) {
+public class ProgramEntityResponseBuilder {
+    public static ResponseEntity<EntityListResponse<Program>> getEntityListResponseResponseEntity(final PagedResult<ProgramDetailsDto> pagedResult) {
         final ModelMapper modelMapper = ProgramMapper.getInstance();
         final List<Program> programs = new ArrayList<>();
 
@@ -32,13 +32,13 @@ public class ProgramEntityResponse {
                 .withTotalCount(pagedResult.getTotalResults()).withTotalPages(pagedResult.getTotalPages());
 
         final Metadata metadata = new Metadata().withPagination(pagination);
-        return new ResponseEntity<>(new EntityListResponse(metadata, results), HttpStatus.OK);
+        return new ResponseEntity<EntityListResponse<Program>>(new EntityListResponse<Program>(metadata, results), HttpStatus.OK);
     }
 
-    public ResponseEntity<EntityListResponse<ProgramDetailsDto>> getEntityListResponseResponseEntityNotFound(final String message) {
+    public static ResponseEntity<EntityListResponse<Program>> getEntityListResponseResponseEntityNotFound(final String message) {
         final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  message));
         final Metadata metadata = new Metadata(null, status);
 
-        return new ResponseEntity<>(new EntityListResponse().withMetadata(metadata), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<EntityListResponse<Program>>(new EntityListResponse<Program>().withMetadata(metadata), HttpStatus.NOT_FOUND);
     }
 }

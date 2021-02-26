@@ -1,7 +1,6 @@
 package org.ibp.api.brapi.v2.program;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -9,9 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
-import org.ibp.api.Util;
 import org.ibp.api.brapi.v1.common.*;
-import org.ibp.api.brapi.v1.program.ProgramEntityResponse;
+import org.ibp.api.brapi.v1.program.Program;
+import org.ibp.api.brapi.v1.program.ProgramEntityResponseBuilder;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -20,15 +19,12 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Api(value = "BrAPI V2 Program Services")
 @Controller(value = "ProgramResourceBrapiV2")
@@ -44,7 +40,7 @@ public class ProgramResourceBrapi {
     @RequestMapping(value = "/brapi/v2/programs", method = RequestMethod.GET)
     @ResponseBody
     @JsonView(BrapiView.BrapiV2.class)
-    public ResponseEntity<EntityListResponse<ProgramDetailsDto>> listPrograms(
+    public ResponseEntity<EntityListResponse<Program>> listPrograms(
             @ApiParam(value = "Filter by the common crop name. Exact match.", required = false)
             @RequestParam(value = "commonCropName", required = false) final String commonCropName,
             @ApiParam(value = "Program filter to only return trials associated with given program id.", required = false)
@@ -83,9 +79,9 @@ public class ProgramResourceBrapi {
                     return ProgramResourceBrapi.this.programService.getProgramsByFilter(new PageRequest(currPage, pagedResult.getPageSize()), programSearchRequest);
                 }
             });
-            return new ProgramEntityResponse().getEntityListResponseResponseEntity(pagedResult);
+            return ProgramEntityResponseBuilder.getEntityListResponseResponseEntity(pagedResult);
         } catch (final ApiRuntimeException | AccessDeniedException apiRuntimeException) {
-            return new ProgramEntityResponse().getEntityListResponseResponseEntityNotFound(apiRuntimeException.getMessage());
+            return ProgramEntityResponseBuilder.getEntityListResponseResponseEntityNotFound(apiRuntimeException.getMessage());
         }
 
     }
