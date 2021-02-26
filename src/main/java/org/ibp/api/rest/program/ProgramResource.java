@@ -40,6 +40,7 @@ public class ProgramResource {
 
     @RequestMapping(value = "/crops/{cropName}/programs", method = RequestMethod.GET)
     public ResponseEntity<List<ProgramSummary>> listProgramsByCrop(@PathVariable final String cropName) {
+		//TODO Review if this IF condition is required
         if (this.hasAdmin()) {
             return new ResponseEntity<>(this.programService.listProgramsByCropName(cropName), HttpStatus.OK);
         } else {
