@@ -2,7 +2,6 @@
 package org.ibp.api.java.program;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.ibp.api.domain.program.ProgramSummary;
@@ -12,15 +11,13 @@ import java.util.List;
 
 public interface ProgramService {
 
-	List<ProgramSummary> listProgramsByCropName(final String cropName);
+	List<ProgramSummary> listProgramsByCropName(String cropName);
 
 	List<ProgramSummary> listProgramsByCropNameAndUser(ProgramSearchRequest programSearchRequest);
 
-	List<ProgramDetailsDto> getProgramsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
+	List<ProgramDetailsDto> getProgramsByFilter(Pageable pageable, ProgramSearchRequest programSearchRequest);
 
-	List<ProgramDTO> listProgramsByUser(Pageable pageable, WorkbenchUser user);
-
-	long countProgramsByUser(WorkbenchUser currentlyLoggedInUser);
+	List<ProgramDTO> filterPrograms(Pageable pageable, ProgramSearchRequest programSearchRequest);
 
 	long countProgramsByFilter(final ProgramSearchRequest programSearchRequest);
 

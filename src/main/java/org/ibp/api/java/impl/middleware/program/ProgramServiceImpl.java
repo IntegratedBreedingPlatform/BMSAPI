@@ -65,13 +65,8 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public List<ProgramDTO> listProgramsByUser(final Pageable pageable, final WorkbenchUser user) {
-		return this.programService.getProgramsByUser(user, pageable);
-	}
-
-	@Override
-	public long countProgramsByUser(final WorkbenchUser currentlyLoggedInUser) {
-		return this.programService.countProgramsByUser(currentlyLoggedInUser);
+	public List<ProgramDTO> filterPrograms(final Pageable pageable, ProgramSearchRequest programSearchRequest) {
+		return this.programService.filterPrograms(programSearchRequest, pageable);
 	}
 
 	@Override
@@ -168,9 +163,9 @@ public class ProgramServiceImpl implements ProgramService {
 		}
 
 		if (!StringUtils.isEmpty(programSearchRequest.getCommonCropName())) {
-			final List<CropType> cropTypeList = this.workbenchDataManager.getInstalledCropDatabses().stream().filter(cropType -> {
-				return programSearchRequest.getCommonCropName().equalsIgnoreCase(cropType.getCropName());
-			}).collect(Collectors.toList());
+			final List<CropType> cropTypeList = this.workbenchDataManager.getInstalledCropDatabses().stream().filter(cropType ->
+				programSearchRequest.getCommonCropName().equalsIgnoreCase(cropType.getCropName())
+			).collect(Collectors.toList());
 
 			if (CollectionUtils.isEmpty(cropTypeList)) {
 				throw new ApiRuntimeException("Crop " + programSearchRequest.getCommonCropName() + " doesn't exist.");
@@ -178,9 +173,9 @@ public class ProgramServiceImpl implements ProgramService {
 
 			if (!Util.isNullOrEmpty(programSearchRequest.getLoggedInUserId())) {
 				final List<CropType> authorizedCrop = this.workbenchDataManager.getAvailableCropsForUser(programSearchRequest
-						.getLoggedInUserId()).stream().filter(cropType -> {return programSearchRequest.getCommonCropName()
-						.equalsIgnoreCase(cropType.getCropName());
-				}).collect(Collectors.toList());
+					.getLoggedInUserId()).stream().filter(cropType -> programSearchRequest.getCommonCropName()
+					.equalsIgnoreCase(cropType.getCropName())
+				).collect(Collectors.toList());
 
 				if (CollectionUtils.isEmpty(authorizedCrop)) {
 					throw new AccessDeniedException("Access Denied: User is not authorized for crop.");

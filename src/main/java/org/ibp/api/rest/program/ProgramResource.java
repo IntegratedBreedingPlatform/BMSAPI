@@ -60,19 +60,22 @@ public class ProgramResource {
     })
     public ResponseEntity<List<ProgramDTO>> listPrograms(final Pageable pageable) {
 
+        final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+        programSearchRequest.setLoggedInUserId(this.securityService.getCurrentlyLoggedInUser().getUserid());
+
         final PagedResult<ProgramDTO> pagedResult = new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(),
             new SearchSpec<ProgramDTO>() {
 
                 @Override
                 public long getCount() {
                         return ProgramResource.this.programService
-                            .countProgramsByUser(ProgramResource.this.securityService.getCurrentlyLoggedInUser());
+                            .countProgramsByFilter(programSearchRequest);
                 }
 
                 @Override
                 public List<ProgramDTO> getResults(final PagedResult<ProgramDTO> pagedResult) {
                         return ProgramResource.this.programService
-                            .listProgramsByUser(pageable, ProgramResource.this.securityService.getCurrentlyLoggedInUser());
+                            .filterPrograms(pageable, programSearchRequest);
                 }
             });
 
