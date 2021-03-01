@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -87,7 +86,9 @@ public class GermplasmImportRequestValidator {
 				return true;
 			}
 
-			// Validations on names synonyms
+			// Validations on names and synonyms
+			if (isAnyCustomNameFieldInvalid(g, index))
+				return true;
 			if (g.getSynonyms().stream().map(Synonym::getType).anyMatch(Objects::isNull)) {
 				errors.reject("germplasm.create.null.name.types", new String[] {index.toString()}, "");
 				return true;
@@ -103,6 +104,8 @@ public class GermplasmImportRequestValidator {
 			}
 
 			// Validations on attributes
+			if (isAnyCustomAttributeFieldInvalid(g, index))
+				return true;
 			if (areAttributesInvalid(g.getAdditionalInfo())) {
 				errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "additionalInfo"}, "");
 				return true;
@@ -112,6 +115,66 @@ public class GermplasmImportRequestValidator {
 		});
 
 		return this.errors;
+	}
+
+	private boolean isAnyCustomNameFieldInvalid(final GermplasmImportRequest g, final Integer index) {
+		if (nameExceedsLength(g.getDefaultDisplayName())) {
+			errors.reject("germplasm.create.name.exceeded.length", new String[] {index.toString(), "defaultDisplayName"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getAccessionNumber()) && nameExceedsLength(g.getAccessionNumber())) {
+			errors.reject("germplasm.create.name.exceeded.length", new String[] {index.toString(), "accessionNumber"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getGenus()) && nameExceedsLength(g.getGenus())) {
+			errors.reject("germplasm.create.name.exceeded.length", new String[] {index.toString(), "genus"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getPedigree()) && nameExceedsLength(g.getPedigree())) {
+			errors.reject("germplasm.create.name.exceeded.length", new String[] {index.toString(), "pedigree"}, "");
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isAnyCustomAttributeFieldInvalid(final GermplasmImportRequest g, final Integer index) {
+		if (!StringUtils.isEmpty(g.getCommonCropName()) && attributeExceedsLength(g.getCommonCropName())) {
+			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "commonCropName"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getGermplasmOrigin()) && attributeExceedsLength(g.getGermplasmOrigin())) {
+			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "germplasmOrigin"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getInstituteCode()) && attributeExceedsLength(g.getInstituteCode())) {
+			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "instituteCode"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getInstituteName()) && attributeExceedsLength(g.getInstituteName())) {
+			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "instituteName"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getSeedSource()) && attributeExceedsLength(g.getSeedSource())) {
+			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "seedSource"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getSpecies()) && attributeExceedsLength(g.getSpecies())) {
+			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "species"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getSpeciesAuthority()) && attributeExceedsLength(g.getSpeciesAuthority())) {
+			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "speciesAuthority"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getSubtaxa()) && attributeExceedsLength(g.getSubtaxa())) {
+			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "subtaxa"}, "");
+			return true;
+		}
+		if (!StringUtils.isEmpty(g.getSubtaxaAuthority()) && attributeExceedsLength(g.getSubtaxaAuthority())) {
+			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "subtaxaAuthority"}, "");
+			return true;
+		}
+		return false;
 	}
 
 	private List<String> getValidBreedingMethodDbIds(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
@@ -147,7 +210,7 @@ public class GermplasmImportRequestValidator {
 			if (StringUtils.isEmpty(n)) {
 				return true;
 			}
-			if (n.length() > NAME_MAX_LENGTH) {
+			if (nameExceedsLength(n)) {
 				return true;
 			}
 			return false;
@@ -169,7 +232,7 @@ public class GermplasmImportRequestValidator {
 				if (StringUtils.isEmpty(n)) {
 					return true;
 				}
-				if (n.length() > ATTRIBUTE_MAX_LENGTH) {
+				if (attributeExceedsLength(n)) {
 					return true;
 				}
 				return false;
@@ -179,6 +242,14 @@ public class GermplasmImportRequestValidator {
 			return false;
 		}
 		return false;
+	}
+
+	private boolean attributeExceedsLength(final String attribute) {
+		return attribute.length() > ATTRIBUTE_MAX_LENGTH;
+	}
+
+	private boolean nameExceedsLength(final String name) {
+		return name.length() > NAME_MAX_LENGTH;
 	}
 
 }
