@@ -1,8 +1,11 @@
 
 package org.ibp.api.rest.sample;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -12,31 +15,25 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SampleListDto {
 
+	private String listName;
 	private String description;
-
 	private String notes;
-
 	private String createdBy;
+	private String takenBy;
+	private String samplingDate;
+	private String cropName;
+	private Integer parentId;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private String createdDate;
+	private String programUUID;
 
+	// Creation from study
+	private Integer datasetId;
 	private Integer selectionVariableId;
-
 	private List<Integer> instanceIds;
 
-	private String takenBy;
-
-	private String samplingDate;
-
-	private Integer datasetId;
-
-	private String cropName;
-
-	private Integer parentId;
-
-	private String listName;
-
-	private String createdDate;
-
-	private String programUUID;
+	// List builder
+	private List<SampleDTO> entries;
 
 	public String getDescription() {
 		return this.description;
@@ -109,22 +106,6 @@ public class SampleListDto {
 	public void setDatasetId(final Integer datasetId) {
 		this.datasetId = datasetId;
 	}
-
-	@Override
-	public int hashCode() {
-		return Pojomatic.hashCode(this);
-	}
-
-	@Override
-	public String toString() {
-		return Pojomatic.toString(this);
-	}
-
-	@Override
-	public boolean equals(final Object o) {
-		return Pojomatic.equals(this, o);
-	}
-
 	public Integer getParentId() {
 		return parentId;
 	}
@@ -156,4 +137,31 @@ public class SampleListDto {
 	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
+
+	public List<SampleDTO> getEntries() {
+		if (this.entries == null) {
+			this.entries = new ArrayList<>();
+		}
+		return this.entries;
+	}
+
+	public void setEntries(final List<SampleDTO> entries) {
+		this.entries = entries;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
 }
