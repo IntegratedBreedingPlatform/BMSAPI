@@ -22,7 +22,7 @@ public class Result<T> {
 
 	private List<T> data = new ArrayList<T>();
 
-	private List<T> observations = new ArrayList<T>();
+	private List<T> observations = null;
 
 	/**
 	 * No args constructor for use in serialization
