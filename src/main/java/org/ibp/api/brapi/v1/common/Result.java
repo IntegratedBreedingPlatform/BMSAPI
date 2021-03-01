@@ -1,38 +1,33 @@
 
 package org.ibp.api.brapi.v1.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * 
  * Generic result object to be used for BrAPI responses where "result" is a collection of type T.
  *
  * @param <T> the type of the object that the "data" collection holds.
- * 
  * @author Naymesh Mistry
- * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"data"})
 public class Result<T> {
 
-	private List<T> data = new ArrayList<T>();
+	private List<T> data = new ArrayList<>();
 
 	private List<T> observations = null;
 
 	/**
 	 * No args constructor for use in serialization
-	 *
 	 */
 	public Result() {
 	}
 
 	/**
-	 *
 	 * @param data
 	 */
 	public Result(final List<T> data) {
@@ -40,7 +35,6 @@ public class Result<T> {
 	}
 
 	/**
-	 *
 	 * @return The data
 	 */
 	public List<T> getData() {
@@ -48,7 +42,6 @@ public class Result<T> {
 	}
 
 	/**
-	 *
 	 * @param data The data
 	 */
 	public void setData(final List<T> data) {
