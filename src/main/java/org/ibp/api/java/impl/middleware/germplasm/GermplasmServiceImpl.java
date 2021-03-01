@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -395,18 +396,26 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 
 	@Override
-	public List<GermplasmDTO> createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList) {
-		// Remove germplasm that fails any validation. They will be excluded from creation
-		this.germplasmImportValidator.pruneGermplasmInvalidForImport(germplasmImportRequestList);
+	public GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList) {
+		final GermplasmImportResponse response = new GermplasmImportResponse();
+		final Integer originalListSize = germplasmImportRequestList.size();
+		int noOfCreatedGermplasm = 0;
+		// Remove germplasm that fails any validation. Thcd ey will be excluded from creation
+		final BindingResult bindingResult = this.germplasmImportValidator.pruneGermplasmInvalidForImport(germplasmImportRequestList);
+		if (bindingResult.hasErrors()) {
+			response.setErrors(bindingResult.getAllErrors());
+		}
 		if (!CollectionUtils.isEmpty(germplasmImportRequestList)) {
 			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 			final List<GermplasmDTO> germplasmDTOList = germplasmService.createGermplasm(user.getUserid(), cropName, germplasmImportRequestList);
 			if (!CollectionUtils.isEmpty(germplasmDTOList)) {
 				this.populateGermplasmPedigree(germplasmDTOList);
+				noOfCreatedGermplasm = germplasmDTOList.size();
 			}
-			return germplasmDTOList;
+			response.setGermplasmList(germplasmDTOList);
 		}
-		return Collections.emptyList();
+		response.setStatus(noOfCreatedGermplasm + " out of " + originalListSize + " germplasm created successfully.");
+		return response;
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {

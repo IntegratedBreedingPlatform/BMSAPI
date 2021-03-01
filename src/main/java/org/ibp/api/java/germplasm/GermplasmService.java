@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -67,6 +68,6 @@ public interface GermplasmService {
 
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
-	List<GermplasmDTO> createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList);
+	GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList);
 
 }
