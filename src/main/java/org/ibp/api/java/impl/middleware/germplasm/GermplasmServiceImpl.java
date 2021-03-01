@@ -397,6 +397,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public GermplasmDeleteResponse deleteGermplasm(final List<Integer> gids) {
 
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(this.errors, gids);
+
 		final Set<Integer> invalidGidsForDeletion = this.germplasmDeleteValidator.checkInvalidGidsForDeletion(gids);
 
 		final Set<Integer> validGermplasmForDeletion =

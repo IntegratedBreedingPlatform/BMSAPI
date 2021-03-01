@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +60,9 @@ public class GermplasmServiceImplTest {
 
 	@Mock
 	private GermplasmDeleteValidator germplasmDeleteValidator;
+
+	@Mock
+	private GermplasmValidator germplasmValidator;
 
 	@Mock
 	private GermplasmService germplasmMiddlewareService;
@@ -160,6 +164,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.germplasmDeleteValidator.checkInvalidGidsForDeletion(gids)).thenReturn(Sets.newHashSet());
 		final GermplasmDeleteResponse response = this.germplasmServiceImpl.deleteGermplasm(gids);
 
+		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(), ArgumentMatchers.anyList());
 		Mockito.verify(this.germplasmMiddlewareService).deleteGermplasm(gids);
 		Assert.assertThat(response.getDeletedGermplasm(), iterableWithSize(3));
 		Assert.assertThat(response.getGermplasmWithErrors(), iterableWithSize(0));
@@ -172,6 +177,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.germplasmDeleteValidator.checkInvalidGidsForDeletion(gids)).thenReturn(new HashSet<>(gids));
 		final GermplasmDeleteResponse response = this.germplasmServiceImpl.deleteGermplasm(gids);
 
+		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(), ArgumentMatchers.anyList());
 		Mockito.verify(this.germplasmMiddlewareService, Mockito.times(0)).deleteGermplasm(ArgumentMatchers.anyList());
 		Assert.assertThat(response.getDeletedGermplasm(), iterableWithSize(0));
 		Assert.assertThat(response.getGermplasmWithErrors(), iterableWithSize(3));
