@@ -95,6 +95,11 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			}
 		}
 
+		//Required because not all our REST services that receives programUUID has a PreAuthorize control
+		if (programId != null && !workbenchUser.hasAccessToAGivenProgram(cropName, Long.valueOf(programId))) {
+			throw new AccessDeniedException("User is not authorized for the program.");
+		}
+
 		return permissions.stream().map(permissionDto -> new SimpleGrantedAuthority(permissionDto.getName())).collect(
 				Collectors.toCollection(ArrayList::new));
 	}

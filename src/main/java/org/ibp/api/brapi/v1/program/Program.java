@@ -2,20 +2,51 @@ package org.ibp.api.brapi.v1.program;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.service.api.BrapiView;
+
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"programDbId", "name", "abbreviation", "objective", "leadPerson"})
+@JsonPropertyOrder({"programDbId", "name", "programName", "abbreviation", "objective", "leadPerson"})
 public class Program {
 
 	private String programDbId;
-	private String name;
+
 	private String abbreviation;
+
 	private String objective;
+
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
+	private String name;
+
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String leadPerson;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String programName;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String leadPersonDbId;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String leadPersonName;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String documentationURL;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String externalReferences;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String commonCropName;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private Map<String, String> additionalInfo;
 
 	public Program() {
 
@@ -32,43 +63,99 @@ public class Program {
 	}
 
 	public String getProgramDbId() {
-		return programDbId;
+		return this.programDbId;
 	}
 
-	public void setProgramDbId(String programDbId) {
+	public void setProgramDbId(final String programDbId) {
 		this.programDbId = programDbId;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	public String getAbbreviation() {
-		return abbreviation;
+		return this.abbreviation;
 	}
 
-	public void setAbbreviation(String abbreviation) {
+	public void setAbbreviation(final String abbreviation) {
 		this.abbreviation = abbreviation;
 	}
 
 	public String getObjective() {
-		return objective;
+		return this.objective;
 	}
 
-	public void setObjective(String objective) {
+	public void setObjective(final String objective) {
 		this.objective = objective;
 	}
 
 	public String getLeadPerson() {
-		return leadPerson;
+		return this.leadPerson;
 	}
 
-	public void setLeadPerson(String leadPerson) {
+	public void setLeadPerson(final String leadPerson) {
 		this.leadPerson = leadPerson;
+	}
+
+	public String getProgramName() {
+		return this.programName;
+	}
+
+	public void setProgramName(final String programName) {
+		this.programName = programName;
+	}
+
+	public String getLeadPersonDbId() {
+		return this.leadPersonDbId;
+	}
+
+	public void setLeadPersonDbId(final String leadPersonDbId) {
+		this.leadPersonDbId = leadPersonDbId;
+	}
+
+	public String getLeadPersonName() {
+		return this.leadPersonName;
+	}
+
+	public void setLeadPersonName(final String leadPersonName) {
+		this.leadPersonName = leadPersonName;
+	}
+
+	public String getDocumentationURL() {
+		return this.documentationURL;
+	}
+
+	public void setDocumentationURL(final String documentationURL) {
+		this.documentationURL = documentationURL;
+	}
+
+	public String getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final String externalReferences) {
+		this.externalReferences = externalReferences;
+	}
+
+	public String getCommonCropName() {
+		return this.commonCropName;
+	}
+
+	public void setCommonCropName(final String commonCropName) {
+		this.commonCropName = commonCropName;
+	}
+
+	public Map<String, String> getAdditionalInfo() {
+		return this.additionalInfo;
+	}
+
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
+		this.additionalInfo = additionalInfo;
 	}
 
 	@Override
