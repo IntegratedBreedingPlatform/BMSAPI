@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.keysequenceregister;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.ibp.api.domain.keysequenceregister.KeySequenceRegisterDeleteResponse;
-import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.keysequenceregister.KeySequenceRegisterService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +21,6 @@ import java.util.stream.Collectors;
 public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterService {
 
 	private static final String SEQUENCE_NUMBER_REGEX = ")\\s?(\\d+).*";
-
-	@Resource
-	private GermplasmValidator germplasmValidator;
 
 	@Resource
 	private GermplasmDataManager germplasmDataManager;
