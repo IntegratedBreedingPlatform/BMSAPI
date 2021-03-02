@@ -239,11 +239,11 @@ public class SampleListServiceImpl implements SampleListService {
 
 		try {
 
-			if (!dto.getSamplingDate().isEmpty()) {
+			if (!StringUtils.isBlank(dto.getSamplingDate())) {
 				sampleListDTO.setSamplingDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getSamplingDate()));
 			}
 
-			if (!dto.getCreatedDate().isEmpty()) {
+			if (!StringUtils.isBlank(dto.getCreatedDate())) {
 				sampleListDTO.setCreatedDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getCreatedDate()));
 			}
 
@@ -256,6 +256,7 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleListDTO.setTakenBy(dto.getTakenBy());
 		sampleListDTO.setParentId(dto.getParentId());
 		sampleListDTO.setListName(dto.getListName());
+		sampleListDTO.setEntries(dto.getEntries());
 		return sampleListDTO;
 	}
 
