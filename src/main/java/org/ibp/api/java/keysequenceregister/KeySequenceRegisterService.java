@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface KeySequenceRegisterService {
 
-	KeySequenceRegisterDeleteResponse deleteKeySequenceReqister(List<Integer> gids, List<String> prefixes);
+	KeySequenceRegisterDeleteResponse deleteKeySequence(List<Integer> gids, List<String> prefixes);
 
 }

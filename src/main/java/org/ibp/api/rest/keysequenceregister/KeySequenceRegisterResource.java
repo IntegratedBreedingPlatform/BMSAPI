@@ -32,7 +32,7 @@ public class KeySequenceRegisterResource {
 		@RequestParam final List<Integer> gids,
 		@RequestParam final List<String> prefixes) {
 
-		return new ResponseEntity<>(this.keySequenceRegisterService.deleteKeySequenceReqister(gids, prefixes), HttpStatus.OK);
+		return new ResponseEntity<>(this.keySequenceRegisterService.deleteKeySequence(gids, prefixes), HttpStatus.OK);
 	}
 
 }

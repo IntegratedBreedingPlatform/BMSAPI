@@ -29,7 +29,7 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	private org.generationcp.middleware.service.api.KeySequenceRegisterService keySequenceRegisterMiddlewareService;
 
 	@Override
-	public KeySequenceRegisterDeleteResponse deleteKeySequenceReqister(final List<Integer> gids, final List<String> prefixes) {
+	public KeySequenceRegisterDeleteResponse deleteKeySequence(final List<Integer> gids, final List<String> prefixes) {
 
 		final List<String> names = this.germplasmDataManager.getNamesByGidsAndPrefixes(gids, prefixes);
 		final Set<String> prefixesToBeDeleted = new HashSet<>();

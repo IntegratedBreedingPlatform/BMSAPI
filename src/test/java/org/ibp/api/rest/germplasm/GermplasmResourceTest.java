@@ -2,7 +2,7 @@ package org.ibp.api.rest.germplasm;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Sets;
-import org.generationcp.middleware.domain.germplasm.GermplasmDeleteResponse;
+import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
