@@ -19,7 +19,7 @@ import java.util.List;
 
 @Api(value = "Key Sequence Register Services")
 @Controller
-public class KeySequenceRegisterResource {
+public class KeySequenceResource {
 
 	@Resource
 	private KeySequenceRegisterService keySequenceRegisterService;
@@ -28,7 +28,7 @@ public class KeySequenceRegisterResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/key-sequences", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity<KeySequenceRegisterDeleteResponse> deleteGermplasm(@PathVariable final String cropName,
+	public ResponseEntity<KeySequenceRegisterDeleteResponse> deleteKeySequence(@PathVariable final String cropName,
 		@RequestParam final List<Integer> gids,
 		@RequestParam final List<String> prefixes) {
 
