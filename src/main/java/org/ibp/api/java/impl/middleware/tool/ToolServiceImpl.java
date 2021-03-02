@@ -56,16 +56,16 @@ public class ToolServiceImpl implements ToolService {
 	private BindingResult errors;
 
 	@Override
-	public List<ToolDTO> getTools(final String cropName, final Integer programId) {
+	public List<ToolDTO> getTools(final String cropName, final String programUUID) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
-		this.validateProgram(cropName, programId);
+		this.validateProgram(cropName, programUUID);
 
+		final Project project = this.workbenchDataManager.getProjectByUuid(programUUID);
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-
 		final List<PermissionDto> permissions =
-			this.permissionService.getPermissionLinks(loggedInUser.getUserid(), cropName, programId);
+			this.permissionService.getPermissionLinks(loggedInUser.getUserid(), cropName, project.getProjectId().intValue());
 
 		// get all categories first
 		final Map<WorkbenchSidebarCategory, List<WorkbenchSidebarCategoryLink>> categoryMap = new LinkedHashMap<>();
@@ -105,19 +105,13 @@ public class ToolServiceImpl implements ToolService {
 		}).collect(Collectors.toList());
 	}
 
-	private void validateProgram(final String cropName, final Integer programId) {
-		if (Objects.isNull(programId)) {
+	private void validateProgram(final String cropName, final String programUUID) {
+		if (Objects.isNull(programUUID)) {
 			this.errors.reject("program.does.not.exist", "");
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 
-		final Project project = this.workbenchDataManager.getProjectById(programId.longValue());
-		if (Objects.isNull(project)) {
-			this.errors.reject("program.does.not.exist", "");
-			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-		}
-
-		this.programValidator.validate(new ProgramDTO(cropName, project.getUniqueID()), this.errors);
+		this.programValidator.validate(new ProgramDTO(cropName, programUUID), this.errors);
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}

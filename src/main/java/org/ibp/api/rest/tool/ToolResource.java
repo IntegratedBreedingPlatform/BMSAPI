@@ -27,8 +27,8 @@ public class ToolResource {
 	@ResponseBody
 	public ResponseEntity<List<ToolDTO>> getTools(
 		@RequestParam final String cropName,
-		@RequestParam final Integer programId) {
-		return new ResponseEntity<>(this.toolService.getTools(cropName, programId), HttpStatus.OK);
+		@RequestParam final String programUUID) {
+		return new ResponseEntity<>(this.toolService.getTools(cropName, programUUID), HttpStatus.OK);
 	}
 
 }

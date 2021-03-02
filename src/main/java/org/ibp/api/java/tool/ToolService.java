@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface ToolService {
 
-	List<ToolDTO> getTools(final String cropName, final Integer programId);
+	List<ToolDTO> getTools(final String cropName, final String programUUID);
 
 }
