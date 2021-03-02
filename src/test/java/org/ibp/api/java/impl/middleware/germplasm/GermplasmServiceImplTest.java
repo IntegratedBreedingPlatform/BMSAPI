@@ -67,14 +67,12 @@ public class GermplasmServiceImplTest {
 	@Mock
 	private GermplasmValidator germplasmValidator;
 
-	@Mock
-	private GermplasmService germplasmMiddlewareService;
-
 	@Captor
 	private ArgumentCaptor<Set<String>> setArgumentCaptor;
 
 	@InjectMocks
 	private GermplasmServiceImpl germplasmServiceImpl;
+
 
 	@Test
 	public void testSearchGermplasmDTO() {
@@ -88,7 +86,7 @@ public class GermplasmServiceImplTest {
 		germplasmDTO.setGermplasmSeedSource("AF07A-412-201");
 		final List<GermplasmDTO> germplasmDTOList = Lists.newArrayList(germplasmDTO);
 
-		Mockito.when(this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE))).thenReturn(germplasmDTOList);
+		Mockito.when(this.middlewareGermplasmService.searchFilteredGermplasm(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE))).thenReturn(germplasmDTOList);
 		final int gid = Integer.parseInt(germplasmDTO.getGid());
 		Mockito.when(this.pedigreeService.getCrossExpansions(Collections.singleton(gid), null, this.crossExpansionProperties))
 			.thenReturn(Collections.singletonMap(gid, "CB1"));
@@ -166,7 +164,7 @@ public class GermplasmServiceImplTest {
 		final GermplasmDeleteResponse response = this.germplasmServiceImpl.deleteGermplasm(gids);
 
 		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(), ArgumentMatchers.anyList());
-		Mockito.verify(this.germplasmMiddlewareService).deleteGermplasm(gids);
+		Mockito.verify(this.middlewareGermplasmService).deleteGermplasm(gids);
 		Assert.assertThat(response.getDeletedGermplasm(), iterableWithSize(3));
 		Assert.assertThat(response.getGermplasmWithErrors(), iterableWithSize(0));
 	}
@@ -179,7 +177,7 @@ public class GermplasmServiceImplTest {
 		final GermplasmDeleteResponse response = this.germplasmServiceImpl.deleteGermplasm(gids);
 
 		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(), ArgumentMatchers.anyList());
-		Mockito.verify(this.germplasmMiddlewareService, Mockito.times(0)).deleteGermplasm(ArgumentMatchers.anyList());
+		Mockito.verify(this.middlewareGermplasmService, Mockito.times(0)).deleteGermplasm(ArgumentMatchers.anyList());
 		Assert.assertThat(response.getDeletedGermplasm(), iterableWithSize(0));
 		Assert.assertThat(response.getGermplasmWithErrors(), iterableWithSize(3));
 	}
