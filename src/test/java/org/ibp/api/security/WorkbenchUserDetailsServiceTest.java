@@ -8,6 +8,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
@@ -78,7 +79,11 @@ public class WorkbenchUserDetailsServiceTest {
 			testUserWorkbench.setName(WorkbenchUserDetailsServiceTest.TEST_USER);
 			testUserWorkbench.setPassword("password");
 			testUserWorkbench.setUserid(WorkbenchUserDetailsServiceTest.USER_ID);
-			final UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
+			final Role role = new Role(1, "ADMIN");
+			final RoleType roleType = new RoleType();
+			roleType.setId(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE.getId());
+			role.setRoleType(roleType);
+			final UserRole testUserRole = new UserRole(testUserWorkbench, role);
 			testUserWorkbench.setRoles(Collections.singletonList(testUserRole));
 			matchingUsers.add(testUserWorkbench);
 
@@ -111,7 +116,12 @@ public class WorkbenchUserDetailsServiceTest {
 		testUserWorkbench.setName(rawUTF8Username);
 		testUserWorkbench.setPassword("password");
 		testUserWorkbench.setUserid(WorkbenchUserDetailsServiceTest.USER_ID);
-		final UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
+		final Role role = new Role(1, "ADMIN");
+		final RoleType roleType = new RoleType();
+		roleType.setId(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE.getId());
+		role.setRoleType(roleType);
+
+		final UserRole testUserRole = new UserRole(testUserWorkbench, role);
 		testUserWorkbench.setRoles(Collections.singletonList(testUserRole));
 		matchingUsers.add(testUserWorkbench);
 

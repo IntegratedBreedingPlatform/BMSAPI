@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
@@ -10,6 +11,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
+import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -35,6 +37,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateDtoValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
@@ -47,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,6 +73,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmUpdateDtoValidator germplasmUpdateDtoValidator;
+
+	@Autowired
+	private GermplasmDeleteValidator germplasmDeleteValidator;
 
 	private BindingResult errors;
 
@@ -236,7 +243,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new ApiRuntimeException("Invalid Germplasm Id");
 		}
 
-
 	}
 
 	@Override
@@ -362,7 +368,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-		germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+		this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
 		return this.germplasmService.importGermplasm(user.getUserid(), cropName, germplasmImportRequestDto);
 	}
 
@@ -371,10 +377,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 		BaseValidator.checkNotNull(germplasmMatchRequestDto, "germplasm.match.request.null");
 		if (!germplasmMatchRequestDto.isValid()) {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
-			errors.reject("germplasm.match.request.invalid", "");
+			this.errors.reject("germplasm.match.request.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
+		return this.germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
 	}
 
 	@Override
@@ -382,10 +388,28 @@ public class GermplasmServiceImpl implements GermplasmService {
 		BaseValidator.checkNotNull(germplasmMatchRequestDto, "germplasm.match.request.null");
 		if (!germplasmMatchRequestDto.isValid()) {
 			this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
-			errors.reject("germplasm.match.request.invalid", "");
+			this.errors.reject("germplasm.match.request.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		return germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
+		return this.germplasmService.findGermplasmMatches(germplasmMatchRequestDto, pageable);
+	}
+
+	@Override
+	public GermplasmDeleteResponse deleteGermplasm(final List<Integer> gids) {
+
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(this.errors, gids);
+
+		final Set<Integer> invalidGidsForDeletion = this.germplasmDeleteValidator.checkInvalidGidsForDeletion(gids);
+
+		final Set<Integer> validGermplasmForDeletion =
+			gids.stream().filter(gid -> !invalidGidsForDeletion.contains(gid)).collect(Collectors.toSet());
+
+		if (!CollectionUtils.isEmpty(validGermplasmForDeletion)) {
+			this.germplasmService.deleteGermplasm(new ArrayList<>(validGermplasmForDeletion));
+		}
+
+		return new GermplasmDeleteResponse(invalidGidsForDeletion, validGermplasmForDeletion);
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
