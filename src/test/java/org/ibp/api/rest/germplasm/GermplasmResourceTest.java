@@ -1,15 +1,28 @@
 package org.ibp.api.rest.germplasm;
 
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Sets;
+import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
+import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Test;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class GermplasmResourceTest extends ApiUnitTestBase {
+
+	@Resource
+	private GermplasmService germplasmService;
 
 	@Test
 	public void testImportGermplasmUpdateSuccess() throws Exception {
@@ -30,6 +43,24 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType).content(this.convertObjectToByte(Arrays.asList(germplasmUpdateDTO))))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
+
+	}
+
+	@Test
+	public void testGermplasmDeleteSuccess() throws Exception {
+
+		final List<Integer> gids = Lists.newArrayList(1, 2, 3);
+		when(this.germplasmService.deleteGermplasm(gids))
+			.thenReturn(new GermplasmDeleteResponse(Sets.newHashSet(1), Sets.newHashSet(2, 3)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.delete("/crops/{cropName}/germplasm", this.cropName)
+				.param("gids", "1,2,3").contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(jsonPath("$.deletedGermplasm", Matchers.containsInAnyOrder(2, 3)))
+			.andExpect(jsonPath("$.germplasmWithErrors", Matchers.containsInAnyOrder(1)));
 
 	}
 

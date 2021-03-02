@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
@@ -9,20 +10,23 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
@@ -35,14 +39,15 @@ import java.util.Set;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.iterableWithSize;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
+@RunWith(MockitoJUnitRunner.class)
 public class GermplasmServiceImplTest {
 
 	private static final int PAGE_SIZE = 10;
 	private static final int PAGE = 1;
-	private GermplasmServiceImpl germplasmServiceImpl;
 
 	@Mock
 	private GermplasmDataManager germplasmDataManager;
@@ -56,20 +61,23 @@ public class GermplasmServiceImplTest {
 	@Mock
 	private CrossExpansionProperties crossExpansionProperties;
 
+	@Mock
+	private GermplasmDeleteValidator germplasmDeleteValidator;
+
+	@Mock
+	private GermplasmValidator germplasmValidator;
+
+	@Mock
+	private GermplasmService germplasmMiddlewareService;
+
 	@Captor
 	private ArgumentCaptor<Set<String>> setArgumentCaptor;
 
-	@Before
-	public void before() {
-		MockitoAnnotations.initMocks(this);
-		this.germplasmServiceImpl = new GermplasmServiceImpl();
-		this.germplasmServiceImpl.setGermplasmDataManager(this.germplasmDataManager);
-		this.germplasmServiceImpl.setPedigreeService(this.pedigreeService);
-		this.germplasmServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
-	}
+	@InjectMocks
+	private GermplasmServiceImpl germplasmServiceImpl;
 
 	@Test
-	public void testSearchGermplasmDTO () {
+	public void testSearchGermplasmDTO() {
 
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
 
@@ -95,7 +103,7 @@ public class GermplasmServiceImplTest {
 	public void shouldFilterGermplasmNameTypes() {
 
 		final Set<String> codes = new HashSet() {{
-			add("LNAME");
+			this.add("LNAME");
 		}};
 
 		final UserDefinedField userDefinedField = new UserDefinedField();
@@ -148,6 +156,32 @@ public class GermplasmServiceImplTest {
 		assertThat(actualTypes, hasSize(2));
 		assertThat(actualTypes, contains(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()));
 		Mockito.verifyNoMoreInteractions(this.germplasmDataManager);
+	}
+
+	@Test
+	public void testDeleteGermplasm_WithValidGids() {
+
+		final List<Integer> gids = Lists.newArrayList(1, 2, 3);
+		Mockito.when(this.germplasmDeleteValidator.checkInvalidGidsForDeletion(gids)).thenReturn(Sets.newHashSet());
+		final GermplasmDeleteResponse response = this.germplasmServiceImpl.deleteGermplasm(gids);
+
+		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(), ArgumentMatchers.anyList());
+		Mockito.verify(this.germplasmMiddlewareService).deleteGermplasm(gids);
+		Assert.assertThat(response.getDeletedGermplasm(), iterableWithSize(3));
+		Assert.assertThat(response.getGermplasmWithErrors(), iterableWithSize(0));
+	}
+
+	@Test
+	public void testDeleteGermplasm_WithInvalidGermplasmForDeletion() {
+
+		final List<Integer> gids = Lists.newArrayList(1, 2, 3);
+		Mockito.when(this.germplasmDeleteValidator.checkInvalidGidsForDeletion(gids)).thenReturn(new HashSet<>(gids));
+		final GermplasmDeleteResponse response = this.germplasmServiceImpl.deleteGermplasm(gids);
+
+		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(), ArgumentMatchers.anyList());
+		Mockito.verify(this.germplasmMiddlewareService, Mockito.times(0)).deleteGermplasm(ArgumentMatchers.anyList());
+		Assert.assertThat(response.getDeletedGermplasm(), iterableWithSize(0));
+		Assert.assertThat(response.getGermplasmWithErrors(), iterableWithSize(3));
 	}
 
 }
