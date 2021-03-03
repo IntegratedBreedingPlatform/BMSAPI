@@ -21,20 +21,15 @@ import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +46,6 @@ public class ProgramResourceBrapi {
 
 	@Autowired
 	private CropValidator cropValidator;
-
-	@Autowired
-	private ResourceBundleMessageSource messageSource;
 
 	@ApiOperation(value = "Get filtered list of breeding Programs", notes = "Get a filtered list of breeding Programs. This list can be filtered by common crop name to narrow results to a specific crop.")
 	@RequestMapping(value = "/brapi/v2/programs", method = RequestMethod.GET)
@@ -73,13 +65,7 @@ public class ProgramResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
 
-		final BindingResult cropErrors = this.cropValidator.validateCrop(commonCropName);
-
-		if (cropErrors.hasErrors()) {
-			final Metadata metadata = new Metadata(null, this.convertToListOfMap(cropErrors));
-			return new ResponseEntity<>(new EntityListResponse<>(metadata, null),
-				HttpStatus.BAD_REQUEST);
-		}
+		this.cropValidator.validateCrop(commonCropName);
 
 		if (!StringUtils.isBlank(abbreviation)) {
 			final List<Map<String, String>> status =
@@ -117,18 +103,6 @@ public class ProgramResourceBrapi {
 			});
 		return ProgramEntityResponseBuilder.getEntityListResponseResponseEntity(pagedResult);
 
-	}
-
-	private String getMessage(final String code, final Object[] arguments) {
-		return this.messageSource.getMessage(code, arguments, LocaleContextHolder.getLocale());
-	}
-
-	private List<Map<String, String>> convertToListOfMap(final BindingResult bindingResult) {
-		final List<Map<String, String>> listOfMap = new ArrayList<>();
-		for (final ObjectError objectError : bindingResult.getAllErrors()) {
-			listOfMap.add(ImmutableMap.of("message", this.getMessage(objectError.getCode(), objectError.getArguments())));
-		}
-		return listOfMap;
 	}
 
 }
