@@ -2,10 +2,9 @@ package org.ibp.api.brapi.v2.validation;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 public class CropValidator {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
 	private SecurityService securityService;
@@ -29,8 +28,8 @@ public class CropValidator {
 		final Integer userId = this.securityService.getCurrentlyLoggedInUser().getUserid();
 
 		if (!StringUtils.isEmpty(cropName)) {
-			final List<CropType> cropTypeList = this.workbenchDataManager.getInstalledCropDatabses().stream().filter(cropType -> {
-				return cropName.equalsIgnoreCase(cropType.getCropName());
+			final List<String> cropTypeList = this.cropService.getInstalledCrops().stream().filter(cropType -> {
+				return cropName.equalsIgnoreCase(cropType);
 			}).collect(Collectors.toList());
 
 			if (CollectionUtils.isEmpty(cropTypeList)) {
@@ -39,10 +38,10 @@ public class CropValidator {
 			}
 
 			if (!Util.isNullOrEmpty(userId)) {
-				final List<CropType> authorizedCrop =
-					this.workbenchDataManager.getAvailableCropsForUser(userId).stream().filter(cropType -> {
+				final List<String> authorizedCrop =
+					this.cropService.getAvailableCropsForUser(userId).stream().filter(cropType -> {
 						return cropName
-							.equalsIgnoreCase(cropType.getCropName());
+							.equalsIgnoreCase(cropType);
 					}).collect(Collectors.toList());
 
 				if (CollectionUtils.isEmpty(authorizedCrop)) {
