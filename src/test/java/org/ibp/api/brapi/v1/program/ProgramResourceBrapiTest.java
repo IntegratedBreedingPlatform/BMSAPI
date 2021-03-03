@@ -12,6 +12,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
@@ -47,6 +49,9 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	@Autowired
 	private SecurityService securityService;
 
+	@Autowired
+	private CropService cropService;
+
 	@Before
 	public void setup() {
 		this.crops = this.getAllCrops();
@@ -57,6 +62,11 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		user.setUserid(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
 		Mockito.when(this.userService.getUserById(Mockito.anyInt())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+		Mockito.when(this.cropService.getInstalledCrops())
+			.thenReturn(this.crops.stream().map(CropType::getCropName).collect(Collectors.toList()));
+		Mockito.when(this.cropService.getAvailableCropsForUser(Mockito.anyInt()))
+			.thenReturn(this.crops.stream().map(CropType::getCropName).collect(Collectors.toList()));
+
 	}
 
 	@Test
