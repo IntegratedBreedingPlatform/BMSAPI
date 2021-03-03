@@ -12,22 +12,20 @@ import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.Util;
+import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -58,15 +56,40 @@ public class ProgramServiceImpl implements ProgramService {
 	public List<ProgramDTO> listProgramsByCropNameAndUser(final ProgramSearchRequest programSearchRequest) {
 		try {
 			//FIXME Should use programService instead
-			return this.convertToProgramSummaries(this.workbenchDataManager.getProjects(null, programSearchRequest ));
+			return this.convertToProgramSummaries(this.workbenchDataManager.getProjects(null, programSearchRequest));
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
 	}
 
+
+	List<ProgramDTO> convertToProgramSummaries(final List<Project> workbenchProgramList) {
+		final List<ProgramDTO> programSummaries = new ArrayList<>();
+		for (final Project workbenchProgram : workbenchProgramList) {
+			final ProgramDTO programSummary =
+				new ProgramDTO(workbenchProgram.getProjectId().toString(), workbenchProgram.getUniqueID(),
+					workbenchProgram.getProjectName(), workbenchProgram.getCropType().getCropName());
+
+			final WorkbenchUser workbenchUser = this.userService.getUserById(workbenchProgram.getUserId());
+			programSummary.setCreatedBy(workbenchUser.getName());
+
+			final List<WorkbenchUser> workbenchUsers = this.userService
+				.getUsersByProjectId(workbenchProgram.getProjectId());
+			final Set<String> members = new HashSet<>();
+			for (final WorkbenchUser member : workbenchUsers) {
+				members.add(member.getName());
+			}
+			programSummary.setMembers(members);
+			if (workbenchProgram.getStartDate() != null) {
+				programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
+			}
+			programSummaries.add(programSummary);
+		}
+		return programSummaries;
+	}
+
 	@Override
 	public List<ProgramDetailsDto> getProgramDetailsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
-		this.validateProgramSearchRequest(programSearchRequest);
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
 		final List<Project> projectList = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
 		if (!projectList.isEmpty()) {
@@ -80,10 +103,7 @@ public class ProgramServiceImpl implements ProgramService {
 				programDetailsDto.setCropName(project.getCropType().getCropName());
 				programDetailsDtoList.add(programDetailsDto);
 			}
-		} else {
-			throw new ApiRuntimeException("Program not found.");
 		}
-
 		return programDetailsDtoList;
 	}
 
@@ -127,60 +147,6 @@ public class ProgramServiceImpl implements ProgramService {
 			return null;
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
-		}
-
-	}
-
-	List<ProgramDTO> convertToProgramSummaries(final List<Project> workbenchProgramList) {
-		final List<ProgramDTO> programSummaries = new ArrayList<>();
-		for (final Project workbenchProgram : workbenchProgramList) {
-			final ProgramDTO programSummary =
-				new ProgramDTO(workbenchProgram.getProjectId().toString(), workbenchProgram.getUniqueID(),
-					workbenchProgram.getProjectName(), workbenchProgram.getCropType().getCropName());
-
-			final WorkbenchUser workbenchUser = this.userService.getUserById(workbenchProgram.getUserId());
-			programSummary.setCreatedBy(workbenchUser.getName());
-
-			final List<WorkbenchUser> workbenchUsers = this.userService
-				.getUsersByProjectId(workbenchProgram.getProjectId());
-			final Set<String> members = new HashSet<>();
-			for (final WorkbenchUser member : workbenchUsers) {
-				members.add(member.getName());
-			}
-			programSummary.setMembers(members);
-			if (workbenchProgram.getStartDate() != null) {
-				programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
-			}
-			programSummaries.add(programSummary);
-		}
-		return programSummaries;
-	}
-
-	private void validateProgramSearchRequest(final ProgramSearchRequest programSearchRequest) {
-		// Currently doesn't support Abbreviation
-		if (!StringUtils.isBlank(programSearchRequest.getAbbreviation())) {
-			throw new ApiRuntimeException("Program not found.");
-		}
-
-		if (!StringUtils.isEmpty(programSearchRequest.getCommonCropName())) {
-			final List<CropType> cropTypeList = this.workbenchDataManager.getInstalledCropDatabses().stream().filter(cropType ->
-				programSearchRequest.getCommonCropName().equalsIgnoreCase(cropType.getCropName())
-			).collect(Collectors.toList());
-
-			if (CollectionUtils.isEmpty(cropTypeList)) {
-				throw new ApiRuntimeException("Crop " + programSearchRequest.getCommonCropName() + " doesn't exist.");
-			}
-
-			if (!Util.isNullOrEmpty(programSearchRequest.getLoggedInUserId())) {
-				final List<CropType> authorizedCrop = this.workbenchDataManager.getAvailableCropsForUser(programSearchRequest
-					.getLoggedInUserId()).stream().filter(cropType -> programSearchRequest.getCommonCropName()
-					.equalsIgnoreCase(cropType.getCropName())
-				).collect(Collectors.toList());
-
-				if (CollectionUtils.isEmpty(authorizedCrop)) {
-					throw new AccessDeniedException("Access Denied: User is not authorized for crop.");
-				}
-			}
 		}
 
 	}

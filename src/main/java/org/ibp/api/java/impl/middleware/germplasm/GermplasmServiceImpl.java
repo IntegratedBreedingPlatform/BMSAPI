@@ -5,13 +5,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -31,6 +31,9 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
+import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
+import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -111,6 +114,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
+
+	@Autowired
+	private GermplasmImportRequestValidator germplasmImportValidator;
+
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -234,7 +241,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public GermplasmDTO getGermplasmDTObyGID(final Integer germplasmId) {
-		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmDataManager.getGermplasmDTOByGID(germplasmId);
+		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmService.getGermplasmDTOByGID(germplasmId);
 		if (germplasmDTOOptional.isPresent()) {
 			final GermplasmDTO germplasmDTO = germplasmDTOOptional.get();
 			germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmId, this.crossExpansionProperties));
@@ -250,8 +257,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
 		try {
 
-			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
-				.searchGermplasmDTO(germplasmSearchRequestDTO, pageable);
+			final List<GermplasmDTO> germplasmDTOList = this.germplasmService.searchFilteredGermplasm(germplasmSearchRequestDTO, pageable);
 			if (germplasmDTOList != null) {
 				this.populateGermplasmPedigree(germplasmDTOList);
 			}
@@ -264,7 +270,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countGermplasmDTOs(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		try {
-			return this.germplasmDataManager.countGermplasmDTOs(germplasmSearchRequestDTO);
+			return this.germplasmService.countFilteredGermplasm(germplasmSearchRequestDTO);
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("An error has occurred when trying to count germplasm", e);
 		}
@@ -273,7 +279,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countGermplasmByStudy(final Integer studyDbId) {
 		try {
-			return this.germplasmDataManager.countGermplasmByStudy(studyDbId);
+			return this.germplasmService.countGermplasmByStudy(studyDbId);
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("An error has occurred when trying to count germplasms", e);
 		}
@@ -285,8 +291,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			this.instanceValidator.validateStudyDbId(studyDbId);
 
-			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
-				.getGermplasmByStudy(studyDbId, pageable);
+			final List<GermplasmDTO> germplasmDTOList = this.germplasmService.getGermplasmByStudy(studyDbId, pageable);
 			if (germplasmDTOList != null) {
 				this.populateGermplasmPedigree(germplasmDTOList);
 			}
@@ -410,6 +415,30 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		return new GermplasmDeleteResponse(invalidGidsForDeletion, validGermplasmForDeletion);
+	}
+
+
+	@Override
+	public GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList) {
+		final GermplasmImportResponse response = new GermplasmImportResponse();
+		final Integer originalListSize = germplasmImportRequestList.size();
+		int noOfCreatedGermplasm = 0;
+		// Remove germplasm that fails any validation. They will be excluded from creation
+		final BindingResult bindingResult = this.germplasmImportValidator.pruneGermplasmInvalidForImport(germplasmImportRequestList);
+		if (bindingResult.hasErrors()) {
+			response.setErrors(bindingResult.getAllErrors());
+		}
+		if (!CollectionUtils.isEmpty(germplasmImportRequestList)) {
+			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+			final List<GermplasmDTO> germplasmDTOList = germplasmService.createGermplasm(user.getUserid(), cropName, germplasmImportRequestList);
+			if (!CollectionUtils.isEmpty(germplasmDTOList)) {
+				this.populateGermplasmPedigree(germplasmDTOList);
+				noOfCreatedGermplasm = germplasmDTOList.size();
+			}
+			response.setGermplasmList(germplasmDTOList);
+		}
+		response.setStatus(noOfCreatedGermplasm + " out of " + originalListSize + " germplasm created successfully.");
+		return response;
 	}
 
 	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
