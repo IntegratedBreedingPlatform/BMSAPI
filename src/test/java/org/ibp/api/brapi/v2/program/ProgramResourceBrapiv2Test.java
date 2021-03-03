@@ -13,7 +13,6 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v2.validation.CropValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.brapi.v1.program.ProgramResourceBrapiTest;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
 import org.junit.Before;
@@ -29,7 +28,6 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +52,7 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
 	private SecurityService securityService;
 
 	@Autowired
-	private CropValidator cropValidator;
+	private ProgramService programService;
 
 	@Autowired
 	private CropValidator cropValidator;
@@ -207,11 +205,9 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
 	}
 
 	@Test
-	@Ignore
-    //FIXME The exception should not be thrown at the service level
-    public void testListProgramFilterByAbbreviation() throws Exception {
-        Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
-                .thenReturn(1L);
+	public void testListProgramFilterByAbbreviation() throws Exception {
+		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
+			.thenReturn(1L);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiv2Test.BRAPI_V2_PROGRAMS)
 			.queryParam("abbreviation", "AAAB").build().encode();
@@ -279,17 +275,6 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
 		cropType.setDbName(dbName);
 		cropType.setVersion(version);
 		return cropType;
-	}
-
-	private List<Project> getProjectList() {
-		final List<Project> projectList = new ArrayList<>();
-		projectList.add(this.getProject(12L, ProgramResourceBrapiv2Test.PROGRAM_UUID_MAIZE, ProgramResourceBrapiv2Test.MAIZE,
-			ProgramResourceBrapiv2Test.MAIZE));
-		projectList.add(this.getProject(11L, ProgramResourceBrapiv2Test.PROGRAM_UUID_RICE, ProgramResourceBrapiv2Test.RICE,
-			ProgramResourceBrapiv2Test.RICE));
-		projectList.add(this.getProject(10L, ProgramResourceBrapiv2Test.PROGRAM_UUID_WHEAT, ProgramResourceBrapiv2Test.WHEAT,
-			ProgramResourceBrapiv2Test.WHEAT));
-		return projectList;
 	}
 
 	private Project getProject(final Long id, final String programUniqueID, final String projectName, final String cropName) {

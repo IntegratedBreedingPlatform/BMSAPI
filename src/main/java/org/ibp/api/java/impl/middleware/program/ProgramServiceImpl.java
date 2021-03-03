@@ -1,18 +1,14 @@
 
 package org.ibp.api.java.impl.middleware.program;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
-import org.ibp.api.Util;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
