@@ -423,7 +423,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final GermplasmImportResponse response = new GermplasmImportResponse();
 		final Integer originalListSize = germplasmImportRequestList.size();
 		int noOfCreatedGermplasm = 0;
-		// Remove germplasm that fails any validation. Thcd ey will be excluded from creation
+		// Remove germplasm that fails any validation. They will be excluded from creation
 		final BindingResult bindingResult = this.germplasmImportValidator.pruneGermplasmInvalidForImport(germplasmImportRequestList);
 		if (bindingResult.hasErrors()) {
 			response.setErrors(bindingResult.getAllErrors());
