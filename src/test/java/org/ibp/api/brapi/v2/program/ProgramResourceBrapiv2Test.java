@@ -26,7 +26,6 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -87,7 +86,7 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isBadRequest()) //
 			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message",
 				Matchers.is("Crop " + ProgramResourceBrapiv2Test.INVALID_CROP + " doesn't exist."))); //
 
 	}

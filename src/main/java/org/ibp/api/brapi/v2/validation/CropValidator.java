@@ -5,13 +5,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.Util;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.ObjectError;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +24,9 @@ public class CropValidator {
 	@Autowired
 	private SecurityService securityService;
 
-	public void validateCrop(final String cropName) {
+	public BindingResult validateCrop(final String cropName) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
 		final Integer userId = this.securityService.getCurrentlyLoggedInUser().getUserid();
 
@@ -34,11 +36,8 @@ public class CropValidator {
 			}).collect(Collectors.toList());
 
 			if (CollectionUtils.isEmpty(cropTypeList)) {
-				throw new ApiRequestValidationException(
-					Arrays.asList(new ObjectError("", new String[] {"crop.does.not.exist"}, new String[] {cropName}, "")));
-			}
-
-			if (!Util.isNullOrEmpty(userId)) {
+				errors.reject("crop.does.not.exist", new String[] {cropName}, "");
+			} else if (!Util.isNullOrEmpty(userId)) {
 				final List<CropType> authorizedCrop =
 					this.workbenchDataManager.getAvailableCropsForUser(userId).stream().filter(cropType -> {
 						return cropName
@@ -46,11 +45,12 @@ public class CropValidator {
 					}).collect(Collectors.toList());
 
 				if (CollectionUtils.isEmpty(authorizedCrop)) {
-					throw new ApiRequestValidationException(
-						Arrays.asList(new ObjectError("", new String[] {"crop.user.has.no.access"}, null, "")));
+					errors.reject("crop.user.has.no.access", "");
 				}
 			}
 		}
+
+		return errors;
 
 	}
 
