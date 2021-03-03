@@ -14,6 +14,7 @@ import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
+import org.ibp.api.brapi.v2.validation.CropValidator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
@@ -52,6 +53,9 @@ public class ProgramResourceBrapi {
 	@Autowired
 	private SecurityService securityService;
 
+	@Autowired
+	private CropValidator cropValidator;
+
 	@ApiOperation(value = "List Programs", notes = "Get a list of programs.")
 	@RequestMapping(value = "/{crop}/brapi/v1/programs", method = RequestMethod.GET)
 	@ResponseBody
@@ -65,6 +69,8 @@ public class ProgramResourceBrapi {
 			required = false) final String programName,
 		@ApiParam(value = "Filter by program abbreviation. Exact match.", required = false) @RequestParam(value = "abbreviation",
 			required = false) final String abbreviation) {
+
+		this.cropValidator.validateCrop(crop);
 
 		if (!StringUtils.isBlank(abbreviation)) {
 			final List<Map<String, String>> status =
