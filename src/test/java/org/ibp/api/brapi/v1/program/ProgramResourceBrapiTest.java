@@ -1,15 +1,13 @@
 
 package org.ibp.api.brapi.v1.program;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang.RandomStringUtils;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -26,7 +24,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
@@ -61,132 +60,123 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testListProgramsBadCrop() throws Exception {
-		final UriComponents uriComponents =
-				UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.INVALID_BRAPI_V1_PROGRAMS).build().encode();
-
-		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
-				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
-				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message",
-						Matchers.is("Crop " + ProgramResourceBrapiTest.INVALID_CROP + " doesn't exist."))); //
-
-	}
-
-	@Test
 	public void testListProgramsNoAdditionalInfo() throws Exception {
 		final List<ProgramDetailsDto> programDetailsDtoList = this.getProgramDetails();
 		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
-				.thenReturn(new Long(this.crops.size()));
+			.thenReturn(new Long(this.crops.size()));
 		final List<Project> projectList = this.getProjectList();
 		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
-				org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
+			org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
 		final UriComponents uriComponents =
-				UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS).build().encode();
+			UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS).build().encode();
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
-				.andExpect(MockMvcResultMatchers.status().isOk()) //
-				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId",
-						Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_MAIZE))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].name", Matchers.is(ProgramResourceBrapiTest.MAIZE))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].programDbId",
-						Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_RICE))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].name", Matchers.is(ProgramResourceBrapiTest.RICE)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[2].programDbId",
-						Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_WHEAT))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[2].name", Matchers.is(ProgramResourceBrapiTest.WHEAT)))
-				// Default starting page index is 0
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.currentPage",
-						Matchers.is(BrapiPagedResult.DEFAULT_PAGE_NUMBER)))
-				// Default page size is 1000
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$.metadata.pagination.pageSize", Matchers.is(BrapiPagedResult.DEFAULT_PAGE_SIZE)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalCount", Matchers.is(this.crops.size()))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalPages", Matchers.is(1)));
+			.andExpect(MockMvcResultMatchers.status().isOk()) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId",
+				Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_MAIZE))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].name", Matchers.is(ProgramResourceBrapiTest.MAIZE))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].programDbId",
+				Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_RICE))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].name", Matchers.is(ProgramResourceBrapiTest.RICE)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[2].programDbId",
+				Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_WHEAT))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[2].name", Matchers.is(ProgramResourceBrapiTest.WHEAT)))
+			// Default starting page index is 0
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.currentPage",
+				Matchers.is(BrapiPagedResult.DEFAULT_PAGE_NUMBER)))
+			// Default page size is 1000
+			.andExpect(
+				MockMvcResultMatchers.jsonPath("$.metadata.pagination.pageSize", Matchers.is(BrapiPagedResult.DEFAULT_PAGE_SIZE)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalCount", Matchers.is(this.crops.size()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalPages", Matchers.is(1)));
 	}
 
 	@Test
 	public void testListProgramsWithPaging() throws Exception {
 		final List<ProgramDetailsDto> programDetailsDtoList = this.getProgramDetails();
 		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
-				.thenReturn(new Long(this.crops.size()));
+			.thenReturn(new Long(this.crops.size()));
 		final List<Project> projectList = this.getProjectList();
 		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
-				org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
+			org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
 		final int page = 1;
 		final int pageSize = 2;
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS)
-				.queryParam("page", page).queryParam("pageSize", pageSize).build().encode();
+			.queryParam("page", page).queryParam("pageSize", pageSize).build().encode();
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
-				.andExpect(MockMvcResultMatchers.status().isOk()) //
-				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId",
-						Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_MAIZE))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].name", Matchers.is(ProgramResourceBrapiTest.MAIZE))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].programDbId",
-						Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_RICE))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].name", Matchers.is(ProgramResourceBrapiTest.RICE)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[2].programDbId",
-						Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_WHEAT))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[2].name", Matchers.is(ProgramResourceBrapiTest.WHEAT)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.currentPage", Matchers.is(page)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.pageSize", Matchers.is(pageSize)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalCount", Matchers.is(this.crops.size()))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalPages", Matchers.is(2)));
+			.andExpect(MockMvcResultMatchers.status().isOk()) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId",
+				Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_MAIZE))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].name", Matchers.is(ProgramResourceBrapiTest.MAIZE))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].programDbId",
+				Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_RICE))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1].name", Matchers.is(ProgramResourceBrapiTest.RICE)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[2].programDbId",
+				Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_WHEAT))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[2].name", Matchers.is(ProgramResourceBrapiTest.WHEAT)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.currentPage", Matchers.is(page)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.pageSize", Matchers.is(pageSize)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalCount", Matchers.is(this.crops.size()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalPages", Matchers.is(2)));
 	}
 
 	@Test
 	public void testListProgramFilterByName() throws Exception {
 		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
-				.thenReturn(1L);
+			.thenReturn(1L);
 
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
 		programDetailsDtoList
-				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE, null, null, null, null, null, null));
+			.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE, null, null, null, null,
+				null, null));
 		final List<Project> projectList = new ArrayList<>();
 		projectList.add(this.getProject(11L, ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE));
 
 		Mockito.when(this.workbenchDataManager.getProjects(org.mockito.Mockito.any(Pageable.class),
-				org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
+			org.mockito.Matchers.any(ProgramSearchRequest.class))).thenReturn(projectList);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS)
-				.queryParam("programName", ProgramResourceBrapiTest.RICE).build().encode();
+			.queryParam("programName", ProgramResourceBrapiTest.RICE).build().encode();
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
-				.andExpect(MockMvcResultMatchers.status().isOk()) //
-				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId",
-						Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_RICE))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].name", Matchers.is(ProgramResourceBrapiTest.RICE))) //
+			.andExpect(MockMvcResultMatchers.status().isOk()) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId",
+				Matchers.is(ProgramResourceBrapiTest.PROGRAM_UUID_RICE))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].name", Matchers.is(ProgramResourceBrapiTest.RICE))) //
 		;
 	}
 
 	@Test
 	public void testListProgramFilterByAbbreviation() throws Exception {
 		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
-				.thenReturn(1L);
+			.thenReturn(1L);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS)
-				.queryParam("abbreviation", "AAAB").build().encode();
+			.queryParam("abbreviation", "AAAB").build().encode();
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
-				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
-				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("Program not found.")));
+			.andExpect(MockMvcResultMatchers.status().isNotImplemented()) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("Abbreviation is not yet supported")));
 
 	}
 
 	private List<ProgramDetailsDto> getProgramDetails() {
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
 		programDetailsDtoList
-				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_MAIZE, ProgramResourceBrapiTest.MAIZE, null, null, null, null, null, null));
+			.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_MAIZE, ProgramResourceBrapiTest.MAIZE, null, null, null, null,
+				null, null));
 		programDetailsDtoList
-				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE, null, null, null, null, null, null));
+			.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_RICE, ProgramResourceBrapiTest.RICE, null, null, null, null,
+				null, null));
 		programDetailsDtoList
-				.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_WHEAT, ProgramResourceBrapiTest.WHEAT, null, null, null, null, null, null));
+			.add(new ProgramDetailsDto(ProgramResourceBrapiTest.PROGRAM_UUID_WHEAT, ProgramResourceBrapiTest.WHEAT, null, null, null, null,
+				null, null));
 		return programDetailsDtoList;
 	}
 
