@@ -34,6 +34,8 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.LocationServiceImpl;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
+import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.api.program.ProgramServiceImpl;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
@@ -120,6 +122,7 @@ import org.generationcp.middleware.service.impl.study.generation.ExperimentDesig
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.service.impl.study.germplasm.source.GermplasmStudySourceServiceImpl;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
+import org.generationcp.middleware.service.impl.workbench.WorkbenchServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SessionFactory;
@@ -359,6 +362,13 @@ public class MiddlewareFactory {
 	public UserService getUserService() {
 		return new UserServiceImpl(this.getWorkbenchSessionProvider());
 	}
+
+	@Bean
+	@DependsOn("WORKBENCH_SessionFactory")
+	public ProgramService getProgramService() {
+		return new ProgramServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
 
 	@Bean
 	@DependsOn("WORKBENCH_SessionFactory")
@@ -605,6 +615,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public ExperimentModelGenerator getExperimentModelGenerator() {
 		return new ExperimentModelGenerator(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@DependsOn("WORKBENCH_SessionFactory")
+	public WorkbenchServiceImpl getWorkbenchService() {
+		return new WorkbenchServiceImpl(this.getWorkbenchSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

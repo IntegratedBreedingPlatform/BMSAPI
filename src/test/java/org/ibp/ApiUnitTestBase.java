@@ -24,6 +24,7 @@ import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
+import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.java.rpackage.RPackageService;
 import org.ibp.api.java.study.StudyEntryService;
 import org.ibp.api.java.study.StudyInstanceService;
@@ -233,6 +234,12 @@ public abstract class ApiUnitTestBase {
 		public org.generationcp.middleware.api.germplasm.GermplasmService germplasmMiddlewareService() {
 			return Mockito.mock(org.generationcp.middleware.api.germplasm.GermplasmService.class);
 
+		}
+
+		@Bean
+		@Primary
+		public ProgramService programService() {
+			return Mockito.mock(ProgramService.class);
 		}
 
 	}

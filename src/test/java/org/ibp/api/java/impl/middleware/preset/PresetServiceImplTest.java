@@ -4,11 +4,11 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.constant.ToolSection;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -70,7 +70,7 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 		presetDTO.setProgramUUID(programUUID);
 		presetDTO.setToolId(23);
 		Mockito.doNothing().when(presetDTOValidator).validate(CROP_NAME, presetDTO);
-		Mockito.doReturn(new ProgramSummary()).when(programService).getByUUIDAndCrop(CROP_NAME, programUUID);
+		Mockito.doReturn(new ProgramDTO()).when(programService).getByUUIDAndCrop(CROP_NAME, programUUID);
 		presetService.savePreset(CROP_NAME, presetDTO);
 	}
 
@@ -80,7 +80,7 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 		presetDTO.setProgramUUID(programUUID);
 		presetDTO.setToolId(23);
 		Mockito.doNothing().when(presetDTOValidator).validate(CROP_NAME, presetDTO);
-		final ProgramSummary programSummary = new ProgramSummary();
+		final ProgramDTO programSummary = new ProgramDTO();
 		programSummary.setMembers(Sets.newHashSet(workbenchUser.getName()));
 		Mockito.doReturn(programSummary).when(programService).getByUUIDAndCrop(CROP_NAME, programUUID);
 		final ProgramPreset programPreset = new ProgramPreset();
@@ -95,7 +95,7 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 		presetDTO.setProgramUUID(programUUID);
 		presetDTO.setToolId(23);
 		Mockito.doNothing().when(presetDTOValidator).validate(CROP_NAME, presetDTO);
-		final ProgramSummary programSummary = new ProgramSummary();
+		final ProgramDTO programSummary = new ProgramDTO();
 		programSummary.setMembers(Sets.newHashSet(workbenchUser.getName()));
 		Mockito.doReturn(programSummary).when(programService).getByUUIDAndCrop(CROP_NAME, programUUID);
 		final ProgramPreset programPreset = new ProgramPreset();

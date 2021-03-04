@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.Operation;
@@ -26,7 +27,6 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.Util;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -540,7 +540,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 
 	private void validateProgram(final String cropName, final String programUUID) {
 		if (!StringUtils.isEmpty(programUUID)) {
-			this.programValidator.validate(new ProgramSummary(cropName, programUUID), errors);
+			this.programValidator.validate(new ProgramDTO(cropName, programUUID), errors);
 			if (errors.hasErrors()) {
 				throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 			}

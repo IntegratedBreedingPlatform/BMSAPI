@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.common;
 
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.ContextHolder;
-import org.ibp.api.domain.program.ProgramSummary;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.program.ProgramService;
 import org.junit.Assert;
@@ -38,7 +38,7 @@ public class ContextResolverImplTest {
 		this.contextResolverImpl.setProgramService(this.programService);
 
 		Mockito.doReturn(Collections.singletonList("Maize")).when(this.cropService).getInstalledCrops();
-		Mockito.doReturn(new ProgramSummary()).when(this.programService).getByUUIDAndCrop(MAIZE, PROGRAM_UUID);
+		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(MAIZE, PROGRAM_UUID);
 	}
 
 

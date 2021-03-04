@@ -5,6 +5,7 @@ import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.commons.util.TreeViewUtil;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -13,7 +14,6 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.ibp.api.Util;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -175,7 +175,7 @@ public class SampleListServiceImpl implements SampleListService {
 		final Boolean folderOnly) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		if (!StringUtils.isEmpty(programUUID)) {
-			this.programValidator.validate(new ProgramSummary(crop, programUUID), errors);
+			this.programValidator.validate(new ProgramDTO(crop, programUUID), errors);
 			if (errors.hasErrors()) {
 				throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 			}

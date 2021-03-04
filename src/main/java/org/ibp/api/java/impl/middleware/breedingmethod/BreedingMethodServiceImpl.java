@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.MethodType;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
@@ -57,7 +57,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		}
 
 		if (programUUID != null) {
-			this.programValidator.validate(new ProgramSummary(cropName, programUUID), errors);
+			this.programValidator.validate(new ProgramDTO(cropName, programUUID), errors);
 		}
 
 		if (!CollectionUtils.isEmpty(searchRequest.getMethodTypes()) ) {
