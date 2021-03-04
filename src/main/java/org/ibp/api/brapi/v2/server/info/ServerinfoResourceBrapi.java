@@ -33,7 +33,7 @@ import java.util.Map;
 @Controller
 public class ServerinfoResourceBrapi {
 
-	private static String VERSION = "2";
+	private static final String VERSION = "2";
 
 	@Autowired
 	private CallService callService;

@@ -35,7 +35,7 @@ import java.util.Map;
 @Controller
 public class CallResourceBrapi {
 
-	private static String VERSION = "1";
+	private static final String VERSION = "1";
 
 	@Autowired
 	private CallService callService;
@@ -52,7 +52,7 @@ public class CallResourceBrapi {
 		@RequestParam(value = "dataType",
 			required = false) final String dataType) {
 
-		return getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
+		return this.getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
 	}
 	@ApiOperation(value = "List of available calls", notes = "Get a list of available calls with crop name.")
 	@RequestMapping(value = "/{crop}/brapi/v1/calls", method = RequestMethod.GET)
@@ -66,7 +66,7 @@ public class CallResourceBrapi {
 		@RequestParam(value = "dataType",
 			required = false) final String dataType) {
 
-		return getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
+		return this.getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
 	}
 
 	private ResponseEntity<EntityListResponse<Map<String, Object>>> getBrapiCallsResponseEntity(
