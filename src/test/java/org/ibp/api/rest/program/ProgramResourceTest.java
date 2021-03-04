@@ -6,14 +6,12 @@ import com.google.common.collect.Sets;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.impl.middleware.program.ProgramServiceImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.ibp.api.java.program.ProgramService;
 import org.junit.Before;
@@ -79,24 +77,15 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 
         final List<ProgramDTO> programList = new ArrayList<>();
 
-//        final Project program1 =
-//                new Project(1L, UUID.randomUUID().toString(), "Program I Created", null,
-//                        this.me.getUserid(), cropType, null);
         final ProgramDTO program1 = new ProgramDTO("1", "fb0783d2-dc82-4db6-a36e-7554d3740092", "Program I Created", cropType.getCropName());
         program1.setMembers(Sets.newHashSet(this.me.getName()));
         program1.setCreatedBy(this.me.getName());
         program1.setStartDate("2015-11-11");
 
-//        final Project program2 =
-//                new Project(2L, UUID.randomUUID().toString(), "Program I am member of", null, this.myBreedingBuddy.getUserid(),
-//                        cropType, null);
         final ProgramDTO program2 = new ProgramDTO("2", UUID.randomUUID().toString(), "Program I am member of", cropType.getCropName());
         program2.setMembers(Sets.newHashSet(this.myBreedingBuddy.getName()));
         program2.setCreatedBy(this.myBreedingBuddy.getName());
         program2.setStartDate("2015-12-12");
-
-//        final String program2Date = "2015-12-12";
-//        program2.setStartDate(ProgramServiceImpl.DATE_FORMAT.parse(program2Date));
 
         programList.add(program1);
         programList.add(program2);
