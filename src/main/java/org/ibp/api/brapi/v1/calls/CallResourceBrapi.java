@@ -35,7 +35,7 @@ import java.util.Map;
 @Controller
 public class CallResourceBrapi {
 
-	private static final String VERSION = "1";
+	static final String VERSION = "1";
 
 	@Autowired
 	private CallService callService;
