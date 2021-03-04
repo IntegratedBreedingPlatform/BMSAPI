@@ -172,7 +172,6 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
 	@Test
 	@Ignore
-	//FIXME The exception should not be thrown at the service level
 	public void testListProgramFilterByAbbreviation() throws Exception {
 		Mockito.when(this.programService.countProgramsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
 			.thenReturn(1L);
