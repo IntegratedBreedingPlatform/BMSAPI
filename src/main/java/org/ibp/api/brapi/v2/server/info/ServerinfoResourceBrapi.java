@@ -76,7 +76,7 @@ public class ServerinfoResourceBrapi {
 
 		if (resultPage != null && resultPage.getTotalResults() > 0) {
 
-			final Result<Map<String, Object>> results = new Result<Map<String, Object>>().withData(resultPage.getPageResults());
+			final Result<Map<String, Object>> results = new Result<Map<String, Object>>().withCalls(resultPage.getPageResults());
 			final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 

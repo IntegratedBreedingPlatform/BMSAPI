@@ -17,7 +17,9 @@ import java.util.List;
 @JsonPropertyOrder({"data"})
 public class Result<T> {
 
-	private List<T> data = new ArrayList<>();
+	private List<T> data = null;
+
+	private List<T> calls = null;
 
 	private List<T> observations = null;
 
@@ -48,6 +50,14 @@ public class Result<T> {
 		this.data = data;
 	}
 
+	public List<T> getCalls() {
+		return calls;
+	}
+
+	public void setCalls(final List<T> calls) {
+		this.calls = calls;
+	}
+
 	public List<T> getObservations() {
 		return this.observations;
 	}
@@ -63,6 +73,11 @@ public class Result<T> {
 
 	public Result<T> withObservations(final List<T> observations) {
 		this.observations = observations;
+		return this;
+	}
+
+	public Result<T> withCalls(final List<T> data) {
+		this.calls = calls;
 		return this;
 	}
 }
