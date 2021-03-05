@@ -51,7 +51,7 @@ public class Result<T> {
 	}
 
 	public List<T> getCalls() {
-		return calls;
+		return this.calls;
 	}
 
 	public void setCalls(final List<T> calls) {
