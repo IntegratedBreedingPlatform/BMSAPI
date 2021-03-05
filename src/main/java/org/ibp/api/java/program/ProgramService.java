@@ -1,23 +1,25 @@
 
 package org.ibp.api.java.program;
 
-import java.util.List;
-
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
-import org.ibp.api.domain.program.ProgramSummary;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface ProgramService {
 
-	List<ProgramSummary> listProgramsByCropName(final String cropName);
+	List<ProgramDTO> listProgramsByCropName(String cropName);
 
-	List<ProgramSummary> listProgramsByCropNameAndUser(ProgramSearchRequest programSearchRequest);
-
-	List<ProgramDetailsDto> getProgramsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
+	List<ProgramDTO> listProgramsByCropNameAndUser(ProgramSearchRequest programSearchRequest);
 
 	long countProgramsByFilter(final ProgramSearchRequest programSearchRequest);
 
-	ProgramSummary getByUUIDAndCrop(String crop, String programUUID);
+	ProgramDTO getByUUIDAndCrop(String crop, String programUUID);
+
+	List<ProgramDetailsDto> getProgramDetailsByFilter(Pageable pageable, ProgramSearchRequest programSearchRequest);
+
+	List<ProgramDTO> getFilteredPrograms(Pageable pageable, ProgramSearchRequest programSearchRequest);
+
 }

@@ -54,7 +54,7 @@ public class ProgramResourceBrapi {
 	public ResponseEntity<EntityListResponse<Program>> listPrograms(
 		@ApiParam(value = "Filter by the common crop name. Exact match.", required = false)
 		@RequestParam(value = "commonCropName", required = false) final String commonCropName,
-		@ApiParam(value = "Program filter to only return trials associated with given program id.", required = false)
+		@ApiParam(value = "Filter by programDbId. Exact match.", required = false)
 		@RequestParam(value = "programDbId", required = false) final String programDbId,
 		@ApiParam(value = "Filter by program name. Exact match.", required = false) @RequestParam(value = "programName",
 			required = false) final String programName,
@@ -94,11 +94,11 @@ public class ProgramResourceBrapi {
 					return ProgramResourceBrapi.this.programService.countProgramsByFilter(programSearchRequest);
 				}
 
-				@Override
-				public List<ProgramDetailsDto> getResults(final PagedResult<ProgramDetailsDto> pagedResult) {
-					final int currPage = pagedResult.getPageNumber() + 1;
+                @Override
+                public List<ProgramDetailsDto> getResults(final PagedResult<ProgramDetailsDto> pagedResult) {
+					final int currPage = pagedResult.getPageNumber();
 					return ProgramResourceBrapi.this.programService
-						.getProgramsByFilter(new PageRequest(currPage, pagedResult.getPageSize()), programSearchRequest);
+						.getProgramDetailsByFilter(new PageRequest(currPage, pagedResult.getPageSize()), programSearchRequest);
 				}
 			});
 		return ProgramEntityResponseBuilder.getEntityListResponseResponseEntity(pagedResult);

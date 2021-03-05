@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
@@ -24,7 +25,6 @@ import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
-import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
@@ -78,7 +78,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
-		ProgramSummary program = new ProgramSummary();
+		ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
@@ -125,7 +125,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	public List<VariableDetails> getVariablesByFilter(String cropName, String programId, VariableFilter variableFilter) {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
-		ProgramSummary program = new ProgramSummary();
+		ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
@@ -165,7 +165,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		this.validateId(variableId, VariableServiceImpl.VARIABLE_NAME);
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
-		ProgramSummary program = new ProgramSummary();
+		ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
@@ -248,7 +248,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		variable.setId(null);
 		variable.setProgramUuid(programId);
 
-		ProgramSummary program = new ProgramSummary();
+		ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
@@ -312,7 +312,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		variable.setId(variableId);
 		variable.setProgramUuid(programId);
 
-		ProgramSummary program = new ProgramSummary();
+		ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
@@ -405,7 +405,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
-		ProgramSummary program = new ProgramSummary();
+		ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 

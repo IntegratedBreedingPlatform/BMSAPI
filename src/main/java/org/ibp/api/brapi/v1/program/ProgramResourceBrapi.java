@@ -7,7 +7,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
@@ -46,9 +45,6 @@ public class ProgramResourceBrapi {
 
 	@Autowired
 	private ProgramService programService;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private SecurityService securityService;
@@ -96,10 +92,9 @@ public class ProgramResourceBrapi {
 
 				@Override
 				public List<ProgramDetailsDto> getResults(final PagedResult<ProgramDetailsDto> pagedResult) {
-					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
-					final int pageNumber = pagedResult.getPageNumber() + 1;
+					final int pageNumber = pagedResult.getPageNumber();
 					return ProgramResourceBrapi.this.programService
-						.getProgramsByFilter(new PageRequest(pageNumber, pagedResult.getPageSize()), programSearchRequest);
+						.getProgramDetailsByFilter(new PageRequest(pageNumber, pagedResult.getPageSize()), programSearchRequest);
 				}
 			});
 

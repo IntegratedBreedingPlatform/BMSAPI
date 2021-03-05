@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.location.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.ibp.api.domain.program.ProgramSummary;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class LocationSearchRequestValidator {
 		}
 
 		if (locationSearchRequest.getProgramUUID() != null) {
-			this.programValidator.validate(new ProgramSummary(crop, locationSearchRequest.getProgramUUID()), errors);
+			this.programValidator.validate(new ProgramDTO(crop, locationSearchRequest.getProgramUUID()), errors);
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
