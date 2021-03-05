@@ -76,7 +76,7 @@ public class Result<T> {
 		return this;
 	}
 
-	public Result<T> withCalls(final List<T> data) {
+	public Result<T> withCalls(final List<T> calls) {
 		this.calls = calls;
 		return this;
 	}
