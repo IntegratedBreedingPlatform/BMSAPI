@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,10 +45,23 @@ public class ServerinfoResourceBrapi {
 	public ResponseEntity<EntityListResponse<Map<String, Object>>> listAvailableCalls(
 		@ApiParam(value = "data format supported by call", required = false, allowableValues = "application/json, text/csv, text/tsv, application/flapjack")
 		@RequestParam(value = "dataType", required = false) final String dataType) {
+		return this.getBrapiCallsResponseEntity(null, null, dataType);
+	}
 
+	@ApiOperation(value = "Get the list of implemented Calls", notes = "Get a list of available calls.")
+	@RequestMapping(value = "/{crop}/brapi/v2/serverinfo", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<EntityListResponse<Map<String, Object>>> listAvailableCalls(@PathVariable final String crop,
+		@ApiParam(value = "data format supported by call", required = false, allowableValues = "application/json, text/csv, text/tsv, application/flapjack")
+		@RequestParam(value = "dataType", required = false) final String dataType) {
+		return this.getBrapiCallsResponseEntity(null, null, dataType);
+	}
+
+	private ResponseEntity<EntityListResponse<Map<String, Object>>> getBrapiCallsResponseEntity(final Integer currentPage,
+		final Integer pageSize,	final String dataType) {
 		PagedResult<Map<String, Object>> resultPage = null;
 
-		resultPage = new PaginatedSearch().executeBrapiSearch(null, null, new SearchSpec<Map<String, Object>>() {
+		resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<Map<String, Object>>() {
 
 			@Override
 			public long getCount() {
@@ -56,7 +70,7 @@ public class ServerinfoResourceBrapi {
 
 			@Override
 			public List<Map<String, Object>> getResults(final PagedResult<Map<String, Object>> pagedResult) {
-				return ServerinfoResourceBrapi.this.callService.getAllCalls(dataType, ServerinfoResourceBrapi.VERSION, null, null);
+				return ServerinfoResourceBrapi.this.callService.getAllCalls(dataType, ServerinfoResourceBrapi.VERSION, pageSize, currentPage);
 			}
 		});
 
