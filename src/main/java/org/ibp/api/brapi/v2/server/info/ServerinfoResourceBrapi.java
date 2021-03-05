@@ -28,13 +28,13 @@ import java.util.Map;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a>
- * Call services.
+ * Server info services.
  */
-@Api(value = "BrAPI Service Info Services")
+@Api(value = "BrAPI Server Info Services")
 @Controller
 public class ServerinfoResourceBrapi {
 
-	public static final String VERSION = "2";
+	public static final String VERSION_2 = "2";
 
 	@Autowired
 	private CallService callService;
@@ -65,12 +65,12 @@ public class ServerinfoResourceBrapi {
 
 			@Override
 			public long getCount() {
-				return ServerinfoResourceBrapi.this.callService.getAllCalls(dataType, ServerinfoResourceBrapi.VERSION, null, null).size();
+				return ServerinfoResourceBrapi.this.callService.getAllCalls(dataType, ServerinfoResourceBrapi.VERSION_2, null, null).size();
 			}
 
 			@Override
 			public List<Map<String, Object>> getResults(final PagedResult<Map<String, Object>> pagedResult) {
-				return ServerinfoResourceBrapi.this.callService.getAllCalls(dataType, ServerinfoResourceBrapi.VERSION, pageSize, currentPage);
+				return ServerinfoResourceBrapi.this.callService.getAllCalls(dataType, ServerinfoResourceBrapi.VERSION_2, pageSize, currentPage);
 			}
 		});
 

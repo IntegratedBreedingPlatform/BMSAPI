@@ -35,7 +35,7 @@ import java.util.Map;
 @Controller
 public class CallResourceBrapi {
 
-	static final String VERSION = "1";
+	static final String VERSION_1 = "1";
 
 	@Autowired
 	private CallService callService;
@@ -83,12 +83,12 @@ public class CallResourceBrapi {
 
 			@Override
 			public long getCount() {
-				return CallResourceBrapi.this.callService.getAllCalls(dataType, CallResourceBrapi.VERSION, null, null).size();
+				return CallResourceBrapi.this.callService.getAllCalls(dataType, CallResourceBrapi.VERSION_1, null, null).size();
 			}
 
 			@Override
 			public List<Map<String, Object>> getResults(final PagedResult<Map<String, Object>> pagedResult) {
-				return CallResourceBrapi.this.callService.getAllCalls(dataType, CallResourceBrapi.VERSION, pageSize, currentPage);
+				return CallResourceBrapi.this.callService.getAllCalls(dataType, CallResourceBrapi.VERSION_1, pageSize, currentPage);
 			}
 		});
 

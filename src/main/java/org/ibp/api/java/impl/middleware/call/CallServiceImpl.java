@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class CallServiceImpl implements CallService {
@@ -82,7 +81,8 @@ public class CallServiceImpl implements CallService {
 				}
 			}
 			if(implementedInTargetVersion) {
-				if(ServerinfoResourceBrapi.VERSION.equals(version)) {
+				if(ServerinfoResourceBrapi.VERSION_2.equals(version)) {
+					//change the key of "call" to "service" for version 2
 					call.put("service", call.remove("call"));
 				}
 				filteredBrapiCalls.add(call);
