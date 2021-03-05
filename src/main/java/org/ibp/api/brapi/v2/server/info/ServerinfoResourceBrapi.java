@@ -74,20 +74,11 @@ public class ServerinfoResourceBrapi {
 			}
 		});
 
-		if (resultPage != null && resultPage.getTotalResults() > 0) {
+		final Result<Map<String, Object>> results = new Result<Map<String, Object>>().withCalls(resultPage.getPageResults());
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
-			final Result<Map<String, Object>> results = new Result<Map<String, Object>>().withCalls(resultPage.getPageResults());
-			final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
-
-			final Metadata metadata = new Metadata().withPagination(pagination);
-			return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
-
-		} else {
-
-			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", "not found calls"));
-			final Metadata metadata = new Metadata(null, status);
-			return new ResponseEntity<>(new EntityListResponse().withMetadata(metadata), HttpStatus.NOT_FOUND);
-		}
+		final Metadata metadata = new Metadata().withPagination(pagination);
+		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 	}
 }
