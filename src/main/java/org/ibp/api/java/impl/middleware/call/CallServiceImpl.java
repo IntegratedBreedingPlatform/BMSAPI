@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.call;
 import com.jayway.jsonpath.JsonPath;
 import net.minidev.json.JSONArray;
 import org.apache.commons.io.IOUtils;
+import org.ibp.api.brapi.v2.server.info.ServerinfoResourceBrapi;
 import org.ibp.api.java.calls.CallService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +82,9 @@ public class CallServiceImpl implements CallService {
 				}
 			}
 			if(implementedInTargetVersion) {
+				if(ServerinfoResourceBrapi.VERSION.equals(version)) {
+					call.put("service", call.remove("call"));
+				}
 				filteredBrapiCalls.add(call);
 			}
 		}
