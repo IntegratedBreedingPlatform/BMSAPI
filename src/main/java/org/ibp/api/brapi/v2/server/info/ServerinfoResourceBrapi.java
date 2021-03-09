@@ -55,7 +55,7 @@ public class ServerinfoResourceBrapi {
 
 	private ResponseEntity<EntityListResponse<Map<String, Object>>> getBrapiCallsResponseEntity(final Integer currentPage,
 		final Integer pageSize,	final String dataType) {
-		PagedResult<Map<String, Object>> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize,
+		final PagedResult<Map<String, Object>> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize,
 			new SearchSpec<Map<String, Object>>() {
 
 			@Override
