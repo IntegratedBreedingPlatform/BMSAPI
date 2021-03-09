@@ -1,9 +1,11 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -17,6 +19,9 @@ public class GermplasmValidator {
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
+
+	@Autowired
+	private GermplasmService germplasmService;
 
 	public void validateGermplasmId(final BindingResult errors, final Integer germplasmId) {
 		if (germplasmId == null) {
@@ -40,5 +45,14 @@ public class GermplasmValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
-
+	public void validateGermplasmGUID(final BindingResult errors, final String germplasmGUID) {
+		if (germplasmGUID == null) {
+			errors.reject("germplasm.required", "");
+			return;
+		}
+		final GermplasmDTO germplasm = this.germplasmService.getGermplasmDTObyGUID(germplasmGUID);
+		if (germplasm == null) {
+			errors.reject("germplasm.invalid", "");
+		}
+	}
 }

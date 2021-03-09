@@ -329,13 +329,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<AttributeDTO> getAttributesByGermplasmGUID(
 			final String germplasmGUID, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
-		this.validateGidAndAttributes(germplasmGUID, attributeDbIds);
+		this.validateGuidAndAttributes(germplasmGUID, attributeDbIds);
 		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmGUID);
-		if (germplasmDTO.isPresent()) {
-			return this.germplasmDataManager.getAttributesByGid(germplasmDTO.get().getGid(), attributeDbIds, pageSize, pageNumber);
-		} else {
-			throw new ApiRuntimeException("Invalid Germplasm Id");
-		}
+		return this.germplasmDataManager.getAttributesByGid(germplasmDTO.get().getGid(), attributeDbIds, pageSize, pageNumber);
 	}
 
 	@Override
@@ -460,9 +456,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return response;
 	}
 
-	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
+	private void validateGuidAndAttributes(final String germplasmGUID, final List<String> attributeDbIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
-		this.germplasmValidator.validateGermplasmId(this.errors, Integer.valueOf(gid));
+		this.germplasmValidator.validateGermplasmGUID(this.errors, germplasmGUID);
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
