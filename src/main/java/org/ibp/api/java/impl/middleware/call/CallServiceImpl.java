@@ -1,9 +1,7 @@
 package org.ibp.api.java.impl.middleware.call;
 
 import com.jayway.jsonpath.JsonPath;
-import net.minidev.json.JSONArray;
 import org.apache.commons.io.IOUtils;
-import org.ibp.api.brapi.v2.server.info.ServerinfoResourceBrapi;
 import org.ibp.api.java.calls.CallService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 @Service
@@ -23,11 +20,14 @@ public class CallServiceImpl implements CallService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CallServiceImpl.class);
 
-	@Value("classpath:brapi/calls.json")
-	private Resource calls;
+	@Value("classpath:brapi/calls_v1.json")
+	private Resource callsV1;
+
+	@Value("classpath:brapi/calls_v2.json")
+	private Resource callsV2;
 
 	@Override
-	public List<Map<String, Object>> getAllCalls(final String dataType, final String version, final Integer pageSize, final Integer pageNumber) {
+	public List<Map<String, Object>> getAllCallsForV1(final String dataType, final Integer pageSize, final Integer pageNumber) {
 		try {
 			List<Map<String, Object>> brapiCalls;
 			final String jsonPath;
@@ -38,7 +38,7 @@ public class CallServiceImpl implements CallService {
 				jsonPath = "$.data.*";
 			}
 
-			final InputStream is = this.calls.getInputStream();
+			final InputStream is = this.callsV1.getInputStream();
 			final String jsonTxt = IOUtils.toString( is );
 			brapiCalls = JsonPath.parse(jsonTxt).read(jsonPath);
 
@@ -60,34 +60,29 @@ public class CallServiceImpl implements CallService {
 				brapiCalls = brapiCalls.subList(fromIndex, toIndex);
 			}
 
-			return this.filterCallsByVersion(brapiCalls, version);
+			return brapiCalls;
 		} catch (final IOException e) {
 			LOG.error(e.getMessage(), e);
 			return new ArrayList<>();
 		}
 	}
 
-	List<Map<String, Object>> filterCallsByVersion(final List<Map<String, Object>> brapiCalls, final String version) {
-		final List<Map<String, Object>> filteredBrapiCalls = new ArrayList<>();
-		for(final Map<String, Object> call: brapiCalls) {
-			final JSONArray versions = ((JSONArray) call.get("versions"));
-			final ListIterator<Object> iterator = versions.listIterator();
-			boolean implementedInTargetVersion = false;
-			while (iterator.hasNext()) {
-				if(!iterator.next().toString().startsWith(version)) {
-					iterator.remove();
-				} else {
-					implementedInTargetVersion = true;
-				}
+	@Override
+	public List<Map<String, Object>> getAllCallsForV2(final String dataType) {
+		try {
+			final String jsonPath;
+			if (dataType != null) {
+				jsonPath = "$.data[?('" + dataType + "' in @['dataTypes'])]";
+			} else {
+				jsonPath = "$.data.*";
 			}
-			if(implementedInTargetVersion) {
-				if(ServerinfoResourceBrapi.VERSION_2.equals(version)) {
-					//change the key of "call" to "service" for version 2
-					call.put("service", call.remove("call"));
-				}
-				filteredBrapiCalls.add(call);
-			}
+
+			final InputStream is = this.callsV2.getInputStream();
+			final String jsonTxt = IOUtils.toString( is );
+			return JsonPath.parse(jsonTxt).read(jsonPath);
+		} catch (final IOException e) {
+			LOG.error(e.getMessage(), e);
+			return new ArrayList<>();
 		}
-		return filteredBrapiCalls;
 	}
 }

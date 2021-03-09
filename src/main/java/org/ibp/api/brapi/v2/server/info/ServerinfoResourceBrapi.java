@@ -1,6 +1,5 @@
 package org.ibp.api.brapi.v2.server.info;
 
-import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -33,8 +31,6 @@ import java.util.Map;
 @Api(value = "BrAPI Server Info Services")
 @Controller
 public class ServerinfoResourceBrapi {
-
-	public static final String VERSION_2 = "2";
 
 	@Autowired
 	private CallService callService;
@@ -59,18 +55,17 @@ public class ServerinfoResourceBrapi {
 
 	private ResponseEntity<EntityListResponse<Map<String, Object>>> getBrapiCallsResponseEntity(final Integer currentPage,
 		final Integer pageSize,	final String dataType) {
-		PagedResult<Map<String, Object>> resultPage = null;
-
-		resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<Map<String, Object>>() {
+		PagedResult<Map<String, Object>> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize,
+			new SearchSpec<Map<String, Object>>() {
 
 			@Override
 			public long getCount() {
-				return ServerinfoResourceBrapi.this.callService.getAllCalls(dataType, ServerinfoResourceBrapi.VERSION_2, null, null).size();
+				return ServerinfoResourceBrapi.this.callService.getAllCallsForV2(dataType).size();
 			}
 
 			@Override
 			public List<Map<String, Object>> getResults(final PagedResult<Map<String, Object>> pagedResult) {
-				return ServerinfoResourceBrapi.this.callService.getAllCalls(dataType, ServerinfoResourceBrapi.VERSION_2, pageSize, currentPage);
+				return ServerinfoResourceBrapi.this.callService.getAllCallsForV2(dataType);
 			}
 		});
 

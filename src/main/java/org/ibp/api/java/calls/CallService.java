@@ -5,5 +5,7 @@ import java.util.Map;
 
 public interface CallService {
 
-	List<Map<String, Object>> getAllCalls(final String dataType, final String version, final Integer pageSize, final Integer pageNumber);
+	List<Map<String, Object>> getAllCallsForV1(final String dataType, final Integer pageSize, final Integer pageNumber);
+
+	List<Map<String, Object>> getAllCallsForV2(final String dataType);
 }

@@ -22,53 +22,67 @@ import static org.mockito.Mockito.doReturn;
 public class CallServiceImplTest {
 
 	@Mock
-	private Resource calls;
+	private Resource callsV1;
+
+	@Mock
+	private Resource callsV2;
 
 	@InjectMocks
 	private CallServiceImpl callService;
 
-	@Before
-	public void setup() throws IOException {
-		this.resetInputStream();
+	@Test
+	public void testGetAllCallsForV1() throws IOException {
+		this.resetInputStreamForV1();
+		final List<Map<String, Object>> result = this.callService.getAllCallsForV1(null, 10, 0);
+		Assert.assertEquals("First page should contain 10 records", 10, result.size());
+		this.resetInputStreamForV1();
+
+		final List<Map<String, Object>> result2 = this.callService.getAllCallsForV1(null, 10, 1);
+		Assert.assertEquals("Second page should contain 10 records", 10, result2.size());
+		this.resetInputStreamForV1();
+
+		final List<Map<String, Object>> result3 = this.callService.getAllCallsForV1(null, null, null);
+		Assert.assertEquals("Should return all records if pageSize and pageNumber are not specified", 20, result3.size());
+		this.resetInputStreamForV1();
+
+		// Search by BrAPI v1.2 where CSV data type = csv
+		final List<Map<String, Object>> result4 = this.callService.getAllCallsForV1("csv", 10, 0);
+		Assert.assertEquals("There is only one call service with csv datatype", 1, result4.size());
+		this.resetInputStreamForV1();
+
+		// Search by BrAPI v1.2 where CSV data type = text/csv
+		final List<Map<String, Object>> result5 = this.callService.getAllCallsForV1("text/csv",10, 0);
+		Assert.assertEquals("There is only one call service with text/csv datatype", 1, result5.size());
+		this.resetInputStreamForV1();
+
+		final List<Map<String, Object>> result6 = this.callService.getAllCallsForV1(null,5, null);
+		Assert.assertEquals("Should return no. of records specified even if pageNumber is not specified", 5, result6.size());
+		this.resetInputStreamForV1();
+
+		final List<Map<String, Object>> result7 = this.callService.getAllCallsForV1(null, null, 0);
+		Assert.assertEquals("Should return all records if pageSize is specified and pageNumber is zero", 20, result7.size());
 	}
 
 	@Test
-	public void testGetAllCalls() throws IOException {
-		final List<Map<String, Object>> result = this.callService.getAllCalls(null, "1",10, 0);
-		Assert.assertEquals("First page should contain 10 records", 10, result.size());
-		this.resetInputStream();
+	public void testGetAllCallsForV2() throws IOException {
+		this.resetInputStreamForV2();
+		List<Map<String, Object>> result = this.callService.getAllCallsForV2(null);
+		Assert.assertEquals("First page should contain 10 records", 12, result.size());
 
-		final List<Map<String, Object>> result2 = this.callService.getAllCalls(null, "1",10, 1);
-		Assert.assertEquals("Second page should contain 10 records", 10, result2.size());
-		this.resetInputStream();
-
-		final List<Map<String, Object>> result3 = this.callService.getAllCalls(null, "1",null, null);
-		Assert.assertEquals("Should return all version 1 records if pageSize and pageNumber are not specified", 20, result3.size());
-		this.resetInputStream();
-
-		// Search by BrAPI v1.2 where CSV data type = csv
-		final List<Map<String, Object>> result4 = this.callService.getAllCalls("csv", "1",10, 0);
-		Assert.assertEquals("There is only one call service with csv datatype", 1, result4.size());
-		this.resetInputStream();
-
-		// Search by BrAPI v1.2 where CSV data type = text/csv
-		final List<Map<String, Object>> result5 = this.callService.getAllCalls("text/csv","1", 10, 0);
-		Assert.assertEquals("There is only one call service with text/csv datatype", 1, result5.size());
-		this.resetInputStream();
-
-		final List<Map<String, Object>> result6 = this.callService.getAllCalls(null, "1",5, null);
-		Assert.assertEquals("Should return no. of records specified even if pageNumber is not specified", 5, result6.size());
-		this.resetInputStream();
-
-		final List<Map<String, Object>> result7 = this.callService.getAllCalls(null, "2",null, 0);
-		Assert.assertEquals("Should return all version 2 records if pageSize is specified and pageNumber is zero", 4, result7.size());
-		this.resetInputStream();
+		this.resetInputStreamForV2();
+		result = this.callService.getAllCallsForV2("application/json");
+		Assert.assertEquals("Should return 12 records", 12, result.size());
 
 	}
 
-	private void resetInputStream() throws IOException {
-		final InputStream is = new FileInputStream(new File("src/test/resources/brapi/calls.json"));
-		doReturn(is).when(this.calls).getInputStream();
+	private void resetInputStreamForV1() throws IOException {
+		final InputStream is = new FileInputStream(new File("src/test/resources/brapi/calls_v1.json"));
+		doReturn(is).when(this.callsV1).getInputStream();
+	}
+
+	private void resetInputStreamForV2() throws IOException {
+		final InputStream is = new FileInputStream(new File("src/test/resources/brapi/calls_v2.json"));
+		doReturn(is).when(this.callsV2).getInputStream();
 	}
 
 }
