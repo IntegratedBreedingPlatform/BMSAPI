@@ -207,13 +207,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
+	public PedigreeDTO getPedigree(final String germplasmDbId, final String notation, final Boolean includeSiblings) {
 		final PedigreeDTO pedigreeDTO;
 		try {
-			pedigreeDTO = this.germplasmDataManager.getPedigree(germplasmDbId, notation, includeSiblings);
-			if (pedigreeDTO != null) {
-				pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmDbId, this.crossExpansionProperties));
+			final Optional<GermplasmDTO> germplasmDto = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
+			if (germplasmDto.isPresent()) {
+				final int gid = Integer.valueOf(germplasmDto.get().getGid());
+				pedigreeDTO = this.germplasmDataManager.getPedigree(gid, notation, includeSiblings);
+				if (pedigreeDTO != null) {
+					pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(pedigreeDTO.getGermplasmDbId(), this.crossExpansionProperties));
+				}
+			} else {
+				throw new ApiRuntimeException("Invalid Germplasm Id");
 			}
+
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("An error has occurred when trying to get the pedigree", e);
 		}
@@ -221,10 +228,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
+	public ProgenyDTO getProgeny(final String germplasmDbId) {
 		final ProgenyDTO progenyDTO;
 		try {
-			progenyDTO = this.germplasmDataManager.getProgeny(germplasmDbId);
+			final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
+			if (germplasmDTO.isPresent()) {
+				final int gid = Integer.valueOf(germplasmDTO.get().getGid());
+				progenyDTO = this.germplasmDataManager.getProgeny(gid);
+			} else {
+				throw new ApiRuntimeException("Invalid Germplasm Id");
+			}
+
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("An error has occurred when trying to get the progeny", e);
 		}
@@ -240,11 +254,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public GermplasmDTO getGermplasmDTObyGID(final Integer germplasmId) {
-		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmService.getGermplasmDTOByGID(germplasmId);
+	public GermplasmDTO getGermplasmDTObyGUID(final String germplasmGUID) {
+		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmService.getGermplasmDTOByGUID(germplasmGUID);
 		if (germplasmDTOOptional.isPresent()) {
 			final GermplasmDTO germplasmDTO = germplasmDTOOptional.get();
-			germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmId, this.crossExpansionProperties));
+			germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(Integer.valueOf(germplasmDTO.getGid()), this.crossExpansionProperties));
 			return germplasmDTO;
 		} else {
 			throw new ApiRuntimeException("Invalid Germplasm Id");
@@ -313,15 +327,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<AttributeDTO> getAttributesByGid(
-		final String gid, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
-		this.validateGidAndAttributes(gid, attributeDbIds);
-		return this.germplasmDataManager.getAttributesByGid(gid, attributeDbIds, pageSize, pageNumber);
+	public List<AttributeDTO> getAttributesByGermplasmGUID(
+			final String germplasmGUID, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
+		this.validateGidAndAttributes(germplasmGUID, attributeDbIds);
+		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmGUID);
+		if (germplasmDTO.isPresent()) {
+			return this.germplasmDataManager.getAttributesByGid(germplasmDTO.get().getGid(), attributeDbIds, pageSize, pageNumber);
+		} else {
+			throw new ApiRuntimeException("Invalid Germplasm Id");
+		}
 	}
 
 	@Override
-	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
-		return this.germplasmDataManager.countAttributesByGid(gid, attributeDbIds);
+	public long countAttributesByGermplasmGUID(final String germplasmGUID, final List<String> attributeDbIds) {
+		return this.germplasmDataManager.countAttributesByGid(germplasmGUID, attributeDbIds);
 	}
 
 	@Override
