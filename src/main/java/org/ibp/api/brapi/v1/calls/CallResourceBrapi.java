@@ -50,7 +50,7 @@ public class CallResourceBrapi {
 		@RequestParam(value = "dataType",
 			required = false) final String dataType) {
 
-		return getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
+		return this.getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
 	}
 	@ApiOperation(value = "List of available calls", notes = "Get a list of available calls with crop name.")
 	@RequestMapping(value = "/{crop}/brapi/v1/calls", method = RequestMethod.GET)
@@ -64,7 +64,7 @@ public class CallResourceBrapi {
 		@RequestParam(value = "dataType",
 			required = false) final String dataType) {
 
-		return getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
+		return this.getBrapiCallsResponseEntity(currentPage, pageSize, dataType);
 	}
 
 	private ResponseEntity<EntityListResponse<Map<String, Object>>> getBrapiCallsResponseEntity(
@@ -81,12 +81,12 @@ public class CallResourceBrapi {
 
 			@Override
 			public long getCount() {
-				return CallResourceBrapi.this.callService.getAllCalls(dataType, null, null).size();
+				return CallResourceBrapi.this.callService.getAllCallsForV1(dataType, null, null).size();
 			}
 
 			@Override
 			public List<Map<String, Object>> getResults(final PagedResult<Map<String, Object>> pagedResult) {
-				return CallResourceBrapi.this.callService.getAllCalls(dataType, pageSize, currentPage);
+				return CallResourceBrapi.this.callService.getAllCallsForV1(dataType, pageSize, currentPage);
 			}
 		});
 

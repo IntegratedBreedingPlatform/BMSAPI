@@ -1,0 +1,147 @@
+{"data": [
+  {
+    "service": "locations",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "programs",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "studies",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "studies/{studyDbId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "trials",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "search/observationunits",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "search/observationunits/{searchResultsDbid}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "seedlots",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "transactions",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "breedingmethods",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "breedingmethods/{breedingMethodDbId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "germplasm",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  }
+]
+}
