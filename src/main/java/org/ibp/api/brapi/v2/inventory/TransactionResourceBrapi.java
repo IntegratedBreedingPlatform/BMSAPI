@@ -93,7 +93,7 @@ public class TransactionResourceBrapi {
 
 		if(!StringUtils.isEmpty(germplasmDbId)) {
 			// GermplasmDbID = Germplasm_UUID
-			searchDTO.setGermplasmGuids(Collections.singletonList(germplasmDbId));
+			searchDTO.setGermplasmUUIDs(Collections.singletonList(germplasmDbId));
 		}
 
 		if(!StringUtils.isEmpty(seedLotDbId)) {

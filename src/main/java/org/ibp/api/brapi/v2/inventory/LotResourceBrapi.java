@@ -54,7 +54,7 @@ public class LotResourceBrapi {
             lotsSearchDto.setLotUUIDs(Collections.singletonList(seedLotDbId));
         }
         if (germplasmDbId != null) {
-            lotsSearchDto.setGermplasmGUIDs(Collections.singletonList(germplasmDbId));
+            lotsSearchDto.setGermplasmUUIDs(Collections.singletonList(germplasmDbId));
         }
         // Only retrieve Active Lots
         lotsSearchDto.setStatus(LotStatus.ACTIVE.getIntValue());
