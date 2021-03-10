@@ -57,7 +57,7 @@ public class LotMapper {
                 this.using(new AdditionalInfoConverter()).map(this.source).setAdditionalInfo(null);
                 this.map().setAmount(this.source.getAvailableBalance());
                 this.map().setCreatedDate(this.source.getCreatedDate());
-                this.map().setGermplasmDbId(this.source.getGid());
+                this.map().setGermplasmDbId(this.source.getGermplasmUUID());
                 this.map().setLocationDbId(this.source.getLocationId());
                 this.map().setSeedLotDescription(this.source.getNotes());
                 this.map().setSeedLotName(this.source.getStockId());

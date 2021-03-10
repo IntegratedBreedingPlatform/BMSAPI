@@ -21,7 +21,7 @@ public class LotDetails {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date lastUpdated;
 
-    private Integer germplasmDbId;
+    private String germplasmDbId;
 
     private Integer locationDbId;
 
@@ -73,11 +73,11 @@ public class LotDetails {
         this.lastUpdated = lastUpdated;
     }
 
-    public Integer getGermplasmDbId() {
+    public String getGermplasmDbId() {
         return germplasmDbId;
     }
 
-    public void setGermplasmDbId(final Integer germplasmDbId) {
+    public void setGermplasmDbId(final String germplasmDbId) {
         this.germplasmDbId = germplasmDbId;
     }
 
