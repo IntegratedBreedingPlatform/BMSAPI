@@ -215,7 +215,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				final int gid = Integer.valueOf(germplasmDto.get().getGid());
 				pedigreeDTO = this.germplasmDataManager.getPedigree(gid, notation, includeSiblings);
 				if (pedigreeDTO != null) {
-					pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(pedigreeDTO.getGermplasmDbId(), this.crossExpansionProperties));
+					pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
 				}
 			} else {
 				throw new ApiRuntimeException("Invalid Germplasm Id");

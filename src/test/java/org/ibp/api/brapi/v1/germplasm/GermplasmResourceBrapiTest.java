@@ -55,7 +55,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		final String germplasmDbId = RandomStringUtils.randomAlphabetic(10);
 
 		final PedigreeDTO pedigreeDTO = new PedigreeDTO();
-		pedigreeDTO.setGermplasmDbId(gid);
+		pedigreeDTO.setGermplasmDbId(String.valueOf(gid));
 		pedigreeDTO.setPedigree(randomAlphanumeric(255));
 
 		doReturn(pedigreeDTO).when(this.germplasmService).getPedigree(germplasmDbId, null, null);
@@ -71,14 +71,14 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGetProgeny() throws Exception {
-		final int gid = nextInt();
+		final String gid = String.valueOf(nextInt());
 		final String germplasmDbId = RandomStringUtils.randomAlphabetic(10);
 
 		final ProgenyDTO progenyDTO = new ProgenyDTO();
 		progenyDTO.setGermplasmDbId(gid);
 		final List<ProgenyDTO.Progeny> progenies = new ArrayList<>();
 		final ProgenyDTO.Progeny progeny = new ProgenyDTO.Progeny();
-		progeny.setGermplasmDbId(nextInt());
+		progeny.setGermplasmDbId(String.valueOf(nextInt()));
 		progeny.setParentType(ParentType.MALE.name());
 		progenies.add(progeny);
 		progenyDTO.setProgeny(progenies);
