@@ -332,7 +332,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.validateGuidAndAttributes(germplasmUUID, attributeDbIds);
 		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
 		if (germplasmDTO.isPresent()) {
-			return this.germplasmDataManager.getAttributesByGid(germplasmDTO.get().getGid(), attributeDbIds, pageSize, pageNumber);
+			return this.germplasmService.getAttributesByGid(germplasmDTO.get().getGid(), attributeDbIds, pageSize, pageNumber);
 		} else {
 			throw new ApiRuntimeException("Invalid GermplasmDbId");
 		}
@@ -343,7 +343,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public long countAttributesByGUID(final String germplasmUUID, final List<String> attributeDbIds) {
 		final Optional<GermplasmDTO> germplasm = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
 		if (germplasm.isPresent()) {
-			return this.germplasmDataManager.countAttributesByGid(germplasm.get().getGid(), attributeDbIds);
+			return this.germplasmService.countAttributesByGid(germplasm.get().getGid(), attributeDbIds);
 		} else {
 			throw new ApiRuntimeException("Invalid GermplasmDbId");
 		}
