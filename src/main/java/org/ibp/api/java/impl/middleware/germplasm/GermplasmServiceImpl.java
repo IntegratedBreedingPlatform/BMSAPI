@@ -331,7 +331,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final String germplasmGUID, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
 		this.validateGuidAndAttributes(germplasmGUID, attributeDbIds);
 		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmGUID);
-		return this.germplasmDataManager.getAttributesByGid(germplasmDTO.get().getGid(), attributeDbIds, pageSize, pageNumber);
+		if (germplasmDTO.isPresent()) {
+			return this.germplasmDataManager.getAttributesByGid(germplasmDTO.get().getGid(), attributeDbIds, pageSize, pageNumber);
+		} else {
+			throw new ApiRuntimeException("Invalid Germplasm Id");
+		}
+
 	}
 
 	@Override
@@ -436,7 +441,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final GermplasmImportResponse response = new GermplasmImportResponse();
-		final Integer originalListSize = germplasmImportRequestList.size();
+		final int originalListSize = germplasmImportRequestList.size();
 		int noOfCreatedGermplasm = 0;
 		// Remove germplasm that fails any validation. They will be excluded from creation
 		final BindingResult bindingResult = this.germplasmImportValidator.pruneGermplasmInvalidForImport(germplasmImportRequestList);
@@ -445,7 +450,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 		if (!CollectionUtils.isEmpty(germplasmImportRequestList)) {
 			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-			final List<GermplasmDTO> germplasmDTOList = germplasmService.createGermplasm(user.getUserid(), cropName, germplasmImportRequestList);
+			final List<GermplasmDTO> germplasmDTOList = this.germplasmService.createGermplasm(user.getUserid(), cropName, germplasmImportRequestList);
 			if (!CollectionUtils.isEmpty(germplasmDTOList)) {
 				this.populateGermplasmPedigree(germplasmDTOList);
 				noOfCreatedGermplasm = germplasmDTOList.size();
