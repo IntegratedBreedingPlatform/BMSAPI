@@ -29,8 +29,6 @@ import java.util.stream.IntStream;
 @Component
 public class GermplasmImportRequestValidator {
 
-	public static final Integer STOCK_ID_MAX_LENGTH = 35;
-	public static final Integer REFERENCE_MAX_LENGTH = 255;
 	public static final Integer NAME_MAX_LENGTH = 255;
 	public static final Integer ATTRIBUTE_MAX_LENGTH = 255;
 
@@ -68,11 +66,7 @@ public class GermplasmImportRequestValidator {
 				errors.reject("germplasm.create.acquisition.date.invalid.format", new String[] {index.toString()}, "");
 				return true;
 			}
-			if (StringUtils.isEmpty(g.getBreedingMethodDbId())) {
-				errors.reject("germplasm.create.breeding.method.null", new String[] {index.toString()}, "");
-				return true;
-			}
-			if (!validBreedingMethodIds.contains(g.getBreedingMethodDbId())) {
+			if (StringUtils.isNotEmpty(g.getBreedingMethodDbId()) && !validBreedingMethodIds.contains(g.getBreedingMethodDbId())) {
 				errors.reject("germplasm.create.breeding.method.invalid", new String[] {index.toString()}, "");
 				return true;
 			}
