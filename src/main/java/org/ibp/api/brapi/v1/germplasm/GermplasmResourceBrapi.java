@@ -404,14 +404,14 @@ public class GermplasmResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return GermplasmResourceBrapi.this.germplasmService.countAttributesByGermplasmGUID(germplasmDbId, attributeDbIds);
+					return GermplasmResourceBrapi.this.germplasmService.countAttributesByGUID(germplasmDbId, attributeDbIds);
 				}
 
 				@Override
 				public List<AttributeDTO> getResults(final PagedResult<AttributeDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return GermplasmResourceBrapi.this.germplasmService
-						.getAttributesByGermplasmGUID(germplasmDbId, attributeDbIds, pagedResult.getPageSize(), pageNumber);
+						.getAttributesByGUID(germplasmDbId, attributeDbIds, pagedResult.getPageSize(), pageNumber);
 				}
 			});
 

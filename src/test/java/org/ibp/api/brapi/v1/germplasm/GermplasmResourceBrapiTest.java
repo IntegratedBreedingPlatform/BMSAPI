@@ -155,7 +155,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		final List<AttributeDTO> attributeDTOS = this.createAttributes(germplasmDbId);
 
 		doReturn(attributeDTOS).when(this.germplasmService)
-				.getAttributesByGermplasmGUID(germplasmDbId, null, BrapiPagedResult.DEFAULT_PAGE_SIZE, 1);
+				.getAttributesByGUID(germplasmDbId, null, BrapiPagedResult.DEFAULT_PAGE_SIZE, 1);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/attributes")
 				.contentType(this.contentType)
