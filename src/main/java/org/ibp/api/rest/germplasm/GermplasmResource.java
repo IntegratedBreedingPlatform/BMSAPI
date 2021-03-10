@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -154,16 +155,6 @@ public class GermplasmResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam final String query) {
 		return new ResponseEntity<>(this.germplasmService.searchNameTypes(query), HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Returns germplasm attributes filtered by a list of codes", notes = "Returns germplasm attributes filtered by a list of codes")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<AttributeDTO>> getGermplasmAttributes(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final Set<String> codes,
-		@RequestParam(required = false) final String type) {
-		return new ResponseEntity<>(this.germplasmService.filterGermplasmAttributes(codes, type), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls/{isGermplasmUpdateFormat}", method = RequestMethod.GET)
