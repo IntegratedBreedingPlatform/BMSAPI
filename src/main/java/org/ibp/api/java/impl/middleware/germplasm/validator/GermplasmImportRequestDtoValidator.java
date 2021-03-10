@@ -414,7 +414,7 @@ public class GermplasmImportRequestDtoValidator {
 			.forEach(g -> attributes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		if (!attributes.isEmpty()) {
 			final List<String> existingGermplasmAttributes =
-				this.germplasmService.filterGermplasmAttributes(attributes).stream().map(AttributeDTO::getCode).collect(
+				this.germplasmService.filterGermplasmAttributes(attributes, null).stream().map(AttributeDTO::getCode).collect(
 					Collectors.toList());
 			final Set<String> repeatedAttributes =
 				existingGermplasmAttributes.stream().filter(i -> Collections.frequency(existingGermplasmAttributes, i) > 1)

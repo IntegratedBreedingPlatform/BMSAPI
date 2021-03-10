@@ -82,7 +82,7 @@ public class GermplasmUpdateDtoValidatorTest {
 
 		when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
 			.thenReturn(Arrays.asList(new GermplasmNameTypeDTO(null, "DRVNM", null), new GermplasmNameTypeDTO(null, "LNAME", null)));
-		when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet()))
+		when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null)))
 			.thenReturn(Arrays.asList(new AttributeDTO(null, "NOTE", null), new AttributeDTO(null, "ACQ_DATE", null)));
 		when(this.germplasmMiddlewareService.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 		when(this.germplasmMiddlewareService.getGermplasmByGUIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
@@ -124,7 +124,7 @@ public class GermplasmUpdateDtoValidatorTest {
 
 		when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
 			.thenReturn(Arrays.asList(new GermplasmNameTypeDTO(null, "DRVNM", null)));
-		when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet()))
+		when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null)))
 			.thenReturn(Arrays.asList(new AttributeDTO(null, "NOTE", null)));
 
 		final BindingResult errors = Mockito.mock(BindingResult.class);

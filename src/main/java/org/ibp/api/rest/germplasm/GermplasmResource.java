@@ -161,9 +161,9 @@ public class GermplasmResource {
 	@ResponseBody
 	public ResponseEntity<List<AttributeDTO>> getGermplasmAttributes(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final Set<String> codes) {
-
-		return new ResponseEntity<>(this.germplasmService.filterGermplasmAttributes(codes), HttpStatus.OK);
+		@RequestParam(required = false) final Set<String> codes,
+		@RequestParam(required = false) final String type) {
+		return new ResponseEntity<>(this.germplasmService.filterGermplasmAttributes(codes, type), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls/{isGermplasmUpdateFormat}", method = RequestMethod.GET)
