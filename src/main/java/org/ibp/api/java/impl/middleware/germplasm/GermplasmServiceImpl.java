@@ -254,8 +254,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public GermplasmDTO getGermplasmDTObyGUID(final String germplasmGUID) {
-		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmService.getGermplasmDTOByGUID(germplasmGUID);
+	public GermplasmDTO getGermplasmDTObyGUID(final String germplasmUUID) {
+		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
 		if (germplasmDTOOptional.isPresent()) {
 			final GermplasmDTO germplasmDTO = germplasmDTOOptional.get();
 			germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(Integer.valueOf(germplasmDTO.getGid()), this.crossExpansionProperties));
@@ -327,10 +327,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<AttributeDTO> getAttributesByGermplasmGUID(
-			final String germplasmGUID, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
-		this.validateGuidAndAttributes(germplasmGUID, attributeDbIds);
-		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmGUID);
+	public List<AttributeDTO> getAttributesByGUID(
+			final String germplasmUUID, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
+		this.validateGuidAndAttributes(germplasmUUID, attributeDbIds);
+		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
 		if (germplasmDTO.isPresent()) {
 			return this.germplasmDataManager.getAttributesByGid(germplasmDTO.get().getGid(), attributeDbIds, pageSize, pageNumber);
 		} else {
@@ -340,8 +340,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public long countAttributesByGermplasmGUID(final String germplasmGUID, final List<String> attributeDbIds) {
-		return this.germplasmDataManager.countAttributesByGid(germplasmGUID, attributeDbIds);
+	public long countAttributesByGUID(final String germplasmUUID, final List<String> attributeDbIds) {
+		final Optional<GermplasmDTO> germplasm = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
+		if (germplasm.isPresent()) {
+			return this.germplasmDataManager.countAttributesByGid(germplasm.get().getGid(), attributeDbIds);
+		} else {
+			throw new ApiRuntimeException("Invalid GermplasmDbId");
+		}
 	}
 
 	@Override

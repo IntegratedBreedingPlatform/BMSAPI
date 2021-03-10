@@ -41,7 +41,7 @@ public interface GermplasmService {
 
 	ProgenyDTO getProgeny(String germplasmDbId);
 
-	GermplasmDTO getGermplasmDTObyGUID(String germplasmGUID);
+	GermplasmDTO getGermplasmDTObyGUID(String germplasmUUID);
 
 	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
 
@@ -51,10 +51,10 @@ public interface GermplasmService {
 
 	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, Pageable pageable);
 
-	List<AttributeDTO> getAttributesByGermplasmGUID(
-		String germplasmGUID, List<String> attributeDbIds, Integer pageSize, Integer pageNUmber);
+	List<AttributeDTO> getAttributesByGUID(
+		String germplasmUUID, List<String> attributeDbIds, Integer pageSize, Integer pageNUmber);
 
-	long countAttributesByGermplasmGUID(String germplasmGUID, List<String> attributeDbIds);
+	long countAttributesByGUID(String germplasmUUID, List<String> attributeDbIds);
 
 	Set<Integer> importGermplasmUpdates(String programUUID, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
