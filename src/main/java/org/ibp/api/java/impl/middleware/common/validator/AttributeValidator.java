@@ -44,7 +44,7 @@ public class AttributeValidator {
 		}
 
 		if (!AttributeValidator.ALLOWED_ATTRIBUTE_TYPES.contains(attributeType.toUpperCase())) {
-			errors.reject("attribute.invalid", "");
+			errors.reject("attribute.type.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
