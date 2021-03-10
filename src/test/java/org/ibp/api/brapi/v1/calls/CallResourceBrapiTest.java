@@ -2,12 +2,10 @@
 package org.ibp.api.brapi.v1.calls;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
-import freemarker.ext.beans.HashAdapter;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.java.calls.CallService;
-import org.ibp.api.java.crop.CropService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -95,7 +93,7 @@ public class CallResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testListAvailableCalls() throws Exception {
 		// TODO user test/resources/brapi/calls.json
-		Mockito.when(this.callService.getAllCalls(null, null, null)).thenReturn(this.calls);
+		Mockito.when(this.callService.getAllCallsForV1(null, null, null)).thenReturn(this.calls);
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/calls").build();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
@@ -116,7 +114,7 @@ public class CallResourceBrapiTest extends ApiUnitTestBase {
 
 	@Test
 	public void testListAvailableCallsWithDatatype() throws Exception {
-		Mockito.when(this.callService.getAllCalls("csv", null, null)).thenReturn(this.calls);
+		Mockito.when(this.callService.getAllCallsForV1("csv", null, null)).thenReturn(this.calls);
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/calls").queryParam("datatype", "csv").build().encode();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))

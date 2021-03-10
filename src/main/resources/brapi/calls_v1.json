@@ -119,6 +119,9 @@
         "dataTypes": [
           "application/json"
         ],
+        "methods": [
+          "GET"
+        ],
         "datatypes": [
           "json"
         ],
@@ -324,22 +327,7 @@
         ]
       },
       {
-        "call": "search/observationunits",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "POST"
-        ],
-        "versions": [
-          "2.0"
-        ]
-      },
-      {
-        "call": "search/observationunits/{searchResultsDbid}",
+        "call": "studies/{studyDbId}/observationvariables",
         "dataTypes": [
           "application/json"
         ],
@@ -350,38 +338,54 @@
           "GET"
         ],
         "versions": [
-          "2.0"
+          "1.3"
         ]
       },
-      {
-        "call": "seedlots",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "2.0"
-        ]
-      },
-      {
-        "call": "transactions",
-        "dataTypes": [
-          "application/json"
-        ],
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "2.0"
-        ]
-      }
-    ]
+
+    {
+      "call": "germplasm",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "versions": [
+        "1.3"
+      ]
+    },
+    {
+      "call": "germplasm/{germplasmDbId}/attributes",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "versions": [
+        "1.3"
+      ]
+    },
+    {
+      "call": "variables",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "versions": [
+        "1.3"
+      ]
+    }
+  ]
 }

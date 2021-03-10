@@ -20,11 +20,14 @@ public class CallServiceImpl implements CallService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CallServiceImpl.class);
 
-	@Value("classpath:brapi/calls.json")
-	private Resource calls;
+	@Value("classpath:brapi/calls_v1.json")
+	private Resource callsV1;
+
+	@Value("classpath:brapi/calls_v2.json")
+	private Resource callsV2;
 
 	@Override
-	public List<Map<String, Object>> getAllCalls(final String dataType, final Integer pageSize, final Integer pageNumber) {
+	public List<Map<String, Object>> getAllCallsForV1(final String dataType, final Integer pageSize, final Integer pageNumber) {
 		try {
 			List<Map<String, Object>> brapiCalls;
 			final String jsonPath;
@@ -35,7 +38,7 @@ public class CallServiceImpl implements CallService {
 				jsonPath = "$.data.*";
 			}
 
-			final InputStream is = this.calls.getInputStream();
+			final InputStream is = this.callsV1.getInputStream();
 			final String jsonTxt = IOUtils.toString( is );
 			brapiCalls = JsonPath.parse(jsonTxt).read(jsonPath);
 
@@ -58,6 +61,25 @@ public class CallServiceImpl implements CallService {
 			}
 
 			return brapiCalls;
+		} catch (final IOException e) {
+			LOG.error(e.getMessage(), e);
+			return new ArrayList<>();
+		}
+	}
+
+	@Override
+	public List<Map<String, Object>> getAllCallsForV2(final String dataType) {
+		try {
+			final String jsonPath;
+			if (dataType != null) {
+				jsonPath = "$.data[?('" + dataType + "' in @['dataTypes'])]";
+			} else {
+				jsonPath = "$.data.*";
+			}
+
+			final InputStream is = this.callsV2.getInputStream();
+			final String jsonTxt = IOUtils.toString( is );
+			return JsonPath.parse(jsonTxt).read(jsonPath);
 		} catch (final IOException e) {
 			LOG.error(e.getMessage(), e);
 			return new ArrayList<>();
