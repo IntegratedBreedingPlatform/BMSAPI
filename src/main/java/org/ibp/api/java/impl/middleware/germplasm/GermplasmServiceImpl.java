@@ -213,7 +213,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final Optional<GermplasmDTO> germplasmDto = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
 			if (germplasmDto.isPresent()) {
 				final int gid = Integer.valueOf(germplasmDto.get().getGid());
-				pedigreeDTO = this.germplasmDataManager.getPedigree(gid, notation, includeSiblings);
+				pedigreeDTO = this.germplasmService.getPedigree(gid, notation, includeSiblings);
 				if (pedigreeDTO != null) {
 					pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
 				}
@@ -234,7 +234,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
 			if (germplasmDTO.isPresent()) {
 				final int gid = Integer.valueOf(germplasmDTO.get().getGid());
-				progenyDTO = this.germplasmDataManager.getProgeny(gid);
+				progenyDTO = this.germplasmService.getProgeny(gid);
 			} else {
 				throw new ApiRuntimeException("Invalid GermplasmDbId");
 			}
