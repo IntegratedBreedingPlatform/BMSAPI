@@ -51,7 +51,7 @@ public class GermplasmResourceBrapi {
 	private GermplasmService germplasmService;
 
 	@Autowired
-	ResourceBundleMessageSource messageSource;
+	private ResourceBundleMessageSource messageSource;
 
 	@ApiOperation(value = "Get a filtered list of Germplasm", notes = "Get a filtered list of Germplasm")
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm", method = RequestMethod.GET)
@@ -114,23 +114,11 @@ public class GermplasmResourceBrapi {
 
 	}
 
-	private List<Germplasm> mapGermplasm(final List<GermplasmDTO> germplasmDTOList) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		final ModelMapper mapper = new ModelMapper();
-		if (!CollectionUtils.isEmpty(germplasmDTOList)) {
-			for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
-				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasmList.add(germplasm);
-			}
-		}
-		return germplasmList;
-	}
-
 	@ApiOperation(value = "Create new Germplasm entities on this server", notes = "Create new Germplasm entities on this server")
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<Germplasm>> getGermplasm(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<Germplasm>> saveGermplasm(@PathVariable final String crop,
 		@RequestBody final List<GermplasmImportRequest> germplasmImportRequestList) {
 		BaseValidator.checkNotNull(germplasmImportRequestList, "germplasm.import.list.null");
 
@@ -200,5 +188,18 @@ public class GermplasmResourceBrapi {
 	private String getMessage(final String code, final Object[] arguments) {
 		return this.messageSource.getMessage(code, arguments, LocaleContextHolder.getLocale());
 	}
+
+	private List<Germplasm> mapGermplasm(final List<GermplasmDTO> germplasmDTOList) {
+		final List<Germplasm> germplasmList = new ArrayList<>();
+		final ModelMapper mapper = new ModelMapper();
+		if (!CollectionUtils.isEmpty(germplasmDTOList)) {
+			for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+				germplasmList.add(germplasm);
+			}
+		}
+		return germplasmList;
+	}
+
 
 }
