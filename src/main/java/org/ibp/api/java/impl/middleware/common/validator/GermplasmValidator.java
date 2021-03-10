@@ -1,24 +1,23 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class GermplasmValidator {
-
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
 
 	@Autowired
 	private GermplasmService germplasmService;
@@ -28,14 +27,14 @@ public class GermplasmValidator {
 			errors.reject("germplasm.required", "");
 			return;
 		}
-		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(germplasmId);
-		if (germplasm == null) {
+		final List<Germplasm> germplasm = this.germplasmService.getGermplasmByGIDs(Arrays.asList(germplasmId));
+		if (CollectionUtils.isEmpty(germplasm)) {
 			errors.reject("germplasm.invalid", "");
 		}
 	}
 
 	public void validateGids(final BindingResult errors, final List<Integer> gids) {
-		final List<Germplasm> existingGermplasms = germplasmDataManager.getGermplasms(gids);
+		final List<Germplasm> existingGermplasms = this.germplasmService.getGermplasmByGIDs(gids);
 		if (existingGermplasms.size() != gids.size() || existingGermplasms.stream().filter(g -> g.getDeleted()).count() > 0) {
 			final List<Integer> existingGids =
 				existingGermplasms.stream().filter(g -> !g.getDeleted()).map(Germplasm::getGid).collect(Collectors.toList());
@@ -50,8 +49,8 @@ public class GermplasmValidator {
 			errors.reject("germplasm.required", "");
 			return;
 		}
-		final GermplasmDTO germplasm = this.germplasmService.getGermplasmDTObyGUID(germplasmGUID);
-		if (germplasm == null) {
+		final Optional<GermplasmDTO> germplasm = this.germplasmService.getGermplasmDTOByGUID(germplasmGUID);
+		if (!germplasm.isPresent()) {
 			errors.reject("germplasm.invalid", "");
 		}
 	}
