@@ -42,7 +42,7 @@ public class LotDetails {
     private Map<String, Object> additionalInfo = new HashMap<>();
 
     public Map<String, Object> getAdditionalInfo() {
-        return additionalInfo;
+        return this.additionalInfo;
     }
 
     public void setAdditionalInfo(final Map<String, Object> additionalInfo) {
@@ -50,7 +50,7 @@ public class LotDetails {
     }
 
     public Double getAmount() {
-        return amount;
+        return this.amount;
     }
 
     public void setAmount(final Double amount) {
@@ -58,7 +58,7 @@ public class LotDetails {
     }
 
     public Date getCreatedDate() {
-        return createdDate;
+        return this.createdDate;
     }
 
     public void setCreatedDate(final Date createdDate) {
@@ -66,7 +66,7 @@ public class LotDetails {
     }
 
     public Date getLastUpdated() {
-        return lastUpdated;
+        return this.lastUpdated;
     }
 
     public void setLastUpdated(final Date lastUpdated) {
@@ -74,7 +74,7 @@ public class LotDetails {
     }
 
     public String getGermplasmDbId() {
-        return germplasmDbId;
+        return this.germplasmDbId;
     }
 
     public void setGermplasmDbId(final String germplasmDbId) {
@@ -82,7 +82,7 @@ public class LotDetails {
     }
 
     public Integer getLocationDbId() {
-        return locationDbId;
+        return this.locationDbId;
     }
 
     public void setLocationDbId(final Integer locationDbId) {
@@ -90,7 +90,7 @@ public class LotDetails {
     }
 
     public String getProgramDbId() {
-        return programDbId;
+        return this.programDbId;
     }
 
     public void setProgramDbId(final String programDbId) {
@@ -98,7 +98,7 @@ public class LotDetails {
     }
 
     public String getSeedLotDescription() {
-        return seedLotDescription;
+        return this.seedLotDescription;
     }
 
     public void setSeedLotDescription(final String seedLotDescription) {
@@ -106,7 +106,7 @@ public class LotDetails {
     }
 
     public String getSeedLotName() {
-        return seedLotName;
+        return this.seedLotName;
     }
 
     public void setSeedLotName(final String seedLotName) {
@@ -114,7 +114,7 @@ public class LotDetails {
     }
 
     public String getSourceCollection() {
-        return sourceCollection;
+        return this.sourceCollection;
     }
 
     public void setSourceCollection(final String sourceCollection) {
@@ -122,7 +122,7 @@ public class LotDetails {
     }
 
     public String getStorageLocation() {
-        return storageLocation;
+        return this.storageLocation;
     }
 
     public void setStorageLocation(final String storageLocation) {
@@ -130,7 +130,7 @@ public class LotDetails {
     }
 
     public String getUnits() {
-        return units;
+        return this.units;
     }
 
     public void setUnits(final String units) {
@@ -138,7 +138,7 @@ public class LotDetails {
     }
 
     public String getSeedLotDbId() {
-        return seedLotDbId;
+        return this.seedLotDbId;
     }
 
     public void setSeedLotDbId(final String seedLotDbId) {
@@ -156,7 +156,7 @@ public class LotDetails {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         return Pojomatic.equals(this, o);
     }
 }
