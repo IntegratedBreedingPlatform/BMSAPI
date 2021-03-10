@@ -86,7 +86,7 @@ public class TransactionServiceImplTest {
 		Assert.assertEquals(transactionDto.getTransactionType(), additionalInfo.get("transactionType"));
 		Assert.assertEquals(transactionDto.getTransactionStatus(), additionalInfo.get("transactionStatus"));
 		Assert.assertEquals(transactionDto.getLot().getLotUUID(), additionalInfo.get("seedLotID"));
-		Assert.assertEquals(transactionDto.getLot().getGid(), additionalInfo.get("germplasmDbId"));
+		Assert.assertEquals(transactionDto.getLot().getGermplasmUUID(), additionalInfo.get("germplasmDbId"));
 		Assert.assertEquals(transactionDto.getLot().getLocationId(), additionalInfo.get("locationId"));
 		Assert.assertEquals(transactionDto.getLot().getLocationName(), additionalInfo.get("locationName"));
 		Assert.assertEquals(transactionDto.getLot().getLocationAbbr(), additionalInfo.get("locationAbbr"));
