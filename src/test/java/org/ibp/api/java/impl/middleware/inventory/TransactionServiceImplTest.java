@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
@@ -66,7 +67,7 @@ public class TransactionServiceImplTest {
 	public void testGetTransactions() {
 		final TransactionDto transactionDto = new TransactionDto(1, "admin", TransactionType.DEPOSIT.name(), new Double(1),new Double(0),
 			"comments", new Date(), 1, "1de85e1c-b947-4ee2-9d19-31eee6da9ad5", 1, "desig", "STOCK-1", 8314, "SEED_AMOUNT_g",
-			LotStatus.ACTIVE.name(), TransactionStatus.CONFIRMED.getValue(), 0, "UNKNOWN", "UNKNOWN", "comments");
+			LotStatus.ACTIVE.name(), TransactionStatus.CONFIRMED.getValue(), 0, "UNKNOWN", "UNKNOWN", "comments", RandomStringUtils.randomAlphanumeric(10));
 		Mockito.when(this.transactionService.searchTransactions(ArgumentMatchers.any(TransactionsSearchDto.class), ArgumentMatchers.any(
 			Pageable.class))).thenReturn(Collections.singletonList(transactionDto));
 		final Pageable pageable = Mockito.mock(Pageable.class);
