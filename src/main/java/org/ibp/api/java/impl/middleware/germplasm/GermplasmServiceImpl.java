@@ -218,7 +218,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
 				}
 			} else {
-				throw new ApiRuntimeException("Invalid Germplasm Id");
+				throw new ApiRuntimeException("Invalid GermplasmDbId");
 			}
 
 		} catch (final MiddlewareQueryException e) {
@@ -236,7 +236,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				final int gid = Integer.valueOf(germplasmDTO.get().getGid());
 				progenyDTO = this.germplasmDataManager.getProgeny(gid);
 			} else {
-				throw new ApiRuntimeException("Invalid Germplasm Id");
+				throw new ApiRuntimeException("Invalid GermplasmDbId");
 			}
 
 		} catch (final MiddlewareQueryException e) {
@@ -261,7 +261,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(Integer.valueOf(germplasmDTO.getGid()), this.crossExpansionProperties));
 			return germplasmDTO;
 		} else {
-			throw new ApiRuntimeException("Invalid Germplasm Id");
+			throw new ApiRuntimeException("Invalid GermplasmDbId");
 		}
 
 	}
@@ -334,7 +334,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (germplasmDTO.isPresent()) {
 			return this.germplasmDataManager.getAttributesByGid(germplasmDTO.get().getGid(), attributeDbIds, pageSize, pageNumber);
 		} else {
-			throw new ApiRuntimeException("Invalid Germplasm Id");
+			throw new ApiRuntimeException("Invalid GermplasmDbId");
 		}
 
 	}
