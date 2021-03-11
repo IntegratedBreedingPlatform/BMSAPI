@@ -399,8 +399,12 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize
 	) {
+
+		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+
 		final PagedResult<AttributeDTO> resultPage =
-			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<AttributeDTO>() {
+			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<AttributeDTO>() {
 
 				@Override
 				public long getCount() {
@@ -411,7 +415,7 @@ public class GermplasmResourceBrapi {
 				public List<AttributeDTO> getResults(final PagedResult<AttributeDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return GermplasmResourceBrapi.this.germplasmService
-						.getAttributesByGUID(germplasmDbId, attributeDbIds, pagedResult.getPageSize(), pageNumber);
+						.getAttributesByGUID(germplasmDbId, attributeDbIds, new PageRequest(finalPageNumber, pagedResult.getPageSize()));
 				}
 			});
 

@@ -52,7 +52,7 @@ public interface GermplasmService {
 	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, Pageable pageable);
 
 	List<AttributeDTO> getAttributesByGUID(
-		String germplasmUUID, List<String> attributeDbIds, Integer pageSize, Integer pageNUmber);
+		String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
 
 	long countAttributesByGUID(String germplasmUUID, List<String> attributeDbIds);
 

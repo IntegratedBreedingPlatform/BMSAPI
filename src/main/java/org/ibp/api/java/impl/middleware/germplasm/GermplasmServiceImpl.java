@@ -208,41 +208,23 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public PedigreeDTO getPedigree(final String germplasmDbId, final String notation, final Boolean includeSiblings) {
-		final PedigreeDTO pedigreeDTO;
-		try {
-			final Optional<GermplasmDTO> germplasmDto = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
-			if (germplasmDto.isPresent()) {
-				final int gid = Integer.valueOf(germplasmDto.get().getGid());
-				pedigreeDTO = this.germplasmService.getPedigree(gid, notation, includeSiblings);
-				if (pedigreeDTO != null) {
-					pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
-				}
-			} else {
-				throw new ApiRuntimeException("Invalid GermplasmDbId");
-			}
-
-		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to get the pedigree", e);
+		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
+		this.germplasmValidator.validateGermplasmGUID(this.errors, germplasmDbId);
+		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
+		final int gid = Integer.valueOf(germplasmDTO.get().getGid());
+		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(gid, notation, includeSiblings);
+		if (pedigreeDTO != null) {
+			pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
 		}
 		return pedigreeDTO;
 	}
 
 	@Override
 	public ProgenyDTO getProgeny(final String germplasmDbId) {
-		final ProgenyDTO progenyDTO;
-		try {
-			final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
-			if (germplasmDTO.isPresent()) {
-				final int gid = Integer.valueOf(germplasmDTO.get().getGid());
-				progenyDTO = this.germplasmService.getProgeny(gid);
-			} else {
-				throw new ApiRuntimeException("Invalid GermplasmDbId");
-			}
-
-		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to get the progeny", e);
-		}
-		return progenyDTO;
+		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
+		this.germplasmValidator.validateGermplasmGUID(this.errors, germplasmDbId);
+		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
+		return this.germplasmService.getProgeny(Integer.valueOf(germplasmDTO.get().getGid()));
 	}
 
 	@Override
@@ -328,25 +310,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public List<AttributeDTO> getAttributesByGUID(
-			final String germplasmUUID, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
+			final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
 		this.validateGuidAndAttributes(germplasmUUID, attributeDbIds);
-		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
-		if (germplasmDTO.isPresent()) {
-			return this.germplasmService.getAttributesByGid(germplasmDTO.get().getGid(), attributeDbIds, pageSize, pageNumber);
-		} else {
-			throw new ApiRuntimeException("Invalid GermplasmDbId");
-		}
+		return this.germplasmService.getAttributesByGUID(germplasmUUID, attributeDbIds, pageable);
 
 	}
 
 	@Override
 	public long countAttributesByGUID(final String germplasmUUID, final List<String> attributeDbIds) {
-		final Optional<GermplasmDTO> germplasm = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
-		if (germplasm.isPresent()) {
-			return this.germplasmService.countAttributesByGid(germplasm.get().getGid(), attributeDbIds);
-		} else {
-			throw new ApiRuntimeException("Invalid GermplasmDbId");
-		}
+		return this.germplasmService.countAttributesByGUID(germplasmUUID, attributeDbIds);
 	}
 
 	@Override
