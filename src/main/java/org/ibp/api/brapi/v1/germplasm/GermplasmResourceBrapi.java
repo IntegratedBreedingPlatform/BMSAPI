@@ -415,7 +415,7 @@ public class GermplasmResourceBrapi {
 				public List<AttributeDTO> getResults(final PagedResult<AttributeDTO> pagedResult) {
 					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return GermplasmResourceBrapi.this.germplasmService
-						.getAttributesByGUID(germplasmDbId, attributeDbIds, new PageRequest(finalPageNumber, pagedResult.getPageSize()));
+						.getAttributesByGUID(germplasmDbId, attributeDbIds, new PageRequest(pageNumber, pagedResult.getPageSize()));
 				}
 			});
 
