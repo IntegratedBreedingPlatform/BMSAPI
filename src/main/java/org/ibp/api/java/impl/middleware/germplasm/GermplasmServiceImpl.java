@@ -208,21 +208,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public PedigreeDTO getPedigree(final String germplasmDbId, final String notation, final Boolean includeSiblings) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
-		this.germplasmValidator.validateGermplasmGUID(this.errors, germplasmDbId);
+		this.validateGUID(germplasmDbId);
 		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
-		final int gid = Integer.valueOf(germplasmDTO.get().getGid());
-		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(gid, notation, includeSiblings);
+		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(Integer.valueOf(germplasmDTO.get().getGid()), notation, includeSiblings);
 		if (pedigreeDTO != null) {
-			pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
+			pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(Integer.valueOf(germplasmDTO.get().getGid()), this.crossExpansionProperties));
 		}
 		return pedigreeDTO;
 	}
 
 	@Override
 	public ProgenyDTO getProgeny(final String germplasmDbId) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
-		this.germplasmValidator.validateGermplasmGUID(this.errors, germplasmDbId);
+		this.validateGUID(germplasmDbId);
 		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
 		return this.germplasmService.getProgeny(Integer.valueOf(germplasmDTO.get().getGid()));
 	}
@@ -237,15 +234,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public GermplasmDTO getGermplasmDTObyGUID(final String germplasmUUID) {
-		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
-		if (germplasmDTOOptional.isPresent()) {
-			final GermplasmDTO germplasmDTO = germplasmDTOOptional.get();
-			germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(Integer.valueOf(germplasmDTO.getGid()), this.crossExpansionProperties));
-			return germplasmDTO;
-		} else {
-			throw new ApiRuntimeException("Invalid GermplasmDbId");
-		}
-
+		this.validateGUID(germplasmUUID);
+		final GermplasmDTO germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID).get();
+		germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(Integer.valueOf(germplasmDTO.getGid()), this.crossExpansionProperties));
+		return germplasmDTO;
 	}
 
 	@Override
@@ -318,6 +310,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public long countAttributesByGUID(final String germplasmUUID, final List<String> attributeDbIds) {
+		this.validateGUID(germplasmUUID);
 		return this.germplasmService.countAttributesByGUID(germplasmUUID, attributeDbIds);
 	}
 
@@ -445,6 +438,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 		this.attributeValidator.validateAttributeIds(this.errors, attributeDbIds);
+		if (this.errors.hasErrors()) {
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+	}
+
+	private void validateGUID(final String germplasmGUID) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
+		this.germplasmValidator.validateGermplasmGUID(this.errors, germplasmGUID);
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
