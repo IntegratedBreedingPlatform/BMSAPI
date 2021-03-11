@@ -7,6 +7,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
@@ -70,10 +71,11 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
 		final String sanitizedTraitsAndSelectionFilename = FileUtils.sanitizeFileName(String
 			.format(
-				"%s_%s_%s.trt", study.getName(), datasetType.getName(),
-				dataSetDto.getName()));
+				"%s_%s_%s", StringUtil.truncate(study.getName(), 75, true),
+					StringUtil.truncate(datasetType.getName(), 75, true),
+				StringUtil.truncate(dataSetDto.getName(), 75, true)));
 		final String traitsAndSelectionFilename =
-			temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedTraitsAndSelectionFilename);
+			temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedTraitsAndSelectionFilename, "trt");
 		final List<MeasurementVariable> traitAndSelectionVariables = this.getTraitAndSelectionVariables(dataSetDto.getDatasetId());
 		files.add(
 			generator.generateTraitAndSelectionVariablesFile(this.convertTraitAndSelectionVariablesData(traitAndSelectionVariables),

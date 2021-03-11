@@ -4,6 +4,7 @@ import com.google.common.io.Files;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.commons.util.StringUtil;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
@@ -128,7 +129,8 @@ public abstract class AbstractDatasetExportService {
 		final File temporaryFolder = Files.createTempDir();
 		final String dataSetName =
 			DatasetTypeEnum.PLOT_DATA.getId() == dataSet.getDatasetTypeId() ? DatasetServiceImpl.PLOT_DATASET_NAME : dataSet.getName();
-		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s_%s.%s", study.getName(), dataSetName, fileExtension));
+		final String fileName = FileNameGenerator.generateFileName(String.format("%s_%s", StringUtil.truncate(study.getName(), 125, true), StringUtil.truncate(dataSetName, 125, true)), fileExtension);
+		final String sanitizedFileName = FileUtils.sanitizeFileName(fileName);
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
 		return generator.generateMultiInstanceFile(observationUnitRowMap, columns, fileNameFullPath);
@@ -151,7 +153,7 @@ public abstract class AbstractDatasetExportService {
 		if (files.size() == 1) {
 			return files.get(0);
 		} else {
-			return this.zipUtil.zipFiles(study.getName(), files);
+			return this.zipUtil.zipFiles(FileNameGenerator.generateFileName(study.getName(), null), files);
 		}
 	}
 
@@ -165,13 +167,16 @@ public abstract class AbstractDatasetExportService {
 		for (final Integer instanceDBID : observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
+			final String studyName = StringUtil.truncate(study.getName(), 50, true);
+			final String locationAbbr = StringUtil.truncate(selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(), 50, true);
+			final String datasetTypeName = StringUtil.truncate(datasetTypeMap.get(dataSetDto.getDatasetTypeId()).getName(), 50, true);
+			final String datasetName = StringUtil.truncate(dataSetDto.getName(), 50, true);
 			final String sanitizedFileName = FileUtils.sanitizeFileName(String
 				.format(
-					"%s_%s_%s_%s." + fileExtension,
-					study.getName() + "-" + selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(),
-					selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(),
-					datasetTypeMap.get(dataSetDto.getDatasetTypeId()).getName(), dataSetDto.getName()));
-			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedFileName);
+					"%s_%s_%s_%s",
+					studyName + "-" + selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(),
+					locationAbbr, datasetTypeName, datasetName));
+			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedFileName, fileExtension);
 			files.add(
 				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID),
 					fileNameFullPath, selectedDatasetInstancesMap.get(instanceDBID)));
