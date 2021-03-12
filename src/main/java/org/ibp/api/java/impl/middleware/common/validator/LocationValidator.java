@@ -68,4 +68,17 @@ public class LocationValidator {
 		}
 	}
 
+	public void validateLocation(final BindingResult errors, final Integer locationId) {
+		if (locationId == null) {
+			errors.reject("location.required", "");
+			return;
+		}
+
+		final Location location = locationDataManager.getLocationByID(locationId);
+
+		if (location == null) {
+			errors.reject("location.invalid", "");
+			return;
+		}
+	}
 }
