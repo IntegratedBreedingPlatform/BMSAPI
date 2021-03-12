@@ -71,9 +71,9 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
 		final String sanitizedTraitsAndSelectionFilename = FileUtils.sanitizeFileName(String
 			.format(
-				"%s_%s_%s", StringUtil.truncate(study.getName(), 75, true),
-					StringUtil.truncate(datasetType.getName(), 75, true),
-				StringUtil.truncate(dataSetDto.getName(), 75, true)));
+				"%s_%s_%s", StringUtil.truncate(study.getName(), 100, true),
+					StringUtil.truncate(datasetType.getName(), 10, true),
+				StringUtil.truncate(dataSetDto.getName(), 100, true)));
 		final String traitsAndSelectionFilename =
 			temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedTraitsAndSelectionFilename, "trt");
 		final List<MeasurementVariable> traitAndSelectionVariables = this.getTraitAndSelectionVariables(dataSetDto.getDatasetId());
