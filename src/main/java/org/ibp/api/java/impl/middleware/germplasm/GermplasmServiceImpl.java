@@ -337,7 +337,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<GermplasmNameTypeDTO> filterGermplasmNameTypes(final Set<String> codes) {
 
-		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
+		return this.germplasmService.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
 			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
 			.stream()
 			.map(userDefinedField -> {
@@ -363,7 +363,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			types.add(type);
 		}
 
-		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
+		return this.germplasmService.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
 			.stream()
 			.map(userDefinedField -> {
 				final org.generationcp.middleware.api.attribute.AttributeDTO attributeDTO =

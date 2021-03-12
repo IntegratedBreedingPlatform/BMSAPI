@@ -21,7 +21,7 @@ import java.util.List;
 public class GermplasmAttributeServiceImpl implements GermplasmAttributeService {
 
 	@Autowired
-	private org.generationcp.middleware.api.attribute.AttributeService attributeService;
+	private org.generationcp.middleware.api.germplasm.GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
 	private AttributeValidator attributeValidator;
@@ -37,13 +37,13 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.attributeValidator.validateAttributeType(errors, attributeType);
-		return this.attributeService.getGermplasmAttributeDtos(gid, attributeType);
+		return this.germplasmAttributeService.getGermplasmAttributeDtos(gid, attributeType);
 	}
 
 	@Override
 	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto) {
 		BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		this.attributeValidator.validateAttribute(errors, gid, dto);
 		this.locationValidator.validateLocation(errors, dto.getLocationId());
 		return  dto;
 	}
