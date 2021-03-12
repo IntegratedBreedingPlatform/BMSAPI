@@ -81,9 +81,9 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "parentDbId", required = false) final String parentDbId,
 		@ApiParam(value = "Search for Germplasm with this child")
 		@RequestParam(value = "progenyDbId", required = false) final String progenyDbId,
-		@ApiParam(value = "externalReferenceId filter is not supported for now. This value is ignored.")
+		@ApiParam(value = "Search for externalReferenceId")
 		@RequestParam(value = "externalReferenceId", required = false) final String externalReferenceId,
-		@ApiParam(value = "externalReferenceId filter is not supported for now. This value is ignored.")
+		@ApiParam(value = "Search for externalReferenceSource")
 		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)
 		@RequestParam(value = "page", required = false) final Integer currentPage,
@@ -91,7 +91,8 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO =
-			this.getGermplasmSearchRequestDto(germplasmPUI, germplasmName, accessionNumber, studyDbId, synonym, genus, parentDbId, progenyDbId);
+			this.getGermplasmSearchRequestDto(germplasmPUI, germplasmName, accessionNumber, studyDbId, synonym, genus, parentDbId,
+				progenyDbId, externalReferenceId, externalReferenceSource);
 		if (!StringUtils.isEmpty(germplasmDbId)) {
 			germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
 		}
@@ -142,19 +143,22 @@ public class GermplasmResourceBrapi {
 	}
 
 	private GermplasmSearchRequestDto getGermplasmSearchRequestDto(final String germplasmPUI, final String germplasmName,
-		final String accessionNumber, final String studyDbId, final String synonym, final String genus, final String parentDbId, final String progenyDbId) {
+		final String accessionNumber, final String studyDbId, final String synonym, final String genus, final String parentDbId,
+		final String progenyDbId, final String externalReferenceId, final String externalReferenceSource) {
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDTO.setPreferredName(germplasmName);
 		germplasmSearchRequestDTO.setStudyDbId(studyDbId);
+		germplasmSearchRequestDTO.setExternalReferenceId(externalReferenceId);
+		germplasmSearchRequestDTO.setExternalReferenceSource(externalReferenceSource);
 		if (synonym != null) {
 			germplasmSearchRequestDTO.setGermplasmNames(Lists.newArrayList(synonym));
 		}
 		germplasmSearchRequestDTO.setParentDbId(parentDbId);
 		germplasmSearchRequestDTO.setProgenyDbId(progenyDbId);
-		if (genus != null){
+		if (genus != null) {
 			germplasmSearchRequestDTO.setGermplasmGenus(Lists.newArrayList(genus));
 		}
-		if (accessionNumber != null){
+		if (accessionNumber != null) {
 			germplasmSearchRequestDTO.setAccessionNumbers(Lists.newArrayList(accessionNumber));
 		}
 
