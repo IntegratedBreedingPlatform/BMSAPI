@@ -152,7 +152,7 @@ public class GermplasmServiceImplTest {
 			this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(ArgumentMatchers.eq(UDTableType.ATRIBUTS_ATTRIBUTE.getTable()),
 				ArgumentMatchers.anySet(), ArgumentMatchers.eq(codes))).thenReturn(Arrays.asList(userDefinedField));
 
-		final List<AttributeDTO> germplasmListTypes = this.germplasmServiceImpl.filterGermplasmAttributes(codes);
+		final List<AttributeDTO> germplasmListTypes = this.germplasmServiceImpl.filterGermplasmAttributes(codes, null);
 		assertNotNull(germplasmListTypes);
 		assertThat(germplasmListTypes, hasSize(1));
 		final AttributeDTO actualGermplasmListTypeDTO = germplasmListTypes.get(0);

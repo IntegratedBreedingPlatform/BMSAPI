@@ -90,7 +90,7 @@ public class GermplasmUpdateDtoValidator {
 			.forEach(
 				g -> attributesCodes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		final Set<String> existingAttributesCodes =
-			this.germplasmService.filterGermplasmAttributes(attributesCodes).stream().map(AttributeDTO::getCode).collect(
+			this.germplasmService.filterGermplasmAttributes(attributesCodes, null).stream().map(AttributeDTO::getCode).collect(
 				Collectors.toSet());
 
 		if (!nameCodes.equals(existingNamesCodes)) {

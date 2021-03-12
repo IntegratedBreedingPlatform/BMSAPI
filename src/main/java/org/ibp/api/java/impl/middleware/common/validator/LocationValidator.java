@@ -1,12 +1,14 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.collect.Lists;
+import com.mchange.lang.IntegerUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.ibp.api.Util;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -65,6 +67,13 @@ public class LocationValidator {
 			final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);
 			invalidAbbreviations.removeAll(existingAbbreviations);
 			errors.reject("lot.input.invalid.abbreviations", new String[] {Util.buildErrorMessageFromList(invalidAbbreviations, 3)}, "");
+		}
+	}
+
+	public void validateLocation(final BindingResult errors, final Integer locationId) {
+		if(locationId == null || this.locationService.getLocation(locationId) == null) {
+			errors.reject("location.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 

@@ -1,7 +1,7 @@
-
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
@@ -351,11 +351,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(final Set<String> codes) {
+	public List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(final Set<String> codes, final String type) {
 
 		final Set<String> types = new HashSet<>();
-		types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
-		types.add(UDTableType.ATRIBUTS_PASSPORT.getType());
+		if(StringUtils.isEmpty(type)) {
+			types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
+			types.add(UDTableType.ATRIBUTS_PASSPORT.getType());
+		} else {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), org.generationcp.middleware.api.attribute.AttributeDTO.class.getName());
+			this.attributeValidator.validateAttributeType(errors, type);
+			types.add(type);
+		}
+
 		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
 			.stream()
 			.map(userDefinedField -> {

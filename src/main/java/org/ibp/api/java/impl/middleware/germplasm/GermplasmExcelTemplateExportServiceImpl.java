@@ -230,7 +230,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 					null);
 
 		final List<AttributeDTO> attributeDTOs =
-			this.germplasmService.filterGermplasmAttributes(null);
+			this.germplasmService.filterGermplasmAttributes(null, null);
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, false);
 		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 
