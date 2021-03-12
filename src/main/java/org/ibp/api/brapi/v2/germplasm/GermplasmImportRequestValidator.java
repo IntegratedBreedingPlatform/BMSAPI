@@ -127,7 +127,7 @@ public class GermplasmImportRequestValidator {
 	private boolean isAnyExternalReferenceInvalid(final GermplasmImportRequest g, final Integer index) {
 		if (g.getExternalReferences() != null) {
 			g.getExternalReferences().stream().anyMatch(r -> {
-				if (r == null) {
+				if (r == null || r.getReferenceID() == null || r.getReferenceSource() == null) {
 					errors.reject("germplasm.create.reference.null", new String[] {index.toString(), "externalReference"}, "");
 					return true;
 				}
