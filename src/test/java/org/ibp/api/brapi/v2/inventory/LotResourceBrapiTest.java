@@ -70,6 +70,7 @@ public class LotResourceBrapiTest extends ApiUnitTestBase {
         lotDto1.setGid(random.nextInt(10000));
         lotDto1.setLocationId(random.nextInt(10000));
         lotDto1.setLotId(random.nextInt(10000));
+        lotDto1.setGermplasmUUID(String.valueOf(random.nextInt(1000)));
         list.add(lotDto1);
 
         Mockito.doReturn(list).when(this.lotService).searchLots(Mockito.any(LotsSearchDto.class),
@@ -85,7 +86,7 @@ public class LotResourceBrapiTest extends ApiUnitTestBase {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$.result.data[0].amount", CoreMatchers.is(lotDto1.getAvailableBalance())))
                 .andExpect(jsonPath("$.result.data[0].createdDate", CoreMatchers.is(timestampFormat.format(lotDto1.getCreatedDate()))))
-                .andExpect(jsonPath("$.result.data[0].germplasmDbId", CoreMatchers.is(lotDto1.getGid())))
+                .andExpect(jsonPath("$.result.data[0].germplasmDbId", CoreMatchers.is(lotDto1.getGermplasmUUID())))
                 .andExpect(jsonPath("$.result.data[0].locationDbId", CoreMatchers.is(lotDto1.getLocationId())))
                 .andExpect(jsonPath("$.result.data[0].seedLotDescription", CoreMatchers.is(lotDto1.getNotes())))
                 .andExpect(jsonPath("$.result.data[0].seedLotName", CoreMatchers.is(lotDto1.getStockId())))

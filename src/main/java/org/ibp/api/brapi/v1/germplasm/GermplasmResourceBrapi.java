@@ -180,21 +180,11 @@ public class GermplasmResourceBrapi {
 		@PathVariable final String crop,
 		@PathVariable final String germplasmDbId) {
 
-		final int gid;
-		try {
-			gid = Integer.parseInt(germplasmDbId);
-		} catch (final NumberFormatException e) {
-			return new ResponseEntity<>(new SingleEntityResponse<Germplasm>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
-
-		}
-
-		final GermplasmDTO germplasmDTO = this.germplasmService.getGermplasmDTObyGID(gid);
+		final GermplasmDTO germplasmDTO = this.germplasmService.getGermplasmDTObyGUID(germplasmDbId);
 
 		if (germplasmDTO != null) {
 			final ModelMapper mapper = new ModelMapper();
 			final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-			germplasm.setCommonCropName(crop);
-
 			final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
 
 			return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
@@ -223,14 +213,7 @@ public class GermplasmResourceBrapi {
 				new SingleEntityResponse<PedigreeDTO>().withMessage("Search by pedigree not implemented"), HttpStatus.NOT_IMPLEMENTED);
 		}
 
-		final int gid;
-		try {
-			gid = Integer.parseInt(germplasmDbId);
-		} catch (final NumberFormatException e) {
-			return new ResponseEntity<>(new SingleEntityResponse<PedigreeDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
-		}
-
-		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(gid, null, includeSiblings);
+		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(germplasmDbId, null, includeSiblings);
 		if (pedigreeDTO == null) {
 			return new ResponseEntity<>(new SingleEntityResponse<PedigreeDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
@@ -247,14 +230,7 @@ public class GermplasmResourceBrapi {
 		@PathVariable(value = "germplasmDbId") final String germplasmDbId
 	) {
 
-		final int gid;
-		try {
-			gid = Integer.parseInt(germplasmDbId);
-		} catch (final NumberFormatException e) {
-			return new ResponseEntity<>(new SingleEntityResponse<ProgenyDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
-		}
-
-		final ProgenyDTO progenyDTO = this.germplasmService.getProgeny(gid);
+		final ProgenyDTO progenyDTO = this.germplasmService.getProgeny(germplasmDbId);
 		if (progenyDTO == null) {
 			return new ResponseEntity<>(new SingleEntityResponse<ProgenyDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
@@ -421,19 +397,22 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize
 	) {
+
+		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+
 		final PagedResult<AttributeDTO> resultPage =
-			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<AttributeDTO>() {
+			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<AttributeDTO>() {
 
 				@Override
 				public long getCount() {
-					return GermplasmResourceBrapi.this.germplasmService.countAttributesByGid(germplasmDbId, attributeDbIds);
+					return GermplasmResourceBrapi.this.germplasmService.countAttributesByGUID(germplasmDbId, attributeDbIds);
 				}
 
 				@Override
 				public List<AttributeDTO> getResults(final PagedResult<AttributeDTO> pagedResult) {
-					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return GermplasmResourceBrapi.this.germplasmService
-						.getAttributesByGid(germplasmDbId, attributeDbIds, pagedResult.getPageSize(), pageNumber);
+						.getAttributesByGUID(germplasmDbId, attributeDbIds, new PageRequest(finalPageNumber, finalPageSize));
 				}
 			});
 
