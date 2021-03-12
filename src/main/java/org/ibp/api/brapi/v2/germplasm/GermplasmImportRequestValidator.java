@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.util.Util;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +45,13 @@ public class GermplasmImportRequestValidator {
 	public BindingResult pruneGermplasmInvalidForImport(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
 		BaseValidator.checkNotEmpty(germplasmImportRequestDtoList, "germplasm.import.list.null");
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequest.class.getName());
+
+		if (!germplasmImportRequestDtoList.stream().filter(i -> Collections.frequency(germplasmImportRequestDtoList, i) > 1)
+			.collect(Collectors.toSet()).isEmpty()) {
+			errors.reject("germplasm.import.duplicated.objects"
+				+ "", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 
 		final List<String> validBreedingMethodIds = this.getValidBreedingMethodDbIds(germplasmImportRequestDtoList);
 		final List<String> validLocationAbbreviations = this.getValidLocationAbbreviations(germplasmImportRequestDtoList);
@@ -105,10 +114,36 @@ public class GermplasmImportRequestValidator {
 				return true;
 			}
 
+			if (isAnyExternalReferenceInvalid(g, index)) {
+				return true;
+			}
+
 			return false;
 		});
 
 		return this.errors;
+	}
+
+	private boolean isAnyExternalReferenceInvalid(final GermplasmImportRequest g, final Integer index) {
+		if (g.getExternalReferences() != null) {
+			g.getExternalReferences().stream().anyMatch(r -> {
+				if (r == null) {
+					errors.reject("germplasm.create.reference.null", new String[] {index.toString(), "externalReference"}, "");
+					return true;
+				}
+				if (StringUtils.isNotEmpty(r.getReferenceID()) && r.getReferenceID().length() > 2000) {
+					errors.reject("germplasm.create.reference.id.exceeded.length", new String[] {index.toString(), "referenceID"}, "");
+					return true;
+				}
+				if (StringUtils.isNotEmpty(r.getReferenceSource()) && r.getReferenceSource().length() > 255) {
+					errors.reject("germplasm.create.reference.source.exceeded.length", new String[] {index.toString(), "referenceSource"},
+						"");
+					return true;
+				}
+				return false;
+			});
+		}
+		return false;
 	}
 
 	private boolean isAnyCustomNameFieldInvalid(final GermplasmImportRequest g, final Integer index) {

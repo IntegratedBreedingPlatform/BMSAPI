@@ -3,6 +3,7 @@ package org.ibp.api.brapi.v1.germplasm;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -110,7 +111,7 @@ public class Germplasm {
 	private Map<String, String> additionalInfo;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private List<String> externalReferences;
+	private List<ExternalReferenceDTO> externalReferences;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private List<String> storageTypes;
@@ -410,11 +411,11 @@ public class Germplasm {
 		this.additionalInfo = additionalInfo;
 	}
 
-	public List<String> getExternalReferences() {
-		return this.externalReferences;
+	public List<ExternalReferenceDTO> getExternalReferences() {
+		return externalReferences;
 	}
 
-	public void setExternalReferences(final List<String> externalReferences) {
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 		this.externalReferences = externalReferences;
 	}
 
