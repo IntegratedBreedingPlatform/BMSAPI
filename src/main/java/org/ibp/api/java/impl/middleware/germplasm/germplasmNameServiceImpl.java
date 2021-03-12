@@ -3,9 +3,11 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +29,13 @@ public class germplasmNameServiceImpl implements GermplasmNameService {
 	@Autowired
 	org.generationcp.middleware.api.germplasm.GermplasmNameService germplasmNameService;
 
+	@Autowired
+	private SecurityService securityService;
+
 	@Override
 	public void deleteName(final GermplasmNameRequestDto germplasmNameRequestDto) {
-		germplasmNameValidator.validate(germplasmNameRequestDto);
-
-
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmNameRequestDto.class.getName());
+		this.germplasmNameValidator.validateDeleteName(errors,germplasmNameRequestDto);
 		germplasmNameService.deleteName(germplasmNameRequestDto.getId());
 	}
 
@@ -39,9 +43,6 @@ public class germplasmNameServiceImpl implements GermplasmNameService {
 	public void updateName(final GermplasmNameRequestDto germplasmNameRequestDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
 		germplasmNameValidator.validateUpdateName(errors, germplasmNameRequestDto);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
 		germplasmNameService.updateName(germplasmNameRequestDto);
 	}
 
@@ -49,9 +50,7 @@ public class germplasmNameServiceImpl implements GermplasmNameService {
 	public Integer createName(final GermplasmNameRequestDto germplasmNameRequestDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
 		germplasmNameValidator.validateCreateName(errors, germplasmNameRequestDto);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-		return germplasmNameService.createName(germplasmNameRequestDto);
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+		return germplasmNameService.createName(germplasmNameRequestDto, loggedInUser.getUserid());
 	}
 }
