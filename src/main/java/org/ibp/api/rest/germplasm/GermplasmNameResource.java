@@ -27,12 +27,10 @@ public class GermplasmNameResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/names", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<Integer>> CreateGermplasmName(@PathVariable final String cropName,
+	public ResponseEntity<Integer> CreateGermplasmName(@PathVariable final String cropName,
 		@PathVariable final Integer gid, @RequestBody final GermplasmNameRequestDto germplasmNameRequestDto) {
 		germplasmNameRequestDto.setGid(gid);
-		final SingleEntityResponse<Integer> singleEntityResponse =
-			new SingleEntityResponse<>(this.germplasmNameService.createName(germplasmNameRequestDto));
-		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmNameService.createName(germplasmNameRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Germplasm name")
