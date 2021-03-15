@@ -2,6 +2,7 @@ package org.ibp.api.rest.germplasm;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
@@ -59,6 +60,16 @@ public class GermplasmAttributeResource {
 	public ResponseEntity<GermplasmAttributeRequestDto> createGermplasmAttribute(@PathVariable final String cropName,
 		@PathVariable final Integer gid, @RequestBody final GermplasmAttributeRequestDto requestDto) {
 		return new ResponseEntity<>(this.germplasmAttributeService.createGermplasmAttribute(gid, requestDto), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Update germplasm attribute",
+		notes = "Update germplasm attribute")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes/{attributeId}", method = RequestMethod.PATCH)
+	@ResponseBody
+	public ResponseEntity<GermplasmAttributeRequestDto> updateGermplasmAttribute(@PathVariable final String cropName,
+		@PathVariable final Integer gid, @PathVariable final Integer attributeId,
+		@ApiParam("Only the following fields can be updated: value, date, and locationId") @RequestBody final GermplasmAttributeRequestDto requestDto) {
+		return new ResponseEntity<>(this.germplasmAttributeService.updateGermplasmAttribute(gid, attributeId, requestDto), HttpStatus.OK);
 	}
 
 
