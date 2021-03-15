@@ -47,25 +47,30 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 
 	@Override
 	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto) {
-
 		BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.attributeValidator.validateAttribute(errors, gid, dto, null);
 		this.locationValidator.validateLocation(errors, dto.getLocationId());
 
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		this.germplasmAttributeService.createGermplasmAttributeDto(gid, dto, loggedInUser.getUserid());
+		this.germplasmAttributeService.createGermplasmAttribute(gid, dto, loggedInUser.getUserid());
 		return  dto;
 	}
 
 	@Override
 	public GermplasmAttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId,
 		final GermplasmAttributeRequestDto dto) {
-
 		BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.attributeValidator.validateAttribute(errors, gid, dto, attributeId);
 		this.locationValidator.validateLocation(errors, dto.getLocationId());
 
-		this.germplasmAttributeService.updateGermplasmAttributeDto(attributeId, dto);
+		this.germplasmAttributeService.updateGermplasmAttribute(attributeId, dto);
 		return  dto;
+	}
+
+	@Override
+	public void deleteGermplasmAttribute(final Integer gid, final Integer attributeId) {
+		BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.attributeValidator.validateGermplasmAttributeExisting(errors, gid, attributeId);
+		this.germplasmAttributeService.deleteGermplasmAttribute(attributeId);
 	}
 }

@@ -81,6 +81,17 @@ public class AttributeValidator {
 		}
 	}
 
+	public void validateGermplasmAttributeExisting(final BindingResult errors, final Integer gid, final Integer attributeId) {
+		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
+			null);
+		List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
+			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
+		if(existingGermplasmAttributes.isEmpty()) {
+			errors.reject("attribute.id.invalid.not.existing", new String[] {attributeId.toString()}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
 	public void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
 		final Integer attributeId) {
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
