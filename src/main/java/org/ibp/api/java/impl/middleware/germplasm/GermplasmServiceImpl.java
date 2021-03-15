@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -33,6 +34,7 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
+import org.ibp.api.brapi.v2.germplasm.GermplasmUpdateRequestValidator;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -117,6 +119,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmImportRequestValidator germplasmImportValidator;
+
+	@Autowired
+	private GermplasmUpdateRequestValidator germplasmUpdateRequestValidator;
 
 
 	@Override
@@ -436,6 +441,22 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 		response.setStatus(noOfCreatedGermplasm + " out of " + originalListSize + " germplasm created successfully.");
 		return response;
+	}
+
+	@Override
+	public GermplasmDTO updateGermplasm(final String germplasmDbId, final GermplasmUpdateRequest germplasmUpdateRequest) {
+		this.validateGUID(germplasmDbId);
+		this.germplasmUpdateRequestValidator.validate(germplasmUpdateRequest);
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		return this.germplasmService.updateGermplasm(user.getUserid(), germplasmDbId, germplasmUpdateRequest);
+	}
+
+	private void validateGUID(final String germplasmUUID) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
+		this.germplasmValidator.validateGermplasmGUID(this.errors, germplasmUUID);
+		if (this.errors.hasErrors()) {
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
 	}
 
 	private void validateGuidAndAttributes(final String germplasmGUID, final List<String> attributeDbIds) {

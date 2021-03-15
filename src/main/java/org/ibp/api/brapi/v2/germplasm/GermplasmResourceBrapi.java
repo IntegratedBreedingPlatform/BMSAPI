@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -15,6 +16,7 @@ import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.germplasm.Germplasm;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -39,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +133,7 @@ public class GermplasmResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<Germplasm>> getGermplasm(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<Germplasm>> createGermplasm(@PathVariable final String crop,
 		@RequestBody final List<GermplasmImportRequest> germplasmImportRequestList) {
 		BaseValidator.checkNotNull(germplasmImportRequestList, "germplasm.import.list.null");
 
@@ -151,6 +154,22 @@ public class GermplasmResourceBrapi {
 		final EntityListResponse<Germplasm> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Create new Germplasm entities on this server", notes = "Create new Germplasm entities on this server")
+	@RequestMapping(value = "/{crop}/brapi/v2/germplasm/{germplasmDbId}", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<SingleEntityResponse<Germplasm>> updateGermplasm(@PathVariable final String crop, @PathVariable final String germplasmDbId,
+		@RequestBody GermplasmUpdateRequest germplasmUpdateRequest) {
+		BaseValidator.checkNotNull(germplasmUpdateRequest, "germplasm.import.list.null");
+
+		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(germplasmDbId, germplasmUpdateRequest);
+		final ModelMapper mapper = new ModelMapper();
+		final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+
+		final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
+		return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
 	}
 
 	private GermplasmSearchRequestDto getGermplasmSearchRequestDto(final String germplasmPUI, final String germplasmName,

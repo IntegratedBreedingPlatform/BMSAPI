@@ -29,12 +29,10 @@ import java.util.stream.IntStream;
 @Component
 public class GermplasmImportRequestValidator {
 
-	public static final Integer STOCK_ID_MAX_LENGTH = 35;
-	public static final Integer REFERENCE_MAX_LENGTH = 255;
 	public static final Integer NAME_MAX_LENGTH = 255;
 	public static final Integer ATTRIBUTE_MAX_LENGTH = 255;
 
-	private BindingResult errors;
+	protected BindingResult errors;
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
@@ -117,7 +115,7 @@ public class GermplasmImportRequestValidator {
 		return this.errors;
 	}
 
-	private boolean isAnyCustomNameFieldInvalid(final GermplasmImportRequest g, final Integer index) {
+	protected boolean isAnyCustomNameFieldInvalid(final GermplasmImportRequest g, final Integer index) {
 		if (nameExceedsLength(g.getDefaultDisplayName())) {
 			errors.reject("germplasm.create.name.exceeded.length", new String[] {index.toString(), "defaultDisplayName"}, "");
 			return true;
@@ -137,7 +135,7 @@ public class GermplasmImportRequestValidator {
 		return false;
 	}
 
-	private boolean isAnyCustomAttributeFieldInvalid(final GermplasmImportRequest g, final Integer index) {
+	protected boolean isAnyCustomAttributeFieldInvalid(final GermplasmImportRequest g, final Integer index) {
 		if (!StringUtils.isEmpty(g.getCommonCropName()) && attributeExceedsLength(g.getCommonCropName())) {
 			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "commonCropName"}, "");
 			return true;
@@ -177,7 +175,7 @@ public class GermplasmImportRequestValidator {
 		return false;
 	}
 
-	private List<String> getValidBreedingMethodDbIds(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
+	protected List<String> getValidBreedingMethodDbIds(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
 		final List<Integer> breedingMethodIds =
 			germplasmImportRequestDtoList.stream().filter(g -> StringUtils.isNotEmpty(g.getBreedingMethodDbId()))
 				.map(g -> Integer.parseInt(g.getBreedingMethodDbId())).collect(Collectors.toList());
@@ -190,7 +188,7 @@ public class GermplasmImportRequestValidator {
 
 	}
 
-	private List<String> getValidLocationAbbreviations(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
+	protected List<String> getValidLocationAbbreviations(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
 		final Set<String> locationAbbrs =
 			germplasmImportRequestDtoList.stream().filter(g -> StringUtils.isNotEmpty(g.getCountryOfOriginCode()))
 				.map(g -> g.getCountryOfOriginCode().toUpperCase()).collect(Collectors.toSet());
@@ -205,7 +203,7 @@ public class GermplasmImportRequestValidator {
 
 	}
 
-	private boolean areNameValuesInvalid(final Collection<String> values) {
+	protected boolean areNameValuesInvalid(final Collection<String> values) {
 		return values.stream().anyMatch(n -> {
 			if (StringUtils.isEmpty(n)) {
 				return true;
@@ -217,7 +215,7 @@ public class GermplasmImportRequestValidator {
 		});
 	}
 
-	private boolean areAttributesInvalid(final Map<String, String> attributes) {
+	protected boolean areAttributesInvalid(final Map<String, String> attributes) {
 		if (attributes != null) {
 			final Set<String> attributeKeys = new HashSet<>();
 
@@ -244,11 +242,11 @@ public class GermplasmImportRequestValidator {
 		return false;
 	}
 
-	private boolean attributeExceedsLength(final String attribute) {
+	protected boolean attributeExceedsLength(final String attribute) {
 		return attribute.length() > ATTRIBUTE_MAX_LENGTH;
 	}
 
-	private boolean nameExceedsLength(final String name) {
+	protected boolean nameExceedsLength(final String name) {
 		return name.length() > NAME_MAX_LENGTH;
 	}
 
