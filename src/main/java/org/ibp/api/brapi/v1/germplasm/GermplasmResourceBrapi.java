@@ -185,8 +185,6 @@ public class GermplasmResourceBrapi {
 		if (germplasmDTO != null) {
 			final ModelMapper mapper = new ModelMapper();
 			final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-			germplasm.setCommonCropName(crop);
-
 			final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
 
 			return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
@@ -413,9 +411,8 @@ public class GermplasmResourceBrapi {
 
 				@Override
 				public List<AttributeDTO> getResults(final PagedResult<AttributeDTO> pagedResult) {
-					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return GermplasmResourceBrapi.this.germplasmService
-						.getAttributesByGUID(germplasmDbId, attributeDbIds, new PageRequest(finalPageNumber, pagedResult.getPageSize()));
+						.getAttributesByGUID(germplasmDbId, attributeDbIds, new PageRequest(finalPageNumber, finalPageSize));
 				}
 			});
 
