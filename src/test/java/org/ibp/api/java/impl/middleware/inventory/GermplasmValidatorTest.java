@@ -1,8 +1,8 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.hamcrest.CoreMatchers;
 import org.ibp.api.domain.ontology.VariableFilter;
@@ -34,7 +34,7 @@ public class GermplasmValidatorTest {
 	public static final String COMMENTS = "Comments";
 
 	@Mock
-	private GermplasmDataManager germplasmDataManager;
+	private GermplasmService germplasmService;
 
 	@InjectMocks
 	private GermplasmValidator germplasmValidator;
@@ -63,7 +63,7 @@ public class GermplasmValidatorTest {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final Germplasm germplasm = new Germplasm(GERMPLASM_ID);
-		Mockito.when(this.germplasmDataManager.getGermplasmByGID(GERMPLASM_ID)).thenReturn(germplasm);
+		Mockito.when(this.germplasmService.getGermplasmByGIDs(Arrays.asList(GERMPLASM_ID))).thenReturn(Arrays.asList(germplasm));
 		this.germplasmValidator.validateGermplasmId(this.errors, GERMPLASM_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
@@ -102,7 +102,7 @@ public class GermplasmValidatorTest {
 		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		Mockito.when(this.germplasmDataManager.getGermplasmByGID(GERMPLASM_ID)).thenReturn(null);
+		Mockito.when(this.germplasmService.getGermplasmByGIDs(Arrays.asList(GERMPLASM_ID))).thenReturn(null);
 		this.germplasmValidator.validateGermplasmId(this.errors, GERMPLASM_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(),  1);
@@ -114,7 +114,7 @@ public class GermplasmValidatorTest {
 	public void testValidateGermplasmListInvalid() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		final List<Integer> gids = Collections.singletonList(GERMPLASM_ID);
-		Mockito.when(this.germplasmDataManager.getGermplasms(gids)).thenReturn(Collections.EMPTY_LIST);
+		Mockito.when(this.germplasmService.getGermplasmByGIDs(gids)).thenReturn(Collections.EMPTY_LIST);
 
 		try {
 			this.germplasmValidator.validateGids(this.errors, gids);
