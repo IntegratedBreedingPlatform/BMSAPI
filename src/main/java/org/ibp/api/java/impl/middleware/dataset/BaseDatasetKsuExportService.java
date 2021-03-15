@@ -73,7 +73,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 			.format(
 				"%s_%s_%s", StringUtil.truncate(study.getName(), 100, true),
 					StringUtil.truncate(datasetType.getName(), 10, true),
-				StringUtil.truncate(dataSetDto.getName(), 100, true)));
+				StringUtil.truncate(dataSetDto.getName(), 90, true)));
 		final String traitsAndSelectionFilename =
 			temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedTraitsAndSelectionFilename, "trt");
 		final List<MeasurementVariable> traitAndSelectionVariables = this.getTraitAndSelectionVariables(dataSetDto.getDatasetId());
