@@ -131,13 +131,13 @@ public class AttributeValidator {
 
 	void validateGermplasmAttributeValue(final BindingResult errors, final String value) {
 		if (value != null && value.length() > GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH) {
-			errors.reject("lot.notes.length", "");
+			errors.reject("attribute.value.invalid.length", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
 	void validateGermplasmAttributeDate(final BindingResult errors, final String date) {
-		if (date == null || !DateUtil.isValidDate(date)) {
+		if (!DateUtil.isValidDate(date)) {
 			errors.reject("attribute.date.invalid.format", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
