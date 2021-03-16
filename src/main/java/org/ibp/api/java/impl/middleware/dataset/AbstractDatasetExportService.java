@@ -129,7 +129,7 @@ public abstract class AbstractDatasetExportService {
 		final File temporaryFolder = Files.createTempDir();
 		final String dataSetName =
 			DatasetTypeEnum.PLOT_DATA.getId() == dataSet.getDatasetTypeId() ? DatasetServiceImpl.PLOT_DATASET_NAME : dataSet.getName();
-		final String fileName = FileNameGenerator.generateFileName(String.format("%s_%s", StringUtil.truncate(study.getName(), 100, true), StringUtil.truncate(dataSetName, 100, true)), fileExtension);
+		final String fileName = FileNameGenerator.generateFileName(String.format("%s_%s", StringUtil.truncate(study.getName(), 45, true), StringUtil.truncate(dataSetName, 45, true)), fileExtension);
 		final String sanitizedFileName = FileUtils.sanitizeFileName(fileName);
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
@@ -167,10 +167,10 @@ public abstract class AbstractDatasetExportService {
 		for (final Integer instanceDBID : observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
-			final String studyName = StringUtil.truncate(study.getName(), 90, true);
+			final String studyName = StringUtil.truncate(study.getName(), 30, true);
 			final String locationAbbr = StringUtil.truncate(selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(), 10, true);
 			final String datasetTypeName = StringUtil.truncate(datasetTypeMap.get(dataSetDto.getDatasetTypeId()).getName(), 10, true);
-			final String datasetName = StringUtil.truncate(dataSetDto.getName(), 90, true);
+			final String datasetName = StringUtil.truncate(dataSetDto.getName(), 30, true);
 			final String sanitizedFileName = FileUtils.sanitizeFileName(String
 				.format(
 					"%s_%s_%s_%s",
