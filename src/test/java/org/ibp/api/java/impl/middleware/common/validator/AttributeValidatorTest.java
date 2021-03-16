@@ -32,6 +32,8 @@ public class AttributeValidatorTest {
 	private static final String PASSPORT_ATTRIBUTE_TYPE = "PASSPORT";
 	private static final Integer GID = 1;
 	private static final Integer ATTRIBUTE_ID = 1;
+	private static final String GERMPLASM_ATTRIBUTE_VALUE = "value";
+	private static final String GERMPLASM_ATTRIBUTE_DATE = "20210316";
 
 	@Mock
 	private GermplasmDataManager germplasmDataManager;
@@ -225,7 +227,7 @@ public class AttributeValidatorTest {
 	public void testValidateGermplasmAttributeValue() {
 		// Validate for happy path scenario
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		this.attributeValidator.validateGermplasmAttributeValue(errors, "value");
+		this.attributeValidator.validateGermplasmAttributeValue(errors, GERMPLASM_ATTRIBUTE_VALUE);
 
 		// Validate for scenario with error
 		final String invalidValue = RandomStringUtils.randomAlphabetic(256);
@@ -236,7 +238,7 @@ public class AttributeValidatorTest {
 	public void testValidateGermplasmAttributeDate() {
 		// Validate for happy path scenario
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		this.attributeValidator.validateGermplasmAttributeDate(errors, "20210316");
+		this.attributeValidator.validateGermplasmAttributeDate(errors, GERMPLASM_ATTRIBUTE_DATE);
 
 		// Validate for scenario with error
 		this.attributeValidator.validateGermplasmAttributeDate(errors, "2021-03-16");
@@ -247,6 +249,8 @@ public class AttributeValidatorTest {
 		final GermplasmAttributeRequestDto germplasmAttributeRequestDto = new GermplasmAttributeRequestDto();
 		germplasmAttributeRequestDto.setAttributeCode(ATTRIBUTE_CODE);
 		germplasmAttributeRequestDto.setAttributeType(PASSPORT_ATTRIBUTE_TYPE);
+		germplasmAttributeRequestDto.setValue(GERMPLASM_ATTRIBUTE_VALUE);
+		germplasmAttributeRequestDto.setDate(GERMPLASM_ATTRIBUTE_DATE);
 		return germplasmAttributeRequestDto;
 	}
 
