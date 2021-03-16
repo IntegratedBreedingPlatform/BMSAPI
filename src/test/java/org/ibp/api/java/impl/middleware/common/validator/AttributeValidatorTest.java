@@ -128,6 +128,7 @@ public class AttributeValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		this.attributeValidator.validateGermplasmAttributeShouldNotExist(errors, GID, germplasmAttributeRequestDto);
 
+		// Validate for scenario with error
 		final GermplasmAttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
 		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(GID, PASSPORT_ATTRIBUTE_TYPE))
 			.thenReturn(Collections.singletonList(germplasmAttributeDto));
@@ -144,6 +145,7 @@ public class AttributeValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		this.attributeValidator.validateGermplasmAttributeExisting(errors, GID, ATTRIBUTE_ID);
 
+		// Validate for scenario with error
 		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(GID, null))
 			.thenReturn(Collections.emptyList());
 		this.attributeValidator.validateGermplasmAttributeExisting(errors, GID, ATTRIBUTE_ID);
@@ -201,7 +203,6 @@ public class AttributeValidatorTest {
 	public void testValidateAttribute() {
 
 		//Validate for update success
-
 		final GermplasmAttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
 		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(GID, PASSPORT_ATTRIBUTE_TYPE))
 			.thenReturn(Collections.singletonList(germplasmAttributeDto));
@@ -214,10 +215,31 @@ public class AttributeValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		this.attributeValidator.validateAttribute(errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
 
-		//Validate for non-existing
+		//Validate for non-existing success
 		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(GID, PASSPORT_ATTRIBUTE_TYPE))
 			.thenReturn(Collections.emptyList());
 		this.attributeValidator.validateAttribute(errors, GID, germplasmAttributeRequestDto, null);
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidateGermplasmAttributeValue() {
+		// Validate for happy path scenario
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		this.attributeValidator.validateGermplasmAttributeValue(errors, "value");
+
+		// Validate for scenario with error
+		final String invalidValue = RandomStringUtils.randomAlphabetic(256);
+		this.attributeValidator.validateGermplasmAttributeValue(errors, invalidValue);
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidateGermplasmAttributeDate() {
+		// Validate for happy path scenario
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		this.attributeValidator.validateGermplasmAttributeDate(errors, "20210316");
+
+		// Validate for scenario with error
+		this.attributeValidator.validateGermplasmAttributeDate(errors, "2021-03-16");
 	}
 
 

@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
@@ -25,6 +26,8 @@ public class AttributeValidator {
 	private static List<String> ALLOWED_ATTRIBUTE_TYPES = Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(),
 		UDTableType.ATRIBUTS_PASSPORT.getType());
 
+	private static Integer GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH = 255;
+
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
@@ -45,7 +48,6 @@ public class AttributeValidator {
 		final List<Attribute> attributes = this.germplasmDataManager.getAttributeByIds(ids);
 		if (attributes.size() != ids.size()) {
 			errors.reject("attribute.invalid", "");
-			return;
 		}
 	}
 
@@ -60,7 +62,7 @@ public class AttributeValidator {
 		}
 	}
 
-	public void validateAttributeCode(final BindingResult errors, final GermplasmAttributeRequestDto dto) {
+	void validateAttributeCode(final BindingResult errors, final GermplasmAttributeRequestDto dto) {
 		final List<AttributeDTO> attributeDTOS = this.germplasmService
 			.filterGermplasmAttributes(Collections.singleton(dto.getAttributeCode()), dto.getAttributeType());
 		if(attributeDTOS.isEmpty()) {
@@ -69,7 +71,7 @@ public class AttributeValidator {
 		}
 	}
 
-	public void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto) {
+	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto) {
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
 			dto.getAttributeType());
 
@@ -92,7 +94,7 @@ public class AttributeValidator {
 		}
 	}
 
-	public void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
+	void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
 		final Integer attributeId) {
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
 			dto.getAttributeType());
@@ -123,7 +125,25 @@ public class AttributeValidator {
 		} else {
 			this.validateGermplasmAttributeForUpdate(errors, gid, dto, attributeId);
 		}
+		this.validateGermplasmAttributeValue(errors, dto.getValue());
+		this.validateGermplasmAttributeDate(errors, dto.getDate());
 	}
+
+	void validateGermplasmAttributeValue(final BindingResult errors, final String value) {
+		if (value != null && value.length() > GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH) {
+			errors.reject("lot.notes.length", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	void validateGermplasmAttributeDate(final BindingResult errors, final String date) {
+		if (date == null || !DateUtil.isValidDate(date)) {
+			errors.reject("attribute.date.invalid.format", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+	}
+
 
 	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
 		this.germplasmDataManager = germplasmDataManager;
@@ -133,7 +153,7 @@ public class AttributeValidator {
 		this.germplasmService = germplasmService;
 	}
 
-	public void setGermplasmAttributeService(final  GermplasmAttributeService germplasmAttributeService) {
+	void setGermplasmAttributeService(final  GermplasmAttributeService germplasmAttributeService) {
 		this.germplasmAttributeService = germplasmAttributeService;
 	}
 }
