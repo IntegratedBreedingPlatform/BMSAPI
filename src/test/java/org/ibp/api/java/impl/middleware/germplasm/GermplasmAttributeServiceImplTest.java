@@ -1,0 +1,102 @@
+package org.ibp.api.java.impl.middleware.germplasm;
+
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BindingResult;
+
+import java.util.Collections;
+
+@RunWith(MockitoJUnitRunner.class)
+public class GermplasmAttributeServiceImplTest {
+
+	private static final Integer GID = 1;
+	private static final Integer GERMPLASM_ATTRIBUTE_ID = 1;
+	private static final String GERMPLASM_ATTRIBUTE_TYPE = "PASSPORT";
+
+	@Mock
+	private org.generationcp.middleware.api.germplasm.GermplasmAttributeService germplasmAttributeService;
+
+	@Mock
+	private AttributeValidator attributeValidator;
+
+	@Mock
+	private GermplasmValidator germplasmValidator;
+
+	@Mock
+	private LocationValidator locationValidator;
+
+	@Mock
+	private SecurityService securityService;
+
+	@InjectMocks
+	private GermplasmAttributeServiceImpl germplasmAttributeServiceImpl;
+
+
+	@Test
+	public void testGetGermplasmAttributeDtos() {
+		this.germplasmAttributeServiceImpl.getGermplasmAttributeDtos(GID, GERMPLASM_ATTRIBUTE_TYPE);
+		Mockito.verify(this.attributeValidator).validateAttributeType(ArgumentMatchers.any(BindingResult.class),
+			ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_TYPE));
+		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class),
+			ArgumentMatchers.eq(Collections.singletonList(GID)));
+		Mockito.verify(this.germplasmAttributeService).getGermplasmAttributeDtos(GID, GERMPLASM_ATTRIBUTE_TYPE);
+	}
+
+	@Test
+	public void testCreateGermplasmAttribute() {
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		workbenchUser.setUserid(1);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(workbenchUser);
+		final GermplasmAttributeRequestDto dto = this.createGermplasmAttributeRequestDto();
+
+		this.germplasmAttributeServiceImpl.createGermplasmAttribute(GID, dto);
+
+		Mockito.verify(this.attributeValidator).validateAttribute(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(GID),
+			ArgumentMatchers.eq(dto), ArgumentMatchers.eq(null));
+		Mockito.verify(this.locationValidator).validateLocation(ArgumentMatchers.any(BindingResult.class),
+			ArgumentMatchers.eq(dto.getLocationId()));
+		Mockito.verify(this.securityService).getCurrentlyLoggedInUser();
+		Mockito.verify(this.germplasmAttributeService).createGermplasmAttribute( ArgumentMatchers.eq(GID),
+			ArgumentMatchers.eq(dto), ArgumentMatchers.eq(workbenchUser.getUserid()));
+	}
+
+	@Test
+	public void testUpdateGermplasmAttribute() {
+		final GermplasmAttributeRequestDto dto = this.createGermplasmAttributeRequestDto();
+		this.germplasmAttributeServiceImpl.updateGermplasmAttribute(GID, GERMPLASM_ATTRIBUTE_ID, dto);
+
+		Mockito.verify(this.attributeValidator).validateAttribute(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(GID),
+			ArgumentMatchers.eq(dto), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
+		Mockito.verify(this.locationValidator).validateLocation(ArgumentMatchers.any(BindingResult.class),
+			ArgumentMatchers.eq(dto.getLocationId()));
+		Mockito.verify(this.germplasmAttributeService).updateGermplasmAttribute( ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID),
+			ArgumentMatchers.eq(dto));
+	}
+
+	@Test
+	public void testDeleteGermplasmAttribute() {
+		this.germplasmAttributeServiceImpl.deleteGermplasmAttribute(GID, GERMPLASM_ATTRIBUTE_ID);
+		Mockito.verify(this.attributeValidator).validateGermplasmAttributeExisting(ArgumentMatchers.any(BindingResult.class),
+			ArgumentMatchers.eq(GID), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
+		Mockito.verify(this.germplasmAttributeService).deleteGermplasmAttribute( ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
+	}
+
+	public GermplasmAttributeRequestDto createGermplasmAttributeRequestDto() {
+		final GermplasmAttributeRequestDto germplasmAttributeRequestDto = new GermplasmAttributeRequestDto();
+		germplasmAttributeRequestDto.setAttributeType(GERMPLASM_ATTRIBUTE_TYPE);
+		germplasmAttributeRequestDto.setLocationId(0);
+		return germplasmAttributeRequestDto;
+	}
+
+}

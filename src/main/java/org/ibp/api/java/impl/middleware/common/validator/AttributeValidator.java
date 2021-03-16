@@ -144,7 +144,6 @@ public class AttributeValidator {
 
 	}
 
-
 	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
 		this.germplasmDataManager = germplasmDataManager;
 	}
