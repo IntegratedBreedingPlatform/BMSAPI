@@ -36,7 +36,7 @@ public class TransactionMapper {
 			additionalInfo.put("transactionType", transactionDto.getTransactionType());
 			additionalInfo.put("transactionStatus", transactionDto.getTransactionStatus());
 			additionalInfo.put("seedLotID", transactionDto.getLot().getLotUUID());
-			additionalInfo.put("germplasmDbId", transactionDto.getLot().getGid());
+			additionalInfo.put("germplasmDbId", transactionDto.getLot().getGermplasmUUID());
 			additionalInfo.put("designation", transactionDto.getLot().getDesignation());
 			additionalInfo.put("locationId", transactionDto.getLot().getLocationId());
 			additionalInfo.put("locationName", transactionDto.getLot().getLocationName());
