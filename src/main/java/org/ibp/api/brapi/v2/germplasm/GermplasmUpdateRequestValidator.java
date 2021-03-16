@@ -1,9 +1,11 @@
 package org.ibp.api.brapi.v2.germplasm;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.LocationService;
@@ -25,24 +27,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Component
-public class GermplasmUpdateRequestValidator extends GermplasmImportRequestValidator {
-
-	public static final Integer NAME_MAX_LENGTH = 255;
-	public static final Integer ATTRIBUTE_MAX_LENGTH = 255;
+public class GermplasmUpdateRequestValidator {
 
 	private BindingResult errors;
+
+	@Autowired
+	private BreedingMethodService breedingMethodService;
+
+	@Autowired
+	private LocationService locationService;
 
 	public void validate(final GermplasmUpdateRequest germplasmUpdateRequest) {
 		BaseValidator.checkNotNull(germplasmUpdateRequest, "germplasm.update.request.null");
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmUpdateRequest.class.getName());
-
-		final List<String> validBreedingMethodIds = this.getValidBreedingMethodDbIds(Collections.singletonList(germplasmUpdateRequest));
-		final List<String> validLocationAbbreviations = this.getValidLocationAbbreviations(Collections.singletonList(germplasmUpdateRequest));
 
 
 		final Set<String> nameKeys = new HashSet<>();
@@ -51,12 +54,10 @@ public class GermplasmUpdateRequestValidator extends GermplasmImportRequestValid
 			&& Util.tryParseDate(germplasmUpdateRequest.getAcquisitionDate(), Util.FRONTEND_DATE_FORMAT) == null) {
 			this.errors.reject("germplasm.update.acquisition.date.invalid.format");
 		}
-		if (!StringUtils.isEmpty(germplasmUpdateRequest.getBreedingMethodDbId()) && !validBreedingMethodIds
-			.contains(germplasmUpdateRequest.getBreedingMethodDbId())) {
+		if (!StringUtils.isEmpty(germplasmUpdateRequest.getBreedingMethodDbId()) && !this.isValidBreedingMethodId(germplasmUpdateRequest)) {
 			this.errors.reject("germplasm.update.breeding.method.invalid");
 		}
-		if (!StringUtils.isEmpty(germplasmUpdateRequest.getCountryOfOriginCode()) && !validLocationAbbreviations
-			.contains(germplasmUpdateRequest.getCountryOfOriginCode())) {
+		if (!StringUtils.isEmpty(germplasmUpdateRequest.getCountryOfOriginCode()) && !this.isValidLocationAbbreviation(germplasmUpdateRequest)) {
 			this.errors.reject("germplasm.update.country.origin.invalid");
 		}
 
@@ -127,6 +128,71 @@ public class GermplasmUpdateRequestValidator extends GermplasmImportRequestValid
 		if (!StringUtils.isEmpty(g.getSubtaxaAuthority()) && this.attributeExceedsLength(g.getSubtaxaAuthority())) {
 			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"subtaxaAuthority"}, "");
 		}
+	}
+
+	private boolean isValidBreedingMethodId(final GermplasmUpdateRequest germplasmUpdateRequest) {
+		if (NumberUtils.isDigits(germplasmUpdateRequest.getBreedingMethodDbId())) {
+			return this.breedingMethodService.getBreedingMethod(Integer.parseInt(germplasmUpdateRequest.getBreedingMethodDbId())).isPresent();
+		}
+		return false;
+	}
+
+	private boolean isValidLocationAbbreviation(final GermplasmUpdateRequest germplasmUpdateRequest) {
+		return
+			this.locationService
+				.countFilteredLocations(
+					new LocationSearchRequest(null, null, null, Collections.singletonList(germplasmUpdateRequest.getCountryOfOriginCode()),
+						null,
+						false)) > 0;
+
+	}
+
+
+	protected boolean areNameValuesInvalid(final Collection<String> values) {
+		return values.stream().anyMatch(n -> {
+			if (StringUtils.isEmpty(n)) {
+				return true;
+			}
+			if (this.nameExceedsLength(n)) {
+				return true;
+			}
+			return false;
+		});
+	}
+
+	protected boolean areAttributesInvalid(final Map<String, String> attributes) {
+		if (attributes != null) {
+			final Set<String> attributeKeys = new HashSet<>();
+
+			if (attributes.keySet().stream().anyMatch(Objects::isNull)) {
+				return true;
+			}
+			attributes.keySet().forEach(attr -> attributeKeys.add(attr.toUpperCase()));
+			if (attributes.keySet().size() != attributeKeys.size()) {
+				return true;
+			}
+			if (attributes.values().stream().anyMatch(n -> {
+				if (StringUtils.isEmpty(n)) {
+					return true;
+				}
+				if (this.attributeExceedsLength(n)) {
+					return true;
+				}
+				return false;
+			})) {
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+
+	protected boolean attributeExceedsLength(final String attribute) {
+		return attribute.length() > GermplasmImportRequestValidator.ATTRIBUTE_MAX_LENGTH;
+	}
+
+	protected boolean nameExceedsLength(final String name) {
+		return name.length() > GermplasmImportRequestValidator.NAME_MAX_LENGTH;
 	}
 
 }

@@ -156,12 +156,12 @@ public class GermplasmResourceBrapi {
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Create new Germplasm entities on this server", notes = "Create new Germplasm entities on this server")
-	@RequestMapping(value = "/{crop}/brapi/v2/germplasm/{germplasmDbId}", method = RequestMethod.POST)
+	@ApiOperation(value = "Update the details of an existing germplasm", notes = "Update the details of an existing germplasm")
+	@RequestMapping(value = "/{crop}/brapi/v2/germplasm/{germplasmDbId}", method = RequestMethod.PUT)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<SingleEntityResponse<Germplasm>> updateGermplasm(@PathVariable final String crop, @PathVariable final String germplasmDbId,
-		@RequestBody GermplasmUpdateRequest germplasmUpdateRequest) {
+		@RequestBody final GermplasmUpdateRequest germplasmUpdateRequest) {
 		BaseValidator.checkNotNull(germplasmUpdateRequest, "germplasm.import.list.null");
 
 		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(germplasmDbId, germplasmUpdateRequest);
