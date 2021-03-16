@@ -171,10 +171,11 @@ public class GermplasmImportRequestValidator {
 			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "commonCropName"}, "");
 			return true;
 		}
-		if (!StringUtils.isEmpty(g.getGermplasmOrigin()) && attributeExceedsLength(g.getGermplasmOrigin())) {
-			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "germplasmOrigin"}, "");
-			return true;
-		}
+		// FIXME IBP-4455
+//		if (!StringUtils.isEmpty(g.getGermplasmOrigin()) && attributeExceedsLength(g.getGermplasmOrigin())) {
+//			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "germplasmOrigin"}, "");
+//			return true;
+//		}
 		if (!StringUtils.isEmpty(g.getInstituteCode()) && attributeExceedsLength(g.getInstituteCode())) {
 			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "instituteCode"}, "");
 			return true;
