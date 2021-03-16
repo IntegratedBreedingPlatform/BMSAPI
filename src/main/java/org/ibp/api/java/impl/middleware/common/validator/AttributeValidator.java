@@ -69,7 +69,7 @@ public class AttributeValidator {
 		}
 	}
 
-	public void validateGermplasmAttributeForCreate(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto) {
+	public void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto) {
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
 			dto.getAttributeType());
 
@@ -119,7 +119,7 @@ public class AttributeValidator {
 		final Integer attributeId) {
 		this.validateAttributeCode(errors, dto);
 		if(attributeId == null) {
-			this.validateGermplasmAttributeForCreate(errors, gid, dto);
+			this.validateGermplasmAttributeShouldNotExist(errors, gid, dto);
 		} else {
 			this.validateGermplasmAttributeForUpdate(errors, gid, dto, attributeId);
 		}
@@ -127,5 +127,13 @@ public class AttributeValidator {
 
 	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
 		this.germplasmDataManager = germplasmDataManager;
+	}
+
+	public void setGermplasmService(final GermplasmService germplasmService) {
+		this.germplasmService = germplasmService;
+	}
+
+	public void setGermplasmAttributeService(final  GermplasmAttributeService germplasmAttributeService) {
+		this.germplasmAttributeService = germplasmAttributeService;
 	}
 }
