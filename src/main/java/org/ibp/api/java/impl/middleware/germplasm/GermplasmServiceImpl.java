@@ -274,7 +274,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		try {
 			return this.germplasmService.countGermplasmByStudy(studyDbId);
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to count germplasms", e);
+			throw new ApiRuntimeException("An error has occurred when trying to count germplasm", e);
 		}
 	}
 
@@ -290,7 +290,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to search germplasms", e);
+			throw new ApiRuntimeException("An error has occurred when trying to search germplasm", e);
 		}
 	}
 
