@@ -63,8 +63,11 @@ public class GermplasmUpdateRequestValidator {
 
 		// Validations on names and synonyms
 		this.validateCustomNameFields(germplasmUpdateRequest);
-		if (germplasmUpdateRequest.getSynonyms().stream().map(Synonym::getType).anyMatch(Objects::isNull)) {
+		if (germplasmUpdateRequest.getSynonyms().stream().map(Synonym::getType).anyMatch(String::isEmpty)) {
 			this.errors.reject("germplasm.update.null.name.types");
+		}
+		if (germplasmUpdateRequest.getSynonyms().stream().map(Synonym::getSynonym).anyMatch(String::isEmpty)) {
+			this.errors.reject("germplasm.update.null.synonym");
 		}
 		germplasmUpdateRequest.getSynonyms().stream().map(Synonym::getType).forEach(name -> nameKeys.add(name.toUpperCase()));
 		if (germplasmUpdateRequest.getSynonyms().size() != nameKeys.size()) {
@@ -85,8 +88,8 @@ public class GermplasmUpdateRequestValidator {
 		}
 	}
 
-	private void validateCustomNameFields(final GermplasmImportRequest g) {
-		if (this.nameExceedsLength(g.getDefaultDisplayName())) {
+	private void validateCustomNameFields(final GermplasmUpdateRequest g) {
+		if (!StringUtils.isEmpty(g.getDefaultDisplayName()) && this.nameExceedsLength(g.getDefaultDisplayName())) {
 			this.errors.reject("germplasm.update.name.exceeded.length", new String[] {"defaultDisplayName"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getAccessionNumber()) && this.nameExceedsLength(g.getAccessionNumber())) {
