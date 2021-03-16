@@ -80,7 +80,7 @@ public class AttributeValidatorTest {
 
 		final Attribute attribute = new Attribute();
 		attribute.setAid(attributeById);
-		List<Attribute> attributeLists = Lists.newArrayList(attribute);
+		final List<Attribute> attributeLists = Lists.newArrayList(attribute);
 		Mockito.doReturn(attributeLists).when(this.germplasmDataManager).getAttributeByIds(Lists.newArrayList(attributeById));
 
 		this.attributeValidator.validateAttributeIds(bindingResult, Lists.newArrayList(String.valueOf(attributeById)));
@@ -163,7 +163,7 @@ public class AttributeValidatorTest {
 			final GermplasmAttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 			this.attributeValidator.validateGermplasmAttributeForUpdate(errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
-		}catch(ApiRequestValidationException e) {
+		}catch(final ApiRequestValidationException e) {
 			Assert.fail("should not throw an error");
 		}
 	}
@@ -180,7 +180,7 @@ public class AttributeValidatorTest {
 			final GermplasmAttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
 			this.attributeValidator.validateGermplasmAttributeForUpdate(errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
 			Assert.fail("should throw an error");
-		}catch(ApiRequestValidationException e) {
+		}catch(final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.id.invalid.not.existing", errors.getAllErrors().get(0).getCode());
 		}
 	}
@@ -196,7 +196,7 @@ public class AttributeValidatorTest {
 			final GermplasmAttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
 			this.attributeValidator.validateGermplasmAttributeForUpdate(errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
 			Assert.fail("should throw an error");
-		}catch(ApiRequestValidationException e) {
+		}catch(final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.code.update.invalid", errors.getAllErrors().get(0).getCode());
 		}
 	}

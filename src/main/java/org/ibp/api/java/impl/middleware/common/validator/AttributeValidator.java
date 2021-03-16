@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 @Component
 public class AttributeValidator {
 
-	private static List<String> ALLOWED_ATTRIBUTE_TYPES = Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(),
+	private static final List<String> ALLOWED_ATTRIBUTE_TYPES = Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(),
 		UDTableType.ATRIBUTS_PASSPORT.getType());
 
-	private static Integer GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH = 255;
+	private static final Integer GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH = 255;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -86,7 +86,7 @@ public class AttributeValidator {
 	public void validateGermplasmAttributeExisting(final BindingResult errors, final Integer gid, final Integer attributeId) {
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
 			null);
-		List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
+		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if(existingGermplasmAttributes.isEmpty()) {
 			errors.reject("attribute.id.invalid.not.existing", new String[] {attributeId.toString()}, "");

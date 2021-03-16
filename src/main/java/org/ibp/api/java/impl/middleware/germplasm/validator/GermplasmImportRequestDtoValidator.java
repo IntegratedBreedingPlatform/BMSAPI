@@ -43,11 +43,11 @@ import java.util.stream.Collectors;
 public class GermplasmImportRequestDtoValidator {
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
-	public static final Integer STOCK_ID_MAX_LENGTH = 35;
-	public static final Integer GUID_MAX_LENGTH = 36;
-	public static final Integer REFERENCE_MAX_LENGTH = 255;
-	public static final Integer NAME_MAX_LENGTH = 255;
-	public static final Integer ATTRIBUTE_MAX_LENGTH = 255;
+	static final Integer STOCK_ID_MAX_LENGTH = 35;
+	static final Integer GUID_MAX_LENGTH = 36;
+	static final Integer REFERENCE_MAX_LENGTH = 255;
+	static final Integer NAME_MAX_LENGTH = 255;
+	static final Integer ATTRIBUTE_MAX_LENGTH = 255;
 
 	private BindingResult errors;
 
@@ -76,9 +76,9 @@ public class GermplasmImportRequestDtoValidator {
 		BaseValidator.checkNotEmpty(germplasmImportRequestDto.getGermplasmList(), "germplasm.import.list.null");
 
 		if (germplasmImportRequestDto.getConnectUsing() == null) {
-			errors.reject("germplasm.import.connect.using.null"
+			this.errors.reject("germplasm.import.connect.using.null"
 				+ "", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		final Set<Integer> clientIds = new HashSet<>();
@@ -146,12 +146,12 @@ public class GermplasmImportRequestDtoValidator {
 			}
 
 			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().equals("0")) {
-				errors.reject("germplasm.import.guid.invalid.zero", "");
+				this.errors.reject("germplasm.import.guid.invalid.zero", "");
 				return true;
 			}
 
 			if (g.getNames().keySet().stream().anyMatch(Objects::isNull)) {
-				errors.reject("germplasm.import.null.name.types", new String[] {g.getClientId().toString()}, "");
+				this.errors.reject("germplasm.import.null.name.types", new String[] {g.getClientId().toString()}, "");
 				return true;
 			}
 
@@ -166,18 +166,18 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
-			if (areNameValuesInvalid(g.getNames().values())) {
+			if (this.areNameValuesInvalid(g.getNames().values())) {
 				return true;
 			}
 
-			if (areAttributesInvalid(g.getClientId(), g.getAttributes())) {
+			if (this.areAttributesInvalid(g.getClientId(), g.getAttributes())) {
 				return true;
 			}
 
 			if (germplasmImportRequestDto.getConnectUsing() != GermplasmImportRequestDto.PedigreeConnectionType.NONE) {
 				if ((StringUtils.isNotEmpty(g.getProgenitor1()) && StringUtils.isEmpty(g.getProgenitor2())) || (
 					StringUtils.isNotEmpty(g.getProgenitor2()) && StringUtils.isEmpty(g.getProgenitor1()))) {
-					errors.reject("germplasm.import.invalid.progenitors.combination", "");
+					this.errors.reject("germplasm.import.invalid.progenitors.combination", "");
 					return true;
 				}
 			} else {
@@ -200,7 +200,7 @@ public class GermplasmImportRequestDtoValidator {
 		});
 
 		if (invalid) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (!germplasmImportRequestDto.isSkipIfExists()) {
@@ -216,17 +216,17 @@ public class GermplasmImportRequestDtoValidator {
 
 	public void validateImportLoadedData(final String programUUID,
 		final List<GermplasmInventoryImportDTO> germplasmInventoryImportDTOList) {
-		errors = new MapBindingResult(new HashMap<String, String>(), GermplasmInventoryImportDTO.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmInventoryImportDTO.class.getName());
 
 		BaseValidator.checkNotEmpty(germplasmInventoryImportDTOList, "germplasm.import.list.null");
 
 		final Set<Integer> clientIds = new HashSet<>();
-		boolean invalid = germplasmInventoryImportDTOList.stream().anyMatch(g -> {
+		final boolean invalid = germplasmInventoryImportDTOList.stream().anyMatch(g -> {
 
 			final Set<String> nameKeys = new HashSet<>();
 
 			if (g == null) {
-				errors.reject("germplasm.import.germplasm.null", "");
+				this.errors.reject("germplasm.import.germplasm.null", "");
 				return true;
 			}
 
@@ -245,29 +245,29 @@ public class GermplasmImportRequestDtoValidator {
 			}
 
 			if (StringUtils.isNotEmpty(g.getCreationDate()) && !DateUtil.isValidDate(g.getCreationDate())) {
-				errors.reject("germplasm.import.creation.date.invalid", "");
+				this.errors.reject("germplasm.import.creation.date.invalid", "");
 				return true;
 			}
 
 			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().length() > GUID_MAX_LENGTH) {
-				errors.reject("germplasm.import.guid.invalid.length", "");
+				this.errors.reject("germplasm.import.guid.invalid.length", "");
 				return true;
 			}
 
 			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().equals("0")) {
-				errors.reject("germplasm.import.guid.invalid.zero", "");
+				this.errors.reject("germplasm.import.guid.invalid.zero", "");
 				return true;
 			}
 
 			if (g.getNames() != null) {
 				g.getNames().keySet().forEach(name -> nameKeys.add(name.toUpperCase()));
 				if (g.getNames().keySet().size() != nameKeys.size()) {
-					errors.reject("germplasm.import.duplicated.name.types",
+					this.errors.reject("germplasm.import.duplicated.name.types",
 						new String[] {(g.getClientId() != null) ? String.valueOf(g.getClientId()) : "unknown"}, "");
 					return true;
 				}
 
-				if (areNameValuesInvalid(g.getNames().values())) {
+				if (this.areNameValuesInvalid(g.getNames().values())) {
 					return true;
 				}
 
@@ -275,22 +275,22 @@ public class GermplasmImportRequestDtoValidator {
 
 			if (StringUtils.isNotEmpty(g.getPreferredName()) && (g.getNames() == null || !nameKeys
 				.contains(g.getPreferredName().toUpperCase()))) {
-				errors.reject("germplasm.import.preferred.name.invalid", "");
+				this.errors.reject("germplasm.import.preferred.name.invalid", "");
 				return true;
 			}
 
-			if (areAttributesInvalid(g.getClientId(), g.getAttributes())) {
+			if (this.areAttributesInvalid(g.getClientId(), g.getAttributes())) {
 				return true;
 			}
 
 			if ((StringUtils.isNotEmpty(g.getProgenitor1()) && StringUtils.isEmpty(g.getProgenitor2())) || (
 				StringUtils.isNotEmpty(g.getProgenitor2()) && StringUtils.isEmpty(g.getProgenitor1()))) {
-				errors.reject("germplasm.import.invalid.progenitors.combination", "");
+				this.errors.reject("germplasm.import.invalid.progenitors.combination", "");
 				return true;
 			}
 
 			if (g.getAmount() != null && g.getAmount() <= 0) {
-				errors.reject("germplasm.import.inventory.amount.invalid", "");
+				this.errors.reject("germplasm.import.inventory.amount.invalid", "");
 				return true;
 			}
 
@@ -359,8 +359,8 @@ public class GermplasmImportRequestDtoValidator {
 					.isNotEmpty(g.getBreedingMethodAbbr()) && Integer.valueOf(1)
 					.equals(methodsMapByAbbreviation
 						.get(g.getBreedingMethodAbbr().toUpperCase()).getNumberOfProgenitors()))) {
-				errors.reject("germplasm.import.mutation.not.supported.when.saving.progenitors", "");
-				throw new ApiRequestValidationException(errors.getAllErrors());
+				this.errors.reject("germplasm.import.mutation.not.supported.when.saving.progenitors", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
 	}
@@ -393,14 +393,14 @@ public class GermplasmImportRequestDtoValidator {
 				.map(g -> g.getStorageLocationAbbr().toUpperCase()).distinct().collect(Collectors.toList());
 		if (!locationAbbreviations.isEmpty()) {
 			final List<Location> existingLocations =
-				locationService.getFilteredLocations(
+				this.locationService.getFilteredLocations(
 					new LocationSearchRequest(programUUID, STORAGE_LOCATION_TYPE, null, new ArrayList<>(locationAbbreviations), null,
 						false), null);
 			if (existingLocations.size() != locationAbbreviations.size()) {
 				final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
 				final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);
 				invalidAbbreviations.removeAll(existingAbbreviations);
-				errors
+				this.errors
 					.reject("germplasm.import.storage.location.abbreviations.not.exist",
 						new String[] {Util.buildErrorMessageFromList(invalidAbbreviations, 3)}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -470,19 +470,20 @@ public class GermplasmImportRequestDtoValidator {
 		if (!stockIds.isEmpty()) {
 			final List<String> uniqueNotNullStockIds = stockIds.stream().distinct().collect(Collectors.toList());
 			if (stockIds.size() != uniqueNotNullStockIds.size()) {
-				errors.reject("lot.input.list.stock.ids.duplicated", "");
+				this.errors.reject("lot.input.list.stock.ids.duplicated", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 
 			if (uniqueNotNullStockIds.stream().filter(c -> c.length() > STOCK_ID_MAX_LENGTH).count() > 0) {
-				errors.reject("lot.stock.id.length.higher.than.maximum", new String[] {String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
+				this.errors.reject("lot.stock.id.length.higher.than.maximum", new String[] {String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 
 			final List<LotDto> existingLotDtos = this.lotService.getLotsByStockIds(uniqueNotNullStockIds);
 			if (!existingLotDtos.isEmpty()) {
 				final List<String> existingStockIds = existingLotDtos.stream().map(LotDto::getStockId).collect(Collectors.toList());
-				errors.reject("lot.input.list.stock.ids.invalid", new String[] {Util.buildErrorMessageFromList(existingStockIds, 3)}, "");
+				this.errors
+					.reject("lot.input.list.stock.ids.invalid", new String[] {Util.buildErrorMessageFromList(existingStockIds, 3)}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
@@ -493,18 +494,18 @@ public class GermplasmImportRequestDtoValidator {
 			germplasmInventoryImportDTOList.stream().filter(g -> StringUtils.isNotEmpty(g.getUnit())).map(g -> g.getUnit()).distinct()
 				.collect(Collectors.toList());
 		if (!units.isEmpty()) {
-			this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(units), errors);
+			this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(units), this.errors);
 		}
 	}
 
 	private boolean areNameValuesInvalid(final Collection<String> values) {
 		return values.stream().anyMatch(n -> {
 			if (StringUtils.isEmpty(n)) {
-				errors.reject("germplasm.import.name.type.value.null.empty", "");
+				this.errors.reject("germplasm.import.name.type.value.null.empty", "");
 				return true;
 			}
 			if (n.length() > NAME_MAX_LENGTH) {
-				errors.reject("germplasm.import.name.type.value.invalid.length", "");
+				this.errors.reject("germplasm.import.name.type.value.invalid.length", "");
 				return true;
 			}
 			return false;
@@ -516,21 +517,22 @@ public class GermplasmImportRequestDtoValidator {
 			final Set<String> attributeKeys = new HashSet<>();
 
 			if (attributes.keySet().stream().anyMatch(Objects::isNull)) {
-				errors.reject("germplasm.import.null.attributes", new String[] {(id != null) ? String.valueOf(id) : "Unknown"}, "");
+				this.errors.reject("germplasm.import.null.attributes", new String[] {(id != null) ? String.valueOf(id) : "Unknown"}, "");
 				return true;
 			}
 			attributes.keySet().forEach(attr -> attributeKeys.add(attr.toUpperCase()));
 			if (attributes.keySet().size() != attributeKeys.size()) {
-				errors.reject("germplasm.import.duplicated.attributes", new String[] {(id != null) ? String.valueOf(id) : "Unknown"}, "");
+				this.errors
+					.reject("germplasm.import.duplicated.attributes", new String[] {(id != null) ? String.valueOf(id) : "Unknown"}, "");
 				return true;
 			}
 			if (attributes.values().stream().anyMatch(n -> {
 				if (StringUtils.isEmpty(n)) {
-					errors.reject("germplasm.import.attribute.value.null.empty", "");
+					this.errors.reject("germplasm.import.attribute.value.null.empty", "");
 					return true;
 				}
 				if (n.length() > ATTRIBUTE_MAX_LENGTH) {
-					errors.reject("germplasm.import.attribute.value.invalid.length", "");
+					this.errors.reject("germplasm.import.attribute.value.invalid.length", "");
 					return true;
 				}
 				return false;

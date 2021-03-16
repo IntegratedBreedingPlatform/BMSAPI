@@ -36,7 +36,7 @@ public class LocationValidator {
 			errors.reject("location.required", "");
 			return;
 		}
-		final Location location = locationDataManager.getLocationByID(locationId);
+		final Location location = this.locationDataManager.getLocationByID(locationId);
 		if (location == null) {
 			errors.reject("location.invalid", "");
 			return;

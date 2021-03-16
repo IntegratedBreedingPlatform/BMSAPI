@@ -39,7 +39,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 
 	@Override
 	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final String attributeType) {
-		BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.attributeValidator.validateAttributeType(errors, attributeType);
 		return this.germplasmAttributeService.getGermplasmAttributeDtos(gid, attributeType);
@@ -47,7 +47,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 
 	@Override
 	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto) {
-		BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.attributeValidator.validateAttribute(errors, gid, dto, null);
 		this.locationValidator.validateLocation(errors, dto.getLocationId());
 
@@ -59,7 +59,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Override
 	public GermplasmAttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId,
 		final GermplasmAttributeRequestDto dto) {
-		BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.attributeValidator.validateAttribute(errors, gid, dto, attributeId);
 		this.locationValidator.validateLocation(errors, dto.getLocationId());
 
@@ -69,7 +69,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 
 	@Override
 	public void deleteGermplasmAttribute(final Integer gid, final Integer attributeId) {
-		BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.attributeValidator.validateGermplasmAttributeExisting(errors, gid, attributeId);
 		this.germplasmAttributeService.deleteGermplasmAttribute(attributeId);
 	}
