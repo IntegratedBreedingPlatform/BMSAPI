@@ -85,7 +85,7 @@ public class GermplasmResourceBrapi {
 		@ApiParam(value = "Search for Germplasm with this child")
 		@RequestParam(value = "progenyDbId", required = false) final String progenyDbId,
 		@ApiParam(value = "Search for externalReferenceId")
-		@RequestParam(value = "externalReferenceId", required = false) final String externalReferenceId,
+		@RequestParam(value = "externalReferenceID", required = false) final String externalReferenceID,
 		@ApiParam(value = "Search for externalReferenceSource")
 		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)
@@ -95,7 +95,7 @@ public class GermplasmResourceBrapi {
 
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO =
 			this.getGermplasmSearchRequestDto(germplasmPUI, germplasmName, accessionNumber, studyDbId, synonym, genus, parentDbId,
-				progenyDbId, externalReferenceId, externalReferenceSource);
+				progenyDbId, externalReferenceID, externalReferenceSource);
 		if (!StringUtils.isEmpty(germplasmDbId)) {
 			germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
 		}
