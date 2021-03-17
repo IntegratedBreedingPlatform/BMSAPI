@@ -326,44 +326,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public List<GermplasmNameTypeDTO> filterGermplasmNameTypes(final Set<String> codes) {
-
-		return this.germplasmService.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
-			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
-			.stream()
-			.map(userDefinedField -> {
-				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
-				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
-				germplasmNameTypeDTO.setName(userDefinedField.getFname());
-				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
-				return germplasmNameTypeDTO;
-			})
-			.collect(Collectors.toList());
-	}
-
-	@Override
-	public List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(final Set<String> codes, final String type) {
-
-		final Set<String> types = new HashSet<>();
-		if(StringUtils.isEmpty(type)) {
-			types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
-			types.add(UDTableType.ATRIBUTS_PASSPORT.getType());
-		} else {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), org.generationcp.middleware.api.attribute.AttributeDTO.class.getName());
-			this.attributeValidator.validateAttributeType(errors, type);
-			types.add(type);
-		}
-
-		return this.germplasmService.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
-			.stream()
-			.map(userDefinedField -> {
-				final org.generationcp.middleware.api.attribute.AttributeDTO attributeDTO =
-					new org.generationcp.middleware.api.attribute.AttributeDTO();
-				attributeDTO.setId(userDefinedField.getFldno());
-				attributeDTO.setName(userDefinedField.getFname());
-				attributeDTO.setCode(userDefinedField.getFcode());
-				return attributeDTO;
-			})
-			.collect(Collectors.toList());
+		return this.germplasmService.filterGermplasmNameTypes(codes);
 	}
 
 	@Override

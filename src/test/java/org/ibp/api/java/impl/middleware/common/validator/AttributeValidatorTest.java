@@ -106,14 +106,14 @@ public class AttributeValidatorTest {
 
 		final GermplasmAttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
 
-		Mockito.when(this.germplasmService.filterGermplasmAttributes(Collections.singleton(germplasmAttributeRequestDto.getAttributeCode()),
+		Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Collections.singleton(germplasmAttributeRequestDto.getAttributeCode()),
 			PASSPORT_ATTRIBUTE_TYPE)).thenReturn(Collections.singletonList(attributeDTO));
 		// Validate for happy path scenario
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		this.attributeValidator.validateAttributeCode(errors, germplasmAttributeRequestDto);
 		Assert.assertFalse(errors.hasErrors());
 
-		Mockito.when(this.germplasmService.filterGermplasmAttributes(Collections.singleton(germplasmAttributeRequestDto.getAttributeCode()),
+		Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Collections.singleton(germplasmAttributeRequestDto.getAttributeCode()),
 			PASSPORT_ATTRIBUTE_TYPE)).thenReturn(Collections.emptyList());
 
 		// Validate for scenario with error
@@ -212,7 +212,7 @@ public class AttributeValidatorTest {
 		final GermplasmAttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
 		final AttributeDTO attributeDTO = new AttributeDTO();
 		attributeDTO.setCode(ATTRIBUTE_CODE);
-		Mockito.when(this.germplasmService.filterGermplasmAttributes(Collections.singleton(germplasmAttributeRequestDto.getAttributeCode()),
+		Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Collections.singleton(germplasmAttributeRequestDto.getAttributeCode()),
 			PASSPORT_ATTRIBUTE_TYPE)).thenReturn(Collections.singletonList(attributeDTO));
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		this.attributeValidator.validateAttribute(errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
@@ -245,7 +245,7 @@ public class AttributeValidatorTest {
 	}
 
 
-	public GermplasmAttributeRequestDto createGermplasmAttributeRequestDto() {
+	private GermplasmAttributeRequestDto createGermplasmAttributeRequestDto() {
 		final GermplasmAttributeRequestDto germplasmAttributeRequestDto = new GermplasmAttributeRequestDto();
 		germplasmAttributeRequestDto.setAttributeCode(ATTRIBUTE_CODE);
 		germplasmAttributeRequestDto.setAttributeType(PASSPORT_ATTRIBUTE_TYPE);
@@ -254,7 +254,7 @@ public class AttributeValidatorTest {
 		return germplasmAttributeRequestDto;
 	}
 
-	public GermplasmAttributeDto createGermplasmAttributeDto() {
+	private GermplasmAttributeDto createGermplasmAttributeDto() {
 		final GermplasmAttributeDto germplasmAttributeDto = new GermplasmAttributeDto();
 		germplasmAttributeDto.setAttributeCode(ATTRIBUTE_CODE);
 		germplasmAttributeDto.setAttributeType(PASSPORT_ATTRIBUTE_TYPE);

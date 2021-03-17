@@ -1,7 +1,10 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
@@ -16,7 +19,9 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -72,5 +77,21 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.attributeValidator.validateGermplasmAttributeExisting(errors, gid, attributeId);
 		this.germplasmAttributeService.deleteGermplasmAttribute(attributeId);
+	}
+
+	@Override
+	public List<AttributeDTO> filterGermplasmAttributes(final Set<String> codes, final String type) {
+
+		final Set<String> types = new HashSet<>();
+		if(StringUtils.isEmpty(type)) {
+			types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
+			types.add(UDTableType.ATRIBUTS_PASSPORT.getType());
+		} else {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), org.generationcp.middleware.api.attribute.AttributeDTO.class.getName());
+			this.attributeValidator.validateAttributeType(errors, type);
+			types.add(type);
+		}
+
+		return this.germplasmAttributeService.filterGermplasmAttributes(codes, types);
 	}
 }

@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.junit.Test;
@@ -59,6 +60,9 @@ public class GermplasmImportRequestDtoValidatorTest {
 
 	@Mock
 	private LotService lotService;
+
+	@Mock
+	private GermplasmAttributeService germplasmAttributeService;
 
 	@InjectMocks
 	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
@@ -724,7 +728,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			attributeDTO1.setCode("NOTE");
 			final AttributeDTO attributeDTO2 = new AttributeDTO();
 			attributeDTO2.setCode("NOTE");
-			Mockito.when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
+			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
 				Lists.newArrayList(attributeDTO1, attributeDTO2));
 			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -753,7 +757,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 				.thenReturn(Collections.singletonList(new Location()));
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
 				.thenReturn(Collections.singletonList(new GermplasmNameTypeDTO()));
-			Mockito.when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
+			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
 				Collections.emptyList());
 			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -1117,7 +1121,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			attributeDTO1.setCode("NOTE");
 			final AttributeDTO attributeDTO2 = new AttributeDTO();
 			attributeDTO2.setCode("NOTE");
-			Mockito.when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
+			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
 				Lists.newArrayList(attributeDTO1, attributeDTO2));
 			this.germplasmImportRequestDtoValidator
 				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
@@ -1134,7 +1138,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.ATTRIBUTE_MAX_LENGTH));
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO1 = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO1.setAttributes(attributes);
-			Mockito.when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
+			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
 				Collections.emptyList());
 			this.germplasmImportRequestDtoValidator
 				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));

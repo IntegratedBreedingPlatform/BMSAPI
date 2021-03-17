@@ -19,6 +19,7 @@ import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
@@ -65,6 +66,9 @@ public class GermplasmImportRequestDtoValidator {
 
 	@Autowired
 	private InventoryCommonValidator inventoryCommonValidator;
+
+	@Autowired
+	private GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
 	private LotService lotService;
@@ -414,7 +418,7 @@ public class GermplasmImportRequestDtoValidator {
 			.forEach(g -> attributes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		if (!attributes.isEmpty()) {
 			final List<String> existingGermplasmAttributes =
-				this.germplasmService.filterGermplasmAttributes(attributes, null).stream().map(AttributeDTO::getCode).collect(
+				this.germplasmAttributeService.filterGermplasmAttributes(attributes, null).stream().map(AttributeDTO::getCode).collect(
 					Collectors.toList());
 			final Set<String> repeatedAttributes =
 				existingGermplasmAttributes.stream().filter(i -> Collections.frequency(existingGermplasmAttributes, i) > 1)

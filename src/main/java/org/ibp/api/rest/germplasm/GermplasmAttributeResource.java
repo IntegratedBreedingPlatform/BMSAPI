@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
-import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +26,6 @@ import java.util.Set;
 public class GermplasmAttributeResource {
 
 	@Autowired
-	private GermplasmService germplasmService;
-
-	@Autowired
 	private GermplasmAttributeService germplasmAttributeService;
 
 	@ApiOperation(value = "Returns germplasm attributes filtered by a list of codes and attibute type",
@@ -40,7 +36,7 @@ public class GermplasmAttributeResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Set<String> codes,
 		@RequestParam(required = false) final String type) {
-		return new ResponseEntity<>(this.germplasmService.filterGermplasmAttributes(codes, type), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmAttributeService.filterGermplasmAttributes(codes, type), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Returns germplasm attributes filtered by gid and attribute type",

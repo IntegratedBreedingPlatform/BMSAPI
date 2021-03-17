@@ -63,7 +63,7 @@ public class AttributeValidator {
 	}
 
 	void validateAttributeCode(final BindingResult errors, final GermplasmAttributeRequestDto dto) {
-		final List<AttributeDTO> attributeDTOS = this.germplasmService
+		final List<AttributeDTO> attributeDTOS = this.germplasmAttributeService
 			.filterGermplasmAttributes(Collections.singleton(dto.getAttributeCode()), dto.getAttributeType());
 		if(attributeDTOS.isEmpty()) {
 			errors.reject("attribute.code.invalid", "");
