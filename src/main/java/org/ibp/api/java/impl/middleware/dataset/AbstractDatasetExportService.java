@@ -153,7 +153,7 @@ public abstract class AbstractDatasetExportService {
 		if (files.size() == 1) {
 			return files.get(0);
 		} else {
-			return this.zipUtil.zipFiles(FileNameGenerator.generateFileName(study.getName(), null), files);
+			return this.zipUtil.zipFiles(FileNameGenerator.generateFileName(study.getName()), files);
 		}
 	}
 

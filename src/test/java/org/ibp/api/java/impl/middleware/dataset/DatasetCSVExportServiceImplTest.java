@@ -146,7 +146,7 @@ public class DatasetCSVExportServiceImplTest {
 
 		final File zipFile = new File("");
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
-		when(this.zipUtil.zipFiles(eq(FileNameGenerator.generateFileName(this.study.getName(), null)), anyListOf(File.class))).thenReturn(zipFile);
+		when(this.zipUtil.zipFiles(eq(FileNameGenerator.generateFileName(this.study.getName())), anyListOf(File.class))).thenReturn(zipFile);
 		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = Mockito.mock(HashMap.class);
 		when(this.studyDatasetService
 			.getInstanceObservationUnitRowsMap(eq(this.study.getId()), eq(this.dataSetDTO.getDatasetId()), any(ArrayList.class)))
@@ -176,7 +176,7 @@ public class DatasetCSVExportServiceImplTest {
 		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables),
 			ArgumentMatchers.anyList(), anyString(), any(StudyInstance.class)))
 			.thenReturn(new File(""));
-		when(this.zipUtil.zipFiles(eq(FileNameGenerator.generateFileName(this.study.getName(), null)), anyListOf(File.class))).thenReturn(zipFile);
+		when(this.zipUtil.zipFiles(eq(FileNameGenerator.generateFileName(this.study.getName())), anyListOf(File.class))).thenReturn(zipFile);
 		this.datasetExportService.setZipUtil(this.zipUtil);
 
 		final Map<Integer, StudyInstance> studyInstanceMap = this.datasetExportService
@@ -194,7 +194,7 @@ public class DatasetCSVExportServiceImplTest {
 				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.anyList(), anyString(),
 				any(StudyInstance.class));
 
-		verify(this.zipUtil).zipFiles(eq(FileNameGenerator.generateFileName(this.study.getName(), null)), anyListOf(File.class));
+		verify(this.zipUtil).zipFiles(eq(FileNameGenerator.generateFileName(this.study.getName())), anyListOf(File.class));
 		assertSame(result, zipFile);
 	}
 

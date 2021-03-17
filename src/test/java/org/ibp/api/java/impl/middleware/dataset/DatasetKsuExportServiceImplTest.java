@@ -157,7 +157,7 @@ public class DatasetKsuExportServiceImplTest {
 
 		final File zipFile = new File("");
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(instanceId1, instanceId2));
-		when(this.zipUtil.zipFiles(eq(FileNameGenerator.generateFileName(study.getName(), null)), anyListOf(File.class))).thenReturn(zipFile);
+		when(this.zipUtil.zipFiles(eq(FileNameGenerator.generateFileName(study.getName())), anyListOf(File.class))).thenReturn(zipFile);
 		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
 		instanceObservationUnitRowsMap.put(1, new ArrayList<>());
 		instanceObservationUnitRowsMap.put(2, new ArrayList<>());
