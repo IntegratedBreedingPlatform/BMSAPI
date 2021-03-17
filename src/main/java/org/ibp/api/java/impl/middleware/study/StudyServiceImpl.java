@@ -6,6 +6,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
+import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
@@ -22,6 +23,7 @@ import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +31,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -52,6 +57,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private StudyValidator studyValidator;
+
+	@Autowired
+	private GermplasmValidator germplasmValidator;
 
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
@@ -166,6 +174,13 @@ public class StudyServiceImpl implements StudyService {
 		} else {
 			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
 		}
+	}
+
+	@Override
+	public List<GermplasmStudyDto> getGermplasmStudies(final Integer gid) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		return this.middlewareStudyService.getGermplasmStudies(gid);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
