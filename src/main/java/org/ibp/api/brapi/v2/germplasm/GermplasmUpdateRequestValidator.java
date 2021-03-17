@@ -47,7 +47,6 @@ public class GermplasmUpdateRequestValidator {
 		BaseValidator.checkNotNull(germplasmUpdateRequest, "germplasm.update.request.null");
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmUpdateRequest.class.getName());
 
-
 		final Set<String> nameKeys = new HashSet<>();
 
 		if (!StringUtils.isEmpty(germplasmUpdateRequest.getAcquisitionDate())
@@ -153,13 +152,7 @@ public class GermplasmUpdateRequestValidator {
 
 	protected boolean areNameValuesInvalid(final Collection<String> values) {
 		return values.stream().anyMatch(n -> {
-			if (StringUtils.isEmpty(n)) {
-				return true;
-			}
-			if (this.nameExceedsLength(n)) {
-				return true;
-			}
-			return false;
+			return this.nameExceedsLength(n);
 		});
 	}
 

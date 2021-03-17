@@ -446,7 +446,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private void validateGUID(final String germplasmUUID) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		this.germplasmValidator.validateGermplasmGUID(this.errors, germplasmUUID);
+		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmUUID);
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
@@ -454,7 +454,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private void validateGuidAndAttributes(final String germplasmGUID, final List<String> attributeDbIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
-		this.germplasmValidator.validateGermplasmGUID(this.errors, germplasmGUID);
+		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmGUID);
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}

@@ -44,12 +44,12 @@ public class GermplasmValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
-	public void validateGermplasmGUID(final BindingResult errors, final String germplasmGUID) {
-		if (germplasmGUID == null) {
+	public void validateGermplasmUUID(final BindingResult errors, final String germplasmUUID) {
+		if (germplasmUUID == null) {
 			errors.reject("germplasm.required", "");
 			return;
 		}
-		final Optional<GermplasmDTO> germplasm = this.germplasmService.getGermplasmDTOByGUID(germplasmGUID);
+		final Optional<GermplasmDTO> germplasm = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
 		if (!germplasm.isPresent()) {
 			errors.reject("germplasm.invalid", "");
 		}
