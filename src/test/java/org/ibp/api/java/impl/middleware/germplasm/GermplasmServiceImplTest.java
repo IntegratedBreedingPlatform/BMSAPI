@@ -4,7 +4,6 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
@@ -12,7 +11,6 @@ import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -25,9 +23,7 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -43,7 +39,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
@@ -195,7 +190,7 @@ public class GermplasmServiceImplTest {
 
 		final GermplasmImportResponse importResponse = this.germplasmServiceImpl.createGermplasm(cropName, germplasmList);
 		Mockito.verify(this.middlewareGermplasmService).createGermplasm(user.getUserid(), cropName, germplasmList);
-		final Integer size = germplasmList.size();
+		final int size = germplasmList.size();
 		Assert.assertThat(importResponse.getStatus(), is(size + " out of " + size + " germplasm created successfully."));
 		Assert.assertThat(importResponse.getGermplasmList(), iterableWithSize(germplasmDTOList.size()));
 		Assert.assertThat(importResponse.getErrors(), nullValue());
@@ -232,7 +227,7 @@ public class GermplasmServiceImplTest {
 
 		final GermplasmImportResponse importResponse = this.germplasmServiceImpl.createGermplasm(cropName, germplasmList);
 		Mockito.verify(this.middlewareGermplasmService).createGermplasm(user.getUserid(), cropName, germplasmList);
-		final Integer size = germplasmList.size();
+		final int size = germplasmList.size();
 		Assert.assertThat(importResponse.getStatus(), is(germplasmDTOList.size() + " out of " + size + " germplasm created successfully."));
 		Assert.assertThat(importResponse.getGermplasmList(), iterableWithSize(germplasmDTOList.size()));
 		Assert.assertThat(importResponse.getErrors(), is(Lists.newArrayList(error)));
