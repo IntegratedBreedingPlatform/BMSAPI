@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
-import org.generationcp.middleware.api.germplasm.GermplasmListDto;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;

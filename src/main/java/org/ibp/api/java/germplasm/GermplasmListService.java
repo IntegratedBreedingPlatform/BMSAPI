@@ -1,7 +1,7 @@
 package org.ibp.api.java.germplasm;
 
 import org.generationcp.commons.pojo.treeview.TreeNode;
-import org.generationcp.middleware.api.germplasm.GermplasmListDto;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;

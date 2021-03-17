@@ -6,7 +6,7 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.api.germplasm.GermplasmListDto;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
