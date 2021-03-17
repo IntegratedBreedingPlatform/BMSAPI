@@ -6,12 +6,12 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.germplasm.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -30,7 +30,7 @@ import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
-import org.ibp.api.java.germplasm.GermplamListService;
+import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
@@ -43,6 +43,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,7 +59,7 @@ import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.ch
 
 @Service
 @Transactional
-public class GermplasmListServiceImpl implements GermplamListService {
+public class GermplasmListServiceImpl implements GermplasmListService {
 
 	public static final String PROGRAM_LISTS = "LISTS";
 	public static final String CROP_LISTS = "CROPLISTS";
@@ -99,7 +101,7 @@ public class GermplasmListServiceImpl implements GermplamListService {
 	public GermplasmSearchService germplasmSearchService;
 
 	@Autowired
-	public GermplasmListService germplasmListService;
+	public org.generationcp.middleware.api.germplasmlist.GermplasmListService germplasmListService;
 
 	@Autowired
 	public ProgramValidator programValidator;
@@ -536,6 +538,13 @@ public class GermplasmListServiceImpl implements GermplamListService {
 		}
 
 		this.germplasmListService.deleteGermplasmListFolder(Integer.parseInt(folderId));
+	}
+
+	@Override
+	public List<GermplasmListDto> getGermplasmLists(final Integer gid) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		this.germplasmValidator.validateGids(this.errors, Collections.singletonList(gid));
+		return this.germplasmListService.getGermplasmLists(gid);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {

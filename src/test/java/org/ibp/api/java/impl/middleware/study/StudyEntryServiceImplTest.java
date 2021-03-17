@@ -26,6 +26,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.hamcrest.collection.IsIn;
 import org.ibp.api.java.entrytype.EntryTypeService;
+import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -86,7 +87,7 @@ public class StudyEntryServiceImplTest {
 	private GermplasmListValidator germplasmListValidator;
 
 	@Mock
-	private org.ibp.api.java.germplasm.GermplamListService germplasmListService;
+	private GermplasmListService germplasmListService;
 
 	@Mock
 	private TermValidator termValidator;
