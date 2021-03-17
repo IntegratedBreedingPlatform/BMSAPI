@@ -126,19 +126,19 @@ public class GermplasmListServiceImplTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testGetGermplasmListChildrenNodes_MissingFolderOnly_ThrowsException() throws ApiRequestValidationException {
-		germplasmListService.getGermplasmListChildrenNodes(CROP, null, null, null);
+		this.germplasmListService.getGermplasmListChildrenNodes(CROP, null, null, null);
 
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testGetGermplasmListChildrenNodes_InvalidParentId_ThrowsException() throws ApiRequestValidationException {
-		germplasmListService.getGermplasmListChildrenNodes(CROP, null, "X", Boolean.TRUE);
+		this.germplasmListService.getGermplasmListChildrenNodes(CROP, null, "X", Boolean.TRUE);
 
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testGetGermplasmListChildrenNodes_ProgramNotSpecified_ThrowsException() throws ApiRequestValidationException {
-		germplasmListService.getGermplasmListChildrenNodes(CROP, null, GermplasmListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
+		this.germplasmListService.getGermplasmListChildrenNodes(CROP, null, GermplasmListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
 
 	}
 
@@ -147,14 +147,14 @@ public class GermplasmListServiceImplTest {
 		final String parentId = "1";
 		final GermplasmList germplasmList = new GermplasmList();
 		final String program = RandomStringUtils.randomAlphabetic(3);
-		Mockito.when(germplasmListManager.getGermplasmListById(Integer.parseInt(parentId))).thenReturn(germplasmList);
-		germplasmListService.getGermplasmListChildrenNodes(CROP, program, parentId, Boolean.FALSE);
+		Mockito.when(this.germplasmListManager.getGermplasmListById(Integer.parseInt(parentId))).thenReturn(germplasmList);
+		this.germplasmListService.getGermplasmListChildrenNodes(CROP, program, parentId, Boolean.FALSE);
 
 	}
 
 	@Test
 	public void testGetGermplasmListChildrenNodes_NoProgramSpecified_ReturnOnlyCropFolder() throws ApiRequestValidationException {
-		final List<TreeNode> result = germplasmListService.getGermplasmListChildrenNodes(CROP, null, null, Boolean.FALSE);
+		final List<TreeNode> result = this.germplasmListService.getGermplasmListChildrenNodes(CROP, null, null, Boolean.FALSE);
 		Assert.assertEquals(result.size(), 1);
 		Assert.assertEquals(GermplasmListServiceImpl.CROP_LISTS, result.get(0).getKey());
 	}
@@ -163,7 +163,7 @@ public class GermplasmListServiceImplTest {
 	public void testGetGermplasmListChildrenNodes_ProgramIsSpecified_ReturnCropAndProgramFolder() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
 
-		final List<TreeNode> result = germplasmListService.getGermplasmListChildrenNodes(CROP, program, null, Boolean.FALSE);
+		final List<TreeNode> result = this.germplasmListService.getGermplasmListChildrenNodes(CROP, program, null, Boolean.FALSE);
 		Assert.assertEquals(result.size(), 2);
 		Assert.assertEquals(GermplasmListServiceImpl.CROP_LISTS, result.get(0).getKey());
 		Assert.assertEquals(GermplasmListServiceImpl.PROGRAM_LISTS, result.get(1).getKey());
@@ -173,15 +173,15 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void testGetGermplasmListChildrenNodes_ParentIsCropList_LoadCropGermplasmLists() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
-		germplasmListService.getGermplasmListChildrenNodes(CROP, program, GermplasmListServiceImpl.CROP_LISTS, Boolean.FALSE);
-		Mockito.verify(germplasmListManager, times(1)).getAllTopLevelLists(null);
+		this.germplasmListService.getGermplasmListChildrenNodes(CROP, program, GermplasmListServiceImpl.CROP_LISTS, Boolean.FALSE);
+		Mockito.verify(this.germplasmListManager, times(1)).getAllTopLevelLists(null);
 	}
 
 	@Test
 	public void testGetGermplasmListChildrenNodes_ParentIsProgramList_LoadProgramGermplasmLists() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
-		germplasmListService.getGermplasmListChildrenNodes(CROP, program, GermplasmListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
-		Mockito.verify(germplasmListManager, times(1)).getAllTopLevelLists(program);
+		this.germplasmListService.getGermplasmListChildrenNodes(CROP, program, GermplasmListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
+		Mockito.verify(this.germplasmListManager, times(1)).getAllTopLevelLists(program);
 	}
 
 	@Test
@@ -195,8 +195,8 @@ public class GermplasmListServiceImplTest {
 
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByIdAndProgramUUID(Integer.parseInt(parentId), program)).thenReturn(Optional.of(germplasmList));
 
-		germplasmListService.getGermplasmListChildrenNodes(CROP, program, parentId, Boolean.FALSE);
-		Mockito.verify(germplasmListManager, times(1)).getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), program, GermplasmListServiceImpl.BATCH_SIZE);
+		this.germplasmListService.getGermplasmListChildrenNodes(CROP, program, parentId, Boolean.FALSE);
+		Mockito.verify(this.germplasmListManager, times(1)).getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), program, GermplasmListServiceImpl.BATCH_SIZE);
 	}
 
 	@Test
@@ -209,7 +209,7 @@ public class GermplasmListServiceImplTest {
 
 		Mockito.when(this.germplasmListManager.getGermplasmListTypes()).thenReturn(Arrays.asList(userDefinedField));
 
-		List<GermplasmListTypeDTO> germplasmListTypes = this.germplasmListService.getGermplasmListTypes();
+		final List<GermplasmListTypeDTO> germplasmListTypes = this.germplasmListService.getGermplasmListTypes();
 		assertNotNull(germplasmListTypes);
 		assertThat(germplasmListTypes, hasSize(1));
 		final GermplasmListTypeDTO actualGermplasmListTypeDTO = germplasmListTypes.get(0);
@@ -345,7 +345,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.createGermplasmListFolder(CROP, PROGRAM_UUID, folderName, parentId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.parent.id.invalid"));
 		}
@@ -363,7 +363,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.createGermplasmListFolder(CROP, PROGRAM_UUID, folderName, parentId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.empty"));
 		}
@@ -381,7 +381,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.createGermplasmListFolder(CROP, PROGRAM_UUID, folderName, parentId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.empty"));
 		}
@@ -399,7 +399,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.createGermplasmListFolder(CROP, PROGRAM_UUID, folderName, parentId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.name.too.long"));
 		}
@@ -422,7 +422,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.createGermplasmListFolder(CROP, PROGRAM_UUID, folderName, parentId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.parent.id.not.exist"));
 		}
@@ -453,7 +453,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.createGermplasmListFolder(CROP, PROGRAM_UUID, folderName, parentId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.name.exists"));
 		}
@@ -514,7 +514,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.updateGermplasmListFolderName(CROP, PROGRAM_UUID, folderName, folderId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.invalid"));
 		}
@@ -532,7 +532,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.updateGermplasmListFolderName(CROP, PROGRAM_UUID, folderName, folderId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.invalid"));
 		}
@@ -550,7 +550,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.updateGermplasmListFolderName(CROP, PROGRAM_UUID, folderName, folderId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.empty"));
 		}
@@ -568,7 +568,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.updateGermplasmListFolderName(CROP, PROGRAM_UUID, folderName, folderId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.empty"));
 		}
@@ -586,7 +586,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.updateGermplasmListFolderName(CROP, PROGRAM_UUID, folderName, parentId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.name.too.long"));
 		}
@@ -610,7 +610,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.updateGermplasmListFolderName(CROP, PROGRAM_UUID, folderName, folderId);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.not.exist"));
 		}
@@ -640,7 +640,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.updateGermplasmListFolderName(CROP, PROGRAM_UUID, folderName, String.valueOf(folderId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.not.exist"));
 		}
@@ -676,7 +676,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.updateGermplasmListFolderName(CROP, PROGRAM_UUID, folderName, String.valueOf(germplasmListId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.name.exists"));
 		}
@@ -788,7 +788,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.moveGermplasmListFolder(CROP, PROGRAM_UUID, null, String.valueOf(parentId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.invalid"));
 		}
@@ -805,7 +805,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.moveGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId), null);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.parent.id.invalid"));
 		}
@@ -822,7 +822,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.moveGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId), String.valueOf(folderId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.move.id.same.values"));
 		}
@@ -839,7 +839,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.moveGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId), GermplasmListServiceImpl.CROP_LISTS);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.parent.id.invalid"));
 		}
@@ -863,7 +863,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.moveGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId), String.valueOf(newParentId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.not.exist"));
 		}
@@ -896,7 +896,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.moveGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId), String.valueOf(newParentId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.move.folder.has.child"));
 		}
@@ -934,7 +934,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.moveGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId), String.valueOf(newParentId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.move.list.another.list.not.allowed"));
 		}
@@ -979,7 +979,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.moveGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId), String.valueOf(newParentId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.name.exists"));
 		}
@@ -1038,7 +1038,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, GermplasmListServiceImpl.CROP_LISTS);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.invalid"));
 		}
@@ -1055,7 +1055,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, GermplasmListServiceImpl.PROGRAM_LISTS);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.invalid"));
 		}
@@ -1072,7 +1072,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, null);
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.folder.id.invalid"));
 		}
@@ -1101,7 +1101,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.delete.not.folder"));
 		}
@@ -1138,7 +1138,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.delete.folder.has.child"));
 		}
@@ -1179,7 +1179,7 @@ public class GermplasmListServiceImplTest {
 		try {
 			this.germplasmListService.deleteGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId));
 			fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.delete.not.owner"));
 		}
