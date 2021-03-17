@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.germplasm.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
@@ -36,10 +37,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1354,6 +1357,20 @@ public class GermplasmListServiceImplTest {
 		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
 
 		Mockito.verifyZeroInteractions(this.germplasmValidator);
+	}
+
+	@Test
+	public void testGetGermplasmLists() {
+		final Integer gid = 1;
+		final GermplasmListDto dto = new GermplasmListDto(1, "listName", "20210317", "description");
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmLists(gid)).thenReturn(Collections.singletonList(dto));
+
+		final List<GermplasmListDto> germplasmListDtos = this.germplasmListService.getGermplasmLists(gid);
+
+		Assert.assertEquals(dto, germplasmListDtos.get(0));
+	 	Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class),
+			ArgumentMatchers.eq(Collections.singletonList(gid)));
+	 	Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmLists(gid);
 	}
 
 	private GermplasmListGeneratorDTO createGermplasmList() {
