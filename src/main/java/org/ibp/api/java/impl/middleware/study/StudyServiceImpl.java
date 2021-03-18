@@ -196,4 +196,8 @@ public class StudyServiceImpl implements StudyService {
 		this.middlewareStudyService = middlewareStudyService;
 	}
 
+	public void setGermplasmValidator(final GermplasmValidator germplasmValidator) {
+		this.germplasmValidator = germplasmValidator;
+	}
+
 }

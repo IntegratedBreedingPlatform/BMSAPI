@@ -10,17 +10,20 @@ import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.Trait;
-import org.ibp.api.domain.study.validators.ObservationValidator;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import uk.co.jemos.podam.api.PodamFactory;
-import uk.co.jemos.podam.api.PodamFactoryImpl;
+import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class StudyServiceImplTest {
@@ -37,12 +40,8 @@ public class StudyServiceImplTest {
 	private StudyValidator studyValidator;
 
 	@Mock
-	private ObservationValidator observationValidator;
+	private GermplasmValidator germplasmValidator;
 
-	final PodamFactory factory = new PodamFactoryImpl();
-
-	final Function<ObservationDto, Observation> observationTransformFunction =
-		input -> StudyServiceImplTest.this.mapObservationDtoToObservation(input);
 
 
 	@Before
@@ -53,6 +52,7 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
 		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
 		this.studyServiceImpl.setStudyValidator(this.studyValidator);
+		this.studyServiceImpl.setGermplasmValidator(this.germplasmValidator);
 	}
 
 	@Test
@@ -60,6 +60,31 @@ public class StudyServiceImplTest {
 		int studyId = 101;
 		this.studyServiceImpl.getStudyReference(studyId);
 		Mockito.verify(this.studyDataManager).getStudyReference(studyId);
+	}
+
+	@Test
+	public void testGetGermplasmStudies_Success() {
+		final Integer gid = 1;
+		this.studyServiceImpl.getGermplasmStudies(gid);
+		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class),
+			ArgumentMatchers.eq(Collections.singletonList(gid)));
+		Mockito.verify(this.mockMiddlewareStudyService).getGermplasmStudies(gid);
+	}
+
+
+	@Test
+	public void testGetGermplasmStudies_ThrowsException_WhenGIDIsInvalid() {
+		final Integer gid = 999;
+		try {
+			Mockito.doThrow(new ApiRequestValidationException(Collections.EMPTY_LIST)).when(this.germplasmValidator)
+				.validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(Collections.singletonList(gid)));
+			this.studyServiceImpl.getGermplasmStudies(gid);
+			Assert.fail("should throw an exception");
+		} catch (ApiRequestValidationException e) {
+			Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class),
+				ArgumentMatchers.eq(Collections.singletonList(gid)));
+			Mockito.verify(this.mockMiddlewareStudyService, Mockito.never()).getGermplasmStudies(gid);
+		}
 	}
 
 	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
