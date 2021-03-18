@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
@@ -16,6 +17,7 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
+import org.ibp.api.brapi.v2.germplasm.GermplasmUpdateRequestValidator;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -75,6 +77,9 @@ public class GermplasmServiceImplTest {
 
 	@Mock
 	private GermplasmImportRequestValidator germplasmImportValidator;
+
+	@Mock
+	private GermplasmUpdateRequestValidator germplasmUpdateRequestValidator;
 
 	@InjectMocks
 	private GermplasmServiceImpl germplasmServiceImpl;
@@ -231,6 +236,30 @@ public class GermplasmServiceImplTest {
 		Assert.assertThat(importResponse.getStatus(), is(germplasmDTOList.size() + " out of " + size + " germplasm created successfully."));
 		Assert.assertThat(importResponse.getGermplasmList(), iterableWithSize(germplasmDTOList.size()));
 		Assert.assertThat(importResponse.getErrors(), is(Lists.newArrayList(error)));
+	}
+
+	@Test
+	public void testUpdateGermplasm(){
+		final WorkbenchUser user = new WorkbenchUser(1);
+		Mockito.doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
+
+		final String germplasmDbId = RandomStringUtils.randomAlphabetic(20);
+		final String breedingMethodDbId = "13";
+
+		final GermplasmDTO germplasmDTO = new GermplasmDTO();
+		germplasmDTO.setGermplasmDbId(germplasmDbId);
+		germplasmDTO.setGid("1");
+		germplasmDTO.setGermplasmName("CB1");
+		germplasmDTO.setGermplasmSeedSource("AF07A-412-201");
+		final GermplasmUpdateRequest updateRequest = new GermplasmUpdateRequest();
+		updateRequest.setBreedingMethodDbId(breedingMethodDbId);
+		Mockito.doReturn(germplasmDTO).when(this.middlewareGermplasmService)
+			.updateGermplasm(user.getUserid(), germplasmDbId, updateRequest);
+
+		final GermplasmDTO germplasm = this.germplasmServiceImpl.updateGermplasm(germplasmDbId, updateRequest);
+		Mockito.verify(this.germplasmValidator).validateGermplasmUUID(ArgumentMatchers.any(), ArgumentMatchers.eq(germplasmDbId));
+		Mockito.verify(this.germplasmUpdateRequestValidator).validate(updateRequest);
+		Mockito.verify(this.middlewareGermplasmService).updateGermplasm(user.getUserid(), germplasmDbId, updateRequest);
 	}
 
 

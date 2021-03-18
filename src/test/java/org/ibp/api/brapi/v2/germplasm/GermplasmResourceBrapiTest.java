@@ -6,6 +6,7 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -143,8 +144,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	@Test
 	public void testCreateGermplasm_InvalidGermplasm() throws Exception {
-		final int gid = nextInt();
-		final String germplasmDbId = String.valueOf(gid);
+		final String germplasmDbId = RandomStringUtils.randomAlphanumeric(20);
 		final GermplasmImportRequest importRequest = new GermplasmImportRequest();
 		importRequest.setBreedingMethodDbId("13");
 		importRequest.setSeedSource("BC07A-412-201");
@@ -167,6 +167,53 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0]", Matchers.hasKey("ERROR1")))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(0)));
 
+	}
+
+	@Test
+	public void testUpdateGermplasm() throws Exception {
+		final GermplasmUpdateRequest updateRequest = new GermplasmUpdateRequest();
+		updateRequest.setBreedingMethodDbId("13");
+		updateRequest.setDefaultDisplayName("CB2");
+		updateRequest.setSeedSource("BC07A-412-201");
+		final String cropName = "maize";
+		final String germplasmDbId = RandomStringUtils.randomAlphanumeric(20);
+		final List<GermplasmDTO> list = this.getTestGermplasmDTOList(germplasmDbId);
+		doReturn(list.get(0)).when(this.germplasmService).updateGermplasm(germplasmDbId, updateRequest);
+
+
+		final GermplasmDTO germplasmDTO = list.get(0);
+		this.mockMvc.perform(MockMvcRequestBuilders.put("/{crop}/brapi/v2/germplasm/{germplasmDbId}", cropName, germplasmDbId)
+			.content(this.convertObjectToByte(updateRequest)).contentType(this.contentType))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmDbId",
+				Matchers.is(germplasmDbId)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.accessionNumber",
+				Matchers.is(germplasmDTO.getAccessionNumber())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.breedingMethodDbId",
+				Matchers.is(germplasmDTO.getBreedingMethodDbId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.countryOfOriginCode",
+				Matchers.is(germplasmDTO.getCountryOfOriginCode())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.commonCropName",
+				Matchers.is(germplasmDTO.getCommonCropName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.defaultDisplayName",
+				Matchers.is(germplasmDTO.getDefaultDisplayName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.genus",
+				Matchers.is(germplasmDTO.getGenus())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmName",
+				Matchers.is(germplasmDTO.getGermplasmName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin",
+				Matchers.is(germplasmDTO.getGermplasmOrigin())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.countryOfOriginCode",
+				Matchers.is(germplasmDTO.getCountryOfOriginCode())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.additionalInfo",
+				Matchers.hasKey(ATTRIBUTETYPE)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.additionalInfo",
+				Matchers.hasValue(germplasmDTO.getAdditionalInfo().get(ATTRIBUTETYPE))))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.synonyms",
+				Matchers.hasKey(NAMETYPE)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.synonyms",
+				Matchers.hasValue(germplasmDTO.getSynonyms().get(NAMETYPE))));
 	}
 
 
