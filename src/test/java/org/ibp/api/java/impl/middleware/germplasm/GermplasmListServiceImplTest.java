@@ -1360,7 +1360,7 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test
-	public void testGetGermplasmLists() {
+	public void testGetGermplasmLists_WithNoErrors() {
 		final Integer gid = 1;
 		final GermplasmListDto dto = new GermplasmListDto(1, "listName", "20210317", "description");
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmLists(gid)).thenReturn(Collections.singletonList(dto));
@@ -1371,6 +1371,21 @@ public class GermplasmListServiceImplTest {
 	 	Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class),
 			ArgumentMatchers.eq(Collections.singletonList(gid)));
 	 	Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmLists(gid);
+	}
+
+	@Test
+	public void testGetGermplasmLists_ThrowsException_WhenGIDIsInvalid() {
+		final Integer gid = 999;
+		try {
+			Mockito.doThrow(new ApiRequestValidationException(Collections.EMPTY_LIST)).when(this.germplasmValidator)
+				.validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(Collections.singletonList(gid)));
+			this.germplasmListService.getGermplasmLists(gid);
+			Assert.fail("should throw an exception");
+		} catch (ApiRequestValidationException e) {
+			Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class),
+				ArgumentMatchers.eq(Collections.singletonList(gid)));
+			Mockito.verify(this.germplasmListServiceMiddleware, Mockito.never()).getGermplasmLists(gid);
+		}
 	}
 
 	private GermplasmListGeneratorDTO createGermplasmList() {
