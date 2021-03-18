@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
-import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -17,6 +16,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
+import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -72,4 +72,6 @@ public interface GermplasmService {
 	GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList);
 
 	GermplasmDeleteResponse deleteGermplasm(List<Integer> gids);
+
+	GermplasmDto getGermplasmDtoById(Integer gid);
 }
