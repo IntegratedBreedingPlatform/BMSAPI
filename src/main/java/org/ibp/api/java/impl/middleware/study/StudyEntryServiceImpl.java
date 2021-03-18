@@ -22,7 +22,7 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.entrytype.EntryTypeService;
-import org.ibp.api.java.germplasm.GermplamListService;
+import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -80,7 +80,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private EntryTypeValidator entryTypeValidator;
 
 	@Autowired
-	private GermplamListService germplasmListService;
+	private GermplasmListService germplasmListService;
 
 	@Autowired
 	private SearchRequestDtoResolver searchRequestDtoResolver;
