@@ -4,20 +4,20 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
+import org.ibp.api.brapi.v2.germplasm.GermplasmUpdateRequestValidator;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -25,9 +25,7 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -43,7 +41,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
@@ -81,8 +78,8 @@ public class GermplasmServiceImplTest {
 	@Mock
 	private GermplasmImportRequestValidator germplasmImportValidator;
 
-	@Captor
-	private ArgumentCaptor<Set<String>> setArgumentCaptor;
+	@Mock
+	private GermplasmUpdateRequestValidator germplasmUpdateRequestValidator;
 
 	@InjectMocks
 	private GermplasmServiceImpl germplasmServiceImpl;
@@ -118,56 +115,24 @@ public class GermplasmServiceImplTest {
 			this.add("LNAME");
 		}};
 
-		final UserDefinedField userDefinedField = new UserDefinedField();
-		userDefinedField.setFcode("LNAME");
-		userDefinedField.setFldno(new Random().nextInt());
-		userDefinedField.setFname("LINE NAME");
+		final GermplasmNameTypeDTO nameTypeDTO = new GermplasmNameTypeDTO();
+		nameTypeDTO.setCode("LNAME");
+		nameTypeDTO.setId(new Random().nextInt());
+		nameTypeDTO.setName("LINE NAME");
 
 		final Set<String> types = Collections.singleton(UDTableType.NAMES_NAME.getType());
-		Mockito.when(this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(), types, codes))
-			.thenReturn(Arrays.asList(userDefinedField));
+		Mockito.when(this.middlewareGermplasmService.filterGermplasmNameTypes(codes)).thenReturn(Arrays.asList(nameTypeDTO));
 
 		final List<GermplasmNameTypeDTO> germplasmListTypes = this.germplasmServiceImpl.filterGermplasmNameTypes(codes);
 		assertNotNull(germplasmListTypes);
 		assertThat(germplasmListTypes, hasSize(1));
 		final GermplasmNameTypeDTO actualGermplasmListTypeDTO = germplasmListTypes.get(0);
-		assertThat(actualGermplasmListTypeDTO.getCode(), is(userDefinedField.getFcode()));
-		assertThat(actualGermplasmListTypeDTO.getId(), is(userDefinedField.getFldno()));
-		assertThat(actualGermplasmListTypeDTO.getName(), is(userDefinedField.getFname()));
+		assertThat(actualGermplasmListTypeDTO.getCode(), is(nameTypeDTO.getCode()));
+		assertThat(actualGermplasmListTypeDTO.getId(), is(nameTypeDTO.getId()));
+		assertThat(actualGermplasmListTypeDTO.getName(), is(nameTypeDTO.getName()));
 
-		Mockito.verify(this.germplasmDataManager).getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(), types, codes);
-		Mockito.verifyNoMoreInteractions(this.germplasmDataManager);
-	}
-
-	@Test
-	public void shouldFilterGermplasmAttributes() {
-		final Set<String> codes = Collections.singleton("NOTE");
-
-		final UserDefinedField userDefinedField = new UserDefinedField();
-		userDefinedField.setFcode("NOTE");
-		userDefinedField.setFldno(new Random().nextInt());
-		userDefinedField.setFname("NOTES");
-
-		Mockito.when(
-			this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(ArgumentMatchers.eq(UDTableType.ATRIBUTS_ATTRIBUTE.getTable()),
-				ArgumentMatchers.anySet(), ArgumentMatchers.eq(codes))).thenReturn(Arrays.asList(userDefinedField));
-
-		final List<AttributeDTO> germplasmListTypes = this.germplasmServiceImpl.filterGermplasmAttributes(codes);
-		assertNotNull(germplasmListTypes);
-		assertThat(germplasmListTypes, hasSize(1));
-		final AttributeDTO actualGermplasmListTypeDTO = germplasmListTypes.get(0);
-		assertThat(actualGermplasmListTypeDTO.getCode(), is(userDefinedField.getFcode()));
-		assertThat(actualGermplasmListTypeDTO.getId(), is(userDefinedField.getFldno()));
-		assertThat(actualGermplasmListTypeDTO.getName(), is(userDefinedField.getFname()));
-
-		Mockito.verify(this.germplasmDataManager)
-			.getUserDefinedFieldByTableTypeAndCodes(ArgumentMatchers.eq(UDTableType.ATRIBUTS_ATTRIBUTE.getTable()),
-				this.setArgumentCaptor.capture(), ArgumentMatchers.eq(codes));
-		final Set<String> actualTypes = this.setArgumentCaptor.getValue();
-		assertNotNull(actualTypes);
-		assertThat(actualTypes, hasSize(2));
-		assertThat(actualTypes, contains(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()));
-		Mockito.verifyNoMoreInteractions(this.germplasmDataManager);
+		Mockito.verify(this.middlewareGermplasmService).filterGermplasmNameTypes(codes);
+		Mockito.verifyNoMoreInteractions(this.middlewareGermplasmService);
 	}
 
 	@Test
@@ -230,7 +195,7 @@ public class GermplasmServiceImplTest {
 
 		final GermplasmImportResponse importResponse = this.germplasmServiceImpl.createGermplasm(cropName, germplasmList);
 		Mockito.verify(this.middlewareGermplasmService).createGermplasm(user.getUserid(), cropName, germplasmList);
-		final Integer size = germplasmList.size();
+		final int size = germplasmList.size();
 		Assert.assertThat(importResponse.getStatus(), is(size + " out of " + size + " germplasm created successfully."));
 		Assert.assertThat(importResponse.getGermplasmList(), iterableWithSize(germplasmDTOList.size()));
 		Assert.assertThat(importResponse.getErrors(), nullValue());
@@ -267,10 +232,34 @@ public class GermplasmServiceImplTest {
 
 		final GermplasmImportResponse importResponse = this.germplasmServiceImpl.createGermplasm(cropName, germplasmList);
 		Mockito.verify(this.middlewareGermplasmService).createGermplasm(user.getUserid(), cropName, germplasmList);
-		final Integer size = germplasmList.size();
+		final int size = germplasmList.size();
 		Assert.assertThat(importResponse.getStatus(), is(germplasmDTOList.size() + " out of " + size + " germplasm created successfully."));
 		Assert.assertThat(importResponse.getGermplasmList(), iterableWithSize(germplasmDTOList.size()));
 		Assert.assertThat(importResponse.getErrors(), is(Lists.newArrayList(error)));
+	}
+
+	@Test
+	public void testUpdateGermplasm(){
+		final WorkbenchUser user = new WorkbenchUser(1);
+		Mockito.doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
+
+		final String germplasmDbId = RandomStringUtils.randomAlphabetic(20);
+		final String breedingMethodDbId = "13";
+
+		final GermplasmDTO germplasmDTO = new GermplasmDTO();
+		germplasmDTO.setGermplasmDbId(germplasmDbId);
+		germplasmDTO.setGid("1");
+		germplasmDTO.setGermplasmName("CB1");
+		germplasmDTO.setGermplasmSeedSource("AF07A-412-201");
+		final GermplasmUpdateRequest updateRequest = new GermplasmUpdateRequest();
+		updateRequest.setBreedingMethodDbId(breedingMethodDbId);
+		Mockito.doReturn(germplasmDTO).when(this.middlewareGermplasmService)
+			.updateGermplasm(user.getUserid(), germplasmDbId, updateRequest);
+
+		final GermplasmDTO germplasm = this.germplasmServiceImpl.updateGermplasm(germplasmDbId, updateRequest);
+		Mockito.verify(this.germplasmValidator).validateGermplasmUUID(ArgumentMatchers.any(), ArgumentMatchers.eq(germplasmDbId));
+		Mockito.verify(this.germplasmUpdateRequestValidator).validate(updateRequest);
+		Mockito.verify(this.middlewareGermplasmService).updateGermplasm(user.getUserid(), germplasmDbId, updateRequest);
 	}
 
 
