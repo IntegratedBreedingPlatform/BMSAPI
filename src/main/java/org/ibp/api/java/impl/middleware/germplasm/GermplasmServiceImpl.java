@@ -212,9 +212,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public PedigreeDTO getPedigree(final String germplasmDbId, final String notation, final Boolean includeSiblings) {
-		this.validateGUID(germplasmDbId);
-		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
+	public PedigreeDTO getPedigree(final String germplasmUUID, final String notation, final Boolean includeSiblings) {
+		this.validateGermplasmUUID(germplasmUUID);
+		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
 		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(Integer.valueOf(germplasmDTO.get().getGid()), notation, includeSiblings);
 		if (pedigreeDTO != null) {
 			pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(Integer.valueOf(germplasmDTO.get().getGid()), this.crossExpansionProperties));
@@ -223,9 +223,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public ProgenyDTO getProgeny(final String germplasmDbId) {
-		this.validateGUID(germplasmDbId);
-		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmDbId);
+	public ProgenyDTO getProgeny(final String germplasmUUID) {
+		this.validateGermplasmUUID(germplasmUUID);
+		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
 		return this.germplasmService.getProgeny(Integer.valueOf(germplasmDTO.get().getGid()));
 	}
 
@@ -239,7 +239,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public GermplasmDTO getGermplasmDTObyGUID(final String germplasmUUID) {
-		this.validateGUID(germplasmUUID);
+		this.validateGermplasmUUID(germplasmUUID);
 		final GermplasmDTO germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID).get();
 		germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(Integer.valueOf(germplasmDTO.getGid()), this.crossExpansionProperties));
 		return germplasmDTO;
@@ -315,7 +315,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public long countAttributesByGUID(final String germplasmUUID, final List<String> attributeDbIds) {
-		this.validateGUID(germplasmUUID);
+		this.validateGermplasmUUID(germplasmUUID);
 		return this.germplasmService.countAttributesByGUID(germplasmUUID, attributeDbIds);
 	}
 
@@ -437,14 +437,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public GermplasmDTO updateGermplasm(final String germplasmDbId, final GermplasmUpdateRequest germplasmUpdateRequest) {
-		this.validateGUID(germplasmDbId);
+	public GermplasmDTO updateGermplasm(final String germplasmUUID, final GermplasmUpdateRequest germplasmUpdateRequest) {
+		this.validateGermplasmUUID(germplasmUUID);
 		this.germplasmUpdateRequestValidator.validate(germplasmUpdateRequest);
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-		return this.germplasmService.updateGermplasm(user.getUserid(), germplasmDbId, germplasmUpdateRequest);
+		return this.germplasmService.updateGermplasm(user.getUserid(), germplasmUUID, germplasmUpdateRequest);
 	}
 
-	private void validateGUID(final String germplasmUUID) {
+	private void validateGermplasmUUID(final String germplasmUUID) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmUUID);
 		if (this.errors.hasErrors()) {

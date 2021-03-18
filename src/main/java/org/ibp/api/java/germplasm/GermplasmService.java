@@ -38,9 +38,9 @@ public interface GermplasmService {
 
 	List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(String name);
 
-	PedigreeDTO getPedigree(String germplasmDbId, String notation, Boolean includeSiblings);
+	PedigreeDTO getPedigree(String germplasmUUID, String notation, Boolean includeSiblings);
 
-	ProgenyDTO getProgeny(String germplasmDbId);
+	ProgenyDTO getProgeny(String germplasmUUID);
 
 	GermplasmDTO getGermplasmDTObyGUID(String germplasmUUID);
 
@@ -72,7 +72,7 @@ public interface GermplasmService {
 
 	GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList);
 
-	GermplasmDTO updateGermplasm(final String germplasmDbId, final GermplasmUpdateRequest germplasmUpdateRequest);
+	GermplasmDTO updateGermplasm(final String germplasmUUID, final GermplasmUpdateRequest germplasmUpdateRequest);
 
 	GermplasmDeleteResponse deleteGermplasm(List<Integer> gids);
 }

@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
+import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -45,7 +46,7 @@ public class GermplasmValidator {
 		}
 	}
 	public void validateGermplasmUUID(final BindingResult errors, final String germplasmUUID) {
-		if (germplasmUUID == null) {
+		if (StringUtils.isEmpty(germplasmUUID)) {
 			errors.reject("germplasm.required", "");
 			return;
 		}
