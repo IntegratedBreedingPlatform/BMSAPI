@@ -57,7 +57,7 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testGetStudyReference() {
-		int studyId = 101;
+		final int studyId = 101;
 		this.studyServiceImpl.getStudyReference(studyId);
 		Mockito.verify(this.studyDataManager).getStudyReference(studyId);
 	}
@@ -80,7 +80,7 @@ public class StudyServiceImplTest {
 				.validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(Collections.singletonList(gid)));
 			this.studyServiceImpl.getGermplasmStudies(gid);
 			Assert.fail("should throw an exception");
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class),
 				ArgumentMatchers.eq(Collections.singletonList(gid)));
 			Mockito.verify(this.mockMiddlewareStudyService, Mockito.never()).getGermplasmStudies(gid);
