@@ -75,7 +75,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Override
 	public void deleteGermplasmAttribute(final Integer gid, final Integer attributeId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.attributeValidator.validateGermplasmAttributeExisting(errors, gid, attributeId);
+		this.attributeValidator.validateGermplasmAttributeExists(errors, gid, attributeId);
 		this.germplasmAttributeService.deleteGermplasmAttribute(attributeId);
 	}
 

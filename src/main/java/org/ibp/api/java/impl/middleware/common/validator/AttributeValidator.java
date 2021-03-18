@@ -83,7 +83,7 @@ public class AttributeValidator {
 		}
 	}
 
-	public void validateGermplasmAttributeExisting(final BindingResult errors, final Integer gid, final Integer attributeId) {
+	public void validateGermplasmAttributeExists(final BindingResult errors, final Integer gid, final Integer attributeId) {
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
 			null);
 		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()

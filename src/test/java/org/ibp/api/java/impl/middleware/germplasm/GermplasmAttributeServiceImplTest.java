@@ -104,7 +104,7 @@ public class GermplasmAttributeServiceImplTest {
 	@Test
 	public void testDeleteGermplasmAttribute() {
 		this.germplasmAttributeServiceImpl.deleteGermplasmAttribute(GID, GERMPLASM_ATTRIBUTE_ID);
-		Mockito.verify(this.attributeValidator).validateGermplasmAttributeExisting(ArgumentMatchers.any(BindingResult.class),
+		Mockito.verify(this.attributeValidator).validateGermplasmAttributeExists(ArgumentMatchers.any(BindingResult.class),
 			ArgumentMatchers.eq(GID), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
 		Mockito.verify(this.germplasmAttributeService).deleteGermplasmAttribute( ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
 	}
