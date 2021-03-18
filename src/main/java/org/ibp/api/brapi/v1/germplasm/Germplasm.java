@@ -32,7 +32,7 @@ public class Germplasm {
 	@JsonView(BrapiView.BrapiV1_2.class)
 	private String germplasmSeedSource;
 
-	private Map<String, String> synonyms;
+	private List<String> synonyms = new ArrayList<>();
 
 	private String commonCropName;
 
@@ -211,11 +211,11 @@ public class Germplasm {
 		this.germplasmSeedSource = germplasmSeedSource;
 	}
 
-	public Map<String, String> getSynonyms() {
+	public List<String> getSynonyms() {
 		return this.synonyms;
 	}
 
-	public void setSynonyms(final Map<String, String> synonyms) {
+	public void setSynonyms(final List<String> synonyms) {
 		this.synonyms = synonyms;
 	}
 
