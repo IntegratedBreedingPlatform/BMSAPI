@@ -48,7 +48,8 @@ public class GermplasmUpdateRequestValidatorTest {
 		updateRequest.setBreedingMethodDbId("1012");
 		updateRequest.setCountryOfOriginCode("XYZ");
 		updateRequest.setAccessionNumber(RandomStringUtils.randomAlphabetic(200));
-		updateRequest.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(200));
+		// FIXME IBP-4455
+//		updateRequest.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(200));
 		updateRequest.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(10)));
 		updateRequest.getAdditionalInfo().put(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(50));
 
@@ -76,7 +77,8 @@ public class GermplasmUpdateRequestValidatorTest {
 		updateRequest.setBreedingMethodDbId("1012");
 		updateRequest.setCountryOfOriginCode("XYZ");
 		updateRequest.setAccessionNumber(RandomStringUtils.randomAlphabetic(260));
-		updateRequest.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(260));
+		// FIXME IBP-4455
+//		updateRequest.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(260));
 		updateRequest.getSynonyms().add(new Synonym("", ""));
 		final String nameType = RandomStringUtils.randomAlphabetic(10);
 		updateRequest.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), nameType));
