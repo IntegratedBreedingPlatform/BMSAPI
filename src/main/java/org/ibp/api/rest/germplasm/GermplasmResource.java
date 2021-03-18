@@ -156,16 +156,6 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.searchNameTypes(query), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Returns germplasm attributes filtered by a list of codes", notes = "Returns germplasm attributes filtered by a list of codes")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<AttributeDTO>> getGermplasmAttributes(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final Set<String> codes) {
-
-		return new ResponseEntity<>(this.germplasmService.filterGermplasmAttributes(codes), HttpStatus.OK);
-	}
-
 	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls/{isGermplasmUpdateFormat}", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
 		@PathVariable final boolean isGermplasmUpdateFormat,
