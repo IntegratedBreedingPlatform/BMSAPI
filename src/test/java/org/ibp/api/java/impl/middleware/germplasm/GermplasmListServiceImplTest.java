@@ -1362,7 +1362,7 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void testGetGermplasmLists_WithNoErrors() {
 		final Integer gid = 1;
-		final GermplasmListDto dto = new GermplasmListDto(1, "listName", "20210317", "description");
+		final GermplasmListDto dto = new GermplasmListDto();
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmLists(gid)).thenReturn(Collections.singletonList(dto));
 
 		final List<GermplasmListDto> germplasmListDtos = this.germplasmListService.getGermplasmLists(gid);
