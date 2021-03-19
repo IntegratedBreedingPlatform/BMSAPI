@@ -7,9 +7,9 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -285,8 +285,6 @@ public class GermplasmResource {
 		@PathVariable final Integer gid) {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmLists(gid), HttpStatus.OK);
 	}
-
-
 
 	/**
 	 * Returns a germplasm by a given germplasm id
