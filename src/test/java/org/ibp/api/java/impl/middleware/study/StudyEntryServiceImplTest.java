@@ -333,14 +333,9 @@ public class StudyEntryServiceImplTest {
 			.thenReturn(datasetDTOS);
 		Mockito.when(this.middlewareStudyEntryService.saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList())).thenReturn(entryDtos);
 
-		try {
-			final List<StudyEntryDto> studyEntryDtos = this.studyEntryService.createStudyEntries(studyId, germplasmListId);
-			Assert.assertNotNull("Duplicate gid in list should be accepted. ", studyEntryDtos);
-			org.junit.Assert.assertEquals("Must return same germplasm list data count", listData.size(),studyEntryDtos.size());
-		} catch (final Exception e) {
-			org.junit.Assert.fail("Duplicate gid in list should be accepted, no exception");
-		}
-
+		final List<StudyEntryDto> studyEntryDtos = this.studyEntryService.createStudyEntries(studyId, germplasmListId);
+		Assert.assertNotNull("Duplicate gid in list should be accepted. ", studyEntryDtos);
+		org.junit.Assert.assertEquals("Must return same germplasm list data count", listData.size(),studyEntryDtos.size());
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
@@ -353,30 +348,19 @@ public class StudyEntryServiceImplTest {
 		final GermplasmListData data1 = new GermplasmListData();
 		data1.setGermplasm(germplasm);
 		data1.setGid(germplasm.getGid());
-		data1.setEntryId(this.randomEntryId());
+		data1.setEntryId(1);
 		data1.setEntryCode(StringUtils.randomAlphanumeric(3));
 
 		final GermplasmListData data2 = new GermplasmListData();
 		data2.setGermplasm(germplasm);
 		data2.setGid(germplasm.getGid());
-		data2.setEntryId(this.randomEntryId());
+		data2.setEntryId(2);
 		data2.setEntryCode(StringUtils.randomAlphanumeric(3));
 
 		final List<GermplasmListData> listData = new ArrayList<>();
 		listData.add(data1);
 		listData.add(data2);
 		return listData;
-	}
-
-	private int randomEntryId() {
-		int entryId;
-		try {
-			final double random = Math.random() * 100;
-			entryId = (int) random;
-		} catch (final Exception e) {
-			entryId = 1;
-		}
-		return entryId;
 	}
 
 }

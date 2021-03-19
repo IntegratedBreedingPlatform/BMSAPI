@@ -49,6 +49,7 @@ import java.util.Set;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -146,7 +147,7 @@ public class DatasetCSVExportServiceImplTest {
 
 		final File zipFile = new File("");
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
-		when(this.zipUtil.zipFiles(eq(FileNameGenerator.generateFileName(this.study.getName())), anyListOf(File.class))).thenReturn(zipFile);
+		when(this.zipUtil.zipFiles(contains(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = Mockito.mock(HashMap.class);
 		when(this.studyDatasetService
 			.getInstanceObservationUnitRowsMap(eq(this.study.getId()), eq(this.dataSetDTO.getDatasetId()), any(ArrayList.class)))
@@ -176,7 +177,7 @@ public class DatasetCSVExportServiceImplTest {
 		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables),
 			ArgumentMatchers.anyList(), anyString(), any(StudyInstance.class)))
 			.thenReturn(new File(""));
-		when(this.zipUtil.zipFiles(eq(FileNameGenerator.generateFileName(this.study.getName())), anyListOf(File.class))).thenReturn(zipFile);
+		when(this.zipUtil.zipFiles(contains(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 		this.datasetExportService.setZipUtil(this.zipUtil);
 
 		final Map<Integer, StudyInstance> studyInstanceMap = this.datasetExportService
