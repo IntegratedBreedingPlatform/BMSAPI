@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
@@ -26,6 +27,7 @@ import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
 import org.ibp.api.java.inventory.manager.LotService;
+import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +71,9 @@ public class GermplasmResource {
 
 	@Autowired
 	private GermplasmTemplateExportService germplasmTemplateExportService;
+
+	@Autowired
+	private StudyService studyService;
 
 	@Autowired
 	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
@@ -298,6 +303,19 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.deleteGermplasm(gids), HttpStatus.OK);
 	}
 
+	/**
+	 * Returns the studies of the given germplasm
+	 *
+	 * @return {@link GermplasmSearchResponse}
+	 */
+	@ApiOperation(value = "Returns the studies of the given germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/studies", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmStudyDto>> getGermplasmStudies(
+		@PathVariable final String cropName, @PathVariable final Integer gid) {
+		return new ResponseEntity<>(this.studyService.getGermplasmStudies(gid), HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Get lists of specified germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/lists", method = RequestMethod.GET)
 	@ResponseBody
@@ -305,7 +323,4 @@ public class GermplasmResource {
 		@PathVariable final Integer gid) {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmLists(gid), HttpStatus.OK);
 	}
-
-
-
 }
