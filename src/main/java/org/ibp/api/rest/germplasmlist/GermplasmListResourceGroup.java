@@ -9,7 +9,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
-import org.ibp.api.java.germplasm.GermplamListService;
+import org.ibp.api.java.germplasm.GermplasmListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ import java.util.List;
 public class GermplasmListResourceGroup {
 
 	@Autowired
-	public GermplamListService germplamListService;
+	public GermplasmListService germplasmListService;
 
 	@ApiOperation(value = "Get germplasm lists given a tree parent node folder", notes = "Get germplasm lists given a tree parent node folder")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
@@ -40,7 +40,7 @@ public class GermplasmListResourceGroup {
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId,
 		@ApiParam(value = "Only folders") @RequestParam(required = true) final Boolean onlyFolders) {
-		final List<TreeNode> children = this.germplamListService.getGermplasmListChildrenNodes(crop, programUUID, parentFolderId, onlyFolders);
+		final List<TreeNode> children = this.germplasmListService.getGermplasmListChildrenNodes(crop, programUUID, parentFolderId, onlyFolders);
 		return new ResponseEntity<>(children, HttpStatus.OK);
 	}
 
@@ -53,7 +53,7 @@ public class GermplasmListResourceGroup {
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmListGeneratorDTO request
 	) {
-		return new ResponseEntity<>(this.germplamListService.create(request), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.germplasmListService.create(request), HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Get germplasm lists types", notes = "Get germplasm lists types")
@@ -62,7 +62,7 @@ public class GermplasmListResourceGroup {
 	public ResponseEntity<List<GermplasmListTypeDTO>> getGermplasmListTypes(
 		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID) {
-		final List<GermplasmListTypeDTO> germplasmListTypes = this.germplamListService.getGermplasmListTypes();
+		final List<GermplasmListTypeDTO> germplasmListTypes = this.germplasmListService.getGermplasmListTypes();
 		return new ResponseEntity<>(germplasmListTypes, HttpStatus.OK);
 	}
 
@@ -75,7 +75,7 @@ public class GermplasmListResourceGroup {
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite
 	) {
-		this.germplamListService.addGermplasmEntriesToList(germplasmListId, searchComposite, programUUID);
+		this.germplasmListService.addGermplasmEntriesToList(germplasmListId, searchComposite, programUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -89,7 +89,7 @@ public class GermplasmListResourceGroup {
 		@RequestParam final String folderName,
 		@RequestParam final String parentId) {
 
-		final Integer folderId = this.germplamListService.createGermplasmListFolder(crop, programUUID, folderName, parentId);
+		final Integer folderId = this.germplasmListService.createGermplasmListFolder(crop, programUUID, folderName, parentId);
 		return new ResponseEntity<>(folderId, HttpStatus.OK);
 	}
 
@@ -103,7 +103,7 @@ public class GermplasmListResourceGroup {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam final String newFolderName) {
 
-		final Integer updatedFolderId = this.germplamListService.updateGermplasmListFolderName(crop, programUUID, newFolderName, folderId);
+		final Integer updatedFolderId = this.germplasmListService.updateGermplasmListFolderName(crop, programUUID, newFolderName, folderId);
 		return new ResponseEntity<>(updatedFolderId, HttpStatus.OK);
 	}
 
@@ -117,7 +117,7 @@ public class GermplasmListResourceGroup {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam final String newParentId) {
 
-		final Integer movedFolderId = this.germplamListService.moveGermplasmListFolder(crop, programUUID, folderId, newParentId);
+		final Integer movedFolderId = this.germplasmListService.moveGermplasmListFolder(crop, programUUID, folderId, newParentId);
 		return new ResponseEntity<>(movedFolderId, HttpStatus.OK);
 	}
 
@@ -129,7 +129,7 @@ public class GermplasmListResourceGroup {
 		@PathVariable final String crop,
 		@PathVariable final String folderId,
 		@RequestParam(required = false) final String programUUID) {
-		this.germplamListService.deleteGermplasmListFolder(crop, programUUID, folderId);
+		this.germplasmListService.deleteGermplasmListFolder(crop, programUUID, folderId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

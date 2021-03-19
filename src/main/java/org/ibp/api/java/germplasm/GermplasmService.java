@@ -61,8 +61,6 @@ public interface GermplasmService {
 
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 
-	List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(Set<String> codes);
-
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(String cropName, String programUUID,
 		GermplasmImportRequestDto germplasmImportRequestDto);
 

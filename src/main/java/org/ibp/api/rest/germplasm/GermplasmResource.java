@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -20,6 +21,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRe
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -75,6 +77,9 @@ public class GermplasmResource {
 
 	@Autowired
 	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
+
+	@Autowired
+	private GermplasmListService germplasmListService;
 
 	@ApiOperation(value = "Search germplasm. <b>Note:</b> Total count is not available for this query.")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
@@ -159,16 +164,6 @@ public class GermplasmResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam final String query) {
 		return new ResponseEntity<>(this.germplasmService.searchNameTypes(query), HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Returns germplasm attributes filtered by a list of codes", notes = "Returns germplasm attributes filtered by a list of codes")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<AttributeDTO>> getGermplasmAttributes(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final Set<String> codes) {
-
-		return new ResponseEntity<>(this.germplasmService.filterGermplasmAttributes(codes), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/crops/{cropName}/germplasm/templates/xls/{isGermplasmUpdateFormat}", method = RequestMethod.GET)
@@ -308,7 +303,6 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.deleteGermplasm(gids), HttpStatus.OK);
 	}
 
-
 	/**
 	 * Returns the studies of the given germplasm
 	 *
@@ -320,5 +314,13 @@ public class GermplasmResource {
 	public ResponseEntity<List<GermplasmStudyDto>> getGermplasmStudies(
 		@PathVariable final String cropName, @PathVariable final Integer gid) {
 		return new ResponseEntity<>(this.studyService.getGermplasmStudies(gid), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get lists of specified germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/lists", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmListDto>> getGermplasmLists(@PathVariable final String cropName,
+		@PathVariable final Integer gid) {
+		return new ResponseEntity<>(this.germplasmListService.getGermplasmLists(gid), HttpStatus.OK);
 	}
 }

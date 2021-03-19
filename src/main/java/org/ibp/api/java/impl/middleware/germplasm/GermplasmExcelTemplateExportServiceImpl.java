@@ -29,6 +29,7 @@ import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.location.LocationService;
@@ -124,6 +125,9 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 
 	@Autowired
 	BreedingMethodService breedingMethodService;
+
+	@Autowired
+	protected GermplasmAttributeService germplasmAttributeService;
 
 
 	public enum ExcelCellStyle {
@@ -230,7 +234,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 					null);
 
 		final List<AttributeDTO> attributeDTOs =
-			this.germplasmService.filterGermplasmAttributes(null);
+			this.germplasmAttributeService.filterGermplasmAttributes(null, null);
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, false);
 		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 
