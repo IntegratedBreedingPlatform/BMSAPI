@@ -419,6 +419,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
+	@Override
+	public GermplasmDto getGermplasmDtoById(final Integer gid) {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		final GermplasmDto germplasmDto = this.germplasmService.getGermplasmDtoById(gid);
+
+		if (germplasmDto == null) {
+			errors.reject("gids.invalid", new String[] {gid.toString()}, "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+		return germplasmDto;
+	}
+
 	private void validateGuidAndAttributes(final String germplasmGUID, final List<String> attributeDbIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
 		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmGUID);
