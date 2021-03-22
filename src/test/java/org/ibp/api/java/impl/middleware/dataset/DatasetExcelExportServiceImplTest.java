@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
@@ -43,6 +44,7 @@ import java.util.Set;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -126,7 +128,7 @@ public class DatasetExcelExportServiceImplTest {
 
 		final File zipFile = new File("");
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
-		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
+		when(this.zipUtil.zipFiles(contains(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 		Mockito.when(this.datasetExportService.getColumns(this.study.getId(), this.dataSetDTO.getDatasetId()))
 			.thenReturn(this.measurementVariables);
 		final File result = this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
@@ -148,7 +150,7 @@ public class DatasetExcelExportServiceImplTest {
 		when(this.datasetExcelGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables),
 			ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(), any(StudyInstance.class)))
 			.thenReturn(new File(""));
-		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
+		when(this.zipUtil.zipFiles(contains(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 		this.datasetExportService.setZipUtil(this.zipUtil);
 
 		final Map<Integer, StudyInstance> studyInstanceMap = this.datasetExportService
@@ -166,7 +168,7 @@ public class DatasetExcelExportServiceImplTest {
 				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(),
 				any(StudyInstance.class));
 
-		verify(this.zipUtil).zipFiles(eq(this.study.getName()), anyListOf(File.class));
+		verify(this.zipUtil).zipFiles(contains(this.study.getName()), anyListOf(File.class));
 		assertSame(result, zipFile);
 	}
 

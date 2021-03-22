@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -33,6 +34,7 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
+import org.ibp.api.brapi.v2.germplasm.GermplasmUpdateRequestValidator;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -117,6 +119,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmImportRequestValidator germplasmImportValidator;
+
+	@Autowired
+	private GermplasmUpdateRequestValidator germplasmUpdateRequestValidator;
 
 
 	@Override
@@ -207,28 +212,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
-		final PedigreeDTO pedigreeDTO;
-		try {
-			pedigreeDTO = this.germplasmDataManager.getPedigree(germplasmDbId, notation, includeSiblings);
-			if (pedigreeDTO != null) {
-				pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmDbId, this.crossExpansionProperties));
-			}
-		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to get the pedigree", e);
+	public PedigreeDTO getPedigree(final String germplasmUUID, final String notation, final Boolean includeSiblings) {
+		this.validateGermplasmUUID(germplasmUUID);
+		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
+		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(Integer.valueOf(germplasmDTO.get().getGid()), notation, includeSiblings);
+		if (pedigreeDTO != null) {
+			pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(Integer.valueOf(germplasmDTO.get().getGid()), this.crossExpansionProperties));
 		}
 		return pedigreeDTO;
 	}
 
 	@Override
-	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
-		final ProgenyDTO progenyDTO;
-		try {
-			progenyDTO = this.germplasmDataManager.getProgeny(germplasmDbId);
-		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to get the progeny", e);
-		}
-		return progenyDTO;
+	public ProgenyDTO getProgeny(final String germplasmUUID) {
+		this.validateGermplasmUUID(germplasmUUID);
+		final Optional<GermplasmDTO> germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID);
+		return this.germplasmService.getProgeny(Integer.valueOf(germplasmDTO.get().getGid()));
 	}
 
 	@Override
@@ -240,16 +238,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public GermplasmDTO getGermplasmDTObyGID(final Integer germplasmId) {
-		final Optional<GermplasmDTO> germplasmDTOOptional = this.germplasmService.getGermplasmDTOByGID(germplasmId);
-		if (germplasmDTOOptional.isPresent()) {
-			final GermplasmDTO germplasmDTO = germplasmDTOOptional.get();
-			germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmId, this.crossExpansionProperties));
-			return germplasmDTO;
-		} else {
-			throw new ApiRuntimeException("Invalid Germplasm Id");
-		}
-
+	public GermplasmDTO getGermplasmDTObyGUID(final String germplasmUUID) {
+		this.validateGermplasmUUID(germplasmUUID);
+		final GermplasmDTO germplasmDTO = this.germplasmService.getGermplasmDTOByGUID(germplasmUUID).get();
+		germplasmDTO.setPedigree(this.pedigreeService.getCrossExpansion(Integer.valueOf(germplasmDTO.getGid()), this.crossExpansionProperties));
+		return germplasmDTO;
 	}
 
 	@Override
@@ -281,7 +274,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		try {
 			return this.germplasmService.countGermplasmByStudy(studyDbId);
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to count germplasms", e);
+			throw new ApiRuntimeException("An error has occurred when trying to count germplasm", e);
 		}
 	}
 
@@ -297,7 +290,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to search germplasms", e);
+			throw new ApiRuntimeException("An error has occurred when trying to search germplasm", e);
 		}
 	}
 
@@ -313,15 +306,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<AttributeDTO> getAttributesByGid(
-		final String gid, final List<String> attributeDbIds, final Integer pageSize, final Integer pageNumber) {
-		this.validateGidAndAttributes(gid, attributeDbIds);
-		return this.germplasmDataManager.getAttributesByGid(gid, attributeDbIds, pageSize, pageNumber);
+	public List<AttributeDTO> getAttributesByGUID(
+			final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
+		this.validateGuidAndAttributes(germplasmUUID, attributeDbIds);
+		return this.germplasmService.getAttributesByGUID(germplasmUUID, attributeDbIds, pageable);
+
 	}
 
 	@Override
-	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
-		return this.germplasmDataManager.countAttributesByGid(gid, attributeDbIds);
+	public long countAttributesByGUID(final String germplasmUUID, final List<String> attributeDbIds) {
+		this.validateGermplasmUUID(germplasmUUID);
+		return this.germplasmService.countAttributesByGUID(germplasmUUID, attributeDbIds);
 	}
 
 	@Override
@@ -421,7 +416,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final GermplasmImportResponse response = new GermplasmImportResponse();
-		final Integer originalListSize = germplasmImportRequestList.size();
+		final int originalListSize = germplasmImportRequestList.size();
 		int noOfCreatedGermplasm = 0;
 		// Remove germplasm that fails any validation. They will be excluded from creation
 		final BindingResult bindingResult = this.germplasmImportValidator.pruneGermplasmInvalidForImport(germplasmImportRequestList);
@@ -430,7 +425,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 		if (!CollectionUtils.isEmpty(germplasmImportRequestList)) {
 			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-			final List<GermplasmDTO> germplasmDTOList = germplasmService.createGermplasm(user.getUserid(), cropName, germplasmImportRequestList);
+			final List<GermplasmDTO> germplasmDTOList = this.germplasmService.createGermplasm(user.getUserid(), cropName, germplasmImportRequestList);
 			if (!CollectionUtils.isEmpty(germplasmDTOList)) {
 				this.populateGermplasmPedigree(germplasmDTOList);
 				noOfCreatedGermplasm = germplasmDTOList.size();
@@ -441,9 +436,25 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return response;
 	}
 
-	private void validateGidAndAttributes(final String gid, final List<String> attributeDbIds) {
+	@Override
+	public GermplasmDTO updateGermplasm(final String germplasmUUID, final GermplasmUpdateRequest germplasmUpdateRequest) {
+		this.validateGermplasmUUID(germplasmUUID);
+		this.germplasmUpdateRequestValidator.validate(germplasmUpdateRequest);
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		return this.germplasmService.updateGermplasm(user.getUserid(), germplasmUUID, germplasmUpdateRequest);
+	}
+
+	private void validateGermplasmUUID(final String germplasmUUID) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmUUID);
+		if (this.errors.hasErrors()) {
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+	}
+
+	private void validateGuidAndAttributes(final String germplasmGUID, final List<String> attributeDbIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
-		this.germplasmValidator.validateGermplasmId(this.errors, Integer.valueOf(gid));
+		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmGUID);
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}

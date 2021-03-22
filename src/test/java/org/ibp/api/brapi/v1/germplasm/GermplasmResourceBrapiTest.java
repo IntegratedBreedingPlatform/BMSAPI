@@ -2,6 +2,7 @@ package org.ibp.api.brapi.v1.germplasm;
 
 import com.google.common.collect.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
@@ -51,13 +52,13 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testGetPedigree() throws Exception {
 		final int gid = nextInt();
-		final String germplasmDbId = String.valueOf(gid);
+		final String germplasmDbId = RandomStringUtils.randomAlphabetic(10);
 
 		final PedigreeDTO pedigreeDTO = new PedigreeDTO();
-		pedigreeDTO.setGermplasmDbId(gid);
+		pedigreeDTO.setGermplasmDbId(String.valueOf(gid));
 		pedigreeDTO.setPedigree(randomAlphanumeric(255));
 
-		doReturn(pedigreeDTO).when(this.germplasmService).getPedigree(gid, null, null);
+		doReturn(pedigreeDTO).when(this.germplasmService).getPedigree(germplasmDbId, null, null);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/pedigree")
 			.contentType(this.contentType)
@@ -70,19 +71,19 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGetProgeny() throws Exception {
-		final int gid = nextInt();
-		final String germplasmDbId = String.valueOf(gid);
+		final String gid = String.valueOf(nextInt());
+		final String germplasmDbId = RandomStringUtils.randomAlphabetic(10);
 
 		final ProgenyDTO progenyDTO = new ProgenyDTO();
 		progenyDTO.setGermplasmDbId(gid);
 		final List<ProgenyDTO.Progeny> progenies = new ArrayList<>();
 		final ProgenyDTO.Progeny progeny = new ProgenyDTO.Progeny();
-		progeny.setGermplasmDbId(nextInt());
+		progeny.setGermplasmDbId(String.valueOf(nextInt()));
 		progeny.setParentType(ParentType.MALE.name());
 		progenies.add(progeny);
 		progenyDTO.setProgeny(progenies);
 
-		doReturn(progenyDTO).when(this.germplasmService).getProgeny(gid);
+		doReturn(progenyDTO).when(this.germplasmService).getProgeny(germplasmDbId);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/progeny")
 			.contentType(this.contentType)
@@ -154,7 +155,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		final List<AttributeDTO> attributeDTOS = this.createAttributes(germplasmDbId);
 
 		doReturn(attributeDTOS).when(this.germplasmService)
-				.getAttributesByGid(germplasmDbId, null, BrapiPagedResult.DEFAULT_PAGE_SIZE, 1);
+				.getAttributesByGUID(germplasmDbId, null, new PageRequest(0, BrapiPagedResult.DEFAULT_PAGE_SIZE));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/attributes")
 				.contentType(this.contentType)

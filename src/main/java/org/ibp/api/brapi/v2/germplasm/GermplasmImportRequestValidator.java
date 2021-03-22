@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.util.Util;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,12 +31,10 @@ import java.util.stream.IntStream;
 @Component
 public class GermplasmImportRequestValidator {
 
-	public static final Integer STOCK_ID_MAX_LENGTH = 35;
-	public static final Integer REFERENCE_MAX_LENGTH = 255;
 	public static final Integer NAME_MAX_LENGTH = 255;
 	public static final Integer ATTRIBUTE_MAX_LENGTH = 255;
 
-	private BindingResult errors;
+	protected BindingResult errors;
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
@@ -45,6 +45,13 @@ public class GermplasmImportRequestValidator {
 	public BindingResult pruneGermplasmInvalidForImport(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
 		BaseValidator.checkNotEmpty(germplasmImportRequestDtoList, "germplasm.import.list.null");
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequest.class.getName());
+
+		if (!germplasmImportRequestDtoList.stream().filter(i -> Collections.frequency(germplasmImportRequestDtoList, i) > 1)
+			.collect(Collectors.toSet()).isEmpty()) {
+			errors.reject("germplasm.import.duplicated.objects"
+				+ "", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 
 		final List<String> validBreedingMethodIds = this.getValidBreedingMethodDbIds(germplasmImportRequestDtoList);
 		final List<String> validLocationAbbreviations = this.getValidLocationAbbreviations(germplasmImportRequestDtoList);
@@ -68,11 +75,7 @@ public class GermplasmImportRequestValidator {
 				errors.reject("germplasm.create.acquisition.date.invalid.format", new String[] {index.toString()}, "");
 				return true;
 			}
-			if (StringUtils.isEmpty(g.getBreedingMethodDbId())) {
-				errors.reject("germplasm.create.breeding.method.null", new String[] {index.toString()}, "");
-				return true;
-			}
-			if (!validBreedingMethodIds.contains(g.getBreedingMethodDbId())) {
+			if (StringUtils.isNotEmpty(g.getBreedingMethodDbId()) && !validBreedingMethodIds.contains(g.getBreedingMethodDbId())) {
 				errors.reject("germplasm.create.breeding.method.invalid", new String[] {index.toString()}, "");
 				return true;
 			}
@@ -111,10 +114,36 @@ public class GermplasmImportRequestValidator {
 				return true;
 			}
 
+			if (isAnyExternalReferenceInvalid(g, index)) {
+				return true;
+			}
+
 			return false;
 		});
 
 		return this.errors;
+	}
+
+	private boolean isAnyExternalReferenceInvalid(final GermplasmImportRequest g, final Integer index) {
+		if (g.getExternalReferences() != null) {
+			return g.getExternalReferences().stream().anyMatch(r -> {
+				if (r == null || StringUtils.isEmpty(r.getReferenceID()) || StringUtils.isEmpty(r.getReferenceSource())) {
+					errors.reject("germplasm.create.reference.null", new String[] {index.toString(), "externalReference"}, "");
+					return true;
+				}
+				if (StringUtils.isNotEmpty(r.getReferenceID()) && r.getReferenceID().length() > 2000) {
+					errors.reject("germplasm.create.reference.id.exceeded.length", new String[] {index.toString(), "referenceID"}, "");
+					return true;
+				}
+				if (StringUtils.isNotEmpty(r.getReferenceSource()) && r.getReferenceSource().length() > 255) {
+					errors.reject("germplasm.create.reference.source.exceeded.length", new String[] {index.toString(), "referenceSource"},
+						"");
+					return true;
+				}
+				return false;
+			});
+		}
+		return false;
 	}
 
 	private boolean isAnyCustomNameFieldInvalid(final GermplasmImportRequest g, final Integer index) {
@@ -137,7 +166,7 @@ public class GermplasmImportRequestValidator {
 		return false;
 	}
 
-	private boolean isAnyCustomAttributeFieldInvalid(final GermplasmImportRequest g, final Integer index) {
+	protected boolean isAnyCustomAttributeFieldInvalid(final GermplasmImportRequest g, final Integer index) {
 		if (!StringUtils.isEmpty(g.getCommonCropName()) && attributeExceedsLength(g.getCommonCropName())) {
 			errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "commonCropName"}, "");
 			return true;
@@ -177,7 +206,7 @@ public class GermplasmImportRequestValidator {
 		return false;
 	}
 
-	private List<String> getValidBreedingMethodDbIds(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
+	protected List<String> getValidBreedingMethodDbIds(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
 		final List<Integer> breedingMethodIds =
 			germplasmImportRequestDtoList.stream().filter(g -> StringUtils.isNotEmpty(g.getBreedingMethodDbId()))
 				.map(g -> Integer.parseInt(g.getBreedingMethodDbId())).collect(Collectors.toList());
@@ -190,7 +219,7 @@ public class GermplasmImportRequestValidator {
 
 	}
 
-	private List<String> getValidLocationAbbreviations(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
+	protected List<String> getValidLocationAbbreviations(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
 		final Set<String> locationAbbrs =
 			germplasmImportRequestDtoList.stream().filter(g -> StringUtils.isNotEmpty(g.getCountryOfOriginCode()))
 				.map(g -> g.getCountryOfOriginCode().toUpperCase()).collect(Collectors.toSet());
@@ -205,7 +234,7 @@ public class GermplasmImportRequestValidator {
 
 	}
 
-	private boolean areNameValuesInvalid(final Collection<String> values) {
+	protected boolean areNameValuesInvalid(final Collection<String> values) {
 		return values.stream().anyMatch(n -> {
 			if (StringUtils.isEmpty(n)) {
 				return true;
@@ -217,7 +246,7 @@ public class GermplasmImportRequestValidator {
 		});
 	}
 
-	private boolean areAttributesInvalid(final Map<String, String> attributes) {
+	protected boolean areAttributesInvalid(final Map<String, String> attributes) {
 		if (attributes != null) {
 			final Set<String> attributeKeys = new HashSet<>();
 
@@ -244,11 +273,11 @@ public class GermplasmImportRequestValidator {
 		return false;
 	}
 
-	private boolean attributeExceedsLength(final String attribute) {
+	protected boolean attributeExceedsLength(final String attribute) {
 		return attribute.length() > ATTRIBUTE_MAX_LENGTH;
 	}
 
-	private boolean nameExceedsLength(final String name) {
+	protected boolean nameExceedsLength(final String name) {
 		return name.length() > NAME_MAX_LENGTH;
 	}
 

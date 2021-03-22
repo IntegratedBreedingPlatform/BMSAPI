@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -15,6 +16,7 @@ import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.germplasm.Germplasm;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -39,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +54,7 @@ public class GermplasmResourceBrapi {
 	private GermplasmService germplasmService;
 
 	@Autowired
-	ResourceBundleMessageSource messageSource;
+	private ResourceBundleMessageSource messageSource;
 
 	@ApiOperation(value = "Get a filtered list of Germplasm", notes = "Get a filtered list of Germplasm")
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm", method = RequestMethod.GET)
@@ -81,9 +84,9 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "parentDbId", required = false) final String parentDbId,
 		@ApiParam(value = "Search for Germplasm with this child")
 		@RequestParam(value = "progenyDbId", required = false) final String progenyDbId,
-		@ApiParam(value = "externalReferenceId filter is not supported for now. This value is ignored.")
+		@ApiParam(value = "Search for externalReferenceId")
 		@RequestParam(value = "externalReferenceId", required = false) final String externalReferenceId,
-		@ApiParam(value = "externalReferenceId filter is not supported for now. This value is ignored.")
+		@ApiParam(value = "Search for externalReferenceSource")
 		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)
 		@RequestParam(value = "page", required = false) final Integer currentPage,
@@ -91,7 +94,8 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO =
-			this.getGermplasmSearchRequestDto(germplasmPUI, germplasmName, accessionNumber, studyDbId, synonym, genus, parentDbId, progenyDbId);
+			this.getGermplasmSearchRequestDto(germplasmPUI, germplasmName, accessionNumber, studyDbId, synonym, genus, parentDbId,
+				progenyDbId, externalReferenceId, externalReferenceSource);
 		if (!StringUtils.isEmpty(germplasmDbId)) {
 			germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
 		}
@@ -114,23 +118,11 @@ public class GermplasmResourceBrapi {
 
 	}
 
-	private List<Germplasm> mapGermplasm(final List<GermplasmDTO> germplasmDTOList) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		final ModelMapper mapper = new ModelMapper();
-		if (!CollectionUtils.isEmpty(germplasmDTOList)) {
-			for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
-				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasmList.add(germplasm);
-			}
-		}
-		return germplasmList;
-	}
-
 	@ApiOperation(value = "Create new Germplasm entities on this server", notes = "Create new Germplasm entities on this server")
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<Germplasm>> getGermplasm(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<Germplasm>> saveGermplasm(@PathVariable final String crop,
 		@RequestBody final List<GermplasmImportRequest> germplasmImportRequestList) {
 		BaseValidator.checkNotNull(germplasmImportRequestList, "germplasm.import.list.null");
 
@@ -153,20 +145,39 @@ public class GermplasmResourceBrapi {
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Update the details of an existing germplasm", notes = "Update the details of an existing germplasm")
+	@RequestMapping(value = "/{crop}/brapi/v2/germplasm/{germplasmDbId}", method = RequestMethod.PUT)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<SingleEntityResponse<Germplasm>> updateGermplasm(@PathVariable final String crop, @PathVariable final String germplasmDbId,
+		@RequestBody final GermplasmUpdateRequest germplasmUpdateRequest) {
+		BaseValidator.checkNotNull(germplasmUpdateRequest, "germplasm.import.list.null");
+
+		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(germplasmDbId, germplasmUpdateRequest);
+		final ModelMapper mapper = new ModelMapper();
+		final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+
+		final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
+		return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
+	}
+
 	private GermplasmSearchRequestDto getGermplasmSearchRequestDto(final String germplasmPUI, final String germplasmName,
-		final String accessionNumber, final String studyDbId, final String synonym, final String genus, final String parentDbId, final String progenyDbId) {
+		final String accessionNumber, final String studyDbId, final String synonym, final String genus, final String parentDbId,
+		final String progenyDbId, final String externalReferenceId, final String externalReferenceSource) {
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDTO.setPreferredName(germplasmName);
 		germplasmSearchRequestDTO.setStudyDbId(studyDbId);
+		germplasmSearchRequestDTO.setExternalReferenceId(externalReferenceId);
+		germplasmSearchRequestDTO.setExternalReferenceSource(externalReferenceSource);
 		if (synonym != null) {
 			germplasmSearchRequestDTO.setGermplasmNames(Lists.newArrayList(synonym));
 		}
 		germplasmSearchRequestDTO.setParentDbId(parentDbId);
 		germplasmSearchRequestDTO.setProgenyDbId(progenyDbId);
-		if (genus != null){
+		if (genus != null) {
 			germplasmSearchRequestDTO.setGermplasmGenus(Lists.newArrayList(genus));
 		}
-		if (accessionNumber != null){
+		if (accessionNumber != null) {
 			germplasmSearchRequestDTO.setAccessionNumbers(Lists.newArrayList(accessionNumber));
 		}
 
@@ -200,5 +211,18 @@ public class GermplasmResourceBrapi {
 	private String getMessage(final String code, final Object[] arguments) {
 		return this.messageSource.getMessage(code, arguments, LocaleContextHolder.getLocale());
 	}
+
+	private List<Germplasm> mapGermplasm(final List<GermplasmDTO> germplasmDTOList) {
+		final List<Germplasm> germplasmList = new ArrayList<>();
+		final ModelMapper mapper = new ModelMapper();
+		if (!CollectionUtils.isEmpty(germplasmDTOList)) {
+			for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+				germplasmList.add(germplasm);
+			}
+		}
+		return germplasmList;
+	}
+
 
 }

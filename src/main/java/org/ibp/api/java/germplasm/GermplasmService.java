@@ -4,6 +4,7 @@ package org.ibp.api.java.germplasm;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -37,11 +38,11 @@ public interface GermplasmService {
 
 	List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(String name);
 
-	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, Boolean includeSiblings);
+	PedigreeDTO getPedigree(String germplasmUUID, String notation, Boolean includeSiblings);
 
-	ProgenyDTO getProgeny(Integer germplasmDbId);
+	ProgenyDTO getProgeny(String germplasmUUID);
 
-	GermplasmDTO getGermplasmDTObyGID(Integer germplasmId);
+	GermplasmDTO getGermplasmDTObyGUID(String germplasmUUID);
 
 	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
 
@@ -51,10 +52,10 @@ public interface GermplasmService {
 
 	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, Pageable pageable);
 
-	List<AttributeDTO> getAttributesByGid(
-		String gid, List<String> attributeDbIds, Integer pageSize, Integer pageNUmber);
+	List<AttributeDTO> getAttributesByGUID(
+		String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
 
-	long countAttributesByGid(String gid, List<String> attributeDbIds);
+	long countAttributesByGUID(String germplasmUUID, List<String> attributeDbIds);
 
 	Set<Integer> importGermplasmUpdates(String programUUID, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
@@ -70,6 +71,8 @@ public interface GermplasmService {
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
 	GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList);
+
+	GermplasmDTO updateGermplasm(final String germplasmUUID, final GermplasmUpdateRequest germplasmUpdateRequest);
 
 	GermplasmDeleteResponse deleteGermplasm(List<Integer> gids);
 }
