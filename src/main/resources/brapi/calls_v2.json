@@ -137,7 +137,7 @@
       "application/json"
     ],
     "methods": [
-      "GET"
+      "GET", "POST", "PUT"
     ],
     "versions": [
       "2.0"
