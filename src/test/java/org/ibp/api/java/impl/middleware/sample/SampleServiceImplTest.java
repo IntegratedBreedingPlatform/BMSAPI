@@ -37,7 +37,7 @@ public class SampleServiceImplTest {
 				.validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(Collections.singletonList(gid)));
 			this.sampleService.getGermplasmSamples(gid);
 			Assert.fail("should throw an exception");
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class),
 				ArgumentMatchers.eq(Collections.singletonList(gid)));
 			Mockito.verify(this.middlewareSampleService, Mockito.never()).getByGid(gid);
