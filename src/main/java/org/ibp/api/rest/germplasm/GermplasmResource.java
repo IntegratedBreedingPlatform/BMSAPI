@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.java.germplasm.GermplasmListService;
@@ -24,6 +25,7 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
+import org.ibp.api.java.impl.middleware.sample.SampleService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -73,6 +75,9 @@ public class GermplasmResource {
 
 	@Autowired
 	private GermplasmListService germplasmListService;
+
+	@Autowired
+	private SampleService sampleService;
 
 	@ApiOperation(value = "Search germplasm. <b>Note:</b> Total count is not available for this query.")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
@@ -301,4 +306,11 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.getGermplasmDtoById(gid), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get samples of specified germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/samples", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<SampleDTO>> getGermplasmSamples(@PathVariable final String cropName,
+		@PathVariable final Integer gid) {
+		return new ResponseEntity<>(this.sampleService.getGermplasmSamples(gid), HttpStatus.OK);
+	}
 }
