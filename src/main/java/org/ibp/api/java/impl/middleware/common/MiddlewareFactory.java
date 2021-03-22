@@ -22,6 +22,8 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitS
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
+import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
+import org.generationcp.middleware.api.germplasm.GermplasmAttributeServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
@@ -593,6 +595,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public AttributeService getAttributeService() {
 		return new AttributeServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmAttributeService getGermplasmAttributeService() {
+		return new GermplasmAttributeServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

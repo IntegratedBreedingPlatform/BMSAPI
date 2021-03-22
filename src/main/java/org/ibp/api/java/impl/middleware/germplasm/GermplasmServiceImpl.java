@@ -1,4 +1,3 @@
-
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -28,7 +27,6 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -56,7 +54,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -331,37 +328,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public List<GermplasmNameTypeDTO> filterGermplasmNameTypes(final Set<String> codes) {
-
-		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.NAMES_NAME.getTable(),
-			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
-			.stream()
-			.map(userDefinedField -> {
-				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
-				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
-				germplasmNameTypeDTO.setName(userDefinedField.getFname());
-				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
-				return germplasmNameTypeDTO;
-			})
-			.collect(Collectors.toList());
-	}
-
-	@Override
-	public List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(final Set<String> codes) {
-
-		final Set<String> types = new HashSet<>();
-		types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
-		types.add(UDTableType.ATRIBUTS_PASSPORT.getType());
-		return this.germplasmDataManager.getUserDefinedFieldByTableTypeAndCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
-			.stream()
-			.map(userDefinedField -> {
-				final org.generationcp.middleware.api.attribute.AttributeDTO attributeDTO =
-					new org.generationcp.middleware.api.attribute.AttributeDTO();
-				attributeDTO.setId(userDefinedField.getFldno());
-				attributeDTO.setName(userDefinedField.getFname());
-				attributeDTO.setCode(userDefinedField.getFcode());
-				return attributeDTO;
-			})
-			.collect(Collectors.toList());
+		return this.germplasmService.filterGermplasmNameTypes(codes);
 	}
 
 	@Override
@@ -450,6 +417,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
+	}
+
+	@Override
+	public GermplasmDto getGermplasmDtoById(final Integer gid) {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		final GermplasmDto germplasmDto = this.germplasmService.getGermplasmDtoById(gid);
+
+		if (germplasmDto == null) {
+			errors.reject("gids.invalid", new String[] {gid.toString()}, "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+		return germplasmDto;
 	}
 
 	private void validateGuidAndAttributes(final String germplasmGUID, final List<String> attributeDbIds) {

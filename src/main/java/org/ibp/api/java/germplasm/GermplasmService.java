@@ -8,7 +8,6 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
-import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -18,6 +17,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
+import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -61,8 +61,6 @@ public interface GermplasmService {
 
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 
-	List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(Set<String> codes);
-
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(String cropName, String programUUID,
 		GermplasmImportRequestDto germplasmImportRequestDto);
 
@@ -75,4 +73,6 @@ public interface GermplasmService {
 	GermplasmDTO updateGermplasm(final String germplasmUUID, final GermplasmUpdateRequest germplasmUpdateRequest);
 
 	GermplasmDeleteResponse deleteGermplasm(List<Integer> gids);
+
+	GermplasmDto getGermplasmDtoById(Integer gid);
 }

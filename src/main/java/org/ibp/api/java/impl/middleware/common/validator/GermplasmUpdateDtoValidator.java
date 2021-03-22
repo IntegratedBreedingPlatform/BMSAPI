@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,6 +46,9 @@ public class GermplasmUpdateDtoValidator {
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
+
+	@Autowired
+	private GermplasmAttributeService germplasmAttributeService;
 
 	public void validate(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
@@ -90,7 +94,7 @@ public class GermplasmUpdateDtoValidator {
 			.forEach(
 				g -> attributesCodes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		final Set<String> existingAttributesCodes =
-			this.germplasmService.filterGermplasmAttributes(attributesCodes).stream().map(AttributeDTO::getCode).collect(
+			this.germplasmAttributeService.filterGermplasmAttributes(attributesCodes, null).stream().map(AttributeDTO::getCode).collect(
 				Collectors.toSet());
 
 		if (!nameCodes.equals(existingNamesCodes)) {

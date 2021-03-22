@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.ibp.api.Util;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -34,7 +35,7 @@ public class LocationValidator {
 			errors.reject("location.required", "");
 			return;
 		}
-		final Location location = locationDataManager.getLocationByID(locationId);
+		final Location location = this.locationDataManager.getLocationByID(locationId);
 		if (location == null) {
 			errors.reject("location.invalid", "");
 			return;
@@ -69,6 +70,13 @@ public class LocationValidator {
 	}
 
 	public void validateLocation(final BindingResult errors, final Integer locationId) {
+		if(locationId == null || this.locationService.getLocation(locationId) == null) {
+			errors.reject("location.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	/*public void validateLocation(final BindingResult errors, final Integer locationId) {
 		if (locationId == null) {
 			errors.reject("location.required", "");
 			return;
@@ -80,5 +88,6 @@ public class LocationValidator {
 			errors.reject("location.invalid", "");
 			return;
 		}
-	}
+	}*/
+
 }

@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.junit.Test;
@@ -60,6 +61,9 @@ public class GermplasmImportRequestDtoValidatorTest {
 	@Mock
 	private LotService lotService;
 
+	@Mock
+	private GermplasmAttributeService germplasmAttributeService;
+
 	@InjectMocks
 	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
 
@@ -69,7 +73,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 	public void testValidateBeforeSaving_ThrowsException_WhenRequestIsNull() {
 		try {
 
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, null);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, null);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.request.null"));
 		}
@@ -79,7 +83,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 	public void testValidateBeforeSaving_ThrowsException_WhenGermplasmListIsNull() {
 		try {
 			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.list.null"));
 		}
@@ -91,7 +95,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
 			final List<GermplasmImportDTO> germplasmImportDTOList = new ArrayList<>();
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.list.null"));
 		}
@@ -105,7 +109,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final GermplasmImportDTO germplasmImportDTO = new GermplasmImportDTO();
 			germplasmImportDTOList.add(germplasmImportDTO);
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.connect.using.null"));
 		}
@@ -119,7 +123,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final List<GermplasmImportDTO> germplasmImportDTOList = new ArrayList<>();
 			germplasmImportDTOList.add(null);
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.germplasm.null"));
 		}
@@ -134,7 +138,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final GermplasmImportDTO germplasmImportDTO = new GermplasmImportDTO();
 			germplasmImportDTOList.add(germplasmImportDTO);
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.names.null.or.empty"));
 		}
@@ -150,7 +154,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportDTO.setNames(new ArrayMap<>());
 			germplasmImportDTOList.add(germplasmImportDTO);
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.names.null.or.empty"));
 		}
@@ -168,7 +172,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportDTO.setNames(names);
 			germplasmImportDTOList.add(germplasmImportDTO);
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.preferred.name.null"));
 		}
@@ -189,7 +193,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportDTO.setNames(names);
 			germplasmImportDTOList.add(germplasmImportDTO);
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.reference.length.error"));
 		}
@@ -208,7 +212,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportDTO.setNames(names);
 			germplasmImportDTOList.add(germplasmImportDTO);
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.creation.date.null"));
 		}
@@ -228,7 +232,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportDTO.setNames(names);
 			germplasmImportDTOList.add(germplasmImportDTO);
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.creation.date.invalid"));
 		}
@@ -248,7 +252,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportDTO.setNames(names);
 			germplasmImportDTOList.add(germplasmImportDTO);
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.client.id.null"));
 		}
@@ -274,7 +278,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 				"20201212", null, null);
 			germplasmImportDTOList.add(germplasmImportDTO2);
 			germplasmImportRequestDto.setGermplasmList(germplasmImportDTOList);
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.client.id.duplicated"));
 		}
@@ -292,7 +296,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 					null,
 					RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 					"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.breeding.method.mandatory"));
 		}
@@ -310,7 +314,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 					"",
 					RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 					"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.breeding.method.mandatory"));
 		}
@@ -328,7 +332,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 					"MUT",
 					RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 					"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.location.mandatory"));
 		}
@@ -346,7 +350,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 					"MUT",
 					RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 					"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.location.mandatory"));
 		}
@@ -364,7 +368,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 					"MUT",
 					RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 					"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.guid.invalid.length"));
 		}
@@ -380,7 +384,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, "0", "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.guid.invalid.zero"));
 		}
@@ -397,7 +401,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.null.name.types"));
 		}
@@ -414,7 +418,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.duplicated.name.types"));
 		}
@@ -430,7 +434,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME1", names, null,
 				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.preferred.name.invalid"));
 		}
@@ -446,7 +450,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.name.type.value.null.empty"));
 		}
@@ -462,7 +466,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.name.type.value.invalid.length"));
 		}
@@ -480,7 +484,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, attributes,
 				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.null.attributes"));
 		}
@@ -499,7 +503,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, attributes,
 				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.duplicated.attributes"));
 		}
@@ -517,7 +521,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, attributes,
 				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.attribute.value.null.empty"));
 		}
@@ -535,7 +539,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, attributes,
 				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.attribute.value.invalid.length"));
 		}
@@ -551,7 +555,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 				"20201212", "0", "0")));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.progenitors.must.be.empty"));
 		}
@@ -568,7 +572,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, germplasmUUID, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 				"20201212", "0", null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.invalid.progenitors.combination"));
 		}
@@ -584,7 +588,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 				"20201212", "1", "a")));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.progenitor.must.be.numeric.when.connecting.by.gid"));
@@ -605,7 +609,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final Germplasm germplasm = new Germplasm();
 			germplasm.setGermplasmUUID(germplasmUUID);
 			Mockito.when(this.germplasmServiceMw.getGermplasmByGUIDs(Mockito.anyList())).thenReturn(Collections.singletonList(germplasm));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.existent.guids"));
@@ -624,7 +628,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 				"20201212", "1", "1")));
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
 				.thenReturn(Collections.emptyList());
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.breeding.methods.not.exist"));
@@ -646,7 +650,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			breedingMethodDTO.setCode("MUT");
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
 				.thenReturn(Collections.singletonList(breedingMethodDTO));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.mutation.not.supported.when.saving.progenitors"));
@@ -669,7 +673,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 				.thenReturn(Collections.singletonList(breedingMethodDTO));
 			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
 				.thenReturn(Collections.emptyList());
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.location.abbreviations.not.exist"));
@@ -693,7 +697,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
 				.thenReturn(Collections.singletonList(new Location()));
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet())).thenReturn(Collections.emptyList());
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.name.types.not.exist"));
@@ -724,9 +728,9 @@ public class GermplasmImportRequestDtoValidatorTest {
 			attributeDTO1.setCode("NOTE");
 			final AttributeDTO attributeDTO2 = new AttributeDTO();
 			attributeDTO2.setCode("NOTE");
-			Mockito.when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet())).thenReturn(
+			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
 				Lists.newArrayList(attributeDTO1, attributeDTO2));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.attributes.duplicated.found"));
@@ -753,9 +757,9 @@ public class GermplasmImportRequestDtoValidatorTest {
 				.thenReturn(Collections.singletonList(new Location()));
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
 				.thenReturn(Collections.singletonList(new GermplasmNameTypeDTO()));
-			Mockito.when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet())).thenReturn(
+			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
 				Collections.emptyList());
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.attributes.not.exist"));
@@ -765,7 +769,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 	@Test
 	public void testValidateImportLoadedData_ThrowsException_WhenListIsEmpty() {
 		try {
-			germplasmImportRequestDtoValidator.validateImportLoadedData(programUUID, new ArrayList<>());
+			this.germplasmImportRequestDtoValidator.validateImportLoadedData(this.programUUID, new ArrayList<>());
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.list.null"));
@@ -775,7 +779,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 	@Test
 	public void testValidateImportLoadedData_ThrowsException_WhenListIsNull() {
 		try {
-			germplasmImportRequestDtoValidator.validateImportLoadedData(programUUID, null);
+			this.germplasmImportRequestDtoValidator.validateImportLoadedData(this.programUUID, null);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.list.null"));
@@ -785,7 +789,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 	@Test
 	public void testValidateImportLoadedData_ThrowsException_WhenGermplasmIsNull() {
 		try {
-			germplasmImportRequestDtoValidator.validateImportLoadedData(programUUID, Collections.singletonList(null));
+			this.germplasmImportRequestDtoValidator.validateImportLoadedData(this.programUUID, Collections.singletonList(null));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.germplasm.null"));
@@ -798,8 +802,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO
 				.setReference(RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH + 1));
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.reference.length.error"));
@@ -811,8 +815,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 		try {
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO.setCreationDate("2020");
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.creation.date.invalid"));
@@ -825,8 +829,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO
 				.setGermplasmUUID(RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.GUID_MAX_LENGTH + 1));
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.guid.invalid.length"));
@@ -838,8 +842,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 		try {
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO.setGermplasmUUID("0");
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.guid.invalid.zero"));
@@ -853,8 +857,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmInventoryImportDTO1.setClientId(1);
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO2 = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO2.setClientId(1);
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Lists.newArrayList(germplasmInventoryImportDTO1, germplasmInventoryImportDTO2));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Lists.newArrayList(germplasmInventoryImportDTO1, germplasmInventoryImportDTO2));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.client.id.duplicated"));
@@ -869,8 +873,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			names.put("lname", "a");
 			names.put("Lname", "b");
 			germplasmInventoryImportDTO.setNames(names);
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.duplicated.name.types"));
@@ -885,8 +889,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			names.put("lname", "a");
 			germplasmInventoryImportDTO.setNames(names);
 			germplasmInventoryImportDTO.setPreferredName("invp");
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.preferred.name.invalid"));
@@ -900,8 +904,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final Map<String, String> names = new HashMap<>();
 			names.put("lname", null);
 			germplasmInventoryImportDTO.setNames(names);
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.name.type.value.null.empty"));
@@ -915,8 +919,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final Map<String, String> names = new HashMap<>();
 			names.put("lname", RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.NAME_MAX_LENGTH + 1));
 			germplasmInventoryImportDTO.setNames(names);
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.name.type.value.invalid.length"));
@@ -930,8 +934,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final Map<String, String> attributes = new HashMap<>();
 			attributes.put(null, "");
 			germplasmInventoryImportDTO.setAttributes(attributes);
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.null.attributes"));
@@ -946,8 +950,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			attributes.put("note", "");
 			attributes.put("NOTE", "");
 			germplasmInventoryImportDTO.setAttributes(attributes);
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.duplicated.attributes"));
@@ -961,8 +965,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final Map<String, String> attributes = new HashMap<>();
 			attributes.put("note", "");
 			germplasmInventoryImportDTO.setAttributes(attributes);
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.attribute.value.null.empty"));
@@ -976,8 +980,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final Map<String, String> attributes = new HashMap<>();
 			attributes.put("note", RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.ATTRIBUTE_MAX_LENGTH + 1));
 			germplasmInventoryImportDTO.setAttributes(attributes);
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.attribute.value.invalid.length"));
@@ -989,8 +993,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 		try {
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO.setProgenitor1("0");
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.invalid.progenitors.combination"));
@@ -1002,8 +1006,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 		try {
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO.setAmount(-1D);
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.inventory.amount.invalid"));
@@ -1017,8 +1021,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmInventoryImportDTO1.setGermplasmUUID("1");
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO2 = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO2.setGermplasmUUID("1");
-			germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Lists.newArrayList(germplasmInventoryImportDTO1, germplasmInventoryImportDTO2));
+			this.germplasmImportRequestDtoValidator
+				.validateImportLoadedData(this.programUUID, Lists.newArrayList(germplasmInventoryImportDTO1, germplasmInventoryImportDTO2));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.duplicated.guids"));
@@ -1033,7 +1037,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
 				.thenReturn(Collections.emptyList());
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.breeding.methods.not.exist"));
@@ -1053,7 +1057,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
 				.thenReturn(Collections.singletonList(breedingMethodDTO));
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.mutation.not.supported.when.saving.progenitors"));
@@ -1068,7 +1072,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
 				.thenReturn(Collections.emptyList());
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.location.abbreviations.not.exist"));
@@ -1083,7 +1087,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
 				.thenReturn(Collections.emptyList());
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.storage.location.abbreviations.not.exist"));
@@ -1099,7 +1103,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmInventoryImportDTO1.setNames(names);
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet())).thenReturn(Collections.emptyList());
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.name.types.not.exist"));
@@ -1117,10 +1121,10 @@ public class GermplasmImportRequestDtoValidatorTest {
 			attributeDTO1.setCode("NOTE");
 			final AttributeDTO attributeDTO2 = new AttributeDTO();
 			attributeDTO2.setCode("NOTE");
-			Mockito.when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet())).thenReturn(
+			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
 				Lists.newArrayList(attributeDTO1, attributeDTO2));
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.attributes.duplicated.found"));
@@ -1134,10 +1138,10 @@ public class GermplasmImportRequestDtoValidatorTest {
 			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.ATTRIBUTE_MAX_LENGTH));
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO1 = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO1.setAttributes(attributes);
-			Mockito.when(this.germplasmService.filterGermplasmAttributes(Mockito.anySet())).thenReturn(
+			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
 				Collections.emptyList());
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.attributes.not.exist"));
@@ -1152,7 +1156,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO2 = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO2.setStockId("A");
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Lists.newArrayList(germplasmInventoryImportDTO1, germplasmInventoryImportDTO2));
+				.validateImportLoadedData(this.programUUID, Lists.newArrayList(germplasmInventoryImportDTO1, germplasmInventoryImportDTO2));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("lot.input.list.stock.ids.duplicated"));
@@ -1166,7 +1170,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			germplasmInventoryImportDTO1
 				.setStockId(RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.STOCK_ID_MAX_LENGTH + 1));
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("lot.stock.id.length.higher.than.maximum"));
@@ -1182,7 +1186,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			lotDto.setStockId("A");
 			Mockito.when(this.lotService.getLotsByStockIds(Mockito.anyList())).thenReturn(Collections.singletonList(lotDto));
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("lot.input.list.stock.ids.invalid"));
@@ -1196,10 +1200,10 @@ public class GermplasmImportRequestDtoValidatorTest {
 			errors.reject("lot.input.invalid.units", "");
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO1 = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO1.setUnit("A");
-			Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(inventoryCommonValidator)
+			Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(this.inventoryCommonValidator)
 				.validateUnitNames(Mockito.anyList(), Mockito.any(BindingResult.class));
 			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
+				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("lot.input.invalid.units"));
