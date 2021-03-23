@@ -20,9 +20,6 @@ public class germplasmNameServiceImpl implements GermplasmNameService {
 	private GermplasmNameValidator germplasmNameValidator;
 
 	@Autowired
-	GermplasmValidator germplasmValidator;
-
-	@Autowired
 	org.generationcp.middleware.api.germplasm.GermplasmNameService germplasmNameService;
 
 	@Autowired
