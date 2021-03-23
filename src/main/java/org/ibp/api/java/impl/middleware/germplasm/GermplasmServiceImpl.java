@@ -15,6 +15,7 @@ import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
@@ -54,6 +55,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -430,6 +432,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 		return germplasmDto;
+	}
+
+	@Override
+	public ProgenitorsDetailsDto getGermplasmProgenitorDetails(final Integer gid) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		return this.germplasmService.getGermplasmProgenitorDetails(gid);
 	}
 
 	private void validateGuidAndAttributes(final String germplasmGUID, final List<String> attributeDbIds) {

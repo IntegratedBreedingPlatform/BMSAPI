@@ -45,7 +45,8 @@ public class GermplasmAttributeResource {
 	@ResponseBody
 	public ResponseEntity<List<GermplasmAttributeDto>> getGermplasmAttributeDtos(@PathVariable final String cropName,
 		@PathVariable final Integer gid,
-		@RequestParam(required = false) final String type) {
+		@RequestParam(required = false) final String type,
+		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.germplasmAttributeService.getGermplasmAttributeDtos(gid, type), HttpStatus.OK);
 	}
 
