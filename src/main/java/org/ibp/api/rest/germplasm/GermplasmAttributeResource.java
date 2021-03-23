@@ -45,6 +45,7 @@ public class GermplasmAttributeResource {
 	@ResponseBody
 	public ResponseEntity<List<GermplasmAttributeDto>> getGermplasmAttributeDtos(@PathVariable final String cropName,
 		@PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final String type) {
 		return new ResponseEntity<>(this.germplasmAttributeService.getGermplasmAttributeDtos(gid, type), HttpStatus.OK);
 	}
@@ -53,19 +54,19 @@ public class GermplasmAttributeResource {
 		notes = "Create attribute for specified germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GermplasmAttributeRequestDto> createGermplasmAttribute(@PathVariable final String cropName,
+	public ResponseEntity<GermplasmAttributeRequestDto> createGermplasmAttribute(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @RequestBody final GermplasmAttributeRequestDto requestDto) {
-		return new ResponseEntity<>(this.germplasmAttributeService.createGermplasmAttribute(gid, requestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmAttributeService.createGermplasmAttribute(gid, requestDto, programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update germplasm attribute",
 		notes = "Update germplasm attribute")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes/{attributeId}", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<GermplasmAttributeRequestDto> updateGermplasmAttribute(@PathVariable final String cropName,
+	public ResponseEntity<GermplasmAttributeRequestDto> updateGermplasmAttribute(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @PathVariable final Integer attributeId,
 		@ApiParam("Only the following fields can be updated: value, date, and locationId") @RequestBody final GermplasmAttributeRequestDto requestDto) {
-		return new ResponseEntity<>(this.germplasmAttributeService.updateGermplasmAttribute(gid, attributeId, requestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmAttributeService.updateGermplasmAttribute(gid, attributeId, requestDto, programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Delete germplasm attribute",
