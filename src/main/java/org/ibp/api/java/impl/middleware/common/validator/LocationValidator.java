@@ -69,14 +69,7 @@ public class LocationValidator {
 		}
 	}
 
-	public void validateLocation(final BindingResult errors, final Integer locationId) {
-		if(locationId == null || this.locationService.getLocation(locationId) == null) {
-			errors.reject("location.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-	}
-
-	/*public void validateLocation(final BindingResult errors, final Integer locationId) {
+	public void validateLocation(final BindingResult errors, final Integer locationId, final String programUUID) {
 		if (locationId == null) {
 			errors.reject("location.required", "");
 			return;
@@ -88,6 +81,11 @@ public class LocationValidator {
 			errors.reject("location.invalid", "");
 			return;
 		}
-	}*/
+
+		if (!StringUtils.isEmpty(programUUID) && location.getProgramUUID() != null && !location.getProgramUUID().equals(programUUID)) {
+			errors.reject("location.belongs.to.another.program", "");
+			return;
+		}
+	}
 
 }
