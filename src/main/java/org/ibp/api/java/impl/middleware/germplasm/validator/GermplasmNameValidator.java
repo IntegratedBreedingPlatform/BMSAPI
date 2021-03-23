@@ -42,7 +42,7 @@ public class GermplasmNameValidator {
 			final Name name = germplasmNameService.getNameByNameId(germplasmNameRequestDto.getId());
 			this.ValidateGermplasmName(errors, germplasmNameRequestDto, name);
 
-			if (germplasmNameRequestDto.getTypeId() != null) {
+			if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
 				this.validateNameType(errors, germplasmNameRequestDto);
 			}
 			if (germplasmNameRequestDto.getName() != null) {
@@ -139,8 +139,8 @@ public class GermplasmNameValidator {
 		}
 	}
 
-	protected void validateNameType(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) { // TODO: Verify use this.germplasmService.filterGermplasmNameTypes(codes) instead
-		final UserDefinedField userDefinedField = this.germplasmNameService.getNameType(germplasmNameRequestDto.getTypeId());
+	protected void validateNameType(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
+		final UserDefinedField userDefinedField = this.germplasmNameService.getNameType(germplasmNameRequestDto.getNameTypeCode());
 		if (userDefinedField == null || !userDefinedField.getFtable().equals("NAMES") || !userDefinedField.getFtype().equals("NAME")) {
 			errors.reject("germplasm.name.type.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
