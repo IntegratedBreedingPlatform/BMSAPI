@@ -25,36 +25,35 @@ public class GermplasmNameResource {
 
 	@ApiOperation(value = "Create Germplasm name")
 	@PreAuthorize("hasAnyAuthority('ADMIN')")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/names", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/germplasm/{gid}/names", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Integer> CreateGermplasmName(@PathVariable final String cropName,
+	public ResponseEntity<Integer> CreateGermplasmName(@PathVariable final String cropName, @PathVariable final String programUUID,
 		@PathVariable final Integer gid, @RequestBody final GermplasmNameRequestDto germplasmNameRequestDto) {
 		germplasmNameRequestDto.setGid(gid);
-		return new ResponseEntity<>(this.germplasmNameService.createName(germplasmNameRequestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmNameService.createName(germplasmNameRequestDto, programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Germplasm name")
 	@PreAuthorize("hasAnyAuthority('ADMIN')")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/names/{nameId}", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/germplasm/{gid}/names/{nameId}", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<Void> updateGermplasmName(@PathVariable final String cropName,
-		@PathVariable final Integer gid, @PathVariable final Integer nameId, @RequestBody final GermplasmNameRequestDto germplasmNameRequestDto) {
+	public ResponseEntity<Void> updateGermplasmName(@PathVariable final String cropName, @PathVariable final String programUUID,
+		@PathVariable final Integer gid, @PathVariable final Integer nameId,
+		@RequestBody final GermplasmNameRequestDto germplasmNameRequestDto) {
 		germplasmNameRequestDto.setId(nameId);
 		germplasmNameRequestDto.setGid(gid);
-		this.germplasmNameService.updateName(germplasmNameRequestDto);
+		this.germplasmNameService.updateName(germplasmNameRequestDto, programUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Delete Germplasm name")
 	@PreAuthorize("hasAnyAuthority('ADMIN')")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/names/{nameId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/germplasm/{gid}/names/{nameId}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity deleteGermplasmName(@PathVariable final String cropName,
+	public ResponseEntity deleteGermplasmName(@PathVariable final String cropName, @PathVariable final String programUUID,
 		@PathVariable final Integer gid, @PathVariable final Integer nameId) {
-
 		final GermplasmNameRequestDto germplasmNameRequestDto = new GermplasmNameRequestDto(nameId, gid);
 		this.germplasmNameService.deleteName(germplasmNameRequestDto);
-
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
