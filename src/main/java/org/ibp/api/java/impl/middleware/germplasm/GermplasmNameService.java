@@ -6,8 +6,8 @@ public interface GermplasmNameService {
 
 	public void deleteName(GermplasmNameRequestDto germplasmNameRequestDto);
 
-	public void updateName(GermplasmNameRequestDto germplasmNameRequestDto);
+	public void updateName(GermplasmNameRequestDto germplasmNameRequestDto, final String programUUID);
 
-	public Integer createName(GermplasmNameRequestDto germplasmNameRequestDto);
+	public Integer createName(GermplasmNameRequestDto germplasmNameRequestDto, final String programUUID);
 
 }
