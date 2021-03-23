@@ -13,6 +13,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
@@ -279,7 +280,8 @@ public class GermplasmResource {
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/studies", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmStudyDto>> getGermplasmStudies(
-		@PathVariable final String cropName, @PathVariable final Integer gid) {
+		@PathVariable final String cropName, @PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.studyService.getGermplasmStudies(gid), HttpStatus.OK);
 	}
 
@@ -287,7 +289,8 @@ public class GermplasmResource {
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/lists", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmListDto>> getGermplasmLists(@PathVariable final String cropName,
-		@PathVariable final Integer gid) {
+		@PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmLists(gid), HttpStatus.OK);
 	}
 
@@ -310,7 +313,18 @@ public class GermplasmResource {
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/samples", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<SampleDTO>> getGermplasmSamples(@PathVariable final String cropName,
-		@PathVariable final Integer gid) {
+		@PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.sampleService.getGermplasmSamples(gid), HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Get progenitor details of specified germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/progenitor-details", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<ProgenitorsDetailsDto> getGermplasmProgenitorDetails(@PathVariable final String cropName,
+		@PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmService.getGermplasmProgenitorDetails(gid), HttpStatus.OK);
+	}
+
 }
