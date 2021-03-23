@@ -12,11 +12,17 @@ import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
+
+import java.text.ParseException;
+import java.util.HashMap;
 
 @Component
 public class GermplasmNameValidator {
 
 	private static final Integer LOT_NOTES_MAX_LENGTH = 255;
+
+	private BindingResult errors;
 
 	@Autowired
 	GermplasmValidator germplasmValidator;
@@ -27,44 +33,47 @@ public class GermplasmNameValidator {
 	@Autowired
 	LocationValidator locationValidator;
 
-	public void validateCreateName(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
+	public void validate(final GermplasmNameRequestDto germplasmNameRequestDto, final String programUUID) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
+
 		germplasmValidator.validateGermplasmId(errors, germplasmNameRequestDto.getGid());
-		this.validateNameType(errors, germplasmNameRequestDto);
-		this.validateNameLength(errors, germplasmNameRequestDto);
-		this.validateDate(errors, germplasmNameRequestDto);
-		locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId());
+
+		if (germplasmNameRequestDto.getId() != null) {
+			final Name name = germplasmNameService.getNameByNameId(germplasmNameRequestDto.getId());
+			this.ValidateGermplasmName(errors, germplasmNameRequestDto, name);
+
+			if (germplasmNameRequestDto.getTypeId() != null) {
+				this.validateNameType(errors, germplasmNameRequestDto);
+			}
+			if (germplasmNameRequestDto.getName() != null) {
+				this.validateNameLength(errors, germplasmNameRequestDto);
+			}
+
+			if (germplasmNameRequestDto.getDate() != null) {
+				this.validateNameDate(errors, germplasmNameRequestDto);
+			}
+
+			if (germplasmNameRequestDto.getLocationId() != null) {
+				locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
+			}
+
+			if (germplasmNameRequestDto.isPreferredName() != null) {
+				this.validateUpdatePreferredName(errors, germplasmNameRequestDto, name);
+			}
+		} else {
+			this.validateNameType(errors, germplasmNameRequestDto);
+			this.validateNameLength(errors, germplasmNameRequestDto);
+			this.validateNameDate(errors, germplasmNameRequestDto);
+			locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
+		}
+
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
-	public void validateUpdateName(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
-		germplasmValidator.validateGermplasmId(errors, germplasmNameRequestDto.getGid());
-
-		final Name name = germplasmNameService.getNameByNameId(germplasmNameRequestDto.getId());
-		this.ValidateGermplasmName(errors, germplasmNameRequestDto, name);
-
-		if (germplasmNameRequestDto.getTypeId() != null) {
-			this.validateNameType(errors, germplasmNameRequestDto);
-		}
-		if (germplasmNameRequestDto != null && germplasmNameRequestDto.getName() != null) {
-			this.validateNameLength(errors, germplasmNameRequestDto);
-		}
-
-		if (germplasmNameRequestDto != null && germplasmNameRequestDto.getDate() != null) {
-			this.validateDate(errors, germplasmNameRequestDto);
-		}
-
-		if (germplasmNameRequestDto != null && germplasmNameRequestDto.getLocationId() != null) {
-			locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId());
-		}
-
-		if (germplasmNameRequestDto != null && germplasmNameRequestDto.getStatus() != null) {
-			this.validateUpdatePreferredName(errors, germplasmNameRequestDto, name);
-		}
-	}
-
-	public void validateDeleteName(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
+	public void validateDeleteName(final GermplasmNameRequestDto germplasmNameRequestDto) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
 		germplasmValidator.validateGermplasmId(errors, germplasmNameRequestDto.getGid());
 
 		if (errors.hasErrors()) {
@@ -96,7 +105,7 @@ public class GermplasmNameValidator {
 
 	protected void validateUpdatePreferredName(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto,
 		final Name name) {
-		if (!germplasmNameRequestDto.getStatus().equals(name.getNstat()) && name.getNstat().equals(1)) {
+		if (!germplasmNameRequestDto.isPreferredName() && name.getNstat().equals(1)) {
 			errors.reject("germplasm.name.preferred.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -116,8 +125,18 @@ public class GermplasmNameValidator {
 		}
 	}
 
-	protected void validateDate(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
-		Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).format(germplasmNameRequestDto.getDate()); // verificar esto.
+	protected void validateNameDate(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
+		if (germplasmNameRequestDto.getDate() == null) {
+			errors.reject("germplasm.name.date.required", "");
+		}
+
+		try {
+			Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).parse(germplasmNameRequestDto.getDate().toString()); // verificar esto.
+		} catch (ParseException e) {
+			errors.reject("germplasm.name.date.invalid", new Object[] {
+					germplasmNameRequestDto.getDate().toString()},
+				"Invalid date value found.");
+		}
 	}
 
 	protected void validateNameType(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) { // TODO: Verify use this.germplasmService.filterGermplasmNameTypes(codes) instead
