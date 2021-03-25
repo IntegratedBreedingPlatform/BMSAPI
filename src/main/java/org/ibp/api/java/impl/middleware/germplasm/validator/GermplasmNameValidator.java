@@ -43,7 +43,7 @@ public class GermplasmNameValidator {
 			this.ValidateGermplasmName(errors, germplasmNameRequestDto, name);
 
 			if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
-				this.validateNameType(errors, germplasmNameRequestDto);
+				this.validateNameTypeCode(errors, germplasmNameRequestDto);
 			}
 			if (germplasmNameRequestDto.getName() != null) {
 				this.validateNameLength(errors, germplasmNameRequestDto);
@@ -61,7 +61,7 @@ public class GermplasmNameValidator {
 				this.validateUpdatePreferredName(errors, germplasmNameRequestDto, name);
 			}
 		} else {
-			this.validateNameType(errors, germplasmNameRequestDto);
+			this.validateNameTypeCode(errors, germplasmNameRequestDto);
 			this.validateNameLength(errors, germplasmNameRequestDto);
 			this.validateNameDate(errors, germplasmNameRequestDto);
 			locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
@@ -139,7 +139,7 @@ public class GermplasmNameValidator {
 		}
 	}
 
-	protected void validateNameType(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
+	protected void validateNameTypeCode(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
 		final UserDefinedField userDefinedField = this.germplasmNameService.getNameType(germplasmNameRequestDto.getNameTypeCode());
 		if (userDefinedField == null || !userDefinedField.getFtable().equals("NAMES") || !userDefinedField.getFtype().equals("NAME")) {
 			errors.reject("germplasm.name.type.invalid", "");
