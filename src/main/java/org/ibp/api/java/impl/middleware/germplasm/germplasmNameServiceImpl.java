@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,13 @@ import java.util.HashMap;
 public class germplasmNameServiceImpl implements GermplasmNameService {
 
 	@Autowired
+	org.generationcp.middleware.api.germplasm.GermplasmNameService germplasmNameService;
+
+	@Autowired
 	private GermplasmNameValidator germplasmNameValidator;
 
 	@Autowired
-	org.generationcp.middleware.api.germplasm.GermplasmNameService germplasmNameService;
+	LocationValidator locationValidator;
 
 	@Autowired
 	private SecurityService securityService;
@@ -36,6 +40,9 @@ public class germplasmNameServiceImpl implements GermplasmNameService {
 	public void updateName(final GermplasmNameRequestDto germplasmNameRequestDto, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
 		germplasmNameValidator.validate(germplasmNameRequestDto, programUUID);
+		if (germplasmNameRequestDto.getLocationId() != null) {
+			locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
+		}
 		germplasmNameService.updateName(germplasmNameRequestDto);
 	}
 
@@ -43,6 +50,7 @@ public class germplasmNameServiceImpl implements GermplasmNameService {
 	public Integer createName(final GermplasmNameRequestDto germplasmNameRequestDto, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
 		germplasmNameValidator.validate(germplasmNameRequestDto, programUUID);
+		locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		return germplasmNameService.createName(germplasmNameRequestDto, loggedInUser.getUserid());
 	}

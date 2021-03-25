@@ -8,7 +8,6 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -30,13 +29,13 @@ public class GermplasmNameValidator {
 	@Autowired
 	GermplasmNameService germplasmNameService;
 
-	@Autowired
-	LocationValidator locationValidator;
-
 	public void validate(final GermplasmNameRequestDto germplasmNameRequestDto, final String programUUID) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-
 		germplasmValidator.validateGermplasmId(errors, germplasmNameRequestDto.getGid());
+
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 
 		if (germplasmNameRequestDto.getId() != null) {
 			final Name name = germplasmNameService.getNameByNameId(germplasmNameRequestDto.getId());
@@ -53,10 +52,6 @@ public class GermplasmNameValidator {
 				this.validateNameDate(errors, germplasmNameRequestDto);
 			}
 
-			if (germplasmNameRequestDto.getLocationId() != null) {
-				locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
-			}
-
 			if (germplasmNameRequestDto.isPreferredName() != null) {
 				this.validateUpdatePreferredName(errors, germplasmNameRequestDto, name);
 			}
@@ -64,10 +59,13 @@ public class GermplasmNameValidator {
 			this.validateNameTypeCode(errors, germplasmNameRequestDto);
 			this.validateNameLength(errors, germplasmNameRequestDto);
 			this.validateNameDate(errors, germplasmNameRequestDto);
-			locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
+			this.validatePreferredName(errors,germplasmNameRequestDto);
 		}
+	}
 
-		if (errors.hasErrors()) {
+	public void validatePreferredName(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
+		if(germplasmNameRequestDto.isPreferredName() != null){
+			errors.reject("germplasm.name.preferred.required", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
