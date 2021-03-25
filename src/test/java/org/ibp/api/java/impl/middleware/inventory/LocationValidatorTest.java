@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
@@ -9,7 +10,9 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.ibp.api.domain.ontology.VariableFilter;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 public class LocationValidatorTest {
@@ -189,5 +193,46 @@ public class LocationValidatorTest {
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("lot.input.list.location.null.or.empty"));
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testvalidateRequiredLocation() {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
+
+		try {
+			this.locationValidator.validateLocation(errors, null, null);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.required"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testvalidateInvalidLocation() {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
+
+		try {
+			this.locationValidator.validateLocation(errors, LOCATION_ID, null);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.invalid"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testvalidateInvalidProgramLocation() {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
+
+		final Location location = new Location();
+		location.setProgramUUID(RandomStringUtils.randomAlphabetic(256));
+		final List<Location> locationList = Lists.newArrayList(location);
+		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(location);
+
+		try {
+			this.locationValidator.validateLocation(errors, LOCATION_ID, RandomStringUtils.randomAlphabetic(256));
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.belongs.to.another.program"));
+			throw e;
+		}
 	}
 }
