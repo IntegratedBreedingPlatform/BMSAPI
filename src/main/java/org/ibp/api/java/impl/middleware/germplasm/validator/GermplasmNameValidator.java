@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm.validator;
 
 import org.apache.commons.lang.StringUtils;
+import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
@@ -136,9 +137,7 @@ public class GermplasmNameValidator {
 			errors.reject("germplasm.name.date.required", "");
 		}
 
-		try {
-			Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).parse(germplasmNameRequestDto.getDate().toString());
-		} catch (ParseException e) {
+		if (DateUtil.isValidDate(germplasmNameRequestDto.getDate().toString())) {
 			errors.reject("germplasm.name.date.invalid", new Object[] {
 					germplasmNameRequestDto.getDate().toString()},
 				"Invalid date value found.");
