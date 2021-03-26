@@ -73,7 +73,7 @@ public class GermplasmAttributeResource {
 		notes = "Delete germplasm attribute")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes/{attributeId}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity<Void> deleteGermplasmAttribute(@PathVariable final String cropName,
+	public ResponseEntity<Void> deleteGermplasmAttribute(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @PathVariable final Integer attributeId) {
 		this.germplasmAttributeService.deleteGermplasmAttribute(gid, attributeId);
 		return new ResponseEntity<>(HttpStatus.OK);
