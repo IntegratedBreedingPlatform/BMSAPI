@@ -80,7 +80,7 @@ public class GermplasmNameValidator {
 		}
 	}
 
-	public void validateDeleteName(final Integer gid, final Integer nameId) {
+	public void validateNameDeletable(final Integer gid, final Integer nameId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
 		germplasmValidator.validateGermplasmId(errors, gid);
 
