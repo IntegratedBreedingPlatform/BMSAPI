@@ -26,21 +26,20 @@ public class GermplasmNameResource {
 	@ApiOperation(value = "Create name for a specified germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/names", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Integer> CreateGermplasmName(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
+	public ResponseEntity<Integer> CreateGermplasmName(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @RequestBody final GermplasmNameRequestDto germplasmNameRequestDto) {
-		germplasmNameRequestDto.setGid(gid);
-		return new ResponseEntity<>(this.germplasmNameService.createName(programUUID, germplasmNameRequestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmNameService.createName(programUUID, germplasmNameRequestDto, gid), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update name for a specified Germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/names/{nameId}", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<Void> updateGermplasmName(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
+	public ResponseEntity<Void> updateGermplasmName(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @PathVariable final Integer nameId,
 		@RequestBody final GermplasmNameRequestDto germplasmNameRequestDto) {
-		germplasmNameRequestDto.setId(nameId);
-		germplasmNameRequestDto.setGid(gid);
-		this.germplasmNameService.updateName(programUUID, germplasmNameRequestDto);
+		this.germplasmNameService.updateName(programUUID, germplasmNameRequestDto, gid, nameId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -49,8 +48,7 @@ public class GermplasmNameResource {
 	@ResponseBody
 	public ResponseEntity deleteGermplasmName(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @PathVariable final Integer nameId) {
-		final GermplasmNameRequestDto germplasmNameRequestDto = new GermplasmNameRequestDto(nameId, gid);
-		this.germplasmNameService.deleteName(germplasmNameRequestDto);
+		this.germplasmNameService.deleteName(gid, nameId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

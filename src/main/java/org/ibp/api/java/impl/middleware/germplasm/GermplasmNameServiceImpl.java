@@ -30,28 +30,28 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	private SecurityService securityService;
 
 	@Override
-	public void deleteName(final GermplasmNameRequestDto germplasmNameRequestDto) {
+	public void deleteName(final Integer gid, final Integer nameId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmNameRequestDto.class.getName());
-		this.germplasmNameValidator.validateDeleteName(germplasmNameRequestDto);
-		germplasmNameService.deleteName(germplasmNameRequestDto.getId());
+		this.germplasmNameValidator.validateDeleteName(gid, nameId);
+		germplasmNameService.deleteName(nameId);
 	}
 
 	@Override
-	public void updateName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto) {
+	public void updateName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Integer nameId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		germplasmNameValidator.validate(germplasmNameRequestDto, programUUID);
+		germplasmNameValidator.validate(programUUID, germplasmNameRequestDto, gid, nameId);
 		if (germplasmNameRequestDto.getLocationId() != null) {
 			locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
 		}
-		germplasmNameService.updateName(germplasmNameRequestDto);
+		germplasmNameService.updateName(germplasmNameRequestDto, gid, nameId);
 	}
 
 	@Override
-	public Integer createName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto) {
+	public Integer createName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		germplasmNameValidator.validate(germplasmNameRequestDto, programUUID);
+		germplasmNameValidator.validate(programUUID, germplasmNameRequestDto, gid, null);
 		locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		return germplasmNameService.createName(germplasmNameRequestDto, loggedInUser.getUserid());
+		return germplasmNameService.createName(loggedInUser.getUserid(), germplasmNameRequestDto, gid);
 	}
 }
