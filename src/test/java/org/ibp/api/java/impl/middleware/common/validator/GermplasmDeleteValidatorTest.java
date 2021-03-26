@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ public class GermplasmDeleteValidatorTest {
 		final List<Integer> gids = Lists.newArrayList(1, 2, 3, 4, 5);
 
 		when(this.germplasmService.getCodeFixedGidsByGidList(gids)).thenReturn(Sets.newHashSet(1));
-		when(this.germplasmService.getGidsOfGermplasmWithDescendants(gids)).thenReturn(Sets.newHashSet(2));
+		when(this.germplasmService.getGidsOfGermplasmWithDescendants(gids, Collections.emptyList())).thenReturn(Sets.newHashSet(2));
 		when(this.germplasmService.getGermplasmUsedInStudies(gids)).thenReturn(Sets.newHashSet(3));
 		when(this.germplasmService.getGidsWithOpenLots(gids)).thenReturn(Sets.newHashSet(4));
 		when(this.germplasmService.getGermplasmUsedInOneOrMoreList(gids)).thenReturn(Sets.newHashSet(5));
