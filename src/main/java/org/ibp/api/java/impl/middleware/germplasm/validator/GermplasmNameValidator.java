@@ -24,22 +24,22 @@ public class GermplasmNameValidator {
 	private BindingResult errors;
 
 	@Autowired
-	GermplasmValidator germplasmValidator;
+	private GermplasmValidator germplasmValidator;
 
 	@Autowired
-	GermplasmNameService germplasmNameService;
+	private GermplasmNameService germplasmNameService;
 
-	public void validate(final GermplasmNameRequestDto germplasmNameRequestDto, final String programUUID) {
+	public void validate(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Integer nameId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		germplasmValidator.validateGermplasmId(errors, germplasmNameRequestDto.getGid());
+		germplasmValidator.validateGermplasmId(errors, gid);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		if (germplasmNameRequestDto.getId() != null) {
-			final Name name = germplasmNameService.getNameByNameId(germplasmNameRequestDto.getId());
-			this.validateNameBelongsToGermplasm(errors, germplasmNameRequestDto, name);
+		if (nameId != null) {
+			final Name name = germplasmNameService.getNameByNameId(nameId);
+			this.validateNameBelongsToGermplasm(errors, gid, name);
 
 			if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
 				this.validateNameTypeCode(errors, germplasmNameRequestDto);
@@ -70,23 +70,22 @@ public class GermplasmNameValidator {
 		}
 	}
 
-	public void validateDeleteName(final GermplasmNameRequestDto germplasmNameRequestDto) {
+	public void validateDeleteName(final Integer gid, final Integer nameId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		germplasmValidator.validateGermplasmId(errors, germplasmNameRequestDto.getGid());
+		germplasmValidator.validateGermplasmId(errors, gid);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final Name name = germplasmNameService.getNameByNameId(germplasmNameRequestDto.getId());
-		this.validateNameBelongsToGermplasm(errors, germplasmNameRequestDto, name);
+		final Name name = germplasmNameService.getNameByNameId(nameId);
+		this.validateNameBelongsToGermplasm(errors, gid, name);
 		this.validateDeletepreferredName(errors, name);
 
 	}
 
-	protected void validateNameBelongsToGermplasm(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto,
-		final Name name) {
-		if (name == null || !name.getGermplasmId().equals(germplasmNameRequestDto.getGid())) {
+	protected void validateNameBelongsToGermplasm(final BindingResult errors, final Integer gid, final Name name) {
+		if (name == null || !name.getGermplasmId().equals(gid)) {
 			errors.reject("germplasm.name.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 
@@ -129,7 +128,7 @@ public class GermplasmNameValidator {
 		}
 
 		try {
-			Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).parse(germplasmNameRequestDto.getDate().toString()); // verificar esto.
+			Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).parse(germplasmNameRequestDto.getDate().toString());
 		} catch (ParseException e) {
 			errors.reject("germplasm.name.date.invalid", new Object[] {
 					germplasmNameRequestDto.getDate().toString()},
