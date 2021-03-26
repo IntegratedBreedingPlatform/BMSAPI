@@ -26,7 +26,7 @@ public class GermplasmNameResource {
 	@ApiOperation(value = "Create name for a specified germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/names", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Integer> CreateGermplasmName(@PathVariable final String cropName,
+	public ResponseEntity<Integer> createGermplasmName(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @RequestBody final GermplasmNameRequestDto germplasmNameRequestDto) {
 		return new ResponseEntity<>(this.germplasmNameService.createName(programUUID, germplasmNameRequestDto, gid), HttpStatus.OK);
