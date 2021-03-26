@@ -39,7 +39,7 @@ public class GermplasmNameValidator {
 
 		if (germplasmNameRequestDto.getId() != null) {
 			final Name name = germplasmNameService.getNameByNameId(germplasmNameRequestDto.getId());
-			this.validateGermplasmName(errors, germplasmNameRequestDto, name);
+			this.validateNameBelongsToGermplasm(errors, germplasmNameRequestDto, name);
 
 			if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
 				this.validateNameTypeCode(errors, germplasmNameRequestDto);
@@ -59,12 +59,12 @@ public class GermplasmNameValidator {
 			this.validateNameTypeCode(errors, germplasmNameRequestDto);
 			this.validateNameLength(errors, germplasmNameRequestDto);
 			this.validateNameDate(errors, germplasmNameRequestDto);
-			this.validatePreferredName(errors,germplasmNameRequestDto);
+			this.validatePreferredName(errors, germplasmNameRequestDto);
 		}
 	}
 
 	public void validatePreferredName(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
-		if(germplasmNameRequestDto.isPreferredName() != null){
+		if (germplasmNameRequestDto.isPreferredName() != null) {
 			errors.reject("germplasm.name.preferred.required", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -79,12 +79,12 @@ public class GermplasmNameValidator {
 		}
 
 		final Name name = germplasmNameService.getNameByNameId(germplasmNameRequestDto.getId());
-		this.validateGermplasmName(errors, germplasmNameRequestDto, name);
+		this.validateNameBelongsToGermplasm(errors, germplasmNameRequestDto, name);
 		this.validateDeletepreferredName(errors, name);
 
 	}
 
-	protected void validateGermplasmName(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto,
+	protected void validateNameBelongsToGermplasm(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto,
 		final Name name) {
 		if (name == null || !name.getGermplasmId().equals(germplasmNameRequestDto.getGid())) {
 			errors.reject("germplasm.name.invalid", "");
@@ -94,7 +94,7 @@ public class GermplasmNameValidator {
 	}
 
 	protected void validateDeletepreferredName(final BindingResult errors, final Name name) {
-		if (name.getNstat().equals(1)) {
+		if (new Integer(1).equals(name.getNstat())) {
 			errors.reject("germplasm.name.preferred.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 
@@ -145,13 +145,11 @@ public class GermplasmNameValidator {
 		}
 	}
 
-
 	public void setGermplasmNameService(final GermplasmNameService germplasmNameService) {
 		this.germplasmNameService = germplasmNameService;
 	}
 
-
-	public  GermplasmNameService getGermplasmNameService() {
+	public GermplasmNameService getGermplasmNameService() {
 		return this.germplasmNameService;
 	}
 }
