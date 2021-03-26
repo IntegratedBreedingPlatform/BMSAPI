@@ -2,11 +2,13 @@ package org.ibp.api.java.impl.middleware.germplasm.validator;
 
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +16,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class GermplasmNameValidator {
@@ -28,6 +34,9 @@ public class GermplasmNameValidator {
 
 	@Autowired
 	private GermplasmNameService germplasmNameService;
+
+	@Autowired
+	GermplasmService germplasmService;
 
 	public void validate(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Integer nameId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
@@ -137,8 +146,9 @@ public class GermplasmNameValidator {
 	}
 
 	protected void validateNameTypeCode(final BindingResult errors, final GermplasmNameRequestDto germplasmNameRequestDto) {
-		final UserDefinedField userDefinedField = this.germplasmNameService.getNameType(germplasmNameRequestDto.getNameTypeCode());
-		if (userDefinedField == null || !userDefinedField.getFtable().equals("NAMES") || !userDefinedField.getFtype().equals("NAME")) {
+		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
+		final List<GermplasmNameTypeDTO>  germplasmNameTypeDTOs = germplasmService.filterGermplasmNameTypes(codes);
+		if (germplasmNameTypeDTOs == null || germplasmNameTypeDTOs.isEmpty()) {
 			errors.reject("germplasm.name.type.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
