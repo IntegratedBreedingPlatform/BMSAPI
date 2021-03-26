@@ -38,7 +38,7 @@ public class GermplasmNameValidator {
 		}
 
 		if (nameId != null) {
-			final Name name = germplasmNameService.getNameByNameId(nameId);
+			final Name name = germplasmNameService.getNameById(nameId);
 			this.validateNameBelongsToGermplasm(errors, gid, name);
 
 			if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
@@ -78,7 +78,7 @@ public class GermplasmNameValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final Name name = germplasmNameService.getNameByNameId(nameId);
+		final Name name = germplasmNameService.getNameById(nameId);
 		this.validateNameBelongsToGermplasm(errors, gid, name);
 		this.validateDeletepreferredName(errors, name);
 
