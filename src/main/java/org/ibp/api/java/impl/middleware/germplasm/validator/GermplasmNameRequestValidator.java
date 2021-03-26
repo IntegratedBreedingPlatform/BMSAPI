@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class GermplasmNameValidator {
+public class GermplasmNameRequestValidator {
 
 	private static final Integer LOT_NOTES_MAX_LENGTH = 255;
 

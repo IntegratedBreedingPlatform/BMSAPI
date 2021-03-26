@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
-import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameRequestValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	private org.generationcp.middleware.api.germplasm.GermplasmNameService germplasmNameService;
 
 	@Autowired
-	private GermplasmNameValidator germplasmNameValidator;
+	private GermplasmNameRequestValidator germplasmNameRequestValidator;
 
 	@Autowired
 	private LocationValidator locationValidator;
@@ -32,14 +32,14 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public void deleteName(final Integer gid, final Integer nameId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmNameRequestDto.class.getName());
-		this.germplasmNameValidator.validateNameDeletable(gid, nameId);
+		this.germplasmNameRequestValidator.validateNameDeletable(gid, nameId);
 		germplasmNameService.deleteName(nameId);
 	}
 
 	@Override
 	public void updateName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Integer nameId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		germplasmNameValidator.validate(programUUID, germplasmNameRequestDto, gid, nameId);
+		germplasmNameRequestValidator.validate(programUUID, germplasmNameRequestDto, gid, nameId);
 		if (germplasmNameRequestDto.getLocationId() != null) {
 			locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
 		}
@@ -49,7 +49,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public Integer createName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		germplasmNameValidator.validate(programUUID, germplasmNameRequestDto, gid, null);
+		germplasmNameRequestValidator.validate(programUUID, germplasmNameRequestDto, gid, null);
 		locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		return germplasmNameService.createName(loggedInUser.getUserid(), germplasmNameRequestDto, gid);
