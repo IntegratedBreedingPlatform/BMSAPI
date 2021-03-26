@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmPatchDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
@@ -78,4 +79,7 @@ public interface GermplasmService {
 	GermplasmDto getGermplasmDtoById(Integer gid);
 
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
+
+	void updateGermplasm(final String programUUID, final Integer gid, final GermplasmPatchDto germplasmPatchDto);
+
 }

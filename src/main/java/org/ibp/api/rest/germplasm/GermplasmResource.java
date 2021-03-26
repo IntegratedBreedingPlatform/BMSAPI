@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmPatchDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
@@ -297,7 +298,7 @@ public class GermplasmResource {
 	/**
 	 * Returns a germplasm by a given germplasm id
 	 *
-	 * @return {@link GermplasmSearchResponse}
+	 * @return {@link GermplasmDto}
 	 */
 	@ApiOperation(value = "Returns a germplasm by a given germplasm id")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}", method = RequestMethod.GET)
@@ -325,6 +326,23 @@ public class GermplasmResource {
 		@PathVariable final Integer gid,
 		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.germplasmService.getGermplasmProgenitorDetails(gid), HttpStatus.OK);
+	}
+
+	/**
+	 * Modify a germplasm
+	 *
+	 * @return {@link GermplasmDto}
+	 */
+	@ApiOperation(value = "Update germplasm information")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}", method = RequestMethod.PATCH)
+	@ResponseBody
+	public ResponseEntity<Void> updateGermplasm(
+		@PathVariable final String cropName,
+		@PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmPatchDto germplasmPatchDto) {
+		this.germplasmService.updateGermplasm(programUUID, gid, germplasmPatchDto);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }

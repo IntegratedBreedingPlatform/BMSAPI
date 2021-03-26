@@ -13,6 +13,7 @@ import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmPatchDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
@@ -451,6 +452,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
+	}
+
+	@Override
+	public void updateGermplasm(final String programUUID, final Integer gid, final GermplasmPatchDto germplasmPatchDto) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		this.germplasmPatchDtoValidator.validate(programUUID, germplasmPatchDto);
+		this.germplasmService.updateGermplasm(gid, germplasmPatchDto);
 	}
 
 	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
