@@ -139,7 +139,7 @@ public class LocationValidatorTest {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final Location location = new Location();
-		final List<Location> locationList = Lists.newArrayList(location);
+		final List<Location> locationList = Collections.singletonList(location);
 		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(location);
 		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(LOCATION_ID))).thenReturn(locationList);
 		this.locationValidator.validateSeedLocationId(this.errors, null, LOCATION_ID);
@@ -152,7 +152,7 @@ public class LocationValidatorTest {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
 		final Location location = new Location();
 		location.setLabbr("DSS");
-		final List<Location> locationList = Lists.newArrayList(location);
+		final List<Location> locationList = Collections.singletonList(location);
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");
 
 		Mockito.when(this.locationService
@@ -225,7 +225,7 @@ public class LocationValidatorTest {
 
 		final Location location = new Location();
 		location.setProgramUUID(RandomStringUtils.randomAlphabetic(256));
-		final List<Location> locationList = Lists.newArrayList(location);
+		final List<Location> locationList = Collections.singletonList(location);
 		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(location);
 
 		try {

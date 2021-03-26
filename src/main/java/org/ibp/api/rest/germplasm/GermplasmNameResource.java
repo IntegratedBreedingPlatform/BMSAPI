@@ -29,7 +29,7 @@ public class GermplasmNameResource {
 	public ResponseEntity<Integer> CreateGermplasmName(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @RequestBody final GermplasmNameRequestDto germplasmNameRequestDto) {
 		germplasmNameRequestDto.setGid(gid);
-		return new ResponseEntity<>(this.germplasmNameService.createName(germplasmNameRequestDto, programUUID), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmNameService.createName(programUUID, germplasmNameRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update name for a specified Germplasm")
@@ -40,7 +40,7 @@ public class GermplasmNameResource {
 		@RequestBody final GermplasmNameRequestDto germplasmNameRequestDto) {
 		germplasmNameRequestDto.setId(nameId);
 		germplasmNameRequestDto.setGid(gid);
-		this.germplasmNameService.updateName(germplasmNameRequestDto, programUUID);
+		this.germplasmNameService.updateName(programUUID, germplasmNameRequestDto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

@@ -15,16 +15,16 @@ import java.util.HashMap;
 
 @Service
 @Transactional
-public class germplasmNameServiceImpl implements GermplasmNameService {
+public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 	@Autowired
-	org.generationcp.middleware.api.germplasm.GermplasmNameService germplasmNameService;
+	private org.generationcp.middleware.api.germplasm.GermplasmNameService germplasmNameService;
 
 	@Autowired
 	private GermplasmNameValidator germplasmNameValidator;
 
 	@Autowired
-	LocationValidator locationValidator;
+	private LocationValidator locationValidator;
 
 	@Autowired
 	private SecurityService securityService;
@@ -37,7 +37,7 @@ public class germplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public void updateName(final GermplasmNameRequestDto germplasmNameRequestDto, final String programUUID) {
+	public void updateName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
 		germplasmNameValidator.validate(germplasmNameRequestDto, programUUID);
 		if (germplasmNameRequestDto.getLocationId() != null) {
@@ -47,7 +47,7 @@ public class germplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public Integer createName(final GermplasmNameRequestDto germplasmNameRequestDto, final String programUUID) {
+	public Integer createName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
 		germplasmNameValidator.validate(germplasmNameRequestDto, programUUID);
 		locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
