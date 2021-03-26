@@ -52,11 +52,7 @@ public class AttributeValidator {
 	}
 
 	public void validateAttributeType(final BindingResult errors, final String attributeType) {
-		if (StringUtils.isEmpty(attributeType)) {
-			return;
-		}
-
-		if (!AttributeValidator.ALLOWED_ATTRIBUTE_TYPES.contains(attributeType.toUpperCase())) {
+		if (!StringUtils.isEmpty(attributeType) && !AttributeValidator.ALLOWED_ATTRIBUTE_TYPES.contains(attributeType.toUpperCase())) {
 			errors.reject("attribute.type.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
