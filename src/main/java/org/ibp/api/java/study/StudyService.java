@@ -2,6 +2,7 @@
 package org.ibp.api.java.study;
 
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -56,4 +57,5 @@ public interface StudyService {
 
 	Integer getEnvironmentDatasetId(Integer studyId);
 
+	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 }

@@ -4,11 +4,16 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -17,6 +22,9 @@ public class SampleServiceImpl implements SampleService {
 
 	@Autowired
 	org.generationcp.middleware.service.api.SampleService sampleService;
+
+	@Autowired
+	private GermplasmValidator germplasmValidator;
 
 	@Override
 	public List<SampleDTO> filter(final String obsUnitId, final Integer listId, final Pageable pageable) {
@@ -37,5 +45,12 @@ public class SampleServiceImpl implements SampleService {
 			throw new ApiRuntimeException("an error happened when try to get the sample", e);
 		}
 		return sampleDetailsDTO;
+	}
+
+	@Override
+	public List<SampleDTO> getGermplasmSamples(final Integer gid) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		return this.sampleService.getByGid(gid);
 	}
 }
