@@ -132,12 +132,14 @@ public class GermplasmNameRequestValidator {
 	protected void validateNameDate(final GermplasmNameRequestDto germplasmNameRequestDto) {
 		if (germplasmNameRequestDto.getDate() == null) {
 			errors.reject("germplasm.name.date.required", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		if (!DateUtil.isValidDate(germplasmNameRequestDto.getDate().toString())) {
 			errors.reject("germplasm.name.date.invalid", new Object[] {
 					germplasmNameRequestDto.getDate().toString()},
 				"Invalid date value found.");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
