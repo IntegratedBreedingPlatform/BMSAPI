@@ -45,7 +45,7 @@ public class GermplasmNameRequestValidator {
 		}
 
 		if (nameId != null) {
-			final Name name = germplasmNameService.getNameById(nameId);
+			final Name name = this.germplasmNameService.getNameById(nameId);
 			this.validateNameBelongsToGermplasm(gid, name);
 
 			if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
@@ -85,7 +85,7 @@ public class GermplasmNameRequestValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final Name name = germplasmNameService.getNameById(nameId);
+		final Name name = this.germplasmNameService.getNameById(nameId);
 		this.validateNameBelongsToGermplasm(gid, name);
 		this.validateDeletepreferredName(name);
 
@@ -145,7 +145,7 @@ public class GermplasmNameRequestValidator {
 
 	protected void validateNameTypeCode(final GermplasmNameRequestDto germplasmNameRequestDto) {
 		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmService.filterGermplasmNameTypes(codes);
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmService.filterGermplasmNameTypes(codes);
 		if (germplasmNameTypeDTOs == null || germplasmNameTypeDTOs.isEmpty()) {
 			errors.reject("germplasm.name.type.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
