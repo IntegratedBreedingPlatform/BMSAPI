@@ -31,7 +31,6 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 	@Override
 	public void deleteName(final Integer gid, final Integer nameId) {
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmNameRequestDto.class.getName());
 		this.germplasmNameRequestValidator.validateNameDeletable(gid, nameId);
 		germplasmNameService.deleteName(nameId);
 	}
