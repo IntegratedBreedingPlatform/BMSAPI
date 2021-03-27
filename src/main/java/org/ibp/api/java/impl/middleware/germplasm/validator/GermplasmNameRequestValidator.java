@@ -71,7 +71,7 @@ public class GermplasmNameRequestValidator {
 	}
 
 	public void validatePreferredName(final GermplasmNameRequestDto germplasmNameRequestDto) {
-		if (germplasmNameRequestDto.isPreferredName() != null) {
+		if (germplasmNameRequestDto.isPreferredName() == null) {
 			errors.reject("germplasm.name.preferred.required", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -134,7 +134,7 @@ public class GermplasmNameRequestValidator {
 			errors.reject("germplasm.name.date.required", "");
 		}
 
-		if (DateUtil.isValidDate(germplasmNameRequestDto.getDate().toString())) {
+		if (!DateUtil.isValidDate(germplasmNameRequestDto.getDate().toString())) {
 			errors.reject("germplasm.name.date.invalid", new Object[] {
 					germplasmNameRequestDto.getDate().toString()},
 				"Invalid date value found.");
