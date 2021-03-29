@@ -6,7 +6,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +18,7 @@ public class GermplasmDeleteValidator {
 	public Set<Integer> checkInvalidGidsForDeletion(final List<Integer> gids) {
 
 		final Set<Integer> codeFixedGermplasms = this.germplasmMiddlewareService.getCodeFixedGidsByGidList(gids);
-		final Set<Integer> germplasmWithDescendants = this.germplasmMiddlewareService.getGidsOfGermplasmWithDescendants(gids, Collections.emptyList());
+		final Set<Integer> germplasmWithDescendants = this.germplasmMiddlewareService.getGidsOfGermplasmWithDescendants(gids);
 		final Set<Integer> germplasmUsedInStudies = this.germplasmMiddlewareService.getGermplasmUsedInStudies(gids);
 		final Set<Integer> germplasmWithOpenLots = this.germplasmMiddlewareService.getGidsWithOpenLots(gids);
 		final Set<Integer> germplasmInOneOrMoreLists = this.germplasmMiddlewareService.getGermplasmUsedInOneOrMoreList(gids);
