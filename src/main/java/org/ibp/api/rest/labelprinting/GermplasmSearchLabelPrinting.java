@@ -1,5 +1,7 @@
 package org.ibp.api.rest.labelprinting;
 
+import org.generationcp.commons.util.FileNameGenerator;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.rest.common.FileType;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 @Component
@@ -54,8 +58,8 @@ public class GermplasmSearchLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	OriginResourceMetadata getOriginResourceMetadata(
 		final LabelsInfoInput labelsInfoInput) {
-		return null;
-	}
+		final String fileName = FileNameGenerator.generateFileName("germplasm-labels");
+		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());	}
 
 	@Override
 	List<LabelType> getAvailableLabelTypes(
