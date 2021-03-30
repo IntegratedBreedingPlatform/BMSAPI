@@ -54,26 +54,26 @@ public class GermplasmAttributeResource {
 		notes = "Create attribute for specified germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GermplasmAttributeRequestDto> createGermplasmAttribute(@PathVariable final String cropName,
+	public ResponseEntity<GermplasmAttributeRequestDto> createGermplasmAttribute(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @RequestBody final GermplasmAttributeRequestDto requestDto) {
-		return new ResponseEntity<>(this.germplasmAttributeService.createGermplasmAttribute(gid, requestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmAttributeService.createGermplasmAttribute(gid, requestDto, programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update germplasm attribute",
 		notes = "Update germplasm attribute")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes/{attributeId}", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<GermplasmAttributeRequestDto> updateGermplasmAttribute(@PathVariable final String cropName,
+	public ResponseEntity<GermplasmAttributeRequestDto> updateGermplasmAttribute(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @PathVariable final Integer attributeId,
 		@ApiParam("Only the following fields can be updated: value, date, and locationId") @RequestBody final GermplasmAttributeRequestDto requestDto) {
-		return new ResponseEntity<>(this.germplasmAttributeService.updateGermplasmAttribute(gid, attributeId, requestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmAttributeService.updateGermplasmAttribute(gid, attributeId, requestDto, programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Delete germplasm attribute",
 		notes = "Delete germplasm attribute")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes/{attributeId}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity<Void> deleteGermplasmAttribute(@PathVariable final String cropName,
+	public ResponseEntity<Void> deleteGermplasmAttribute(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @PathVariable final Integer attributeId) {
 		this.germplasmAttributeService.deleteGermplasmAttribute(gid, attributeId);
 		return new ResponseEntity<>(HttpStatus.OK);
