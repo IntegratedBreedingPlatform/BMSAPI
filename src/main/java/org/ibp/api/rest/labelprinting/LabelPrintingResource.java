@@ -54,6 +54,9 @@ public class LabelPrintingResource {
 	private LabelPrintingStrategy lotLabelPrinting;
 
 	@Autowired
+	private LabelPrintingStrategy germplasmSearchLabelPrinting;
+
+	@Autowired
 	private CSVLabelsFileGenerator csvLabelsFileGenerator;
 
 	@Autowired
@@ -175,6 +178,9 @@ public class LabelPrintingResource {
 				break;
 			case LOT:
 				labelPrintingStrategy = this.lotLabelPrinting;
+				break;
+			case GERMPLASM_SEARCH:
+				labelPrintingStrategy = this.germplasmSearchLabelPrinting;
 				break;
 			default:
 				labelPrintingStrategy = null;
