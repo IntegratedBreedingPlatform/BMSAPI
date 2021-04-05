@@ -69,9 +69,21 @@ public class LocationValidator {
 		}
 	}
 
-	public void validateLocation(final BindingResult errors, final Integer locationId) {
-		if(locationId == null || this.locationService.getLocation(locationId) == null) {
+	public void validateLocation(final BindingResult errors, final Integer locationId, final String programUUID) {
+		if (locationId == null) {
+			errors.reject("location.required", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final Location location = locationDataManager.getLocationByID(locationId);
+
+		if (location == null) {
 			errors.reject("location.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (!StringUtils.isEmpty(programUUID) && location.getProgramUUID() != null && !location.getProgramUUID().equals(programUUID)) {
+			errors.reject("location.belongs.to.another.program", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}

@@ -51,25 +51,24 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto) {
+	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.attributeValidator.validateAttribute(errors, gid, dto, null);
-		this.locationValidator.validateLocation(errors, dto.getLocationId());
+		this.locationValidator.validateLocation(errors, dto.getLocationId(), programUUID);
 
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		this.germplasmAttributeService.createGermplasmAttribute(gid, dto, loggedInUser.getUserid());
-		return  dto;
+		return dto;
 	}
 
 	@Override
-	public GermplasmAttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId,
-		final GermplasmAttributeRequestDto dto) {
+	public GermplasmAttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId, final GermplasmAttributeRequestDto dto, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.attributeValidator.validateAttribute(errors, gid, dto, attributeId);
-		this.locationValidator.validateLocation(errors, dto.getLocationId());
+		this.locationValidator.validateLocation(errors, dto.getLocationId(), programUUID);
 
 		this.germplasmAttributeService.updateGermplasmAttribute(attributeId, dto);
-		return  dto;
+		return dto;
 	}
 
 	@Override
@@ -83,11 +82,12 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	public List<AttributeDTO> filterGermplasmAttributes(final Set<String> codes, final String type) {
 
 		final Set<String> types = new HashSet<>();
-		if(StringUtils.isEmpty(type)) {
+		if (StringUtils.isEmpty(type)) {
 			types.add(UDTableType.ATRIBUTS_ATTRIBUTE.getType());
 			types.add(UDTableType.ATRIBUTS_PASSPORT.getType());
 		} else {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), org.generationcp.middleware.api.attribute.AttributeDTO.class.getName());
+			final BindingResult errors =
+				new MapBindingResult(new HashMap<String, String>(), org.generationcp.middleware.api.attribute.AttributeDTO.class.getName());
 			this.attributeValidator.validateAttributeType(errors, type);
 			types.add(type);
 		}
