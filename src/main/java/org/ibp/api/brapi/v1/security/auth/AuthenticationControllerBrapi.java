@@ -46,7 +46,7 @@ public class AuthenticationControllerBrapi {
 	private UserDetailsService userDetailsService;
 
 	@ApiOperation(value = "Get token")
-	@RequestMapping(value = {"/brapi/v1/token", "/token"}, method = RequestMethod.POST)
+	@RequestMapping(value = {"/brapi/v1/token", "/brapi/v2/token", "/token"}, method = RequestMethod.POST)
 	@ResponseBody
 	public TokenResponse authenticate(@RequestBody final TokenRequest tokenRequest) {
 		final String username = tokenRequest.getUsername();
