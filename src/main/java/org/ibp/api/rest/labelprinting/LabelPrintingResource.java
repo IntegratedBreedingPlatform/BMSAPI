@@ -54,7 +54,7 @@ public class LabelPrintingResource {
 	private LabelPrintingStrategy lotLabelPrinting;
 
 	@Autowired
-	private LabelPrintingStrategy germplasmSearchLabelPrinting;
+	private LabelPrintingStrategy germplasmLabelPrinting;
 
 	@Autowired
 	private CSVLabelsFileGenerator csvLabelsFileGenerator;
@@ -179,8 +179,8 @@ public class LabelPrintingResource {
 			case LOT:
 				labelPrintingStrategy = this.lotLabelPrinting;
 				break;
-			case GERMPLASM_SEARCH:
-				labelPrintingStrategy = this.germplasmSearchLabelPrinting;
+			case GERMPLASM:
+				labelPrintingStrategy = this.germplasmLabelPrinting;
 				break;
 			default:
 				labelPrintingStrategy = null;
@@ -202,7 +202,7 @@ public class LabelPrintingResource {
 					|| this.request.isUserInRole(PermissionsEnum.MANAGE_INVENTORY.name())
 					|| this.request.isUserInRole(PermissionsEnum.MANAGE_LOTS.name())
 					|| this.request.isUserInRole(PermissionsEnum.LOT_LABEL_PRINTING.name());
-			case GERMPLASM_SEARCH:
+			case GERMPLASM:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.GERMPLASM.name())
 					|| this.request.isUserInRole(PermissionsEnum.MANAGE_GERMPLASM.name())

@@ -19,12 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 @Component
 @Transactional
-public class GermplasmSearchLabelPrinting extends LabelPrintingStrategy {
+public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
