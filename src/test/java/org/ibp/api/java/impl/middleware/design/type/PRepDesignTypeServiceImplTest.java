@@ -213,6 +213,43 @@ public class PRepDesignTypeServiceImplTest {
 
 	}
 
+	@Test
+	public void testCreateReplicationListItemForPRepDesignWithSystemDefinedNonReplicatedEntryType() {
+
+		final int noOfTestEntries = 4;
+		final int noOfCheckEntries = 2;
+		final int noOfNonReplicatedEntries = 20;
+		final int replicationNumber = 3;
+		final float replicationPercentage = 100.0f;
+		final float noOfTestEntriesToReplicate = Math.round((float) noOfTestEntries * (replicationPercentage / 100));
+
+		final List<StudyEntryDto> importedGermplasmList = StudyEntryTestDataGenerator.createStudyEntryDtoList(noOfTestEntries, noOfCheckEntries, noOfNonReplicatedEntries);
+
+		// Set the first germplasm as CHECK_ENTRY.
+		final StudyEntryDto checkImportedGermplasm = importedGermplasmList.get(0);
+		checkImportedGermplasm.getProperties().get(TermId.ENTRY_TYPE.getId()).setValue(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
+
+		final Map<BreedingViewDesignParameter, List<ListItem>> map =
+				this.designTypeService
+						.createReplicationListItems(importedGermplasmList, replicationPercentage, replicationNumber);
+
+		Assert.assertNotNull(map);
+		Assert.assertEquals(1, map.size());
+		Assert.assertNotNull(map.get(BreedingViewDesignParameter.NREPEATS));
+
+		float countOfReplicatedListItem = 0;
+		for (final ListItem listItem : map.get(BreedingViewDesignParameter.NREPEATS)) {
+			if (listItem.getValue().equals(String.valueOf(replicationNumber))) {
+				countOfReplicatedListItem++;
+			}
+		}
+
+		Assert.assertEquals("Non Replicated Entries are not included from countReplicatedListITem",
+				String.valueOf(countOfReplicatedListItem), String.valueOf((noOfTestEntriesToReplicate + noOfCheckEntries)));
+		Assert.assertEquals(26,map.get(BreedingViewDesignParameter.NREPEATS).size());
+	}
+
+
 	private List<StandardVariable> createTestStandardVariables() {
 		final List<StandardVariable> standardVariables = new ArrayList<>();
 		standardVariables.add(StandardVariableTestDataInitializer.createStandardVariable(TermId.ENTRY_NO.getId(), ENTRY_NO));

@@ -46,4 +46,28 @@ public abstract class StudyEntryTestDataGenerator {
 		return studyEntryDto;
 	}
 
+	public static List<StudyEntryDto> createStudyEntryDtoList(final int numberOfTestEntries, final int numberOfCheckEntries, final int numberOfNonReplicatedEntries) {
+		final List<StudyEntryDto> studyEntryDtoList = new ArrayList<>();
+
+		int entryNumber = 1;
+		int germplasmId = 100;
+		for (int i = 1; i <= numberOfCheckEntries; i++) {
+			studyEntryDtoList.add(createStudyEntry(entryNumber, germplasmId, SystemDefinedEntryType.CHECK_ENTRY));
+			entryNumber++;
+			germplasmId++;
+		}
+		for (int i = 1; i <= numberOfTestEntries; i++) {
+			studyEntryDtoList.add(createStudyEntry(entryNumber, germplasmId, SystemDefinedEntryType.TEST_ENTRY));
+			entryNumber++;
+			germplasmId++;
+		}
+
+		for (int i = 1; i <= numberOfNonReplicatedEntries; i++) {
+			studyEntryDtoList.add(createStudyEntry(entryNumber, germplasmId, SystemDefinedEntryType.NON_REPLICATED_ENTRY));
+			entryNumber++;
+			germplasmId++;
+		}
+		return studyEntryDtoList;
+	}
+
 }
