@@ -78,4 +78,6 @@ public interface GermplasmService {
 	GermplasmDto getGermplasmDtoById(Integer gid);
 
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
+
+	Set<Integer> getGermplasmUsedInOneOrMoreList(List<Integer> gids, Integer listId);
 }

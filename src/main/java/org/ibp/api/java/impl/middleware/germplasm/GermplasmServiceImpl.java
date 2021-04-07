@@ -42,6 +42,7 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateDtoValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
@@ -121,6 +122,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmUpdateRequestValidator germplasmUpdateRequestValidator;
+
+	@Autowired
+	private GermplasmListValidator germplasmListValidator;
 
 
 	@Override
@@ -379,6 +383,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		return new GermplasmDeleteResponse(invalidGidsForDeletion, validGermplasmForDeletion);
+	}
+
+	@Override
+	public Set<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids, final Integer listId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(this.errors, gids);
+		this.germplasmListValidator.validateGermplasmList(listId);
+
+		return this.germplasmService.getGermplasmUsedInOneOrMoreList(gids, listId);
 	}
 
 
