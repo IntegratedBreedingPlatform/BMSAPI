@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +38,7 @@ public class ProgramResource {
     @Autowired
     private SecurityService securityService;
 
+    @Deprecated // IBP-4301 (fixes dao to consider admin roles), IBP-4466 (add optional crop param to /programs)
     @RequestMapping(value = "/crops/{cropName}/programs", method = RequestMethod.GET)
     public ResponseEntity<List<ProgramDTO>> listProgramsByCrop(@PathVariable final String cropName) {
 		//TODO Review if this IF condition is required
@@ -57,10 +59,11 @@ public class ProgramResource {
         @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)"),
         @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.")
     })
-    public ResponseEntity<List<ProgramDTO>> listPrograms(final Pageable pageable) {
+    public ResponseEntity<List<ProgramDTO>> listPrograms(@RequestParam(required = false) final String cropName, final Pageable pageable) {
 
         final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
         programSearchRequest.setLoggedInUserId(this.securityService.getCurrentlyLoggedInUser().getUserid());
+        programSearchRequest.setCommonCropName(cropName);
 
         final PagedResult<ProgramDTO> pagedResult = new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(),
             new SearchSpec<ProgramDTO>() {
