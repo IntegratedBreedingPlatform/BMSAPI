@@ -218,12 +218,12 @@ public class PRepDesignTypeServiceImplTest {
 
 		final int noOfTestEntries = 4;
 		final int noOfCheckEntries = 2;
-		final int noOfNonReplicatedEntries = 20;
+		final int nonReplicatedEntriesCount = 20;
 		final int replicationNumber = 3;
 		final float replicationPercentage = 100.0f;
 		final float noOfTestEntriesToReplicate = Math.round((float) noOfTestEntries * (replicationPercentage / 100));
 
-		final List<StudyEntryDto> importedGermplasmList = StudyEntryTestDataGenerator.createStudyEntryDtoList(noOfTestEntries, noOfCheckEntries, noOfNonReplicatedEntries);
+		final List<StudyEntryDto> importedGermplasmList = StudyEntryTestDataGenerator.createStudyEntryDtoList(noOfTestEntries, noOfCheckEntries, nonReplicatedEntriesCount);
 
 		// Set the first germplasm as CHECK_ENTRY.
 		final StudyEntryDto checkImportedGermplasm = importedGermplasmList.get(0);
