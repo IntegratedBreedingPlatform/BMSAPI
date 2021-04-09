@@ -24,4 +24,13 @@ public class ReleaseNoteResource {
 		return new ResponseEntity<>(latestReleaseNote, HttpStatus.OK);
 	}
 
+	@RequestMapping(
+		value = "/dont-show-again",
+		method = RequestMethod.PUT
+	)
+	public ResponseEntity<Void> dontShowAgain() {
+		this.releaseNoteService.dontShowAgain();
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 }

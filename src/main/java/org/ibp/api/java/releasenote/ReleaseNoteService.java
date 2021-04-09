@@ -6,4 +6,6 @@ public interface ReleaseNoteService {
 
 	ReleaseNoteDTO getLatestReleaseNote();
 
+	void dontShowAgain();
+
 }
