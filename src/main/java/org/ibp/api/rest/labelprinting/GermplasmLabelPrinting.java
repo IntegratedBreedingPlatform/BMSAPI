@@ -61,6 +61,12 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
+	public static List<Sortable> SORTED_BY = Arrays.asList(new Sortable(GERMPLASM_DETAILS_FIELD.GID.name(),"GID"),
+		new Sortable(GERMPLASM_DETAILS_FIELD.PREFERRED_NAME.name(),"PREFERRED NAME"),
+		new Sortable(GERMPLASM_DETAILS_FIELD.GROUP_ID.name(),"GROUP ID"),
+		new Sortable(GERMPLASM_DETAILS_FIELD.CREATION_DATE.name(),"GERMPLASM DATE"));
+
+
 	private enum GERMPLASM_DETAILS_FIELD {
 		GID(40, "GID"),
 		GUID(41, "GUID"),
@@ -176,9 +182,41 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());	}
 
 	@Override
-	List<LabelType> getAvailableLabelTypes(
-		final LabelsInfoInput labelsInfoInput) {
-		return null;
+	List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput) {
+		final List<LabelType> labelTypes = new LinkedList<>();
+
+		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
+			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
+
+		final List<GermplasmSearchResponse> responseList =
+			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, null);
+
+		final List<UserDefinedField> attributeTypes = this.germplasmSearchService.getGermplasmAttributeTypes(germplasmSearchRequest);
+		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest);
+
+		// Germplasm Details labels
+		labelTypes.add(GERMPLASM_DETAILS_FIXED_LABEL_TYPES);
+
+		// Pedigree labels
+		labelTypes.add(PEDIGREE_FIXED_LABEL_TYPES);
+
+		// Names labels
+		final LabelType namesType = new LabelType("Names", "Names");
+		namesType.setFields(new ArrayList<>());
+		namesType.getFields().addAll(nameTypes.stream()
+			.map(attr -> new Field(toKey(attr.getFldno()), attr.getFcode()))
+			.collect(Collectors.toList()));
+		labelTypes.add(namesType);
+
+		// Attribiutes labels
+		final LabelType attirbutesType = new LabelType("Attributes", "Attributes");
+		attirbutesType.setFields(new ArrayList<>());
+		attirbutesType.getFields().addAll(attributeTypes.stream()
+			.map(attr -> new Field(toKey(attr.getFldno()), attr.getFcode()))
+			.collect(Collectors.toList()));
+		labelTypes.add(attirbutesType);
+
+		return labelTypes;
 	}
 
 	@Override
@@ -189,11 +227,30 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	List<FileType> getSupportedFileTypes() {
-		return null;
+		return SUPPORTED_FILE_TYPES;
 	}
 
 	@Override
 	List<Sortable> getSortableFields() {
 		return null;
+	}
+
+
+	/**
+	 * Identify non-fixed columns with id = MAX_FIXED_TYPE_INDEX + column-id
+	 * Requires no collision between non-fixed columns id
+	 * Allocates some space for future fixed-columns
+	 */
+	private static final Integer MAX_FIXED_TYPE_INDEX = 1000;
+
+	private static int toKey(final int id) {
+		return id + MAX_FIXED_TYPE_INDEX;
+	}
+
+	private static int toId(final int key) {
+		if (key > MAX_FIXED_TYPE_INDEX) {
+			return key - MAX_FIXED_TYPE_INDEX;
+		}
+		return key;
 	}
 }
