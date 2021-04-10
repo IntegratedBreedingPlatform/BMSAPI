@@ -15,6 +15,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
+import org.ibp.api.rest.labelprinting.domain.Sortable;
 import org.ibp.api.rest.labelprinting.filegenerator.CSVLabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.ExcelLabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.LabelsFileGenerator;
@@ -117,6 +118,20 @@ public class LabelPrintingResource {
 		final List<LabelType> labelTypes = labelPrintingStrategy.getAvailableLabelTypes(labelsInfoInput);
 
 		return new ResponseEntity<>(labelTypes, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/SortableFields", method = RequestMethod.GET)
+	@ApiOperation(value = "Get the Sortable fields according to the specified printing label type",
+		notes = "Returns list of Sortable label fields according to the printing label type.")
+	@ResponseBody
+	public ResponseEntity<List<Sortable>> getSortableFields(
+		@PathVariable final String cropname, @PathVariable final String programUUID,
+		@PathVariable final String labelPrintingType) {
+
+		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
+		final List<Sortable> sortables = labelPrintingStrategy.getSortableFields();
+
+		return new ResponseEntity<>(sortables, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/labels/{fileExtension}", method = RequestMethod.POST)

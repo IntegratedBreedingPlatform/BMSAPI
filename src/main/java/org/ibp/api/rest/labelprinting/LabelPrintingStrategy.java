@@ -14,6 +14,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
+import org.ibp.api.rest.labelprinting.domain.Sortable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -90,6 +91,12 @@ public abstract class LabelPrintingStrategy {
 	 * @return
 	 */
 	abstract List<FileType> getSupportedFileTypes();
+
+	/**
+	 * List of Sortable field labels for a particular strategy.
+	 * @return Sortable
+	 */
+	abstract List<Sortable> getSortableFields();
 
 	/**
 	 * Validate LabelsGeneratorInput
