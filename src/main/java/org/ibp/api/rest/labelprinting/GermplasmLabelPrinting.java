@@ -222,7 +222,194 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	LabelsData getLabelsData(
 		final LabelsGeneratorInput labelsGeneratorInput) {
-		return null;
+		// Get raw data
+		final Integer searchRequestId = labelsGeneratorInput.getSearchRequestId();
+
+		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
+			.getSearchRequest(searchRequestId, GermplasmSearchRequest.class);
+
+		// TODO Fix this. Make dynamic load to add columns according to selected fields.
+		germplasmSearchRequest.setAddedColumnsPropertyIds(
+			Arrays.asList(
+				"GERMPLASM DATE",
+				"METHOD ABBREV",
+				"METHOD NUMBER",
+				"METHOD GROUP",
+				"PREFERRED NAME",
+				"PREFERRED ID",
+				"GROUP SOURCE GID",
+				"GROUP SOURCE",
+				"IMMEDIATE SOURCE GID",
+				"IMMEDIATE SOURCE"));
+
+		PageRequest pageRequest = null;
+		if(!StringUtils.isBlank(labelsGeneratorInput.getSortBy())){
+			pageRequest = new PageRequest(0, Integer.MAX_VALUE, new Sort(Sort.Direction.ASC, labelsGeneratorInput.getSortBy()));
+		}
+
+		final List<GermplasmSearchResponse> responseList =
+			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageRequest, null);
+
+		final Map<Integer, Map<Integer, String>> attributeValues = this.germplasmSearchService.getGermplasmAttributeValues(germplasmSearchRequest);
+		final Map<Integer, Map<Integer, String>> nameValues = this.germplasmSearchService.getGermplasmNameValues(germplasmSearchRequest);
+		// Data to be exported
+		final List<Map<Integer, String>> data = new ArrayList<>();
+
+		final Map<String, String> pedigreeByGID = new HashMap<>();
+		final Set<Integer> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+
+		if (labelsGeneratorInput.isBarcodeRequired()) {
+			if (labelsGeneratorInput.isAutomaticBarcode()) {
+				keys.add(GERMPLASM_DETAILS_FIELD.GUID.getId());
+			} else {
+				keys.addAll(labelsGeneratorInput.getBarcodeFields());
+			}
+		}
+
+		for (final GermplasmSearchResponse germplasmSearchResponse : responseList) {
+			data.add(this.getDataRow(keys, germplasmSearchResponse, attributeValues, nameValues, pedigreeByGID));
+		}
+
+		return new LabelsData(GERMPLASM_DETAILS_FIELD.GUID.getId(), data);
+	}
+
+	private Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues, final Map<String, String> pedigreeByGID) {
+
+		final Map<Integer, String> columns = new HashMap<>();
+		for (final Integer key : keys) {
+			final int id = toId(key);
+
+			if (GERMPLASM_DETAILS_FIELD.getById(id) != null) {
+				switch (GERMPLASM_DETAILS_FIELD.getById(id)) {
+					case GID:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGid(),""));
+						break;
+
+					case GUID:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmUUID(),""));
+						break;
+
+					case GROUP_ID:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGroupId(),""));
+						break;
+
+					case LOCATION:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getLocationName(),""));
+						break;
+
+					case LOCATION_ABBR:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getLocationAbbr(),""));
+						break;
+
+					case BREEDING_METHOD_NAME:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodName(),""));
+						break;
+
+					case PREFERRED_ID:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredId(),""));
+						break;
+
+					case PREFERRED_NAME:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredName(),""));
+						break;
+
+					case REFERENCE:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getReferenceId(),""));
+						break;
+
+					case CREATION_DATE:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmDate(),""));
+						break;
+
+					case METHOD_CODE:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodCode(),""));
+						break;
+
+					case METHOD_NUMBER:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodNumber(),""));
+						break;
+
+					case METHOD_GROUP:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodGroup(),""));
+						break;
+
+					case GROUP_SOURCE_GID:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGroupSourceGID(),""));
+						break;
+
+					case GROUP_SOURCE_PREFERRED_NAME:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGroupSourcePreferredName(),""));
+						break;
+					case AVAILABLE:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getAvailableBalance(),""));
+						break;
+
+					case UNITS:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getUnit(),""));
+						break;
+
+					case LOTS:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getLotCount(),""));
+						break;
+
+					default:
+						break;
+
+				}
+
+			} else if (PEDIGREE_FIELD.getById(id) != null){
+				switch (PEDIGREE_FIELD.getById(id)) {
+					case CROSS:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getPedigreeString(),""));
+						break;
+
+					case FEMALE_PARENT_GID:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getFemaleParentGID(),""));
+						break;
+
+					case MALE_PARENT_GID:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentGID(),""));
+						break;
+
+					case MALE_PARENT_PREFERRED_NAME:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentPreferredName(),""));
+						break;
+
+					case INMEDIATE_SOURCE_GID:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourceGID(),""));
+						break;
+
+					case INMEDIATE_SOURCE_PREFERRED_NAME:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourcePreferredName(),""));
+						break;
+
+					default:
+						break;
+				}
+			} else {
+
+				// Not part of the fixed columns
+				// Attributes
+				final Map<Integer, String> attributesByType = attributeValues.get(germplasmSearchResponse.getGid());
+				if (attributesByType != null) {
+					final String attributeValue = attributesByType.get(id);
+					if (attributeValue != null) {
+						columns.put(key, attributeValue);
+					}
+				}
+
+				// Not part of the fixed columns
+				// Name
+				final Map<Integer, String> namesByType = nameValues.get(germplasmSearchResponse.getGid());
+				if (namesByType != null) {
+					final String nameValue = namesByType.get(id);
+					if (nameValue != null) {
+						columns.put(key, nameValue);
+					}
+				}
+			}
+		}
+		return columns;
 	}
 
 	@Override
@@ -232,9 +419,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	List<Sortable> getSortableFields() {
-		return null;
+		return SORTED_BY;
 	}
-
 
 	/**
 	 * Identify non-fixed columns with id = MAX_FIXED_TYPE_INDEX + column-id
