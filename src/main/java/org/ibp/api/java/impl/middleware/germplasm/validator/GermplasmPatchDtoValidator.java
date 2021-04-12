@@ -95,14 +95,15 @@ public class GermplasmPatchDtoValidator {
 		}
 
 		final Set<Integer> allProgenitors = new HashSet<>();
-		if (germplasmPatchDto.getGpid1() != null) {
+		if (germplasmPatchDto.getGpid1() != null && germplasmPatchDto.getGpid1() != 0) {
 			allProgenitors.add(germplasmPatchDto.getGpid1());
 		}
-		if (germplasmPatchDto.getGpid2() != null) {
+		if (germplasmPatchDto.getGpid2() != null && germplasmPatchDto.getGpid2() != 0) {
 			allProgenitors.add(germplasmPatchDto.getGpid2());
 		}
 		if (CollectionUtils.isNotEmpty(germplasmPatchDto.getOtherProgenitors())) {
-			allProgenitors.addAll(germplasmPatchDto.getOtherProgenitors().stream().filter(Objects::nonNull).collect(Collectors.toList()));
+			allProgenitors
+				.addAll(germplasmPatchDto.getOtherProgenitors().stream().filter(p -> p != null && p != 0).collect(Collectors.toList()));
 		}
 
 		final List<Integer> existingGermplasm =
