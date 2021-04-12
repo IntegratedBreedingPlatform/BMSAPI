@@ -458,12 +458,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public void updateGermplasmBasicDetails(final String programUUID, final Integer gid,
+	public boolean updateGermplasmBasicDetails(final String programUUID, final Integer gid,
 		final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.germplasmBasicDetailsValidator.validate(programUUID, germplasmBasicDetailsDto);
-		this.germplasmService.updateGermplasmBasicDetails(gid, germplasmBasicDetailsDto);
+		if (germplasmBasicDetailsDto.getBreedingLocationId() == null && germplasmBasicDetailsDto.getCreationDate() == null
+			&& germplasmBasicDetailsDto.getReference() == null) {
+			return false;
+		} else {
+			this.germplasmService.updateGermplasmBasicDetails(gid, germplasmBasicDetailsDto);
+			return true;
+		}
 	}
 
 	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {

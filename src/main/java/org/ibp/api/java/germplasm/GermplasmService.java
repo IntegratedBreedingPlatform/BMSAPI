@@ -80,6 +80,7 @@ public interface GermplasmService {
 
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 
-	void updateGermplasmBasicDetails(final String programUUID, final Integer gid, final GermplasmBasicDetailsDto germplasmBasicDetailsDto);
+	boolean updateGermplasmBasicDetails(final String programUUID, final Integer gid,
+		final GermplasmBasicDetailsDto germplasmBasicDetailsDto);
 
 }
