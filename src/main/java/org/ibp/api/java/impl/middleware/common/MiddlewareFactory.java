@@ -101,7 +101,7 @@ import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
-import org.generationcp.middleware.service.api.releasenote.ReleaseNoteServiceImpl;
+import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
