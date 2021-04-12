@@ -20,6 +20,7 @@ import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
 import org.ibp.api.brapi.v2.germplasm.GermplasmUpdateRequestValidator;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
@@ -71,6 +72,9 @@ public class GermplasmServiceImplTest {
 
 	@Mock
 	private GermplasmValidator germplasmValidator;
+
+	@Mock
+	private GermplasmListValidator germplasmListValidator;
 
 	@Mock
 	private SecurityService securityService;
@@ -159,6 +163,17 @@ public class GermplasmServiceImplTest {
 		Mockito.verify(this.middlewareGermplasmService, Mockito.times(0)).deleteGermplasm(ArgumentMatchers.anyList());
 		Assert.assertThat(response.getDeletedGermplasm(), iterableWithSize(0));
 		Assert.assertThat(response.getGermplasmWithErrors(), iterableWithSize(3));
+	}
+
+	@Test
+	public void testGetGermplasmPresentInOtherLists_Success() {
+		final List<Integer> gids = Lists.newArrayList(1, 2, 3);
+		final Integer listId = 1;
+
+		this.germplasmServiceImpl.getGermplasmPresentInOtherLists(gids, listId);
+		Mockito.verify(this.germplasmValidator).validateGids(Mockito.any(BindingResult.class), Mockito.eq(gids));
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(listId);
+		Mockito.verify(this.middlewareGermplasmService).getGermplasmPresentInOtherLists(gids, listId);
 	}
 
 	@Test
