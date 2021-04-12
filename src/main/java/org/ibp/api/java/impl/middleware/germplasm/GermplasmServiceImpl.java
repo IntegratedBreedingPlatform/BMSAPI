@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -45,6 +46,7 @@ import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidato
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateDtoValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmBasicDetailsValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,6 +124,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Autowired
 	private GermplasmUpdateRequestValidator germplasmUpdateRequestValidator;
 
+	@Autowired
+	private GermplasmBasicDetailsValidator germplasmBasicDetailsValidator;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -451,6 +455,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
+	}
+
+	@Override
+	public boolean updateGermplasmBasicDetails(final String programUUID, final Integer gid,
+		final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		this.germplasmBasicDetailsValidator.validate(programUUID, germplasmBasicDetailsDto);
+		if (germplasmBasicDetailsDto.allAttributesNull()) {
+			return false;
+		}
+		this.germplasmService.updateGermplasmBasicDetails(gid, germplasmBasicDetailsDto);
+		return true;
 	}
 
 	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
