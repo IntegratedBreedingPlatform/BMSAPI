@@ -386,12 +386,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Set<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids, final Integer listId) {
+	public Set<Integer> getGermplasmPresentInOtherLists(final List<Integer> gids, final Integer listId) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(this.errors, gids);
 		this.germplasmListValidator.validateGermplasmList(listId);
 
-		return this.germplasmService.getGermplasmUsedInOneOrMoreList(gids, listId);
+		return this.germplasmService.getGermplasmPresentInOtherLists(gids, listId);
 	}
 
 

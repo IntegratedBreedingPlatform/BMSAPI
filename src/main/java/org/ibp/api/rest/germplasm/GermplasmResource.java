@@ -334,7 +334,7 @@ public class GermplasmResource {
 	public ResponseEntity<Set<Integer>> getGermplasmPresentInOtherLists(@PathVariable final String cropName,
 		@RequestParam final List<Integer> gids, @RequestParam(required = false) final Integer listId,
 		@RequestParam(required = false) final String programUUID) {
-		return new ResponseEntity<>(this.germplasmService.getGermplasmUsedInOneOrMoreList(gids, listId),
+		return new ResponseEntity<>(this.germplasmService.getGermplasmPresentInOtherLists(gids, listId),
 			HttpStatus.OK);
 	}
 

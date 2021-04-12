@@ -79,5 +79,5 @@ public interface GermplasmService {
 
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 
-	Set<Integer> getGermplasmUsedInOneOrMoreList(List<Integer> gids, Integer listId);
+	Set<Integer> getGermplasmPresentInOtherLists(List<Integer> gids, Integer listId);
 }
