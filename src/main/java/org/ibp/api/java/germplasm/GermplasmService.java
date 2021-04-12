@@ -71,9 +71,9 @@ public interface GermplasmService {
 
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
-	GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList);
+	GermplasmImportResponse createGermplasm(String cropName, List<GermplasmImportRequest> germplasmImportRequestList);
 
-	GermplasmDTO updateGermplasm(final String germplasmUUID, final GermplasmUpdateRequest germplasmUpdateRequest);
+	GermplasmDTO updateGermplasm(String germplasmUUID, GermplasmUpdateRequest germplasmUpdateRequest);
 
 	GermplasmDeleteResponse deleteGermplasm(List<Integer> gids);
 
@@ -81,8 +81,7 @@ public interface GermplasmService {
 
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 
-	boolean updateGermplasmBasicDetails(final String programUUID, final Integer gid,
-		final GermplasmBasicDetailsDto germplasmBasicDetailsDto);
+	boolean updateGermplasmBasicDetails(String programUUID, Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
 
 	boolean updateGermplasmPedigree(final String programUUID, final Integer gid,
 		final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto);

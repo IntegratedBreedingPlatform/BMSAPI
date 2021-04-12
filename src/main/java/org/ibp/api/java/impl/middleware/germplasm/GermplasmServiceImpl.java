@@ -464,13 +464,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.germplasmBasicDetailsValidator.validate(programUUID, germplasmBasicDetailsDto);
-		if (germplasmBasicDetailsDto.getBreedingLocationId() == null && germplasmBasicDetailsDto.getCreationDate() == null
-			&& germplasmBasicDetailsDto.getReference() == null) {
+		if (germplasmBasicDetailsDto.allAttributesNull()) {
 			return false;
-		} else {
-			this.germplasmService.updateGermplasmBasicDetails(gid, germplasmBasicDetailsDto);
-			return true;
 		}
+		this.germplasmService.updateGermplasmBasicDetails(gid, germplasmBasicDetailsDto);
+		return true;
 	}
 
 	@Override
