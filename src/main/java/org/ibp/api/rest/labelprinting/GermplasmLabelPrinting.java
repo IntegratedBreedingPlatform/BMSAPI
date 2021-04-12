@@ -224,7 +224,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final LabelsGeneratorInput labelsGeneratorInput) {
 		// Get raw data
 		final Integer searchRequestId = labelsGeneratorInput.getSearchRequestId();
-
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(searchRequestId, GermplasmSearchRequest.class);
 
@@ -254,8 +253,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final Map<Integer, Map<Integer, String>> nameValues = this.germplasmSearchService.getGermplasmNameValues(germplasmSearchRequest);
 		// Data to be exported
 		final List<Map<Integer, String>> data = new ArrayList<>();
-
-		final Map<String, String> pedigreeByGID = new HashMap<>();
 		final Set<Integer> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toSet());
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
@@ -267,13 +264,13 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		}
 
 		for (final GermplasmSearchResponse germplasmSearchResponse : responseList) {
-			data.add(this.getDataRow(keys, germplasmSearchResponse, attributeValues, nameValues, pedigreeByGID));
+			data.add(this.getDataRow(keys, germplasmSearchResponse, attributeValues, nameValues));
 		}
 
 		return new LabelsData(GERMPLASM_DETAILS_FIELD.GUID.getId(), data);
 	}
 
-	private Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues, final Map<String, String> pedigreeByGID) {
+	private Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues) {
 
 		final Map<Integer, String> columns = new HashMap<>();
 		for (final Integer key : keys) {
@@ -386,7 +383,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 					default:
 						break;
 				}
-			} else {
+			} else if (attributeValues != null && nameValues != null) {
 
 				// Not part of the fixed columns
 				// Attributes
