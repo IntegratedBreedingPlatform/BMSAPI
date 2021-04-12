@@ -12,8 +12,8 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmPatchDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
@@ -46,8 +46,8 @@ import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidato
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateDtoValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmBasicDetailsValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
-import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmPatchDtoValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -125,7 +125,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private GermplasmUpdateRequestValidator germplasmUpdateRequestValidator;
 
 	@Autowired
-	private GermplasmPatchDtoValidator germplasmPatchDtoValidator;
+	private GermplasmBasicDetailsValidator germplasmBasicDetailsValidator;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -458,11 +458,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public void updateGermplasm(final String programUUID, final Integer gid, final GermplasmPatchDto germplasmPatchDto) {
+	public void updateGermplasmBasicDetails(final String programUUID, final Integer gid,
+		final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
-		this.germplasmPatchDtoValidator.validate(programUUID, germplasmPatchDto);
-		this.germplasmService.updateGermplasm(gid, germplasmPatchDto);
+		this.germplasmBasicDetailsValidator.validate(programUUID, germplasmBasicDetailsDto);
+		this.germplasmService.updateGermplasmBasicDetails(gid, germplasmBasicDetailsDto);
 	}
 
 	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
