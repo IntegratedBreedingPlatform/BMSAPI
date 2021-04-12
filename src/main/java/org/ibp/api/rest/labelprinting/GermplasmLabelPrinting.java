@@ -23,7 +23,6 @@ import org.ibp.api.rest.labelprinting.domain.Sortable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +38,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @Transactional
@@ -227,30 +227,42 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(searchRequestId, GermplasmSearchRequest.class);
 
-		// TODO Fix this. Make dynamic load to add columns according to selected fields.
-		germplasmSearchRequest.setAddedColumnsPropertyIds(
-			Arrays.asList(
-				"GERMPLASM DATE",
-				"METHOD ABBREV",
-				"METHOD NUMBER",
-				"METHOD GROUP",
-				"PREFERRED NAME",
-				"PREFERRED ID",
-				"GROUP SOURCE GID",
-				"GROUP SOURCE",
-				"IMMEDIATE SOURCE GID",
-				"IMMEDIATE SOURCE"));
+		final List<String> addedColumnsPropertyIds = new ArrayList<>();
+		germplasmSearchRequest.setAddedColumnsPropertyIds(addedColumnsPropertyIds);
+
+		labelsGeneratorInput.getFields().forEach((listOfSelectedFields) ->
+			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, addedColumnsPropertyIds)
+		);
+
+		final List<Integer> listOfGermplasmDetailsAndPedrigreeIds = Stream.of(PEDIGREE_FIELD.values())
+			.map(PEDIGREE_FIELD::getId)
+			.collect(Collectors.toList());
+
+		listOfGermplasmDetailsAndPedrigreeIds.addAll(
+			Stream.of(GERMPLASM_DETAILS_FIELD.values()).map(GERMPLASM_DETAILS_FIELD::getId).collect(Collectors.toList()));
+
+		final List<Integer> selectedFieldIds =
+			labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toList());
+
+		final boolean haveNamesOrAttributes =
+			selectedFieldIds.stream().anyMatch((fieldId) -> !listOfGermplasmDetailsAndPedrigreeIds.contains(fieldId));
 
 		PageRequest pageRequest = null;
-		if(!StringUtils.isBlank(labelsGeneratorInput.getSortBy())){
+		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
 			pageRequest = new PageRequest(0, Integer.MAX_VALUE, new Sort(Sort.Direction.ASC, labelsGeneratorInput.getSortBy()));
 		}
 
 		final List<GermplasmSearchResponse> responseList =
 			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageRequest, null);
 
-		final Map<Integer, Map<Integer, String>> attributeValues = this.germplasmSearchService.getGermplasmAttributeValues(germplasmSearchRequest);
-		final Map<Integer, Map<Integer, String>> nameValues = this.germplasmSearchService.getGermplasmNameValues(germplasmSearchRequest);
+		Map<Integer, Map<Integer, String>> attributeValues = null;
+		Map<Integer, Map<Integer, String>> nameValues = null;
+
+		if (haveNamesOrAttributes) {
+			attributeValues = this.germplasmSearchService.getGermplasmAttributeValues(germplasmSearchRequest);
+			nameValues = this.germplasmSearchService.getGermplasmNameValues(germplasmSearchRequest);
+		}
+
 		// Data to be exported
 		final List<Map<Integer, String>> data = new ArrayList<>();
 		final Set<Integer> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toSet());
@@ -407,6 +419,48 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			}
 		}
 		return columns;
+	}
+
+	private void addingColumnToGermplasmSearchRequest(final List<Integer> listOfSelectedFields, final List<String> addedColumnsPropertyIds) {
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.CREATION_DATE.id)) {
+			addedColumnsPropertyIds.add("GERMPLASM DATE");
+		}
+
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.METHOD_CODE.id)) {
+			addedColumnsPropertyIds.add("METHOD ABBREV");
+		}
+
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.METHOD_NUMBER.id)) {
+			addedColumnsPropertyIds.add("METHOD NUMBER");
+		}
+
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.METHOD_GROUP.id)) {
+			addedColumnsPropertyIds.add("METHOD GROUP");
+		}
+
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.PREFERRED_NAME.id)) {
+			addedColumnsPropertyIds.add("PREFERRED NAME");
+		}
+
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.PREFERRED_ID.id)) {
+			addedColumnsPropertyIds.add("PREFERRED ID");
+		}
+
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.GROUP_SOURCE_GID.id)) {
+			addedColumnsPropertyIds.add("GROUP SOURCE GID");
+		}
+
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.GROUP_SOURCE_PREFERRED_NAME.id)) {
+			addedColumnsPropertyIds.add("GROUP SOURCE");
+		}
+
+		if (listOfSelectedFields.contains(PEDIGREE_FIELD.INMEDIATE_SOURCE_GID.id)) {
+			addedColumnsPropertyIds.add("IMMEDIATE SOURCE GID");
+		}
+
+		if (listOfSelectedFields.contains(PEDIGREE_FIELD.INMEDIATE_SOURCE_PREFERRED_NAME.id)) {
+			addedColumnsPropertyIds.add("IMMEDIATE SOURCE");
+		}
 	}
 
 	@Override
