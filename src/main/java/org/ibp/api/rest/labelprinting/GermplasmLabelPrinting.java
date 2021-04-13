@@ -157,7 +157,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			.map(field -> new Field(field.getId(), field.getName()))
 			.collect(Collectors.toList()));
 
-
 	@Override
 	void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput) {
 
@@ -179,7 +178,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	OriginResourceMetadata getOriginResourceMetadata(
 		final LabelsInfoInput labelsInfoInput) {
 		final String fileName = FileNameGenerator.generateFileName("germplasm-labels");
-		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());	}
+		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
+	}
 
 	@Override
 	List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput) {
@@ -229,6 +229,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		final List<String> addedColumnsPropertyIds = new ArrayList<>();
 		germplasmSearchRequest.setAddedColumnsPropertyIds(addedColumnsPropertyIds);
+
 
 		labelsGeneratorInput.getFields().forEach((listOfSelectedFields) ->
 			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, addedColumnsPropertyIds)
@@ -282,7 +283,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		return new LabelsData(GERMPLASM_DETAILS_FIELD.GUID.getId(), data);
 	}
 
-	private Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues) {
+	private Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse,
+		final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues) {
 
 		final Map<Integer, String> columns = new HashMap<>();
 		for (final Integer key : keys) {
@@ -291,74 +293,74 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			if (GERMPLASM_DETAILS_FIELD.getById(id) != null) {
 				switch (GERMPLASM_DETAILS_FIELD.getById(id)) {
 					case GID:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getGid(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGid(), ""));
 						break;
 
 					case GUID:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmUUID(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmUUID(), ""));
 						break;
 
 					case GROUP_ID:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getGroupId(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGroupId(), ""));
 						break;
 
 					case LOCATION:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getLocationName(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getLocationName(), ""));
 						break;
 
 					case LOCATION_ABBR:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getLocationAbbr(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getLocationAbbr(), ""));
 						break;
 
 					case BREEDING_METHOD_NAME:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodName(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodName(), ""));
 						break;
 
 					case PREFERRED_ID:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredId(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredId(), ""));
 						break;
 
 					case PREFERRED_NAME:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredName(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredName(), ""));
 						break;
 
 					case REFERENCE:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getReferenceId(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getReferenceId(), ""));
 						break;
 
 					case CREATION_DATE:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmDate(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmDate(), ""));
 						break;
 
 					case METHOD_CODE:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodCode(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodCode(), ""));
 						break;
 
 					case METHOD_NUMBER:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodNumber(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodNumber(), ""));
 						break;
 
 					case METHOD_GROUP:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodGroup(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMethodGroup(), ""));
 						break;
 
 					case GROUP_SOURCE_GID:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getGroupSourceGID(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGroupSourceGID(), ""));
 						break;
 
 					case GROUP_SOURCE_PREFERRED_NAME:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getGroupSourcePreferredName(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getGroupSourcePreferredName(), ""));
 						break;
 					case AVAILABLE:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getAvailableBalance(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getAvailableBalance(), ""));
 						break;
 
 					case UNITS:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getUnit(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getUnit(), ""));
 						break;
 
 					case LOTS:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getLotCount(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getLotCount(), ""));
 						break;
 
 					default:
@@ -366,30 +368,30 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 				}
 
-			} else if (PEDIGREE_FIELD.getById(id) != null){
+			} else if (PEDIGREE_FIELD.getById(id) != null) {
 				switch (PEDIGREE_FIELD.getById(id)) {
 					case CROSS:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getPedigreeString(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getPedigreeString(), ""));
 						break;
 
 					case FEMALE_PARENT_GID:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getFemaleParentGID(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getFemaleParentGID(), ""));
 						break;
 
 					case MALE_PARENT_GID:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentGID(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentGID(), ""));
 						break;
 
 					case MALE_PARENT_PREFERRED_NAME:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentPreferredName(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentPreferredName(), ""));
 						break;
 
 					case INMEDIATE_SOURCE_GID:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourceGID(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourceGID(), ""));
 						break;
 
 					case INMEDIATE_SOURCE_PREFERRED_NAME:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourcePreferredName(),""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourcePreferredName(), ""));
 						break;
 
 					default:
@@ -427,39 +429,40 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		}
 
 		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.METHOD_CODE.id)) {
-			addedColumnsPropertyIds.add("METHOD ABBREV");
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.METHOD_ABBREV);
 		}
 
 		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.METHOD_NUMBER.id)) {
-			addedColumnsPropertyIds.add("METHOD NUMBER");
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.METHOD_NUMBER);
 		}
 
 		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.METHOD_GROUP.id)) {
-			addedColumnsPropertyIds.add("METHOD GROUP");
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.METHOD_GROUP);
 		}
 
-		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.PREFERRED_NAME.id)) {
-			addedColumnsPropertyIds.add("PREFERRED NAME");
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.PREFERRED_NAME.id)
+			|| !StringUtils.isBlank(sortBy) && sortBy.equals(GermplasmLabelPrinting.PREFERRED_NAME)) {
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.PREFERRED_NAME);
 		}
 
 		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.PREFERRED_ID.id)) {
-			addedColumnsPropertyIds.add("PREFERRED ID");
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.PREFERRED_ID);
 		}
 
 		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.GROUP_SOURCE_GID.id)) {
-			addedColumnsPropertyIds.add("GROUP SOURCE GID");
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.GROUP_SOURCE_GID);
 		}
 
 		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.GROUP_SOURCE_PREFERRED_NAME.id)) {
-			addedColumnsPropertyIds.add("GROUP SOURCE");
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.GROUP_SOURCE);
 		}
 
 		if (listOfSelectedFields.contains(PEDIGREE_FIELD.INMEDIATE_SOURCE_GID.id)) {
-			addedColumnsPropertyIds.add("IMMEDIATE SOURCE GID");
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.IMMEDIATE_SOURCE_GID);
 		}
 
 		if (listOfSelectedFields.contains(PEDIGREE_FIELD.INMEDIATE_SOURCE_PREFERRED_NAME.id)) {
-			addedColumnsPropertyIds.add("IMMEDIATE SOURCE");
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.IMMEDIATE_SOURCE);
 		}
 	}
 
