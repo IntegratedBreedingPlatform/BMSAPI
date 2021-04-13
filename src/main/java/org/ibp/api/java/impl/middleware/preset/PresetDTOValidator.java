@@ -9,6 +9,7 @@ import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
@@ -39,11 +40,11 @@ public class PresetDTOValidator {
 
 	private BindingResult errors;
 
-	public void validate(final String crop, final PresetDTO presetDTO) {
+	public void validate(final String crop, final Integer presetId, final PresetDTO presetDTO) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
 
-		if (presetDTO.getToolId() == null || presetDTO.getToolId()!= FIELDBOOK_TOOL_ID) {
+		if (presetDTO.getToolId() == null || presetDTO.getToolId() != FIELDBOOK_TOOL_ID) {
 			this.errors.reject("preset.invalid.tool", "");
 		}
 
@@ -59,7 +60,7 @@ public class PresetDTOValidator {
 		final String programUUID = presetDTO.getProgramUUID();
 		if (StringUtils.isEmpty(programUUID)) {
 			this.errors.reject("preset.program.uuid.required", "");
-		// It is assumed that programUUID was set in ContextHolder. Check that it is the same specified in DTO
+			// It is assumed that programUUID was set in ContextHolder. Check that it is the same specified in DTO
 		} else if (!programUUID.equals(ContextHolder.getCurrentProgram())) {
 			this.errors.reject("preset.invalid.program.uuid", "");
 		}
@@ -75,12 +76,33 @@ public class PresetDTOValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final List<ProgramPreset> presets = this.presetService
-				.getProgramPresetFromProgramAndToolByName(presetName, programUUID, presetDTO.getToolId(),
+		if (presetId != null) {
+			final ProgramPreset programPreset = this.presetService.getProgramPresetById(presetId);
+			if (programPreset == null) {
+				this.errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
+				this.errors.reject("preset.not.found", "");
+				throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+			}
+
+			// verify is exists a Preset with the new preset name.
+			if (!programPreset.getName().equals(presetDTO.getName())) {
+				// this is for create Preset
+				final List<ProgramPreset> presets = this.presetService
+					.getProgramPresetFromProgramAndToolByName(presetName, programUUID, presetDTO.getToolId(),
 						presetDTO.getToolSection());
-		if (!presets.isEmpty()) {
-			this.errors.reject("preset.name.invalid", "");
-			throw new ConflictException(this.errors.getAllErrors());
+				if (!presets.isEmpty()) {
+					this.errors.reject("preset.name.invalid", "");
+					throw new ConflictException(this.errors.getAllErrors());
+				}
+			}
+		} else {
+			final List<ProgramPreset> presets = this.presetService
+				.getProgramPresetFromProgramAndToolByName(presetName, programUUID, presetDTO.getToolId(),
+					presetDTO.getToolSection());
+			if (!presets.isEmpty()) {
+				this.errors.reject("preset.name.invalid", "");
+				throw new ConflictException(this.errors.getAllErrors());
+			}
 		}
 
 		if (!PresetType.LABEL_PRINTING_PRESET.equals(PresetType.getEnum(presetDTO.getType()))) {

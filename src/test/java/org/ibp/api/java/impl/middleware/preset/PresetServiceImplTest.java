@@ -63,23 +63,22 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 		Mockito.doReturn(workbenchUser).when(securityService).getCurrentlyLoggedInUser();
 	}
 
-
 	@Test(expected = ForbiddenException.class)
-	public void savePreset_ThrowsException_WhenUserDoesNotBelongToProgram () {
+	public void savePreset_ThrowsException_WhenUserDoesNotBelongToProgram() {
 		final PresetDTO presetDTO = new PresetDTO();
 		presetDTO.setProgramUUID(programUUID);
 		presetDTO.setToolId(23);
-		Mockito.doNothing().when(presetDTOValidator).validate(CROP_NAME, presetDTO);
+		Mockito.doNothing().when(presetDTOValidator).validate(CROP_NAME, null, presetDTO);
 		Mockito.doReturn(new ProgramDTO()).when(programService).getByUUIDAndCrop(CROP_NAME, programUUID);
 		presetService.savePreset(CROP_NAME, presetDTO);
 	}
 
 	@Test(expected = MiddlewareQueryException.class)
-	public void savePreset_ThrowsException_WhenThereIsAMiddlewareException () {
+	public void savePreset_ThrowsException_WhenThereIsAMiddlewareException() {
 		final PresetDTO presetDTO = new PresetDTO();
 		presetDTO.setProgramUUID(programUUID);
 		presetDTO.setToolId(23);
-		Mockito.doNothing().when(presetDTOValidator).validate(CROP_NAME, presetDTO);
+		Mockito.doNothing().when(presetDTOValidator).validate(CROP_NAME, null, presetDTO);
 		final ProgramDTO programSummary = new ProgramDTO();
 		programSummary.setMembers(Sets.newHashSet(workbenchUser.getName()));
 		Mockito.doReturn(programSummary).when(programService).getByUUIDAndCrop(CROP_NAME, programUUID);
@@ -90,11 +89,11 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void savePreset_Ok () {
+	public void savePreset_Ok() {
 		final PresetDTO presetDTO = new PresetDTO();
 		presetDTO.setProgramUUID(programUUID);
 		presetDTO.setToolId(23);
-		Mockito.doNothing().when(presetDTOValidator).validate(CROP_NAME, presetDTO);
+		Mockito.doNothing().when(presetDTOValidator).validate(CROP_NAME, null, presetDTO);
 		final ProgramDTO programSummary = new ProgramDTO();
 		programSummary.setMembers(Sets.newHashSet(workbenchUser.getName()));
 		Mockito.doReturn(programSummary).when(programService).getByUUIDAndCrop(CROP_NAME, programUUID);
@@ -104,22 +103,22 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 		presetService.savePreset(CROP_NAME, presetDTO);
 	}
 
-	@Test (expected = ApiRequestValidationException.class)
+	@Test(expected = ApiRequestValidationException.class)
 	public void getPresets_ThrowsException_IfProgramUUIDIsEmpty() {
 		presetService.getPresets(null, 23, ToolSection.DATASET_LABEL_PRINTING_PRESET.name());
 	}
 
-	@Test (expected = ApiRequestValidationException.class)
+	@Test(expected = ApiRequestValidationException.class)
 	public void getPresets_ThrowsException_IfToolIdIsEmpty() {
 		presetService.getPresets(programUUID, null, ToolSection.DATASET_LABEL_PRINTING_PRESET.name());
 	}
 
-	@Test (expected = ApiRequestValidationException.class)
+	@Test(expected = ApiRequestValidationException.class)
 	public void getPresets_ThrowsException_IfToolSectionIsEmpty() {
 		presetService.getPresets(programUUID, 23, null);
 	}
 
-	@Test (expected = ResourceNotFoundException.class)
+	@Test(expected = ResourceNotFoundException.class)
 	public void deletePreset_ThrowsException_IfPresetDoesNotExist() {
 		Mockito.doReturn(null).when(middlewarePresetService).getProgramPresetById(presetId);
 		presetService.deletePreset(CROP_NAME, presetId);
