@@ -18,18 +18,18 @@ public class Sortable {
 	}
 
 	public String getFieldName() {
-		return fieldName;
+		return this.fieldName;
 	}
 
-	public void setFieldName(String fieldName) {
+	public void setFieldName(final String fieldName) {
 		this.fieldName = fieldName;
 	}
 
 	public String getSortBy() {
-		return sortBy;
+		return this.sortBy;
 	}
 
-	public void setSortBy(String sortBy) {
+	public void setSortBy(final String sortBy) {
 		this.sortBy = sortBy;
 	}
 }
