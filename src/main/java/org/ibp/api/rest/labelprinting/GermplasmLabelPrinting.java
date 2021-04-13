@@ -7,9 +7,11 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
@@ -44,6 +46,21 @@ import java.util.stream.Stream;
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
+	public final static String GERMPLASM_DATE = "GERMPLASM DATE";
+	public final static String METHOD_ABBREV = "METHOD ABBREV";
+	public final static String METHOD_NUMBER = "METHOD NUMBER";
+	public final static String METHOD_GROUP = "METHOD GROUP";
+	public final static String PREFERRED_NAME = "PREFERRED NAME";
+	public final static String PREFERRED_ID = "PREFERRED ID";
+	public final static String GROUP_SOURCE_GID = "GROUP SOURCE GID";
+	public final static String GROUP_SOURCE = "GROUP SOURCE";
+	public final static String IMMEDIATE_SOURCE_GID = "IMMEDIATE SOURCE GID";
+	public final static String IMMEDIATE_SOURCE = "IMMEDIATE SOURCE";
+
+	public final static String GID = "GID";
+	public final static String GROUP_ID = "GROUP ID";
+
+
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
 
@@ -61,30 +78,30 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
-	public static List<Sortable> SORTED_BY = Arrays.asList(new Sortable(GERMPLASM_DETAILS_FIELD.GID.name(),"GID"),
-		new Sortable(GERMPLASM_DETAILS_FIELD.PREFERRED_NAME.name(),"PREFERRED NAME"),
-		new Sortable(GERMPLASM_DETAILS_FIELD.GROUP_ID.name(),"GROUP ID"),
-		new Sortable(GERMPLASM_DETAILS_FIELD.CREATION_DATE.name(),"GERMPLASM DATE"));
+	public static List<Sortable> SORTED_BY = Arrays.asList(new Sortable(GERMPLASM_DETAILS_FIELD.GID.name(), GermplasmLabelPrinting.GID),
+		new Sortable(GERMPLASM_DETAILS_FIELD.PREFERRED_NAME.name(), GermplasmLabelPrinting.PREFERRED_NAME),
+		new Sortable(GERMPLASM_DETAILS_FIELD.GROUP_ID.name(), GermplasmLabelPrinting.GROUP_ID),
+		new Sortable(GERMPLASM_DETAILS_FIELD.CREATION_DATE.name(), GermplasmLabelPrinting.GERMPLASM_DATE));
 
 
 	private enum GERMPLASM_DETAILS_FIELD {
-		GID(40, "GID"),
-		GUID(41, "GUID"),
-		GROUP_ID(42, "GroupID"),
-		LOCATION(43, "Location"),
-		LOCATION_ABBR(44, "Location Abbr"),
-		BREEDING_METHOD_NAME(45,"Breeding Method Name"),
-		PREFERRED_ID(46, "PreferredID"),
-		PREFERRED_NAME(47, "Preferred Name"),
-		REFERENCE(48, "Reference"),
-		CREATION_DATE(49, "Creation Date"),
-		METHOD_CODE(50, "Method Code"),
-		METHOD_NUMBER(51, "Method Number"),
-		METHOD_GROUP(52, "Method Group"),
-		GROUP_SOURCE_GID(53, "Group Source GID"),
-		GROUP_SOURCE_PREFERRED_NAME(54, "Group Source Preferred Name"),
-		AVAILABLE(55, "Available"),
-		UNITS(56, "Units"),
+		GID(TermId.GID.getId(), "GID"),
+		GUID(LabelPrintingStaticField.GUID.getFieldId(), "GUID"),
+		GROUP_ID(TermId.GROUP_ID.getId(), "GroupID"),
+		LOCATION(TermId.GERMPLASM_LOCATION.getId(), "Location"),
+		LOCATION_ABBR(TermId.LOCATION_ABBR.getId(), "Location Abbr"),
+		BREEDING_METHOD_NAME(TermId.BREEDING_METHOD.getId(), "Breeding Method Name"),
+		PREFERRED_ID(TermId.PREFERRED_ID.getId(), "PreferredID"),
+		PREFERRED_NAME(TermId.PREFERRED_NAME.getId(), "Preferred Name"),
+		REFERENCE(LabelPrintingStaticField.REFERENCE.getFieldId(), "Reference"),
+		CREATION_DATE(TermId.GERMPLASM_DATE.getId(), "Creation Date"),
+		METHOD_CODE(LabelPrintingStaticField.METHOD_CODE.getFieldId(), "Method Code"),
+		METHOD_NUMBER(LabelPrintingStaticField.METHOD_NUMBER.getFieldId(), "Method Number"),
+		METHOD_GROUP(LabelPrintingStaticField.METHOD_GROUP.getFieldId(), "Method Group"),
+		GROUP_SOURCE_GID(LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId(), "Group Source GID"),
+		GROUP_SOURCE_PREFERRED_NAME(LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId(), "Group Source Preferred Name"),
+		AVAILABLE(TermId.AVAILABLE_INVENTORY.getId(), "Available"),
+		UNITS(TermId.UNITS_INVENTORY.getId(), "Units"),
 		LOTS(57, "Lots");
 
 		private static Map<Integer, GERMPLASM_DETAILS_FIELD> byId =
@@ -122,8 +139,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	private enum PEDIGREE_FIELD {
 		CROSS(58, "Cross"),
 		FEMALE_PARENT_GID(59, "Female Parent GID"),
-		MALE_PARENT_GID(60, "Male Parent GID"),
-		MALE_PARENT_PREFERRED_NAME(61, "Male Parent Preferred Name"),
+		MALE_PARENT_GID(TermId.CROSS_MALE_GID.getId(), "Male Parent GID"),
+		MALE_PARENT_PREFERRED_NAME(TermId.CROSS_MALE_PREFERRED_NAME.getId(), "Male Parent Preferred Name"),
 		INMEDIATE_SOURCE_GID(62, "Immediate Source GID"),
 		INMEDIATE_SOURCE_PREFERRED_NAME(63, "Immediate Source Preferred Name");
 
@@ -232,7 +249,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 
 		labelsGeneratorInput.getFields().forEach((listOfSelectedFields) ->
-			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, addedColumnsPropertyIds)
+			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, labelsGeneratorInput.getSortBy(),addedColumnsPropertyIds)
 		);
 
 		final List<Integer> listOfGermplasmDetailsAndPedrigreeIds = Stream.of(PEDIGREE_FIELD.values())
@@ -423,9 +440,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		return columns;
 	}
 
-	private void addingColumnToGermplasmSearchRequest(final List<Integer> listOfSelectedFields, final List<String> addedColumnsPropertyIds) {
-		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.CREATION_DATE.id)) {
-			addedColumnsPropertyIds.add("GERMPLASM DATE");
+	private void addingColumnToGermplasmSearchRequest(final List<Integer> listOfSelectedFields,
+		final String sortBy, final List<String> addedColumnsPropertyIds) {
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.CREATION_DATE.id)
+			|| !StringUtils.isBlank(sortBy) && sortBy.equals(GermplasmLabelPrinting.GERMPLASM_DATE)) {
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.GERMPLASM_DATE);
 		}
 
 		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.METHOD_CODE.id)) {
