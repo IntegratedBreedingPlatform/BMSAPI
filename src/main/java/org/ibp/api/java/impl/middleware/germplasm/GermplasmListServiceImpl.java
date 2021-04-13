@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
+import org.generationcp.commons.constant.ListTreeState;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
@@ -18,6 +19,7 @@ import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -97,6 +99,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public GermplasmDataManager germplasmDataManager;
 
 	@Autowired
+	public UserProgramStateDataManager userProgramStateDataManager;
+
+	@Autowired
 	public GermplasmSearchService germplasmSearchService;
 
 	@Autowired
@@ -142,8 +147,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			cropFolderNode.setNumOfChildren(this.germplasmListManager.getAllTopLevelLists(null).size());
 			treeNodes.add(cropFolderNode);
 			if (programUUID != null) {
-				final TreeNode programFolderNode = new TreeNode(GermplasmListServiceImpl.PROGRAM_LISTS, AppConstants.PROGRAM_LISTS.getString(), true, LEAD_CLASS,
-						AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
+				final TreeNode programFolderNode = this.getProgramFolderTreeNode(programUUID);
 				programFolderNode.setNumOfChildren(this.germplasmListManager.getAllTopLevelLists(programUUID).size());
 				treeNodes.add(programFolderNode);
 			}
@@ -180,6 +184,32 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				newNode.setParentId(parentId);
 			}
 			return childNodes;
+		}
+		return treeNodes;
+	}
+
+	private TreeNode getProgramFolderTreeNode(final String programUUID) {
+		return new TreeNode(GermplasmListServiceImpl.PROGRAM_LISTS, AppConstants.PROGRAM_LISTS.getString(), true, LEAD_CLASS,
+							AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
+	}
+
+	@Override
+	public List<TreeNode> getUserTreeState(final String crop, final String programUUID, final String userId) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		this.validateProgram(crop, programUUID);
+		// TODO verify user ID is valid
+		final List<String> treeFolders = this.userProgramStateDataManager
+			.getUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name());
+		// Left trim on folder IDs
+		treeFolders.forEach(s -> StringUtils.stripStart(s, null));
+		final List<TreeNode> treeNodes = new ArrayList<>();
+		for (final String folderKey : treeFolders) {
+			if (treeFolders.get(0).equals(folderKey)) {
+				treeNodes.add(this.getProgramFolderTreeNode(programUUID));
+			} else {
+				treeNodes.add(new TreeNode(folderKey, folderKey, true, LEAD_CLASS,
+					AppConstants.FOLDER_ICON_PNG.getString(), programUUID));
+			}
 		}
 		return treeNodes;
 	}
@@ -346,7 +376,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<UserDefinedField> germplasmListTypes = this.germplasmListManager.getGermplasmListTypes();
 		return germplasmListTypes.stream()
 			.map(userDefinedField -> {
-				GermplasmListTypeDTO germplasmListTypeDTO = new GermplasmListTypeDTO();
+				final GermplasmListTypeDTO germplasmListTypeDTO = new GermplasmListTypeDTO();
 				germplasmListTypeDTO.setCode(userDefinedField.getFcode());
 				germplasmListTypeDTO.setId(userDefinedField.getFldno());
 				germplasmListTypeDTO.setName(userDefinedField.getFname());

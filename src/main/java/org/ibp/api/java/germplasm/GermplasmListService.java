@@ -14,6 +14,8 @@ public interface GermplasmListService {
 
 	List<TreeNode> getGermplasmListChildrenNodes(final String crop, final String programUUID, final String parentId, final Boolean folderOnly);
 
+	List<TreeNode> getUserTreeState(final String crop, final String programUUID, final String userId);
+
 	GermplasmList getGermplasmList(Integer germplasmListId);
 
 	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request);
