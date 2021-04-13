@@ -22,8 +22,8 @@ public class PresetMapper {
 	private ResourceBundleMessageSource messageSource;
 
 	public PresetMapper() {
-		jacksonMapper = new ObjectMapper();
-		jacksonMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
+		this.jacksonMapper = new ObjectMapper();
+		this.jacksonMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
 	}
 
 	ProgramPreset map (final PresetDTO presetDTO) {
@@ -33,9 +33,22 @@ public class PresetMapper {
 		programPreset.setToolSection(presetDTO.getToolSection());
 		programPreset.setProgramUuid(presetDTO.getProgramUUID());
 		try {
-			programPreset.setConfiguration(jacksonMapper.writerWithView(PresetDTO.View.Configuration.class).writeValueAsString(presetDTO));
+			programPreset.setConfiguration(this.jacksonMapper.writerWithView(PresetDTO.View.Configuration.class).writeValueAsString(presetDTO));
 		} catch (final Exception e) {
-			throw new ApiRuntimeException(messageSource.getMessage("preset.mapping.internal.error", null, LocaleContextHolder.getLocale()));
+			throw new ApiRuntimeException(this.messageSource.getMessage("preset.mapping.internal.error", null, LocaleContextHolder.getLocale()));
+		}
+		return programPreset;
+	}
+
+	ProgramPreset map (final PresetDTO presetDTO, final ProgramPreset programPreset) {
+		programPreset.setName(presetDTO.getName());
+		programPreset.setToolId(presetDTO.getToolId());
+		programPreset.setToolSection(presetDTO.getToolSection());
+		programPreset.setProgramUuid(presetDTO.getProgramUUID());
+		try {
+			programPreset.setConfiguration(this.jacksonMapper.writerWithView(PresetDTO.View.Configuration.class).writeValueAsString(presetDTO));
+		} catch (final Exception e) {
+			throw new ApiRuntimeException(this.messageSource.getMessage("preset.mapping.internal.error", null, LocaleContextHolder.getLocale()));
 		}
 		return programPreset;
 	}
@@ -43,9 +56,9 @@ public class PresetMapper {
 	PresetDTO map (final ProgramPreset programPreset) {
 		final PresetDTO presetDTO;
 		try {
-			presetDTO = jacksonMapper.readValue(programPreset.getConfiguration(), PresetDTO.class);
+			presetDTO = this.jacksonMapper.readValue(programPreset.getConfiguration(), PresetDTO.class);
 		} catch (final Exception e) {
-			throw new ApiRuntimeException(messageSource.getMessage("preset.mapping.internal.error", null, LocaleContextHolder.getLocale()));
+			throw new ApiRuntimeException(this.messageSource.getMessage("preset.mapping.internal.error", null, LocaleContextHolder.getLocale()));
 		}
 		presetDTO.setToolId(programPreset.getToolId());
 		presetDTO.setProgramUUID(programPreset.getProgramUuid());
