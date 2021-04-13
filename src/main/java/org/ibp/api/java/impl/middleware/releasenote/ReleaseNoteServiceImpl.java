@@ -21,7 +21,8 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	@Override
 	public ReleaseNoteDTO getLatestReleaseNote() {
 		return this.releaseNoteService.getLatestReleaseNote()
-			.map(releaseNote -> new ReleaseNoteDTO(releaseNote.getId(), releaseNote.getVersion(), releaseNote.getReleaseDate()))
+			.map(releaseNote -> new ReleaseNoteDTO(releaseNote.getId(), releaseNote.getVersion(), releaseNote.getReleaseDate(),
+				releaseNote.getHasComingSoon()))
 			.orElseGet(ReleaseNoteDTO::new);
 	}
 
