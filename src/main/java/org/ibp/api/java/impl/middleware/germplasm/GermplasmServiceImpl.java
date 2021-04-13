@@ -390,16 +390,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Set<Integer> getGermplasmPresentInOtherLists(final List<Integer> gids, final Integer listId) {
-		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.germplasmValidator.validateGids(this.errors, gids);
-		this.germplasmListValidator.validateGermplasmList(listId);
-
-		return this.germplasmService.getGermplasmPresentInOtherLists(gids, listId);
-	}
-
-
-	@Override
 	public GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final GermplasmImportResponse response = new GermplasmImportResponse();
 		final int originalListSize = germplasmImportRequestList.size();

@@ -166,17 +166,6 @@ public class GermplasmServiceImplTest {
 	}
 
 	@Test
-	public void testGetGermplasmPresentInOtherLists_Success() {
-		final List<Integer> gids = Lists.newArrayList(1, 2, 3);
-		final Integer listId = 1;
-
-		this.germplasmServiceImpl.getGermplasmPresentInOtherLists(gids, listId);
-		Mockito.verify(this.germplasmValidator).validateGids(Mockito.any(BindingResult.class), Mockito.eq(gids));
-		Mockito.verify(this.germplasmListValidator).validateGermplasmList(listId);
-		Mockito.verify(this.middlewareGermplasmService).getGermplasmPresentInOtherLists(gids, listId);
-	}
-
-	@Test
 	public void testCreateGermplasm_AllCreated(){
 		final WorkbenchUser user = new WorkbenchUser(1);
 		Mockito.doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();

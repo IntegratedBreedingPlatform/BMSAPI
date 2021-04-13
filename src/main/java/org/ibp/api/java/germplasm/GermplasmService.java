@@ -80,8 +80,6 @@ public interface GermplasmService {
 
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 
-	Set<Integer> getGermplasmPresentInOtherLists(List<Integer> gids, Integer listId);
-
 	boolean updateGermplasmBasicDetails(String programUUID, Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
 
 }

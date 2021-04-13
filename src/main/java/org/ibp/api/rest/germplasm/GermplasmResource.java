@@ -328,17 +328,6 @@ public class GermplasmResource {
 		return new ResponseEntity<>(this.germplasmService.getGermplasmProgenitorDetails(gid), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get Germplasm used in lists other than specified.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/lists", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<Set<Integer>> getGermplasmPresentInOtherLists(@PathVariable final String cropName,
-		@RequestParam final List<Integer> gids, @RequestParam(required = false) final Integer listId,
-		@RequestParam(required = false) final String programUUID) {
-		return new ResponseEntity<>(this.germplasmService.getGermplasmPresentInOtherLists(gids, listId),
-			HttpStatus.OK);
-	}
-
 	/**
 	 * Modify a germplasm
 	 *
