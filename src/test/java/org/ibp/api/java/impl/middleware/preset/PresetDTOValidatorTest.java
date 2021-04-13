@@ -79,25 +79,24 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 	}
 
-
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfToolSectionIsNull() {
 		final PresetDTO presetDTO = new PresetDTO();
-		this.presetDTOValidator.validate(CROP_NAME,null, presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfToolSectionIsInvalid() {
 		final PresetDTO presetDTO = new PresetDTO();
 		presetDTO.setId(RandomUtils.nextInt());
-		this.presetDTOValidator.validate(CROP_NAME,null, presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfToolSectionIsEmpty() {
 		final PresetDTO presetDTO = new PresetDTO();
 		presetDTO.setToolId(this.toolId);
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -105,7 +104,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		final PresetDTO presetDTO = new PresetDTO();
 		presetDTO.setToolId(this.toolId);
 		presetDTO.setToolSection(RandomStringUtils.random(2));
-		this.presetDTOValidator.validate(CROP_NAME,null, presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -113,7 +112,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		final PresetDTO presetDTO = new PresetDTO();
 		presetDTO.setToolId(this.toolId);
 		presetDTO.setToolSection(this.toolSection);
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -122,7 +121,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setToolId(this.toolId);
 		presetDTO.setToolSection(this.toolSection);
 		presetDTO.setType(RandomStringUtils.random(3));
-		this.presetDTOValidator.validate(CROP_NAME,null, presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -133,7 +132,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setType(this.type);
 		presetDTO.setProgramUUID(this.programUUID);
 		Mockito.doReturn(null).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -144,7 +143,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setType(this.type);
 		presetDTO.setProgramUUID(this.programUUID);
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ConflictException.class)
@@ -159,10 +158,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		final List<ProgramPreset> programPresets = Arrays.asList(new ProgramPreset());
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(programPresets).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = NotSupportedException.class)
@@ -176,10 +175,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -193,10 +192,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -211,10 +210,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -230,10 +229,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -254,10 +253,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME,null, presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -275,19 +274,19 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		this.selectedField.forEach(list -> {
 			list.forEach(id -> Mockito.doReturn(new VariableDetails()).when(this.variableService)
-					.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
+				.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-				new LabelPrintingPresetDTO.BarcodeSetting(true, true, Arrays.asList(1));
+			new LabelPrintingPresetDTO.BarcodeSetting(true, true, Arrays.asList(1));
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -305,19 +304,19 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		this.selectedField.forEach(list -> {
 			list.forEach(id -> Mockito.doReturn(new VariableDetails()).when(this.variableService)
-					.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
+				.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-				new LabelPrintingPresetDTO.BarcodeSetting(true, false, new ArrayList<>());
+			new LabelPrintingPresetDTO.BarcodeSetting(true, false, new ArrayList<>());
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -335,21 +334,21 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		this.selectedField.forEach(list -> {
 			list.forEach(id -> Mockito.doReturn(new VariableDetails()).when(this.variableService)
-					.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
+				.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-				new LabelPrintingPresetDTO.BarcodeSetting(true, false, Arrays.asList(-1));
+			new LabelPrintingPresetDTO.BarcodeSetting(true, false, Arrays.asList(-1));
 		Mockito.doReturn(null).when(this.variableService).getVariableById(CROP_NAME, presetDTO.getProgramUUID(), "-1");
 
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -367,7 +366,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		this.selectedField.forEach(list -> {
 			list.forEach(id -> Mockito.doReturn(new VariableDetails()).when(this.variableService)
-					.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
+				.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(false, true, null);
@@ -375,10 +374,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -396,19 +395,19 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		this.selectedField.forEach(list -> {
 			list.forEach(id -> Mockito.doReturn(new VariableDetails()).when(this.variableService)
-					.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
+				.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-				new LabelPrintingPresetDTO.BarcodeSetting(false, false, Arrays.asList(1));
+			new LabelPrintingPresetDTO.BarcodeSetting(false, false, Arrays.asList(1));
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -427,7 +426,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		this.selectedField.forEach(list -> {
 			list.forEach(id -> Mockito.doReturn(new VariableDetails()).when(this.variableService)
-					.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
+				.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(false, false, null);
@@ -435,10 +434,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -458,7 +457,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		this.selectedField.forEach(list -> {
 			list.forEach(id -> Mockito.doReturn(new VariableDetails()).when(this.variableService)
-					.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
+				.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(false, false, null);
@@ -466,10 +465,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME, null,presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 
 	@Test
@@ -489,7 +488,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		this.selectedField.forEach(list -> {
 			list.forEach(id -> Mockito.doReturn(new VariableDetails()).when(this.variableService)
-					.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
+				.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(false, false, null);
@@ -497,9 +496,9 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new ProgramDTO()).when(this.programService).getByUUIDAndCrop(CROP_NAME, this.programUUID);
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
-				.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
-						presetDTO.getToolSection());
+			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
+				presetDTO.getToolSection());
 
-		this.presetDTOValidator.validate(CROP_NAME,null, presetDTO);
+		this.presetDTOValidator.validate(CROP_NAME, null, presetDTO);
 	}
 }
