@@ -21,7 +21,7 @@ public class GermplasmListValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (this.germplasmListManager.getGermplasmListById(germplasmListId) == null) {
+		if (germplasmListId != null && this.germplasmListManager.getGermplasmListById(germplasmListId) == null) {
 			errors.reject("list.germplasm.does.not.exist", "");
 		}
 
