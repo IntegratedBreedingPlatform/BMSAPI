@@ -20,7 +20,6 @@ import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
 import org.ibp.api.brapi.v2.germplasm.GermplasmUpdateRequestValidator;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
-import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
@@ -72,9 +71,6 @@ public class GermplasmServiceImplTest {
 
 	@Mock
 	private GermplasmValidator germplasmValidator;
-
-	@Mock
-	private GermplasmListValidator germplasmListValidator;
 
 	@Mock
 	private SecurityService securityService;
