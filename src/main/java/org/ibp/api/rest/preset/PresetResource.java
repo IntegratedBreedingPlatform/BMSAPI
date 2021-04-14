@@ -49,7 +49,7 @@ public class PresetResource {
 
 	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/presets/{presetId}", method = RequestMethod.PUT)
 	@ApiOperation(value = "Update a existing Preset",
-		notes = "update a existing Preset.")
+		notes = "Update a existing Preset.")
 	@ResponseBody
 	public ResponseEntity<Void> updatePreset(
 		@PathVariable final String cropname, @PathVariable final String programUUID, @PathVariable final Integer presetId,
