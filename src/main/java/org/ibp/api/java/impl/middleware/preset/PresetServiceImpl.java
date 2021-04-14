@@ -72,12 +72,8 @@ public class PresetServiceImpl implements PresetService {
 
 	@Override
 	public void deletePreset(final String crop, final Integer presetId) {
+		this.presetDTOValidator.validateDeletable(presetId);
 		final ProgramPreset programPreset = this.presetService.getProgramPresetById(presetId);
-		if (programPreset == null) {
-			this.errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
-			this.errors.reject("preset.not.found", "");
-			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-		}
 		this.validateUserIsAProgramMember(crop, this.securityService.getCurrentlyLoggedInUser().getName(), programPreset.getProgramUuid());
 		this.presetService.deleteProgramPreset(presetId);
 	}

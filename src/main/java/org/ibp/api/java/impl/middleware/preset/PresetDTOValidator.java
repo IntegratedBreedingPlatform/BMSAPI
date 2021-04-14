@@ -117,6 +117,20 @@ public class PresetDTOValidator {
 		}
 	}
 
+	public void validateDeletable(final Integer presetId) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
+
+		final ProgramPreset programPreset = this.presetService.getProgramPresetById(presetId);
+		if (programPreset == null) {
+			this.errors.reject("preset.not.found", "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+		if (StringUtils.isBlank(programPreset.getProgramUuid())) {
+			this.errors.reject("preset.template.invalid.delete", "");
+			throw new ConflictException(this.errors.getAllErrors());
+		}
+	}
+
 	/**
 	 * Validates supported tool sections
 	 */
