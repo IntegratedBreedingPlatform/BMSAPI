@@ -57,14 +57,6 @@ public class PresetDTOValidator {
 			this.errors.reject("preset.invalid.type", "");
 		}
 
-		final String programUUID = presetDTO.getProgramUUID();
-		if (StringUtils.isEmpty(programUUID)) {
-			this.errors.reject("preset.program.uuid.required", "");
-			// It is assumed that programUUID was set in ContextHolder. Check that it is the same specified in DTO
-		} else if (!programUUID.equals(ContextHolder.getCurrentProgram())) {
-			this.errors.reject("preset.invalid.program.uuid", "");
-		}
-
 		final String presetName = presetDTO.getName();
 		if (StringUtils.isEmpty(presetName)) {
 			this.errors.reject("preset.name.required", "");
@@ -84,18 +76,28 @@ public class PresetDTOValidator {
 				throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 			}
 
-			// verify is exists a Preset with the new preset name.
-			if (!programPreset.getName().equals(presetDTO.getName())) {
-				// this is for create Preset
-				final List<ProgramPreset> presets = this.presetService
-					.getProgramPresetFromProgramAndToolByName(presetName, programUUID, presetDTO.getToolId(),
-						presetDTO.getToolSection());
-				if (!presets.isEmpty()) {
-					this.errors.reject("preset.name.invalid", "");
-					throw new ConflictException(this.errors.getAllErrors());
-				}
+			if (StringUtils.isBlank(programPreset.getProgramUuid())) {
+				this.errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
+				this.errors.reject("preset.template.invalid.update", "");
+				throw new ConflictException(this.errors.getAllErrors());
+			}
+
+			if (!programPreset.getName().equals(presetName)) {
+				this.errors.reject("preset.name.update.invalid", new String[] {String.valueOf(programPreset.getName())}, "");
+				throw new ConflictException(this.errors.getAllErrors());
 			}
 		} else {
+			final String programUUID = presetDTO.getProgramUUID();
+			if (StringUtils.isEmpty(programUUID)) {
+				this.errors.reject("preset.program.uuid.required", "");
+				throw new ConflictException(this.errors.getAllErrors());
+
+				// It is assumed that programUUID was set in ContextHolder. Check that it is the same specified in DTO
+			} else if (!programUUID.equals(ContextHolder.getCurrentProgram())) {
+				this.errors.reject("preset.invalid.program.uuid", "");
+				throw new ConflictException(this.errors.getAllErrors());
+			}
+
 			final List<ProgramPreset> presets = this.presetService
 				.getProgramPresetFromProgramAndToolByName(presetName, programUUID, presetDTO.getToolId(),
 					presetDTO.getToolSection());
