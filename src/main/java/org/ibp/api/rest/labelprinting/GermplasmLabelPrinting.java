@@ -60,6 +60,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	public final static String GID = "GID";
 	public final static String GROUP_ID = "GROUP ID";
 
+	public final static String ORIG_FINAL_NAME = "germplasm-labels";
 
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
@@ -85,7 +86,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 
 	private enum GERMPLASM_DETAILS_FIELD {
-		GID(TermId.GID.getId(), "GID"),
+		GID(TermId.GID.getId(), GermplasmLabelPrinting.GID),
 		GUID(LabelPrintingStaticField.GUID.getFieldId(), "GUID"),
 		GROUP_ID(TermId.GROUP_ID.getId(), "GroupID"),
 		LOCATION(TermId.GERMPLASM_LOCATION.getId(), "Location"),
@@ -194,7 +195,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	OriginResourceMetadata getOriginResourceMetadata(
 		final LabelsInfoInput labelsInfoInput) {
-		final String fileName = FileNameGenerator.generateFileName("germplasm-labels");
+		final String fileName = FileNameGenerator.generateFileName(GermplasmLabelPrinting.ORIG_FINAL_NAME);
 		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
 	}
 
@@ -249,7 +250,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 
 		labelsGeneratorInput.getFields().forEach((listOfSelectedFields) ->
-			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, labelsGeneratorInput.getSortBy(),addedColumnsPropertyIds)
+			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, labelsGeneratorInput.getSortBy(), addedColumnsPropertyIds)
 		);
 
 		final List<Integer> listOfGermplasmDetailsAndPedrigreeIds = Stream.of(PEDIGREE_FIELD.values())
