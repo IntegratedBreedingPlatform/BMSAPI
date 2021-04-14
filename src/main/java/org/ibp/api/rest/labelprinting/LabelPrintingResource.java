@@ -120,7 +120,7 @@ public class LabelPrintingResource {
 		return new ResponseEntity<>(labelTypes, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/SortableFields", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/sortable-fields", method = RequestMethod.GET)
 	@ApiOperation(value = "Get the Sortable fields according to the specified printing label type",
 		notes = "Returns list of Sortable label fields according to the printing label type.")
 	@ResponseBody
