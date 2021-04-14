@@ -21,11 +21,11 @@ public class GermplasmDeleteValidator {
 		final Set<Integer> germplasmWithDescendants = this.germplasmMiddlewareService.getGidsOfGermplasmWithDescendants(gids);
 		final Set<Integer> germplasmUsedInStudies = this.germplasmMiddlewareService.getGermplasmUsedInStudies(gids);
 		final Set<Integer> germplasmWithOpenLots = this.germplasmMiddlewareService.getGidsWithOpenLots(gids);
-		final Set<Integer> germplasmInOneOrMoreLists = this.germplasmMiddlewareService.getGermplasmUsedInOneOrMoreList(gids);
+		final Set<Integer> germplasmUsedInLockedList = this.germplasmMiddlewareService.getGermplasmUsedInLockedList(gids);
 
 		return Sets.newHashSet(Iterables
 			.concat(codeFixedGermplasms, germplasmWithDescendants, germplasmUsedInStudies, germplasmWithOpenLots,
-				germplasmInOneOrMoreLists));
+				germplasmUsedInLockedList));
 
 	}
 
