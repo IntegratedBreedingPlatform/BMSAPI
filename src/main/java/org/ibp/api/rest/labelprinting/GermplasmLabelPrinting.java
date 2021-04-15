@@ -252,7 +252,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, addedColumnsPropertyIds)
 		);
 
-		if (StringUtils.isBlank(labelsGeneratorInput.getSortBy()) && !addedColumnsPropertyIds.contains(labelsGeneratorInput.getSortBy())) {
+		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy()) && !addedColumnsPropertyIds.contains(labelsGeneratorInput.getSortBy())) {
 			addedColumnsPropertyIds.add(labelsGeneratorInput.getSortBy());
 		}
 
