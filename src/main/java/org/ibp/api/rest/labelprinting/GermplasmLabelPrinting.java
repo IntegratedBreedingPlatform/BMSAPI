@@ -3,7 +3,7 @@ package org.ibp.api.rest.labelprinting;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.api.germplasm.GermplasmService;
+
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -12,6 +12,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
+import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
@@ -207,9 +208,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 
-		final List<GermplasmSearchResponse> responseList =
-			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, null);
-
 		final List<UserDefinedField> attributeTypes = this.germplasmSearchService.getGermplasmAttributeTypes(germplasmSearchRequest);
 		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest);
 
@@ -277,7 +275,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		}
 
 		final List<GermplasmSearchResponse> responseList =
-			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageRequest, null);
+			this.germplasmService.searchGermplasm(germplasmSearchRequest, pageRequest, null);
 
 		Map<Integer, Map<Integer, String>> attributeValues = null;
 		Map<Integer, Map<Integer, String>> nameValues = null;
