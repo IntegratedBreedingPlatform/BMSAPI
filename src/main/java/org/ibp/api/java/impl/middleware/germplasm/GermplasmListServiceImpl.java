@@ -49,12 +49,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.trim;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
 
@@ -195,23 +198,27 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public List<TreeNode> getUserTreeState(final String crop, final String programUUID, final String userId) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateProgram(crop, programUUID);
 		// TODO verify user ID is valid
 		final List<String> treeFolders = this.userProgramStateDataManager
 			.getUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name());
-		// Left trim on folder IDs
-		treeFolders.forEach(s -> StringUtils.stripStart(s, null));
-		final List<TreeNode> treeNodes = new ArrayList<>();
-		for (final String folderKey : treeFolders) {
-			if (treeFolders.get(0).equals(folderKey)) {
-				treeNodes.add(this.getProgramFolderTreeNode(programUUID));
-			} else {
-				treeNodes.add(new TreeNode(folderKey, folderKey, true, LEAD_CLASS,
-					AppConstants.FOLDER_ICON_PNG.getString(), programUUID));
+		if (!CollectionUtils.isEmpty(treeFolders)) {
+			final TreeNode rootNode = this.getProgramFolderTreeNode(programUUID);
+			rootNode.setChildren(this.getGermplasmListChildrenNodes(crop, programUUID, rootNode.getKey(), false));
+			TreeNode parentNode = rootNode;
+			for (int i=1; i<treeFolders.size(); i++) {
+				final String finalKey = StringUtils.stripStart(treeFolders.get(i), " ");
+				final Optional<TreeNode> parentNodeOpt = parentNode.getChildren().stream().filter(c -> c.getKey().equals(finalKey)).findFirst();
+				if (parentNodeOpt.isPresent()) {
+					parentNode = parentNodeOpt.get();
+					parentNode.setChildren(this.getGermplasmListChildrenNodes(crop, programUUID, finalKey, false));
+				}
 			}
+			return Collections.singletonList(rootNode);
 		}
-		return treeNodes;
+
+		return Collections.emptyList();
 	}
 
 	@Override
