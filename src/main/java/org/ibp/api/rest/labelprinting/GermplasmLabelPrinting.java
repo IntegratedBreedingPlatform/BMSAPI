@@ -62,6 +62,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	public final static String GID = "GID";
 	public final static String GROUP_ID = "GROUP ID";
 
+	public final static String MALE_PARENT_GID = "MGID";
+	public final static String FEMALE_PARENT_GID = "FGID";
+	public final static String CROSS_MALE_PREFERRED_NAME = "CROSS-MALE PREFERRED NAME";
+
 	public final static String ORIG_FINAL_NAME = "germplasm-labels";
 
 	@Autowired
@@ -476,6 +480,19 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.GROUP_SOURCE_PREFERRED_NAME.id)) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.GROUP_SOURCE);
+		}
+
+
+		if (listOfSelectedFields.contains(PEDIGREE_FIELD.FEMALE_PARENT_GID.id)) {
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.MALE_PARENT_GID);
+		}
+
+		if (listOfSelectedFields.contains(PEDIGREE_FIELD.MALE_PARENT_GID.id)) {
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.FEMALE_PARENT_GID);
+		}
+
+		if (listOfSelectedFields.contains(PEDIGREE_FIELD.MALE_PARENT_PREFERRED_NAME.id)) {
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.CROSS_MALE_PREFERRED_NAME);
 		}
 
 		if (listOfSelectedFields.contains(PEDIGREE_FIELD.INMEDIATE_SOURCE_GID.id)) {
