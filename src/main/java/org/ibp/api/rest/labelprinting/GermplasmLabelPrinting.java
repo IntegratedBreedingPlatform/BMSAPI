@@ -48,6 +48,8 @@ import java.util.stream.Stream;
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
+	public static final int MAX_GID_LIST_SIZE = 5000;
+
 	public final static String GERMPLASM_DATE = "GERMPLASM DATE";
 	public final static String METHOD_ABBREV = "METHOD ABBREV";
 	public final static String METHOD_NUMBER = "METHOD NUMBER";
@@ -275,7 +277,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		PageRequest pageRequest = null;
 		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
-			pageRequest = new PageRequest(0, Integer.MAX_VALUE, new Sort(Sort.Direction.ASC, labelsGeneratorInput.getSortBy()));
+			pageRequest = new PageRequest(0, GermplasmLabelPrinting.MAX_GID_LIST_SIZE, new Sort(Sort.Direction.ASC, labelsGeneratorInput.getSortBy()));
 		}
 
 		final List<GermplasmSearchResponse> responseList =
