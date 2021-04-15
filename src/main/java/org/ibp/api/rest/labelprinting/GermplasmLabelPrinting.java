@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -245,13 +246,17 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(searchRequestId, GermplasmSearchRequest.class);
 
-		final List<String> addedColumnsPropertyIds = new ArrayList<>();
-		germplasmSearchRequest.setAddedColumnsPropertyIds(addedColumnsPropertyIds);
-
+		final Set<String> addedColumnsPropertyIds = new HashSet<>();
 
 		labelsGeneratorInput.getFields().forEach((listOfSelectedFields) ->
-			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, labelsGeneratorInput.getSortBy(), addedColumnsPropertyIds)
+			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, addedColumnsPropertyIds)
 		);
+
+		if (StringUtils.isBlank(labelsGeneratorInput.getSortBy()) && !addedColumnsPropertyIds.contains(labelsGeneratorInput.getSortBy())) {
+			addedColumnsPropertyIds.add(labelsGeneratorInput.getSortBy());
+		}
+
+		germplasmSearchRequest.setAddedColumnsPropertyIds(addedColumnsPropertyIds.stream().collect(Collectors.toList()));
 
 		final List<Integer> listOfGermplasmDetailsAndPedrigreeIds = Stream.of(PEDIGREE_FIELD.values())
 			.map(PEDIGREE_FIELD::getId)
@@ -442,9 +447,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	private void addingColumnToGermplasmSearchRequest(final List<Integer> listOfSelectedFields,
-		final String sortBy, final List<String> addedColumnsPropertyIds) {
-		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.CREATION_DATE.id)
-			|| !StringUtils.isBlank(sortBy) && sortBy.equals(GermplasmLabelPrinting.GERMPLASM_DATE)) {
+		final Set<String> addedColumnsPropertyIds) {
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.CREATION_DATE.id)) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.GERMPLASM_DATE);
 		}
 
@@ -460,8 +464,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.METHOD_GROUP);
 		}
 
-		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.PREFERRED_NAME.id)
-			|| !StringUtils.isBlank(sortBy) && sortBy.equals(GermplasmLabelPrinting.PREFERRED_NAME)) {
+		if (listOfSelectedFields.contains(GERMPLASM_DETAILS_FIELD.PREFERRED_NAME.id)) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.PREFERRED_NAME);
 		}
 
