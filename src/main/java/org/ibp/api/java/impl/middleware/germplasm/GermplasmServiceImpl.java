@@ -391,7 +391,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return new GermplasmDeleteResponse(invalidGidsForDeletion, validGermplasmForDeletion);
 	}
 
-
 	@Override
 	public GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final GermplasmImportResponse response = new GermplasmImportResponse();
