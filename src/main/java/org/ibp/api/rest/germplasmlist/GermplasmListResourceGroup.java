@@ -1,16 +1,23 @@
 package org.ibp.api.rest.germplasmlist;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmListService;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -30,6 +38,9 @@ public class GermplasmListResourceGroup {
 
 	@Autowired
 	public GermplasmListService germplasmListService;
+
+	@Autowired
+	private SecurityService securityService;
 
 	@ApiOperation(value = "Get germplasm lists given a tree parent node folder", notes = "Get germplasm lists given a tree parent node folder")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
@@ -77,6 +88,26 @@ public class GermplasmListResourceGroup {
 	) {
 		this.germplasmListService.addGermplasmEntriesToList(germplasmListId, searchComposite, programUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation("Get my lists")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/my-lists", method = RequestMethod.GET)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. ")
+	})
+	@ResponseBody
+	public ResponseEntity<List<MyListsDTO>> getMyLists(
+		@PathVariable final String cropName,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
+	) {
+		final Integer userId = this.securityService.getCurrentlyLoggedInUser().getUserid();
+		return new ResponseEntity<>(this.germplasmListService.getMyLists(programUUID, pageable, userId), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create germplasm list folder", notes = "Create sample list folder.")
