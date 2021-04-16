@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.manager;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -105,6 +106,16 @@ public class UserValidator {
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+	}
+
+	public void validateUserId(final BindingResult errors, final String userId) {
+		if (NumberUtils.isDigits(userId)) {
+			final WorkbenchUser user = this.userService.getUserById(Integer.parseInt(userId));
+			if (!Objects.isNull(user)) {
+				return;
+			}
+		}
+		errors.reject(SIGNUP_FIELD_INVALID_USER_ID);
 	}
 
 	private void validateUserUpdate(final UserDetailDto user) {

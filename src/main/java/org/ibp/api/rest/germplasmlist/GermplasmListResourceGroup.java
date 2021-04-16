@@ -136,7 +136,7 @@ GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Get last saved hierarchy of germplasm list folders last used by user", notes = "Get last saved hierarchy of germplasm list folders last used by user")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
-	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/user-tree", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/user-tree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getUserTreeState(
 		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
