@@ -171,7 +171,6 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	@Ignore
 	public void testListProgramFilterByAbbreviation() throws Exception {
 		Mockito.when(this.programService.countProgramsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
 			.thenReturn(1L);
