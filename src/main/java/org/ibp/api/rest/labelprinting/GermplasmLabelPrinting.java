@@ -354,7 +354,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 						break;
 
 					case REFERENCE:
-						columns.put(key, Objects.toString(germplasmSearchResponse.getReferenceId(), ""));
+						columns.put(key, Objects.toString(germplasmSearchResponse.getReference(), ""));
 						break;
 
 					case CREATION_DATE:
