@@ -67,6 +67,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	public final static String MALE_PARENT_GID = "MGID";
 	public final static String FEMALE_PARENT_GID = "FGID";
 	public final static String CROSS_MALE_PREFERRED_NAME = "CROSS-MALE PREFERRED NAME";
+	public final static String CROSS_FEMALE_PREFERRED_NAME = "CROSS-FEMALE PREFERRED NAME";
 
 	public final static String ORIG_FINAL_NAME = "germplasm-labels";
 
@@ -150,6 +151,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		FEMALE_PARENT_GID(59, "Female Parent GID"),
 		MALE_PARENT_GID(TermId.CROSS_MALE_GID.getId(), "Male Parent GID"),
 		MALE_PARENT_PREFERRED_NAME(TermId.CROSS_MALE_PREFERRED_NAME.getId(), "Male Parent Preferred Name"),
+		FEMALE_PARENT_PREFERRED_NAME(TermId.CROSS_FEMALE_PREFERRED_NAME.getId(), "Female Parent Preferred Name"),
 		INMEDIATE_SOURCE_GID(62, "Immediate Source GID"),
 		INMEDIATE_SOURCE_PREFERRED_NAME(63, "Immediate Source Preferred Name");
 
@@ -413,6 +415,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 						columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentPreferredName(), ""));
 						break;
 
+					case FEMALE_PARENT_PREFERRED_NAME:
+						columns.put(key, Objects.toString(germplasmSearchResponse.getFemaleParentPreferredName(), ""));
+						break;
+
 					case INMEDIATE_SOURCE_GID:
 						columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourceGID(), ""));
 						break;
@@ -495,6 +501,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		if (listOfSelectedFields.contains(PEDIGREE_FIELD.MALE_PARENT_PREFERRED_NAME.id)) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.CROSS_MALE_PREFERRED_NAME);
+		}
+
+		if (listOfSelectedFields.contains(PEDIGREE_FIELD.FEMALE_PARENT_PREFERRED_NAME.id)) {
+			addedColumnsPropertyIds.add(GermplasmLabelPrinting.CROSS_FEMALE_PREFERRED_NAME);
 		}
 
 		if (listOfSelectedFields.contains(PEDIGREE_FIELD.INMEDIATE_SOURCE_GID.id)) {
