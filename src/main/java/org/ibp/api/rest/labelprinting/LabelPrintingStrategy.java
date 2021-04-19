@@ -14,7 +14,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
-import org.ibp.api.rest.labelprinting.domain.Sortable;
+import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -96,7 +96,7 @@ public abstract class LabelPrintingStrategy {
 	 * List of Sortable field labels for a particular strategy.
 	 * @return Sortable
 	 */
-	abstract List<Sortable> getSortableFields();
+	abstract List<SortableFieldDto> getSortableFields();
 
 	/**
 	 * Validate LabelsGeneratorInput
@@ -191,7 +191,7 @@ public abstract class LabelPrintingStrategy {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		if(!labelsGeneratorInput.isAutomaticBarcode()){
 			for (final Map<Integer, String> data:labelsData.getData()){
-				List<Integer> barcodeIds =
+				final List<Integer> barcodeIds =
 					labelsGeneratorInput.getBarcodeFields().stream().filter(labelId -> StringUtils.isEmpty(data.get(labelId))).collect(
 						Collectors.toList());
 					if(!barcodeIds.isEmpty()){

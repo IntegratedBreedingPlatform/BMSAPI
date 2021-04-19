@@ -22,7 +22,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
-import org.ibp.api.rest.labelprinting.domain.Sortable;
+import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -56,7 +56,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	private static List<Integer> PEDIGREE_FIELD_IDS;
 	private static List<Integer> GERMPLASM_FIELD_IDS;
 
-	public static List<Sortable> SORTED_BY;
+	public static List<SortableFieldDto> SORTED_BY;
 
 	public final static String GERMPLASM_DATE = "GERMPLASM DATE";
 	public final static String METHOD_ABBREV = "METHOD ABBREV";
@@ -104,10 +104,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final String creationDatePropValue = this.getMessage("label.printing.field.germplasm.creation.date");
 
 		SORTED_BY = Arrays.asList(
-			new Sortable(gidPropValue, GermplasmLabelPrinting.GID),
-			new Sortable(preferredNamePropValue, GermplasmLabelPrinting.PREFERRED_NAME),
-			new Sortable(groupIdPropValue, GermplasmLabelPrinting.GROUP_ID),
-			new Sortable(creationDatePropValue, GermplasmLabelPrinting.GERMPLASM_DATE));
+			new SortableFieldDto(gidPropValue, GermplasmLabelPrinting.GID),
+			new SortableFieldDto(preferredNamePropValue, GermplasmLabelPrinting.PREFERRED_NAME),
+			new SortableFieldDto(groupIdPropValue, GermplasmLabelPrinting.GROUP_ID),
+			new SortableFieldDto(creationDatePropValue, GermplasmLabelPrinting.GERMPLASM_DATE));
 
 		DEFAULT_GERMPLASM_DETAILS_FIELDS = this.buildGermplasmDetailsFields();
 		GERMPLASM_FIELD_IDS = DEFAULT_GERMPLASM_DETAILS_FIELDS.stream().map(field -> field.getId()).collect(Collectors.toList());
@@ -118,7 +118,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput) {
+	public void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput) {
 
 	}
 
@@ -208,11 +208,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		listOfGermplasmDetailsAndPedrigreeIds.addAll(GERMPLASM_FIELD_IDS);
 		listOfGermplasmDetailsAndPedrigreeIds.addAll(PEDIGREE_FIELD_IDS);
 
-		final List<Integer> selectedFieldIds =
+		final List<Integer> fieldsContainsNamesOrAttributes =
 			labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toList());
 
 		final boolean haveNamesOrAttributes =
-			selectedFieldIds.stream().anyMatch((fieldId) -> !listOfGermplasmDetailsAndPedrigreeIds.contains(fieldId));
+			fieldsContainsNamesOrAttributes.stream().anyMatch((fieldId) -> !listOfGermplasmDetailsAndPedrigreeIds.contains(fieldId));
 
 		PageRequest pageRequest = null;
 		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
@@ -537,7 +537,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	List<Sortable> getSortableFields() {
+	List<SortableFieldDto> getSortableFields() {
 		return SORTED_BY;
 	}
 

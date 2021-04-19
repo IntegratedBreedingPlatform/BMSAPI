@@ -4,16 +4,16 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class Sortable {
+public class SortableFieldDto {
 
 	private String fieldName;
 	private String sortBy;
 
-	public Sortable(){
+	public SortableFieldDto(){
 
 	}
 
-	public Sortable(final String fieldName, final String sortBy) {
+	public SortableFieldDto(final String fieldName, final String sortBy) {
 		this.fieldName = fieldName;
 		this.sortBy = sortBy;
 	}

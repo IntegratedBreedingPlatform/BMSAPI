@@ -19,7 +19,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
-import org.ibp.api.rest.labelprinting.domain.Sortable;
+import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -368,7 +368,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	List<Sortable> getSortableFields() {
+	List<SortableFieldDto> getSortableFields() {
 		return null;
 	}
 
