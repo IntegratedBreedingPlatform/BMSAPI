@@ -222,8 +222,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final List<GermplasmSearchResponse> responseList =
 			this.germplasmService.searchGermplasm(germplasmSearchRequest, pageRequest, null);
 
-		Map<Integer, Map<Integer, String>> attributeValues = null;
-		Map<Integer, Map<Integer, String>> nameValues = null;
+		Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
+		Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 
 		if (haveNamesOrAttributes) {
 			attributeValues = this.germplasmSearchService.getGermplasmAttributeValues(germplasmSearchRequest);
