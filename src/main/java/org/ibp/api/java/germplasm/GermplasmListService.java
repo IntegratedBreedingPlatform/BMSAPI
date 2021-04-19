@@ -18,6 +18,8 @@ public interface GermplasmListService {
 
 	GermplasmList getGermplasmList(Integer germplasmListId);
 
+	long countMyLists(String programUUID, Integer userId);
+
 	List<MyListsDTO> getMyLists(String programUUID, Pageable pageable, Integer userId);
 
 	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request);

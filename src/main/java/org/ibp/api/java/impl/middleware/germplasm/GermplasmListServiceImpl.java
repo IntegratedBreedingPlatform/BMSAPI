@@ -193,6 +193,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public long countMyLists(final String programUUID, final Integer userId) {
+		return this.germplasmListService.countMyLists(programUUID, userId);
+	}
+
+	@Override
 	public List<MyListsDTO> getMyLists(final String programUUID, final Pageable pageable, final Integer userId) {
 		final Map<String, GermplasmListTypeDTO> listTypes = this.getGermplasmListTypes()
 			.stream().collect(toMap(GermplasmListTypeDTO::getCode, identity()));

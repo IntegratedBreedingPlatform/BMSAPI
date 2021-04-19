@@ -16,9 +16,13 @@ import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
+import org.ibp.api.rest.common.PaginatedSearch;
+import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -101,7 +105,24 @@ public class StudyResource {
 		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
 	) {
 		final Integer userId = this.securityService.getCurrentlyLoggedInUser().getUserid();
-		return new ResponseEntity<>(this.myStudiesService.getMyStudies(programUUID, pageable, userId), HttpStatus.OK);
+		final PagedResult<MyStudiesDTO> result =
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<MyStudiesDTO>() {
+
+				@Override
+				public long getCount() {
+					return myStudiesService.countMyStudies(programUUID, userId);
+				}
+
+				@Override
+				public List<MyStudiesDTO> getResults(final PagedResult<MyStudiesDTO> pagedResult) {
+					return myStudiesService.getMyStudies(programUUID, pageable, userId);
+				}
+			});
+		final List<MyStudiesDTO> pageResults = result.getPageResults();
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(result.getTotalResults()));
+
+		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK );
 	}
 
 }

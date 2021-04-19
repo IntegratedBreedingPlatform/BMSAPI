@@ -9,15 +9,19 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.rest.common.PaginatedSearch;
+import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -107,7 +111,23 @@ public class GermplasmListResourceGroup {
 		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
 	) {
 		final Integer userId = this.securityService.getCurrentlyLoggedInUser().getUserid();
-		return new ResponseEntity<>(this.germplasmListService.getMyLists(programUUID, pageable, userId), HttpStatus.OK);
+		final PagedResult<MyListsDTO> result =
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<MyListsDTO>() {
+
+				@Override
+				public long getCount() {
+					return germplasmListService.countMyLists(programUUID, userId);
+				}
+
+				@Override
+				public List<MyListsDTO> getResults(final PagedResult<MyListsDTO> pagedResult) {
+					return germplasmListService.getMyLists(programUUID, pageable, userId);
+				}
+			});
+		final List<MyListsDTO> pageResults = result.getPageResults();
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(result.getTotalResults()));
+		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create germplasm list folder", notes = "Create sample list folder.")
