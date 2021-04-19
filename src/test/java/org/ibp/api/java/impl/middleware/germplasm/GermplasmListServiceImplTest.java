@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.constant.ListTreeState;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
@@ -9,11 +10,13 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -28,10 +31,12 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
+import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -101,6 +106,12 @@ public class GermplasmListServiceImplTest {
 
 	@Mock
 	private GermplasmService germplasmService;
+
+	@Mock
+	private UserValidator userValidator;
+
+	@Mock
+	private UserProgramStateDataManager userProgramStateDataManager;
 
 	@Before
 	public void init() {
@@ -189,14 +200,20 @@ public class GermplasmListServiceImplTest {
 		final String program = RandomStringUtils.randomAlphabetic(3);
 		final String parentId = "1";
 
-		final GermplasmList germplasmList = new GermplasmList();
-		germplasmList.setType(GermplasmList.FOLDER_TYPE);
-		germplasmList.setProgramUUID(PROGRAM_UUID);
+		final GermplasmList germplasmList = this.getGermplasmList(new Random().nextInt());
 
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByIdAndProgramUUID(Integer.parseInt(parentId), program)).thenReturn(Optional.of(germplasmList));
 
 		this.germplasmListService.getGermplasmListChildrenNodes(CROP, program, parentId, Boolean.FALSE);
 		Mockito.verify(this.germplasmListManager, times(1)).getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), program, GermplasmListServiceImpl.BATCH_SIZE);
+	}
+
+	private GermplasmList getGermplasmList(final Integer id) {
+		final GermplasmList germplasmList = new GermplasmList();
+		germplasmList.setType(GermplasmList.FOLDER_TYPE);
+		germplasmList.setProgramUUID(GermplasmListServiceImplTest.PROGRAM_UUID);
+		germplasmList.setId(id);
+		return germplasmList;
 	}
 
 	@Test
@@ -1387,6 +1404,83 @@ public class GermplasmListServiceImplTest {
 			Mockito.verify(this.germplasmListServiceMiddleware, Mockito.never()).getGermplasmLists(gid);
 		}
 	}
+
+	@Test
+	public void testGetUserTreeState_NoSavedTreeState() {
+		final String userId = RandomStringUtils.randomNumeric(3);
+		Mockito.doReturn(Collections.emptyList()).when(this.userProgramStateDataManager)
+			.getUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID,
+				ListTreeState.GERMPLASM_LIST.name());
+
+		final List<TreeNode> treeNodes = this.germplasmListService
+			.getUserTreeState(GermplasmListServiceImplTest.CROP, GermplasmListServiceImplTest.PROGRAM_UUID, userId);
+		final ArgumentCaptor<ProgramDTO> programCaptor = ArgumentCaptor.forClass(ProgramDTO.class);
+		Mockito.verify(this.programValidator).validate(programCaptor.capture(), ArgumentMatchers.any());
+		Assert.assertThat(programCaptor.getValue().getCrop(), is(GermplasmListServiceImplTest.CROP));
+		Assert.assertThat(programCaptor.getValue().getUniqueID(), is(GermplasmListServiceImplTest.PROGRAM_UUID));
+		Mockito.verify(this.userValidator).validateUserId(ArgumentMatchers.any(), ArgumentMatchers.eq(userId));
+		Mockito.verify(this.userProgramStateDataManager)
+			.getUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID,
+				ListTreeState.GERMPLASM_LIST.name());
+		Assert.assertThat(treeNodes.size(), is(2));
+		Assert.assertThat(treeNodes.get(0).getKey(), is(GermplasmListServiceImpl.CROP_LISTS));
+		Assert.assertTrue(treeNodes.get(0).getChildren().isEmpty());
+		Assert.assertThat(treeNodes.get(1).getKey(), is(GermplasmListServiceImpl.PROGRAM_LISTS));
+		Assert.assertTrue(treeNodes.get(1).getChildren().isEmpty());
+	}
+
+	@Test
+	public void testGetUserTreeState_WithSavedTreeState() {
+		final String userId = RandomStringUtils.randomNumeric(3);
+		Mockito.doReturn(Arrays.asList("Program Lists", " 2", " 4", " 6")).when(this.userProgramStateDataManager)
+			.getUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID,
+				ListTreeState.GERMPLASM_LIST.name());
+		// Top level folder IDs under Program: 2, 3
+		Mockito.doReturn(Arrays.asList(this.getGermplasmList(2), this.getGermplasmList(3))).when(this.germplasmListManager)
+			.getAllTopLevelLists(GermplasmListServiceImplTest.PROGRAM_UUID);
+		// Folder IDs 4 and 5 under parent 2
+		Mockito.doReturn(Arrays.asList(this.getGermplasmList(4), this.getGermplasmList(5))).when(this.germplasmListManager)
+			.getGermplasmListByParentFolderIdBatched(2, GermplasmListServiceImplTest.PROGRAM_UUID, GermplasmListServiceImpl.BATCH_SIZE);
+		// Folder IDs 6 and 7 under parent 4
+		Mockito.doReturn(Arrays.asList(this.getGermplasmList(6), this.getGermplasmList(7))).when(this.germplasmListManager)
+			.getGermplasmListByParentFolderIdBatched(4, GermplasmListServiceImplTest.PROGRAM_UUID, GermplasmListServiceImpl.BATCH_SIZE);
+		Mockito.doReturn(Optional.of(this.getGermplasmList(new Random().nextInt()))).when(this.germplasmListServiceMiddleware)
+			.getGermplasmListByIdAndProgramUUID(ArgumentMatchers.any(), ArgumentMatchers.any());
+
+		final List<TreeNode> treeNodes = this.germplasmListService
+			.getUserTreeState(GermplasmListServiceImplTest.CROP, GermplasmListServiceImplTest.PROGRAM_UUID, userId);
+		final ArgumentCaptor<ProgramDTO> programCaptor = ArgumentCaptor.forClass(ProgramDTO.class);
+		Mockito.verify(this.programValidator).validate(programCaptor.capture(), ArgumentMatchers.any());
+		Assert.assertThat(programCaptor.getValue().getCrop(), is(GermplasmListServiceImplTest.CROP));
+		Assert.assertThat(programCaptor.getValue().getUniqueID(), is(GermplasmListServiceImplTest.PROGRAM_UUID));
+		Mockito.verify(this.userValidator).validateUserId(ArgumentMatchers.any(), ArgumentMatchers.eq(userId));
+		Mockito.verify(this.userProgramStateDataManager)
+			.getUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID,
+				ListTreeState.GERMPLASM_LIST.name());
+		Assert.assertThat(treeNodes.size(), is(2));
+		// Verify root Crop and Program Nodes
+		Assert.assertThat(treeNodes.get(0).getKey(), is(GermplasmListServiceImpl.CROP_LISTS));
+		Assert.assertTrue(treeNodes.get(0).getChildren().isEmpty());
+		Assert.assertThat(treeNodes.get(1).getKey(), is(GermplasmListServiceImpl.PROGRAM_LISTS));
+		// Verify children of root Program Lists node
+		Assert.assertThat(treeNodes.get(1).getChildren().size(), is(2));
+		final TreeNode level1Folder = treeNodes.get(1).getChildren().get(0);
+		Assert.assertThat(level1Folder.getKey(), is("2"));
+		Assert.assertThat(treeNodes.get(1).getChildren().get(1).getKey(), is("3"));
+		// Verify children of Program Lists > Folder ID 2
+		Assert.assertThat(level1Folder.getChildren().size(), is(2));
+		final TreeNode level2Folder = level1Folder.getChildren().get(0);
+		Assert.assertThat(level2Folder.getKey(), is("4"));
+		Assert.assertThat(level1Folder.getChildren().get(1).getKey(), is("5"));
+		// Verify children of Program Lists > Folder ID 2 > Folder ID 4
+		Assert.assertThat(level2Folder.getChildren().size(), is(2));
+		final TreeNode level3Folder = level2Folder.getChildren().get(0);
+		Assert.assertThat(level3Folder.getKey(), is("6"));
+		Assert.assertTrue(level3Folder.getChildren().isEmpty());
+		Assert.assertThat(level2Folder.getChildren().get(1).getKey(), is("7"));
+		Assert.assertNull(level2Folder.getChildren().get(1).getChildren());
+	}
+
 
 	private GermplasmListGeneratorDTO createGermplasmList() {
 		final GermplasmListGeneratorDTO list = new GermplasmListGeneratorDTO();
