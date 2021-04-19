@@ -208,11 +208,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		listOfGermplasmDetailsAndPedrigreeIds.addAll(GERMPLASM_FIELD_IDS);
 		listOfGermplasmDetailsAndPedrigreeIds.addAll(PEDIGREE_FIELD_IDS);
 
-		final List<Integer> fieldsContainsNamesOrAttributes =
+		final List<Integer> selectedFieldIds =
 			labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toList());
 
-		final boolean haveNamesOrAttributes =
-			fieldsContainsNamesOrAttributes.stream().anyMatch((fieldId) -> !listOfGermplasmDetailsAndPedrigreeIds.contains(fieldId));
+		final boolean fieldsContainsNamesOrAttributes =
+			selectedFieldIds.stream().anyMatch((fieldId) -> !listOfGermplasmDetailsAndPedrigreeIds.contains(fieldId));
 
 		PageRequest pageRequest = null;
 		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
@@ -225,7 +225,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 
-		if (haveNamesOrAttributes) {
+		if (fieldsContainsNamesOrAttributes) {
 			attributeValues = this.germplasmSearchService.getGermplasmAttributeValues(germplasmSearchRequest);
 			nameValues = this.germplasmSearchService.getGermplasmNameValues(germplasmSearchRequest);
 		}
