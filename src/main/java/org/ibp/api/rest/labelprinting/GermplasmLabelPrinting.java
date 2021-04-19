@@ -97,7 +97,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
 	@PostConstruct
-	void initStaticFields() {
+	public void initStaticFields() {
 		final String gidPropValue = this.getMessage("label.printing.field.germplasm.gid");
 		final String preferredNamePropValue = this.getMessage("label.printing.field.germplasm.preferred.name");
 		final String groupIdPropValue = this.getMessage("label.printing.field.germplasm.group.id");
@@ -123,26 +123,26 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	LabelsNeededSummary getSummaryOfLabelsNeeded(
+	public LabelsNeededSummary getSummaryOfLabelsNeeded(
 		final LabelsInfoInput labelsInfoInput) {
 		return null;
 	}
 
 	@Override
-	LabelsNeededSummaryResponse transformLabelsNeededSummary(
+	public LabelsNeededSummaryResponse transformLabelsNeededSummary(
 		final LabelsNeededSummary labelsNeededSummary) {
 		return null;
 	}
 
 	@Override
-	OriginResourceMetadata getOriginResourceMetadata(
+	public OriginResourceMetadata getOriginResourceMetadata(
 		final LabelsInfoInput labelsInfoInput) {
 		final String fileName = FileNameGenerator.generateFileName(GermplasmLabelPrinting.ORIG_FINAL_NAME);
 		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
 	}
 
 	@Override
-	List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput) {
+	public List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput) {
 		final List<LabelType> labelTypes = new LinkedList<>();
 		final String germplasmPropValue = this.getMessage("label.printing.germplasm.details");
 		final String pedigreePropValue = this.getMessage("label.printing.pedigree.details");
@@ -185,7 +185,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	LabelsData getLabelsData(
+	public LabelsData getLabelsData(
 		final LabelsGeneratorInput labelsGeneratorInput) {
 		// Get raw data
 		final Integer searchRequestId = labelsGeneratorInput.getSearchRequestId();
@@ -532,12 +532,12 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	List<FileType> getSupportedFileTypes() {
+	public List<FileType> getSupportedFileTypes() {
 		return SUPPORTED_FILE_TYPES;
 	}
 
 	@Override
-	List<SortableFieldDto> getSortableFields() {
+	public List<SortableFieldDto> getSortableFields() {
 		return SORTED_BY;
 	}
 
@@ -559,7 +559,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		return key;
 	}
 
-	String getMessage(final String code) {
+	public String getMessage(final String code) {
 		return this.messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
 	}
 
