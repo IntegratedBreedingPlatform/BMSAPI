@@ -93,6 +93,10 @@ public class ProgenitorsUpdateRequestDtoValidator {
 
 		final Set<Integer> allProgenitors = this.getAllProgenitors(gpid1, gpid2, otherProgenitors);
 
+		if (allProgenitors.contains(gid)) {
+			this.errors.reject("germplasm.update.progenitors.can.not.be.equals.to.gid", "");
+		}
+
 		final List<Integer> existingGermplasm =
 			germplasmService.getGermplasmByGIDs(Lists.newArrayList(allProgenitors)).stream().map(Germplasm::getGid).collect(
 				Collectors.toList());
