@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting.domain;
 
+import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
@@ -31,5 +32,20 @@ public class Sortable {
 
 	public void setSortBy(final String sortBy) {
 		this.sortBy = sortBy;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }
