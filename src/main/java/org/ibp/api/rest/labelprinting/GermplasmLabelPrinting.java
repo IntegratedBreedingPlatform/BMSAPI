@@ -94,7 +94,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	@Autowired
 	private GermplasmService germplasmService;
 
-	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
+	public static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
 	@PostConstruct
 	public void initStaticFields() {
@@ -110,10 +110,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			new SortableFieldDto(creationDatePropValue, GermplasmLabelPrinting.GERMPLASM_DATE));
 
 		DEFAULT_GERMPLASM_DETAILS_FIELDS = this.buildGermplasmDetailsFields();
-		GERMPLASM_FIELD_IDS = DEFAULT_GERMPLASM_DETAILS_FIELDS.stream().map(field -> field.getId()).collect(Collectors.toList());
+		GERMPLASM_FIELD_IDS = DEFAULT_GERMPLASM_DETAILS_FIELDS.stream().map(Field::getId).collect(Collectors.toList());
 
 		DEFAULT_PEDIGREE_DETAILS_FIELDS = this.buildPedigreeDetailsFields();
-		PEDIGREE_FIELD_IDS = DEFAULT_PEDIGREE_DETAILS_FIELDS.stream().map(field -> field.getId()).collect(Collectors.toList());
+		PEDIGREE_FIELD_IDS = DEFAULT_PEDIGREE_DETAILS_FIELDS.stream().map(Field::getId).collect(Collectors.toList());
 
 	}
 
@@ -169,7 +169,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final LabelType namesType = new LabelType(namesPropValue, namesPropValue);
 		namesType.setFields(new ArrayList<>());
 		namesType.getFields().addAll(nameTypes.stream()
-			.map(attr -> new Field(toKey(attr.getFldno()), attr.getFcode()))
+			.map(nameType -> new Field(toKey(nameType.getFldno()), nameType.getFcode()))
 			.collect(Collectors.toList()));
 		labelTypes.add(namesType);
 
@@ -177,7 +177,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final LabelType attirbutesType = new LabelType(attributesPropValue, attributesPropValue);
 		attirbutesType.setFields(new ArrayList<>());
 		attirbutesType.getFields().addAll(attributeTypes.stream()
-			.map(attr -> new Field(toKey(attr.getFldno()), attr.getFcode()))
+			.map(attributeType -> new Field(toKey(attributeType.getFldno()), attributeType.getFcode()))
 			.collect(Collectors.toList()));
 		labelTypes.add(attirbutesType);
 
@@ -198,11 +198,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, addedColumnsPropertyIds)
 		);
 
-		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy()) && !addedColumnsPropertyIds.contains(labelsGeneratorInput.getSortBy())) {
+		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
 			addedColumnsPropertyIds.add(labelsGeneratorInput.getSortBy());
 		}
 
-		germplasmSearchRequest.setAddedColumnsPropertyIds(addedColumnsPropertyIds.stream().collect(Collectors.toList()));
+		germplasmSearchRequest.setAddedColumnsPropertyIds(new ArrayList<>(addedColumnsPropertyIds));
 
 		final List<Integer> listOfGermplasmDetailsAndPedrigreeIds = new ArrayList<>();
 		listOfGermplasmDetailsAndPedrigreeIds.addAll(GERMPLASM_FIELD_IDS);
@@ -344,7 +344,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 				if (LabelPrintingStaticField.LOTS.getFieldId().equals(id)) {
 					columns.put(key, Objects.toString(germplasmSearchResponse.getLotCount(), ""));
-					continue;
 				}
 
 			} else if (PEDIGREE_FIELD_IDS.contains(id)) {
@@ -380,7 +379,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 				if (LabelPrintingStaticField.INMEDIATE_SOURCE_PREFERRED_NAME.getFieldId().equals(id)) {
 					columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourcePreferredName(), ""));
-					continue;
 				}
 			} else {
 				// Not part of the fixed columns
