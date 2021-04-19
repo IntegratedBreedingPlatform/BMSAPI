@@ -430,7 +430,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 					default:
 						break;
 				}
-			} else if (attributeValues != null && nameValues != null) {
+			} else {
 
 				// Not part of the fixed columns
 				// Attributes
