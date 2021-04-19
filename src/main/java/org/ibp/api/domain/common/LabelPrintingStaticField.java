@@ -1,9 +1,7 @@
 package org.ibp.api.domain.common;
 
-import java.util.List;
-import org.ibp.api.rest.common.FileType;
-
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This enum is needed for hardcoded labels in printing label module (those that are not variable in the ontology)
@@ -31,13 +29,16 @@ public enum LabelPrintingStaticField {
 	USERNAME(33),
 
 	GUID(41),
-	LOCATION(43),
 	METHOD_CODE(50),
 	METHOD_NUMBER(51),
 	METHOD_GROUP(52),
 	GROUP_SOURCE_GID(53),
 	GROUP_SOURCE_PREFERRED_NAME(54),
-	REFERENCE(48);
+	REFERENCE(48),
+	LOTS(57),
+	CROSS(58),
+	INMEDIATE_SOURCE_GID(62),
+	INMEDIATE_SOURCE_PREFERRED_NAME(63);
 
 	private Integer fieldId;
 
