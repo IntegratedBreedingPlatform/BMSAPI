@@ -32,6 +32,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
+import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -467,6 +468,11 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	public List<FileType> getSupportedFileTypes() {
 		return SUPPORTED_FILE_TYPES;
+	}
+
+	@Override
+	List<SortableFieldDto> getSortableFields() {
+		return null;
 	}
 
 	String getMessage(final String code) {
