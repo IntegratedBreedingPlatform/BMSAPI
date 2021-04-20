@@ -212,18 +212,28 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 		// Initialize crop and program folder nodes
 		final List<TreeNode> treeNodesList = this.getChildrenNodes(programUUID, null, false);
+		// Retrieve the list of expanded nodes
 		final List<String> treeFolders = this.userProgramStateDataManager
 			.getUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name());
 		if (!CollectionUtils.isEmpty(treeFolders)) {
+			final Map<String, TreeNode> folderParentNodeMap = new HashMap<>();
 			final TreeNode programRootNode = treeNodesList.get(1);
 			programRootNode.setChildren(this.getChildrenNodes(programUUID, programRootNode.getKey(), false));
-			TreeNode parentNode = programRootNode;
+			programRootNode.getChildren().forEach(c -> folderParentNodeMap.put(c.getKey(), programRootNode));
 			for (int i=1; i<treeFolders.size(); i++) {
 				final String finalKey = StringUtils.stripStart(treeFolders.get(i), " ");
-				final Optional<TreeNode> parentNodeOpt = parentNode.getChildren().stream().filter(c -> c.getKey().equals(finalKey)).findFirst();
+				final Optional<Map.Entry<String, TreeNode>> parentNodeOpt =
+					folderParentNodeMap.entrySet().stream().filter(entry -> entry.getKey().equals(finalKey)).findFirst();
+				// Find parent node then look for the node to expand among the parent's children then finally expand that node
 				if (parentNodeOpt.isPresent()) {
-					parentNode = parentNodeOpt.get();
-					parentNode.setChildren(this.getChildrenNodes(programUUID, finalKey, false));
+					final TreeNode parentNode = parentNodeOpt.get().getValue();
+					final Optional<TreeNode> nodeToExpand =
+						parentNode.getChildren().stream().filter(child -> child.getKey().equals(finalKey)).findFirst();
+					nodeToExpand.ifPresent(node -> {
+						 node.setChildren(this.getChildrenNodes(programUUID, finalKey, false));
+						 node.getChildren().forEach(c -> folderParentNodeMap.put(c.getKey(), node));
+						}
+					);
 				}
 			}
 

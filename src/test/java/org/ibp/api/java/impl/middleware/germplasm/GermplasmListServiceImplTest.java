@@ -1432,10 +1432,18 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void testGetUserTreeState_WithSavedTreeState() {
 		final String userId = RandomStringUtils.randomNumeric(3);
-		Mockito.doReturn(Arrays.asList("Program Lists", " 2", " 4", " 6")).when(this.userProgramStateDataManager)
+		Mockito.doReturn(Arrays.asList("Program Lists", " 2", " 4", " 5")).when(this.userProgramStateDataManager)
 			.getUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID,
 				ListTreeState.GERMPLASM_LIST.name());
-		// Top level folder IDs under Program: 2, 3
+		// Test Tree looks like this:
+		//   > "Program Lists"
+		//      v 2
+		//         v 4
+		//           > 6
+		//           > 7
+		//        v 5
+		//           > 8
+		//      > 3
 		Mockito.doReturn(Arrays.asList(this.getGermplasmList(2), this.getGermplasmList(3))).when(this.germplasmListManager)
 			.getAllTopLevelLists(GermplasmListServiceImplTest.PROGRAM_UUID);
 		// Folder IDs 4 and 5 under parent 2
@@ -1444,6 +1452,8 @@ public class GermplasmListServiceImplTest {
 		// Folder IDs 6 and 7 under parent 4
 		Mockito.doReturn(Arrays.asList(this.getGermplasmList(6), this.getGermplasmList(7))).when(this.germplasmListManager)
 			.getGermplasmListByParentFolderIdBatched(4, GermplasmListServiceImplTest.PROGRAM_UUID, GermplasmListServiceImpl.BATCH_SIZE);
+		Mockito.doReturn(Collections.singletonList(this.getGermplasmList(8))).when(this.germplasmListManager)
+			.getGermplasmListByParentFolderIdBatched(5, GermplasmListServiceImplTest.PROGRAM_UUID, GermplasmListServiceImpl.BATCH_SIZE);
 		Mockito.doReturn(Optional.of(this.getGermplasmList(new Random().nextInt()))).when(this.germplasmListServiceMiddleware)
 			.getGermplasmListByIdAndProgramUUID(ArgumentMatchers.any(), ArgumentMatchers.any());
 
@@ -1464,21 +1474,34 @@ public class GermplasmListServiceImplTest {
 		Assert.assertThat(treeNodes.get(1).getKey(), is(GermplasmListServiceImpl.PROGRAM_LISTS));
 		// Verify children of root Program Lists node
 		Assert.assertThat(treeNodes.get(1).getChildren().size(), is(2));
-		final TreeNode level1Folder = treeNodes.get(1).getChildren().get(0);
-		Assert.assertThat(level1Folder.getKey(), is("2"));
-		Assert.assertThat(treeNodes.get(1).getChildren().get(1).getKey(), is("3"));
+		final TreeNode folderID2 = treeNodes.get(1).getChildren().get(0);
+		Assert.assertThat(folderID2.getKey(), is("2"));
+		final TreeNode folderId3 = treeNodes.get(1).getChildren().get(1);
+		Assert.assertThat(folderId3.getKey(), is("3"));
+		Assert.assertNull(folderId3.getChildren());
+
 		// Verify children of Program Lists > Folder ID 2
-		Assert.assertThat(level1Folder.getChildren().size(), is(2));
-		final TreeNode level2Folder = level1Folder.getChildren().get(0);
-		Assert.assertThat(level2Folder.getKey(), is("4"));
-		Assert.assertThat(level1Folder.getChildren().get(1).getKey(), is("5"));
+		Assert.assertThat(folderID2.getChildren().size(), is(2));
+		final TreeNode folderId4 = folderID2.getChildren().get(0);
+		Assert.assertThat(folderId4.getKey(), is("4"));
+		final TreeNode folderId5 = folderID2.getChildren().get(1);
+		Assert.assertThat(folderId5.getKey(), is("5"));
+
 		// Verify children of Program Lists > Folder ID 2 > Folder ID 4
-		Assert.assertThat(level2Folder.getChildren().size(), is(2));
-		final TreeNode level3Folder = level2Folder.getChildren().get(0);
-		Assert.assertThat(level3Folder.getKey(), is("6"));
-		Assert.assertTrue(level3Folder.getChildren().isEmpty());
-		Assert.assertThat(level2Folder.getChildren().get(1).getKey(), is("7"));
-		Assert.assertNull(level2Folder.getChildren().get(1).getChildren());
+		Assert.assertThat(folderId4.getChildren().size(), is(2));
+		final TreeNode folderId6 = folderId4.getChildren().get(0);
+		Assert.assertThat(folderId6.getKey(), is("6"));
+		Assert.assertNull(folderId6.getChildren());
+		final TreeNode folderId7 = folderId4.getChildren().get(1);
+		Assert.assertThat(folderId7.getKey(), is("7"));
+		Assert.assertNull(folderId7.getChildren());
+
+
+		// Verify children of Program Lists > Folder ID 2 > Folder ID 5
+		Assert.assertThat(folderId5.getChildren().size(), is(1));
+		final TreeNode folderId8 = folderId5.getChildren().get(0);
+		Assert.assertThat(folderId8.getKey(), is("8"));
+		Assert.assertNull(folderId8.getChildren());
 	}
 
 
