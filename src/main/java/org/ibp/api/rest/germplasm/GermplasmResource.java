@@ -21,8 +21,11 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
+import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
@@ -82,8 +85,31 @@ public class GermplasmResource {
 	@Autowired
 	private SampleService sampleService;
 
-	@ApiOperation(value = "Search germplasm. <b>Note:</b> Total count is not available for this query.")
+	@Autowired
+	private SearchRequestService searchRequestService;
+
+	@ApiOperation(value = "Post germplasm search", notes = "Post germplasm search")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + HAS_GERMPLASM_SEARCH)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasm(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmSearchRequest germplasmSearchRequest) {
+
+		BaseValidator.checkNotNull(germplasmSearchRequest, "param.null", new String[] {"germplasmSearchDTO"});
+
+		final String searchRequestId =
+			this.searchRequestService.saveSearchRequest(germplasmSearchRequest, GermplasmSearchRequest.class).toString();
+		final SearchDto searchDto = new SearchDto(searchRequestId);
+		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse<SearchDto>(searchDto);
+
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+
+	}
+
+	@ApiOperation(value = "Search germplasm. <b>Note:</b> Total count is not available for this query.")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + HAS_GERMPLASM_SEARCH)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -94,14 +120,15 @@ public class GermplasmResource {
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
 	@ResponseBody
-	public ResponseEntity<List<GermplasmSearchResponse>> searchGermplasm(
+	public ResponseEntity<List<GermplasmSearchResponse>> getGermplasm(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody final GermplasmSearchRequest germplasmSearchRequest,
+		@RequestParam final Integer searchRequestId,
 		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
 	) {
 
-		BaseValidator.checkNotNull(germplasmSearchRequest, "param.null", new String[] {"germplasmSearchDTO"});
+		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
+			.getSearchRequest(searchRequestId, GermplasmSearchRequest.class);
 
 		final PagedResult<GermplasmSearchResponse> result =
 			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmSearchResponse>() {

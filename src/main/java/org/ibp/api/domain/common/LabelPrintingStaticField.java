@@ -1,9 +1,7 @@
 package org.ibp.api.domain.common;
 
-import java.util.List;
-import org.ibp.api.rest.common.FileType;
-
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This enum is needed for hardcoded labels in printing label module (those that are not variable in the ontology)
@@ -28,7 +26,19 @@ public enum LabelPrintingStaticField {
 	TYPE(30),
 	CREATED(31),
 	TRN_NOTES(32),
-	USERNAME(33);
+	USERNAME(33),
+
+	GUID(41),
+	METHOD_CODE(50),
+	METHOD_NUMBER(51),
+	METHOD_GROUP(52),
+	GROUP_SOURCE_GID(53),
+	GROUP_SOURCE_PREFERRED_NAME(54),
+	REFERENCE(48),
+	LOTS(57),
+	CROSS(58),
+	INMEDIATE_SOURCE_GID(62),
+	INMEDIATE_SOURCE_PREFERRED_NAME(63);
 
 	private Integer fieldId;
 
@@ -37,7 +47,7 @@ public enum LabelPrintingStaticField {
 	}
 
 	public Integer getFieldId() {
-		return fieldId;
+		return this.fieldId;
 	}
 
 	public void setFieldId(final Integer fieldId) {
@@ -46,8 +56,8 @@ public enum LabelPrintingStaticField {
 
 	public static List<Integer> getAvailableStaticFields() {
 		final List<Integer> availableStaticFieldIds = new ArrayList<>();
-		for (LabelPrintingStaticField e : LabelPrintingStaticField.values()) {
-			availableStaticFieldIds.add(e.getFieldId());
+		for (final LabelPrintingStaticField labelPrintingStaticField : LabelPrintingStaticField.values()) {
+			availableStaticFieldIds.add(labelPrintingStaticField.getFieldId());
 		}
 		return availableStaticFieldIds;
 	}
