@@ -6,6 +6,7 @@ import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,9 +22,12 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	private String status;
 	private String email;
 	private Set<CropDto> crops;
+	private Set<String> authorities;
+	private String selectedCropName;
+	private String selectedProgramUUID;
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(Integer id) {
@@ -76,6 +80,30 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 
 	public void setUserRoles(final List<UserRoleDto> userRoles) {
 		this.userRoles = userRoles;
+	}
+
+	public Set<String> getAuthorities() {
+		return this.authorities;
+	}
+
+	public void setAuthorities(final Set<String> authorities) {
+		this.authorities = authorities;
+	}
+
+	public String getSelectedCropName() {
+		return this.selectedCropName;
+	}
+
+	public void setSelectedCropName(final String selectedCropName) {
+		this.selectedCropName = selectedCropName;
+	}
+
+	public String getSelectedProgramUUID() {
+		return this.selectedProgramUUID;
+	}
+
+	public void setSelectedProgramUUID(final String selectedProgramUUID) {
+		this.selectedProgramUUID = selectedProgramUUID;
 	}
 
 	@Override
