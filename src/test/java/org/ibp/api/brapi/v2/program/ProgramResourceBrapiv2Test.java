@@ -77,7 +77,6 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
 	}
 
 	@Test
-	@Ignore
     public void testListProgramsBadCrop() throws Exception {
         Mockito
 			.doThrow(new ApiRequestValidationException(Arrays.asList(
@@ -86,7 +85,7 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
 
 		final UriComponents uriComponents =
 			UriComponentsBuilder.newInstance().path(ProgramResourceBrapiv2Test.BRAPI_V2_PROGRAMS)
-				.queryParam("cropName", ProgramResourceBrapiv2Test.INVALID_CROP).build().encode();
+				.queryParam("commonCropName", ProgramResourceBrapiv2Test.INVALID_CROP).build().encode();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isBadRequest()) //
