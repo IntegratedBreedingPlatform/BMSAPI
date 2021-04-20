@@ -8,16 +8,18 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
-import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
+import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
+import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -61,8 +63,6 @@ public interface GermplasmService {
 
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 
-	List<org.generationcp.middleware.api.attribute.AttributeDTO> filterGermplasmAttributes(Set<String> codes);
-
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(String cropName, String programUUID,
 		GermplasmImportRequestDto germplasmImportRequestDto);
 
@@ -70,9 +70,16 @@ public interface GermplasmService {
 
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
-	GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList);
+	GermplasmImportResponse createGermplasm(String cropName, List<GermplasmImportRequest> germplasmImportRequestList);
 
-	GermplasmDTO updateGermplasm(final String germplasmUUID, final GermplasmUpdateRequest germplasmUpdateRequest);
+	GermplasmDTO updateGermplasm(String germplasmUUID, GermplasmUpdateRequest germplasmUpdateRequest);
 
 	GermplasmDeleteResponse deleteGermplasm(List<Integer> gids);
+
+	GermplasmDto getGermplasmDtoById(Integer gid);
+
+	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
+
+	boolean updateGermplasmBasicDetails(String programUUID, Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
+
 }

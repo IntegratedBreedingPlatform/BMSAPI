@@ -12,6 +12,8 @@ public class StudyEntryMetadata {
 
 	private Long nonTestEntriesCount;
 
+	private Long nonReplicatedEntriesCount;
+
 	private Boolean hasUnassignedEntries;
 
 	public Long getTestEntriesCount() {
@@ -46,7 +48,15 @@ public class StudyEntryMetadata {
 		this.hasUnassignedEntries = hasUnassignedEntries;
 	}
 
-	@Override
+  public Long getNonReplicatedEntriesCount() {
+	return nonReplicatedEntriesCount;
+  }
+
+  public void setNonReplicatedEntriesCount(final Long nonReplicatedEntriesCount) {
+	this.nonReplicatedEntriesCount = nonReplicatedEntriesCount;
+  }
+
+  @Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
 	}

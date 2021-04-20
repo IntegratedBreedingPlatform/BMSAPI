@@ -22,7 +22,7 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.entrytype.EntryTypeService;
-import org.ibp.api.java.germplasm.GermplamListService;
+import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -80,7 +80,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private EntryTypeValidator entryTypeValidator;
 
 	@Autowired
-	private GermplamListService germplasmListService;
+	private GermplasmListService germplasmListService;
 
 	@Autowired
 	private SearchRequestDtoResolver searchRequestDtoResolver;
@@ -267,7 +267,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		}
 	}
 
-	@Override
+  @Override public long countAllNonReplicatedTestEntries(final Integer studyId) {
+	return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
+			Collections.singletonList(String.valueOf(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())));
+  }
+
+  @Override
 	public StudyEntryMetadata getStudyEntriesMetadata(final Integer studyId, final String programUuid) {
 		this.studyValidator.validate(studyId, false);
 		final StudyEntryMetadata studyEntryMetadata = new StudyEntryMetadata();
@@ -275,6 +280,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		studyEntryMetadata.setCheckEntriesCount(this.countAllCheckTestEntries(studyId, programUuid, true));
 		studyEntryMetadata.setNonTestEntriesCount(this.countAllCheckTestEntries(studyId, programUuid, false));
 		studyEntryMetadata.setHasUnassignedEntries(this.middlewareStudyEntryService.hasUnassignedEntries(studyId));
+		studyEntryMetadata.setNonReplicatedEntriesCount(this.countAllNonReplicatedTestEntries(studyId));
 		return studyEntryMetadata;
 	}
 

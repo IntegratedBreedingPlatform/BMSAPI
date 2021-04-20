@@ -1,6 +1,7 @@
 package org.ibp.api.java.germplasm;
 
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
@@ -9,7 +10,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 
 import java.util.List;
 
-public interface GermplamListService {
+public interface GermplasmListService {
 
 	List<TreeNode> getGermplasmListChildrenNodes(final String crop, final String programUUID, final String parentId, final Boolean folderOnly);
 
@@ -29,5 +30,7 @@ public interface GermplamListService {
 	Integer moveGermplasmListFolder(String cropName, String programUUID, String folderId, String newParentFolderId);
 
 	void deleteGermplasmListFolder(String cropName, String programUUID, String folderId);
+
+	List<GermplasmListDto> getGermplasmLists(Integer gid);
 
 }
