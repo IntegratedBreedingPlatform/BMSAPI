@@ -14,6 +14,7 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -59,11 +61,16 @@ public class ProgramResource {
         @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)"),
         @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.")
     })
-    public ResponseEntity<List<ProgramDTO>> listPrograms(@RequestParam(required = false) final String cropName, final Pageable pageable) {
+    public ResponseEntity<List<ProgramDTO>> listPrograms(
+        @RequestParam(required = false) final String cropName,
+        @RequestParam(required = false) final String programNameContainsString,
+        @ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
+    ) {
 
         final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
         programSearchRequest.setLoggedInUserId(this.securityService.getCurrentlyLoggedInUser().getUserid());
         programSearchRequest.setCommonCropName(cropName);
+        programSearchRequest.setProgramNameContainsString(programNameContainsString);
 
         final PagedResult<ProgramDTO> pagedResult = new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(),
             new SearchSpec<ProgramDTO>() {
