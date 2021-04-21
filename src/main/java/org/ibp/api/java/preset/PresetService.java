@@ -14,4 +14,6 @@ public interface PresetService {
 
 	void deletePreset(String crop, Integer presetId);
 
+	void updatePreset(String crop, Integer presetId, PresetDTO presetDTO);
+
 }

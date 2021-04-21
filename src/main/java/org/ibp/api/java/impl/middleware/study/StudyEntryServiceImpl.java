@@ -267,7 +267,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		}
 	}
 
-	@Override
+  @Override public long countAllNonReplicatedTestEntries(final Integer studyId) {
+	return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
+			Collections.singletonList(String.valueOf(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())));
+  }
+
+  @Override
 	public StudyEntryMetadata getStudyEntriesMetadata(final Integer studyId, final String programUuid) {
 		this.studyValidator.validate(studyId, false);
 		final StudyEntryMetadata studyEntryMetadata = new StudyEntryMetadata();
@@ -275,6 +280,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		studyEntryMetadata.setCheckEntriesCount(this.countAllCheckTestEntries(studyId, programUuid, true));
 		studyEntryMetadata.setNonTestEntriesCount(this.countAllCheckTestEntries(studyId, programUuid, false));
 		studyEntryMetadata.setHasUnassignedEntries(this.middlewareStudyEntryService.hasUnassignedEntries(studyId));
+		studyEntryMetadata.setNonReplicatedEntriesCount(this.countAllNonReplicatedTestEntries(studyId));
 		return studyEntryMetadata;
 	}
 

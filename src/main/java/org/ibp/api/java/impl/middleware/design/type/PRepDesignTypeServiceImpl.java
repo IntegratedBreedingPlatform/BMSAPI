@@ -112,7 +112,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 
 		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
 			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
-			if (entryType.isPresent() && SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() == Integer.valueOf(entryType.get())) {
+			if (entryType.isPresent() && SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() == Integer.parseInt(entryType.get())) {
 				testEntryCount++;
 				testEntryNumbers.add(studyEntryDto.getEntryNumber());
 			}
@@ -126,10 +126,11 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 			randomTestEntryNumbers.add(testEntryNumbers.get(new Random().nextInt(testEntryNumbers.size())));
 		}
 
+
 		final List<ListItem> replicationListItem = new LinkedList<>();
 		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
 			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
-			if (entryType.isPresent() && SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() != Integer.valueOf(entryType.get())) {
+			if (entryType.isPresent() && !this.isTestEntry(entryType.get()) && !this.isNonReplicatedEntry(entryType.get())) {
 				// All Check Entries in the list should be replicated
 				replicationListItem.add(new ListItem(String.valueOf(replicationNumber)));
 			} else if (randomTestEntryNumbers.contains(studyEntryDto.getEntryNumber())) {
@@ -143,4 +144,13 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 
 		return Collections.singletonMap(BreedingViewDesignParameter.NREPEATS, replicationListItem);
 	}
+
+	private boolean isTestEntry(final String entryType) {
+	  return SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() == Integer.parseInt(entryType);
+	}
+
+  private boolean isNonReplicatedEntry(final String entryType) {
+	return SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId() == Integer.parseInt(entryType);
+  }
+
 }
