@@ -100,5 +100,21 @@ public class UserMapper {
 				this.using(cropsConverter).map(this.source.getPerson().getCrops()).setCrops(null);
 			}
 		});
+
+		mapper.addMappings(new PropertyMap<WorkbenchUser, UserDetailDto>() {
+
+			@Override
+			protected void configure() {
+				this.map().setId(this.source.getUserid());
+				this.map().setUsername(this.source.getName());
+				this.map().setFirstName(this.source.getPerson().getFirstName());
+				this.map().setLastName(this.source.getPerson().getLastName());
+				this.using(toStatusConvert).map().setStatus(this.source.getStatus().toString());
+				this.map().setEmail(this.source.getPerson().getEmail());
+				this.using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
+				this.using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);
+				this.using(cropsConverter).map(this.source.getPerson().getCrops()).setCrops(null);
+			}
+		});
 	}
 }
