@@ -38,6 +38,7 @@ import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.rest.common.UserTreeState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -240,6 +241,34 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		return treeNodesList;
+	}
+
+	@Override
+	public void saveGermplasmListTreeState(final String crop, final UserTreeState userTreeState) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		checkNotNull(userTreeState, "param.null", new String[] {"treeState"});
+		final String programUUID = userTreeState.getProgramUUID();
+		this.validateProgram(crop, programUUID);
+
+		final String userId = userTreeState.getUserId();
+		this.userValidator.validateUserId(this.errors, userId);
+
+		final List<String> folders = userTreeState.getFolders();
+		this.validateFolders(folders, programUUID);
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		// Persist the tree state for user
+		this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name(),
+			folders);
+	}
+
+	private void validateFolders(final List<String> folders, final String programUUID) {
+		if (CollectionUtils.isEmpty(folders)) {
+			this.errors.reject("list.folders.empty", "");
+		}
+		folders.forEach(nodeId -> this.validateNodeId(nodeId.toUpperCase(), programUUID, ListNodeType.PARENT, true));
 	}
 
 	@Override

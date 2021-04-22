@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.ListTreeState;
@@ -33,6 +34,8 @@ import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.rest.common.UserTreeState;
+import org.ibp.api.rest.germplasmlist.GermplasmListResourceGroupTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +47,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+import sun.java2d.pipe.AAShapePipe;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1455,7 +1459,7 @@ public class GermplasmListServiceImplTest {
 		Mockito.doReturn(Collections.singletonList(this.getGermplasmList(8))).when(this.germplasmListManager)
 			.getGermplasmListByParentFolderIdBatched(5, GermplasmListServiceImplTest.PROGRAM_UUID, GermplasmListServiceImpl.BATCH_SIZE);
 		Mockito.doReturn(Optional.of(this.getGermplasmList(new Random().nextInt()))).when(this.germplasmListServiceMiddleware)
-			.getGermplasmListByIdAndProgramUUID(ArgumentMatchers.any(), ArgumentMatchers.any());
+			.getGermplasmListByIdAndProgramUUID(ArgumentMatchers.any(), ArgumentMatchers.eq(GermplasmListServiceImplTest.PROGRAM_UUID));
 
 		final List<TreeNode> treeNodes = this.germplasmListService
 			.getUserTreeState(GermplasmListServiceImplTest.CROP, GermplasmListServiceImplTest.PROGRAM_UUID, userId);
@@ -1496,7 +1500,6 @@ public class GermplasmListServiceImplTest {
 		Assert.assertThat(folderId7.getKey(), is("7"));
 		Assert.assertNull(folderId7.getChildren());
 
-
 		// Verify children of Program Lists > Folder ID 2 > Folder ID 5
 		Assert.assertThat(folderId5.getChildren().size(), is(1));
 		final TreeNode folderId8 = folderId5.getChildren().get(0);
@@ -1504,6 +1507,66 @@ public class GermplasmListServiceImplTest {
 		Assert.assertNull(folderId8.getChildren());
 	}
 
+	@Test
+	public void testSaveTreeState_ValidInputs() {
+		Mockito.doReturn(Optional.of(this.getGermplasmList(new Random().nextInt()))).when(this.germplasmListServiceMiddleware)
+			.getGermplasmListByIdAndProgramUUID(ArgumentMatchers.any(), ArgumentMatchers.eq(GermplasmListServiceImplTest.PROGRAM_UUID));
+		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
+		final UserTreeState treeState = new UserTreeState();
+		treeState.setUserId(userId);
+		treeState.setProgramUUID(GermplasmListServiceImplTest.PROGRAM_UUID);
+		treeState.setFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, "5", "7"));
+
+		this.germplasmListService.saveGermplasmListTreeState(GermplasmListServiceImplTest.CROP, treeState);
+		final ArgumentCaptor<ProgramDTO> programCaptor = ArgumentCaptor.forClass(ProgramDTO.class);
+		Mockito.verify(this.programValidator).validate(programCaptor.capture(), ArgumentMatchers.any());
+		Assert.assertThat(programCaptor.getValue().getCrop(), is(GermplasmListServiceImplTest.CROP));
+		Assert.assertThat(programCaptor.getValue().getUniqueID(), is(GermplasmListServiceImplTest.PROGRAM_UUID));
+		Mockito.verify(this.userValidator).validateUserId(ArgumentMatchers.any(), ArgumentMatchers.eq(userId));
+		Mockito.verify(this.userProgramStateDataManager).saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID, ListTreeState.GERMPLASM_LIST
+			.name(), treeState.getFolders());
+	}
+
+	@Test
+	public void testSaveTreeState_FolderDoesntExistInProgram() {
+		final String invalidFolder = "7";
+		Mockito.doReturn(Optional.empty()).when(this.germplasmListServiceMiddleware)
+			.getGermplasmListByIdAndProgramUUID(Integer.parseInt(invalidFolder), GermplasmListServiceImplTest.PROGRAM_UUID);
+		final String validFolder = "5";
+		Mockito.doReturn(Optional.of(this.getGermplasmList(Integer.parseInt(validFolder)))).when(this.germplasmListServiceMiddleware)
+			.getGermplasmListByIdAndProgramUUID(Integer.parseInt(validFolder), GermplasmListServiceImplTest.PROGRAM_UUID);
+		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
+		final UserTreeState treeState = new UserTreeState();
+		treeState.setUserId(userId);
+		treeState.setProgramUUID(GermplasmListServiceImplTest.PROGRAM_UUID);
+		treeState.setFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, validFolder, invalidFolder));
+
+		try {
+			this.germplasmListService.saveGermplasmListTreeState(GermplasmListServiceImplTest.CROP, treeState);
+			Assert.fail("Should have thrown validation exception but did not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(e.getErrors().get(0).getCode(), is("list.parent.id.not.exist"));
+			Mockito.verify(this.userProgramStateDataManager, Mockito.never()).saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID, ListTreeState.GERMPLASM_LIST
+				.name(), treeState.getFolders());
+		}
+	}
+
+	@Test
+	public void testSaveTreeState_NoFolderToSave() {
+		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
+		final UserTreeState treeState = new UserTreeState();
+		treeState.setUserId(userId);
+		treeState.setProgramUUID(GermplasmListServiceImplTest.PROGRAM_UUID);
+
+		try {
+			this.germplasmListService.saveGermplasmListTreeState(GermplasmListServiceImplTest.CROP, treeState);
+			Assert.fail("Should have thrown validation exception but did not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(e.getErrors().get(0).getCode(), is("list.folders.empty"));
+			Mockito.verify(this.userProgramStateDataManager, Mockito.never()).saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID, ListTreeState.GERMPLASM_LIST
+				.name(), treeState.getFolders());
+		}
+	}
 
 	private GermplasmListGeneratorDTO createGermplasmList() {
 		final GermplasmListGeneratorDTO list = new GermplasmListGeneratorDTO();

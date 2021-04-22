@@ -109,6 +109,10 @@ public class UserValidator {
 	}
 
 	public void validateUserId(final BindingResult errors, final String userId) {
+		if (Objects.isNull(userId)) {
+			errors.reject("signup.field.missing.userId");
+			return;
+		}
 		if (NumberUtils.isDigits(userId)) {
 			final WorkbenchUser user = this.userService.getUserById(Integer.parseInt(userId));
 			if (!Objects.isNull(user)) {
