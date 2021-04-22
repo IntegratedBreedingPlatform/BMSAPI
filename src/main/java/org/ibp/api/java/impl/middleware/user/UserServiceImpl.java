@@ -106,19 +106,19 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public UserDto getUserWithAuthorities(final String cropName, final String programUuid) {
+	public UserDetailDto getUserWithAuthorities(final String cropName, final String programUuid) {
 		final String userName = SecurityUtil.getLoggedInUserName();
 		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUuid);
 		final ModelMapper userMapper = UserMapper.getInstance();
-		final UserDto userDto = userMapper.map(user, UserDto.class);
+		final UserDetailDto userDetailDto = userMapper.map(user, UserDetailDto.class);
 
 		final Project lastOpenedProject = this.workbenchDataManager.getLastOpenedProject(user.getUserid());
 		if (!Objects.isNull(lastOpenedProject)) {
-			userDto.setSelectedCropName(lastOpenedProject.getCropType().getCropName());
-			userDto.setSelectedProgramUUID(lastOpenedProject.getUniqueID());
+			userDetailDto.setSelectedCropName(lastOpenedProject.getCropType().getCropName());
+			userDetailDto.setSelectedProgramUUID(lastOpenedProject.getUniqueID());
 		}
 
-		return userDto;
+		return userDetailDto;
 	}
 
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
