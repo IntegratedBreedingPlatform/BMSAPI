@@ -16,5 +16,5 @@ public interface UserService {
 
 	List<UserDetailDto> getUsersByProjectUUID(final String projectUUID);
 
-	UserDto getUserWithAuthorities(final String cropName, final String programUuid);
+	UserDetailDto getUserWithAuthorities(final String cropName, final String programUuid);
 }

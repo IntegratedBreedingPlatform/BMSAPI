@@ -6,6 +6,7 @@ import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,66 +22,93 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	private String status;
 	private String email;
 	private Set<CropDto> crops;
+	private Set<String> authorities;
+	private String selectedCropName;
+	private String selectedProgramUUID;
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
-	public void setUsername(String username) {
+	public void setUsername(final String username) {
 		this.username = username;
 	}
 
 	public String getFirstName() {
-		return firstName;
+		return this.firstName;
 	}
 
-	public void setFirstName(String firstName) {
+	public void setFirstName(final String firstName) {
 		this.firstName = firstName;
 	}
 
 	public String getLastName() {
-		return lastName;
+		return this.lastName;
 	}
 
-	public void setLastName(String lastName) {
+	public void setLastName(final String lastName) {
 		this.lastName = lastName;
 	}
 
 	public String getStatus() {
-		return status;
+		return this.status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(final String status) {
 		this.status = status;
 	}
 
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
-	public void setEmail(String email) {
+	public void setEmail(final String email) {
 		this.email = email;
 	}
 
 	public List<UserRoleDto> getUserRoles() {
-		return userRoles;
+		return this.userRoles;
 	}
 
 	public void setUserRoles(final List<UserRoleDto> userRoles) {
 		this.userRoles = userRoles;
 	}
 
+	public Set<String> getAuthorities() {
+		return this.authorities;
+	}
+
+	public void setAuthorities(final Set<String> authorities) {
+		this.authorities = authorities;
+	}
+
+	public String getSelectedCropName() {
+		return this.selectedCropName;
+	}
+
+	public void setSelectedCropName(final String selectedCropName) {
+		this.selectedCropName = selectedCropName;
+	}
+
+	public String getSelectedProgramUUID() {
+		return this.selectedProgramUUID;
+	}
+
+	public void setSelectedProgramUUID(final String selectedProgramUUID) {
+		this.selectedProgramUUID = selectedProgramUUID;
+	}
+
 	@Override
-	public int compareTo(UserDto o) {
-		int compareId = o.getUserId();
+	public int compareTo(final UserDto o) {
+		final int compareId = o.getUserId();
 		return Integer.valueOf(this.getId()).compareTo(compareId);
 	}
 
@@ -101,7 +129,7 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -111,7 +139,7 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		UserDetailDto other = (UserDetailDto) obj;
+		final UserDetailDto other = (UserDetailDto) obj;
 		if (this.id != other.id) {
 			return false;
 		}
@@ -121,19 +149,24 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
-			.append("id", id)
-			.append("username", username)
-			.append("firstName", firstName)
-			.append("lastName", lastName)
-			.append("status", status)
-			.append("email", email)
-			.append("crops", crops)
-			.append("userRoles", userRoles)
+			.append("id", this.id)
+			.append("username", this.username)
+			.append("firstName", this.firstName)
+			.append("lastName", this.lastName)
+			.append("status", this.status)
+			.append("email", this.email)
+			.append("crops", this.crops)
+			.append("selectedCropName", this.selectedCropName)
+			.append("selectedProgramUUID", this.selectedProgramUUID)
+
 			.toString();
 	}
 
 	public Set<CropDto> getCrops() {
-		return crops;
+		if (this.crops == null) {
+			this.crops = new HashSet<>();
+		}
+		return this.crops;
 	}
 
 	public void setCrops(final Set<CropDto> crops) {
