@@ -205,6 +205,7 @@ public class StudyEntryServiceImplTest {
 		final Long testEntriesCount = Long.valueOf(5);
 		final Long checkEntriesCount = Long.valueOf(3);
 		final Long nonTestEntriesCount = Long.valueOf(2);
+		final Long nonReplicatedEntriesCount = Long.valueOf(3);
 
 		Mockito.when(this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
 			Collections.singletonList(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()))))
@@ -212,6 +213,9 @@ public class StudyEntryServiceImplTest {
 		Mockito.when(this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
 			Collections.singletonList(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()))))
 			.thenReturn(checkEntriesCount);
+		Mockito.when(this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
+				Collections.singletonList(String.valueOf(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId()))))
+				.thenReturn(nonReplicatedEntriesCount);
 
 		final List<Enumeration> enumerations = new ArrayList<>();
 		enumerations.add(new Enumeration(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId(),
@@ -220,19 +224,30 @@ public class StudyEntryServiceImplTest {
 			SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeName(),SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeValue(), 2));
 		enumerations.add(new Enumeration(SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeCategoricalId(),
 			SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeName(),SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeValue(), 3));
+		enumerations.add(new Enumeration(SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeCategoricalId(),
+				SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeName(),SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeValue(), 4));
+
 		Mockito.when(this.entryTypeService.getEntryTypes(programUUID)).thenReturn(enumerations);
 
 		final List<String> checkEntryTypeIds = enumerations.stream()
 			.filter(entryType -> entryType.getId() != SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())
 			.map(entryType -> String.valueOf(entryType.getId())).collect(Collectors.toList());
+
+		final List<String> nonReplicatedEntryTypeIds = enumerations.stream()
+				.filter(entryType -> entryType.getId() == SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())
+				.map(entryType -> String.valueOf(entryType.getId())).collect(Collectors.toList());
+
+
 		Mockito.when(this.middlewareStudyEntryService
 			.countStudyGermplasmByEntryTypeIds(studyId, checkEntryTypeIds)).thenReturn(nonTestEntriesCount);
 		Mockito.when(this.middlewareStudyEntryService.hasUnassignedEntries(studyId)).thenReturn(false);
+
 
 		final StudyEntryMetadata metadata = this.studyEntryService.getStudyEntriesMetadata(studyId, programUUID);
 		Assert.assertEquals(testEntriesCount, metadata.getTestEntriesCount());
 		Assert.assertEquals(checkEntriesCount, metadata.getCheckEntriesCount());
 		Assert.assertEquals(nonTestEntriesCount, metadata.getNonTestEntriesCount());
+		Assert.assertEquals(nonReplicatedEntriesCount, metadata.getNonReplicatedEntriesCount());
 		Assert.assertFalse(metadata.getHasUnassignedEntries());
 	}
 

@@ -41,53 +41,58 @@ public class PresetServiceImpl implements PresetService {
 
 	@Override
 	public PresetDTO savePreset(final String crop, final PresetDTO presetDTO) {
-		presetDTOValidator.validate(crop, presetDTO);
-		this.validateUserIsAProgramMember(crop, securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
-		ProgramPreset programPreset = presetMapper.map(presetDTO);
-		programPreset = presetService.saveProgramPreset(programPreset);
+		this.presetDTOValidator.validate(crop, null, presetDTO);
+		this.validateUserIsAProgramMember(crop, this.securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
+		ProgramPreset programPreset = this.presetMapper.map(presetDTO);
+		programPreset = this.presetService.saveProgramPreset(programPreset);
 		presetDTO.setId(programPreset.getProgramPresetId());
 		return presetDTO;
 	}
 
 	@Override
 	public List<PresetDTO> getPresets(final String programUUID, final Integer toolId, final String toolSection) {
-		errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
 		if (StringUtils.isEmpty(programUUID)) {
-			errors.reject("preset.program.required", "");
+			this.errors.reject("preset.program.required", "");
 		}
 		if (StringUtils.isEmpty(toolSection)) {
-			errors.reject("preset.tool.section.required", "");
+			this.errors.reject("preset.tool.section.required", "");
 		}
 		if (toolId == null) {
-			errors.reject("preset.tool.id.required", "");
+			this.errors.reject("preset.tool.id.required", "");
 		}
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		final List<ProgramPreset> programPresets = presetService.getProgramPresetFromProgramAndTool(programUUID, toolId, toolSection);
+		final List<ProgramPreset> programPresets = this.presetService.getProgramPresetFromProgramAndTool(programUUID, toolId, toolSection);
 		final List<PresetDTO> presetDTOs = new ArrayList<>();
-		programPresets.forEach(programPreset -> presetDTOs.add(presetMapper.map(programPreset)));
+		programPresets.forEach(programPreset -> presetDTOs.add(this.presetMapper.map(programPreset)));
 		return presetDTOs;
 	}
 
 	@Override
 	public void deletePreset(final String crop, final Integer presetId) {
-		final ProgramPreset programPreset = presetService.getProgramPresetById(presetId);
-		if (programPreset == null) {
-			errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
-			errors.reject("preset.not.found", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
-		}
-		this.validateUserIsAProgramMember(crop, securityService.getCurrentlyLoggedInUser().getName(), programPreset.getProgramUuid());
-		presetService.deleteProgramPreset(presetId);
+		this.presetDTOValidator.validateDeletable(presetId);
+		final ProgramPreset programPreset = this.presetService.getProgramPresetById(presetId);
+		this.validateUserIsAProgramMember(crop, this.securityService.getCurrentlyLoggedInUser().getName(), programPreset.getProgramUuid());
+		this.presetService.deleteProgramPreset(presetId);
 	}
 
-	private void validateUserIsAProgramMember(final String crop, final String username, final String programUUID){
-		final ProgramDTO program = programService.getByUUIDAndCrop(crop, programUUID);
+	@Override
+	public void updatePreset(final String crop, final Integer presetId, final PresetDTO presetDTO) {
+		this.presetDTOValidator.validate(crop, presetId, presetDTO);
+		this.validateUserIsAProgramMember(crop, this.securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
+		final ProgramPreset updateProgramPreset = this.presetService.getProgramPresetById(presetId);
+		final ProgramPreset programPreset = this.presetMapper.map(presetDTO, updateProgramPreset);
+		this.presetService.updateProgramPreset(updateProgramPreset);
+	}
+
+	private void validateUserIsAProgramMember(final String crop, final String username, final String programUUID) {
+		final ProgramDTO program = this.programService.getByUUIDAndCrop(crop, programUUID);
 		if (!program.getMembers().contains(username)) {
-			errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
-			errors.reject("preset.user.not.a.program.member", "");
-			throw new ForbiddenException(errors.getAllErrors().get(0));
+			this.errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
+			this.errors.reject("preset.user.not.a.program.member", "");
+			throw new ForbiddenException(this.errors.getAllErrors().get(0));
 		}
 	}
 }

@@ -32,6 +32,8 @@ public interface StudyEntryService {
 
 	long countAllCheckTestEntries(Integer studyId, String programUuid, Boolean checkOnly);
 
+	long countAllNonReplicatedTestEntries(Integer studyId);
+
 	StudyEntryMetadata getStudyEntriesMetadata(Integer studyId, String programUuid);
 
 	List<MeasurementVariable> getEntryDescriptorColumns(Integer studyId);
