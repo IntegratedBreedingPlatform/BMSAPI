@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
@@ -48,6 +49,7 @@ import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmBasicDetailsValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.ProgenitorsUpdateRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -62,6 +64,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -126,6 +129,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmBasicDetailsValidator germplasmBasicDetailsValidator;
+
+	@Autowired
+	private ProgenitorsUpdateRequestDtoValidator progenitorsUpdateRequestDtoValidator;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -466,6 +472,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 			return false;
 		}
 		this.germplasmService.updateGermplasmBasicDetails(gid, germplasmBasicDetailsDto);
+		return true;
+	}
+
+	@Override
+	public boolean updateGermplasmPedigree(final String programUUID, final Integer gid,
+		final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		if (Objects.nonNull(progenitorsUpdateRequestDto) && progenitorsUpdateRequestDto.allAttributesNull()) {
+			return false;
+		}
+		this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
+		this.germplasmService.updateGermplasmPedigree(gid, progenitorsUpdateRequestDto);
 		return true;
 	}
 

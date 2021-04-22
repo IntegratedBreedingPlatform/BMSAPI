@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
@@ -356,14 +357,14 @@ public class GermplasmResource {
 	}
 
 	/**
-	 * Modify a germplasm
+	 * Modify germplasm basic details
 	 *
 	 * @return {@link GermplasmDto}
 	 */
 	@ApiOperation(value = "Update germplasm basic details")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/basic-details", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<Void> updateGermplasm(
+	public ResponseEntity<Void> updateGermplasmBasicDetails(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
 		@RequestParam(required = false) final String programUUID,
@@ -371,4 +372,22 @@ public class GermplasmResource {
 		final boolean updateExecuted = this.germplasmService.updateGermplasmBasicDetails(programUUID, gid, germplasmBasicDetailsDto);
 		return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
 	}
+
+	/**
+	 * Modify germplasm pedigree
+	 *
+	 * @return {@link GermplasmDto}
+	 */
+	@ApiOperation(value = "Update germplasm pedigree: breeding method and progenitors")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/progenitor-details", method = RequestMethod.PATCH)
+	@ResponseBody
+	public ResponseEntity<Void> updateGermplasmPedigree(
+		@PathVariable final String cropName,
+		@PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto) {
+		final boolean updateExecuted = this.germplasmService.updateGermplasmPedigree(programUUID, gid, progenitorsUpdateRequestDto);
+		return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
+	}
+
 }
