@@ -162,6 +162,11 @@ public class LotResource {
 
 				@Override
 				public long getCount() {
+					return 0;
+				}
+
+				@Override
+				public long getFilteredCount() {
 					return LotResource.this.lotService.countSearchLots(searchDTO);
 				}
 
@@ -179,7 +184,7 @@ public class LotResource {
 		final List<ExtendedLotDto> extendedLotDtos = resultPage.getPageResults();
 
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
+		headers.add("X-Filtered-Count", Long.toString(resultPage.getFilteredResults()));
 
 		return new ResponseEntity<>(extendedLotDtos, headers, HttpStatus.OK);
 
