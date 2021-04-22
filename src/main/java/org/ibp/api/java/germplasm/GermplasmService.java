@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
@@ -81,5 +82,8 @@ public interface GermplasmService {
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 
 	boolean updateGermplasmBasicDetails(String programUUID, Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
+
+	boolean updateGermplasmPedigree(final String programUUID, final Integer gid,
+		final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto);
 
 }
