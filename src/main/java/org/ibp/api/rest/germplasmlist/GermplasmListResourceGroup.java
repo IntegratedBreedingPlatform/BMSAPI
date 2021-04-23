@@ -147,13 +147,14 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Save hierarchy of germplasm list folders last used by user", notes = "Save hierarchy of germplasm list folders last used by user")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree-state", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> saveUserTreeState(
 		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@RequestBody final UserTreeState treeState) {
-		this.germplasmListService.saveGermplasmListTreeState(crop, treeState);
+		this.germplasmListService.saveGermplasmListTreeState(crop, programUUID, treeState);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

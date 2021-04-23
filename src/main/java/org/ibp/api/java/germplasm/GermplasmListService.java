@@ -17,7 +17,7 @@ public interface GermplasmListService {
 
 	List<TreeNode> getUserTreeState(final String crop, final String programUUID, final String userId);
 
-	void saveGermplasmListTreeState(final String crop, final UserTreeState userTreeState);
+	void saveGermplasmListTreeState(final String crop, final String programUUID, final UserTreeState userTreeState);
 
 	GermplasmList getGermplasmList(Integer germplasmListId);
 

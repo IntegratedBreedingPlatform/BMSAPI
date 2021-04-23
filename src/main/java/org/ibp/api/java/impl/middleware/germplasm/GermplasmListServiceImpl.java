@@ -244,10 +244,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void saveGermplasmListTreeState(final String crop, final UserTreeState userTreeState) {
+	public void saveGermplasmListTreeState(final String crop, final String programUUID, final UserTreeState userTreeState) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		checkNotNull(userTreeState, "param.null", new String[] {"treeState"});
-		final String programUUID = userTreeState.getProgramUUID();
 		this.validateProgram(crop, programUUID);
 
 		final String userId = userTreeState.getUserId();

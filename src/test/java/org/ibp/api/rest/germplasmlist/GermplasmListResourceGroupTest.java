@@ -25,7 +25,6 @@ import static org.mockito.Mockito.doReturn;
 
 public class GermplasmListResourceGroupTest extends ApiUnitTestBase {
 
-	private static final String CROP = "maize";
 	private static final String PROGRAM_UUID = "50a7e02e-db60-4240-bd64-417b34606e46";
 
 	@Resource
@@ -80,10 +79,9 @@ public class GermplasmListResourceGroupTest extends ApiUnitTestBase {
 		final String userId = RandomStringUtils.randomNumeric(2);
 		final UserTreeState treeState = new UserTreeState();
 		treeState.setUserId(userId);
-		treeState.setProgramUUID(GermplasmListResourceGroupTest.PROGRAM_UUID);
 		treeState.setFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, "5", "7"));
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/crops/{crop}/germplasm-lists/tree-state",
-			crop).content(this.convertObjectToByte(treeState))
+			crop).param("programUUID", GermplasmListResourceGroupTest.PROGRAM_UUID).content(this.convertObjectToByte(treeState))
 			.contentType(this.contentType))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print());

@@ -12,7 +12,6 @@ import java.util.List;
 public class UserTreeState {
 
 	private String userId;
-	private String programUUID;
 	private List<String> folders = new ArrayList<>();
 
 	public UserTreeState() {
@@ -25,14 +24,6 @@ public class UserTreeState {
 
 	public void setUserId(final String userId) {
 		this.userId = userId;
-	}
-
-	public String getProgramUUID() {
-		return this.programUUID;
-	}
-
-	public void setProgramUUID(final String programUUID) {
-		this.programUUID = programUUID;
 	}
 
 	public List<String> getFolders() {
