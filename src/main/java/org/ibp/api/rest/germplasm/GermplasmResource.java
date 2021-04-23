@@ -362,6 +362,7 @@ public class GermplasmResource {
 	 * @return {@link GermplasmDto}
 	 */
 	@ApiOperation(value = "Update germplasm basic details")
+	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_BASIC_DETAILS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/basic-details", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity<Void> updateGermplasmBasicDetails(
@@ -379,6 +380,7 @@ public class GermplasmResource {
 	 * @return {@link GermplasmDto}
 	 */
 	@ApiOperation(value = "Update germplasm pedigree: breeding method and progenitors")
+	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_PEDIGREE')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/progenitor-details", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity<Void> updateGermplasmPedigree(

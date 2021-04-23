@@ -24,6 +24,7 @@ public class GermplasmNameResource {
 	private GermplasmNameService germplasmNameService;
 
 	@ApiOperation(value = "Create name for a specified germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_NAMES')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/names", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Integer> createGermplasmName(@PathVariable final String cropName,
@@ -33,6 +34,7 @@ public class GermplasmNameResource {
 	}
 
 	@ApiOperation(value = "Update name for a specified Germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_NAMES')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/names/{nameId}", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity<Void> updateGermplasmName(@PathVariable final String cropName,
@@ -44,6 +46,7 @@ public class GermplasmNameResource {
 	}
 
 	@ApiOperation(value = "Delete name for a specified Germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_NAMES')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/names/{nameId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteGermplasmName(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
@@ -51,4 +54,5 @@ public class GermplasmNameResource {
 		this.germplasmNameService.deleteName(gid, nameId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
+
 }

@@ -9,12 +9,17 @@ import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.springframework.data.domain.Pageable;
+import org.ibp.api.rest.common.UserTreeState;
 
 import java.util.List;
 
 public interface GermplasmListService {
 
 	List<TreeNode> getGermplasmListChildrenNodes(final String crop, final String programUUID, final String parentId, final Boolean folderOnly);
+
+	List<TreeNode> getUserTreeState(final String crop, final String programUUID, final String userId);
+
+	void saveGermplasmListTreeState(final String crop, final String programUUID, final UserTreeState userTreeState);
 
 	GermplasmList getGermplasmList(Integer germplasmListId);
 
