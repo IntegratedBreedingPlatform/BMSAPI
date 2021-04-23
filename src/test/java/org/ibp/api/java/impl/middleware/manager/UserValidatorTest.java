@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.manager;
 
 import liquibase.util.StringUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -22,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -408,6 +410,38 @@ public class UserValidatorTest {
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.assertValidateException(userDto, false, "user.crop.not.exist", null);
+	}
+
+	@Test
+	public void testValidateUserId_NullUserId() {
+		final BindingResult result = Mockito.mock(BindingResult.class);
+		this.uservalidator.validateUserId(result, null);
+		Mockito.verify(result).reject("signup.field.missing.userId");
+	}
+
+	@Test
+	public void testValidateUserId_NonDigitsUserId() {
+		final BindingResult result = Mockito.mock(BindingResult.class);
+		this.uservalidator.validateUserId(result, RandomStringUtils.randomAlphabetic(3));
+		Mockito.verify(result).reject("signup.field.invalid.userId");
+	}
+
+	@Test
+	public void testValidateUserId_ValidUserId() {
+		final BindingResult result = Mockito.mock(BindingResult.class);
+		final Integer userId = new Random().nextInt(100);
+		Mockito.doReturn(UserTestDataGenerator.initializeWorkbenchUser(userId, UserTestDataGenerator.initializeUserRoleAdmin())).when(this.userService).getUserById(userId);
+		this.uservalidator.validateUserId(result, userId.toString());
+		Mockito.verifyZeroInteractions(result);
+	}
+
+	@Test
+	public void testValidateUserId_NonExistentUserId() {
+		final BindingResult result = Mockito.mock(BindingResult.class);
+		final Integer userId = new Random().nextInt(100);
+		Mockito.doReturn(null).when(this.userService).getUserById(userId);
+		this.uservalidator.validateUserId(result, userId.toString());
+		Mockito.verify(result).reject("signup.field.invalid.userId");
 	}
 
 	private void assertValidateException(final UserDetailDto userDto, final boolean createUser, final String message, final List<String> errorArgs) {

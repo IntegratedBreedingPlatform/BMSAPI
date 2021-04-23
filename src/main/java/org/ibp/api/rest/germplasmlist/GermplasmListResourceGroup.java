@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.germplasm.GermplasmListService;
+import org.ibp.api.rest.common.UserTreeState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,8 @@ import java.util.List;
 
 @Api(value = "Germplasm List Services")
 @Controller
-public class GermplasmListResourceGroup {
+public class
+GermplasmListResourceGroup {
 
 	@Autowired
 	public GermplasmListService germplasmListService;
@@ -130,6 +132,29 @@ public class GermplasmListResourceGroup {
 		@PathVariable final String folderId,
 		@RequestParam(required = false) final String programUUID) {
 		this.germplasmListService.deleteGermplasmListFolder(crop, programUUID, folderId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get tree of expanded germplasm list folders last used by user", notes = "Get tree of expanded germplasm list folders last used by user")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree-state", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<TreeNode>> getUserTreeState(
+		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@ApiParam(value = "The User ID") @RequestParam(required = true) final String userId) {
+		return new ResponseEntity<>( this.germplasmListService.getUserTreeState(crop, programUUID, userId), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Save hierarchy of germplasm list folders last used by user", notes = "Save hierarchy of germplasm list folders last used by user")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree-state", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> saveUserTreeState(
+		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@RequestBody final UserTreeState treeState) {
+		this.germplasmListService.saveGermplasmListTreeState(crop, programUUID, treeState);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
