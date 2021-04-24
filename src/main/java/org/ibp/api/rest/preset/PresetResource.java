@@ -27,7 +27,10 @@ import java.util.List;
 	+ "'CROP_MANAGEMENT',"
 	+ "'MANAGE_INVENTORY',"
 	+ "'MANAGE_LOTS',"
-	+ "'LOT_LABEL_PRINTING'"
+	+ "'LOT_LABEL_PRINTING',"
+	+ "'GERMPLASM',"
+	+ "'MANAGE_GERMPLASM',"
+	+ "'GERMPLASM_LABEL_PRINTING'"
 	+ ")")
 @RestController
 public class PresetResource {
