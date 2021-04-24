@@ -13,6 +13,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -40,6 +41,7 @@ import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.UserTreeState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -57,6 +59,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
@@ -276,6 +280,33 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public long countMyLists(final String programUUID, final Integer userId) {
+		return this.germplasmListService.countMyLists(programUUID, userId);
+	}
+
+	@Override
+	public List<MyListsDTO> getMyLists(final String programUUID, final Pageable pageable, final Integer userId) {
+		final Map<String, GermplasmListTypeDTO> listTypes = this.getGermplasmListTypes()
+			.stream().collect(toMap(GermplasmListTypeDTO::getCode, identity()));
+
+		final List<MyListsDTO> myLists = this.germplasmListService.getMyLists(programUUID, pageable, userId);
+		for (final MyListsDTO myList : myLists) {
+			if (myList.getFolder() == null) {
+				if (programUUID == null) {
+					myList.setFolder(AppConstants.CROP_LISTS.getString());
+				} else {
+					myList.setFolder(AppConstants.PROGRAM_LISTS.getString());
+				}
+			}
+			final GermplasmListTypeDTO type = listTypes.get(myList.getType());
+			if (type != null) {
+				myList.setTypeName(type.getName());
+			}
+		}
+		return myLists;
+	}
+
+	@Override
 	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request) {
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
@@ -363,7 +394,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<Integer> gids = request.getEntries()
 			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
 		final Map<Integer, Germplasm> germplasmMap = this.germplasmDataManager.getGermplasms(gids)
-			.stream().collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
+			.stream().collect(toMap(Germplasm::getGid, identity()));
 		final Map<Integer, String> crossExpansions =
 			this.pedigreeService.getCrossExpansionsBulk(new HashSet<>(gids), null, this.crossExpansionProperties);
 		final Map<Integer, String> plotCodeValuesByGIDs = this.germplasmService.getPlotCodeValues(new HashSet<>(gids));
