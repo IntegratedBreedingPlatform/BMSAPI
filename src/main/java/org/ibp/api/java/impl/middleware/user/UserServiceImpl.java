@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.user;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -9,6 +10,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.domain.user.UserMapper;
+import org.ibp.api.domain.user.UserProfileDto;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -21,8 +23,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -119,6 +124,33 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return userDetailDto;
+	}
+
+	@Override
+	public Integer updateUserProfile(final UserProfileDto userProfileDto, final WorkbenchUser workbenchUser) {
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserProfileDto.class.getName());
+		final UserDto userDto = new UserDto(workbenchUser);
+
+		this.userValidator.validateUserProfileLogged(errors, workbenchUser);
+
+		if (!StringUtils.isBlank(userProfileDto.getFirstName()) && !userDto.getFirstName().equals(userProfileDto.getFirstName())) {
+			this.userValidator
+				.validateFieldLength(errors, userProfileDto.getFirstName(), UserValidator.FIRST_NAME, UserValidator.FIRST_NAME_MAX_LENGTH);
+			userDto.setFirstName(userProfileDto.getFirstName());
+		}
+
+		if (!StringUtils.isBlank(userProfileDto.getLastName()) && !userDto.getLastName().equals(userProfileDto.getLastName())) {
+			this.userValidator
+				.validateFieldLength(errors, userProfileDto.getLastName(), UserValidator.LAST_NAME, UserValidator.LAST_NAME_MAX_LENGTH);
+			userDto.setLastName(userProfileDto.getLastName());
+		}
+
+		if (!StringUtils.isBlank(userProfileDto.getEmail()) && !userProfileDto.getEmail().equals(workbenchUser.getPerson().getEmail())) {
+			this.userValidator.validateEmail(errors, userProfileDto.getEmail());
+			userDto.setEmail(userProfileDto.getEmail());
+		}
+
+		return this.userService.updateUser(userDto);
 	}
 
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
