@@ -59,7 +59,7 @@ public class UserValidator {
 	public static final String EMAIL_LOCAL_PART_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*";
 	private static final Pattern USERNAME_PATTERN = Pattern.compile(EMAIL_LOCAL_PART_REGEX);
 	private static final String EMAIL_REGEX = EMAIL_LOCAL_PART_REGEX
-				+ "@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+		+ "@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
 	public static final int FIRST_NAME_MAX_LENGTH = 20;
 	public static final int LAST_NAME_MAX_LENGTH = 50;
@@ -135,8 +135,8 @@ public class UserValidator {
 		}
 		//If person entity is associated to more than one user, block user edition
 		//Temporary validation, it should be removed when we unify persons and users
-		final List<UserDto> usersWithSamePersonId = this.userService.getUsersByPersonIds(Lists.newArrayList(userUpdate.getPerson().getId()));
-		if (usersWithSamePersonId.size()>1) {
+		final List<UserDto> usersWithSamePersonId =	this.userService.getUsersByPersonIds(Lists.newArrayList(userUpdate.getPerson().getId()));
+		if (usersWithSamePersonId.size() > 1) {
 			this.errors.reject(CANNOT_UPDATE_PERSON_MULTIPLE_USERS);
 		}
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
@@ -336,10 +336,10 @@ public class UserValidator {
 		}
 
 	}
-    
+
 	protected void validateUserStatus(final String fieldValue) {
 		if (!Objects.isNull(fieldValue) && !"true".equalsIgnoreCase(fieldValue)
-				&& !"false".equalsIgnoreCase(fieldValue)) {
+			&& !"false".equalsIgnoreCase(fieldValue)) {
 			this.errors.reject(SIGNUP_FIELD_INVALID_STATUS);
 		}
 	}
