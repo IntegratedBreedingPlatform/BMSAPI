@@ -6,6 +6,9 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class UserProfileDto {
 
+	private String userName;
+	private String password;
+
 	private String firstName;
 	private String lastName;
 	private String email;
@@ -41,6 +44,22 @@ public class UserProfileDto {
 
 	public void setEmail(final String email) {
 		this.email = email;
+	}
+
+	public String getUserName() {
+		return this.userName;
+	}
+
+	public void setUserName(final String userName) {
+		this.userName = userName;
+	}
+
+	public String getPassword() {
+		return this.password;
+	}
+
+	public void setPassword(final String password) {
+		this.password = password;
 	}
 
 	@Override
