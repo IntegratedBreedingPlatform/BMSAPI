@@ -4,9 +4,11 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.springframework.data.domain.Pageable;
 import org.ibp.api.rest.common.UserTreeState;
 
 import java.util.List;
@@ -20,6 +22,10 @@ public interface GermplasmListService {
 	void saveGermplasmListTreeState(final String crop, final String programUUID, final UserTreeState userTreeState);
 
 	GermplasmList getGermplasmList(Integer germplasmListId);
+
+	long countMyLists(String programUUID, Integer userId);
+
+	List<MyListsDTO> getMyLists(String programUUID, Pageable pageable, Integer userId);
 
 	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request);
 
