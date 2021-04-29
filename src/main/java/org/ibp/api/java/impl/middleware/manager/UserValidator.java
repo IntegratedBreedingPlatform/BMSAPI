@@ -375,7 +375,7 @@ public class UserValidator {
 	public void validateUserProfileLogged(final BindingResult errors, final WorkbenchUser workbenchUser){
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		if (!workbenchUser.getUserid().equals(loggedInUser.getUserid())) {
-			errors.reject("user.perfile.update.invalid.user.logged", new Object[] {loggedInUser.getName(), workbenchUser.getName()}, "");
+			errors.reject("user.perfile.update.invalid.user.logged", new Object[] {}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 
 		}
