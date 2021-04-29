@@ -123,7 +123,7 @@ public class UserValidator {
 	}
 
 	private void validateUserUpdate(final UserDetailDto user) {
-		WorkbenchUser userUpdate = this.userService.getUserById(user.getId());
+		final WorkbenchUser userUpdate = this.userService.getUserById(user.getId());
 		if (Objects.isNull(userUpdate)) {
 			this.errors.reject(SIGNUP_FIELD_INVALID_USER_ID);
 			return;
@@ -200,7 +200,7 @@ public class UserValidator {
 			// Roles in the list must exist
 			final Set<Integer> roleIds = userRoles.stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 
-			final List<Role> savedRoles = workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds));
+			final List<Role> savedRoles = this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds));
 
 			if (savedRoles.size() != roleIds.size()) {
 				this.errors.reject("user.invalid.roles", new String[] {
@@ -248,7 +248,7 @@ public class UserValidator {
 			// Instance ROLE can not have neither crop nor program
 			// Crop ROLE MUST have a crop and can not have a program
 			// Program ROLE MUST have crop and program and program MUST belong to the specified crop
-			Map<Integer, Role> savedRolesMap = savedRoles.stream().collect(
+			final Map<Integer, Role> savedRolesMap = savedRoles.stream().collect(
 				Collectors.toMap(Role::getId, Function.identity()));
 			for (final UserRoleDto userRoleDto : userRoles) {
 				final Role role = savedRolesMap.get(userRoleDto.getRole().getId());
@@ -273,7 +273,7 @@ public class UserValidator {
 						this.errors.reject("user.invalid.program.role", new String[] {role.getId().toString()}, "");
 
 					} else {
-						final Project project = workbenchDataManager
+						final Project project = this.workbenchDataManager
 							.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
 						if (project == null) {
 							this.errors.reject("user.invalid.crop.program.pair",
@@ -381,7 +381,7 @@ public class UserValidator {
 		}
 	}
 
-	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
