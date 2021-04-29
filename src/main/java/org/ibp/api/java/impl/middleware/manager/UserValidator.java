@@ -344,6 +344,43 @@ public class UserValidator {
 		}
 	}
 
+	public void validateFieldLength(final BindingResult errors, final String fieldValue, final String fieldName,
+		final Integer maxLength) {
+		if (maxLength < fieldValue.length()) {
+			errors.reject(SIGNUP_FIELD_LENGTH_EXCEED, new String[] {fieldName, Integer.toString(maxLength)}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	protected void validateEmailFormat(final BindingResult errors, final String eMail) {
+		if (!Objects.isNull(eMail) && !Pattern.compile(EMAIL_REGEX).matcher(eMail).matches()) {
+			errors.reject(SIGNUP_FIELD_INVALID_EMAIL_FORMAT);
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	protected void validatePersonEmailIfExists(final BindingResult errors, final String email) {
+		if (this.userService.isPersonWithEmailExists(email)) {
+			errors.reject(SIGNUP_FIELD_EMAIL_EXISTS);
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	public void validateEmail(final BindingResult errors, final String email) {
+		this.validateFieldLength(errors, email, UserValidator.EMAIL, UserValidator.EMAIL_MAX_LENGTH);
+		this.validateEmailFormat(errors, email);
+		this.validatePersonEmailIfExists(errors, email);
+	}
+
+	public void validateUserProfileLogged(final BindingResult errors, final WorkbenchUser workbenchUser){
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+		if (!workbenchUser.getUserid().equals(loggedInUser.getUserid())) {
+			errors.reject("user.perfile.update.invalid.user.logged", new Object[] {loggedInUser.getName(), workbenchUser.getName()}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+
+		}
+	}
+
 	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
