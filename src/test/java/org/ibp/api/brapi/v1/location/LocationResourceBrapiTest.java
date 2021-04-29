@@ -1,12 +1,11 @@
 
 package org.ibp.api.brapi.v1.location;
 
-import java.util.List;
-
+import com.beust.jcommander.internal.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -24,8 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.beust.jcommander.internal.Lists;
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.List;
 
 public class LocationResourceBrapiTest extends ApiUnitTestBase {
 
@@ -81,7 +79,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testListLocationsBadlocationType() throws Exception {
+	public void testListLocationsBadLocationType() throws Exception {
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(LocationResourceBrapiTest.MAIZE_BRAPI_V1_LOCATIONS)
 			.queryParam("locationType", "countryy").build().encode();
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
@@ -90,4 +88,5 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("not found locations"))); //
 
 	}
+
 }
