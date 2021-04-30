@@ -4,19 +4,18 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class UserProfileDto {
+public class UserProfileUpdateRequestDTO {
 
-	private String userName;
 	private String password;
 
 	private String firstName;
 	private String lastName;
 	private String email;
 
-	public UserProfileDto() {
+	public UserProfileUpdateRequestDTO() {
 	}
 
-	public UserProfileDto(final String firstName, final String lastName, final String email) {
+	public UserProfileUpdateRequestDTO(final String firstName, final String lastName, final String email) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
@@ -44,14 +43,6 @@ public class UserProfileDto {
 
 	public void setEmail(final String email) {
 		this.email = email;
-	}
-
-	public String getUserName() {
-		return this.userName;
-	}
-
-	public void setUserName(final String userName) {
-		this.userName = userName;
 	}
 
 	public String getPassword() {
