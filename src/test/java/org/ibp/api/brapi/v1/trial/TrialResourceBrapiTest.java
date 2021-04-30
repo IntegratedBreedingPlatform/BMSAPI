@@ -304,7 +304,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		final String additionalInfoKey = RandomStringUtils.randomAlphabetic(5);
 		final String additionalInfoValue = RandomStringUtils.randomAlphabetic(5);
 
-		final ContactDto contactDto = new ContactDto(new Random().nextInt(), "Maize Breeder", "admin@abc.org", "Creator");
+		final ContactDto contactDto = new ContactDto(RandomStringUtils.randomNumeric(3), "Maize Breeder", "admin@abc.org", "Creator");
 		final StudySummary studySummary =
 			new StudySummary().setName(name).setDescription(description).setSeasons(ImmutableList.<String>builder().add(season).build())
 				.setStudyDbid(studyDbId).setLocationId(locationId).setProgramDbId(programDbId).setType(type)

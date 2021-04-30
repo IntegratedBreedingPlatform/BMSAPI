@@ -34,7 +34,7 @@ public class StudyMapper {
 		@Override public List<Contact> convert(final MappingContext<List<UserDto>, List<Contact>> context) {
 			final List<Contact> contacts = new ArrayList<>();
 			for (final UserDto userDto : context.getSource()) {
-				contacts.add(new Contact(userDto.getUserId(), userDto.getEmail(), userDto.getFirstName() + " " + userDto.getLastName(),
+				contacts.add(new Contact(String.valueOf(userDto.getUserId()), userDto.getEmail(), userDto.getFirstName() + " " + userDto.getLastName(),
 					"", ""));
 			}
 			return context.getMappingEngine().map(context.create(contacts, context.getDestinationType()));
