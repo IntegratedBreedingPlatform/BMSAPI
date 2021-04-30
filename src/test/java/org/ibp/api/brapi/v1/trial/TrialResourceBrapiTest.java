@@ -79,7 +79,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwStudySummary.size()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(studySummary.getStudyDbid()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(String.valueOf(studySummary.getStudyDbid())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialName", Matchers.is(studySummary.getName()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId", Matchers.is(studySummary.getProgramDbId()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programName", Matchers.is(studySummary.getProgramName()))) //
@@ -150,7 +150,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwStudySummary.size()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(studySummary.getStudyDbid()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(String.valueOf(studySummary.getStudyDbid())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialName", Matchers.is(studySummary.getName()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId", Matchers.is(studySummary.getProgramDbId()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programName", Matchers.is(studySummary.getProgramName()))) //
@@ -333,7 +333,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwStudySummary.size()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(studySummary.getStudyDbid()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(String.valueOf(studySummary.getStudyDbid())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialName", Matchers.is(studySummary.getName()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDescription", Matchers.is(studySummary.getDescription()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialPUI", Matchers.is(studySummary.getObservationUnitId()))) //

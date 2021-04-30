@@ -19,7 +19,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TrialSummary {
 
-	private Integer trialDbId;
+	private String trialDbId;
 
 	private String trialName;
 
@@ -70,11 +70,11 @@ public class TrialSummary {
 
 	}
 
-	public Integer getTrialDbId() {
+	public String getTrialDbId() {
 		return this.trialDbId;
 	}
 
-	public void setTrialDbId(final Integer trialDbId) {
+	public void setTrialDbId(final String trialDbId) {
 		this.trialDbId = trialDbId;
 	}
 
