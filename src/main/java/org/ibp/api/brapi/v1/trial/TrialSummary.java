@@ -61,7 +61,7 @@ public class TrialSummary {
 	private List<String> externalReferences = new ArrayList<>();
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private String publications  = StringUtils.EMPTY;;
+	private List<String> publications = new ArrayList<>();
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private List<String> datasetAuthorships = new ArrayList<>();
@@ -207,11 +207,11 @@ public class TrialSummary {
 		this.externalReferences = externalReferences;
 	}
 
-	public String getPublications() {
+	public List<String> getPublications() {
 		return this.publications;
 	}
 
-	public void setPublications(final String publications) {
+	public void setPublications(final List<String> publications) {
 		this.publications = publications;
 	}
 

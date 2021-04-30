@@ -348,7 +348,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].additionalInfo", Matchers.hasValue(additionalInfoValue)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].datasetAuthorships", Matchers.is(IsCollectionWithSize.hasSize(0)))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].externalReferences", Matchers.is(IsCollectionWithSize.hasSize(0)))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].publications", Matchers.is(""))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].publications", Matchers.is(IsCollectionWithSize.hasSize(0))))//
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].documentationURL", Matchers.is(""))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].contacts", Matchers.is(IsCollectionWithSize.hasSize(1)))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].contacts[0].contactDbId",
