@@ -10,7 +10,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.domain.user.UserMapper;
-import org.ibp.api.domain.user.UserProfileDto;
+import org.ibp.api.domain.user.UserProfileUpdateRequestDTO;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -127,30 +127,29 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Integer updateUserProfile(final UserProfileDto userProfileDto, final WorkbenchUser workbenchUser) {
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserProfileDto.class.getName());
+	public void updateUserProfile(final UserProfileUpdateRequestDTO userProfileUpdateRequestDTO, final WorkbenchUser workbenchUser) {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserProfileUpdateRequestDTO.class.getName());
 		final UserDto userDto = new UserDto(workbenchUser);
 
-		this.userValidator.validateUserProfileLogged(errors, workbenchUser);
-
-		if (!StringUtils.isBlank(userProfileDto.getFirstName()) && !userDto.getFirstName().equals(userProfileDto.getFirstName())) {
+		if (!StringUtils.isBlank(userProfileUpdateRequestDTO.getFirstName()) && !userDto.getFirstName().equals(userProfileUpdateRequestDTO.getFirstName())) {
 			this.userValidator
-				.validateFieldLength(errors, userProfileDto.getFirstName(), UserValidator.FIRST_NAME, UserValidator.FIRST_NAME_MAX_LENGTH);
-			userDto.setFirstName(userProfileDto.getFirstName());
+				.validateFieldLength(errors, userProfileUpdateRequestDTO.getFirstName(), UserValidator.FIRST_NAME, UserValidator.FIRST_NAME_MAX_LENGTH);
+			userDto.setFirstName(userProfileUpdateRequestDTO.getFirstName());
 		}
 
-		if (!StringUtils.isBlank(userProfileDto.getLastName()) && !userDto.getLastName().equals(userProfileDto.getLastName())) {
+		if (!StringUtils.isBlank(userProfileUpdateRequestDTO.getLastName()) && !userDto.getLastName().equals(userProfileUpdateRequestDTO.getLastName())) {
 			this.userValidator
-				.validateFieldLength(errors, userProfileDto.getLastName(), UserValidator.LAST_NAME, UserValidator.LAST_NAME_MAX_LENGTH);
-			userDto.setLastName(userProfileDto.getLastName());
+				.validateFieldLength(errors, userProfileUpdateRequestDTO.getLastName(), UserValidator.LAST_NAME, UserValidator.LAST_NAME_MAX_LENGTH);
+			userDto.setLastName(userProfileUpdateRequestDTO.getLastName());
 		}
 
-		if (!StringUtils.isBlank(userProfileDto.getEmail()) && !userProfileDto.getEmail().equals(workbenchUser.getPerson().getEmail())) {
-			this.userValidator.validateEmail(errors, userProfileDto.getEmail());
-			userDto.setEmail(userProfileDto.getEmail());
+		if (!StringUtils.isBlank(userProfileUpdateRequestDTO.getEmail()) && !userProfileUpdateRequestDTO
+			.getEmail().equals(workbenchUser.getPerson().getEmail())) {
+			this.userValidator.validateEmail(errors, userProfileUpdateRequestDTO.getEmail());
+			userDto.setEmail(userProfileUpdateRequestDTO.getEmail());
 		}
 
-		return this.userService.updateUser(userDto);
+		this.userService.updateUser(userDto);
 	}
 
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
