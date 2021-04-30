@@ -2,8 +2,9 @@ package org.ibp.api.rest.user.profile;
 
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.ibp.api.domain.user.UserProfileDto;
+import org.ibp.api.domain.user.UserProfileUpdateRequestDTO;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,19 +33,24 @@ public class UserProfileResource {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
-	@ApiOperation(value = "Update user profile", notes = "Update First name, Laste name and Email from user profile in this deployment instance of BMSAPI. ")
-	@RequestMapping(value = "/users/profile", method = RequestMethod.PATCH)
+	@Autowired
+	private SecurityService securityService;
+
+	@ApiOperation(value = "Update user profile", notes = "Update First name, Last name and Email from user profile in this deployment instance of BMSAPI. ")
+	@RequestMapping(value = "my-profile", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<Integer> updateProfile(
-		@RequestBody final UserProfileDto userProfileDto) {
+	public ResponseEntity<Void> updateProfile(
+		@RequestBody final UserProfileUpdateRequestDTO userProfileUpdateRequestDTO) {
 
 		try {
-			final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(userProfileDto.getUserName(), userProfileDto.getPassword());
+			final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(this.securityService.getCurrentlyLoggedInUser().getName(), userProfileUpdateRequestDTO
+				.getPassword());
 			final Authentication authentication = this.authenticationManager.authenticate(credentials);
 		} catch (final AuthenticationException e) {
 			throw new ApiRuntimeException("The password is wrong, please check");
 		}
-		final WorkbenchUser workbenchUser = this.userServiceMiddleware.getUserByUsername(userProfileDto.getUserName());
-		return new ResponseEntity<>(this.userService.updateUserProfile(userProfileDto, workbenchUser), HttpStatus.OK);
+		final WorkbenchUser workbenchUser = this.securityService.getCurrentlyLoggedInUser();
+		this.userService.updateUserProfile(userProfileUpdateRequestDTO, workbenchUser);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
