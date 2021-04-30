@@ -59,7 +59,7 @@ public class UserValidator {
 	public static final String EMAIL_LOCAL_PART_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*";
 	private static final Pattern USERNAME_PATTERN = Pattern.compile(EMAIL_LOCAL_PART_REGEX);
 	private static final String EMAIL_REGEX = EMAIL_LOCAL_PART_REGEX
-				+ "@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+		+ "@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
 	public static final int FIRST_NAME_MAX_LENGTH = 20;
 	public static final int LAST_NAME_MAX_LENGTH = 50;
@@ -123,7 +123,7 @@ public class UserValidator {
 	}
 
 	private void validateUserUpdate(final UserDetailDto user) {
-		WorkbenchUser userUpdate = this.userService.getUserById(user.getId());
+		final WorkbenchUser userUpdate = this.userService.getUserById(user.getId());
 		if (Objects.isNull(userUpdate)) {
 			this.errors.reject(SIGNUP_FIELD_INVALID_USER_ID);
 			return;
@@ -135,8 +135,8 @@ public class UserValidator {
 		}
 		//If person entity is associated to more than one user, block user edition
 		//Temporary validation, it should be removed when we unify persons and users
-		final List<UserDto> usersWithSamePersonId = this.userService.getUsersByPersonIds(Lists.newArrayList(userUpdate.getPerson().getId()));
-		if (usersWithSamePersonId.size()>1) {
+		final List<UserDto> usersWithSamePersonId =	this.userService.getUsersByPersonIds(Lists.newArrayList(userUpdate.getPerson().getId()));
+		if (usersWithSamePersonId.size() > 1) {
 			this.errors.reject(CANNOT_UPDATE_PERSON_MULTIPLE_USERS);
 		}
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
@@ -200,7 +200,7 @@ public class UserValidator {
 			// Roles in the list must exist
 			final Set<Integer> roleIds = userRoles.stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 
-			final List<Role> savedRoles = workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds));
+			final List<Role> savedRoles = this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds));
 
 			if (savedRoles.size() != roleIds.size()) {
 				this.errors.reject("user.invalid.roles", new String[] {
@@ -248,7 +248,7 @@ public class UserValidator {
 			// Instance ROLE can not have neither crop nor program
 			// Crop ROLE MUST have a crop and can not have a program
 			// Program ROLE MUST have crop and program and program MUST belong to the specified crop
-			Map<Integer, Role> savedRolesMap = savedRoles.stream().collect(
+			final Map<Integer, Role> savedRolesMap = savedRoles.stream().collect(
 				Collectors.toMap(Role::getId, Function.identity()));
 			for (final UserRoleDto userRoleDto : userRoles) {
 				final Role role = savedRolesMap.get(userRoleDto.getRole().getId());
@@ -273,7 +273,7 @@ public class UserValidator {
 						this.errors.reject("user.invalid.program.role", new String[] {role.getId().toString()}, "");
 
 					} else {
-						final Project project = workbenchDataManager
+						final Project project = this.workbenchDataManager
 							.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
 						if (project == null) {
 							this.errors.reject("user.invalid.crop.program.pair",
@@ -336,15 +336,43 @@ public class UserValidator {
 		}
 
 	}
-    
+
 	protected void validateUserStatus(final String fieldValue) {
 		if (!Objects.isNull(fieldValue) && !"true".equalsIgnoreCase(fieldValue)
-				&& !"false".equalsIgnoreCase(fieldValue)) {
+			&& !"false".equalsIgnoreCase(fieldValue)) {
 			this.errors.reject(SIGNUP_FIELD_INVALID_STATUS);
 		}
 	}
 
-	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+	public void validateFieldLength(final BindingResult errors, final String fieldValue, final String fieldName,
+		final Integer maxLength) {
+		if (maxLength < fieldValue.length()) {
+			errors.reject(SIGNUP_FIELD_LENGTH_EXCEED, new String[] {fieldName, Integer.toString(maxLength)}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	protected void validateEmailFormat(final BindingResult errors, final String eMail) {
+		if (!Objects.isNull(eMail) && !Pattern.compile(EMAIL_REGEX).matcher(eMail).matches()) {
+			errors.reject(SIGNUP_FIELD_INVALID_EMAIL_FORMAT);
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	protected void validatePersonEmailIfExists(final BindingResult errors, final String email) {
+		if (this.userService.isPersonWithEmailExists(email)) {
+			errors.reject(SIGNUP_FIELD_EMAIL_EXISTS);
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	public void validateEmail(final BindingResult errors, final String email) {
+		this.validateFieldLength(errors, email, UserValidator.EMAIL, UserValidator.EMAIL_MAX_LENGTH);
+		this.validateEmailFormat(errors, email);
+		this.validatePersonEmailIfExists(errors, email);
+	}
+
+	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
