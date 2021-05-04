@@ -1,12 +1,14 @@
 package org.ibp.api.brapi.v1.study;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
 import org.generationcp.middleware.service.api.study.ExperimentalDesign;
+import org.generationcp.middleware.util.serializer.DatePropertySerializer;
+import org.generationcp.middleware.util.serializer.StringToBooleanSerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -47,12 +49,20 @@ public class StudyDetailsData {
 
 	private String trialName;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	// Use custom serializer to format date according to view
+	// V1.2-3 - yyyy-MM-dd
+	// V2.0 - yyyy-MM-dd'T'HH:mm:ss.SSS'Z
+	@JsonSerialize(using = DatePropertySerializer.class)
 	private Date startDate;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	// Use custom serializer to format date according to view
+	// V1.2-3 - yyyy-MM-dd
+	// V2.0 - yyyy-MM-dd'T'HH:mm:ss.SSS'Z
+	@JsonSerialize(using = DatePropertySerializer.class)
 	private Date endDate;
 
+	// Use custom serializer to convert string to boolean if active view is for 2.0
+	@JsonSerialize(using = StringToBooleanSerializer.class)
 	private String active;
 
 	@JsonView(BrapiView.BrapiV2.class)
