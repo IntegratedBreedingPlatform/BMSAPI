@@ -15,15 +15,15 @@ public class LotDetails {
 
     private Double amount;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private Date createdDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private Date lastUpdated;
 
     private String germplasmDbId;
 
-    private Integer locationDbId;
+    private String locationDbId;
 
     private String programDbId;
 
@@ -81,11 +81,11 @@ public class LotDetails {
         this.germplasmDbId = germplasmDbId;
     }
 
-    public Integer getLocationDbId() {
+    public String getLocationDbId() {
         return this.locationDbId;
     }
 
-    public void setLocationDbId(final Integer locationDbId) {
+    public void setLocationDbId(final String locationDbId) {
         this.locationDbId = locationDbId;
     }
 
