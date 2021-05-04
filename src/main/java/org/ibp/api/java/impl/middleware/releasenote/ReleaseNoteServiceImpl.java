@@ -22,7 +22,7 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	public ReleaseNoteDTO getLatestReleaseNote() {
 		return this.releaseNoteService.getLatestReleaseNote()
 			.map(releaseNote -> new ReleaseNoteDTO(releaseNote.getId(), releaseNote.getVersion(), releaseNote.getReleaseDate(),
-				releaseNote.getHasComingSoon()))
+				releaseNote.getHasComingSoon(), releaseNote.getFileName()))
 			.orElseGet(ReleaseNoteDTO::new);
 	}
 
