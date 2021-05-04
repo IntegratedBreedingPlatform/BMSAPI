@@ -7,6 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -78,10 +80,10 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 				Matchers.hasKey(ATTRIBUTETYPE)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].additionalInfo",
 				Matchers.hasValue(germplasmDTO.getAdditionalInfo().get(ATTRIBUTETYPE))))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms",
-				Matchers.hasKey(NAMETYPE)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms",
-				Matchers.hasValue(germplasmDTO.getSynonyms().get(NAMETYPE))));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms[0].type",
+				Matchers.is(NAMETYPE)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms[0].synonym",
+				Matchers.is(germplasmDTO.getSynonyms().get(0).getSynonym())));
 
 	}
 
@@ -109,8 +111,8 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status", IsCollectionWithSize.hasSize(1)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0]", Matchers.hasKey("INFO")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0]", Matchers.hasValue(response.getStatus())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].messageType", Matchers.is("INFO")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is(response.getStatus())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(list.size())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmDbId",
 				Matchers.is(germplasmDbId)))
@@ -136,10 +138,10 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 				Matchers.hasKey(ATTRIBUTETYPE)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].additionalInfo",
 				Matchers.hasValue(germplasmDTO.getAdditionalInfo().get(ATTRIBUTETYPE))))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms",
-				Matchers.hasKey(NAMETYPE)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms",
-				Matchers.hasValue(germplasmDTO.getSynonyms().get(NAMETYPE))));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms[0].type",
+				Matchers.is(NAMETYPE)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].synonyms[0].synonym",
+				Matchers.is(germplasmDTO.getSynonyms().get(0).getSynonym())));
 	}
 
 	@Test
@@ -161,10 +163,11 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 			.content(this.convertObjectToByte(requestList)).contentType(this.contentType))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status", IsCollectionWithSize.hasSize(1)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0]", Matchers.hasKey("INFO")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0]", Matchers.hasValue(response.getStatus())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0]", Matchers.hasKey("ERROR1")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status", IsCollectionWithSize.hasSize(2)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].messageType", Matchers.is("INFO")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is(response.getStatus())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[1].messageType", Matchers.is("ERROR")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[1].message", Matchers.is("ERROR1 Germplasm at position 1 is invalid because there is one or more null type in synonyms.")))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(0)));
 
 	}
@@ -210,10 +213,10 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 				Matchers.hasKey(ATTRIBUTETYPE)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.additionalInfo",
 				Matchers.hasValue(germplasmDTO.getAdditionalInfo().get(ATTRIBUTETYPE))))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.synonyms",
-				Matchers.hasKey(NAMETYPE)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.synonyms",
-				Matchers.hasValue(germplasmDTO.getSynonyms().get(NAMETYPE))));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.synonyms[0].type",
+				Matchers.is(NAMETYPE)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.synonyms[0].synonym",
+				Matchers.is(germplasmDTO.getSynonyms().get(0).getSynonym())));
 	}
 
 
@@ -230,7 +233,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		germplasmDTO.setGermplasmName(RandomStringUtils.randomAlphabetic(20));
 		germplasmDTO.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(20));
 		germplasmDTO.setSeedSource(RandomStringUtils.randomAlphabetic(20));
-		germplasmDTO.setSynonyms(Collections.singletonMap(NAMETYPE, RandomStringUtils.randomAlphabetic(20)));
+		germplasmDTO.setSynonyms(Arrays.asList(new Synonym(RandomStringUtils.randomAlphabetic(20), NAMETYPE)));
 		germplasmDTO.setAdditionalInfo(Collections.singletonMap(ATTRIBUTETYPE, RandomStringUtils.randomAlphabetic(20)));
 		return Lists.newArrayList(germplasmDTO);
 	}

@@ -130,13 +130,17 @@ public class GermplasmResourceBrapi {
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 
 		final List<Map<String, String>> status = new ArrayList<>();
+		final Map<String, String> messageInfo = new HashMap<>();
+		messageInfo.put("message", germplasmImportResponse.getStatus());
+		messageInfo.put("messageType", "INFO");
+		status.add(messageInfo);
 		if (!CollectionUtils.isEmpty(germplasmImportResponse.getErrors())) {
 			int index = 1;
 			for (final ObjectError error : germplasmImportResponse.getErrors()) {
-				final Map<String, String> messages = new HashMap<>();
-				messages.put("message", "ERROR" + index++ + this.getMessage(error.getCode(), error.getArguments()));
-				messages.put("messageType", "ERROR");
-				status.add(messages);
+				final Map<String, String> messageError = new HashMap<>();
+				messageError.put("message", "ERROR" + index++ + " " + this.getMessage(error.getCode(), error.getArguments()));
+				messageError.put("messageType", "ERROR");
+				status.add(messageError);
 			}
 		}
 		final Metadata metadata = new Metadata().withStatus(status);

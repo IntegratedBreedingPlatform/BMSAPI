@@ -77,7 +77,7 @@ public class LotResourceBrapiTest extends ApiUnitTestBase {
                 Mockito.any(Pageable.class));
 
 
-        final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd");
+        final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders
@@ -87,7 +87,7 @@ public class LotResourceBrapiTest extends ApiUnitTestBase {
                 .andExpect(jsonPath("$.result.data[0].amount", CoreMatchers.is(lotDto1.getAvailableBalance())))
                 .andExpect(jsonPath("$.result.data[0].createdDate", CoreMatchers.is(timestampFormat.format(lotDto1.getCreatedDate()))))
                 .andExpect(jsonPath("$.result.data[0].germplasmDbId", CoreMatchers.is(lotDto1.getGermplasmUUID())))
-                .andExpect(jsonPath("$.result.data[0].locationDbId", CoreMatchers.is(lotDto1.getLocationId())))
+                .andExpect(jsonPath("$.result.data[0].locationDbId", CoreMatchers.is(String.valueOf(lotDto1.getLocationId()))))
                 .andExpect(jsonPath("$.result.data[0].seedLotDescription", CoreMatchers.is(lotDto1.getNotes())))
                 .andExpect(jsonPath("$.result.data[0].seedLotName", CoreMatchers.is(lotDto1.getStockId())))
                 .andExpect(jsonPath("$.result.data[0].storageLocation", CoreMatchers.is(lotDto1.getLocationName())))
@@ -96,13 +96,13 @@ public class LotResourceBrapiTest extends ApiUnitTestBase {
                 .andExpect(jsonPath("$.result.data[0].additionalInfo.username", CoreMatchers.is(lotDto1.getCreatedByUsername())))
                 .andExpect(jsonPath("$.result.data[0].additionalInfo.status", CoreMatchers.is(lotDto1.getStatus())))
                 .andExpect(jsonPath("$.result.data[0].additionalInfo.germplasmName", CoreMatchers.is(lotDto1.getDesignation())))
-                .andExpect(jsonPath("$.result.data[0].additionalInfo.actualBalance", CoreMatchers.is(lotDto1.getActualBalance())))
-                .andExpect(jsonPath("$.result.data[0].additionalInfo.totalReserved", CoreMatchers.is(lotDto1.getReservedTotal())))
-                .andExpect(jsonPath("$.result.data[0].additionalInfo.totalWithdrawals", CoreMatchers.is(lotDto1.getWithdrawalTotal())))
-                .andExpect(jsonPath("$.result.data[0].additionalInfo.pendingDeposits", CoreMatchers.is(lotDto1.getPendingDepositsTotal())))
+                .andExpect(jsonPath("$.result.data[0].additionalInfo.actualBalance", CoreMatchers.is(String.valueOf(lotDto1.getActualBalance()))))
+                .andExpect(jsonPath("$.result.data[0].additionalInfo.totalReserved", CoreMatchers.is(String.valueOf(lotDto1.getReservedTotal()))))
+                .andExpect(jsonPath("$.result.data[0].additionalInfo.totalWithdrawals", CoreMatchers.is(String.valueOf(lotDto1.getWithdrawalTotal()))))
+                .andExpect(jsonPath("$.result.data[0].additionalInfo.pendingDeposits", CoreMatchers.is(String.valueOf(lotDto1.getPendingDepositsTotal()))))
                 .andExpect(jsonPath("$.result.data[0].additionalInfo.lastDepositDate", CoreMatchers.is(dateFormat.format(lotDto1.getLastDepositDate()))))
                 .andExpect(jsonPath("$.result.data[0].additionalInfo.lastWithdrawalDate", CoreMatchers.is(dateFormat.format(lotDto1.getLastWithdrawalDate()))))
-                .andExpect(jsonPath("$.result.data[0].additionalInfo.lotInternalId", CoreMatchers.is(lotDto1.getLotId())));
+                .andExpect(jsonPath("$.result.data[0].additionalInfo.lotInternalId", CoreMatchers.is(String.valueOf(lotDto1.getLotId()))));
 
     }
 }
