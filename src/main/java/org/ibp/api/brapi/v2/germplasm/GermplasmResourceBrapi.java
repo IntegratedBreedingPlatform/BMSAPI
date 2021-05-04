@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +98,7 @@ public class GermplasmResourceBrapi {
 		if (!StringUtils.isEmpty(germplasmDbId)) {
 			germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
 		}
-		if (!StringUtils.isEmpty(commonCropName)){
+		if (!StringUtils.isEmpty(commonCropName)) {
 			germplasmSearchRequestDTO.setCommonCropNames(Lists.newArrayList(commonCropName));
 		}
 
@@ -126,20 +125,21 @@ public class GermplasmResourceBrapi {
 		@RequestBody final List<GermplasmImportRequest> germplasmImportRequestList) {
 		BaseValidator.checkNotNull(germplasmImportRequestList, "germplasm.import.list.null");
 
-
 		final GermplasmImportResponse germplasmImportResponse = this.germplasmService.createGermplasm(crop, germplasmImportRequestList);
 		final List<Germplasm> germplasmList = this.mapGermplasm(germplasmImportResponse.getGermplasmList());
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 
-		final Map<String, String> messages = new HashMap<>();
-		messages.put("INFO", germplasmImportResponse.getStatus());
+		final List<Map<String, String>> status = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(germplasmImportResponse.getErrors())) {
 			int index = 1;
 			for (final ObjectError error : germplasmImportResponse.getErrors()) {
-				messages.put("ERROR" + index++, this.getMessage(error.getCode(), error.getArguments()));
+				final Map<String, String> messages = new HashMap<>();
+				messages.put("message", "ERROR" + index++ + this.getMessage(error.getCode(), error.getArguments()));
+				messages.put("messageType", "ERROR");
+				status.add(messages);
 			}
 		}
-		final Metadata metadata = new Metadata().withStatus(Lists.newArrayList(messages));
+		final Metadata metadata = new Metadata().withStatus(status);
 		final EntityListResponse<Germplasm> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
@@ -149,7 +149,8 @@ public class GermplasmResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm/{germplasmDbId}", method = RequestMethod.PUT)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<SingleEntityResponse<Germplasm>> updateGermplasm(@PathVariable final String crop, @PathVariable final String germplasmDbId,
+	public ResponseEntity<SingleEntityResponse<Germplasm>> updateGermplasm(@PathVariable final String crop,
+		@PathVariable final String germplasmDbId,
 		@RequestBody final GermplasmUpdateRequest germplasmUpdateRequest) {
 		BaseValidator.checkNotNull(germplasmUpdateRequest, "germplasm.import.list.null");
 
@@ -223,6 +224,5 @@ public class GermplasmResourceBrapi {
 		}
 		return germplasmList;
 	}
-
 
 }
