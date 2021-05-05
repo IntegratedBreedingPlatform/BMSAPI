@@ -72,7 +72,7 @@ public class ObservationUnitResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get Observation Unit search", notes = "Get the results of a Observation Unit search request")
-	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits/{searchResultsDbid}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> getObservationUnitsSearch(

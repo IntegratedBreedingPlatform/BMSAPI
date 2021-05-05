@@ -38,7 +38,7 @@ public class TransactionResourceBrapi {
 	private TransactionService transactionService;
 
 	@ApiOperation(value = "Get a filtered list of Seed Lot Transactions", notes = "Get a filtered list of Seed Lot Transactions")
-	@RequestMapping(value = "/{cropName}/brapi/v2/transactions", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropName}/brapi/v2/seedlots/transactions", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_TRANSACTIONS', 'VIEW_TRANSACTIONS')")
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<TransactionDto>> getTransaction(@PathVariable final String cropName,
