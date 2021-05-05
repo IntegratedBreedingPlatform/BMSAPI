@@ -132,7 +132,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Create germplasm list folder", notes = "Create sample list folder.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+ 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createGermplasmListFolder(
@@ -146,7 +146,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Update germplasm list folder", notes = "Update germplasm list folder.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateGermplasmListFolderName(
@@ -160,7 +160,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Move germplasm list folder.", notes = "Move germplasm list folder.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}/move", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity moveGermplasmList(
@@ -174,7 +174,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Delete germplasm list folder", notes = "Delete germplasm list folder.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteGermplasmListFolder(
