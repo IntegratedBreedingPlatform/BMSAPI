@@ -1,6 +1,5 @@
 package org.ibp.api.brapi.v1.study;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -10,6 +9,7 @@ import org.generationcp.middleware.service.api.study.EnvironmentParameter;
 import org.generationcp.middleware.service.api.study.ExperimentalDesign;
 import org.generationcp.middleware.util.serializer.DatePropertySerializer;
 import org.generationcp.middleware.util.serializer.StringToBooleanSerializer;
+import org.generationcp.middleware.util.serializer.TimestampPropertySerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -36,7 +36,7 @@ public class StudyDetailsData {
 	private String studyTypeName;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+	@JsonSerialize(using = TimestampPropertySerializer.class)
 	private Date lastUpdate;
 
 	@JsonView(BrapiView.BrapiV2.class)

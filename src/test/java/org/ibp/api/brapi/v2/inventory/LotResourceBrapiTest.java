@@ -77,7 +77,7 @@ public class LotResourceBrapiTest extends ApiUnitTestBase {
                 Mockito.any(Pageable.class));
 
 
-        final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders
