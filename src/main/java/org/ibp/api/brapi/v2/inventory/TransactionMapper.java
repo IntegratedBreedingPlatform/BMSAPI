@@ -1,5 +1,6 @@
 package org.ibp.api.brapi.v2.inventory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
@@ -45,8 +46,10 @@ public class TransactionMapper {
 			additionalInfo.put("stockId", transactionDto.getLot().getStockId());
 			additionalInfo.put("lotId", String.valueOf(transactionDto.getLot().getLotId()));
 			additionalInfo.put("lotStatus", transactionDto.getLot().getStatus());
-			additionalInfo.put("lotNotes", transactionDto.getLot().getNotes());
-
+			if (StringUtils.isNotEmpty(transactionDto.getLot().getNotes())) {
+				additionalInfo.put("lotNotes", transactionDto.getLot().getNotes());
+			}
+			
 			return context.getMappingEngine().map(context.create(additionalInfo, context.getDestinationType()));
 		}
 
