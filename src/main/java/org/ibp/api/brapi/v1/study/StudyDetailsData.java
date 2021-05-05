@@ -1,5 +1,6 @@
 package org.ibp.api.brapi.v1.study;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -35,7 +36,8 @@ public class StudyDetailsData {
 	private String studyTypeName;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private String lastUpdate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+	private Date lastUpdate;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String commonCropName;
@@ -132,7 +134,7 @@ public class StudyDetailsData {
 		final List<String> seasons, final String trialDbId, final String trialName, final Date startDate, final Date endDate,
 		final String active, final Location location, final String culturalPractices, final List<String> dataLinks,
 		final String documentationURL, final List<EnvironmentParameter> environmentParameters, final ExperimentalDesign experimentalDesign,
-		final List<String> externalReferences, final String growthFacility, final String lastUpdate, final String license,
+		final List<String> externalReferences, final String growthFacility, final Date lastUpdate, final String license,
 		final String observationUnitsDescription, final List<Contact> contacts, final Map<String, String> additionalInfo) {
 		this.studyDbId = studyDbId;
 		this.studyName = studyName;
@@ -440,11 +442,11 @@ public class StudyDetailsData {
 		return this;
 	}
 
-	public String getLastUpdate() {
+	public Date getLastUpdate() {
 		return this.lastUpdate;
 	}
 
-	public StudyDetailsData setLastUpdate(final String lastUpdate) {
+	public StudyDetailsData setLastUpdate(final Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
 		return this;
 	}
