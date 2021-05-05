@@ -1,11 +1,13 @@
 package org.ibp.api.brapi.v2.inventory;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -41,6 +43,7 @@ public class TransactionResourceBrapi {
 	@RequestMapping(value = "/{cropName}/brapi/v2/seedlots/transactions", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_TRANSACTIONS', 'VIEW_TRANSACTIONS')")
 	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<TransactionDto>> getTransaction(@PathVariable final String cropName,
 		@ApiParam(value = "Unique id for a transaction on this server") @RequestParam(value = "transactionDbId", required = false)
 		final String transactionDbId,
