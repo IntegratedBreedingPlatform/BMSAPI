@@ -77,7 +77,7 @@ public class TransactionResourceBrapiTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(list).when(this.transactionService).getTransactions(Mockito.any(TransactionsSearchDto.class),
 			Mockito.any(Pageable.class));
-		final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+		final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
