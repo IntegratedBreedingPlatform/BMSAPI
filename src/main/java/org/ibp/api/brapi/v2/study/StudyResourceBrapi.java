@@ -83,7 +83,8 @@ public class StudyResourceBrapi {
 			locationSearchRequest.setLocationIds(Collections.singletonList(mwStudyDetails.getMetadata().getLocationId()));
 			final List<Location> locations = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
 			if (!locations.isEmpty()) {
-				result.setLocation(locations.get(0));
+				result.setLocationDbId(locations.get(0).getLocationDbId());
+				result.setLocationName(locations.get(0).getLocationName());
 			}
 		}
 		result.setCommonCropName(crop);
