@@ -2,6 +2,8 @@ package org.ibp.api.brapi.v2.inventory;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.generationcp.middleware.util.serializer.DatePropertySerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -15,10 +17,10 @@ public class LotDetails {
 
     private Double amount;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    @JsonSerialize(using = DatePropertySerializer.class)
     private Date createdDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    @JsonSerialize(using = DatePropertySerializer.class)
     private Date lastUpdated;
 
     private String germplasmDbId;
