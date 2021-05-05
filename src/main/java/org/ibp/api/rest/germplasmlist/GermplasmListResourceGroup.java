@@ -62,7 +62,7 @@ GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Create a new Germplasm list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')" + PermissionsEnum.HAS_IMPORT_GERMPLASM)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM')")
 	@ResponseBody
 	public ResponseEntity<GermplasmListGeneratorDTO> create(
 		@ApiParam(required = true) @PathVariable final String crop,
