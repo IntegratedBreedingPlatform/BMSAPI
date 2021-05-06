@@ -39,7 +39,6 @@ import java.io.File;
 import javax.annotation.PostConstruct;
 
 @SpringBootApplication(exclude = {
-	HibernateJpaAutoConfiguration.class,
 	DataSourceAutoConfiguration.class,
 	DataSourceTransactionManagerAutoConfiguration.class})
 @EnableSwagger2
