@@ -55,6 +55,13 @@ public class StudyDetailsData {
 
 	private String active;
 
+	@JsonView(BrapiView.BrapiV2.class)
+	private String locationDbId;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String locationName;
+
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private Location location;
 
 	@JsonView(BrapiView.BrapiV2.class)
@@ -477,6 +484,22 @@ public class StudyDetailsData {
 
 	public void addContact(final Contact contact) {
 		this.contacts.add(contact);
+	}
+
+	public String getLocationDbId() {
+		return locationDbId;
+	}
+
+	public void setLocationDbId(final String locationDbId) {
+		this.locationDbId = locationDbId;
+	}
+
+	public String getLocationName() {
+		return locationName;
+	}
+
+	public void setLocationName(final String locationName) {
+		this.locationName = locationName;
 	}
 
 	@Override
