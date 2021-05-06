@@ -48,7 +48,7 @@ GermplasmListResourceGroup {
 	private SecurityService securityService;
 
 	@ApiOperation(value = "Get germplasm lists given a tree parent node folder", notes = "Get germplasm lists given a tree parent node folder")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getGermplasmListByParentFolderId(
@@ -62,7 +62,7 @@ GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Create a new Germplasm list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')" + PermissionsEnum.HAS_IMPORT_GERMPLASM)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM')")
 	@ResponseBody
 	public ResponseEntity<GermplasmListGeneratorDTO> create(
 		@ApiParam(required = true) @PathVariable final String crop,
@@ -132,7 +132,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Create germplasm list folder", notes = "Create sample list folder.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+ 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createGermplasmListFolder(
@@ -146,7 +146,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Update germplasm list folder", notes = "Update germplasm list folder.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateGermplasmListFolderName(
@@ -160,7 +160,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Move germplasm list folder.", notes = "Move germplasm list folder.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}/move", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity moveGermplasmList(
@@ -174,7 +174,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Delete germplasm list folder", notes = "Delete germplasm list folder.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteGermplasmListFolder(
@@ -186,7 +186,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Get tree of expanded germplasm list folders last used by user", notes = "Get tree of expanded germplasm list folders last used by user")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree-state", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getUserTreeState(
@@ -197,7 +197,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Save hierarchy of germplasm list folders last used by user", notes = "Save hierarchy of germplasm list folders last used by user")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree-state", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> saveUserTreeState(
