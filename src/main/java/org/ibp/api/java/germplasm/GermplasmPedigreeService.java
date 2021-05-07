@@ -10,4 +10,6 @@ public interface GermplasmPedigreeService {
 	GermplasmTreeNode getGermplasmPedigreeTree(Integer gid, Integer level, boolean includeDerivativeLine);
 
 	List<GermplasmDto> getGenerationHistory(Integer gid);
+
+	List<GermplasmDto> getManagementNeighbors(Integer gid);
 }

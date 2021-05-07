@@ -46,4 +46,12 @@ public class GermplasmPedigreeResource {
 		return new ResponseEntity<>(this.germplasmPedigreeService.getGenerationHistory(gid), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Returns the management neighbors of the given germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/management-neighbors", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmDto>> getManagementNeighbors(
+		@PathVariable final String cropName, @PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmPedigreeService.getManagementNeighbors(gid), HttpStatus.OK);
+	}
 }
