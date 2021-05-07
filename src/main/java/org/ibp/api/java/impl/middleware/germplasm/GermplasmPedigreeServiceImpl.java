@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
+import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.ibp.api.java.germplasm.GermplasmPedigreeService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 @Transactional
@@ -27,6 +29,13 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		return this.germplasmPedigreeService.getGermplasmPedigreeTree(gid, level, includeDerivativeLines);
+	}
+
+	@Override
+	public List<GermplasmDto> getGenerationHistory(final Integer gid) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		return this.germplasmPedigreeService.getGenerationHistory(gid);
 	}
 
 }

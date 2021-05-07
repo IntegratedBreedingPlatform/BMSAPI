@@ -3,7 +3,11 @@ package org.ibp.api.rest.germplasm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
+import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.ibp.api.java.germplasm.GermplasmPedigreeService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Api(value = "Germplasm Pedigree Services")
 @Controller
@@ -21,7 +26,7 @@ public class GermplasmPedigreeResource {
 	private GermplasmPedigreeService germplasmPedigreeService;
 
 
-	@ApiOperation(value = "Get Germplasm Pedigree Tree")
+	@ApiOperation(value = "Returns the of the given germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/tree/{level}", method = RequestMethod.GET)
 	@ResponseBody
 	public GermplasmTreeNode getGermplasmPedigreeTree(@PathVariable final String cropName, @PathVariable final Integer gid,
@@ -30,4 +35,15 @@ public class GermplasmPedigreeResource {
 		@RequestParam(required = false) final boolean includeDerivativeLines) {
 		return this.germplasmPedigreeService.getGermplasmPedigreeTree(gid, level, includeDerivativeLines);
 	}
+
+
+	@ApiOperation(value = "Returns the generation history of the given germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/generation-history", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmDto>> getGenerationHistory(
+		@PathVariable final String cropName, @PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmPedigreeService.getGenerationHistory(gid), HttpStatus.OK);
+	}
+
 }
