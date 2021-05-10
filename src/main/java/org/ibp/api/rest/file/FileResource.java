@@ -11,9 +11,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,8 +30,11 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.utils.IoUtils;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 
 @Api("File services")
 @RestController
@@ -73,7 +76,7 @@ public class FileResource {
 
 	@RequestMapping(value = "/files/{fileName}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Resource> getFile(@RequestParam final String fileName) {
+	public ResponseEntity<Resource> getFile(@PathVariable final String fileName) {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 
@@ -94,6 +97,26 @@ public class FileResource {
 				.body(resource);
 		} catch (final SdkClientException e) {
 			throw new ApiRuntimeException("Something went wrong while contacting Amazon S3, please contact your administrator", e);
+		}
+	}
+
+	@RequestMapping(value = "/images/{imageName}", method = RequestMethod.GET)
+	@ResponseBody
+	public byte[] getImage(@PathVariable final String imageName) {
+		try {
+			final S3Client s3Client = this.buildS3Client();
+
+			final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+				.bucket(this.bucketName)
+				.key(imageName)
+				.build();
+			final ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
+
+			return IoUtils.toByteArray(response);
+		} catch (final SdkClientException e) {
+			throw new ApiRuntimeException("Something went wrong while contacting Amazon S3, please contact your administrator", e);
+		} catch (final IOException e) {
+			throw new ApiRuntimeException("Something was wrong while retrieving the image", e);
 		}
 	}
 
