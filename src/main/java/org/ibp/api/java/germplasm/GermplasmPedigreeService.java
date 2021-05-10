@@ -12,4 +12,6 @@ public interface GermplasmPedigreeService {
 	List<GermplasmDto> getGenerationHistory(Integer gid);
 
 	List<GermplasmDto> getManagementNeighbors(Integer gid);
+
+	List<GermplasmDto> getGroupRelatives(Integer gid);
 }

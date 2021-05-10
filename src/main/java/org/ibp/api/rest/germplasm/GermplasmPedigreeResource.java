@@ -54,4 +54,13 @@ public class GermplasmPedigreeResource {
 		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.germplasmPedigreeService.getManagementNeighbors(gid), HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Returns the group relatives of the given germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/group-relatives", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmDto>> getGroupRelatives(
+		@PathVariable final String cropName, @PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmPedigreeService.getGroupRelatives(gid), HttpStatus.OK);
+	}
 }

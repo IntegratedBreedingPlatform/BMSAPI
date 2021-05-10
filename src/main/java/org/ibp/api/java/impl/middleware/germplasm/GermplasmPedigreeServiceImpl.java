@@ -45,4 +45,11 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		return this.germplasmPedigreeService.getManagementNeighbors(gid);
 	}
 
+	@Override
+	public List<GermplasmDto> getGroupRelatives(final Integer gid) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		return this.germplasmPedigreeService.getGroupRelatives(gid);
+	}
+
 }
