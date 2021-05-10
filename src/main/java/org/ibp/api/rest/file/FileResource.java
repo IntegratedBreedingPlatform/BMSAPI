@@ -53,7 +53,7 @@ public class FileResource {
 
 	@RequestMapping(value = "/files", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<String> upload(@RequestPart("file") final MultipartFile file) {
+	public ResponseEntity<Map<String, String>> upload(@RequestPart("file") final MultipartFile file) {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 
@@ -64,7 +64,7 @@ public class FileResource {
 				.build();
 			final PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
 
-			return new ResponseEntity<>(fileName, HttpStatus.CREATED);
+			return new ResponseEntity<>(Collections.singletonMap("fileName", fileName), HttpStatus.CREATED);
 		} catch (final SdkClientException e) {
 			// Amazon S3 couldn't be contacted for a response, or the client
 			// couldn't parse the response from Amazon S3.
