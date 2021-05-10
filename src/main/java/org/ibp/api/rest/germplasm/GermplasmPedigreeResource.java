@@ -2,6 +2,7 @@ package org.ibp.api.rest.germplasm;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.api.germplasm.pedigree.GermplasmNeighborhoodNode;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -62,5 +63,31 @@ public class GermplasmPedigreeResource {
 		@PathVariable final String cropName, @PathVariable final Integer gid,
 		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.germplasmPedigreeService.getGroupRelatives(gid), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Returns the Maintenance neighborhood of the given germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/maintenance-neighbors", method = RequestMethod.GET)
+	@ResponseBody
+	public GermplasmNeighborhoodNode getMaintenanceNeighborhood(
+		@PathVariable final String cropName, @PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final Integer numberOfStepsBackward,
+		@RequestParam(required = false) final Integer numberOfStepsForward) {
+		final int stepsBackward = numberOfStepsBackward == null ? 0 : numberOfStepsBackward;
+		final int stepsForward = numberOfStepsForward == null ? 0 : numberOfStepsForward;
+		return this.germplasmPedigreeService.getGermplasmMaintenanceNeighborhood(gid, stepsBackward, stepsForward);
+	}
+
+	@ApiOperation(value = "Returns the Derivative neighborhood of the given germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/derivative-neighbors", method = RequestMethod.GET)
+	@ResponseBody
+	public GermplasmNeighborhoodNode getDerivativeNeighborhood(
+		@PathVariable final String cropName, @PathVariable final Integer gid,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final Integer numberOfStepsBackward,
+		@RequestParam(required = false) final Integer numberOfStepsForward) {
+		final int stepsBackward = numberOfStepsBackward == null ? 0 : numberOfStepsBackward;
+		final int stepsForward = numberOfStepsForward == null ? 0 : numberOfStepsForward;
+		return this.germplasmPedigreeService.getGermplasmDerivativeNeighborhood(gid, stepsBackward, stepsForward);
 	}
 }

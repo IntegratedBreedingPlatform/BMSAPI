@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.generationcp.middleware.api.germplasm.pedigree.GermplasmNeighborhoodNode;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.ibp.api.java.germplasm.GermplasmPedigreeService;
@@ -50,6 +51,20 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		return this.germplasmPedigreeService.getGroupRelatives(gid);
+	}
+
+	@Override
+	public GermplasmNeighborhoodNode getGermplasmMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		return this.germplasmPedigreeService.getGermplasmMaintenanceNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward);
+	}
+
+	@Override
+	public GermplasmNeighborhoodNode getGermplasmDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		return this.germplasmPedigreeService.getGermplasmDerivativeNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward);
 	}
 
 }
