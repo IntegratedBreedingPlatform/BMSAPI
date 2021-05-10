@@ -25,7 +25,7 @@ public class KeySequenceResource {
 	private KeySequenceRegisterService keySequenceRegisterService;
 
 	@ApiOperation(value = "Delete Key Prefix Cache")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'GERMPLASM', 'MANAGE_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/key-sequences", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<KeySequenceRegisterDeleteResponse> deleteKeySequence(@PathVariable final String cropName,
