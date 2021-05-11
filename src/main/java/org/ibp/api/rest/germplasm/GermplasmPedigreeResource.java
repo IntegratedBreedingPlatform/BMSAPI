@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmNeighborhoodNode;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.ibp.api.java.germplasm.GermplasmPedigreeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
