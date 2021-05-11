@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -111,6 +113,33 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public List<ProgramDTO> getFilteredPrograms(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
 		return this.programService.filterPrograms(programSearchRequest, pageable);
+	}
+
+	@Override
+	public ProgramDTO getLastOpenedProject(final Integer userId) {
+		final Project project = this.workbenchDataManager.getLastOpenedProject(userId);
+		return project != null ? new ProgramDTO(project) : null;
+	}
+
+	@Override
+	public void saveOrUpdateProjectUserInfo(final Integer userId, final Long  projectId) {
+		final WorkbenchUser user = this.userService.getUserById(userId);
+		final Project project = this.workbenchDataManager.getProjectById(projectId);
+
+		final ProjectUserInfo projectUserInfo =
+			this.userService.getProjectUserInfoByProjectIdAndUserId(projectId, user.getUserid());
+		if (projectUserInfo != null) {
+			projectUserInfo.setLastOpenDate(new Date());
+			this.userService.saveOrUpdateProjectUserInfo(projectUserInfo);
+		} else {
+			final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user);
+			pUserInfo.setLastOpenDate(new Date());
+			this.userService.saveOrUpdateProjectUserInfo(pUserInfo);
+		}
+
+		project.setLastOpenDate(new Date());
+		this.workbenchDataManager.mergeProject(project);
+
 	}
 
 	@Override

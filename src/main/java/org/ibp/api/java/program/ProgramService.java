@@ -22,4 +22,7 @@ public interface ProgramService {
 
 	List<ProgramDTO> getFilteredPrograms(Pageable pageable, ProgramSearchRequest programSearchRequest);
 
+	ProgramDTO getLastOpenedProject(final Integer userId);
+
+	void saveOrUpdateProjectUserInfo(final Integer userId, final Long  projectId);
 }
