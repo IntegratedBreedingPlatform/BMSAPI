@@ -71,11 +71,9 @@ public class GermplasmPedigreeResource {
 	public GermplasmNeighborhoodNode getMaintenanceNeighborhood(
 		@PathVariable final String cropName, @PathVariable final Integer gid,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final Integer numberOfStepsBackward,
-		@RequestParam(required = false) final Integer numberOfStepsForward) {
-		final int stepsBackward = numberOfStepsBackward == null ? 0 : numberOfStepsBackward;
-		final int stepsForward = numberOfStepsForward == null ? 0 : numberOfStepsForward;
-		return this.germplasmPedigreeService.getGermplasmMaintenanceNeighborhood(gid, stepsBackward, stepsForward);
+		@RequestParam final Integer numberOfStepsBackward,
+		@RequestParam final Integer numberOfStepsForward) {
+		return this.germplasmPedigreeService.getGermplasmMaintenanceNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward);
 	}
 
 	@ApiOperation(value = "Returns the Derivative neighborhood of the given germplasm")
@@ -84,10 +82,8 @@ public class GermplasmPedigreeResource {
 	public GermplasmNeighborhoodNode getDerivativeNeighborhood(
 		@PathVariable final String cropName, @PathVariable final Integer gid,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final Integer numberOfStepsBackward,
-		@RequestParam(required = false) final Integer numberOfStepsForward) {
-		final int stepsBackward = numberOfStepsBackward == null ? 0 : numberOfStepsBackward;
-		final int stepsForward = numberOfStepsForward == null ? 0 : numberOfStepsForward;
-		return this.germplasmPedigreeService.getGermplasmDerivativeNeighborhood(gid, stepsBackward, stepsForward);
+		@RequestParam final Integer numberOfStepsBackward,
+		@RequestParam final Integer numberOfStepsForward) {
+		return this.germplasmPedigreeService.getGermplasmDerivativeNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward);
 	}
 }
