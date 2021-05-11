@@ -12,7 +12,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -38,9 +37,7 @@ import java.io.File;
 
 import javax.annotation.PostConstruct;
 
-@SpringBootApplication(exclude = {
-	DataSourceAutoConfiguration.class,
-	DataSourceTransactionManagerAutoConfiguration.class})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
 @EnableSwagger2
 @Configuration
 public class Main extends WebMvcConfigurerAdapter {
