@@ -1,6 +1,7 @@
 package org.ibp.api.rest.file;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,18 +55,20 @@ public class FileResource {
 
 	@RequestMapping(value = "/files", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Map<String, String>> upload(@RequestPart("file") final MultipartFile file) {
+	public ResponseEntity<Map<String, String>> upload(
+		@RequestPart("file") final MultipartFile file,
+		@ApiParam("store file under this name / key") @RequestParam final String key
+	) {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 
-			final String fileName = file.getOriginalFilename();
 			final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
 				.bucket(this.bucketName)
-				.key(fileName)
+				.key(key)
 				.build();
 			final PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
 
-			return new ResponseEntity<>(Collections.singletonMap("fileName", fileName), HttpStatus.CREATED);
+			return new ResponseEntity<>(Collections.singletonMap("key", key), HttpStatus.CREATED);
 		} catch (final SdkClientException e) {
 			// Amazon S3 couldn't be contacted for a response, or the client
 			// couldn't parse the response from Amazon S3.
@@ -74,22 +78,22 @@ public class FileResource {
 		}
 	}
 
-	@RequestMapping(value = "/files/{fileName}", method = RequestMethod.GET)
+	@RequestMapping(value = "/files/{key}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Resource> getFile(@PathVariable final String fileName) {
+	public ResponseEntity<Resource> getFile(@ApiParam("file name / key") @PathVariable final String key) {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 
 			final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
 				.bucket(this.bucketName)
-				.key(fileName)
+				.key(key)
 				.build();
 			final ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
 
 			final InputStreamResource resource = new InputStreamResource(response);
 
 			final HttpHeaders headers = new HttpHeaders();
-			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + key + "\"");
 			return ResponseEntity.ok()
 				.headers(headers)
 				.contentLength(response.response().contentLength())
@@ -100,15 +104,15 @@ public class FileResource {
 		}
 	}
 
-	@RequestMapping(value = "/images/{imageName}", method = RequestMethod.GET)
+	@RequestMapping(value = "/images/{key}", method = RequestMethod.GET)
 	@ResponseBody
-	public byte[] getImage(@PathVariable final String imageName) {
+	public byte[] getImage(@ApiParam("file name / key") @PathVariable final String key) {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 
 			final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
 				.bucket(this.bucketName)
-				.key(imageName)
+				.key(key)
 				.build();
 			final ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
 
