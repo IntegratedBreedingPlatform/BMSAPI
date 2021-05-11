@@ -54,14 +54,14 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	}
 
 	@Override
-	public GermplasmNeighborhoodNode getGermplasmMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward) {
+	public GermplasmNeighborhoodNode getGermplasmMaintenanceNeighborhood(final Integer gid, final int numberOfStepsBackward, final int numberOfStepsForward) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		return this.germplasmPedigreeService.getGermplasmMaintenanceNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward);
 	}
 
 	@Override
-	public GermplasmNeighborhoodNode getGermplasmDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward) {
+	public GermplasmNeighborhoodNode getGermplasmDerivativeNeighborhood(final Integer gid, final int numberOfStepsBackward, final int numberOfStepsForward) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		return this.germplasmPedigreeService.getGermplasmDerivativeNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward);

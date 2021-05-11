@@ -25,7 +25,6 @@ public class GermplasmPedigreeResource {
 	@Resource
 	private GermplasmPedigreeService germplasmPedigreeService;
 
-
 	@ApiOperation(value = "Returns the of the given germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/tree/{level}", method = RequestMethod.GET)
 	@ResponseBody
@@ -35,7 +34,6 @@ public class GermplasmPedigreeResource {
 		@RequestParam(required = false) final boolean includeDerivativeLines) {
 		return this.germplasmPedigreeService.getGermplasmPedigreeTree(gid, level, includeDerivativeLines);
 	}
-
 
 	@ApiOperation(value = "Returns the generation history of the given germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/generation-history", method = RequestMethod.GET)
