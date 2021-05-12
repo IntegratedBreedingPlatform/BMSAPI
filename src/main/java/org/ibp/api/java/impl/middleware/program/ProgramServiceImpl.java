@@ -122,12 +122,12 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public void saveOrUpdateProjectUserInfo(final Integer userId, final Long  projectId) {
+	public void saveOrUpdateProjectUserInfo(final Integer userId, final String  programUUID) {
 		final WorkbenchUser user = this.userService.getUserById(userId);
-		final Project project = this.workbenchDataManager.getProjectById(projectId);
+		final Project project = this.workbenchDataManager.getProjectByUuid(programUUID);
 
 		final ProjectUserInfo projectUserInfo =
-			this.userService.getProjectUserInfoByProjectIdAndUserId(projectId, user.getUserid());
+			this.userService.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), user.getUserid());
 		if (projectUserInfo != null) {
 			projectUserInfo.setLastOpenDate(new Date());
 			this.userService.saveOrUpdateProjectUserInfo(projectUserInfo);
@@ -176,4 +176,8 @@ public class ProgramServiceImpl implements ProgramService {
 
 	}
 
+	public ProgramDTO getProjectByUuid(final String programUUID) {
+		final Project project = this.workbenchDataManager.getProjectByUuid(programUUID);
+		return project != null ? new ProgramDTO(project) : null;
+	}
 }

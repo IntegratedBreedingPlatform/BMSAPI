@@ -2,6 +2,7 @@
 package org.ibp.api.java.program;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,5 +25,7 @@ public interface ProgramService {
 
 	ProgramDTO getLastOpenedProject(final Integer userId);
 
-	void saveOrUpdateProjectUserInfo(final Integer userId, final Long  projectId);
+	void saveOrUpdateProjectUserInfo(final Integer userId, final String  programUUID);
+
+	ProgramDTO getProjectByUuid(final String programUUID);
 }
