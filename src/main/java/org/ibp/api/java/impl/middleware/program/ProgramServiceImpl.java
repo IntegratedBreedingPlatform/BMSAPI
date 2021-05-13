@@ -122,24 +122,8 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public void saveOrUpdateProjectUserInfo(final Integer userId, final String  programUUID) {
-		final WorkbenchUser user = this.userService.getUserById(userId);
-		final Project project = this.workbenchDataManager.getProjectByUuid(programUUID);
-
-		final ProjectUserInfo projectUserInfo =
-			this.userService.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), user.getUserid());
-		if (projectUserInfo != null) {
-			projectUserInfo.setLastOpenDate(new Date());
-			this.userService.saveOrUpdateProjectUserInfo(projectUserInfo);
-		} else {
-			final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user);
-			pUserInfo.setLastOpenDate(new Date());
-			this.userService.saveOrUpdateProjectUserInfo(pUserInfo);
-		}
-
-		project.setLastOpenDate(new Date());
-		this.workbenchDataManager.mergeProject(project);
-
+	public void saveOrUpdateProjectUserInfo(final Integer userId, final String programUUID) {
+		this.programService.saveOrUpdateProjectUserInfo(userId, programUUID);
 	}
 
 	@Override
