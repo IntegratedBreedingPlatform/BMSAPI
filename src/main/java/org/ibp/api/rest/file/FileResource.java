@@ -2,11 +2,10 @@ package org.ibp.api.rest.file;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
-import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.file.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,22 +19,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.utils.IoUtils;
 
-import java.io.IOException;
-import java.util.Collections;
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @Api("File services")
@@ -44,14 +29,8 @@ public class FileResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FileResource.class);
 
-	@Value("${aws.bucketName}")
-	private String bucketName;
-
-	@Value("${aws.accessKeyId}")
-	private String accessKey;
-
-	@Value("${aws.secretAccessKey}")
-	private String secretKey;
+	@Autowired
+	private FileStorageService fileStorageService;
 
 	@RequestMapping(value = "/files", method = RequestMethod.POST)
 	@ResponseBody
@@ -59,83 +38,23 @@ public class FileResource {
 		@RequestPart("file") final MultipartFile file,
 		@ApiParam("store file under this name / key") @RequestParam final String key
 	) {
-		try {
-			final S3Client s3Client = this.buildS3Client();
-
-			final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-				.bucket(this.bucketName)
-				.key(key)
-				.build();
-			final PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
-
-			return new ResponseEntity<>(Collections.singletonMap("key", key), HttpStatus.CREATED);
-		} catch (final SdkClientException e) {
-			// Amazon S3 couldn't be contacted for a response, or the client
-			// couldn't parse the response from Amazon S3.
-			throw new ApiRuntimeException("Something went wrong while contacting Amazon S3, please contact your administrator", e);
-		} catch (final IOException e) {
-			throw new ApiRuntimeException("Your file format is not supported", e);
-		}
+		return new ResponseEntity<>(this.fileStorageService.upload(file, key), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/files/{key}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Resource> getFile(@ApiParam("file name / key") @PathVariable final String key) {
-		try {
-			final S3Client s3Client = this.buildS3Client();
-
-			final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-				.bucket(this.bucketName)
-				.key(key)
-				.build();
-			final ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
-
-			final InputStreamResource resource = new InputStreamResource(response);
-
-			final HttpHeaders headers = new HttpHeaders();
-			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + key + "\"");
-			return ResponseEntity.ok()
-				.headers(headers)
-				.contentLength(response.response().contentLength())
-				.contentType(MediaType.APPLICATION_OCTET_STREAM)
-				.body(resource);
-		} catch (final SdkClientException e) {
-			throw new ApiRuntimeException("Something went wrong while contacting Amazon S3, please contact your administrator", e);
-		}
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + key + "\"");
+		return ResponseEntity.ok()
+			.headers(headers)
+			.contentType(MediaType.APPLICATION_OCTET_STREAM)
+			.body(this.fileStorageService.getFile(key));
 	}
 
 	@RequestMapping(value = "/images/{key}", method = RequestMethod.GET)
 	@ResponseBody
 	public byte[] getImage(@ApiParam("file name / key") @PathVariable final String key) {
-		try {
-			final S3Client s3Client = this.buildS3Client();
-
-			final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-				.bucket(this.bucketName)
-				.key(key)
-				.build();
-			final ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
-
-			return IoUtils.toByteArray(response);
-		} catch (final SdkClientException e) {
-			throw new ApiRuntimeException("Something went wrong while contacting Amazon S3, please contact your administrator", e);
-		} catch (final IOException e) {
-			throw new ApiRuntimeException("Something was wrong while retrieving the image", e);
-		}
-	}
-
-	/*
-	 * TODO
-	 *  - forcing credentials for now (Unable to load credentials from any of the providers in the chain AwsCredentialsProviderChain)
-	 *  - configurable region
-	 */
-	private S3Client buildS3Client() {
-		final AwsBasicCredentials credentials = AwsBasicCredentials.create(this.accessKey, this.secretKey);
-		return S3Client.builder()
-			.region(Region.US_EAST_1)
-			// https://github.com/aws/aws-sdk-java-v2/issues/1786#issuecomment-706542582
-			.httpClient(UrlConnectionHttpClient.builder().build())
-			.credentialsProvider(StaticCredentialsProvider.create(credentials))
-			.build();
+		return this.fileStorageService.getImage(key);
 	}
 }
