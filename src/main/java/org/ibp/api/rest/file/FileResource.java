@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Api("File services")
@@ -41,9 +42,10 @@ public class FileResource {
 		return new ResponseEntity<>(this.fileStorageService.upload(file, key), HttpStatus.CREATED);
 	}
 
-	@RequestMapping(value = "/files/{key}", method = RequestMethod.GET)
+	@RequestMapping(value = "/files/**", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Resource> getFile(@ApiParam("file name / key") @PathVariable final String key) {
+	public ResponseEntity<Resource> getFile(final HttpServletRequest request) {
+		final String key = getKey(request);
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + key + "\"");
 		return ResponseEntity.ok()
@@ -52,9 +54,14 @@ public class FileResource {
 			.body(this.fileStorageService.getFile(key));
 	}
 
-	@RequestMapping(value = "/images/{key}", method = RequestMethod.GET)
+	@RequestMapping(value = "/images/**", method = RequestMethod.GET)
 	@ResponseBody
-	public byte[] getImage(@ApiParam("file name / key") @PathVariable final String key) {
+	public byte[] getImage(final HttpServletRequest request) {
+		final String key = getKey(request);
 		return this.fileStorageService.getImage(key);
+	}
+
+	private static String getKey(final HttpServletRequest request) {
+		return request.getRequestURI().split(request.getContextPath() + "/images/")[1];
 	}
 }

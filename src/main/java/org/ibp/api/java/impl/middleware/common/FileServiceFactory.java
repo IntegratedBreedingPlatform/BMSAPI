@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.common;
 
+import com.jcraft.jsch.JSch;
 import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.file.AWSS3FileStorageServiceImpl;
 import org.ibp.api.java.impl.middleware.file.SFTPFileStorageServiceImpl;
@@ -48,6 +49,12 @@ public class FileServiceFactory {
 			// I've tried some alternatives with Optional but couldn't make it to work
 			return new NoneFileStorageServiceImpl();
 		}
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public JSch getJsch() {
+		return new JSch();
 	}
 
 	private boolean hasAWSProperties() {
