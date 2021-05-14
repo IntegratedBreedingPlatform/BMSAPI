@@ -23,10 +23,10 @@ public class ProgramUsageResource {
 	@Autowired
 	public SecurityService securityService;
 
-	@ApiOperation(value = "Return the last program selected by the user", notes = "Return the last program selected by the user")
+	@ApiOperation(value = "Return the last program launched by the user", notes = "Return the last program launched by the user")
 	@RequestMapping(value = "program-usage/last", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<ProgramDTO> getSelectedProgram(
+	public ResponseEntity<ProgramDTO> getLastLauchedProgram(
 		@RequestParam final Integer userId) {
 		return new ResponseEntity<>(this.programService.getLastOpenedProject(userId), HttpStatus.OK);
 	}
