@@ -15,7 +15,7 @@ public interface ProgramService {
 
 	List<ProgramDTO> listProgramsByCropNameAndUser(ProgramSearchRequest programSearchRequest);
 
-	long countProgramsByFilter(final ProgramSearchRequest programSearchRequest);
+	long countProgramsByFilter(ProgramSearchRequest programSearchRequest);
 
 	ProgramDTO getByUUIDAndCrop(String crop, String programUUID);
 
@@ -23,9 +23,9 @@ public interface ProgramService {
 
 	List<ProgramDTO> getFilteredPrograms(Pageable pageable, ProgramSearchRequest programSearchRequest);
 
-	ProgramDTO getLastOpenedProject(final Integer userId);
+	ProgramDTO getLastOpenedProject(Integer userId);
 
-	void saveOrUpdateProjectUserInfo(final Integer userId, final String  programUUID);
+	void saveOrUpdateProjectUserInfo(Integer userId, String  programUUID);
 
-	ProgramDTO getProjectByUuid(final String programUUID);
+	ProgramDTO getProjectByUuid(String programUUID);
 }
