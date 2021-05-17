@@ -56,25 +56,7 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 	}
 
 	@Override
-	public Resource getFile(final String key) {
-		try {
-			final S3Client s3Client = this.buildS3Client();
-
-			final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-				.bucket(this.bucketName)
-				.key(key)
-				.build();
-			final ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
-
-			return new InputStreamResource(response);
-
-		} catch (final SdkClientException e) {
-			throw new ApiRuntimeException("Something went wrong while contacting Amazon S3, please contact your administrator", e);
-		}
-	}
-
-	@Override
-	public byte[] getImage(final String key) {
+	public byte[] getFile(final String key) {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 

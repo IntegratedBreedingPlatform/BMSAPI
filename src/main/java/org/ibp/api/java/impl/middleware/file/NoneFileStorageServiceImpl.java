@@ -17,12 +17,7 @@ public class NoneFileStorageServiceImpl implements FileStorageService {
 	}
 
 	@Override
-	public Resource getFile(final String key) {
-		throw new ApiRuntimeException(MESSAGE);
-	}
-
-	@Override
-	public byte[] getImage(final String key) {
+	public byte[] getFile(final String key) {
 		throw new ApiRuntimeException(MESSAGE);
 	}
 }

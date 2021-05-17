@@ -9,7 +9,5 @@ public interface FileStorageService {
 
 	Map<String, String> upload(MultipartFile file, String key);
 
-	Resource getFile(String key);
-
-	byte[] getImage(String key);
+	byte[] getFile(String key);
 }

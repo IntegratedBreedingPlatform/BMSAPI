@@ -61,13 +61,7 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 	}
 
 	@Override
-	public Resource getFile(final String key) {
-		// TODO
-		return null;
-	}
-
-	@Override
-	public byte[] getImage(final String key) {
+	public byte[] getFile(final String key) {
 		ChannelSftp channelSftp = null;
 		byte[] bytes;
 		try {
