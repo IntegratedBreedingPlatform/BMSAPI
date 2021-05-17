@@ -19,8 +19,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
+
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -65,6 +71,7 @@ public class SFTPFileStorageServiceImplTest {
 		this.sftpFileStorageService.upload(file, KEY);
 		verify(this.channel).cd(FOLDER_1);
 		verify(this.channel, times(2)).cd(FOLDER_2);
-		verify(channel).mkdir(FOLDER_2);
+		verify(this.channel).mkdir(FOLDER_2);
+		verify(this.channel).put(nullable(InputStream.class), eq(FILENAME_PNG));
 	}
 }
