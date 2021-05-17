@@ -31,7 +31,7 @@ public class GermplasmPedigreeResource {
 	public GermplasmTreeNode getGermplasmPedigreeTree(@PathVariable final String cropName, @PathVariable final Integer gid,
 		@PathVariable final Integer level,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final boolean includeDerivativeLines) {
+		@RequestParam final boolean includeDerivativeLines) {
 		return this.germplasmPedigreeService.getGermplasmPedigreeTree(gid, level, includeDerivativeLines);
 	}
 
