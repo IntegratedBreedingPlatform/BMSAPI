@@ -35,6 +35,9 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 	@Value("${aws.secretAccessKey}")
 	private String secretKey;
 
+	@Value("${aws.region}")
+	private String region;
+
 	@Override
 	public Map<String, String> upload(final MultipartFile file, final String key) {
 		try {
@@ -82,7 +85,7 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 	private S3Client buildS3Client() {
 		final AwsBasicCredentials credentials = AwsBasicCredentials.create(this.accessKey, this.secretKey);
 		return S3Client.builder()
-			.region(Region.US_EAST_1)
+			.region(Region.of(this.region))
 			// https://github.com/aws/aws-sdk-java-v2/issues/1786#issuecomment-706542582
 			.httpClient(UrlConnectionHttpClient.builder().build())
 			.credentialsProvider(StaticCredentialsProvider.create(credentials))

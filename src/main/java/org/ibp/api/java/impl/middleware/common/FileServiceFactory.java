@@ -27,6 +27,9 @@ public class FileServiceFactory {
 	@Value("${aws.secretAccessKey}")
 	private String secretKey;
 
+	@Value("${aws.region}")
+	private String region;
+
 	// SFTP
 
 	@Value("${sftp.host}")
@@ -58,7 +61,7 @@ public class FileServiceFactory {
 	}
 
 	private boolean hasAWSProperties() {
-		return !isBlank(this.bucketName) && !isBlank(this.accessKey) && !isBlank(this.secretKey);
+		return !isBlank(this.bucketName) && !isBlank(this.accessKey) && !isBlank(this.secretKey) && !isBlank(this.region);
 	}
 
 	private boolean hasSFTPProperties() {
