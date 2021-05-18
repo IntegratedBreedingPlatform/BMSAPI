@@ -26,11 +26,11 @@ public class GermplasmPedigreeResource {
 	private GermplasmPedigreeService germplasmPedigreeService;
 
 	@ApiOperation(value = "Returns the of the given germplasm")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/tree/{level}", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/tree", method = RequestMethod.GET)
 	@ResponseBody
 	public GermplasmTreeNode getGermplasmPedigreeTree(@PathVariable final String cropName, @PathVariable final Integer gid,
-		@PathVariable final Integer level,
 		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final Integer level,
 		@RequestParam final boolean includeDerivativeLines) {
 		return this.germplasmPedigreeService.getGermplasmPedigreeTree(gid, level, includeDerivativeLines);
 	}
