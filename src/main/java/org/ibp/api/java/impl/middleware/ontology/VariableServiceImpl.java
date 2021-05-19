@@ -55,11 +55,13 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	private static final String VARIABLE_NAME = "Variable";
 	private static final String ERROR_MESSAGE = "Error!";
-	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.ENVIRONMENT_CONDITION);
+	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.ENVIRONMENT_CONDITION, VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
 	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId(), //
-		VariableType.ENVIRONMENT_CONDITION.getId());
+		VariableType.ENVIRONMENT_CONDITION.getId(), //
+		VariableType.GERMPLASM_ATTRIBUTE.getId(), //
+		VariableType.GERMPLASM_PASSPORT.getId());
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
