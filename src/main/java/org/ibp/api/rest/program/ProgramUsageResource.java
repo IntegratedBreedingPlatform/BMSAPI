@@ -24,7 +24,7 @@ public class ProgramUsageResource {
 	public SecurityService securityService;
 
 	@ApiOperation(value = "Return the last program launched by the user", notes = "Return the last program launched by the user")
-	@RequestMapping(value = "program-usage/last", method = RequestMethod.GET)
+	@RequestMapping(value = "my-program-usage/last", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<ProgramDTO> getLastLauchedProgram(
 		@RequestParam final Integer userId) {
@@ -32,7 +32,7 @@ public class ProgramUsageResource {
 	}
 
 	@ApiOperation(value = "Save the program selected by the user", notes = "Save the program selected by the user")
-	@RequestMapping(value = "/crops/{cropName}/program-usage", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/my-program-usage", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> saveSelectedProgram(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID) {
 		this.programService.saveOrUpdateProjectUserInfo(this.securityService.getCurrentlyLoggedInUser().getUserid(), programUUID);
