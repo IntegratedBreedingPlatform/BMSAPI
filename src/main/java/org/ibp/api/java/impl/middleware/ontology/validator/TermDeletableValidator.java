@@ -1,19 +1,13 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
-import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
@@ -24,6 +18,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 @Component
 public class TermDeletableValidator extends OntologyValidator implements org.springframework.validation.Validator {
@@ -52,7 +49,9 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 			boolean hasUsage = false,
 					isReferred = false;
 			if (Objects.equals(request.getCvId(), CvId.VARIABLES.getId())) {
-				hasUsage = this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(request.getId()));
+				hasUsage = this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(request.getId())) || //
+				 this.ontologyVariableDataManager.isVariableUsedInGermplasm(Integer.valueOf(request.getId())) || //
+				 this.ontologyVariableDataManager.isVariableUsedInBreedingMethods(Integer.valueOf(request.getId()));
 			} else {
 				isReferred = this.termDataManager.isTermReferred(StringUtil.parseInt(request.getId(), null));
 			}
