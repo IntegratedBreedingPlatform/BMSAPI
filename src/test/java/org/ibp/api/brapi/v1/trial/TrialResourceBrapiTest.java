@@ -54,11 +54,15 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		final String additionalInfoKey = RandomStringUtils.randomAlphabetic(5);
 		final String additionalInfoValue = RandomStringUtils.randomAlphabetic(5);
 
-		final StudySummary studySummary = new StudySummary().setName(name).setSeasons(ImmutableList.<String>builder().add(season).build())
-			.setStudyDbid(studyDbId).setLocationId(locationId).setProgramDbId(programDbId).setType(type)
-			.setYears(ImmutableList.<String>builder().add(year).build()).setProgramDbId(programDbId).setProgramName(programName)
-			.setStartDate(DateUtil.parseDate(startDate)).setEndDate(DateUtil.parseDate(endDate)).setActive(true)
-			.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
+		final StudySummary studySummary = new StudySummary();
+		studySummary.setName(name);
+		studySummary.setTrialDbId(studyDbId);
+		studySummary.setLocationId(locationId);
+		studySummary.setProgramDbId(programDbId);
+		studySummary.setStartDate(DateUtil.parseDate(startDate));
+		studySummary.setEndDate(DateUtil.parseDate(endDate));
+		studySummary.setActive(true);
+		studySummary.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
 
 		final InstanceMetadata instanceMetadata = new InstanceMetadata();
 		instanceMetadata.setInstanceDbId(1234);
@@ -79,7 +83,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwStudySummary.size()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(String.valueOf(studySummary.getStudyDbid())))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(String.valueOf(studySummary.getTrialDbId())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialName", Matchers.is(studySummary.getName()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId", Matchers.is(studySummary.getProgramDbId()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programName", Matchers.is(studySummary.getProgramName()))) //
@@ -123,11 +127,16 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		final String additionalInfoKey = RandomStringUtils.randomAlphabetic(5);
 		final String additionalInfoValue = RandomStringUtils.randomAlphabetic(5);
 
-		final StudySummary studySummary = new StudySummary().setName(name).setSeasons(ImmutableList.<String>builder().add(season).build())
-			.setStudyDbid(studyDbId).setLocationId(locationId).setProgramDbId(programDbId).setType(type)
-			.setYears(ImmutableList.<String>builder().add(year).build()).setProgramDbId(programDbId).setProgramName(programName)
-			.setStartDate(DateUtil.parseDate(startDate)).setEndDate(DateUtil.parseDate(endDate)).setActive(true)
-			.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
+		final StudySummary studySummary = new StudySummary();
+		studySummary.setName(name);
+		studySummary.setTrialDbId(studyDbId);
+		studySummary.setLocationId(locationId);
+		studySummary.setProgramDbId(programDbId);
+		studySummary.setProgramName(programName);
+		studySummary.setStartDate(DateUtil.parseDate(startDate));
+		studySummary.setEndDate(DateUtil.parseDate(endDate));
+		studySummary.setActive(true);
+		studySummary.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
 
 		final InstanceMetadata instanceMetadata = new InstanceMetadata();
 		instanceMetadata.setInstanceDbId(1234);
@@ -150,7 +159,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwStudySummary.size()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(String.valueOf(studySummary.getStudyDbid())))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(String.valueOf(studySummary.getTrialDbId())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialName", Matchers.is(studySummary.getName()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId", Matchers.is(studySummary.getProgramDbId()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programName", Matchers.is(studySummary.getProgramName()))) //
@@ -305,14 +314,20 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		final String additionalInfoValue = RandomStringUtils.randomAlphabetic(5);
 
 		final ContactDto contactDto = new ContactDto(RandomStringUtils.randomNumeric(3), "Maize Breeder", "admin@abc.org", "Creator");
-		final StudySummary studySummary =
-			new StudySummary().setName(name).setDescription(description).setSeasons(ImmutableList.<String>builder().add(season).build())
-				.setStudyDbid(studyDbId).setLocationId(locationId).setProgramDbId(programDbId).setType(type)
-				.setYears(ImmutableList.<String>builder().add(year).build()).setProgramDbId(programDbId).setProgramName(programName)
-				.setStartDate(DateUtil.parseDate(startDate)).setEndDate(DateUtil.parseDate(endDate)).setActive(true)
-				.setObservationUnitId(trialPUI)
-				.setContacts(Collections.singletonList(contactDto))
-				.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
+
+		final StudySummary studySummary = new StudySummary();
+		studySummary.setName(name);
+		studySummary.setDescription(description);
+		studySummary.setTrialDbId(studyDbId);
+		studySummary.setLocationId(locationId);
+		studySummary.setProgramDbId(programDbId);
+		studySummary.setProgramName(programName);
+		studySummary.setStartDate(DateUtil.parseDate(startDate));
+		studySummary.setEndDate(DateUtil.parseDate(endDate));
+		studySummary.setActive(true);
+		studySummary.setObservationUnitId(trialPUI);
+		studySummary.setContacts(Collections.singletonList(contactDto));
+		studySummary.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
 
 		final InstanceMetadata instanceMetadata = new InstanceMetadata();
 		instanceMetadata.setInstanceDbId(1234);
@@ -333,7 +348,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwStudySummary.size()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(String.valueOf(studySummary.getStudyDbid())))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", Matchers.is(String.valueOf(studySummary.getTrialDbId())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialName", Matchers.is(studySummary.getName()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDescription", Matchers.is(studySummary.getDescription()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialPUI", Matchers.is(studySummary.getObservationUnitId()))) //

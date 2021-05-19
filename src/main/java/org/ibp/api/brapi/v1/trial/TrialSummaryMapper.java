@@ -74,7 +74,7 @@ public class TrialSummaryMapper {
 			@Override
 			protected void configure() {
 				this.map(this.source.getLocationId(), this.destination.getLocationDbId());
-				this.map(this.source.getStudyDbid(), this.destination.getTrialDbId());
+				this.map(this.source.getTrialDbId(), this.destination.getTrialDbId());
 				this.map(this.source.getName(), this.destination.getTrialName());
 				this.map(this.source.getDescription(), this.destination.getTrialDescription());
 				this.map(this.source.getObservationUnitId(), this.destination.getTrialPUI());

@@ -47,7 +47,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Api(value = "BrAPI v2 Study Services")
 @Controller(value = "StudyResourceBrapiV2")
@@ -67,7 +66,7 @@ public class StudyResourceBrapi {
 
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());;
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());;
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
@@ -130,14 +129,29 @@ public class StudyResourceBrapi {
 		if (!StringUtils.isBlank(validationError)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
 			final Metadata metadata = new Metadata(null, status);
-			final EntityListResponse<StudyInstanceDto> entityListResponse = new EntityListResponse<>(metadata, new Result<StudyInstanceDto>());
+			final EntityListResponse<StudyInstanceDto> entityListResponse = new EntityListResponse<>(metadata, new Result<>());
 
 			return new ResponseEntity<>(entityListResponse, HttpStatus.BAD_REQUEST);
 		}
 
-		final StudySearchFilter filter = new StudySearchFilter().withStudyTypeDbId(studyTypeDbId).withProgramDbId(programDbId)
-			.withLocationDbId(locationDbId).withGermplasmDbid(germplasmDbid).withObservationVariableDbId(observationVariableDbId)
-			.withStudyDbId(studyDbId).withTrialDbId(trialDbId).withTrialName(trialName).withStudyPUI(studyPUI).withSeasonDbId(seasonDbId);
+		final StudySearchFilter filter = new StudySearchFilter();
+
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setStudyTypeDbId(studyTypeDbId);
+		studySearchFilter.setProgramDbId(programDbId);
+		studySearchFilter.setLocationDbId(locationDbId);
+		studySearchFilter.setSeasonDbId(seasonDbId);
+		if (trialDbId != null) {
+			studySearchFilter.setTrialDbIds(Collections.singletonList(trialDbId));
+		}
+		if (studyDbId != null) {
+			studySearchFilter.setStudyDbIds(Collections.singletonList(studyDbId));
+		}
+		studySearchFilter.setActive(active);
+		studySearchFilter.setGermplasmDbId(germplasmDbid);
+		studySearchFilter.setObservationVariableDbId(observationVariableDbId);
+		studySearchFilter.setTrialName(trialName);
+		studySearchFilter.setStudyPUI(studyPUI);
 
 		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -163,10 +177,9 @@ public class StudyResourceBrapi {
 				}
 			});
 
-		final List<StudyInstanceDto> studyInstanceDtoList = resultPage.getPageResults().stream()
-			.peek(studyInstanceDto -> {studyInstanceDto.setCommonCropName(crop);}).collect(Collectors.toList());
+		resultPage.getPageResults().stream().forEach(studyInstanceDto -> studyInstanceDto.setCommonCropName(crop));
 
-		final Result<StudyInstanceDto> result = new Result<StudyInstanceDto>().withData(studyInstanceDtoList);
+		final Result<StudyInstanceDto> result = new Result<StudyInstanceDto>().withData(resultPage.getPageResults());
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 

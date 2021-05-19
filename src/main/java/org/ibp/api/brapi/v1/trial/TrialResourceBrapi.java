@@ -81,7 +81,9 @@ public class TrialResourceBrapi {
 			return new ResponseEntity<>(new EntityListResponse<>(metadata, new Result<>()), HttpStatus.NOT_FOUND);
 		}
 
-		final StudySearchFilter filter = new StudySearchFilter().withProgramDbId(programDbId).withLocationDbId(locationDbId);
+		final StudySearchFilter filter = new StudySearchFilter();
+		filter.setProgramDbId(programDbId);
+		filter.setLocationDbId(locationDbId);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;

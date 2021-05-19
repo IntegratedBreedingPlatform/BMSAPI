@@ -157,8 +157,18 @@ public class StudyResourceBrapi {
 			pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 		}
 
-		final StudySearchFilter studySearchFilter =
-			new StudySearchFilter(studyTypeDbId, programDbId, locationDbId, seasonDbId, trialDbId, studyDbId, active);
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setStudyTypeDbId(studyTypeDbId);
+		studySearchFilter.setProgramDbId(programDbId);
+		studySearchFilter.setLocationDbId(locationDbId);
+		studySearchFilter.setSeasonDbId(seasonDbId);
+		if (trialDbId != null) {
+			studySearchFilter.setTrialDbIds(Collections.singletonList(trialDbId));
+		}
+		if (studyDbId != null) {
+			studySearchFilter.setStudyDbIds(Collections.singletonList(studyDbId));
+		}
+		studySearchFilter.setActive(active);
 
 		final PagedResult<StudyInstanceDto> resultPage =
 			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudyInstanceDto>() {

@@ -93,9 +93,20 @@ public class TrialResourceBrapi {
 			return new ResponseEntity<>(new EntityListResponse<>(metadata, new Result<>()), HttpStatus.BAD_REQUEST);
 		}
 
-		final StudySearchFilter filter = new StudySearchFilter().withProgramDbId(programDbId).withLocationDbId(locationDbId)
-			.withStudyDbId(studyDbId).withTrialDbId(trialDbId).withTrialName(trialName).withTrialPUI(trialPUI).withContactDbId(contactDbId)
-			.withSearchDateRangeStart(searchDateRangeStart).withSearchDateRangeEnd(searchDateRangeEnd);
+		final StudySearchFilter filter = new StudySearchFilter();
+		filter.setProgramDbId(programDbId);
+		filter.setLocationDbId(locationDbId);
+		if (trialDbId != null) {
+			filter.setTrialDbIds(Collections.singletonList(trialDbId));
+		}
+		if (studyDbId != null) {
+			filter.setStudyDbIds(Collections.singletonList(studyDbId));
+		}
+		filter.setTrialName(trialName);
+		filter.setTrialPUI(trialPUI);
+		filter.setContactDbId(contactDbId);
+		filter.setSearchDateRangeStart(searchDateRangeStart);
+		filter.setSearchDateRangeEnd(searchDateRangeEnd);
 
 		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;

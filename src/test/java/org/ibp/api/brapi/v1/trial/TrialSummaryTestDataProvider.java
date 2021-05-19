@@ -45,7 +45,7 @@ public class TrialSummaryTestDataProvider {
 		studySummary.setProgramDbId("64646");
 		studySummary.setProgramName("PROGRAM1");
 		studySummary.setStartDate(Util.tryParseDate("20160404"));
-		studySummary.setStudyDbid(2);
+		studySummary.setTrialDbId(2);
 		studySummary.setName("STUDY1");
 		studySummary.setOptionalInfo(getOptionalInfo());
 		studySummary.setInstanceMetaData(getInstanceMatadatas());
