@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.file;
 
-import com.google.common.base.Preconditions;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -12,7 +11,7 @@ import org.ibp.api.java.file.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.util.CollectionUtils;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,6 +19,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class SFTPFileStorageServiceImpl implements FileStorageService {
 
@@ -31,6 +32,12 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 
 	@Value("${sftp.password}")
 	private String password;
+
+	@Value("${sftp.privateKey}")
+	private String privateKey;
+
+	@Autowired
+	private ResourceLoader resourceLoader;
 
 	@Autowired
 	private JSch jsch;
@@ -94,12 +101,19 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 		}
 	}
 
-	private ChannelSftp setupJsch() throws JSchException {
+	private ChannelSftp setupJsch() throws JSchException, IOException {
 		// TODO
 		// jsch.setKnownHosts(this.knownhosts);
 		this.jsch.setConfig("StrictHostKeyChecking", "no");
+		if (isBlank(this.password)) {
+			// TODO load only file path?
+			final Resource resource = this.resourceLoader.getResource("classpath:" + this.privateKey);
+			this.jsch.addIdentity(resource.getURI().getPath());
+		}
 		final Session jschSession = this.jsch.getSession(this.username, this.host);
-		jschSession.setPassword(this.password);
+		if (!isBlank(this.password)) {
+			jschSession.setPassword(this.password);
+		}
 		jschSession.connect();
 		return (ChannelSftp) jschSession.openChannel("sftp");
 	}

@@ -3,8 +3,8 @@ package org.ibp.api.java.impl.middleware.common;
 import com.jcraft.jsch.JSch;
 import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.file.AWSS3FileStorageServiceImpl;
-import org.ibp.api.java.impl.middleware.file.SFTPFileStorageServiceImpl;
 import org.ibp.api.java.impl.middleware.file.NoneFileStorageServiceImpl;
+import org.ibp.api.java.impl.middleware.file.SFTPFileStorageServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +41,9 @@ public class FileServiceFactory {
 	@Value("${sftp.password}")
 	private String password;
 
+	@Value("${sftp.privateKey}")
+	private String privateKey;
+
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public FileStorageService getFileStorageService() {
@@ -65,7 +68,8 @@ public class FileServiceFactory {
 	}
 
 	private boolean hasSFTPProperties() {
-		return !isBlank(this.host) && !isBlank(this.username) && !isBlank(this.password);
+		return !isBlank(this.host) && !isBlank(this.username)
+			&& (!isBlank(this.password) || !isBlank(this.privateKey));
 	}
 
 }
