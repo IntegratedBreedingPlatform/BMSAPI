@@ -59,6 +59,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		studySummary.setTrialDbId(studyDbId);
 		studySummary.setLocationId(locationId);
 		studySummary.setProgramDbId(programDbId);
+		studySummary.setProgramName(programName);
 		studySummary.setStartDate(DateUtil.parseDate(startDate));
 		studySummary.setEndDate(DateUtil.parseDate(endDate));
 		studySummary.setActive(true);
