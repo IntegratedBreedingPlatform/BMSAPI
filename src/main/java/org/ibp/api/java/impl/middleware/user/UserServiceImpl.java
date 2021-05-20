@@ -116,13 +116,6 @@ public class UserServiceImpl implements UserService {
 		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUuid);
 		final ModelMapper userMapper = UserMapper.getInstance();
 		final UserDetailDto userDetailDto = userMapper.map(user, UserDetailDto.class);
-
-		final Project lastOpenedProject = this.workbenchDataManager.getLastOpenedProject(user.getUserid());
-		if (!Objects.isNull(lastOpenedProject)) {
-			userDetailDto.setSelectedCropName(lastOpenedProject.getCropType().getCropName());
-			userDetailDto.setSelectedProgramUUID(lastOpenedProject.getUniqueID());
-		}
-
 		return userDetailDto;
 	}
 
