@@ -144,7 +144,6 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	@Test
 	public void testCreateGermplasm_InvalidGermplasm() throws Exception {
-		final String germplasmDbId = RandomStringUtils.randomAlphanumeric(20);
 		final GermplasmImportRequest importRequest = new GermplasmImportRequest();
 		importRequest.setBreedingMethodDbId("13");
 		importRequest.setSeedSource("BC07A-412-201");
