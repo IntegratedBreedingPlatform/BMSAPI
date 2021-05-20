@@ -10,8 +10,6 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.file.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -33,11 +31,8 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 	@Value("${sftp.password}")
 	private String password;
 
-	@Value("${sftp.privateKey}")
-	private String privateKey;
-
-	@Autowired
-	private ResourceLoader resourceLoader;
+	@Value("${sftp.privateKeyPath}")
+	private String privateKeyPath;
 
 	@Autowired
 	private JSch jsch;
@@ -111,9 +106,7 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 		// jsch.setKnownHosts(this.knownhosts);
 		this.jsch.setConfig("StrictHostKeyChecking", "no");
 		if (isBlank(this.password)) {
-			// TODO load only file path?
-			final Resource resource = this.resourceLoader.getResource("classpath:" + this.privateKey);
-			this.jsch.addIdentity(resource.getURI().getPath());
+			this.jsch.addIdentity(this.privateKeyPath);
 		}
 		final Session jschSession = this.jsch.getSession(this.username, this.host);
 		if (!isBlank(this.password)) {

@@ -41,8 +41,8 @@ public class FileServiceFactory {
 	@Value("${sftp.password}")
 	private String password;
 
-	@Value("${sftp.privateKey}")
-	private String privateKey;
+	@Value("${sftp.privateKeyPath}")
+	private String privateKeyPath;
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -69,7 +69,7 @@ public class FileServiceFactory {
 
 	private boolean hasSFTPProperties() {
 		return !isBlank(this.host) && !isBlank(this.username)
-			&& (!isBlank(this.password) || !isBlank(this.privateKey));
+			&& (!isBlank(this.password) || !isBlank(this.privateKeyPath));
 	}
 
 }
