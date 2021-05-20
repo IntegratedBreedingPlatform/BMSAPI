@@ -77,6 +77,11 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 		}
 	}
 
+	@Override
+	public boolean isConfigured() {
+		return true;
+	}
+
 	/*
 	 * TODO
 	 *  - forcing credentials for now (Unable to load credentials from any of the providers in the chain AwsCredentialsProviderChain)

@@ -88,6 +88,11 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 		return bytes;
 	}
 
+	@Override
+	public boolean isConfigured() {
+		return true;
+	}
+
 	private static void close(final ChannelSftp channelSftp) {
 		if (channelSftp != null) {
 			try {

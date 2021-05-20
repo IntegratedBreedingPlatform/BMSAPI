@@ -20,4 +20,9 @@ public class NoneFileStorageServiceImpl implements FileStorageService {
 	public byte[] getFile(final String key) {
 		throw new ApiRuntimeException(MESSAGE);
 	}
+
+	@Override
+	public boolean isConfigured() {
+		return false;
+	}
 }
