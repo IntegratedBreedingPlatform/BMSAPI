@@ -2,8 +2,10 @@
 package org.ibp.api.security.xauth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.generationcp.middleware.ContextHolder;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.java.impl.middleware.common.ContextResolutionException;
+import org.ibp.api.security.BMSUser;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,6 +72,7 @@ public class XAuthTokenFilter extends GenericFilterBean {
 					final UsernamePasswordAuthenticationToken token =
 						new UsernamePasswordAuthenticationToken(details, details.getPassword(), details.getAuthorities());
 					SecurityContextHolder.getContext().setAuthentication(token);
+					ContextHolder.setLoggedInUserId(((BMSUser) details).getUserId());
 				}
 			}
 			filterChain.doFilter(servletRequest, servletResponse);
