@@ -28,7 +28,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TrialResourceBrapiTest extends ApiUnitTestBase {
@@ -63,7 +62,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		studySummary.setStartDate(DateUtil.parseDate(startDate));
 		studySummary.setEndDate(DateUtil.parseDate(endDate));
 		studySummary.setActive(true);
-		studySummary.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
+		studySummary.setAdditionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
 
 		final InstanceMetadata instanceMetadata = new InstanceMetadata();
 		instanceMetadata.setInstanceDbId(1234);
@@ -137,7 +136,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		studySummary.setStartDate(DateUtil.parseDate(startDate));
 		studySummary.setEndDate(DateUtil.parseDate(endDate));
 		studySummary.setActive(true);
-		studySummary.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
+		studySummary.setAdditionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
 
 		final InstanceMetadata instanceMetadata = new InstanceMetadata();
 		instanceMetadata.setInstanceDbId(1234);
@@ -328,7 +327,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		studySummary.setActive(true);
 		studySummary.setObservationUnitId(trialPUI);
 		studySummary.setContacts(Collections.singletonList(contactDto));
-		studySummary.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
+		studySummary.setAdditionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
 
 		final InstanceMetadata instanceMetadata = new InstanceMetadata();
 		instanceMetadata.setInstanceDbId(1234);

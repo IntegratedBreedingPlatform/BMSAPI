@@ -25,7 +25,7 @@ public class TrialSummaryMapperTest {
 		assertThat(studySummary.getStartDate(), equalTo(studySummaryDto.getStartDate()));
 		assertThat(String.valueOf(studySummary.getTrialDbId()), equalTo(studySummaryDto.getTrialDbId()));
 		assertThat(studySummary.getName(), equalTo(studySummaryDto.getTrialName()));
-		assertThat(studySummary.getOptionalInfo().size(), equalTo(studySummaryDto.getAdditionalInfo().size()));
+		assertThat(studySummary.getAdditionalInfo().size(), equalTo(studySummaryDto.getAdditionalInfo().size()));
 		assertThat(studySummary.getInstanceMetaData().size(), equalTo(studySummaryDto.getStudies().size()));
 		assertThat(studySummary.getContacts().size(), equalTo(studySummaryDto.getContacts().size()));
 		final Contact contact = studySummaryDto.getContacts().get(0);

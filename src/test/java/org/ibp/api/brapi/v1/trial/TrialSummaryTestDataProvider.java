@@ -4,7 +4,6 @@ import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.util.Util;
-import org.ibp.api.brapi.v1.study.Contact;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class TrialSummaryTestDataProvider {
 		studySummary.setStartDate(Util.tryParseDate("20160404"));
 		studySummary.setTrialDbId(2);
 		studySummary.setName("STUDY1");
-		studySummary.setOptionalInfo(getOptionalInfo());
+		studySummary.setAdditionalInfo(getOptionalInfo());
 		studySummary.setInstanceMetaData(getInstanceMatadatas());
 		studySummary.setContacts(getContacts());
 		return studySummary;

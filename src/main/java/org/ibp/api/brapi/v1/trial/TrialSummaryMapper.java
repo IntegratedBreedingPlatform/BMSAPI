@@ -83,7 +83,7 @@ public class TrialSummaryMapper {
 				this.map(this.source.getStartDate(), this.destination.getStartDate());
 				this.map(this.source.getEndDate(), this.destination.getEndDate());
 				this.map(this.source.isActive(), this.destination.isActive());
-				this.map(this.source.getOptionalInfo(), this.destination.getAdditionalInfo());
+				this.map(this.source.getAdditionalInfo(), this.destination.getAdditionalInfo());
 				this.using(new StudySummaryConverter()).map(this.source.getInstanceMetaData()).setStudies(null);
 				this.using(new ContactConverter()).map(this.source.getContacts()).setContacts(null);
 			}
