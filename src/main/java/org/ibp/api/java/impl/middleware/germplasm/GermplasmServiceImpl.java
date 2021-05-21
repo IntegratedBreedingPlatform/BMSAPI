@@ -30,7 +30,6 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
@@ -50,7 +49,6 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmBasicDetailsValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.ProgenitorsUpdateRequestDtoValidator;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -114,9 +112,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmService;
-
-	@Autowired
-	private SecurityService securityService;
 
 	@Autowired
 	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
@@ -333,9 +328,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		this.germplasmUpdateDtoValidator.validate(programUUID, germplasmUpdateDTOList);
 
-		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-		return this.germplasmService.importGermplasmUpdates(user.getUserid(), germplasmUpdateDTOList);
-
+		return this.germplasmService.importGermplasmUpdates(germplasmUpdateDTOList);
 	}
 
 	@Override
@@ -346,9 +339,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
-		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
-		return this.germplasmService.importGermplasm(user.getUserid(), cropName, germplasmImportRequestDto);
+		return this.germplasmService.importGermplasm(cropName, germplasmImportRequestDto);
 	}
 
 	@Override
@@ -402,8 +394,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			response.setErrors(bindingResult.getAllErrors());
 		}
 		if (!CollectionUtils.isEmpty(germplasmImportRequestList)) {
-			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-			final List<GermplasmDTO> germplasmDTOList = this.germplasmService.createGermplasm(user.getUserid(), cropName, germplasmImportRequestList);
+			final List<GermplasmDTO> germplasmDTOList = this.germplasmService.createGermplasm(cropName, germplasmImportRequestList);
 			if (!CollectionUtils.isEmpty(germplasmDTOList)) {
 				this.populateGermplasmPedigree(germplasmDTOList);
 				noOfCreatedGermplasm = germplasmDTOList.size();
@@ -418,8 +409,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public GermplasmDTO updateGermplasm(final String germplasmUUID, final GermplasmUpdateRequest germplasmUpdateRequest) {
 		this.validateGermplasmUUID(germplasmUUID);
 		this.germplasmUpdateRequestValidator.validate(germplasmUpdateRequest);
-		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-		return this.germplasmService.updateGermplasm(user.getUserid(), germplasmUUID, germplasmUpdateRequest);
+		return this.germplasmService.updateGermplasm(germplasmUUID, germplasmUpdateRequest);
 	}
 
 	private void validateGermplasmUUID(final String germplasmUUID) {
