@@ -1,16 +1,8 @@
 
 package org.ibp.api.security;
 
-import static org.hamcrest.Matchers.emptyCollectionOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.net.URL;
-import java.nio.charset.Charset;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import org.ibp.Main;
 import org.ibp.api.brapi.v1.security.auth.TokenRequest;
 import org.ibp.api.security.xauth.Token;
@@ -18,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -26,11 +19,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -42,13 +32,23 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.Random;
+
+import static org.hamcrest.Matchers.emptyCollectionOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @SpringApplicationConfiguration(classes = Main.class)
 public class SecurityIntegrationTest {
+
+	private static final Integer USER_ID = new Random().nextInt();
 
 	@Autowired
 	private WebApplicationContext context;
@@ -71,8 +71,20 @@ public class SecurityIntegrationTest {
 		public UserDetailsService userDetailsService() {
 			// Application context is using BCryptPasswordEncoder so setting encrypted password in memory test user store.
 			final String bcryptPassword = new BCryptPasswordEncoder().encode(TEST_PASS);
-			final UserDetails testUser = new User(TEST_USER, bcryptPassword, Lists.newArrayList(new SimpleGrantedAuthority(TEST_ROLE)));
-			return new InMemoryUserDetailsManager(Lists.newArrayList(testUser));
+
+			final BMSUser user = Mockito.mock(BMSUser.class);
+			Mockito.when(user.getUserId()).thenReturn(USER_ID);
+			Mockito.when(user.getUsername()).thenReturn(TEST_USER);
+			Mockito.when(user.getPassword()).thenReturn(bcryptPassword);
+			Mockito.when(user.getAuthorities()).thenReturn(Lists.newArrayList(new SimpleGrantedAuthority(TEST_ROLE)));
+			Mockito.when(user.isAccountNonLocked()).thenReturn(true);
+			Mockito.when(user.isAccountNonExpired()).thenReturn(true);
+			Mockito.when(user.isCredentialsNonExpired()).thenReturn(true);
+			Mockito.when(user.isEnabled()).thenReturn(true);
+
+			final WorkbenchUserDetailsService detailsService = Mockito.mock(WorkbenchUserDetailsService.class);
+			Mockito.when(detailsService.loadUserByUsername(TEST_USER)).thenReturn(user);
+			return detailsService;
 		}
 	}
 
