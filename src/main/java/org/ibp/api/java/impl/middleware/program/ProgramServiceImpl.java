@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -114,6 +116,16 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
+	public ProgramDTO getLastOpenedProject(final Integer userId) {
+		return this.programService.getLastOpenedProject(userId);
+	}
+
+	@Override
+	public void saveOrUpdateProjectUserInfo(final Integer userId, final String programUUID) {
+		this.programService.saveOrUpdateProjectUserInfo(userId, programUUID);
+	}
+
+	@Override
 	public ProgramDTO getByUUIDAndCrop(final String crop, final String programUUID) {
 		try {
 			final Project workbenchProgram = this.workbenchDataManager.getProjectByUuidAndCrop(programUUID, crop);
@@ -147,4 +159,8 @@ public class ProgramServiceImpl implements ProgramService {
 
 	}
 
+	public ProgramDTO getProjectByUuid(final String programUUID) {
+		final Project project = this.workbenchDataManager.getProjectByUuid(programUUID);
+		return project != null ? new ProgramDTO(project) : null;
+	}
 }
