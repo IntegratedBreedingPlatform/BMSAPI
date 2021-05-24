@@ -2,6 +2,7 @@
 package org.ibp.api.java.program;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,7 @@ public interface ProgramService {
 
 	List<ProgramDTO> listProgramsByCropNameAndUser(ProgramSearchRequest programSearchRequest);
 
-	long countProgramsByFilter(final ProgramSearchRequest programSearchRequest);
+	long countProgramsByFilter(ProgramSearchRequest programSearchRequest);
 
 	ProgramDTO getByUUIDAndCrop(String crop, String programUUID);
 
@@ -22,4 +23,9 @@ public interface ProgramService {
 
 	List<ProgramDTO> getFilteredPrograms(Pageable pageable, ProgramSearchRequest programSearchRequest);
 
+	ProgramDTO getLastOpenedProject(Integer userId);
+
+	void saveOrUpdateProjectUserInfo(Integer userId, String  programUUID);
+
+	ProgramDTO getProjectByUuid(String programUUID);
 }

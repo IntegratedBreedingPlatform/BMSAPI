@@ -2,6 +2,7 @@
 package org.ibp.api.security.xauth;
 
 import org.ibp.api.java.impl.middleware.common.ContextResolutionException;
+import org.ibp.api.security.BMSUser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,8 +24,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Random;
 
 public class XAuthTokenFilterTest {
+
+	private static final Integer USER_ID = new Random().nextInt();
 
 	@Mock
 	private UserDetailsService userDetailsService;
@@ -46,7 +50,7 @@ public class XAuthTokenFilterTest {
 	public void testDoFilterValidRequest() throws IOException, ServletException {
 		final String testUser = "admin";
 
-		final User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
+		final User userDetails = new BMSUser(USER_ID, testUser, "password", Collections.<GrantedAuthority>emptyList());
 		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenReturn(userDetails);
 
 		// Generate a valid token
@@ -71,7 +75,7 @@ public class XAuthTokenFilterTest {
 	public void testDoFilterValidBrAPIRequest() throws IOException, ServletException {
 		final String testUser = "admin";
 
-		final User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
+		final User userDetails = new BMSUser(USER_ID, testUser, "password", Collections.emptyList());
 		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenReturn(userDetails);
 
 		// Generate a valid token
