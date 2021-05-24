@@ -10,9 +10,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
@@ -21,7 +19,6 @@ import org.ibp.api.brapi.v2.germplasm.GermplasmUpdateRequestValidator;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,9 +52,6 @@ public class GermplasmServiceImplTest {
 	private static final int PAGE = 1;
 
 	@Mock
-	private GermplasmDataManager germplasmDataManager;
-
-	@Mock
 	private GermplasmService middlewareGermplasmService;
 
 	@Mock
@@ -73,9 +67,6 @@ public class GermplasmServiceImplTest {
 	private GermplasmValidator germplasmValidator;
 
 	@Mock
-	private SecurityService securityService;
-
-	@Mock
 	private GermplasmImportRequestValidator germplasmImportValidator;
 
 	@Mock
@@ -83,7 +74,6 @@ public class GermplasmServiceImplTest {
 
 	@InjectMocks
 	private GermplasmServiceImpl germplasmServiceImpl;
-
 
 	@Test
 	public void testSearchGermplasmDTO() {
@@ -163,8 +153,6 @@ public class GermplasmServiceImplTest {
 
 	@Test
 	public void testCreateGermplasm_AllCreated(){
-		final WorkbenchUser user = new WorkbenchUser(1);
-		Mockito.doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
 		final BindingResult result = Mockito.mock(BindingResult.class);
 		Mockito.doReturn(false).when(result).hasErrors();
 		Mockito.doReturn(result).when(this.germplasmImportValidator).pruneGermplasmInvalidForImport(ArgumentMatchers.anyList());
@@ -191,10 +179,10 @@ public class GermplasmServiceImplTest {
 		final List<GermplasmImportRequest> germplasmList = Lists.newArrayList(importRequest1, importRequest2);
 		final String cropName = "maize";
 
-		Mockito.doReturn(germplasmDTOList).when(this.middlewareGermplasmService).createGermplasm(user.getUserid(), cropName, germplasmList);
+		Mockito.doReturn(germplasmDTOList).when(this.middlewareGermplasmService).createGermplasm(cropName, germplasmList);
 
 		final GermplasmImportResponse importResponse = this.germplasmServiceImpl.createGermplasm(cropName, germplasmList);
-		Mockito.verify(this.middlewareGermplasmService).createGermplasm(user.getUserid(), cropName, germplasmList);
+		Mockito.verify(this.middlewareGermplasmService).createGermplasm(cropName, germplasmList);
 		final int size = germplasmList.size();
 		Assert.assertThat(importResponse.getStatus(), is(size + " out of " + size + " germplasm created successfully."));
 		Assert.assertThat(importResponse.getGermplasmList(), iterableWithSize(germplasmDTOList.size()));
@@ -203,8 +191,6 @@ public class GermplasmServiceImplTest {
 
 	@Test
 	public void testCreateGermplasm_InvalidNotCreated(){
-		final WorkbenchUser user = new WorkbenchUser(1);
-		Mockito.doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
 		final BindingResult result = Mockito.mock(BindingResult.class);
 		final ObjectError error = Mockito.mock(ObjectError.class);
 		Mockito.doReturn(true).when(result).hasErrors();
@@ -228,10 +214,10 @@ public class GermplasmServiceImplTest {
 		final List<GermplasmImportRequest> germplasmList = Lists.newArrayList(importRequest1, importRequest2);
 		final String cropName = "maize";
 
-		Mockito.doReturn(germplasmDTOList).when(this.middlewareGermplasmService).createGermplasm(user.getUserid(), cropName, germplasmList);
+		Mockito.doReturn(germplasmDTOList).when(this.middlewareGermplasmService).createGermplasm(cropName, germplasmList);
 
 		final GermplasmImportResponse importResponse = this.germplasmServiceImpl.createGermplasm(cropName, germplasmList);
-		Mockito.verify(this.middlewareGermplasmService).createGermplasm(user.getUserid(), cropName, germplasmList);
+		Mockito.verify(this.middlewareGermplasmService).createGermplasm(cropName, germplasmList);
 		final int size = germplasmList.size();
 		Assert.assertThat(importResponse.getStatus(), is(germplasmDTOList.size() + " out of " + size + " germplasm created successfully."));
 		Assert.assertThat(importResponse.getGermplasmList(), iterableWithSize(germplasmDTOList.size()));
@@ -240,9 +226,6 @@ public class GermplasmServiceImplTest {
 
 	@Test
 	public void testUpdateGermplasm(){
-		final WorkbenchUser user = new WorkbenchUser(1);
-		Mockito.doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
-
 		final String germplasmDbId = RandomStringUtils.randomAlphabetic(20);
 		final String breedingMethodDbId = "13";
 
@@ -254,12 +237,12 @@ public class GermplasmServiceImplTest {
 		final GermplasmUpdateRequest updateRequest = new GermplasmUpdateRequest();
 		updateRequest.setBreedingMethodDbId(breedingMethodDbId);
 		Mockito.doReturn(germplasmDTO).when(this.middlewareGermplasmService)
-			.updateGermplasm(user.getUserid(), germplasmDbId, updateRequest);
+			.updateGermplasm(germplasmDbId, updateRequest);
 
 		final GermplasmDTO germplasm = this.germplasmServiceImpl.updateGermplasm(germplasmDbId, updateRequest);
 		Mockito.verify(this.germplasmValidator).validateGermplasmUUID(ArgumentMatchers.any(), ArgumentMatchers.eq(germplasmDbId));
 		Mockito.verify(this.germplasmUpdateRequestValidator).validate(updateRequest);
-		Mockito.verify(this.middlewareGermplasmService).updateGermplasm(user.getUserid(), germplasmDbId, updateRequest);
+		Mockito.verify(this.middlewareGermplasmService).updateGermplasm(germplasmDbId, updateRequest);
 	}
 
 

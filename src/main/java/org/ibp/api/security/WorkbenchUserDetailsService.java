@@ -64,7 +64,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			if (matchingUsers != null && !matchingUsers.isEmpty()) {
 				final WorkbenchUser workbenchUser = matchingUsers.get(0);
 				// FIXME Populate flags for accountNonExpired, credentialsNonExpired, accountNonLocked properly, all true for now.
-				return new org.springframework.security.core.userdetails.User(workbenchUser.getName(), workbenchUser.getPassword(),
+				return new BMSUser(workbenchUser.getUserid(), workbenchUser.getName(), workbenchUser.getPassword(),
 						this.getAuthorities(workbenchUser));
 			}
 			throw new UsernameNotFoundException("Invalid username/password.");

@@ -23,8 +23,6 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	private String email;
 	private Set<CropDto> crops;
 	private Set<String> authorities;
-	private String selectedCropName;
-	private String selectedProgramUUID;
 
 	public Integer getId() {
 		return this.id;
@@ -90,22 +88,6 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 		this.authorities = authorities;
 	}
 
-	public String getSelectedCropName() {
-		return this.selectedCropName;
-	}
-
-	public void setSelectedCropName(final String selectedCropName) {
-		this.selectedCropName = selectedCropName;
-	}
-
-	public String getSelectedProgramUUID() {
-		return this.selectedProgramUUID;
-	}
-
-	public void setSelectedProgramUUID(final String selectedProgramUUID) {
-		this.selectedProgramUUID = selectedProgramUUID;
-	}
-
 	@Override
 	public int compareTo(final UserDto o) {
 		final int compareId = o.getUserId();
@@ -156,9 +138,6 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 			.append("status", this.status)
 			.append("email", this.email)
 			.append("crops", this.crops)
-			.append("selectedCropName", this.selectedCropName)
-			.append("selectedProgramUUID", this.selectedProgramUUID)
-
 			.toString();
 	}
 
