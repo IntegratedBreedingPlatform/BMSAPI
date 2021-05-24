@@ -103,6 +103,8 @@ import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
 import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
@@ -637,6 +639,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public ExperimentModelGenerator getExperimentModelGenerator() {
 		return new ExperimentModelGenerator(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public VariableDataValidatorFactory getVariableDataValidatorFactory() {
+		return new VariableDataValidatorFactoryImpl();
 	}
 
 	@Bean

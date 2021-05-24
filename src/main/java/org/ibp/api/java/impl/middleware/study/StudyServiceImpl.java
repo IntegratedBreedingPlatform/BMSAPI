@@ -6,15 +6,18 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
+import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -22,10 +25,15 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.ibp.api.brapi.v2.trial.TrialImportResponse;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.ibp.api.java.impl.middleware.study.validator.TrialImportRequestValidator;
 import org.ibp.api.java.study.StudyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,6 +50,10 @@ import java.util.List;
 @Service
 @Transactional
 public class StudyServiceImpl implements StudyService {
+	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
+
+	@Autowired
+	private SecurityService securityService;
 
 	@Autowired
 	private DatasetService middlewareDatasetService;
@@ -60,6 +72,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
+
+	@Autowired
+	private TrialImportRequestValidator trialImportRequestDtoValidator;
 
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
@@ -181,6 +196,31 @@ public class StudyServiceImpl implements StudyService {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		return this.middlewareStudyService.getGermplasmStudies(gid);
+	}
+
+	@Override
+	public TrialImportResponse createTrials(String cropName, List<TrialImportRequestDTO> trialImportRequestDTOs) {
+		final TrialImportResponse response = new TrialImportResponse();
+		final int originalListSize = trialImportRequestDTOs.size();
+		int noOfCreatedTrials = 0;
+		LOG.error("HERE");
+		// Remove germplasm that fails any validation. They will be excluded from creation
+
+		final BindingResult bindingResult = this.trialImportRequestDtoValidator.pruneTrialsInvalidForImport(trialImportRequestDTOs, cropName);
+		if (bindingResult.hasErrors()) {
+			response.setErrors(bindingResult.getAllErrors());
+		}
+		if (!CollectionUtils.isEmpty(trialImportRequestDTOs)) {
+
+			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+			final List<StudySummary> studySummaries = this.middlewareStudyService.saveStudies(cropName, trialImportRequestDTOs, user.getUserid());
+			if (!CollectionUtils.isEmpty(studySummaries)) {
+				noOfCreatedTrials = studySummaries.size();
+			}
+			response.setStudySummaries(studySummaries);
+		}
+		response.setStatus(noOfCreatedTrials + " out of " + originalListSize + " trials created successfully.");
+		return response;
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
