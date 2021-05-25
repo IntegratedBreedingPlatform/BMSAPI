@@ -152,7 +152,8 @@ public class TrialResourceBrapi {
 		+ "<p><strong>Note: </strong> non-standard BrAPI call</p>")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials/{trialDbId}/table", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<org.ibp.api.brapi.v1.trial.TrialObservationTable>> getTrialObservationsAsTable(@PathVariable final String crop,
+	public ResponseEntity<SingleEntityResponse<org.ibp.api.brapi.v1.trial.TrialObservationTable>> getTrialObservationsAsTable(
+		@PathVariable final String crop,
 		@PathVariable final Integer trialDbId) {
 
 		org.ibp.api.brapi.v1.trial.TrialObservationTable trialObservationsTable = new org.ibp.api.brapi.v1.trial.TrialObservationTable();

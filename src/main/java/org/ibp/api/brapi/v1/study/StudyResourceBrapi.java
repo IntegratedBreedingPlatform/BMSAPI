@@ -253,18 +253,20 @@ public class StudyResourceBrapi {
 	@ApiOperation(value = "Get study details", notes = "Get study details")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV1_3.class)
-	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
+	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
+		@PathVariable final Integer studyDbId) {
 
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());;
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+			;
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
 		//Add environment parameters to addtionalInfo
 		final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
-				Collectors.toMap(MeasurementVariable::getName, MeasurementVariable::getValue));
+			Collectors.toMap(MeasurementVariable::getName, MeasurementVariable::getValue));
 		mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
 
 		final Metadata metadata = new Metadata();
@@ -372,7 +374,8 @@ public class StudyResourceBrapi {
 			required = false) final Integer pageSize) throws BrapiNotFoundException {
 
 		// Resolve the datasetId in which StudyDbId belongs to. (In BRAPI, studyDbId is nd_geolocation_id)
-		final Optional<Integer> datasetIdForInstance = this.studyInstanceService.getDatasetIdForInstanceIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		final Optional<Integer> datasetIdForInstance =
+			this.studyInstanceService.getDatasetIdForInstanceIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
 		final Integer datasetId = datasetIdForInstance.isPresent() ? datasetIdForInstance.get() : null;
 		if (datasetId == null) {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
