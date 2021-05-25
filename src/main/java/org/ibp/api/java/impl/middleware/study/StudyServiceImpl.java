@@ -32,8 +32,6 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.study.validator.TrialImportRequestValidator;
 import org.ibp.api.java.study.StudyService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,7 +48,6 @@ import java.util.List;
 @Service
 @Transactional
 public class StudyServiceImpl implements StudyService {
-	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
 
 	@Autowired
 	private SecurityService securityService;
@@ -203,9 +200,8 @@ public class StudyServiceImpl implements StudyService {
 		final TrialImportResponse response = new TrialImportResponse();
 		final int originalListSize = trialImportRequestDTOs.size();
 		int noOfCreatedTrials = 0;
-		LOG.error("HERE");
-		// Remove germplasm that fails any validation. They will be excluded from creation
 
+		// Remove germplasm that fails any validation. They will be excluded from creation
 		final BindingResult bindingResult = this.trialImportRequestDtoValidator.pruneTrialsInvalidForImport(trialImportRequestDTOs, cropName);
 		if (bindingResult.hasErrors()) {
 			response.setErrors(bindingResult.getAllErrors());

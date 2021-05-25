@@ -78,14 +78,13 @@ public class TrialImportRequestValidator {
 			if (trialDbId != null) {
 				errors.reject("trial.import.name.duplicate.not.unique", new String[] {index.toString()}, "");
 				return true;
-
 			}
 
 			if (StringUtils.isEmpty(t.getTrialDescription())) {
 				errors.reject("trial.import.description.null", new String[] {index.toString()}, "");
 				return true;
 			}
-			if (t.getTrialName().length() > TRIAL_DESCRIPTION_MAX_LENGTH) {
+			if (t.getTrialDescription().length() > TRIAL_DESCRIPTION_MAX_LENGTH) {
 				errors.reject("trial.import.description.exceed.length", new String[] {index.toString()}, "");
 				return true;
 			}
