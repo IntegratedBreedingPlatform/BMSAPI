@@ -28,6 +28,8 @@ import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -57,6 +59,8 @@ import java.util.Map;
 @Api(value = "BrAPI v2 Trial Services")
 @Controller(value = "TrialResourceBrapiV2")
 public class TrialResourceBrapi {
+
+	private static final Logger LOG = LoggerFactory.getLogger(TrialResourceBrapi.class);
 
 	@Autowired
 	private StudyService studyService;
@@ -163,6 +167,7 @@ public class TrialResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<TrialSummary>> createTrial(@PathVariable final String crop,
 		@RequestBody final List<TrialImportRequestDTO> trialImportRequestDTOs) {
+		LOG.error(trialImportRequestDTOs.get(0).toString());
 		BaseValidator.checkNotNull(trialImportRequestDTOs, "trial.import.request.null");
 
 		final TrialImportResponse trialImportResponse = this.studyService.createTrials(crop, trialImportRequestDTOs);
