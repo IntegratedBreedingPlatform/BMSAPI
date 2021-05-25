@@ -7,17 +7,13 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.Util;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +24,6 @@ import java.util.stream.IntStream;
 
 @Component
 public class TrialImportRequestValidator {
-
-	private static final Logger LOG = LoggerFactory.getLogger(TrialImportRequestValidator.class);
 
 	private static final Integer TRIAL_NAME_MAX_LENGTH = 225;
 	private static final Integer TRIAL_DESCRIPTION_MAX_LENGTH = 225;
@@ -46,12 +40,6 @@ public class TrialImportRequestValidator {
 		BaseValidator.checkNotEmpty(trialImportRequestDTOS, "trial.import.request.null");
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequest.class.getName());
-
-		if (!trialImportRequestDTOS.stream().filter(i -> Collections.frequency(trialImportRequestDTOS, i) > 1)
-			.collect(Collectors.toSet()).isEmpty()) {
-			errors.reject("trial.import.duplicated.objects", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
 
 		final Map<TrialImportRequestDTO, Integer> importRequestByIndexMap = IntStream.range(0, trialImportRequestDTOS.size())
 			.boxed().collect(Collectors.toMap(trialImportRequestDTOS::get, i -> i));
@@ -123,9 +111,11 @@ public class TrialImportRequestValidator {
 				}
 				if (endDate.before(new Date()) && t.isActive()) {
 					errors.reject("trial.import.active.should.be.false", new String[] {index.toString()}, "");
+					return true;
 				}
 				if (new Date().before(endDate) && !t.isActive()) {
 					errors.reject("trial.import.active.should.be.true", new String[] {index.toString()}, "");
+					return true;
 				}
 			} else {
 				if (!t.isActive()) {
@@ -152,8 +142,6 @@ public class TrialImportRequestValidator {
 
 			return false;
 		});
-
-		LOG.error("SIZE: " + trialImportRequestDTOS.size());
 
 		return this.errors;
 	}
