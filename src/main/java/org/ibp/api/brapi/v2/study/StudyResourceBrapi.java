@@ -75,7 +75,6 @@ public class StudyResourceBrapi {
 		final Metadata metadata = new Metadata();
 		final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 		metadata.setPagination(pagination);
-		metadata.setStatus(Collections.singletonList(new HashMap<>()));
 		final ModelMapper studyMapper = StudyMapper.getInstance();
 		final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
 		if (mwStudyDetails.getMetadata().getLocationId() != null) {

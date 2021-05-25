@@ -27,15 +27,15 @@ public class LotMapper {
 
         @Override
         public Map<String, Object> convert(final MappingContext<ExtendedLotDto, Map<String, Object>> context) {
-            final Map<String, Object> additionalInfo = new HashMap<>();
+            final Map<String, String> additionalInfo = new HashMap<>();
             final ExtendedLotDto lotDto = context.getSource();
             additionalInfo.put("username", lotDto.getCreatedByUsername());
             additionalInfo.put("status", lotDto.getStatus());
             additionalInfo.put("germplasmName", lotDto.getDesignation());
-            additionalInfo.put("actualBalance", lotDto.getActualBalance());
-            additionalInfo.put("totalReserved", lotDto.getReservedTotal());
-            additionalInfo.put("totalWithdrawals", lotDto.getWithdrawalTotal());
-            additionalInfo.put("pendingDeposits", lotDto.getPendingDepositsTotal());
+            additionalInfo.put("actualBalance", String.valueOf(lotDto.getActualBalance()));
+            additionalInfo.put("totalReserved", String.valueOf(lotDto.getReservedTotal()));
+            additionalInfo.put("totalWithdrawals", String.valueOf(lotDto.getWithdrawalTotal()));
+            additionalInfo.put("pendingDeposits", String.valueOf(lotDto.getPendingDepositsTotal()));
             final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             if (lotDto.getLastDepositDate() != null) {
                 additionalInfo.put("lastDepositDate", dateFormat.format(lotDto.getLastDepositDate()));
@@ -43,7 +43,7 @@ public class LotMapper {
             if (lotDto.getLastWithdrawalDate() != null) {
                 additionalInfo.put("lastWithdrawalDate", dateFormat.format(lotDto.getLastWithdrawalDate()));
             }
-            additionalInfo.put("lotInternalId", lotDto.getLotId());
+            additionalInfo.put("lotInternalId", String.valueOf(lotDto.getLotId()));
 
             return context.getMappingEngine().map(context.create(additionalInfo, context.getDestinationType()));
         }
@@ -58,7 +58,7 @@ public class LotMapper {
                 this.map().setAmount(this.source.getAvailableBalance());
                 this.map().setCreatedDate(this.source.getCreatedDate());
                 this.map().setGermplasmDbId(this.source.getGermplasmUUID());
-                this.map().setLocationDbId(this.source.getLocationId());
+                this.map().setLocationDbId(String.valueOf(this.source.getLocationId()));
                 this.map().setSeedLotDescription(this.source.getNotes());
                 this.map().setSeedLotName(this.source.getStockId());
                 this.map().setStorageLocation(this.source.getLocationName());

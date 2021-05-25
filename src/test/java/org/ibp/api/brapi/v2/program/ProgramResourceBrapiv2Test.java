@@ -38,7 +38,7 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
 	private static final String RICE = "Rice";
 	private static final String MAIZE = "Maize";
 	private static final String INVALID_CROP = "maize2";
-	private static final String BRAPI_V2_PROGRAMS = "/brapi/v2/programs";
+	private static final String BRAPI_V2_PROGRAMS = "/maize/brapi/v2/programs";
 	final static String PROGRAM_UUID_RICE = "92c47f83-4427-44c9-982f-b611b8917a2d";
 	final static String PROGRAM_UUID_WHEAT = "2ca55832-5c5d-404f-b05c-bc6e305c8b76";
 	final static String PROGRAM_UUID_MAIZE = "d1a052d0-65eb-4d0e-8813-6c770d10f253";

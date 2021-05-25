@@ -218,7 +218,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$.result.location.latitude", is(location.getLatitude())))
 			.andExpect(jsonPath("$.result.location.longitude", is(location.getLongitude())))
 			.andExpect(jsonPath("$.result.location.altitude", is(location.getAltitude())))
-			.andExpect(jsonPath("$.result.contacts[0].contactDbId", is(studyDetailsDto.getContacts().get(0).getUserId())))
+			.andExpect(jsonPath("$.result.contacts[0].contactDbId", is(String.valueOf(studyDetailsDto.getContacts().get(0).getUserId()))))
 			.andExpect(jsonPath("$.result.contacts[0].name",
 				is(studyDetailsDto.getContacts().get(0).getFirstName() + " " + studyDetailsDto.getContacts().get(0).getLastName())))
 			.andExpect(jsonPath("$.result.contacts[0].email", is(studyDetailsDto.getContacts().get(0).getEmail())))
