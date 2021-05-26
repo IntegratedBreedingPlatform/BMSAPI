@@ -14,7 +14,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 @Configuration
-public class FileServiceFactory {
+public class FileStorageServiceFactory {
 
 	// AWS
 
