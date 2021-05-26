@@ -49,77 +49,67 @@ public class TrialImportRequestValidator {
 		trialImportRequestDTOS.removeIf(t -> {
 			final Integer index = importRequestByIndexMap.get(t) + 1;
 
-			if (StringUtils.isEmpty(t.getTrialName())) {
-				errors.reject("trial.import.name.null", new String[] {index.toString()}, "");
-				return true;
-			}
-			if (t.getTrialName().length() > TRIAL_NAME_MAX_LENGTH) {
+
+			if (StringUtils.isNotEmpty(t.getTrialName()) && t.getTrialName().length() > TRIAL_NAME_MAX_LENGTH) {
 				errors.reject("trial.import.name.exceed.length", new String[] {index.toString()}, "");
 				return true;
 			}
 
-			if (trialNames.contains(t.getTrialName())) {
+			if (StringUtils.isNotEmpty(t.getTrialName()) && trialNames.contains(t.getTrialName())) {
 				errors.reject("trial.import.name.duplicate.import", new String[] {index.toString()}, "");
 				return true;
 			}
-
-			if (StringUtils.isEmpty(t.getProgramDbId())) {
-				errors.reject("trial.import.program.dbid.null", new String[] {index.toString()}, "");
-				return true;
+			if(StringUtils.isNotEmpty(crop)) {
+				Project project = this.workbenchDataManager.getProjectByUuidAndCrop(t.getProgramDbId(), crop);
+				if (project == null) {
+					errors.reject("trial.import.program.dbid.invalid", new String[] {index.toString()}, "");
+					return true;
+				}
 			}
 
-			Project project = this.workbenchDataManager.getProjectByUuidAndCrop(t.getProgramDbId(), crop);
-			if (project == null) {
-				errors.reject("trial.import.program.dbid.invalid", new String[] {index.toString()}, "");
-				return true;
+			if(StringUtils.isNotEmpty(t.getTrialName()) && StringUtils.isNotEmpty(t.getProgramDbId())) {
+				final Integer trialDbId = this.fieldbookService.getProjectIdByNameAndProgramUUID(t.getTrialName(), t.getProgramDbId());
+				if (trialDbId != null) {
+					errors.reject("trial.import.name.duplicate.not.unique", new String[] {index.toString()}, "");
+					return true;
+				}
 			}
 
-			final Integer trialDbId = this.fieldbookService.getProjectIdByNameAndProgramUUID(t.getTrialName(), t.getProgramDbId());
-			if (trialDbId != null) {
-				errors.reject("trial.import.name.duplicate.not.unique", new String[] {index.toString()}, "");
-				return true;
-			}
-
-			if (StringUtils.isEmpty(t.getTrialDescription())) {
-				errors.reject("trial.import.description.null", new String[] {index.toString()}, "");
-				return true;
-			}
-			if (t.getTrialDescription().length() > TRIAL_DESCRIPTION_MAX_LENGTH) {
+			if (StringUtils.isNotEmpty(t.getTrialDescription()) && t.getTrialDescription().length() > TRIAL_DESCRIPTION_MAX_LENGTH) {
 				errors.reject("trial.import.description.exceed.length", new String[] {index.toString()}, "");
 				return true;
 			}
-			if (StringUtils.isEmpty(t.getStartDate())) {
-				errors.reject("trial.import.start.date.null", new String[] {index.toString()}, "");
-				return true;
-			}
-			final Date startDate = Util.tryParseDate(t.getStartDate(), Util.FRONTEND_DATE_FORMAT);
-			if (startDate == null) {
-				errors.reject("trial.import.start.date.invalid.format", new String[] {index.toString()}, "");
-				return true;
-			}
 
-			if (StringUtils.isNotEmpty(t.getEndDate())) {
-				final Date endDate = Util.tryParseDate(t.getEndDate(), Util.FRONTEND_DATE_FORMAT);
-				if (endDate == null) {
-					errors.reject("trial.import.end.date.invalid.format", new String[] {index.toString()}, "");
+			if(StringUtils.isNotEmpty(t.getStartDate())) {
+				final Date startDate = Util.tryParseDate(t.getStartDate(), Util.FRONTEND_DATE_FORMAT);
+				if (startDate == null) {
+					errors.reject("trial.import.start.date.invalid.format", new String[] {index.toString()}, "");
 					return true;
 				}
-				if (endDate.compareTo(startDate) < 0) {
-					errors.reject("trial.import.end.date.invalid.date", new String[] {index.toString()}, "");
-					return true;
-				}
-				if (endDate.before(new Date()) && t.isActive()) {
-					errors.reject("trial.import.active.should.be.false", new String[] {index.toString()}, "");
-					return true;
-				}
-				if (new Date().before(endDate) && !t.isActive()) {
-					errors.reject("trial.import.active.should.be.true", new String[] {index.toString()}, "");
-					return true;
-				}
-			} else {
-				if (!t.isActive()) {
-					errors.reject("trial.import.active.should.be.true", new String[] {index.toString()}, "");
-					return true;
+
+				if (StringUtils.isNotEmpty(t.getEndDate())) {
+					final Date endDate = Util.tryParseDate(t.getEndDate(), Util.FRONTEND_DATE_FORMAT);
+					if (endDate == null) {
+						errors.reject("trial.import.end.date.invalid.format", new String[] {index.toString()}, "");
+						return true;
+					}
+					if (endDate.compareTo(startDate) < 0) {
+						errors.reject("trial.import.end.date.invalid.date", new String[] {index.toString()}, "");
+						return true;
+					}
+					if (endDate.before(new Date()) && t.isActive()) {
+						errors.reject("trial.import.active.should.be.false", new String[] {index.toString()}, "");
+						return true;
+					}
+					if (new Date().before(endDate) && !t.isActive()) {
+						errors.reject("trial.import.active.should.be.true", new String[] {index.toString()}, "");
+						return true;
+					}
+				} else {
+					if (!t.isActive()) {
+						errors.reject("trial.import.active.should.be.true", new String[] {index.toString()}, "");
+						return true;
+					}
 				}
 			}
 
@@ -136,9 +126,10 @@ public class TrialImportRequestValidator {
 				return true;
 			}
 
-			// Add current trial name on the trialNames list after it passed all validations
-			trialNames.add(t.getTrialName());
-
+			if(StringUtils.isNotEmpty(t.getTrialName())) {
+				// Add current trial name on the trialNames list after it passed all validations
+				trialNames.add(t.getTrialName());
+			}
 			return false;
 		});
 
