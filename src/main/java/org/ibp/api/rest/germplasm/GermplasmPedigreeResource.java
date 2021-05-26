@@ -25,7 +25,7 @@ public class GermplasmPedigreeResource {
 	@Resource
 	private GermplasmPedigreeService germplasmPedigreeService;
 
-	@ApiOperation(value = "Returns the of the given germplasm")
+	@ApiOperation(value = "Returns the pedigree tree of the given germplasm")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/tree", method = RequestMethod.GET)
 	@ResponseBody
 	public GermplasmTreeNode getGermplasmPedigreeTree(@PathVariable final String cropName, @PathVariable final Integer gid,
