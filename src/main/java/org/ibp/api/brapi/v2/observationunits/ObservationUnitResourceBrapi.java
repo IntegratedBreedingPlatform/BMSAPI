@@ -72,11 +72,11 @@ public class ObservationUnitResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get Observation Unit search", notes = "Get the results of a Observation Unit search request")
-	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits/{searchResultsDbid}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> getObservationUnitsSearch(
-		@PathVariable final String crop, @PathVariable final String searchResultsDbid,
+		@PathVariable final String crop, @PathVariable final String searchResultsDbId,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
 			required = false) final Integer currentPage,
@@ -89,7 +89,7 @@ public class ObservationUnitResourceBrapi {
 		try {
 			observationUnitsSearchRequestDto =
 				(ObservationUnitsSearchRequestDto) this.searchRequestService
-					.getSearchRequest(Integer.valueOf(searchResultsDbid), ObservationUnitsSearchRequestDto.class);
+					.getSearchRequest(Integer.valueOf(searchResultsDbId), ObservationUnitsSearchRequestDto.class);
 		} catch (final NumberFormatException | MiddlewareException e) {
 			return new ResponseEntity<>(
 				new EntityListResponse<>(new Result<>(new ArrayList<PhenotypeSearchDTO>())).withMessage("no search request found"),

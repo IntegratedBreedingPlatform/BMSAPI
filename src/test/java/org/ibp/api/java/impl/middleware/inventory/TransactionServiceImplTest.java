@@ -87,12 +87,12 @@ public class TransactionServiceImplTest {
 		Assert.assertEquals(transactionDto.getTransactionStatus(), additionalInfo.get("transactionStatus"));
 		Assert.assertEquals(transactionDto.getLot().getLotUUID(), additionalInfo.get("seedLotID"));
 		Assert.assertEquals(transactionDto.getLot().getGermplasmUUID(), additionalInfo.get("germplasmDbId"));
-		Assert.assertEquals(transactionDto.getLot().getLocationId(), additionalInfo.get("locationId"));
+		Assert.assertEquals(String.valueOf(transactionDto.getLot().getLocationId()), additionalInfo.get("locationId"));
 		Assert.assertEquals(transactionDto.getLot().getLocationName(), additionalInfo.get("locationName"));
 		Assert.assertEquals(transactionDto.getLot().getLocationAbbr(), additionalInfo.get("locationAbbr"));
-		Assert.assertEquals(transactionDto.getLot().getUnitId(), additionalInfo.get("unitId"));
+		Assert.assertEquals(String.valueOf(transactionDto.getLot().getUnitId()), additionalInfo.get("unitId"));
 		Assert.assertEquals(transactionDto.getLot().getStockId(), additionalInfo.get("stockId"));
-		Assert.assertEquals(transactionDto.getLot().getLotId(), additionalInfo.get("lotId"));
+		Assert.assertEquals(String.valueOf(transactionDto.getLot().getLotId()), additionalInfo.get("lotId"));
 		Assert.assertEquals(transactionDto.getLot().getStatus(), additionalInfo.get("lotStatus"));
 		Assert.assertEquals(transactionDto.getLot().getNotes(), additionalInfo.get("lotNotes"));
 		Assert.assertEquals(transactionDto.getLot().getDesignation(), additionalInfo.get("designation"));

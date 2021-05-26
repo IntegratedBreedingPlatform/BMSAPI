@@ -72,7 +72,7 @@
     ]
   },
   {
-    "service": "search/observationunits/{searchResultsDbid}",
+    "service": "search/observationunits/{searchResultsDbId}",
     "dataTypes": [
       "application/json"
     ],
@@ -96,7 +96,7 @@
     ]
   },
   {
-    "service": "transactions",
+    "service": "seedlots/transactions",
     "dataTypes": [
       "application/json"
     ],

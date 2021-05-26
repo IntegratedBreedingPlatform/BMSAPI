@@ -176,6 +176,7 @@ public class GermplasmResourceBrapi {
 	@ApiOperation(value = "Germplasm search by germplasmDbId", notes = "Germplasm search by germplasmDbId")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}", method = RequestMethod.GET)
 	@ResponseBody
+	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<Germplasm>> searchGermplasm(
 		@PathVariable final String crop,
 		@PathVariable final String germplasmDbId) {

@@ -101,12 +101,12 @@ public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 		phenotypeSearchDTO.setProgramDbId("04136e3f-55f9-4a80-9c24-5066a253ce6f");
 		phenotypeSearchDTO.setTrialDbId("25008");
 		phenotypeSearchDTO.setTrialName("Trial Name");
-		final int searchResultsDbid = nextInt();
-		doReturn(new ObservationUnitsSearchRequestDto()).when(this.searchRequestService).getSearchRequest(searchResultsDbid, ObservationUnitsSearchRequestDto.class);
+		final int searchResultsDbId = nextInt();
+		doReturn(new ObservationUnitsSearchRequestDto()).when(this.searchRequestService).getSearchRequest(searchResultsDbId, ObservationUnitsSearchRequestDto.class);
 		when(this.studyService.searchPhenotypes(Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE), Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER), any(
 			PhenotypeSearchRequestDTO.class))).thenReturn(Arrays.asList(phenotypeSearchDTO));
 		this.mockMvc.perform(
-			MockMvcRequestBuilders.get("/{crop}/brapi/v2/search/observationunits/{searchResultsDbid}", this.cropName, searchResultsDbid)
+			MockMvcRequestBuilders.get("/{crop}/brapi/v2/search/observationunits/{searchResultsDbId}", this.cropName, searchResultsDbId)
 				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].observationUnitXRef", nullValue()))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId", is("04136e3f-55f9-4a80-9c24-5066a253ce6f")))
