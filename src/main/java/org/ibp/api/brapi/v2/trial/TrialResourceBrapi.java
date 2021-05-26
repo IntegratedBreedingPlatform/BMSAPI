@@ -9,7 +9,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.BrapiView;
@@ -19,7 +18,6 @@ import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
-import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.trial.TrialSummary;
 import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
 import org.ibp.api.domain.common.PagedResult;
@@ -59,8 +57,6 @@ import java.util.Map;
 @Api(value = "BrAPI v2 Trial Services")
 @Controller(value = "TrialResourceBrapiV2")
 public class TrialResourceBrapi {
-
-	private static final Logger LOG = LoggerFactory.getLogger(TrialResourceBrapi.class);
 
 	@Autowired
 	private StudyService studyService;
@@ -167,23 +163,28 @@ public class TrialResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<TrialSummary>> createTrial(@PathVariable final String crop,
 		@RequestBody final List<TrialImportRequestDTO> trialImportRequestDTOs) {
-		LOG.error(trialImportRequestDTOs.get(0).toString());
 		BaseValidator.checkNotNull(trialImportRequestDTOs, "trial.import.request.null");
 
 		final TrialImportResponse trialImportResponse = this.studyService.createTrials(crop, trialImportRequestDTOs);
 		final List<TrialSummary> trialSummaries = this.translateResults(trialImportResponse.getStudySummaries(), crop);
 		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaries);
 
-		final Map<String, String> messages = new HashMap<>();
-		messages.put("INFO", trialImportResponse.getStatus());
+		final List<Map<String, String>> status = new ArrayList<>();
+		final Map<String, String> messageInfo = new HashMap<>();
+		messageInfo.put("message", trialImportResponse.getStatus());
+		messageInfo.put("messageType", "INFO");
+		status.add(messageInfo);
 		if (!CollectionUtils.isEmpty(trialImportResponse.getErrors())) {
 			int index = 1;
 			for (final ObjectError error : trialImportResponse.getErrors()) {
-				messages.put("ERROR" + index++,
-					this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale()));
+				final Map<String, String> messageError = new HashMap<>();
+				messageError.put("message", "ERROR" + index++ + " " + this.messageSource
+					.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale()));
+				messageError.put("messageType", "ERROR");
+				status.add(messageError);
 			}
 		}
-		final Metadata metadata = new Metadata().withStatus(Lists.newArrayList(messages));
+		final Metadata metadata = new Metadata().withStatus(status);
 		final EntityListResponse<TrialSummary> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
@@ -192,7 +193,7 @@ public class TrialResourceBrapi {
 	private List<TrialSummary> translateResults(final List<StudySummary> studySummaries, final String crop) {
 		final ModelMapper modelMapper = TrialSummaryMapper.getInstance();
 		final List<TrialSummary> trialSummaryList = new ArrayList<>();
-		if(!CollectionUtils.isEmpty(studySummaries)) {
+		if (!CollectionUtils.isEmpty(studySummaries)) {
 			for (final StudySummary mwStudy : studySummaries) {
 				final TrialSummary trialSummaryDto = modelMapper.map(mwStudy, TrialSummary.class);
 				trialSummaryDto.setCommonCropName(crop);
