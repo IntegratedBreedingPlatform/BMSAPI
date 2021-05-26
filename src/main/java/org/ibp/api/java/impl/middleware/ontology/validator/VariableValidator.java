@@ -373,7 +373,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
 		}
 
-		if (this.isGermplasmAttributeVariable(variable) && variable.getVariableTypes().size() > 1) {
+		if (this.isGermplasmPassportVariable(variable) && variable.getVariableTypes().size() > 1) {
 			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
 		}
 
