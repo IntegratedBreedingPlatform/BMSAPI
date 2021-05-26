@@ -135,16 +135,6 @@ public class TrialImportRequestValidatorTest {
 	}
 
 	@Test
-	public void testPruneTrialsInvalidForImport_WhereEndDateIsNullAndActiveIsFalse() {
-		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
-		dtoList.get(0).setEndDate(null);
-		dtoList.get(0).setActive(false);
-		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
-		Assert.assertTrue(result.hasErrors());
-		Assert.assertEquals("trial.import.active.should.be.true", result.getAllErrors().get(0).getCode());
-	}
-
-	@Test
 	public void testPruneTrialsInvalidForImport_WhereEndDateIsInvalid() {
 		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
 		dtoList.get(0).setEndDate("20210524");
@@ -161,33 +151,6 @@ public class TrialImportRequestValidatorTest {
 		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("trial.import.end.date.invalid.date", result.getAllErrors().get(0).getCode());
-	}
-
-	@Test
-	public void testPruneTrialsInvalidForImport_WhereEndDateIsBeforeCurrentDateAndActiveIsTrue() {
-		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
-		dtoList.get(0).setEndDate("2021-04-24");
-		dtoList.get(0).setStartDate("2021-04-23");
-		dtoList.get(0).setActive(true);
-		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
-		Assert.assertTrue(result.hasErrors());
-		Assert.assertEquals("trial.import.active.should.be.false", result.getAllErrors().get(0).getCode());
-	}
-
-	@Test
-	public void testPruneTrialsInvalidForImport_WhereEndDateIsAfterCurrentDateAndActiveIsFalse() {
-		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
-		dtoList.get(0).setStartDate("2021-04-23");
-
-		//Get Tomorrow's date
-		final Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DATE, 1);
-		dtoList.get(0).setEndDate(Util.formatDateAsStringValue(cal.getTime(), Util.FRONTEND_DATE_FORMAT));
-		dtoList.get(0).setActive(false);
-
-		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
-		Assert.assertTrue(result.hasErrors());
-		Assert.assertEquals("trial.import.active.should.be.true", result.getAllErrors().get(0).getCode());
 	}
 
 	@Test
@@ -265,7 +228,6 @@ public class TrialImportRequestValidatorTest {
 	public List<TrialImportRequestDTO> createTrialImportRequestDTOList() {
 		final List<TrialImportRequestDTO> trialImportRequestDTOList = new ArrayList<>();
 		final TrialImportRequestDTO dto = new TrialImportRequestDTO();
-		dto.setActive(true);
 		dto.setTrialName(TRIAL_NAME);
 		dto.setTrialDescription(RandomStringUtils.randomAlphabetic(10));
 		dto.setStartDate("2021-05-25");

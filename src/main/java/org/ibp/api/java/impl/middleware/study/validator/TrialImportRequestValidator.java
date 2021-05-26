@@ -108,19 +108,6 @@ public class TrialImportRequestValidator {
 					errors.reject("trial.import.end.date.invalid.date", new String[] {index.toString()}, "");
 					return true;
 				}
-				if (endDate.before(new Date()) && t.isActive()) {
-					errors.reject("trial.import.active.should.be.false", new String[] {index.toString()}, "");
-					return true;
-				}
-				if (new Date().before(endDate) && !t.isActive()) {
-					errors.reject("trial.import.active.should.be.true", new String[] {index.toString()}, "");
-					return true;
-				}
-			} else {
-				if (!t.isActive()) {
-					errors.reject("trial.import.active.should.be.true", new String[] {index.toString()}, "");
-					return true;
-				}
 			}
 
 			if (StringUtils.isNotEmpty(t.getCommonCropName()) && !crop.equalsIgnoreCase(t.getCommonCropName())) {
