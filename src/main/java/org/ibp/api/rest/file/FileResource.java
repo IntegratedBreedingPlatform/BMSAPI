@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URLDecoder;
 import java.util.Map;
 
 @Api("File services")
@@ -45,6 +46,7 @@ public class FileResource {
 	}
 
 	private static String getKey(final HttpServletRequest request) {
-		return request.getRequestURI().split(request.getContextPath() + "/files/")[1];
+		final String key = request.getRequestURI().split(request.getContextPath() + "/files/")[1];
+		return URLDecoder.decode(key);
 	}
 }
