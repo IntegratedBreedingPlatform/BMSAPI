@@ -63,6 +63,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		VariableType.GERMPLASM_ATTRIBUTE.getId(), //
 		VariableType.GERMPLASM_PASSPORT.getId());
 
+	private static List NOT_EDITABLE_AND_DELETABLE_VARIABLES =
+		Arrays.asList("PLOT_NUMBER_AP_text", "INSTANCE_NUMBER_AP_text", "REP_NUMBER_AP_text", "PLANT_NUMBER_AP_text", "PLOT_CODE_AP_text");
+
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
@@ -218,6 +221,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			ModelMapper mapper = OntologyMapper.getInstance();
 			VariableDetails response = mapper.map(ontologyVariable, VariableDetails.class);
 
+			if (NOT_EDITABLE_AND_DELETABLE_VARIABLES.contains(ontologyVariable.getName())) {
+				response.getMetadata().setDeletable(false);
+				return response;
+			}
+
 			if (!deletable) {
 				if (CollectionUtils.containsAny(ontologyVariable.getVariableTypes(), VariableServiceImpl.EDITABLE_VARIABLES_TYPES)) {
 					response.getMetadata().addEditableField("alias");
@@ -237,6 +245,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				response.getMetadata().addEditableField("scale");
 				response.getMetadata().addEditableField("expectedRange");
 			}
+
 			response.getMetadata().setDeletable(deletable);
 			return response;
 		} catch (MiddlewareException e) {
