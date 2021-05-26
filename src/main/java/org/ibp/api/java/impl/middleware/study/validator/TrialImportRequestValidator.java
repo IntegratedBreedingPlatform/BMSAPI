@@ -110,11 +110,6 @@ public class TrialImportRequestValidator {
 				}
 			}
 
-			if (StringUtils.isNotEmpty(t.getCommonCropName()) && !crop.equalsIgnoreCase(t.getCommonCropName())) {
-				errors.reject("trial.import.crop.invalid", new String[] {index.toString()}, "");
-				return true;
-			}
-
 			if (isAnyAdditionalInfoInvalid(t, index)) {
 				return true;
 			}
