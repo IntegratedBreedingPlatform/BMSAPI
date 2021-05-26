@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
@@ -111,7 +112,7 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public List<UserDefinedField> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
+	public List<CVTerm> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
 		return this.lotService.getGermplasmAttributeTypes(searchDto);
 	}
 

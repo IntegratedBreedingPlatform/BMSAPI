@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.inventory.manager.LotService;
@@ -209,7 +210,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final Integer searchRequestId = labelsInfoInput.getSearchRequestId();
 		final LotsSearchDto searchDto =
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
-		final List<UserDefinedField> attributes = this.lotService.getGermplasmAttributeTypes(searchDto);
+		final List<CVTerm> attributes = this.lotService.getGermplasmAttributeTypes(searchDto);
 
 		// Build label list
 
@@ -220,7 +221,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final LabelType germplasmLabelTypes = new LabelType(GERMPLASM_FIXED_LABEL_TYPES.getTitle(), GERMPLASM_FIXED_LABEL_TYPES.getKey());
 		germplasmLabelTypes.setFields(new ArrayList<>(GERMPLASM_FIXED_LABEL_TYPES.getFields()));
 		germplasmLabelTypes.getFields().addAll(attributes.stream()
-			.map(attr -> new Field(toKey(attr.getFldno()), attr.getFcode()))
+			.map(attr -> new Field(toKey(attr.getCvTermId()), attr.getName()))
 			.collect(Collectors.toList()));
 		labelTypes.add(germplasmLabelTypes);
 
