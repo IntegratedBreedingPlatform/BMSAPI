@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.common.FileType;
@@ -152,7 +153,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 
-		final List<UserDefinedField> attributeTypes = this.germplasmSearchService.getGermplasmAttributeTypes(germplasmSearchRequest);
+		final List<CVTerm> attributes = this.germplasmSearchService.getGermplasmAttributeTypes(germplasmSearchRequest);
 		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest);
 
 		// Germplasm Details labels
@@ -176,8 +177,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		// Attribiutes labels
 		final LabelType attirbutesType = new LabelType(attributesPropValue, attributesPropValue);
 		attirbutesType.setFields(new ArrayList<>());
-		attirbutesType.getFields().addAll(attributeTypes.stream()
-			.map(attributeType -> new Field(toKey(attributeType.getFldno()), attributeType.getFcode()))
+		attirbutesType.getFields().addAll(attributes.stream()
+			.map(attributeType -> new Field(toKey(attributeType.getCvTermId()), attributeType.getName()))
 			.collect(Collectors.toList()));
 		labelTypes.add(attirbutesType);
 
