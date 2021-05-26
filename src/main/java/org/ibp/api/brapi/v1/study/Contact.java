@@ -10,7 +10,7 @@ import org.pojomatic.annotations.AutoProperty;
 @JsonPropertyOrder({"contactDbId", "email", "instituteName", "name", "type", "orcid"})
 public class Contact {
 
-	private Integer contactDbId;
+	private String contactDbId;
 
 	private String name;
 
@@ -37,7 +37,7 @@ public class Contact {
 	 * @param type
 	 * @param orcid
 	 */
-	public Contact(final Integer contactDbId, final String email, final String name, final String type, final String orcid) {
+	public Contact(final String contactDbId, final String email, final String name, final String type, final String orcid) {
 		this.contactDbId = contactDbId;
 		this.email = email;
 		this.name = name;
@@ -45,7 +45,7 @@ public class Contact {
 		this.orcid = orcid;
 	}
 
-	public Contact(final Integer contactDbId, final String email, final String name, final String type, final String orcid,
+	public Contact(final String contactDbId, final String email, final String name, final String type, final String orcid,
 		final String instituteName) {
 		this(contactDbId, email, name, type, orcid);
 		this.instituteName = instituteName;
@@ -54,7 +54,7 @@ public class Contact {
 	/**
 	 * @return the contactDBId
 	 */
-	public Integer getContactDbId() {
+	public String getContactDbId() {
 		return this.contactDbId;
 	}
 
@@ -62,7 +62,7 @@ public class Contact {
 	 * @param contactDbId
 	 * @return Contact
 	 */
-	public Contact setContactDbId(final Integer contactDbId) {
+	public Contact setContactDbId(final String contactDbId) {
 		this.contactDbId = contactDbId;
 		return this;
 	}

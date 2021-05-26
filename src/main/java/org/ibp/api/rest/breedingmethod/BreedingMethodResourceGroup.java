@@ -77,10 +77,12 @@ public class BreedingMethodResourceGroup {
 		@RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "method types to retrieve: GEN, DER, MAN")
 		@RequestParam(required = false) final List<String> methodTypes,
+		@ApiParam(value = "list of breeding method codes")
+		@RequestParam(required = false) final List<String> methodCodes,
 		@ApiParam(value = "retrieve favorite locations only", required = true)
 		@RequestParam final boolean favoritesOnly
 		) {
-		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, favoritesOnly);
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, methodCodes, favoritesOnly);
 		searchRequest.setMethodTypes(methodTypes);
 		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, searchRequest, null);
 		return new ResponseEntity<>(breedingMethods, HttpStatus.OK);

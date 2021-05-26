@@ -33,7 +33,7 @@ public class TrialSummaryTestDataProvider {
 
 	public static List<ContactDto> getContacts() {
 		final List<ContactDto> contacts = new ArrayList<>();
-		contacts.add(new ContactDto(1, "Maize Breeder", "admin@abc.org", "Creator"));
+		contacts.add(new ContactDto("1", "Maize Breeder", "admin@abc.org", "Creator"));
 		return contacts;
 	}
 

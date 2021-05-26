@@ -119,6 +119,7 @@ public class StudyResourceBrapi {
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
 	@ResponseBody
+	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<EntityListResponse<StudyInstanceDto>> listStudies(@PathVariable final String crop,
 		@ApiParam(value = "Common name for the crop associated with this study.") @RequestParam(value = "commonCropName", required = false)
 		final String commonCropName,
