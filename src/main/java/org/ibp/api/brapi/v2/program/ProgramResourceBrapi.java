@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,12 +49,14 @@ public class ProgramResourceBrapi {
 	private CropValidator cropValidator;
 
 	@ApiOperation(value = "Get filtered list of breeding Programs", notes = "Get a filtered list of breeding Programs. This list can be filtered by common crop name to narrow results to a specific crop.")
-	@RequestMapping(value = "/brapi/v2/programs", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropName}/brapi/v2/programs", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<Program>> listPrograms(
-		@ApiParam(value = "Filter by the common crop name. Exact match.", required = false)
-		@RequestParam(value = "commonCropName", required = false) final String commonCropName,
+		@PathVariable final String cropName,
+		@ApiParam(value = "<strong>Ignored.</strong> Use cropName", required = false)
+		@RequestParam(value = "commonCropName", required = false)
+		final String commonCropName,
 		@ApiParam(value = "Filter by programDbId. Exact match.", required = false)
 		@RequestParam(value = "programDbId", required = false) final String programDbId,
 		@ApiParam(value = "Filter by program name. Exact match.", required = false) @RequestParam(value = "programName",
@@ -83,9 +86,7 @@ public class ProgramResourceBrapi {
 		programSearchRequest.setProgramName(programName);
 		programSearchRequest.setAbbreviation(abbreviation);
 		programSearchRequest.setLoggedInUserId(this.securityService.getCurrentlyLoggedInUser().getUserid());
-		if (!StringUtils.isBlank(commonCropName)) {
-			programSearchRequest.setCommonCropName(commonCropName);
-		}
+		programSearchRequest.setCommonCropName(cropName);
 		final PagedResult<ProgramDetailsDto> pagedResult =
 			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<ProgramDetailsDto>() {
 
