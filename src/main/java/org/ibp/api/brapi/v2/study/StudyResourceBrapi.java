@@ -125,7 +125,7 @@ public class StudyResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(value = "pageSize", required = false)
 		final Integer pageSize
 		) {
-		final String validationError = this.parameterValidation(crop, commonCropName, active, sortBy, sortOrder);
+		final String validationError = this.parameterValidation(crop, commonCropName, sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
 			final Metadata metadata = new Metadata(null, status);
@@ -189,7 +189,7 @@ public class StudyResourceBrapi {
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
-	private String parameterValidation(final String crop, final String commonCropName, final Boolean active, final String sortBy,
+	private String parameterValidation(final String crop, final String commonCropName, final String sortBy,
 		final String sortOrder) {
 		final List<String> sortbyFields = ImmutableList.<String>builder().add("studyDbId").add("trialDbId").add("programDbId")
 			.add("locationDbId").add("studyTypeDbId").add("trialName").add("programName").add("seasonDbId").build();
@@ -198,9 +198,6 @@ public class StudyResourceBrapi {
 
 		if (!StringUtils.isEmpty(commonCropName) && !crop.equals(commonCropName)) {
 			return "Invalid commonCropName value";
-		}
-		if (active != null && !active) {
-			return "No inactive studies found.";
 		}
 		if (!StringUtils.isBlank(sortBy) && !sortbyFields.contains(sortBy)) {
 			return "sortBy bad filter, expect " + StringUtils.join(sortbyFields, "/");
