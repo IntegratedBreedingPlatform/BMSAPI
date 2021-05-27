@@ -74,7 +74,7 @@ public class TrialSummaryMapper {
 			@Override
 			protected void configure() {
 				this.map(this.source.getLocationId(), this.destination.getLocationDbId());
-				this.map(this.source.getStudyDbid(), this.destination.getTrialDbId());
+				this.map(this.source.getTrialDbId(), this.destination.getTrialDbId());
 				this.map(this.source.getName(), this.destination.getTrialName());
 				this.map(this.source.getDescription(), this.destination.getTrialDescription());
 				this.map(this.source.getObservationUnitId(), this.destination.getTrialPUI());
@@ -83,7 +83,7 @@ public class TrialSummaryMapper {
 				this.map(this.source.getStartDate(), this.destination.getStartDate());
 				this.map(this.source.getEndDate(), this.destination.getEndDate());
 				this.map(this.source.isActive(), this.destination.isActive());
-				this.map(this.source.getOptionalInfo(), this.destination.getAdditionalInfo());
+				this.map(this.source.getAdditionalInfo(), this.destination.getAdditionalInfo());
 				this.using(new StudySummaryConverter()).map(this.source.getInstanceMetaData()).setStudies(null);
 				this.using(new ContactConverter()).map(this.source.getContacts()).setContacts(null);
 			}

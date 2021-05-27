@@ -499,7 +499,7 @@ public class StudyDetailsData {
 	}
 
 	public String getLocationDbId() {
-		return locationDbId;
+		return this.locationDbId;
 	}
 
 	public void setLocationDbId(final String locationDbId) {
@@ -507,7 +507,7 @@ public class StudyDetailsData {
 	}
 
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public void setLocationName(final String locationName) {
