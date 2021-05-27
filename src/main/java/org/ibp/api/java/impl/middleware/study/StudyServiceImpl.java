@@ -201,7 +201,7 @@ public class StudyServiceImpl implements StudyService {
 		final int originalListSize = trialImportRequestDTOs.size();
 		int noOfCreatedTrials = 0;
 
-		// Remove germplasm that fails any validation. They will be excluded from creation
+		// Remove trials that fails any validation. They will be excluded from creation
 		final BindingResult bindingResult = this.trialImportRequestDtoValidator.pruneTrialsInvalidForImport(trialImportRequestDTOs, cropName);
 		if (bindingResult.hasErrors()) {
 			response.setErrors(bindingResult.getAllErrors());
