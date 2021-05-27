@@ -13,7 +13,6 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.ibp.api.brapi.v1.trial.TrialSummary;
 import org.ibp.api.brapi.v2.trial.TrialImportResponse;
 import org.springframework.data.domain.Pageable;
 
