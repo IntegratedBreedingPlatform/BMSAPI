@@ -74,7 +74,7 @@ public class TrialResourceBrapi {
 		@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder",
 			required = false) final String sortOrder) {
 
-		final String validationError = this.parameterValidation(active, sortBy, sortOrder);
+		final String validationError = this.parameterValidation(sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
 			final Metadata metadata = new Metadata(null, status);
@@ -84,6 +84,7 @@ public class TrialResourceBrapi {
 		final StudySearchFilter filter = new StudySearchFilter();
 		filter.setProgramDbId(programDbId);
 		filter.setLocationDbId(locationDbId);
+		filter.setActive(active);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -129,17 +130,14 @@ public class TrialResourceBrapi {
 		return trialSummaryList;
 	}
 
-	private String parameterValidation(final Boolean active, final String sortBy, final String sortOrder) {
+	private String parameterValidation(final String sortBy, final String sortOrder) {
 		final List<String> sortbyFields = ImmutableList.<String>builder().add("trialDbId").add("trialName").add("programDbId")
-			.add("programName").add("startDate").add("endDate").add("active").build();
+			.add("programName").add("startDate").add("endDate").build();
 		final List<String> sortOrders = ImmutableList.<String>builder().add(TrialResourceBrapi.ORDER_BY_ASCENDING)
 			.add(TrialResourceBrapi.ORDER_BY_DESCENDING).build();
 
-		if (active != null && !active) {
-			return "No inactive studies found.";
-		}
 		if (!StringUtils.isBlank(sortBy) && !sortbyFields.contains(sortBy)) {
-			return "sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate/active";
+			return "sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate";
 
 		}
 		if (!StringUtils.isBlank(sortOrder) && !sortOrders.contains(sortOrder)) {
