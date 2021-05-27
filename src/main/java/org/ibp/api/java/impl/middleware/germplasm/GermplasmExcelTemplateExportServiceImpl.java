@@ -24,6 +24,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.MethodService;
 import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
@@ -217,9 +218,9 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 
 		int currentRowNum = 0;
 
-		final VariableFilter variableFilter = new VariableFilter();
-		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
+		final VariableFilter inventoryPropertyFilter = new VariableFilter();
+		inventoryPropertyFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+		final List<VariableDetails> units = this.variableService.getVariablesByFilter(inventoryPropertyFilter);
 
 		final List<LocationDto> storageLocations =
 			this.locationService
@@ -233,8 +234,11 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 					new LocationSearchRequest(programUUID, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, null, false),
 					null);
 
-		final List<AttributeDTO> attributeDTOs =
-			this.germplasmAttributeService.filterGermplasmAttributes(null, null);
+		final VariableFilter attributeVariableTypeFilter = new VariableFilter();
+		attributeVariableTypeFilter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE.getId());
+		attributeVariableTypeFilter.addVariableType(VariableType.GERMPLASM_PASSPORT.getId());
+		final List<VariableDetails> attributeDTOs = this.variableService.getVariablesByFilter(attributeVariableTypeFilter);
+
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, false);
 		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 
@@ -292,20 +296,20 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 	}
 
 	private int writeAttributeSection(final HSSFSheet codesSheet, final int currentRowNum,
-		final List<AttributeDTO> germplasmAttributeDTOS) {
+		final List<VariableDetails> germplasmAttributeDTOS) {
 		int rowNumIndex = currentRowNum;
 		int count = germplasmAttributeDTOS.size();
-		for (final AttributeDTO germplasmAttributeDTO : germplasmAttributeDTOS) {
+		for (final VariableDetails germplasmAttributeDTO : germplasmAttributeDTOS) {
 			final HSSFRow row = codesSheet.createRow(rowNumIndex++);
 			HSSFCell cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, CellType.STRING);
 			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_BORDER) :
 				this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_AND_BOTTOM_BORDER));
-			cell.setCellValue(germplasmAttributeDTO.getCode());
+			cell.setCellValue(germplasmAttributeDTO.getName());
 
 			cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_SECOND_COLUMN_INDEX, CellType.STRING);
 			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
 				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
-			cell.setCellValue(germplasmAttributeDTO.getName());
+			cell.setCellValue(germplasmAttributeDTO.getDescription());
 			count--;
 		}
 		return rowNumIndex;
