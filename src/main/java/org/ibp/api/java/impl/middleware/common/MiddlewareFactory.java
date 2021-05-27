@@ -28,6 +28,8 @@ import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
+import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeService;
+import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeServiceImpl;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
@@ -601,6 +603,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmService getGermplasmService() {
 		return new GermplasmServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmPedigreeService getGermplasmPedigreeService() {
+		return new GermplasmPedigreeServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
