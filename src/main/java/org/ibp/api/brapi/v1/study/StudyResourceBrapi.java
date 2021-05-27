@@ -133,7 +133,7 @@ public class StudyResourceBrapi {
 			value =
 				"Filter by trial.") @RequestParam(value = "trialDbId", required = false) final String trialDbId,
 		@ApiParam(value = "Filter by study DbId") @RequestParam(value = "studyDbId", required = false) final String studyDbId,
-		@ApiParam(value = "Filter active status true/false.") @RequestParam(value = "active", required = false, defaultValue = "true")
+		@ApiParam(value = "Filter active status true/false.") @RequestParam(value = "active", required = false)
 		final Boolean active,
 		@ApiParam(value = "Name of the field to sort by.") @RequestParam(value = "sortBy", required = false) final String sortBy,
 		@ApiParam(value = "Sort order direction. Ascending/Descending.") @RequestParam(value = "sortOrder", required = false)
