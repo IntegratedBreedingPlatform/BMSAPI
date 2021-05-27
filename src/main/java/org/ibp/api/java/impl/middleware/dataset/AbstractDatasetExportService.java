@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -91,6 +92,8 @@ public abstract class AbstractDatasetExportService {
 
 		// Get all variables for the dataset
 		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId());
+
+		// Add Stock id column
 		if (dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
 			transactionsSearchDto.setTransactionStatus(Arrays.asList(0,1));
@@ -100,11 +103,17 @@ public abstract class AbstractDatasetExportService {
 			}
 		}
 
+		// File data column cannot be edited using export/import
+		this.removeFileDatatypeColumns(columns);
+
+		// Get data
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = this.getSelectedDatasetInstancesMap(
 			dataSet.getInstances(),
 			instanceIds);
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
 			this.getObservationUnitRowMap(study, dataSet, selectedDatasetInstancesMap);
+
+		// Reorder
 		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder =
 			DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
 		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
@@ -214,6 +223,13 @@ public abstract class AbstractDatasetExportService {
 		// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
 		plotDataSetColumns.add(plotDataSetColumns.indexOf(designationColumn.get()) + 1,
 			this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR,null, true));
+	}
+
+	private void removeFileDatatypeColumns(final List<MeasurementVariable> columns) {
+		columns.removeIf(variable -> {
+			return variable.getDataTypeId() != null
+				&& variable.getDataTypeId().equals(DataType.FILE_VARIABLE.getId());
+		});
 	}
 
 	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
