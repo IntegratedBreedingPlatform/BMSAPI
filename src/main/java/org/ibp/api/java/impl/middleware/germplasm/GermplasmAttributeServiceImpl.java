@@ -1,22 +1,30 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.ibp.api.domain.ontology.VariableDetails;
+import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,18 +50,26 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Autowired
 	private SecurityService securityService;
 
+	@Autowired
+	private VariableValidator variableValidator;
+
+	@Autowired
+	private VariableService variableService;
+
 	@Override
-	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final String attributeType) {
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
-		this.attributeValidator.validateAttributeType(errors, attributeType);
-		return this.germplasmAttributeService.getGermplasmAttributeDtos(gid, attributeType);
+		this.attributeValidator.validateAttributeType(errors, variableTypeId);
+		return this.germplasmAttributeService.getGermplasmAttributeDtos(gid, variableTypeId);
 	}
 
 	@Override
-	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto, final String programUUID) {
+	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final Integer variableTypeId,
+		final GermplasmAttributeRequestDto dto, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.attributeValidator.validateAttribute(errors, gid, dto, null);
+		this.attributeValidator.validateAttribute(errors, gid, dto, variableTypeId, null);
+		this.variableValidator.checkVariableExist(null, dto.getVariableId(), CvId.VARIABLES.getId(), errors);
 		this.locationValidator.validateLocation(errors, dto.getLocationId(), programUUID);
 
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
@@ -64,7 +80,8 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Override
 	public GermplasmAttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId, final GermplasmAttributeRequestDto dto, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.attributeValidator.validateAttribute(errors, gid, dto, attributeId);
+		this.attributeValidator.validateAttribute(errors, gid, dto, null, attributeId);
+		this.variableValidator.checkVariableExist(null, dto.getVariableId(), CvId.VARIABLES.getId(), errors);
 		this.locationValidator.validateLocation(errors, dto.getLocationId(), programUUID);
 
 		this.germplasmAttributeService.updateGermplasmAttribute(attributeId, dto);
@@ -79,6 +96,8 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
+	@Deprecated
+	//Diego, this function does not make sense anymore, we should implement something or use something from VariableService
 	public List<AttributeDTO> filterGermplasmAttributes(final Set<String> codes, final String type) {
 
 		final Set<String> types = new HashSet<>();
@@ -88,7 +107,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		} else {
 			final BindingResult errors =
 				new MapBindingResult(new HashMap<String, String>(), org.generationcp.middleware.api.attribute.AttributeDTO.class.getName());
-			this.attributeValidator.validateAttributeType(errors, type);
+			// this.attributeValidator.validateAttributeType(errors, type);
 			types.add(type);
 		}
 

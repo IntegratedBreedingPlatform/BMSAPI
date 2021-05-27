@@ -580,4 +580,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
         return true;
     }
 
+	public void checkVariableExist(final String Name, final Integer variableId, Integer cvId, Errors errors) {
+		this.checkTermExist(Name, String.valueOf(variableId), cvId, errors);
+	}
 }

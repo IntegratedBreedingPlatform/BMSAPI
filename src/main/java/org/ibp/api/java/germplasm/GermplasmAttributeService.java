@@ -1,19 +1,21 @@
 package org.ibp.api.java.germplasm;
 
+import com.google.common.base.Optional;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.ibp.api.domain.ontology.VariableDetails;
 
 import java.util.List;
 import java.util.Set;
 
 public interface GermplasmAttributeService {
 
-	List<GermplasmAttributeDto> getGermplasmAttributeDtos(Integer gid, String attributeType);
+	List<GermplasmAttributeDto> getGermplasmAttributeDtos(Integer gid, Integer variableTypeId);
 
-	GermplasmAttributeRequestDto createGermplasmAttribute(Integer gid, GermplasmAttributeRequestDto germplasmAttributeRequestDto, final String programUUID);
+	GermplasmAttributeRequestDto createGermplasmAttribute(Integer gid, Integer variableTypeId, GermplasmAttributeRequestDto germplasmAttributeRequestDto, String programUUID);
 
-	GermplasmAttributeRequestDto updateGermplasmAttribute(Integer gid, Integer attributeId, GermplasmAttributeRequestDto dto, final String programUUID);
+	GermplasmAttributeRequestDto updateGermplasmAttribute(Integer gid, Integer attributeId, GermplasmAttributeRequestDto dto, String programUUID);
 
 	void deleteGermplasmAttribute(Integer gid, Integer attributeId);
 

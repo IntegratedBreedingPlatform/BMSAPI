@@ -1,13 +1,12 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.base.Optional;
 import org.generationcp.commons.util.DateUtil;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.UDTableType;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -16,15 +15,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class AttributeValidator {
 
-	private static final List<String> ALLOWED_ATTRIBUTE_TYPES = Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(),
-		UDTableType.ATRIBUTS_PASSPORT.getType());
+	private static final List<Integer> ALLOWED_ATTRIBUTE_TYPES =
+		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId());
 
 	private static final Integer GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH = 255;
 
@@ -51,30 +49,22 @@ public class AttributeValidator {
 		}
 	}
 
-	public void validateAttributeType(final BindingResult errors, final String attributeType) {
-		if (!StringUtils.isEmpty(attributeType) && !AttributeValidator.ALLOWED_ATTRIBUTE_TYPES.contains(attributeType.toUpperCase())) {
-			errors.reject("attribute.type.invalid", "");
+	public void validateAttributeType(final BindingResult errors, final Integer variableTypeId) {
+		if (variableTypeId != null && !AttributeValidator.ALLOWED_ATTRIBUTE_TYPES.contains(variableTypeId)) {
+			errors.reject("attribute.variable.type.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
-	void validateAttributeCode(final BindingResult errors, final GermplasmAttributeRequestDto dto) {
-		final List<AttributeDTO> attributeDTOS = this.germplasmAttributeService
-			.filterGermplasmAttributes(Collections.singleton(dto.getAttributeCode()), dto.getAttributeType());
-		if(attributeDTOS.isEmpty()) {
-			errors.reject("attribute.code.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-	}
-
-	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto) {
-		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
-			dto.getAttributeType());
+	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
+		final Integer variableTypeId) {
+		final List<GermplasmAttributeDto> germplasmAttributeDtos =
+			this.germplasmAttributeService.getGermplasmAttributeDtos(gid, variableTypeId);
 
 		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
-			.filter(existing -> existing.getAttributeCode().equalsIgnoreCase(dto.getAttributeCode())).collect(Collectors.toList());
+			.filter(existing -> existing.getVariableId().equals(dto.getVariableId())).collect(Collectors.toList());
 		if (!existingGermplasmAttributes.isEmpty()) {
-			errors.reject("attribute.code.invalid.existing", new String[] {dto.getAttributeCode()}, "");
+			errors.reject("attribute.name.invalid.existing", new String[] {existingGermplasmAttributes.get(0).getVariableName()}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
@@ -85,39 +75,38 @@ public class AttributeValidator {
 		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if(existingGermplasmAttributes.isEmpty()) {
-			errors.reject("attribute.id.invalid.not.existing", new String[] {attributeId.toString()}, "");
+			errors.reject("attribute.id.invalid.not.existing", new Integer[] {attributeId}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
 	void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
 		final Integer attributeId) {
-		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
-			dto.getAttributeType());
+		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null);
 
 
 		// Filter by germplasm attribute id
 		List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if(existingGermplasmAttributes.isEmpty()) {
-			errors.reject("attribute.id.invalid.not.existing", new String[] {attributeId.toString()}, "");
+			errors.reject("attribute.id.invalid.not.existing", new Integer[] {attributeId}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		// Filter by germplasm attribute code
+		// Filter by germplasm attribute Variable Id
 		existingGermplasmAttributes = existingGermplasmAttributes.stream()
-			.filter(existing -> existing.getAttributeCode().equalsIgnoreCase(dto.getAttributeCode())).collect(Collectors.toList());
+			.filter(existing -> existing.getVariableId().equals(dto.getVariableId())).collect(Collectors.toList());
 		if (existingGermplasmAttributes.isEmpty()) {
-			errors.reject("attribute.code.update.invalid", "");
+			errors.reject("attribute.variable.id.invalid.not.existing", new Integer[] {dto.getVariableId()}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
-	public void validateAttribute(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
+	public void validateAttribute(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto, final Integer variableTypeId,
 		final Integer attributeId) {
-		this.validateAttributeCode(errors, dto);
 		if(attributeId == null) {
-			this.validateGermplasmAttributeShouldNotExist(errors, gid, dto);
+			this.validateAttributeType(errors, variableTypeId);
+			this.validateGermplasmAttributeShouldNotExist(errors, gid, dto, variableTypeId);
 		} else {
 			this.validateGermplasmAttributeForUpdate(errors, gid, dto, attributeId);
 		}
