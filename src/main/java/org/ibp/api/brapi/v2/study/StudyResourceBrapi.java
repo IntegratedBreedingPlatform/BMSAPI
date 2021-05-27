@@ -134,8 +134,6 @@ public class StudyResourceBrapi {
 			return new ResponseEntity<>(entityListResponse, HttpStatus.BAD_REQUEST);
 		}
 
-		final StudySearchFilter filter = new StudySearchFilter();
-
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		studySearchFilter.setStudyTypeDbId(studyTypeDbId);
 		studySearchFilter.setProgramDbId(programDbId);
@@ -168,12 +166,12 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyService.countStudyInstances(filter);
+					return StudyResourceBrapi.this.studyService.countStudyInstances(studySearchFilter);
 				}
 
 				@Override
 				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
-					return StudyResourceBrapi.this.studyService.getStudyInstancesWithMetadata(filter, pageRequest);
+					return StudyResourceBrapi.this.studyService.getStudyInstancesWithMetadata(studySearchFilter, pageRequest);
 				}
 			});
 
