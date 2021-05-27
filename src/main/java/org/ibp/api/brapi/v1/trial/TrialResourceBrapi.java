@@ -132,13 +132,12 @@ public class TrialResourceBrapi {
 
 	private String parameterValidation(final String sortBy, final String sortOrder) {
 		final List<String> sortbyFields = ImmutableList.<String>builder().add("trialDbId").add("trialName").add("programDbId")
-			.add("programName").add("startDate").add("endDate").build();
+			.add("programName").add("startDate").add("endDate").add("active").build();
 		final List<String> sortOrders = ImmutableList.<String>builder().add(TrialResourceBrapi.ORDER_BY_ASCENDING)
 			.add(TrialResourceBrapi.ORDER_BY_DESCENDING).build();
 
 		if (!StringUtils.isBlank(sortBy) && !sortbyFields.contains(sortBy)) {
-			return "sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate";
-
+			return "sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate/active";
 		}
 		if (!StringUtils.isBlank(sortOrder) && !sortOrders.contains(sortOrder)) {
 			return "sortOrder bad filter, expect asc/desc";

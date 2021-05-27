@@ -227,8 +227,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.currentPage", Matchers.is(1))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.pageSize", Matchers.is(1))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalCount", Matchers.is(1))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalPages", Matchers.is(1))) //
-		;
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalPages", Matchers.is(1)));
 	}
 
 	@Test
@@ -267,21 +266,9 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message",
-			Matchers.is("sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate/active"))) //
-		;
+			Matchers.is("sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate/active")));
 	}
 
-	@Test
-	public void testGetListStudySummariesFilterByInactiveStudies() throws Exception {
-		final UriComponents uriComponents =
-			UriComponentsBuilder.newInstance().path(TrialResourceBrapiTest.MAIZE_BRAPI_V1_TRIALS).queryParam("programDbId", 1)
-				.queryParam("pageSize", 10).queryParam("pageNumber", 1).queryParam("active", Boolean.FALSE).build().encode();
-		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
-			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
-			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("No inactive studies found."))) //
-		;
-	}
 
 	@Test
 	public void testGetListStudySummariesBadSorterOrder() throws Exception {
@@ -291,8 +278,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 			.andDo(MockMvcResultHandlers.print()).andExpect(
-			MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("sortOrder bad filter, expect asc/desc"))) //
-		;
+			MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("sortOrder bad filter, expect asc/desc")));
 	}
 
 	@Test
