@@ -82,13 +82,12 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "commonCropName",
 			required = false) final String commonCropName) {
 
-
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDTO.setPreferredName(germplasmName);
 		if (!StringUtils.isEmpty(germplasmDbId)) {
 			germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
 		}
-		if (!StringUtils.isEmpty(commonCropName)){
+		if (!StringUtils.isEmpty(commonCropName)) {
 			germplasmSearchRequestDTO.setCommonCropNames(Lists.newArrayList(commonCropName));
 		}
 
@@ -121,32 +120,32 @@ public class GermplasmResourceBrapi {
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> getGermplasms(
-			@PathVariable final String crop,
-			@ApiParam(value = "Permanent unique identifier")
-			@RequestParam(value = "germplasmPUI",
-					required = false) final String germplasmPUI,
-			@ApiParam(value = "Internal database identifier")
-			@RequestParam(value = "germplasmDbId",
-					required = false) final String germplasmDbId,
-			@ApiParam(value = "Name of the germplasm")
-			@RequestParam(value = "germplasmName",
-					required = false) final String germplasmName,
-			@ApiParam(value = "The common crop name")
-			@RequestParam(value = "commonCropName",
-					required = false) final String commonCropName,
-			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)
-			@RequestParam(value = "page",
-					required = false) final Integer currentPage,
-			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
-			@RequestParam(value = "pageSize",
-					required = false) final Integer pageSize) {
+		@PathVariable final String crop,
+		@ApiParam(value = "Permanent unique identifier")
+		@RequestParam(value = "germplasmPUI",
+			required = false) final String germplasmPUI,
+		@ApiParam(value = "Internal database identifier")
+		@RequestParam(value = "germplasmDbId",
+			required = false) final String germplasmDbId,
+		@ApiParam(value = "Name of the germplasm")
+		@RequestParam(value = "germplasmName",
+			required = false) final String germplasmName,
+		@ApiParam(value = "The common crop name")
+		@RequestParam(value = "commonCropName",
+			required = false) final String commonCropName,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize) {
 
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDTO.setPreferredName(germplasmName);
 		if (germplasmDbId != null) {
 			germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
 		}
-		if (!StringUtils.isEmpty(commonCropName)){
+		if (!StringUtils.isEmpty(commonCropName)) {
 			germplasmSearchRequestDTO.setCommonCropNames(Lists.newArrayList(commonCropName));
 		}
 
@@ -163,7 +162,7 @@ public class GermplasmResourceBrapi {
 
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 

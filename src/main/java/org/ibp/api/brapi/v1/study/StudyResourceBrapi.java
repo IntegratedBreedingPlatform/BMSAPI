@@ -133,7 +133,7 @@ public class StudyResourceBrapi {
 			value =
 				"Filter by trial.") @RequestParam(value = "trialDbId", required = false) final String trialDbId,
 		@ApiParam(value = "Filter by study DbId") @RequestParam(value = "studyDbId", required = false) final String studyDbId,
-		@ApiParam(value = "Filter active status true/false.") @RequestParam(value = "active", required = false, defaultValue = "true")
+		@ApiParam(value = "Filter active status true/false.") @RequestParam(value = "active", required = false)
 		final Boolean active,
 		@ApiParam(value = "Name of the field to sort by.") @RequestParam(value = "sortBy", required = false) final String sortBy,
 		@ApiParam(value = "Sort order direction. Ascending/Descending.") @RequestParam(value = "sortOrder", required = false)
@@ -157,8 +157,18 @@ public class StudyResourceBrapi {
 			pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 		}
 
-		final StudySearchFilter studySearchFilter =
-			new StudySearchFilter(studyTypeDbId, programDbId, locationDbId, seasonDbId, trialDbId, studyDbId, active);
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setStudyTypeDbId(studyTypeDbId);
+		studySearchFilter.setProgramDbId(programDbId);
+		studySearchFilter.setLocationDbId(locationDbId);
+		studySearchFilter.setSeasonDbId(seasonDbId);
+		if (trialDbId != null) {
+			studySearchFilter.setTrialDbIds(Collections.singletonList(trialDbId));
+		}
+		if (studyDbId != null) {
+			studySearchFilter.setStudyDbIds(Collections.singletonList(studyDbId));
+		}
+		studySearchFilter.setActive(active);
 
 		final PagedResult<StudyInstanceDto> resultPage =
 			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudyInstanceDto>() {
@@ -243,18 +253,20 @@ public class StudyResourceBrapi {
 	@ApiOperation(value = "Get study details", notes = "Get study details")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV1_3.class)
-	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
+	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
+		@PathVariable final Integer studyDbId) {
 
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());;
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+			;
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
 		//Add environment parameters to addtionalInfo
 		final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
-				Collectors.toMap(MeasurementVariable::getName, MeasurementVariable::getValue));
+			Collectors.toMap(MeasurementVariable::getName, MeasurementVariable::getValue));
 		mwStudyDetails.getAdditionalInfo().putAll(additionalInfo);
 
 		final Metadata metadata = new Metadata();
@@ -362,7 +374,8 @@ public class StudyResourceBrapi {
 			required = false) final Integer pageSize) throws BrapiNotFoundException {
 
 		// Resolve the datasetId in which StudyDbId belongs to. (In BRAPI, studyDbId is nd_geolocation_id)
-		final Optional<Integer> datasetIdForInstance = this.studyInstanceService.getDatasetIdForInstanceIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		final Optional<Integer> datasetIdForInstance =
+			this.studyInstanceService.getDatasetIdForInstanceIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
 		final Integer datasetId = datasetIdForInstance.isPresent() ? datasetIdForInstance.get() : null;
 		if (datasetId == null) {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
