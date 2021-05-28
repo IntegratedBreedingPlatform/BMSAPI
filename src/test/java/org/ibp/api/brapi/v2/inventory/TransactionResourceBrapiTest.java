@@ -77,11 +77,11 @@ public class TransactionResourceBrapiTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(list).when(this.transactionService).getTransactions(Mockito.any(TransactionsSearchDto.class),
 			Mockito.any(Pageable.class));
-		final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+		final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.get("/{cropName}/brapi/v2/transactions", this.cropName).contentType(this.contentType))
+				.get("/{cropName}/brapi/v2/seedlots/transactions", this.cropName).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$.result.data[0].amount", CoreMatchers.is(transactionDto.getAmount())))

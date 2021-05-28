@@ -4,7 +4,6 @@ import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.util.Util;
-import org.ibp.api.brapi.v1.study.Contact;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +32,7 @@ public class TrialSummaryTestDataProvider {
 
 	public static List<ContactDto> getContacts() {
 		final List<ContactDto> contacts = new ArrayList<>();
-		contacts.add(new ContactDto(1, "Maize Breeder", "admin@abc.org", "Creator"));
+		contacts.add(new ContactDto("1", "Maize Breeder", "admin@abc.org", "Creator"));
 		return contacts;
 	}
 
@@ -45,9 +44,9 @@ public class TrialSummaryTestDataProvider {
 		studySummary.setProgramDbId("64646");
 		studySummary.setProgramName("PROGRAM1");
 		studySummary.setStartDate(Util.tryParseDate("20160404"));
-		studySummary.setStudyDbid(2);
+		studySummary.setTrialDbId(2);
 		studySummary.setName("STUDY1");
-		studySummary.setOptionalInfo(getOptionalInfo());
+		studySummary.setAdditionalInfo(getOptionalInfo());
 		studySummary.setInstanceMetaData(getInstanceMatadatas());
 		studySummary.setContacts(getContacts());
 		return studySummary;

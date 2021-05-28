@@ -2,6 +2,8 @@ package org.ibp.api.brapi.v2.inventory;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.generationcp.middleware.util.serializer.DatePropertySerializer;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
@@ -14,7 +16,7 @@ public class TransactionDto {
 	private Map<String, Object> additionalInfo;
 	private Double amount;
 	private String transactionDescription;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+	@JsonSerialize(using = DatePropertySerializer.class)
 	private Date transactionTimestamp;
 
 	private String units;

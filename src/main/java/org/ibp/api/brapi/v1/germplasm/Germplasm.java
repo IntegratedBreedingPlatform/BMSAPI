@@ -3,8 +3,11 @@ package org.ibp.api.brapi.v1.germplasm;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.service.api.BrapiView;
+import org.generationcp.middleware.util.serializer.SynonymPropertySerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -32,7 +35,8 @@ public class Germplasm {
 	@JsonView(BrapiView.BrapiV1_2.class)
 	private String germplasmSeedSource;
 
-	private Map<String, String> synonyms;
+	@JsonSerialize(using = SynonymPropertySerializer.class)
+	private List<Synonym> synonyms = new ArrayList<>();
 
 	private String commonCropName;
 
@@ -211,11 +215,11 @@ public class Germplasm {
 		this.germplasmSeedSource = germplasmSeedSource;
 	}
 
-	public Map<String, String> getSynonyms() {
+	public List<Synonym> getSynonyms() {
 		return this.synonyms;
 	}
 
-	public void setSynonyms(final Map<String, String> synonyms) {
+	public void setSynonyms(final List<Synonym> synonyms) {
 		this.synonyms = synonyms;
 	}
 
@@ -412,7 +416,7 @@ public class Germplasm {
 	}
 
 	public List<ExternalReferenceDTO> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {

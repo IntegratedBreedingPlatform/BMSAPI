@@ -31,10 +31,12 @@ public class StudyMapper {
 
 	private static class ContactConverter implements Converter<List<UserDto>, List<Contact>> {
 
-		@Override public List<Contact> convert(final MappingContext<List<UserDto>, List<Contact>> context) {
+		@Override
+		public List<Contact> convert(final MappingContext<List<UserDto>, List<Contact>> context) {
 			final List<Contact> contacts = new ArrayList<>();
 			for (final UserDto userDto : context.getSource()) {
-				contacts.add(new Contact(userDto.getUserId(), userDto.getEmail(), userDto.getFirstName() + " " + userDto.getLastName(),
+				contacts.add(new Contact(String.valueOf(userDto.getUserId()), userDto.getEmail(),
+					userDto.getFirstName() + " " + userDto.getLastName(),
 					"", ""));
 			}
 			return context.getMappingEngine().map(context.create(contacts, context.getDestinationType()));
@@ -42,9 +44,11 @@ public class StudyMapper {
 
 	}
 
+
 	private static class EnvironmentParameterConverter implements Converter<List<MeasurementVariable>, List<EnvironmentParameter>> {
 
-		@Override public List<EnvironmentParameter> convert(final MappingContext<List<MeasurementVariable>, List<EnvironmentParameter>> context) {
+		@Override
+		public List<EnvironmentParameter> convert(final MappingContext<List<MeasurementVariable>, List<EnvironmentParameter>> context) {
 			final List<EnvironmentParameter> environmentParameters = new ArrayList<>();
 			for (final MeasurementVariable variable : context.getSource()) {
 				final EnvironmentParameter environmentParameter = new EnvironmentParameter();
@@ -59,9 +63,11 @@ public class StudyMapper {
 
 	}
 
+
 	private static class ExperimentalDesignConverted implements Converter<String, ExperimentalDesign> {
 
-		@Override public ExperimentalDesign convert(final MappingContext<String, ExperimentalDesign> context) {
+		@Override
+		public ExperimentalDesign convert(final MappingContext<String, ExperimentalDesign> context) {
 			final ExperimentalDesign experimentalDesign = new ExperimentalDesign();
 			experimentalDesign.setDescription(context.getSource());
 			return context.getMappingEngine().map(context.create(experimentalDesign, context.getDestinationType()));
@@ -72,7 +78,8 @@ public class StudyMapper {
 	private static void addStudyDetailsDataMapping(final ModelMapper mapper) {
 		mapper.addMappings(new PropertyMap<StudyDetailsDto, StudyDetailsData>() {
 
-			@Override protected void configure() {
+			@Override
+			protected void configure() {
 				this.map().setAdditionalInfo(this.source.getAdditionalInfo());
 				this.map().setSeasons(this.source.getMetadata().getSeasons());
 				this.map().setActive(String.valueOf(this.source.getMetadata().getActive()));
@@ -87,7 +94,8 @@ public class StudyMapper {
 				this.map().setTrialDbId(String.valueOf(this.source.getMetadata().getTrialDbId()));
 				this.map().setStudyDescription(this.source.getMetadata().getStudyDescription());
 				this.map().setLastUpdate(this.source.getMetadata().getLastUpdate());
-				this.using(new ExperimentalDesignConverted()).map(this.source.getMetadata().getExperimentalDesign()).setExperimentalDesign(null);
+				this.using(new ExperimentalDesignConverted()).map(this.source.getMetadata().getExperimentalDesign())
+					.setExperimentalDesign(null);
 				this.using(new ContactConverter()).map(this.source.getContacts()).setContacts(null);
 				this.using(new EnvironmentParameterConverter()).map(this.source.getEnvironmentParameters()).setEnvironmentParameters(null);
 			}

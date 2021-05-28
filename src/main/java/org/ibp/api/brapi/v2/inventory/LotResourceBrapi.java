@@ -1,11 +1,13 @@
 package org.ibp.api.brapi.v2.inventory;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.common.*;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.inventory.manager.LotService;
@@ -38,6 +40,7 @@ public class LotResourceBrapi {
     @PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
     @RequestMapping(value = "/{crop}/brapi/v2/seedlots", method = RequestMethod.GET)
     @ResponseBody
+    @JsonView(BrapiView.BrapiV2.class)
     public ResponseEntity<EntityListResponse<LotDetails>> getSeedLots(@PathVariable final String crop, @RequestParam(value = "seedLotDbId", required = false)  final String seedLotDbId,
                                                         @RequestParam(value = "germplasmDbId", required = false)  final String germplasmDbId,
                                                         @ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)

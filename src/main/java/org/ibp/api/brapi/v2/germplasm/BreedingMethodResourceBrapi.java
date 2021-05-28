@@ -95,7 +95,6 @@ public class BreedingMethodResourceBrapi {
 		final Metadata metadata = new Metadata();
 		final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 		metadata.setPagination(pagination);
-		metadata.setStatus(Collections.singletonList(new HashMap<>()));
 		final SingleEntityResponse<BreedingMethod> entityListResponse = new SingleEntityResponse<BreedingMethod>(metadata, method);
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}

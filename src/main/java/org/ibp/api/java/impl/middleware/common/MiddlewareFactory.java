@@ -28,6 +28,8 @@ import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
+import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeService;
+import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeServiceImpl;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
@@ -103,6 +105,8 @@ import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
 import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
@@ -605,6 +609,12 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmPedigreeService getGermplasmPedigreeService() {
+		return new GermplasmPedigreeServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public AttributeService getAttributeService() {
 		return new AttributeServiceImpl(this.getCropDatabaseSessionProvider());
 	}
@@ -637,6 +647,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public ExperimentModelGenerator getExperimentModelGenerator() {
 		return new ExperimentModelGenerator(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public VariableDataValidatorFactory getVariableDataValidatorFactory() {
+		return new VariableDataValidatorFactoryImpl();
 	}
 
 	@Bean
