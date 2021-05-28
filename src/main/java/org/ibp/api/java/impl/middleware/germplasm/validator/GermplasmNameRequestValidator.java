@@ -92,7 +92,7 @@ public class GermplasmNameRequestValidator {
 	}
 
 	protected void validateNameBelongsToGermplasm(final Integer gid, final Name name) {
-		if (name == null || !name.getGermplasmId().equals(gid)) {
+		if (name == null || name.getGermplasm() == null || !name.getGermplasm().getGid().equals(gid)) {
 			errors.reject("germplasm.name.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 
