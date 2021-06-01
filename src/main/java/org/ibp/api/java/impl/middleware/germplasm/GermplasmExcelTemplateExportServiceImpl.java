@@ -211,11 +211,11 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		}
 	}
 
-	private void writeCodesSheet(final String cropName, final String programUUID, final boolean isGermplasmUpdateFormat) {
+	private void writeOtherCodesSheet(final String cropName, final String programUUID, final boolean isGermplasmUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
-		final HSSFSheet codesSheet =
-			this.wb.createSheet(this.getMessageSource().getMessage("export.germplasm.list.template.sheet.codes", null, locale));
-		codesSheet.setDefaultRowHeightInPoints(16);
+		final HSSFSheet otherCodesSheet =
+			this.wb.createSheet(this.getMessageSource().getMessage("export.germplasm.list.template.sheet.other.codes", null, locale));
+		otherCodesSheet.setDefaultRowHeightInPoints(16);
 
 		int currentRowNum = 0;
 
@@ -235,44 +235,35 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 					new LocationSearchRequest(programUUID, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, null, false),
 					null);
 
-		final VariableFilter attributeVariableTypeFilter = new VariableFilter();
-		attributeVariableTypeFilter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE.getId());
-		attributeVariableTypeFilter.addVariableType(VariableType.GERMPLASM_PASSPORT.getId());
-		final List<VariableDetails> attributeDTOs = this.variableService.getVariablesByFilter(attributeVariableTypeFilter);
-
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, false);
 		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 
 		final List<GermplasmNameTypeDTO> germplasmNames = this.germplasmService.filterGermplasmNameTypes(null);
 
-		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.breeding.methods.column");
-		currentRowNum = this.writeBreedingMethodSection(codesSheet, currentRowNum, BreedingMethodDTOs);
-		codesSheet.createRow(currentRowNum++);
+		this.writeCodesHeader(otherCodesSheet, currentRowNum++, "export.germplasm.list.template.breeding.methods.column");
+		currentRowNum = this.writeBreedingMethodSection(otherCodesSheet, currentRowNum, BreedingMethodDTOs);
+		otherCodesSheet.createRow(currentRowNum++);
 
-		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.attributes.column");
-		currentRowNum = this.writeAttributeSection(codesSheet, currentRowNum, attributeDTOs);
-		codesSheet.createRow(currentRowNum++);
+		this.writeCodesHeader(otherCodesSheet, currentRowNum++, "export.germplasm.list.template.location.abbr.column");
+		currentRowNum = this.writeLocationAbbrSection(otherCodesSheet, currentRowNum, locations);
+		otherCodesSheet.createRow(currentRowNum++);
 
-		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.location.abbr.column");
-		currentRowNum = this.writeLocationAbbrSection(codesSheet, currentRowNum, locations);
-		codesSheet.createRow(currentRowNum++);
-
-		this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.name.column");
-		currentRowNum = this.writeNameSection(codesSheet, currentRowNum, germplasmNames);
-		codesSheet.createRow(currentRowNum++);
+		this.writeCodesHeader(otherCodesSheet, currentRowNum++, "export.germplasm.list.template.name.column");
+		currentRowNum = this.writeNameSection(otherCodesSheet, currentRowNum, germplasmNames);
+		otherCodesSheet.createRow(currentRowNum++);
 
 		if (!isGermplasmUpdateFormat) {
-			this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.storage.location.abbr.column");
-			currentRowNum = this.writeLocationAbbrSection(codesSheet, currentRowNum, storageLocations);
-			codesSheet.createRow(currentRowNum++);
+			this.writeCodesHeader(otherCodesSheet, currentRowNum++, "export.germplasm.list.template.storage.location.abbr.column");
+			currentRowNum = this.writeLocationAbbrSection(otherCodesSheet, currentRowNum, storageLocations);
+			otherCodesSheet.createRow(currentRowNum++);
 
-			this.writeCodesHeader(codesSheet, currentRowNum++, "export.germplasm.list.template.units.column");
-			currentRowNum = this.writeUnitsSection(codesSheet, currentRowNum, units);
-			codesSheet.createRow(currentRowNum++);
+			this.writeCodesHeader(otherCodesSheet, currentRowNum++, "export.germplasm.list.template.units.column");
+			currentRowNum = this.writeUnitsSection(otherCodesSheet, currentRowNum, units);
+			otherCodesSheet.createRow(currentRowNum++);
 		}
 
-		codesSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, 34 * 250);
-		codesSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_SECOND_COLUMN_INDEX, 65 * 250);
+		otherCodesSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, 34 * 250);
+		otherCodesSheet.setColumnWidth(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_SECOND_COLUMN_INDEX, 65 * 250);
 	}
 
 	private int writeNameSection(final HSSFSheet codesSheet, final int currentRowNum, final List<GermplasmNameTypeDTO> germplasmNames) {
@@ -291,26 +282,6 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
 			cell.setCellValue(germplasmName.getName());
 
-			count--;
-		}
-		return rowNumIndex;
-	}
-
-	private int writeAttributeSection(final HSSFSheet codesSheet, final int currentRowNum,
-		final List<VariableDetails> germplasmAttributeDTOS) {
-		int rowNumIndex = currentRowNum;
-		int count = germplasmAttributeDTOS.size();
-		for (final VariableDetails germplasmAttributeDTO : germplasmAttributeDTOS) {
-			final HSSFRow row = codesSheet.createRow(rowNumIndex++);
-			HSSFCell cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, CellType.STRING);
-			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_BORDER) :
-				this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_AND_BOTTOM_BORDER));
-			cell.setCellValue(germplasmAttributeDTO.getName());
-
-			cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_SECOND_COLUMN_INDEX, CellType.STRING);
-			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
-				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
-			cell.setCellValue(germplasmAttributeDTO.getDescription());
 			count--;
 		}
 		return rowNumIndex;
