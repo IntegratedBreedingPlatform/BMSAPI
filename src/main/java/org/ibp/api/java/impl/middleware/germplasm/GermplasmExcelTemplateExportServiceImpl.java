@@ -12,7 +12,6 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -25,10 +24,11 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.MethodService;
 import org.ibp.api.domain.location.LocationDto;
-import org.ibp.api.domain.ontology.DataType;
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -166,7 +167,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 					GermplasmExcelTemplateExportServiceImpl.FILE_NAME);
 			return this.generateTemplateFile(fileNameFullPath, cropName, programUUID, isGermplasmUpdateFormat);
 		} catch (final IOException e) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("cannot.export.as.xls.germplasm.template", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
@@ -217,53 +218,48 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		for (final VariableDetails variableDetails : variableDetailsList) {
 			final HSSFRow row = hSSFSheet.createRow(currentRowNum++);
 
+			final CellStyle cellStyle = count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
+				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER);
+
 			HSSFCell cell = row.createCell(0, CellType.STRING);
-			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
-				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
+			cell.setCellStyle(cellStyle);
 			cell.setCellValue(variableDetails.getName());
 
 			cell = row.createCell(1, CellType.STRING);
-			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
-				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
+			cell.setCellStyle(cellStyle);
 			cell.setCellValue(variableDetails.getAlias());
 
 			cell = row.createCell(2, CellType.STRING);
-			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
-				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
+			cell.setCellStyle(cellStyle);
 			cell.setCellValue(variableDetails.getDescription());
 
 			cell = row.createCell(3, CellType.STRING);
-			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
-				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
+			cell.setCellStyle(cellStyle);
 			cell.setCellValue(variableDetails.getProperty().getName());
 
 			cell = row.createCell(4, CellType.STRING);
-			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
-				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
+			cell.setCellStyle(cellStyle);
 			cell.setCellValue(variableDetails.getScale().getName());
 
 			cell = row.createCell(5, CellType.STRING);
-			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
-				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
+			cell.setCellStyle(cellStyle);
 			cell.setCellValue(variableDetails.getMethod().getName());
 
-			final String dataTypeCode = this.getDataTypeCode(variableDetails.getScale().getDataType());
+			final String dataTypeId = variableDetails.getScale().getDataType().getId();
+			final String dataTypeCode = this.getDataTypeCode(Integer.valueOf(dataTypeId));
 			cell = row.createCell(6, CellType.STRING);
-			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
-				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
+			cell.setCellStyle(cellStyle);
 			cell.setCellValue(dataTypeCode);
 
-			final String expectedRange = this.getExpectedRange(dataTypeCode, variableDetails);
+			final String expectedRange = this.getExpectedRange(variableDetails.getScale().getDataType().getName(), variableDetails);
 			cell = row.createCell(7, CellType.STRING);
-			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER) :
-				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER));
+			cell.setCellStyle(cellStyle);
 			cell.setCellValue(expectedRange);
 			count--;
-
 		}
 	}
 
-	private int writeOntologyVariableHeader(final HSSFSheet sheet, int currentRowNum, final String variableTypeName) {
+	private int writeOntologyVariableHeader(final HSSFSheet sheet, final int currentRowNum, final String variableTypeName) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		int rowNumIndex = currentRowNum;
 		sheet.addMergedRegion(new CellRangeAddress(currentRowNum, 0, 0, 7));
@@ -317,42 +313,37 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		return rowNumIndex;
 	}
 
-	private String getExpectedRange(final String dataTypeCode, final VariableDetails variableDetails) {
-		if (dataTypeCode.equals(org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE.getDataTypeCode())) {
-			final List<String> values = variableDetails.getScale().getValidValues().getCategories().stream().map(category -> category.getName()) //
-					.collect(Collectors.toList());
-			return StringUtils.join(values, ";");
-		} else if (dataTypeCode.equals(org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE.getDataTypeCode())) {
-			final StringBuilder range = new StringBuilder("");
+	private String getExpectedRange(final String dataTypeName, final VariableDetails variableDetails) {
 
-			if (variableDetails.getExpectedRange() != null && //
-				(StringUtils.isNotBlank(variableDetails.getExpectedRange().getMin()) ||
-					StringUtils.isNotBlank(variableDetails.getExpectedRange().getMax()))) {
+		final DataType dataType = DataType.getByName(dataTypeName);
+		switch(dataType){
+			case CATEGORICAL_VARIABLE:
+				final List<Category> categories = variableDetails.getScale().getValidValues().getCategories();
+				final List<String> values = categories.stream().map(Category::getName).collect(Collectors.toList());
+				return StringUtils.join(values, ";");
 
-				if (StringUtils.isNotBlank(variableDetails.getExpectedRange().getMin())) {
+			case NUMERIC_VARIABLE:
+				final StringBuilder range = new StringBuilder();
+				if (variableDetails.getExpectedRange() != null && //
+					(StringUtils.isNotBlank(variableDetails.getExpectedRange().getMin()) //
+						|| StringUtils.isNotBlank(variableDetails.getExpectedRange().getMax()))) {
 					range.append(variableDetails.getExpectedRange().getMin()).append("-");
-				}
-				if (StringUtils.isNotBlank(variableDetails.getExpectedRange().getMax())) {
 					range.append(variableDetails.getExpectedRange().getMax());
-				}
-			} else {
 
-				if (StringUtils.isNotBlank(variableDetails.getScale().getValidValues().getMin())) {
+				} else if (StringUtils.isNotBlank(variableDetails.getScale().getValidValues().getMin()) //
+					|| StringUtils.isNotBlank(variableDetails.getScale().getValidValues().getMax())) {
 					range.append(variableDetails.getScale().getValidValues().getMin()).append("-");
-				}
-				if (StringUtils.isNotBlank(variableDetails.getScale().getValidValues().getMax())) {
 					range.append(variableDetails.getScale().getValidValues().getMax());
 				}
-			}
-			return range.toString();
-		}
+				return range.toString();
 
-		return "";
+			default:
+				return "";
+		}
 	}
 
-	private String getDataTypeCode(final DataType dataType) {
-		final Integer dataTypeId = Integer.parseInt(dataType.getId());
-		return org.generationcp.middleware.domain.ontology.DataType.getById(dataTypeId).getDataTypeCode();
+	private String getDataTypeCode(final Integer dataTypeId) {
+		return DataType.getById(dataTypeId).getDataTypeCode();
 	}
 
 	private void writeObservationSheet(final boolean isGermplasmUpdateFormat) {
@@ -406,12 +397,12 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 					null);
 
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, false);
-		final List<BreedingMethodDTO> BreedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest, null);
+		final List<BreedingMethodDTO> breedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 
 		final List<GermplasmNameTypeDTO> germplasmNames = this.germplasmService.filterGermplasmNameTypes(null);
 
 		this.writeCodesHeader(otherCodesSheet, currentRowNum++, "export.germplasm.list.template.breeding.methods.column");
-		currentRowNum = this.writeBreedingMethodSection(otherCodesSheet, currentRowNum, BreedingMethodDTOs);
+		currentRowNum = this.writeBreedingMethodSection(otherCodesSheet, currentRowNum, breedingMethodDTOs);
 		otherCodesSheet.createRow(currentRowNum++);
 
 		this.writeCodesHeader(otherCodesSheet, currentRowNum++, "export.germplasm.list.template.location.abbr.column");
@@ -553,8 +544,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 	}
 
 	private Map<ExcelCellStyle, CellStyle> createStyles() {
-		final Map<ExcelCellStyle, CellStyle> styles = new HashMap<>();
-		final DataFormat format = this.wb.createDataFormat();
+		final Map<ExcelCellStyle, CellStyle> styles = new EnumMap<>(ExcelCellStyle.class);
 
 		this.setCustomColorAtIndex(IndexedColors.YELLOW, 255, 255, 204);
 		this.setCustomColorAtIndex(IndexedColors.PALE_BLUE, 197, 217, 241);
@@ -565,26 +555,25 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		this.setCustomColorAtIndex(IndexedColors.OLIVE_GREEN, 235, 241, 222);
 
 		final Font headerFontObservation = this.buildFont("arial", 10, true);
-		final Font headerFontCodes = this.buildFont("calibri", 11, true);
 		final Font fontCodes = this.buildFont("calibri", 11, false);
 
-		final CellStyle HeadingStyleYellow = this.createStyleWithBorder();
-		HeadingStyleYellow.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
-		HeadingStyleYellow.setAlignment(HorizontalAlignment.CENTER);
-		HeadingStyleYellow.setFont(headerFontObservation);
-		styles.put(ExcelCellStyle.HEADING_STYLE_YELLOW, HeadingStyleYellow);
+		final CellStyle headingStyleYellow = this.createStyleWithBorder();
+		headingStyleYellow.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+		headingStyleYellow.setAlignment(HorizontalAlignment.CENTER);
+		headingStyleYellow.setFont(headerFontObservation);
+		styles.put(ExcelCellStyle.HEADING_STYLE_YELLOW, headingStyleYellow);
 
-		final CellStyle HeadingStylePaleBlue = this.createStyleWithBorder();
-		HeadingStylePaleBlue.setFillForegroundColor(IndexedColors.PALE_BLUE.getIndex());
-		HeadingStylePaleBlue.setAlignment(HorizontalAlignment.CENTER);
-		HeadingStylePaleBlue.setFont(headerFontObservation);
-		styles.put(ExcelCellStyle.HEADING_STYLE_PALE_BLUE, HeadingStylePaleBlue);
+		final CellStyle headingStylePaleBlue = this.createStyleWithBorder();
+		headingStylePaleBlue.setFillForegroundColor(IndexedColors.PALE_BLUE.getIndex());
+		headingStylePaleBlue.setAlignment(HorizontalAlignment.CENTER);
+		headingStylePaleBlue.setFont(headerFontObservation);
+		styles.put(ExcelCellStyle.HEADING_STYLE_PALE_BLUE, headingStylePaleBlue);
 
-		final CellStyle HeadingStyleBlue = this.createStyleWithBorder();
-		HeadingStyleBlue.setFillForegroundColor(IndexedColors.BLUE.getIndex());
-		HeadingStyleBlue.setAlignment(HorizontalAlignment.CENTER);
-		HeadingStyleBlue.setFont(headerFontObservation);
-		styles.put(ExcelCellStyle.HEADING_STYLE_BLUE, HeadingStyleBlue);
+		final CellStyle headingStyleBlue = this.createStyleWithBorder();
+		headingStyleBlue.setFillForegroundColor(IndexedColors.BLUE.getIndex());
+		headingStyleBlue.setAlignment(HorizontalAlignment.CENTER);
+		headingStyleBlue.setFont(headerFontObservation);
+		styles.put(ExcelCellStyle.HEADING_STYLE_BLUE, headingStyleBlue);
 
 		final CellStyle hedingStyleOrange = this.createStyleWithBorder();
 		hedingStyleOrange.setFillForegroundColor(IndexedColors.ORANGE.getIndex());
