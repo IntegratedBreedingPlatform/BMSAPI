@@ -143,6 +143,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		STYLE_OLIVE_GREEN_WITH_LATERAL_BORDER,
 		STYLE_AQUA_WITH_LATERAL_AND_BOTTOM_BORDER,
 		STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER,
+		STYLE_AQUA_GREEN_WITH_BORDER,
 	}
 
 
@@ -486,6 +487,11 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		cellStyleOliveGreenWithLateralAndBottomBorder.setFont(fontCodes);
 		styles.put(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER, cellStyleOliveGreenWithLateralAndBottomBorder);
 
+		final CellStyle cellStyleAquaGreenWithBorder = this.createStyleWithBorder();
+		cellStyleAquaGreenWithBorder.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+		cellStyleAquaGreenWithBorder.setAlignment(HorizontalAlignment.CENTER);
+		cellStyleAquaGreenWithBorder.setFont(headerFontObservation);
+		styles.put(ExcelCellStyle.STYLE_AQUA_GREEN_WITH_BORDER, cellStyleAquaGreenWithBorder);
 		return styles;
 	}
 
