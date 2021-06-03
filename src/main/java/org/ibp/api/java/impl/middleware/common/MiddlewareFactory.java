@@ -9,10 +9,12 @@ import org.generationcp.commons.ruleengine.impl.RulesServiceImpl;
 import org.generationcp.commons.ruleengine.service.RulesService;
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.commons.service.CsvExportSampleListService;
+import org.generationcp.commons.service.GermplasmCodeGenerationService;
 import org.generationcp.commons.service.GermplasmNamingService;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
+import org.generationcp.commons.service.impl.GermplasmCodeGenerationServiceImpl;
 import org.generationcp.commons.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
@@ -311,7 +313,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmGroupingService getGermplasmGroupingService() {
-		return new GermplasmGroupingServiceImpl(this.getCropDatabaseSessionProvider());
+		return new GermplasmGroupingServiceImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
 	}
 
 	@Bean
@@ -677,6 +679,12 @@ public class MiddlewareFactory {
 	@DependsOn("WORKBENCH_SessionFactory")
 	public ReleaseNoteService getReleaseNoteService() {
 		return new ReleaseNoteServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmCodeGenerationService getGermplasmCodeGenerationService() {
+		return new GermplasmCodeGenerationServiceImpl();
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
