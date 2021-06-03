@@ -494,53 +494,40 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		middlewareVariableFilter.setProgramUuid(variableFilter.getProgramUuid());
 
 		if (!Util.isNullOrEmpty(variableFilter.getPropertyIds())) {
-			for (Integer i : variableFilter.getPropertyIds()) {
-				middlewareVariableFilter.addPropertyId(i);
-			}
+			variableFilter.getPropertyIds().forEach(middlewareVariableFilter::addPropertyId);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getMethodIds())) {
-			for (Integer i : variableFilter.getMethodIds()) {
-				middlewareVariableFilter.addMethodId(i);
-			}
+			variableFilter.getMethodIds().forEach(middlewareVariableFilter::addMethodId);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getScaleIds())) {
-			for (Integer i : variableFilter.getScaleIds()) {
-				middlewareVariableFilter.addScaleId(i);
-			}
+			variableFilter.getScaleIds().forEach(middlewareVariableFilter::addScaleId);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getVariableIds())) {
-			for (Integer i : variableFilter.getVariableIds()) {
-				middlewareVariableFilter.addVariableId(i);
-			}
+			variableFilter.getVariableIds().forEach(middlewareVariableFilter::addVariableId);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getExcludedVariableIds())) {
-			for (Integer i : variableFilter.getExcludedVariableIds()) {
-				middlewareVariableFilter.addExcludedVariableId(i);
-			}
+			variableFilter.getExcludedVariableIds().forEach(middlewareVariableFilter::addExcludedVariableId);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getDataTypes())) {
-			for (Integer i : variableFilter.getDataTypes()) {
-				middlewareVariableFilter.addDataType(DataType.getById(i));
-			}
+			variableFilter.getDataTypes().stream().map(DataType::getById).forEach(middlewareVariableFilter::addDataType);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getVariableTypes())) {
-			for (Integer i : variableFilter.getVariableTypes()) {
-				middlewareVariableFilter.addVariableType(VariableType.getById(i));
-			}
+			variableFilter.getVariableTypes().stream().map(VariableType::getById).forEach(middlewareVariableFilter::addVariableType);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getPropertyClasses())) {
-			for (String s : variableFilter.getPropertyClasses()) {
-				middlewareVariableFilter.addPropertyClass(s);
-			}
+			variableFilter.getPropertyClasses().forEach(middlewareVariableFilter::addPropertyClass);
 		}
 
+		if (!Util.isNullOrEmpty(variableFilter.getNames())) {
+			variableFilter.getNames().forEach(middlewareVariableFilter::addName);
+		}
 	}
 
 	@Override

@@ -2,10 +2,6 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
-
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -20,13 +16,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class ObservationsTableValidator {
 
 	private static final String DATA_TYPE_NUMERIC = "Numeric";
-	public static final String MISSING_VALUE = "missing";
 
 	public void validateList(final List<List<String>> inputData) throws ApiRequestValidationException {
 

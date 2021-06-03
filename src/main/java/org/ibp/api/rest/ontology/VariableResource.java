@@ -133,6 +133,9 @@ public class VariableResource {
 			+ " to list possible variable type ids that can be supplied here as a comma separated list. ")
 		@RequestParam(value = "variableTypeIds", required = false) final Set<Integer> variableTypeIds,
 
+		@ApiParam(value = "List of names or alias ")
+		@RequestParam(value = "variableNames", required = false) final Set<String> variableNames,
+
 		@ApiParam(value = "Use <code>GET /ontology/{cropname}/classes</code> service "
 			+ " to retrieve possible property class values that can be supplied here as a comma separated list.")
 		@RequestParam(value = "propertyClasses", required = false) final Set<String> propertyClasses) {
@@ -170,6 +173,10 @@ public class VariableResource {
 
 		if (!Util.isNullOrEmpty(propertyClasses)) {
 			propertyClasses.forEach(variableFilter::addPropertyClass);
+		}
+
+		if (!Util.isNullOrEmpty(variableNames)) {
+			variableNames.forEach(variableFilter::addName);
 		}
 
 		return new ResponseEntity<>(this.variableService.getVariablesByFilter(cropname, programUUID, variableFilter), HttpStatus.OK);

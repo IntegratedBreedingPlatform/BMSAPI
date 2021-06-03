@@ -17,6 +17,7 @@ public class VariableFilter {
 	private final List<Integer> dataTypesIds = new ArrayList<>();
 	private final List<Integer> variableTypeIds = new ArrayList<>();
 	private final List<String> propertyClasses = new ArrayList<>();
+	private final List<String> names = new ArrayList<>();
 
 	public String getProgramUuid() {
 		return programUuid;
@@ -106,8 +107,16 @@ public class VariableFilter {
 		this.propertyClasses.add(className);
 	}
 
+	public void addName(String name) {
+		this.names.add(name);
+	}
+
 	public void addVariableIds(List<Integer> variableIds) {
 		this.variableIds.addAll(variableIds);
+	}
+
+	public List<String> getNames() {
+		return names;
 	}
 
 	@Override public String toString() {
@@ -123,7 +132,8 @@ public class VariableFilter {
 				", dataTypesIds=" + dataTypesIds +
 				", variableTypeIds=" + variableTypeIds +
 				", propertyClasses=" + propertyClasses +
-				'}';
+			", names=" + names +
+			'}';
 	}
 
 	@Override public boolean equals(Object o) {
@@ -166,6 +176,10 @@ public class VariableFilter {
 		if (variableTypeIds != null ? !variableTypeIds.equals(that.variableTypeIds) : that.variableTypeIds != null) {
 			return false;
 		}
+		if (names != null ? !names.equals(that.names) : that.names != null) {
+			return false;
+		}
+
 		return !(propertyClasses != null ? !propertyClasses.equals(that.propertyClasses) : that.propertyClasses != null);
 
 	}
@@ -182,6 +196,8 @@ public class VariableFilter {
 		result = 31 * result + (dataTypesIds != null ? dataTypesIds.hashCode() : 0);
 		result = 31 * result + (variableTypeIds != null ? variableTypeIds.hashCode() : 0);
 		result = 31 * result + (propertyClasses != null ? propertyClasses.hashCode() : 0);
+		result = 31 * result + (names != null ? names.hashCode() : 0);
+
 		return result;
 	}
 }
