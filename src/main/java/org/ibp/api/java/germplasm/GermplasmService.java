@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
@@ -37,7 +38,7 @@ public interface GermplasmService {
 
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
-	List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(String name);
+	List<Variable> searchAttributes(String name, String programUUID);
 
 	List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(String name);
 

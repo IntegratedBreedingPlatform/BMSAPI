@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -206,8 +207,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(final String query) {
-		return this.attributeService.searchAttributes(query);
+	public List<Variable> searchAttributes(final String query, final String programUUID) {
+		return this.attributeService.searchAttributes(query, programUUID);
 	}
 
 	@Override
