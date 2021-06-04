@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import com.google.common.base.Optional;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
@@ -9,7 +8,6 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
-import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -31,9 +29,6 @@ public class AttributeValidator {
 
 	@Autowired
 	private GermplasmAttributeService germplasmAttributeService;
-
-	@Autowired
-	private GermplasmService germplasmService;
 
 	public void validateAttributeIds(final BindingResult errors, final List<String> attributeIds) {
 		if (attributeIds == null || attributeIds.isEmpty()) {
@@ -131,10 +126,6 @@ public class AttributeValidator {
 
 	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
 		this.germplasmDataManager = germplasmDataManager;
-	}
-
-	public void setGermplasmService(final GermplasmService germplasmService) {
-		this.germplasmService = germplasmService;
 	}
 
 	void setGermplasmAttributeService(final  GermplasmAttributeService germplasmAttributeService) {

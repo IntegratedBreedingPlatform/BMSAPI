@@ -1,10 +1,8 @@
 package org.ibp.api.java.germplasm;
 
-import com.google.common.base.Optional;
 import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
-import org.ibp.api.domain.ontology.VariableDetails;
 
 import java.util.List;
 import java.util.Set;
