@@ -51,7 +51,8 @@ public class GermplasmImportRequestDtoValidator {
 	static final Integer REFERENCE_MAX_LENGTH = 255;
 	static final Integer NAME_MAX_LENGTH = 255;
 	static final Integer ATTRIBUTE_MAX_LENGTH = 255;
-	private List<VariableType> ATTRIBUTE_TYPES = Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
+	private static final List<VariableType> ATTRIBUTE_TYPES =
+		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
 
 	private BindingResult errors;
 

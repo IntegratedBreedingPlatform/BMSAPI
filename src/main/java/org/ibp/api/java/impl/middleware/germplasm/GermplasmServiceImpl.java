@@ -328,7 +328,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		this.germplasmUpdateDtoValidator.validate(programUUID, germplasmUpdateDTOList);
 
-		return this.germplasmService.importGermplasmUpdates(germplasmUpdateDTOList);
+		return this.germplasmService.importGermplasmUpdates(programUUID, germplasmUpdateDTOList);
 	}
 
 	@Override
@@ -340,7 +340,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		this.germplasmImportRequestDtoValidator.validateBeforeSaving(programUUID, germplasmImportRequestDto);
-		return this.germplasmService.importGermplasm(cropName, germplasmImportRequestDto);
+		return this.germplasmService.importGermplasm(cropName, programUUID, germplasmImportRequestDto);
 	}
 
 	@Override
