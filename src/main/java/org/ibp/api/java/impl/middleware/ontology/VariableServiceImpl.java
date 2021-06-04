@@ -575,4 +575,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		return variableDTOs;
 	}
 
+	@Override
+	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
+		return this.ontologyVariableDataManager.searchAttributeVariables(query, programUUID);
+	}
+
 }

@@ -38,8 +38,6 @@ public interface GermplasmService {
 
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
-	List<Variable> searchAttributes(String name, String programUUID);
-
 	List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(String name);
 
 	PedigreeDTO getPedigree(String germplasmUUID, String notation, Boolean includeSiblings);

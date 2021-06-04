@@ -32,6 +32,7 @@ import org.ibp.api.java.germplasm.GermplasmTemplateExportService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.sample.SampleService;
+import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -87,6 +88,9 @@ public class GermplasmResource {
 
 	@Autowired
 	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private VariableService variableService;
 
 	@ApiOperation(value = "Post germplasm search", notes = "Post germplasm search")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
@@ -172,7 +176,7 @@ public class GermplasmResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = true) final String query) {
 
-		return new ResponseEntity<>(this.germplasmService.searchAttributes(query, programUUID), HttpStatus.OK);
+		return new ResponseEntity<>(this.variableService.searchAttributeVariables(query, programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Returns germplasm name types filtered by a list of codes", notes = "Returns germplasm name types filtered by a list of codes")

@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.generationcp.middleware.api.attribute.AttributeService;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
@@ -106,9 +105,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private GermplasmSearchService germplasmSearchService;
 
 	@Autowired
-	private AttributeService attributeService;
-
-	@Autowired
 	private GermplasmNameTypeService germplasmNameTypeService;
 
 	@Autowired
@@ -204,11 +200,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public long countSearchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
 		return this.germplasmSearchService.countSearchGermplasm(germplasmSearchRequest, programUUID);
-	}
-
-	@Override
-	public List<Variable> searchAttributes(final String query, final String programUUID) {
-		return this.attributeService.searchAttributes(query, programUUID);
 	}
 
 	@Override
