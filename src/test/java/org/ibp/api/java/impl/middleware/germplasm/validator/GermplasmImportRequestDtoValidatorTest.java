@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.germplasm.validator;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -13,11 +12,11 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportD
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.junit.Test;
@@ -62,7 +61,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 	private LotService lotService;
 
 	@Mock
-	private GermplasmAttributeService germplasmAttributeService;
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@InjectMocks
 	private GermplasmImportRequestDtoValidator germplasmImportRequestDtoValidator;
@@ -705,39 +704,6 @@ public class GermplasmImportRequestDtoValidatorTest {
 	}
 
 	@Test
-	public void testValidateBeforeSaving_ThrowsException_WhenAttributeIsDuplicated() {
-		try {
-			final Map<String, String> names = new HashMap<>();
-			names.put("LNAME", "MYNAME");
-			final Map<String, String> attributes = new HashMap<>();
-			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.ATTRIBUTE_MAX_LENGTH));
-			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-			germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GID);
-			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
-				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, attributes,
-				"20201212", null, null)));
-			final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO();
-			breedingMethodDTO.setCode(RandomStringUtils.randomAlphabetic(3).toUpperCase());
-			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
-				.thenReturn(Collections.singletonList(breedingMethodDTO));
-			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
-				.thenReturn(Collections.singletonList(new Location()));
-			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
-				.thenReturn(Collections.singletonList(new GermplasmNameTypeDTO()));
-			final AttributeDTO attributeDTO1 = new AttributeDTO();
-			attributeDTO1.setCode("NOTE");
-			final AttributeDTO attributeDTO2 = new AttributeDTO();
-			attributeDTO2.setCode("NOTE");
-			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
-				Lists.newArrayList(attributeDTO1, attributeDTO2));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("germplasm.import.attributes.duplicated.found"));
-		}
-	}
-
-	@Test
 	public void testValidateBeforeSaving_ThrowsException_WhenAttributeIsNotFound() {
 		try {
 			final Map<String, String> names = new HashMap<>();
@@ -757,7 +723,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 				.thenReturn(Collections.singletonList(new Location()));
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
 				.thenReturn(Collections.singletonList(new GermplasmNameTypeDTO()));
-			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
+			Mockito.when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(
 				Collections.emptyList());
 			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -1111,34 +1077,13 @@ public class GermplasmImportRequestDtoValidatorTest {
 	}
 
 	@Test
-	public void testValidateImportLoadedData_ThrowsException_WhenAttributeIsDuplicated() {
-		try {
-			final Map<String, String> attributes = new HashMap<>();
-			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.ATTRIBUTE_MAX_LENGTH));
-			final GermplasmInventoryImportDTO germplasmInventoryImportDTO1 = new GermplasmInventoryImportDTO();
-			germplasmInventoryImportDTO1.setAttributes(attributes);
-			final AttributeDTO attributeDTO1 = new AttributeDTO();
-			attributeDTO1.setCode("NOTE");
-			final AttributeDTO attributeDTO2 = new AttributeDTO();
-			attributeDTO2.setCode("NOTE");
-			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
-				Lists.newArrayList(attributeDTO1, attributeDTO2));
-			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("germplasm.import.attributes.duplicated.found"));
-		}
-	}
-
-	@Test
 	public void testValidateImportLoadedData_ThrowsException_WhenAttributeIsNotFound() {
 		try {
 			final Map<String, String> attributes = new HashMap<>();
 			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.ATTRIBUTE_MAX_LENGTH));
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO1 = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO1.setAttributes(attributes);
-			Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Mockito.anySet(), Mockito.eq(null))).thenReturn(
+			Mockito.when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(
 				Collections.emptyList());
 			this.germplasmImportRequestDtoValidator
 				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
