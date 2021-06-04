@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
@@ -20,6 +19,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
@@ -168,11 +168,11 @@ public class GermplasmResource {
 	@ApiOperation(value = "Search germplasm attributes")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes/search", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<AttributeDTO>> searchAttributes(@PathVariable final String cropName,
+	public ResponseEntity<List<Variable>> searchAttributes(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = true) final String query) {
 
-		return new ResponseEntity<>(this.germplasmService.searchAttributes(query), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmService.searchAttributes(query, programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Returns germplasm name types filtered by a list of codes", notes = "Returns germplasm name types filtered by a list of codes")
