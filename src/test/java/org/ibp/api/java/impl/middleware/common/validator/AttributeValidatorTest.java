@@ -56,7 +56,6 @@ public class AttributeValidatorTest {
 		MockitoAnnotations.initMocks(this);
 		this.attributeValidator = new AttributeValidator();
 		this.attributeValidator.setGermplasmDataManager(this.germplasmDataManager);
-		this.attributeValidator.setGermplasmService(this.germplasmService);
 		this.attributeValidator.setGermplasmAttributeService(this.germplasmAttributeService);
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 	}
