@@ -39,7 +39,7 @@ public class TrialImportRequestValidator {
 	public BindingResult pruneTrialsInvalidForImport(final List<TrialImportRequestDTO> trialImportRequestDTOS, final String crop) {
 		BaseValidator.checkNotEmpty(trialImportRequestDTOS, "trial.import.request.null");
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequest.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), TrialImportRequestDTO.class.getName());
 
 		final Map<TrialImportRequestDTO, Integer> importRequestByIndexMap = IntStream.range(0, trialImportRequestDTOS.size())
 			.boxed().collect(Collectors.toMap(trialImportRequestDTOS::get, i -> i));

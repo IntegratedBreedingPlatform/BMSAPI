@@ -6,6 +6,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
+import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -25,10 +26,12 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.ibp.api.brapi.v2.study.StudyImportResponse;
 import org.ibp.api.brapi.v2.trial.TrialImportResponse;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyImportRequestValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.study.validator.TrialImportRequestValidator;
 import org.ibp.api.java.study.StudyService;
@@ -72,6 +75,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private TrialImportRequestValidator trialImportRequestDtoValidator;
+
+	@Autowired
+	private StudyImportRequestValidator studyImportRequestValidator;
 
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
@@ -216,6 +222,30 @@ public class StudyServiceImpl implements StudyService {
 			response.setStudySummaries(studySummaries);
 		}
 		response.setStatus(noOfCreatedTrials + " out of " + originalListSize + " trials created successfully.");
+		return response;
+	}
+
+	@Override
+	public StudyImportResponse createStudies(String cropName, List<StudyImportRequestDTO> studyImportRequestDTOS) {
+		final StudyImportResponse response = new StudyImportResponse();
+		final int originalListSize = studyImportRequestDTOS.size();
+		int noOfCreatedStudies = 0;
+
+		// Remove studies that fails any validation. They will be excluded from creation
+		final BindingResult bindingResult = this.studyImportRequestValidator.pruneStudiesInvalidForImport(studyImportRequestDTOS, cropName);
+		if (bindingResult.hasErrors()) {
+			response.setErrors(bindingResult.getAllErrors());
+		}
+		if (!CollectionUtils.isEmpty(studyImportRequestDTOS)) {
+
+			/*final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+			final List<StudySummary> studySummaries = this.middlewareStudyService.saveStudies(cropName, studyImportRequestDTOS, user.getUserid());
+			if (!CollectionUtils.isEmpty(studySummaries)) {
+				noOfCreatedStudies = studySummaries.size();
+			}
+			response.setStudySummaries(studySummaries);*/
+		}
+		response.setStatus(noOfCreatedStudies + " out of " + originalListSize + " studies created successfully.");
 		return response;
 	}
 

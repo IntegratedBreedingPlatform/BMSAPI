@@ -2,6 +2,7 @@
 package org.ibp.api.java.study;
 
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.domain.dms.Study;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.ibp.api.brapi.v2.study.StudyImportResponse;
 import org.ibp.api.brapi.v2.trial.TrialImportResponse;
 import org.springframework.data.domain.Pageable;
 
@@ -62,4 +64,6 @@ public interface StudyService {
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 
 	TrialImportResponse createTrials(String cropName, List<TrialImportRequestDTO> trialImportRequestDTOs);
+
+	StudyImportResponse createStudies(String cropName, List<StudyImportRequestDTO> studyImportRequestDTOS);
 }
