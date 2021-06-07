@@ -156,14 +156,6 @@ public class AttributeValidator {
 		}
 	}
 
-	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
-		this.germplasmDataManager = germplasmDataManager;
-	}
-
-	void setGermplasmAttributeService(final  GermplasmAttributeService germplasmAttributeService) {
-		this.germplasmAttributeService = germplasmAttributeService;
-	}
-
 	public void setOntologyVariableDataManager(
 		final OntologyVariableDataManager ontologyVariableDataManager) {
 		this.ontologyVariableDataManager = ontologyVariableDataManager;
