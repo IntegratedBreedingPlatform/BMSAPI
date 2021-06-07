@@ -50,7 +50,6 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
 		germplasmNameRequestValidator.validate(programUUID, germplasmNameRequestDto, gid, null);
 		locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
-		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		return germplasmNameService.createName(loggedInUser.getUserid(), germplasmNameRequestDto, gid);
+		return germplasmNameService.createName(germplasmNameRequestDto, gid);
 	}
 }

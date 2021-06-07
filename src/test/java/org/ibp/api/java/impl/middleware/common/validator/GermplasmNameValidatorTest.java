@@ -2,10 +2,9 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
-import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
-import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameRequestValidator;
@@ -15,18 +14,14 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.Assert.assertThat;
@@ -34,9 +29,8 @@ import static org.junit.Assert.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class GermplasmNameValidatorTest {
 
-	final static Integer GERMPLASM_ID = 100;
-
-	final static Integer NAME_ID = 1;
+	final static Integer GERMPLASM_ID = new Random().nextInt();
+	final static Integer NAME_ID = new Random().nextInt();
 
 
 	@Mock
@@ -47,8 +41,6 @@ public class GermplasmNameValidatorTest {
 
 	@Mock
 	private org.ibp.api.java.germplasm.GermplasmService germplasmService;
-
-	private BindingResult errors;
 
 	@InjectMocks
 	private GermplasmNameRequestValidator germplasmNameRequestValidator;
@@ -149,7 +141,7 @@ public class GermplasmNameValidatorTest {
 	public void testValidateDeleteName_ThrowsException_WhenNameIsNotBelongsToGermplasm(){
 		try {
 			final Name name = new Name(2);
-			name.setGermplasmId(GermplasmNameValidatorTest.GERMPLASM_ID);
+			name.setGermplasm(this.mockGermplasm());
 			name.setNstat(1);
 
 			Mockito.when(this.germplasmNameService.getNameById(Mockito.any())).thenReturn(null);
@@ -163,7 +155,7 @@ public class GermplasmNameValidatorTest {
 	public void testValidateDeleteName_ThrowsException_WhenPreferredNameCannotBeDeleted(){
 		try {
 			Name name = new Name();
-			name.setGermplasmId(GermplasmNameValidatorTest.GERMPLASM_ID);
+			name.setGermplasm(this.mockGermplasm());
 			name.setNid(1);
 			name.setNstat(1);
 			Mockito.when(this.germplasmNameService.getNameById(Mockito.any())).thenReturn(name);
@@ -179,7 +171,7 @@ public class GermplasmNameValidatorTest {
 			final GermplasmNameRequestDto germplasmNameRequestDto = new GermplasmNameRequestDto();
 			germplasmNameRequestDto.setNameTypeCode(RandomStringUtils.randomAlphabetic(5));
 			final Name name = new Name(GermplasmNameValidatorTest.NAME_ID);
-			name.setGermplasmId(GermplasmNameValidatorTest.GERMPLASM_ID);
+			name.setGermplasm(this.mockGermplasm());
 			name.setNstat(1);
 
 
@@ -198,7 +190,7 @@ public class GermplasmNameValidatorTest {
 			germplasmNameRequestDto.setName(RandomStringUtils.randomAlphabetic(256));
 
 			final Name name = new Name(GermplasmNameValidatorTest.NAME_ID);
-			name.setGermplasmId(GermplasmNameValidatorTest.GERMPLASM_ID);
+			name.setGermplasm(this.mockGermplasm());
 			name.setNstat(1);
 
 			Mockito.when(this.germplasmNameService.getNameById(Mockito.any())).thenReturn(name);
@@ -217,7 +209,7 @@ public class GermplasmNameValidatorTest {
 			germplasmNameRequestDto.setPreferredName(Boolean.FALSE);
 
 			final Name name = new Name(GermplasmNameValidatorTest.NAME_ID);
-			name.setGermplasmId(GermplasmNameValidatorTest.GERMPLASM_ID);
+			name.setGermplasm(this.mockGermplasm());
 			name.setNstat(1);
 
 			Mockito.when(this.germplasmNameService.getNameById(GermplasmNameValidatorTest.NAME_ID)).thenReturn(name);
@@ -236,7 +228,7 @@ public class GermplasmNameValidatorTest {
 			germplasmNameRequestDto.setDate("20212201");
 
 			final Name name = new Name(GermplasmNameValidatorTest.NAME_ID);
-			name.setGermplasmId(GermplasmNameValidatorTest.GERMPLASM_ID);
+			name.setGermplasm(this.mockGermplasm());
 			name.setNstat(1);
 
 			Mockito.when(this.germplasmNameService.getNameById(Mockito.any())).thenReturn(name);
@@ -246,7 +238,6 @@ public class GermplasmNameValidatorTest {
 		}
 	}
 
-
 	private GermplasmNameRequestDto createNewGermplasmNameRequestDto() {
 		GermplasmNameRequestDto germplasmNameRequestDto = new GermplasmNameRequestDto();
 		germplasmNameRequestDto.setName(RandomStringUtils.randomAlphabetic(10));
@@ -255,5 +246,11 @@ public class GermplasmNameValidatorTest {
 		germplasmNameRequestDto.setNameTypeCode(RandomStringUtils.randomAlphabetic(5));
 		germplasmNameRequestDto.setLocationId(9001);
 		return germplasmNameRequestDto;
+	}
+
+	private Germplasm mockGermplasm() {
+		Germplasm germplasm = Mockito.mock(Germplasm.class);
+		Mockito.when(germplasm.getGid()).thenReturn(GERMPLASM_ID);
+		return germplasm;
 	}
 }
