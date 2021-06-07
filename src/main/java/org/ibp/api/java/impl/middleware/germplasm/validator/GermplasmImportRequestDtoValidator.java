@@ -443,8 +443,9 @@ public class GermplasmImportRequestDtoValidator {
 				attributes.removeAll(existingAttributeVariables.stream()
 					.map(v -> v.getName().toUpperCase())
 					.collect(Collectors.toSet()));
-				attributes.removeAll(existingAttributeVariables.stream()
-					.map(v -> v.getName().toUpperCase())
+
+				attributes.removeAll(existingAttributeVariables.stream().filter(va -> StringUtils.isNotEmpty(va.getAlias()))
+					.map(v -> v.getAlias().toUpperCase())
 					.collect(Collectors.toSet()));
 				this.errors.reject("germplasm.import.attributes.not.exist",
 					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributes), 3)}, "");
