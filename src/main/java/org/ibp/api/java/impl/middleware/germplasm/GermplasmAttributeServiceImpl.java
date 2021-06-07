@@ -7,7 +7,6 @@ import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,9 +36,6 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 
 	@Autowired
 	private SecurityService securityService;
-
-	@Autowired
-	private VariableValidator variableValidator;
 
 	@Override
 	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId) {
