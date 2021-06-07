@@ -202,7 +202,6 @@ public class GermplasmUpdateDtoValidatorTest {
 
 	@Test
 	public void testValidate_CreationDate() {
-		final String programUUID = RandomStringUtils.random(10);
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setCreationDate("AAAABBCC");
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
