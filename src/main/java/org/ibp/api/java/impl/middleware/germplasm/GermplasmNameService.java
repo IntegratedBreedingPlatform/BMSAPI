@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.domain.germplasm.GermplasmNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
+import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
 
 import java.util.Map;
@@ -16,4 +17,5 @@ public interface GermplasmNameService {
 
 	public Map<Integer, GermplasmGroupNamingResult> createNames(String programUUID, GermplasmNameBatchRequestDto germplasmNameBatchRequestDto);
 
+	public String getNextNameInSequence(GermplasmNameSetting germplasmNameSetting);
 }

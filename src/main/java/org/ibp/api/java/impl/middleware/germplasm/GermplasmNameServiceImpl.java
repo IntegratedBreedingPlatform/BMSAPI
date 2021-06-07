@@ -3,8 +3,9 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import org.generationcp.commons.service.GermplasmCodeGenerationService;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameRequestValidator;
@@ -69,6 +70,16 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 			return this.germplasmCodeGenerationService.createCodeNames(germplasmNameBatchRequestDto);
 		} catch (final Exception e) {
 			throw new ApiRuntimeException("An error has occurred when trying generate code names", e);
+		}
+	}
+
+	@Override
+	public String getNextNameInSequence(final GermplasmNameSetting germplasmNameSetting) {
+		try {
+			return this.germplasmCodeGenerationService.getNextNameInSequence(germplasmNameSetting);
+		} catch (final Exception e) {
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmNameSetting.class.getName());
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 }
