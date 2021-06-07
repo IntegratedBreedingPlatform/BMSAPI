@@ -9,13 +9,12 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
-import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -23,11 +22,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,22 +42,18 @@ public class GermplasmUpdateDtoValidatorTest {
 	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmMiddlewareService;
 
 	@Mock
-	private LocationDataManager locationDataManager;
-
-	@Mock
 	private LocationService locationService;
 
 	@Mock
 	private BreedingMethodService breedingMethodService;
 
 	@Mock
-	private GermplasmAttributeService germplasmAttributeService;
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@InjectMocks
 	private GermplasmUpdateDtoValidator germplasmUpdateDtoValidator;
 
 	@Test
-	@Ignore("FIXME into IBP-4659")
 	public void testValidation_Success() {
 
 		final String programUUID = RandomStringUtils.random(10);
@@ -87,6 +80,16 @@ public class GermplasmUpdateDtoValidatorTest {
 
 		when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
 			.thenReturn(Arrays.asList(new GermplasmNameTypeDTO(null, "DRVNM", null), new GermplasmNameTypeDTO(null, "LNAME", null)));
+
+		final Variable variable1 = new Variable();
+		variable1.setName("NOTE");
+
+		final Variable variable2 = new Variable();
+		variable2.setName("ACQ_DATE");
+
+		Mockito.when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(
+			Arrays.asList(variable1, variable2));
+
 		when(this.germplasmMiddlewareService.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 		when(this.germplasmMiddlewareService.getGermplasmByGUIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 		when(this.germplasmMiddlewareService.getGermplasmByGIDs(Arrays.asList(3, 4)))
@@ -96,8 +99,6 @@ public class GermplasmUpdateDtoValidatorTest {
 			.getFilteredLocations(new LocationSearchRequest(programUUID, null, null,
 				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null, false), null))
 			.thenReturn(Arrays.asList(location));
-
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		try {
 			this.germplasmUpdateDtoValidator.validate(programUUID, germplasmUpdateList);
@@ -115,8 +116,8 @@ public class GermplasmUpdateDtoValidatorTest {
 	}
 
 	@Test
-	@Ignore("FIXME into IBP-4659")
 	public void testValidate_InvalidAttributeAndNameCodes() {
+		final String programUUID = RandomStringUtils.random(10);
 
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.getNames().put("DRVNM", "");
@@ -128,9 +129,13 @@ public class GermplasmUpdateDtoValidatorTest {
 
 		when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
 			.thenReturn(Arrays.asList(new GermplasmNameTypeDTO(null, "DRVNM", null)));
+		final Variable variable1 = new Variable();
+		variable1.setName("NOTE");
+		Mockito.when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(
+			Arrays.asList(variable1));
 
 		final BindingResult errors = Mockito.mock(BindingResult.class);
-		this.germplasmUpdateDtoValidator.validateAttributeAndNameCodes(errors, germplasmUpdateList);
+		this.germplasmUpdateDtoValidator.validateAttributeAndNameCodes(errors, programUUID, germplasmUpdateList);
 		Mockito.verify(errors).reject("germplasm.update.invalid.name.code", new String[] {"LNAME"}, "");
 		Mockito.verify(errors).reject("germplasm.update.invalid.attribute.code", new String[] {"ACQ_DATE"}, "");
 	}

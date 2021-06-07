@@ -430,6 +430,16 @@ public class GermplasmImportRequestDtoValidator {
 				this.ontologyVariableDataManager.getWithFilter(variableFilter);
 
 			if (existingAttributeVariables.size() != attributes.size()) {
+				//Check if same variable was used by name or alias
+				existingAttributeVariables.forEach(v -> {
+					if (attributes.contains(v.getName().toUpperCase()) && StringUtils.isNotEmpty(v.getAlias()) && attributes
+						.contains(v.getAlias().toUpperCase())) {
+						this.errors.reject("germplasm.import.two.columns.referring.to.same.variable",
+							new String[] {v.getName(), v.getAlias()}, "");
+						throw new ApiRequestValidationException(this.errors.getAllErrors());
+					}
+				});
+
 				attributes.removeAll(existingAttributeVariables.stream()
 					.map(v -> v.getName().toUpperCase())
 					.collect(Collectors.toSet()));

@@ -11,10 +11,14 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
+import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +26,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +38,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class GermplasmUpdateDtoValidator {
+
+	private static final List<VariableType> ATTRIBUTE_TYPES =
+		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
 
 	@Autowired
 	private GermplasmService germplasmService;
@@ -47,14 +55,14 @@ public class GermplasmUpdateDtoValidator {
 	private BreedingMethodService breedingMethodService;
 
 	@Autowired
-	private GermplasmAttributeService germplasmAttributeService;
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	public void validate(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmUpdateDTO.class.getName());
 
 		this.validateEmptyList(errors, germplasmUpdateDTOList);
-		this.validateAttributeAndNameCodes(errors, germplasmUpdateDTOList);
+		this.validateAttributeAndNameCodes(errors, programUUID, germplasmUpdateDTOList);
 		this.validateGermplasmIdAndGermplasmUUID(errors, germplasmUpdateDTOList);
 		this.validateLocationAbbreviation(errors, programUUID, germplasmUpdateDTOList);
 		this.validateBreedingMethod(errors, programUUID, germplasmUpdateDTOList);
@@ -74,7 +82,8 @@ public class GermplasmUpdateDtoValidator {
 		}
 	}
 
-	protected void validateAttributeAndNameCodes(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateAttributeAndNameCodes(final BindingResult errors, final String programUUID,
+		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> nameCodes = new HashSet<>();
 		germplasmUpdateDTOList
@@ -92,26 +101,51 @@ public class GermplasmUpdateDtoValidator {
 		germplasmUpdateDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
 			.forEach(
 				g -> attributesCodes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
-		final Set<String> existingAttributesCodes = null; //
-		// FIXME into IBP-4560 (using VariableService)
-		/*	this.germplasmAttributeService.filterGermplasmAttributes(attributesCodes, null).stream().map(AttributeDTO::getCode).collect(
-				Collectors.toSet());*/
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.setProgramUuid(programUUID);
+		ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+		attributesCodes.forEach(variableFilter::addName);
+
+		final List<Variable> existingAttributeVariables =
+			this.ontologyVariableDataManager.getWithFilter(variableFilter);
+
+		final List<String> existingVariablesNamesAndAlias = new ArrayList<>();
+		existingAttributeVariables.forEach(v -> {
+				existingVariablesNamesAndAlias.add(v.getName().toUpperCase());
+				if (StringUtils.isNotEmpty(v.getAlias())) {
+					existingVariablesNamesAndAlias.add(v.getAlias().toUpperCase());
+				}
+			}
+		);
 
 		if (!nameCodes.equals(existingNamesCodes)) {
 			errors.reject("germplasm.update.invalid.name.code", new String[] {
 				String.join(",", nameCodes.stream().filter((name) -> !existingNamesCodes.contains(name)).collect(
 					Collectors.toList()))}, "");
 		}
-		if (!attributesCodes.equals(existingAttributesCodes)) {
-			errors.reject("germplasm.update.invalid.attribute.code", new String[] {
-				String.join(",", attributesCodes.stream().filter((attribute) -> !existingAttributesCodes.contains(attribute)).collect(
-					Collectors.toList()))}, "");
-		}
-		final List<String> ambiguosCodes = new ArrayList<>(CollectionUtils.intersection(existingNamesCodes, existingAttributesCodes));
-		if (!ambiguosCodes.isEmpty()) {
-			errors.reject("germplasm.update.code.is.defined.as.name.and.attribute", new String[] {String.join(",", ambiguosCodes)}, "");
+
+		if (existingAttributeVariables.size() != attributesCodes.size()) {
+			//Check if same variable was used by name or alias
+			existingAttributeVariables.forEach(v -> {
+				if (attributesCodes.contains(v.getName().toUpperCase()) && StringUtils.isNotEmpty(v.getAlias()) && attributesCodes
+					.contains(v.getAlias().toUpperCase())) {
+					errors.reject("germplasm.import.two.columns.referring.to.same.variable",
+						new String[] {v.getName(), v.getAlias()}, "");
+					return;
+				}
+			});
+
+			attributesCodes.removeAll(existingVariablesNamesAndAlias);
+			errors.reject("germplasm.update.invalid.attribute.code",
+				new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributesCodes), 3)}, "");
 		}
 
+		final List<String> ambiguousCodes =
+			new ArrayList<>(CollectionUtils.intersection(existingNamesCodes, existingVariablesNamesAndAlias));
+		if (!ambiguousCodes.isEmpty()) {
+			errors.reject("germplasm.update.code.is.defined.as.name.and.attribute", new String[] {String.join(",", ambiguousCodes)}, "");
+		}
 	}
 
 	protected void validateGermplasmIdAndGermplasmUUID(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
