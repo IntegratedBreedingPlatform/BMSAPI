@@ -39,11 +39,11 @@ public class GermplasmAttributeResource {
 
 	@ApiOperation(value = "Create attribute for specified germplasm", notes = "Create attribute for specified germplasm")
 	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_ATTRIBUTES')")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes/{variableTypeId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GermplasmAttributeRequestDto> createGermplasmAttribute(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
-		@PathVariable final Integer gid, @PathVariable final Integer variableTypeId, @RequestBody final GermplasmAttributeRequestDto requestDto) {
-		return new ResponseEntity<>(this.germplasmAttributeService.createGermplasmAttribute(gid, variableTypeId, requestDto, programUUID),
+		@PathVariable final Integer gid, @RequestBody final GermplasmAttributeRequestDto requestDto) {
+		return new ResponseEntity<>(this.germplasmAttributeService.createGermplasmAttribute(gid, requestDto, programUUID),
 			HttpStatus.OK);
 	}
 

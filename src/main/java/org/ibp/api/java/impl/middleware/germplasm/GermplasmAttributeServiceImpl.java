@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
@@ -10,7 +9,6 @@ import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,9 +41,6 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Autowired
 	private VariableValidator variableValidator;
 
-	@Autowired
-	private VariableService variableService;
-
 	@Override
 	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -55,13 +50,11 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final Integer variableTypeId,
-		final GermplasmAttributeRequestDto dto, final String programUUID) {
+	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto,
+		final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.attributeValidator.validateAttribute(errors, gid, dto, variableTypeId, null);
-		this.variableValidator.checkVariableExist(null, dto.getVariableId(), CvId.VARIABLES.getId(), errors);
+		this.attributeValidator.validateAttribute(errors, gid, dto, null);
 		this.locationValidator.validateLocation(errors, dto.getLocationId(), programUUID);
-
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		this.germplasmAttributeService.createGermplasmAttribute(gid, dto, loggedInUser.getUserid());
 		return dto;
@@ -70,10 +63,8 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Override
 	public GermplasmAttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId, final GermplasmAttributeRequestDto dto, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.attributeValidator.validateAttribute(errors, gid, dto, null, attributeId);
-		this.variableValidator.checkVariableExist(null, dto.getVariableId(), CvId.VARIABLES.getId(), errors);
+		this.attributeValidator.validateAttribute(errors, gid, dto, attributeId);
 		this.locationValidator.validateLocation(errors, dto.getLocationId(), programUUID);
-
 		this.germplasmAttributeService.updateGermplasmAttribute(attributeId, dto);
 		return dto;
 	}

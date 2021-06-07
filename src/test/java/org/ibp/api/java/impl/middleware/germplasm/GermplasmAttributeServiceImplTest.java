@@ -11,9 +11,7 @@ import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -21,7 +19,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 
 import java.util.Collections;
-import java.util.Set;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GermplasmAttributeServiceImplTest {
@@ -51,9 +48,6 @@ public class GermplasmAttributeServiceImplTest {
 	@Mock
 	private SecurityService securityService;
 
-	@Captor
-	private ArgumentCaptor<Set<String>> setArgumentCaptor;
-
 	@InjectMocks
 	private GermplasmAttributeServiceImpl germplasmAttributeServiceImpl;
 
@@ -75,10 +69,10 @@ public class GermplasmAttributeServiceImplTest {
 		final GermplasmAttributeRequestDto dto = this.createGermplasmAttributeRequestDto();
 		dto.setVariableId(VARIABLE_ID);
 		this.germplasmAttributeServiceImpl
-			.createGermplasmAttribute(GID, GERMPLASM_ATTRIBUTE_TYPE_ID, dto, GermplasmAttributeServiceImplTest.PROGRAM_UUID);
+			.createGermplasmAttribute(GID, dto, GermplasmAttributeServiceImplTest.PROGRAM_UUID);
 
 		Mockito.verify(this.attributeValidator).validateAttribute(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(GID),
-			ArgumentMatchers.eq(dto), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_TYPE_ID), Mockito.any());
+			ArgumentMatchers.eq(dto), Mockito.any());
 		Mockito.verify(this.locationValidator).validateLocation(ArgumentMatchers.any(BindingResult.class),
 			ArgumentMatchers.eq(dto.getLocationId()), Mockito.any());
 		Mockito.verify(this.securityService).getCurrentlyLoggedInUser();
@@ -92,7 +86,7 @@ public class GermplasmAttributeServiceImplTest {
 		this.germplasmAttributeServiceImpl.updateGermplasmAttribute(GID, GERMPLASM_ATTRIBUTE_ID, dto, GermplasmAttributeServiceImplTest.PROGRAM_UUID);
 
 		Mockito.verify(this.attributeValidator).validateAttribute(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(GID),
-			ArgumentMatchers.eq(dto), Mockito.any(), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
+			ArgumentMatchers.eq(dto), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
 		Mockito.verify(this.variableValidator)
 			.checkVariableExist(Mockito.any(), ArgumentMatchers.eq(dto.getVariableId()), ArgumentMatchers.eq(CvId.VARIABLES.getId()),
 				ArgumentMatchers.any(BindingResult.class));
