@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.common.validator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -93,9 +92,10 @@ public class GermplasmUpdateDtoValidator {
 		germplasmUpdateDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
 			.forEach(
 				g -> attributesCodes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
-		final Set<String> existingAttributesCodes =
-			this.germplasmAttributeService.filterGermplasmAttributes(attributesCodes, null).stream().map(AttributeDTO::getCode).collect(
-				Collectors.toSet());
+		final Set<String> existingAttributesCodes = null; //
+		// FIXME into IBP-4560 (using VariableService)
+		/*	this.germplasmAttributeService.filterGermplasmAttributes(attributesCodes, null).stream().map(AttributeDTO::getCode).collect(
+				Collectors.toSet());*/
 
 		if (!nameCodes.equals(existingNamesCodes)) {
 			errors.reject("germplasm.update.invalid.name.code", new String[] {

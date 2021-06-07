@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -244,20 +243,6 @@ public class AttributeValidatorTest {
 		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(GID,null))
 			.thenReturn(Collections.singletonList(germplasmAttributeDto));
 		this.attributeValidator.validateAttribute(this.errors, GID, germplasmAttributeRequestDto,null, ATTRIBUTE_ID);
-		Assert.assertFalse(this.errors.hasErrors());
-	}
-
-	@Test
-	@Ignore("Fix germplasmAttributeService.filterGermplasmAttributes ")
-	public void testValidateAttribute_ForNonExistentGermplasmAttributeScenario_WhenGermplasmAttributeIsValid() {
-		final GermplasmAttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
-		final AttributeDTO attributeDTO = new AttributeDTO();
-		attributeDTO.setCode(ATTRIBUTE_CODE);
-		/*Mockito.when(this.germplasmAttributeService.filterGermplasmAttributes(Collections.singleton(germplasmAttributeRequestDto.getName()),
-			VariableType.GERMPLASM_ATTRIBUTE.getId())).thenReturn(Collections.singletonList(attributeDTO));*/
-		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(GID, VariableType.GERMPLASM_ATTRIBUTE.getId()))
-			.thenReturn(Collections.emptyList());
-		this.attributeValidator.validateAttribute(this.errors, GID, germplasmAttributeRequestDto, null,null);
 		Assert.assertFalse(this.errors.hasErrors());
 	}
 

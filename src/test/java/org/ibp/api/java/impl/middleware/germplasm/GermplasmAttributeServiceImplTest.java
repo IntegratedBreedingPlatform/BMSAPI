@@ -1,17 +1,14 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -23,15 +20,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Random;
 import java.util.Set;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GermplasmAttributeServiceImplTest {
@@ -118,37 +108,6 @@ public class GermplasmAttributeServiceImplTest {
 		Mockito.verify(this.attributeValidator).validateGermplasmAttributeExists(ArgumentMatchers.any(BindingResult.class),
 			ArgumentMatchers.eq(GID), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
 		Mockito.verify(this.germplasmAttributeService).deleteGermplasmAttribute(ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
-	}
-
-	@Test
-	@Ignore
-	public void shouldFilterGermplasmAttributes() {
-		final Set<String> codes = Collections.singleton("NOTE");
-
-		final AttributeDTO attributeDTO = new AttributeDTO();
-		attributeDTO.setCode("NOTE");
-		attributeDTO.setId(new Random().nextInt());
-		attributeDTO.setName("NOTES");
-
-		Mockito.when(
-			this.germplasmAttributeService.filterGermplasmAttributes(ArgumentMatchers.eq(codes), ArgumentMatchers.anySet()))
-			.thenReturn(Arrays.asList(attributeDTO));
-
-		/*final List<AttributeDTO> germplasmListTypes = this.germplasmAttributeServiceImpl.filterGermplasmAttributes(codes, null);
-		assertNotNull(germplasmListTypes);
-		assertThat(germplasmListTypes, hasSize(1));
-		final AttributeDTO actualGermplasmListTypeDTO = germplasmListTypes.get(0);
-		assertThat(actualGermplasmListTypeDTO.getCode(), is(attributeDTO.getCode()));
-		assertThat(actualGermplasmListTypeDTO.getId(), is(attributeDTO.getId()));
-		assertThat(actualGermplasmListTypeDTO.getName(), is(attributeDTO.getName()));*/
-
-		Mockito.verify(this.germplasmAttributeService)
-			.filterGermplasmAttributes(ArgumentMatchers.eq(codes), this.setArgumentCaptor.capture());
-		final Set<String> actualTypes = this.setArgumentCaptor.getValue();
-		assertNotNull(actualTypes);
-		assertThat(actualTypes, hasSize(2));
-		assertThat(actualTypes, contains(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()));
-		Mockito.verifyNoMoreInteractions(this.germplasmAttributeService);
 	}
 
 	public GermplasmAttributeRequestDto createGermplasmAttributeRequestDto() {

@@ -3,10 +3,8 @@ package org.ibp.api.rest.germplasm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
-import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.Set;
 
 @Api(value = "Germplasm Attribute Services")
 @Controller
@@ -29,19 +26,6 @@ public class GermplasmAttributeResource {
 
 	@Autowired
 	private GermplasmAttributeService germplasmAttributeService;
-
-	@Deprecated
-	@ApiOperation(value = "Returns germplasm attributes filtered by a list of codes and attibute type", notes = "Returns germplasm attributes filtered by a list of codes and attibute type")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<AttributeDTO>> getGermplasmAttributes(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final Set<String> codes,
-		@RequestParam(required = false) final String type) {
-		//We have discussed many times in the week that this service will no longer be needed, we need to either find a service in VariableResource or VariableFiler or implement a new one
-		//that satisfies our need of filtering by a list of names
-		return new ResponseEntity<>(this.germplasmAttributeService.filterGermplasmAttributes(codes, type), HttpStatus.OK);
-	}
 
 	@ApiOperation(value = "Returns germplasm attributes filtered by gid and attribute type", notes = "Returns germplasm attributes by gid and attribute type")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes", method = RequestMethod.GET)
