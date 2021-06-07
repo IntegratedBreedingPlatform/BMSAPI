@@ -39,6 +39,9 @@ public class AttributeValidator {
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
+	@Autowired
+	private VariableValueValidator variableValueValidator;
+
 	public void validateAttributeType(final BindingResult errors, final Integer attributeType) {
 		if (!AttributeValidator.ALLOWED_ATTRIBUTE_TYPES_IDS.contains(attributeType)) {
 			errors.reject("attribute.variable.type.invalid", "");
@@ -60,8 +63,7 @@ public class AttributeValidator {
 		}
 	}
 
-	public void validateAttributeVariable(final BindingResult errors, final Integer variableId) {
-		final Variable variable = this.ontologyVariableDataManager.getVariable(null, variableId, false);
+	public void validateAttributeVariable(final BindingResult errors, final Variable variable) {
 		if (variable == null) {
 			errors.reject("attribute.variable.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -72,8 +74,15 @@ public class AttributeValidator {
 		}
 	}
 
+	public void validateVariableDataTypeValue(final BindingResult errors, final Variable variable, final String value) {
+		if (!variableValueValidator.isValidAttributeValue(variable, value)) {
+			errors.reject("invalid.variable.value", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
 	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto) {
-		//FIXME Implement new service to get by gid and variable
+		//TODO Implement new service to get by gid and variable
 		final List<GermplasmAttributeDto> germplasmAttributeDtos =
 			this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null);
 		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
@@ -97,7 +106,7 @@ public class AttributeValidator {
 
 	void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
 		final Integer attributeId) {
-		//FIXME Get by attribute id
+		//TODO Implement new service to get by attribute id
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null);
 
 		// Filter by germplasm attribute id
@@ -120,14 +129,16 @@ public class AttributeValidator {
 	public void validateAttribute(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
 		final Integer attributeId) {
 		BaseValidator.checkNotNull(dto, "param.null", new String[] {"request body"});
+		BaseValidator.checkNotNull(dto.getVariableId(), "param.null", new String[] {"variableId"});
+		final Variable variable = this.ontologyVariableDataManager.getVariable(null, dto.getVariableId(), false);
 		if(attributeId == null) {
-			BaseValidator.checkNotNull(dto.getVariableId(), "param.null", new String[] {"variableId"});
-			this.validateAttributeVariable(errors, dto.getVariableId());
+			this.validateAttributeVariable(errors, variable);
 			this.validateGermplasmAttributeShouldNotExist(errors, gid, dto);
 		} else {
 			this.validateGermplasmAttributeForUpdate(errors, gid, dto, attributeId);
 		}
 		this.validateGermplasmAttributeValue(errors, dto.getValue());
+		this.validateVariableDataTypeValue(errors, variable, dto.getValue());
 		this.validateGermplasmAttributeDate(errors, dto.getDate());
 	}
 
@@ -143,7 +154,6 @@ public class AttributeValidator {
 			errors.reject("attribute.date.invalid.format", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-
 	}
 
 	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
