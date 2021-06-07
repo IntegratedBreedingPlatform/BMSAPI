@@ -2,12 +2,10 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,9 +39,6 @@ public class GermplasmAttributeServiceImplTest {
 
 	@Mock
 	private LocationValidator locationValidator;
-
-	@Mock
-	private VariableValidator variableValidator;
 
 	@Mock
 	private SecurityService securityService;
@@ -87,9 +82,6 @@ public class GermplasmAttributeServiceImplTest {
 
 		Mockito.verify(this.attributeValidator).validateAttribute(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(GID),
 			ArgumentMatchers.eq(dto), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
-		Mockito.verify(this.variableValidator)
-			.checkVariableExist(Mockito.any(), ArgumentMatchers.eq(dto.getVariableId()), ArgumentMatchers.eq(CvId.VARIABLES.getId()),
-				ArgumentMatchers.any(BindingResult.class));
 		Mockito.verify(this.locationValidator).validateLocation(ArgumentMatchers.any(BindingResult.class),
 			ArgumentMatchers.eq(dto.getLocationId()), Mockito.any());
 		Mockito.verify(this.germplasmAttributeService).updateGermplasmAttribute(ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID),
@@ -106,9 +98,6 @@ public class GermplasmAttributeServiceImplTest {
 
 	public GermplasmAttributeRequestDto createGermplasmAttributeRequestDto() {
 		final GermplasmAttributeRequestDto germplasmAttributeRequestDto = new GermplasmAttributeRequestDto();
-
-		//germplasmAttributeRequestDto.setAttributeType(GERMPLASM_ATTRIBUTE_TYPE_ID);
-
 		germplasmAttributeRequestDto.setLocationId(0);
 		return germplasmAttributeRequestDto;
 	}
