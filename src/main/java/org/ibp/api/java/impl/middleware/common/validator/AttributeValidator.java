@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
@@ -131,6 +130,7 @@ public class AttributeValidator {
 		final Integer attributeId) {
 		BaseValidator.checkNotNull(dto, "param.null", new String[] {"request body"});
 		BaseValidator.checkNotNull(dto.getVariableId(), "param.null", new String[] {"variableId"});
+		BaseValidator.checkNotEmpty(dto.getValue(), "param.null", new String[] {"value"});
 		final Variable variable = this.ontologyVariableDataManager.getVariable(null, dto.getVariableId(), false);
 		if(attributeId == null) {
 			this.validateAttributeVariable(errors, variable);
@@ -144,10 +144,6 @@ public class AttributeValidator {
 	}
 
 	void validateGermplasmAttributeValue(final BindingResult errors, final String value) {
-		if (StringUtils.isEmpty(value)) {
-			errors.reject("attribute.value.mandatory", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
 		if (value.length() > GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH) {
 			errors.reject("attribute.value.invalid.length", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
