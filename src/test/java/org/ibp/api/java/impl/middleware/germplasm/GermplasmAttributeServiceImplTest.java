@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -23,7 +24,7 @@ public class GermplasmAttributeServiceImplTest {
 
 	private static final Integer GID = 1;
 	private static final Integer GERMPLASM_ATTRIBUTE_ID = 1;
-	private static final Integer GERMPLASM_ATTRIBUTE_TYPE_ID = 1813;
+	private static final Integer GERMPLASM_ATTRIBUTE_TYPE_ID = VariableType.GERMPLASM_ATTRIBUTE.getId();
 	private static final Integer VARIABLE_ID = 101010;
 
 	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphanumeric(15);
@@ -65,7 +66,6 @@ public class GermplasmAttributeServiceImplTest {
 		dto.setVariableId(VARIABLE_ID);
 		this.germplasmAttributeServiceImpl
 			.createGermplasmAttribute(GID, dto, GermplasmAttributeServiceImplTest.PROGRAM_UUID);
-
 		Mockito.verify(this.attributeValidator).validateAttribute(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(GID),
 			ArgumentMatchers.eq(dto), Mockito.any());
 		Mockito.verify(this.locationValidator).validateLocation(ArgumentMatchers.any(BindingResult.class),
@@ -79,7 +79,6 @@ public class GermplasmAttributeServiceImplTest {
 	public void testUpdateGermplasmAttribute() {
 		final GermplasmAttributeRequestDto dto = this.createGermplasmAttributeRequestDto();
 		this.germplasmAttributeServiceImpl.updateGermplasmAttribute(GID, GERMPLASM_ATTRIBUTE_ID, dto, GermplasmAttributeServiceImplTest.PROGRAM_UUID);
-
 		Mockito.verify(this.attributeValidator).validateAttribute(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(GID),
 			ArgumentMatchers.eq(dto), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
 		Mockito.verify(this.locationValidator).validateLocation(ArgumentMatchers.any(BindingResult.class),
