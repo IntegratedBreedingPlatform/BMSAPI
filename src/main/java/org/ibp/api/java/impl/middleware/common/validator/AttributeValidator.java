@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
@@ -143,7 +144,11 @@ public class AttributeValidator {
 	}
 
 	void validateGermplasmAttributeValue(final BindingResult errors, final String value) {
-		if (value != null && value.length() > GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH) {
+		if (StringUtils.isEmpty(value)) {
+			errors.reject("attribute.value.mandatory", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		if (value.length() > GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH) {
 			errors.reject("attribute.value.invalid.length", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
