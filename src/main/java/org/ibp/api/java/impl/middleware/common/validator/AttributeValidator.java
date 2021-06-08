@@ -157,8 +157,4 @@ public class AttributeValidator {
 		}
 	}
 
-	public void setOntologyVariableDataManager(
-		final OntologyVariableDataManager ontologyVariableDataManager) {
-		this.ontologyVariableDataManager = ontologyVariableDataManager;
-	}
 }
