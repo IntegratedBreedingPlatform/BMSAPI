@@ -3,11 +3,9 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
@@ -41,9 +39,6 @@ public class GermplasmAttributeServiceImplTest {
 	@Mock
 	private LocationValidator locationValidator;
 
-	@Mock
-	private SecurityService securityService;
-
 	@InjectMocks
 	private GermplasmAttributeServiceImpl germplasmAttributeServiceImpl;
 
@@ -59,9 +54,6 @@ public class GermplasmAttributeServiceImplTest {
 
 	@Test
 	public void testCreateGermplasmAttribute() {
-		final WorkbenchUser workbenchUser = new WorkbenchUser();
-		workbenchUser.setUserid(1);
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(workbenchUser);
 		final GermplasmAttributeRequestDto dto = this.createGermplasmAttributeRequestDto();
 		dto.setVariableId(VARIABLE_ID);
 		this.germplasmAttributeServiceImpl
@@ -70,9 +62,8 @@ public class GermplasmAttributeServiceImplTest {
 			ArgumentMatchers.eq(dto), Mockito.any());
 		Mockito.verify(this.locationValidator).validateLocation(ArgumentMatchers.any(BindingResult.class),
 			ArgumentMatchers.eq(dto.getLocationId()), Mockito.any());
-		Mockito.verify(this.securityService).getCurrentlyLoggedInUser();
 		Mockito.verify(this.germplasmAttributeService).createGermplasmAttribute(ArgumentMatchers.eq(GID),
-			ArgumentMatchers.eq(dto), ArgumentMatchers.eq(workbenchUser.getUserid()));
+			ArgumentMatchers.eq(dto));
 	}
 
 	@Test
