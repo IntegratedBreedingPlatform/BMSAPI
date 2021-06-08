@@ -67,6 +67,22 @@ public class AttributeValidatorTest {
 	}
 
 	@Test
+	public void testValidateAttributeType_ValidAttributeTypeValue() {
+		this.attributeValidator.validateAttributeType(this.errors, VariableType.GERMPLASM_ATTRIBUTE.getId());
+		Assert.assertFalse(this.errors.hasErrors());
+	}
+
+	@Test
+	public void testValidateAttributeType_ThrowsException_WhenAttributeTypeValueIsInvalid() {
+		try {
+			this.attributeValidator.validateAttributeType(this.errors, VariableType.TRAIT.getId());
+			Assert.fail("should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertEquals("attribute.variable.type.invalid", this.errors.getAllErrors().get(0).getCode());
+		}
+	}
+
+	@Test
 	public void testValidateAttributeId_WhenAttributeIdIsInvalid() throws MiddlewareQueryException {
 		final Integer attributeById = Integer.valueOf(RandomStringUtils.randomNumeric(1));
 
@@ -90,22 +106,6 @@ public class AttributeValidatorTest {
 		this.attributeValidator.validateAttributeIds(bindingResult, Lists.newArrayList(String.valueOf(attributeById)));
 
 		Assert.assertFalse(bindingResult.hasErrors());
-	}
-
-	@Test
-	public void testValidateAttributeType_ValidAttributeTypeValue() {
-		this.attributeValidator.validateAttributeType(this.errors, VariableType.GERMPLASM_ATTRIBUTE.getId());
-		Assert.assertFalse(this.errors.hasErrors());
-	}
-
-	@Test
-	public void testValidateAttributeType_ThrowsException_WhenAttributeTypeValueIsInvalid() {
-		try{
-			this.attributeValidator.validateAttributeType(this.errors, 1815);
-			Assert.fail("should throw an exception");
-		} catch (final ApiRequestValidationException e) {
-			Assert.assertEquals("attribute.variable.type.invalid", this.errors.getAllErrors().get(0).getCode());
-		}
 	}
 
 	@Test
@@ -286,6 +286,17 @@ public class AttributeValidatorTest {
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.variable.type.invalid", this.errors.getAllErrors().get(0).getCode());
 		}
+	}
+
+	@Test
+	public void testValidateVariableDataTypeValue_ThrowsException_WhenValueIsInvalid() {
+		try {
+			Mockito.doReturn(true).when(this.variableValueValidator).isValidAttributeValue(Mockito.any(), Mockito.any());
+			this.attributeValidator.validateVariableDataTypeValue(this.errors, new Variable(), RandomStringUtils.randomAlphabetic(20));
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertEquals("attribute.variable.type.invalid", this.errors.getAllErrors().get(0).getCode());
+		}
+
 	}
 
 	private GermplasmAttributeRequestDto createGermplasmAttributeRequestDto() {
