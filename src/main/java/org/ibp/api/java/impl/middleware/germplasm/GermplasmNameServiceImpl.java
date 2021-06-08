@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -64,7 +65,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public Map<Integer, GermplasmGroupNamingResult> createNames(final String programUUID,
+	public List<GermplasmGroupNamingResult> createNames(final String programUUID,
 		final GermplasmNameBatchRequestDto germplasmNameBatchRequestDto) {
 		try {
 			return this.germplasmCodeGenerationService.createCodeNames(germplasmNameBatchRequestDto);

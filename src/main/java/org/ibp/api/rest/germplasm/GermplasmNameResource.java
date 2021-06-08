@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Map;
+import java.util.List;
 
 @Api(value = "Germplasm name Services")
 @Controller
@@ -42,7 +42,7 @@ public class GermplasmNameResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_NAMES')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/names", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Map<Integer, GermplasmGroupNamingResult>> createGermplasmNames(@PathVariable final String cropName,
+	public ResponseEntity<List<GermplasmGroupNamingResult>> createGermplasmNames(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmNameBatchRequestDto germplasmNameBatchRequestDto) {
 		return new ResponseEntity<>(this.germplasmNameService.createNames(programUUID, germplasmNameBatchRequestDto), HttpStatus.OK);
