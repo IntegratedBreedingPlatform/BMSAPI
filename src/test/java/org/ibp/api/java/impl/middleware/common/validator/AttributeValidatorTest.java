@@ -12,16 +12,19 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.util.VariableValueUtil;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -29,6 +32,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(VariableValueUtil.class)
 public class AttributeValidatorTest {
 
 	private static final String VARIABLE_NAME = "STAT_ACC";
@@ -184,6 +192,7 @@ public class AttributeValidatorTest {
 			Assert.assertEquals("attribute.id.invalid.not.existing", errors.getAllErrors().get(0).getCode());
 		}
 	}
+
 	@Test
 	public void testValidateGermplasmAttribute_ThrowsException_WhenAttributeCodeIsInvalid() {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
@@ -205,8 +214,6 @@ public class AttributeValidatorTest {
 	}
 
 	@Test
-	@Ignore
-	//FIXME Try to mock a static method with our current version of mockito is not possible
 	public void testValidateAttribute_ForUpdateScenario_WhenGermplasmAttributeIsValid() {
 
 		//Validate for update success
@@ -226,8 +233,10 @@ public class AttributeValidatorTest {
 		variable.addVariableType(VariableType.GERMPLASM_PASSPORT);
 
 		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(null, VARIABLE_ID, false);
-		//		utilities.when(() -> VariableValueUtil.isValidAttributeValue(Mockito.any(), Mockito.any()))
-		//			.thenReturn(true);
+
+		mockStatic(VariableValueUtil.class);
+
+		when(VariableValueUtil.isValidAttributeValue(Mockito.any(), Mockito.any())).thenReturn(true);
 
 		this.attributeValidator.validateAttribute(this.errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
 		Assert.assertFalse(this.errors.hasErrors());
@@ -290,15 +299,13 @@ public class AttributeValidatorTest {
 	}
 
 	@Test
-	@Ignore
-	//FIXME Try to mock a static method with our current version of mockito is not possible
 	public void testValidateVariableDataTypeValue_ThrowsException_WhenValueIsInvalid() {
 		try {
-			//			utilities.when(() -> VariableValueUtil.isValidAttributeValue(Mockito.any(), Mockito.any()))
-			//				.thenReturn(false);
+			mockStatic(VariableValueUtil.class);
+			when(VariableValueUtil.isValidAttributeValue(Mockito.any(), Mockito.any())).thenReturn(false);
 			this.attributeValidator.validateVariableDataTypeValue(this.errors, new Variable(), RandomStringUtils.randomAlphabetic(20));
 		} catch (final ApiRequestValidationException e) {
-			Assert.assertEquals("attribute.variable.type.invalid", this.errors.getAllErrors().get(0).getCode());
+			Assert.assertEquals("invalid.variable.value", this.errors.getAllErrors().get(0).getCode());
 		}
 
 	}
