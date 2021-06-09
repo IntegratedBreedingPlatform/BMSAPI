@@ -17,9 +17,13 @@ import java.util.List;
 @Component
 public class GermplasmCodeNameBatchRequestValidator {
 
+	protected static final String CODE_1 = "CODE1";
+	protected static final String CODE_2 = "CODE2";
+	protected static final String CODE_3 = "CODE3";
+
 	private BindingResult errors;
 
-	private final List<String> validNameTypes = Arrays.asList("CODE1", "CODE2", "CODE3");
+	private final List<String> validNameTypes = Arrays.asList(CODE_1, CODE_2, CODE_3);
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
@@ -29,7 +33,9 @@ public class GermplasmCodeNameBatchRequestValidator {
 		this.germplasmValidator.validateGids(this.errors, germplasmCodeNameBatchRequestDto.getGids());
 		this.validateNameType(germplasmCodeNameBatchRequestDto.getNameType());
 		this.validateGermplasmNameSetting(germplasmCodeNameBatchRequestDto.getGermplasmCodeNameSetting());
-		throw new ApiRequestValidationException(this.errors.getAllErrors());
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	private void validateGermplasmNameSetting(final GermplasmNameSetting germplasmNameSetting) {
@@ -39,7 +45,7 @@ public class GermplasmCodeNameBatchRequestValidator {
 			} else if (germplasmNameSetting.getPrefix().length() > 49) {
 				this.errors.reject("germplasm.code.name.prefix.max.length.exceeded");
 			}
-			if (StringUtils.isNotEmpty(germplasmNameSetting.getPrefix()) && germplasmNameSetting.getSuffix().length() > 49) {
+			if (StringUtils.isNotEmpty(germplasmNameSetting.getSuffix()) && germplasmNameSetting.getSuffix().length() > 49) {
 				this.errors.reject("germplasm.code.name.suffix.max.length.exceeded");
 			}
 		}
