@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.commons.service.GermplasmCodeGenerationService;
-import org.generationcp.middleware.domain.germplasm.GermplasmNameBatchRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
@@ -18,7 +18,6 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional
@@ -65,10 +64,10 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public List<GermplasmGroupNamingResult> createNames(final String programUUID,
-		final GermplasmNameBatchRequestDto germplasmNameBatchRequestDto) {
+	public List<GermplasmGroupNamingResult> createCodeNames(final String programUUID,
+		final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
 		try {
-			return this.germplasmCodeGenerationService.createCodeNames(germplasmNameBatchRequestDto);
+			return this.germplasmCodeGenerationService.createCodeNames(germplasmCodeNameBatchRequestDto);
 		} catch (final Exception e) {
 			throw new ApiRuntimeException("An error has occurred when trying generate code names", e);
 		}

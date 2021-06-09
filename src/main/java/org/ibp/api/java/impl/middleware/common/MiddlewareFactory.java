@@ -684,7 +684,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmCodeGenerationService getGermplasmCodeGenerationService() {
-		return new GermplasmCodeGenerationServiceImpl();
+		return new GermplasmCodeGenerationServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
