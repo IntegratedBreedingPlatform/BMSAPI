@@ -8,6 +8,7 @@ import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmCodeNameBatchRequestValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameRequestValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 	@Autowired
 	private GermplasmNameRequestValidator germplasmNameRequestValidator;
+
+	@Autowired
+	private GermplasmCodeNameBatchRequestValidator germplasmCodeNameBatchRequestValidator;
 
 	@Autowired
 	private LocationValidator locationValidator;
@@ -66,6 +70,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public List<GermplasmGroupNamingResult> createCodeNames(final String programUUID,
 		final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
+		this.germplasmCodeNameBatchRequestValidator.validate(germplasmCodeNameBatchRequestDto);
 		try {
 			return this.germplasmCodeGenerationService.createCodeNames(germplasmCodeNameBatchRequestDto);
 		} catch (final Exception e) {
