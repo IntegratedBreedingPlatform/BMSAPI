@@ -238,12 +238,12 @@ public class StudyServiceImpl implements StudyService {
 		}
 		if (!CollectionUtils.isEmpty(studyImportRequestDTOS)) {
 
-			/*final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-			final List<StudySummary> studySummaries = this.middlewareStudyService.saveStudies(cropName, studyImportRequestDTOS, user.getUserid());
-			if (!CollectionUtils.isEmpty(studySummaries)) {
-				noOfCreatedStudies = studySummaries.size();
+			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+			final List<StudyInstanceDto> instances = this.middlewareStudyService.saveStudyInstances(cropName, studyImportRequestDTOS, user.getUserid());
+			if (!CollectionUtils.isEmpty(instances)) {
+				noOfCreatedStudies = instances.size();
 			}
-			response.setStudySummaries(studySummaries);*/
+			response.setStudyInstanceDtos(instances);
 		}
 		response.setStatus(noOfCreatedStudies + " out of " + originalListSize + " studies created successfully.");
 		return response;
