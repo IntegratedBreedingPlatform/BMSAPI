@@ -201,7 +201,7 @@ public class StudyResourceBrapi {
 
 	@ApiOperation(value = "Create new Studies", notes = "Create new Studies.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
-	@RequestMapping(value = "/{crop}/brapi/v2/trials", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/brapi/v2/studies", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<StudyInstanceDto>> createStudy(@PathVariable final String crop,
