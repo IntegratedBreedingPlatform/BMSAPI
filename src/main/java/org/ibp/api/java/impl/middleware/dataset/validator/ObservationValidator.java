@@ -6,9 +6,9 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.util.VariableValueUtil;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
-import org.ibp.api.java.impl.middleware.common.validator.VariableValueValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -24,9 +24,6 @@ public class ObservationValidator {
 
 	@Autowired
 	protected OntologyVariableDataManager ontologyVariableDataManager;
-
-	@Autowired
-	protected VariableValueValidator variableValueValidator;
 
 	private BindingResult errors;
 
@@ -65,7 +62,7 @@ public class ObservationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		final Variable var = this.ontologyVariableDataManager.getVariable(ContextHolder.getCurrentProgram(), variableId, true);
 
-		if (!variableValueValidator.isValidObservationValue(var, value)) {
+		if (!VariableValueUtil.isValidObservationValue(var, value)) {
 			this.errors.reject("invalid.variable.value");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}

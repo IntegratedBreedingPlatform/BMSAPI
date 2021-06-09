@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.util.VariableValueUtil;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,9 +39,6 @@ public class AttributeValidator {
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
-
-	@Autowired
-	private VariableValueValidator variableValueValidator;
 
 	public void validateAttributeType(final BindingResult errors, final Integer attributeType) {
 		if (!AttributeValidator.ALLOWED_ATTRIBUTE_TYPES_IDS.contains(attributeType)) {
@@ -75,7 +73,7 @@ public class AttributeValidator {
 	}
 
 	public void validateVariableDataTypeValue(final BindingResult errors, final Variable variable, final String value) {
-		if (!variableValueValidator.isValidAttributeValue(variable, value)) {
+		if (!VariableValueUtil.isValidAttributeValue(variable, value)) {
 			errors.reject("invalid.variable.value", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
