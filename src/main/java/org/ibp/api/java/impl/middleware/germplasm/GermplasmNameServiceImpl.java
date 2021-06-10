@@ -68,8 +68,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public List<GermplasmGroupNamingResult> createCodeNames(final String programUUID,
-		final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
+	public List<GermplasmGroupNamingResult> createCodeNames(final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
 		this.germplasmCodeNameBatchRequestValidator.validate(germplasmCodeNameBatchRequestDto);
 		try {
 			return this.germplasmCodeGenerationService.createCodeNames(germplasmCodeNameBatchRequestDto);

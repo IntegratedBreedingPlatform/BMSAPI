@@ -39,21 +39,19 @@ public class GermplasmNameResource {
 	}
 
 	@ApiOperation(value = "Create code name (CODE1, CODE2, CODE2) for specified list of germplasm")
-	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_NAMES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'CODE_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/coding", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmGroupNamingResult>> createGermplasmCodeNames(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
-		return new ResponseEntity<>(this.germplasmNameService.createCodeNames(programUUID, germplasmCodeNameBatchRequestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmNameService.createCodeNames(germplasmCodeNameBatchRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get next code name sequence based on the specified name settings")
-	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_NAMES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'CODE_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/coding/sequence", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<String> getNextSequence(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmNameSetting germplasmNameSetting) {
 		return new ResponseEntity<>(this.germplasmNameService.getNextNameInSequence(germplasmNameSetting), HttpStatus.OK);
 	}

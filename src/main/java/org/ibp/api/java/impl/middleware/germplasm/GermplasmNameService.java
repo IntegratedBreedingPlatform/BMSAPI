@@ -15,7 +15,7 @@ public interface GermplasmNameService {
 
 	public Integer createName(String programUUID, GermplasmNameRequestDto germplasmNameRequestDto, Integer gid);
 
-	public List<GermplasmGroupNamingResult> createCodeNames(String programUUID, GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto);
+	public List<GermplasmGroupNamingResult> createCodeNames(GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto);
 
 	public String getNextNameInSequence(GermplasmNameSetting germplasmNameSetting);
 }
