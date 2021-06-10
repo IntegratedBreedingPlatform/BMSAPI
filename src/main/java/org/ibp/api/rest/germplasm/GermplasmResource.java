@@ -59,7 +59,8 @@ import java.util.Set;
 
 @Api(value = "Germplasm Services")
 @Controller
-public class GermplasmResource {
+public class GermplasmResource implements GermplasmAPI
+{
 
 	private static final String HAS_GERMPLASM_SEARCH = " or hasAnyAuthority('STUDIES'"
 		+ ", 'MANAGE_STUDIES'"
@@ -328,13 +329,14 @@ public class GermplasmResource {
 	 *
 	 * @return {@link GermplasmDto}
 	 */
+	@Override
 	@ApiOperation(value = "Returns a germplasm by a given germplasm id")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<GermplasmDto> getGermplasmDtoById(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
-		@RequestParam(required = false) final String programUUID) {
+		@RequestParam(required = false) final String programUUID, final String token) {
 		return new ResponseEntity<>(this.germplasmService.getGermplasmDtoById(gid), HttpStatus.OK);
 	}
 

@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -40,6 +41,7 @@ import javax.annotation.PostConstruct;
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
 @EnableSwagger2
 @Configuration
+@EnableAspectJAutoProxy(proxyTargetClass=true)
 public class Main extends WebMvcConfigurerAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
