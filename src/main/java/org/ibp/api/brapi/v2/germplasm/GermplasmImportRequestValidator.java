@@ -258,10 +258,7 @@ public class GermplasmImportRequestValidator {
 				return true;
 			}
 			if (attributes.values().stream().anyMatch(n -> {
-				if (StringUtils.isEmpty(n)) {
-					return true;
-				}
-				if (attributeExceedsLength(n)) {
+				if (StringUtils.isNotEmpty(n) && attributeExceedsLength(n)) {
 					return true;
 				}
 				return false;
