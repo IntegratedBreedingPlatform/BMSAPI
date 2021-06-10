@@ -548,11 +548,7 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 			if (attributes.values().stream().anyMatch(n -> {
-				if (StringUtils.isEmpty(n)) {
-					this.errors.reject("germplasm.import.attribute.value.null.empty", "");
-					return true;
-				}
-				if (n.length() > ATTRIBUTE_MAX_LENGTH) {
+				if (StringUtils.isNotEmpty(n) && n.length() > ATTRIBUTE_MAX_LENGTH) {
 					this.errors.reject("germplasm.import.attribute.value.invalid.length", "");
 					return true;
 				}

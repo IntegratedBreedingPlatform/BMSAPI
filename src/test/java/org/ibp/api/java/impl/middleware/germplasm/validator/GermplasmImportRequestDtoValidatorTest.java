@@ -509,24 +509,6 @@ public class GermplasmImportRequestDtoValidatorTest {
 	}
 
 	@Test
-	public void testValidateBeforeSaving_ThrowsException_WhenAnAttributeValueIsNull() {
-		try {
-			final Map<String, String> names = new HashMap<>();
-			names.put("LNAME", "MYNAME");
-			final Map<String, String> attributes = new HashMap<>();
-			attributes.put("NOTE", null);
-			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-			germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GID);
-			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
-				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, attributes,
-				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.attribute.value.null.empty"));
-		}
-	}
-
-	@Test
 	public void testValidateBeforeSaving_ThrowsException_WhenAnAttributeValueIsInvalid() {
 		try {
 			final Map<String, String> names = new HashMap<>();
@@ -921,21 +903,6 @@ public class GermplasmImportRequestDtoValidatorTest {
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("germplasm.import.duplicated.attributes"));
-		}
-	}
-
-	@Test
-	public void testValidateImportLoadedData_ThrowsException_WhenAttributeValueIsEmpty() {
-		try {
-			final GermplasmInventoryImportDTO germplasmInventoryImportDTO = new GermplasmInventoryImportDTO();
-			final Map<String, String> attributes = new HashMap<>();
-			attributes.put("note", "");
-			germplasmInventoryImportDTO.setAttributes(attributes);
-			this.germplasmImportRequestDtoValidator
-				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("germplasm.import.attribute.value.null.empty"));
 		}
 	}
 
