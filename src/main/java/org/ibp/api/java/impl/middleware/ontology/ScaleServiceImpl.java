@@ -133,7 +133,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 			final List<Integer> variablesIds = this.getVariablesIds(relationships);
 
-			editable = !this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
+			editable = !this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds) && !this.ontologyVariableDataManager.areVariablesUsedInAttributes(variablesIds);
 
 			// If scale is categorical, determine which categories could be edited (ie. those not used in existing studies)
 			if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId()) && !editable) {
