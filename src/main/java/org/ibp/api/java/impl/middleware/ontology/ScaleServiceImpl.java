@@ -137,8 +137,8 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 			// If scale is categorical, determine which categories could be edited (ie. those not used in existing studies)
 			if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId()) && !editable) {
-				final List<String> categories = this.termDataManager.getCategoriesUsedInStudies(scaleId);
-				
+				final List<String> categories = this.termDataManager.getCategoriesInUse(scaleId);
+
 				for (final Category category : scaleDetails.getValidValues().getCategories()) {
 					if (categories.contains(category.getName())) {
 						category.setEditable(Boolean.FALSE);
