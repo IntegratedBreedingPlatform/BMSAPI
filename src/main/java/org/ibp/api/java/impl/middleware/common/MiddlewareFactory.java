@@ -105,10 +105,12 @@ import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.generationcp.middleware.service.api.job.JobService;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
+import org.generationcp.middleware.service.impl.job.JobServiceImpl;
 import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
@@ -677,6 +679,12 @@ public class MiddlewareFactory {
 	@DependsOn("WORKBENCH_SessionFactory")
 	public ReleaseNoteService getReleaseNoteService() {
 		return new ReleaseNoteServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@DependsOn("WORKBENCH_SessionFactory")
+	public JobService getJobService() {
+		return new JobServiceImpl(this.getWorkbenchSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

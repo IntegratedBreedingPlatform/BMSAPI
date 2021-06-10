@@ -23,7 +23,13 @@ public class AuditReportJob implements Job {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void execute(JobExecutionContext context) {
-        JobDataMap dataMap = context.getTrigger().getJobDataMap();
+        JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         final ResponseEntity<GermplasmDto> germplasmDtoById = this.germplasmRestClient.getGermplasmDtoById(dataMap.getString("cropName"),
             dataMap.getInt("gid"),

@@ -36,6 +36,12 @@ public class QuartzConfig {
 	@Autowired
 	private ApplicationContext applicationContext;
 
+	@Autowired
+	private CustomJobListener customJobListener;
+
+	@Autowired
+	private CustomTriggerListener customTriggerListener;
+
 	@Bean
 	public SpringBeanJobFactory springBeanJobFactory() {
 		AutoWiringSpringBeanJobFactory jobFactory = new AutoWiringSpringBeanJobFactory();
@@ -48,8 +54,11 @@ public class QuartzConfig {
 		final Properties properties = this.getProperties();
 		final StdSchedulerFactory schedulerFactory = new StdSchedulerFactory(properties);
 		schedulerFactory.initialize();
+
 		final Scheduler scheduler = schedulerFactory.getScheduler();
 		scheduler.setJobFactory(springBeanJobFactory());
+		scheduler.getListenerManager().addJobListener(customJobListener);
+		scheduler.getListenerManager().addTriggerListener(customTriggerListener);
 		return scheduler;
 	}
 

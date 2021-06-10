@@ -1,9 +1,11 @@
 package org.ibp.api.rest.audit;
 
+import org.ibp.api.java.job.JobService;
 import org.ibp.api.quartz.ScheduleJobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,10 +21,13 @@ public class AuditResource {
 	@Autowired
 	private ScheduleJobBuilder scheduleJobBuilder;
 
+	@Autowired
+	private JobService jobService;
+
 	@RequestMapping(
 		value = "/crops/{cropName}/audit/report",
 		method = RequestMethod.GET)
-	public ResponseEntity<Void> getReport(final HttpServletRequest request,
+	public ResponseEntity<String> getReport(final HttpServletRequest request,
 		@PathVariable final String cropName,
 		@RequestParam final String programUUID,
 		@RequestParam final Integer gid) throws SchedulerException {
@@ -33,8 +38,8 @@ public class AuditResource {
 		jobDataMap.put("token", request.getHeader("X-Auth-Token"));
 		jobDataMap.put("gid", gid);
 
-		this.scheduleJobBuilder.buildAuditReportJob(jobDataMap);
-		return null;
+		final String quartzJobId = this.scheduleJobBuilder.buildAuditReportJob(jobDataMap);
+		return new ResponseEntity<>(this.jobService.create(quartzJobId), HttpStatus.OK);
 	}
 
 }
