@@ -131,7 +131,7 @@ public class ScaleServiceImplTest {
 		// Only 3 out of 5 valid values are being used in non-deleted studies
 		final List<String> usedCategories = Arrays.asList("1", "2", "3");
 		Mockito.doReturn(usedCategories).when(this.termDataManager)
-				.getCategoriesUsedInStudies(ScaleServiceImplTest.CATEGORICAL_SCALE);
+				.getCategoriesInUse(ScaleServiceImplTest.CATEGORICAL_SCALE);
 
 		// Method to test
 		final ScaleDetails scaleDetails = this.scaleServiceImpl.getScaleById(ScaleServiceImplTest.CATEGORICAL_SCALE.toString());
