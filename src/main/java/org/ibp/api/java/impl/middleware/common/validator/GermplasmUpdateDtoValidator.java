@@ -119,7 +119,7 @@ public class GermplasmUpdateDtoValidator {
 			}
 		);
 
-		if (!nameCodes.equals(existingNamesCodes)) {
+		if (!nameCodes.isEmpty() && !nameCodes.equals(existingNamesCodes)) {
 			errors.reject("germplasm.update.invalid.name.code", new String[] {
 				String.join(",", nameCodes.stream().filter((name) -> !existingNamesCodes.contains(name)).collect(
 					Collectors.toList()))}, "");
@@ -137,8 +137,10 @@ public class GermplasmUpdateDtoValidator {
 			});
 
 			attributesCodes.removeAll(existingVariablesNamesAndAlias);
-			errors.reject("germplasm.update.invalid.attribute.code",
-				new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributesCodes), 3)}, "");
+			if (!attributesCodes.isEmpty()) {
+				errors.reject("germplasm.update.invalid.attribute.code",
+					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributesCodes), 3)}, "");
+			}
 		}
 
 		final List<String> ambiguousCodes =
