@@ -128,7 +128,6 @@ public class AttributeValidator {
 		final Integer attributeId) {
 		BaseValidator.checkNotNull(dto, "param.null", new String[] {"request body"});
 		BaseValidator.checkNotNull(dto.getVariableId(), "param.null", new String[] {"variableId"});
-		BaseValidator.checkNotEmpty(dto.getValue(), "param.null", new String[] {"value"});
 		final Variable variable = this.ontologyVariableDataManager.getVariable(null, dto.getVariableId(), false);
 		if(attributeId == null) {
 			this.validateAttributeVariable(errors, variable);
