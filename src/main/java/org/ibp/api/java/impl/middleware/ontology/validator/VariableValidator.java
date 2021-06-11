@@ -71,7 +71,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
 		org.generationcp.middleware.domain.ontology.VariableType.TRAIT.getId(), //
 		org.generationcp.middleware.domain.ontology.VariableType.SELECTION_METHOD.getId(), //
-		org.generationcp.middleware.domain.ontology.VariableType.ENVIRONMENT_CONDITION.getId());
+		org.generationcp.middleware.domain.ontology.VariableType.ENVIRONMENT_CONDITION.getId(), //
+		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getId(), //
+		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getId());
 
 	@Override
 	public boolean supports(final Class<?> aClass) {
