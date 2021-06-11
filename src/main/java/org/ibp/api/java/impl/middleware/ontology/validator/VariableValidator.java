@@ -542,24 +542,15 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	}
 
 	private boolean isAnalysisVariable(final VariableDetails variable) {
-		return this.isVariable(variable, org.generationcp.middleware.domain.ontology.VariableType.ANALYSIS.getId());
+		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.ANALYSIS.getName());
     }
 
 	private boolean isGermplasmAttributeVariable(final VariableDetails variable) {
-		return this.isVariable(variable, org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getId());
+		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getName());
 	}
 
 	private boolean isGermplasmPassportVariable(final VariableDetails variable) {
-		return this.isVariable(variable, org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getId());
-	}
-
-	private boolean isVariable(final VariableDetails variable, final Integer variableTypeId) {
-		for(final org.ibp.api.domain.ontology.VariableType type : variable.getVariableTypes()){
-			if(Objects.equals(StringUtil.parseInt(type.getId(), 0), variableTypeId)){
-				return true;
-			}
-		}
-		return false;
+		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getName());
 	}
 
     private boolean areAllPreviousVariableTypesPresent(Set<org.generationcp.middleware.domain.ontology.VariableType> previousTypeList, List<VariableType> currentTypeList){
