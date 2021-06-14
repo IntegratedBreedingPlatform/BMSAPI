@@ -82,7 +82,7 @@ public class AttributeValidator {
 	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto) {
 		//TODO Implement new service to get by gid and variable
 		final List<GermplasmAttributeDto> germplasmAttributeDtos =
-			this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null);
+			this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
 		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getVariableId().equals(dto.getVariableId())).collect(Collectors.toList());
 		if (!existingGermplasmAttributes.isEmpty()) {
@@ -93,7 +93,7 @@ public class AttributeValidator {
 
 	public void validateGermplasmAttributeExists(final BindingResult errors, final Integer gid, final Integer attributeId) {
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
-			null);
+			null, null);
 		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if(existingGermplasmAttributes.isEmpty()) {
@@ -105,7 +105,7 @@ public class AttributeValidator {
 	void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
 		final Integer attributeId) {
 		//TODO Implement new service to get by attribute id
-		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null);
+		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
 
 		// Filter by germplasm attribute id
 		List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
