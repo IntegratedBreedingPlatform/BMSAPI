@@ -114,6 +114,7 @@ public class LabelPrintingResource {
 		@RequestBody final LabelsInfoInput labelsInfoInput) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
+		labelsInfoInput.setProgramUUID(programUUID);
 		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
 		final List<LabelType> labelTypes = labelPrintingStrategy.getAvailableLabelTypes(labelsInfoInput);
 
