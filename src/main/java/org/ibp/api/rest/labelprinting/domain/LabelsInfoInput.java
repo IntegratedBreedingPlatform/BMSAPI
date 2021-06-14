@@ -10,6 +10,7 @@ public class LabelsInfoInput {
 	private Integer datasetId;
 	private Integer searchRequestId;
 	private String  sortBy;
+	private String programUUID;
 
 	public Integer getStudyId() {
 		return studyId;
@@ -41,6 +42,14 @@ public class LabelsInfoInput {
 
 	public void setSortBy(final String sortBy) {
 		this.sortBy = sortBy;
+	}
+
+	public String getProgramUUID() {
+		return this.programUUID;
+	}
+
+	public void setProgramUUID(final String programUUID) {
+		this.programUUID = programUUID;
 	}
 
 	@Override
