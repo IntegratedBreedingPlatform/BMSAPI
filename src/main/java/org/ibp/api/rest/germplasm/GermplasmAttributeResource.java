@@ -34,7 +34,7 @@ public class GermplasmAttributeResource {
 		@PathVariable final Integer gid,
 		@RequestParam(required = false) final Integer variableTypeId,
 		@RequestParam(required = false) final String programUUID) {
-		return new ResponseEntity<>(this.germplasmAttributeService.getGermplasmAttributeDtos(gid, variableTypeId), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmAttributeService.getGermplasmAttributeDtos(gid, variableTypeId, programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create attribute for specified germplasm", notes = "Create attribute for specified germplasm")

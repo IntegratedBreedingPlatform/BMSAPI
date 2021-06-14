@@ -33,11 +33,11 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	private LocationValidator locationValidator;
 
 	@Override
-	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId) {
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.attributeValidator.validateAttributeType(errors, variableTypeId);
-		return this.germplasmAttributeService.getGermplasmAttributeDtos(gid, variableTypeId);
+		return this.germplasmAttributeService.getGermplasmAttributeDtos(gid, variableTypeId, programUUID);
 	}
 
 	@Override
