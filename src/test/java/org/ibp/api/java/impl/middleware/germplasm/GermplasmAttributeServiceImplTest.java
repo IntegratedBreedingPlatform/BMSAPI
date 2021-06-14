@@ -44,12 +44,12 @@ public class GermplasmAttributeServiceImplTest {
 
 	@Test
 	public void testGetGermplasmAttributeDtos() {
-		this.germplasmAttributeServiceImpl.getGermplasmAttributeDtos(GID, GERMPLASM_ATTRIBUTE_TYPE_ID);
+		this.germplasmAttributeServiceImpl.getGermplasmAttributeDtos(GID, GERMPLASM_ATTRIBUTE_TYPE_ID, null);
 		Mockito.verify(this.attributeValidator).validateAttributeType(ArgumentMatchers.any(BindingResult.class),
 			ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_TYPE_ID));
 		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class),
 			ArgumentMatchers.eq(Collections.singletonList(GID)));
-		Mockito.verify(this.germplasmAttributeService).getGermplasmAttributeDtos(GID, GERMPLASM_ATTRIBUTE_TYPE_ID);
+		Mockito.verify(this.germplasmAttributeService).getGermplasmAttributeDtos(GID, GERMPLASM_ATTRIBUTE_TYPE_ID, null);
 	}
 
 	@Test
