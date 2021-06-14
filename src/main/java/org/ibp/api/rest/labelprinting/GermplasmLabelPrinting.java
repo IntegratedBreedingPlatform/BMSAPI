@@ -8,10 +8,10 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.common.FileType;
@@ -153,7 +153,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 
-		final List<CVTerm> attributes = this.germplasmSearchService.getGermplasmAttributeTypes(germplasmSearchRequest);
+		final List<Variable> attributeVariables = this.germplasmSearchService.getGermplasmAttributeVariables(germplasmSearchRequest, labelsInfoInput.getProgramUUID());
 		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest);
 
 		// Germplasm Details labels
@@ -177,8 +177,9 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		// Attribiutes labels
 		final LabelType attirbutesType = new LabelType(attributesPropValue, attributesPropValue);
 		attirbutesType.setFields(new ArrayList<>());
-		attirbutesType.getFields().addAll(attributes.stream()
-			.map(attributeType -> new Field(toKey(attributeType.getCvTermId()), attributeType.getName()))
+		attirbutesType.getFields().addAll(attributeVariables.stream()
+			.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
+				StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 			.collect(Collectors.toList()));
 		labelTypes.add(attirbutesType);
 
