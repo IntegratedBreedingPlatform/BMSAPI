@@ -1,13 +1,13 @@
 package org.ibp.api.rest.labelprinting;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.inventory.manager.LotService;
@@ -220,8 +220,9 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		// Germplasm labels
 		final LabelType germplasmLabelTypes = new LabelType(GERMPLASM_FIXED_LABEL_TYPES.getTitle(), GERMPLASM_FIXED_LABEL_TYPES.getKey());
 		germplasmLabelTypes.setFields(new ArrayList<>(GERMPLASM_FIXED_LABEL_TYPES.getFields()));
-		germplasmLabelTypes.getFields().addAll(attributes.stream()
-			.map(attr -> new Field(toKey(attr.getCvTermId()), attr.getName()))
+		germplasmLabelTypes.getFields().addAll(germplasmAttributeVariables.stream()
+			.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
+				StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 			.collect(Collectors.toList()));
 		labelTypes.add(germplasmLabelTypes);
 
