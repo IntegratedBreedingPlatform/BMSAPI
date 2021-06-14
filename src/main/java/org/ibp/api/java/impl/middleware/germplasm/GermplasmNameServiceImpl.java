@@ -1,11 +1,11 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.commons.service.GermplasmCodeGenerationService;
+import org.generationcp.commons.service.GermplasmNamingService;
 import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmCodeNameBatchRequestValidator;
@@ -41,6 +41,9 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 	@Autowired
 	private GermplasmCodeGenerationService germplasmCodeGenerationService;
+
+	@Autowired
+	private GermplasmNamingService germplasmNamingService;
 
 	@Override
 	public void deleteName(final Integer gid, final Integer nameId) {
@@ -80,10 +83,9 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public String getNextNameInSequence(final GermplasmNameSetting germplasmNameSetting) {
 		try {
-			return this.germplasmCodeGenerationService.getNextNameInSequence(germplasmNameSetting);
+			return this.germplasmNamingService.getNextNameInSequence(germplasmNameSetting);
 		} catch (final Exception e) {
-			final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmNameSetting.class.getName());
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ApiRuntimeException("An error has occurred when trying generate next name in sequence", e);
 		}
 	}
 }
