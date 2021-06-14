@@ -23,6 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -151,6 +152,15 @@ public class StudyImportRequestValidatorTest {
 		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.import.environment.parameter.value.exceeded.length", result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
+	public void testPruneStudiesInvalidForImport_WhereSeasonsValuesAreMoreThanOne() {
+		final List<StudyImportRequestDTO> studyImportRequestDTOS = this.createStudyImportRequestDTOList();
+		studyImportRequestDTOS.get(0).setSeasons(Arrays.asList("DRY", "WET"));
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("study.import.season.invalid", result.getAllErrors().get(0).getCode());
 	}
 
 	private List<StudyImportRequestDTO> createStudyImportRequestDTOList() {

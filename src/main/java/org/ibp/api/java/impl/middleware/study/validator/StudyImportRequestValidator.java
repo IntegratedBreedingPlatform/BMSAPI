@@ -66,6 +66,11 @@ public class StudyImportRequestValidator {
 					return true;
 				}
 			}
+			
+			if(!CollectionUtils.isEmpty(s.getSeasons()) && s.getSeasons().size() > 1) {
+				this.errors.reject("study.import.season.invalid", new String[] {index.toString()}, "");
+				return true;
+			}
 
 			if (this.isAnyEnvironmentParametersInvalid(s, index)) {
 				return true;
