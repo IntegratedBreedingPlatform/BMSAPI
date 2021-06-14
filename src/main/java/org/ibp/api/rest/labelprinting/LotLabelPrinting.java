@@ -210,7 +210,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final Integer searchRequestId = labelsInfoInput.getSearchRequestId();
 		final LotsSearchDto searchDto =
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
-		final List<CVTerm> attributes = this.lotService.getGermplasmAttributeTypes(searchDto);
+		final List<Variable> germplasmAttributeVariables = this.lotService.getGermplasmAttributeVariables(searchDto, labelsInfoInput.getProgramUUID());
 
 		// Build label list
 
