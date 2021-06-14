@@ -14,9 +14,9 @@ import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
@@ -111,8 +111,8 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public List<CVTerm> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
-		return this.lotService.getGermplasmAttributeTypes(searchDto);
+	public List<Variable> getGermplasmAttributeVariables(final LotsSearchDto searchDto, final String programUUID) {
+		return this.lotService.getGermplasmAttributeVariables(searchDto, programUUID);
 	}
 
 	@Override

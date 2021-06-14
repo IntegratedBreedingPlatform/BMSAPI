@@ -8,8 +8,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public interface LotService {
 
 	long countSearchLots(LotsSearchDto lotsSearchDto);
 
-	List<CVTerm> getGermplasmAttributeTypes(LotsSearchDto searchDto);
+	List<Variable> getGermplasmAttributeVariables(LotsSearchDto searchDto, String programUUID);
 
 	Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(LotsSearchDto searchDto);
 
