@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchReques
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmCodeNameBatchRequestValidator;
@@ -82,6 +83,11 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 	@Override
 	public String getNextNameInSequence(final GermplasmNameSetting germplasmNameSetting) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmNameSetting.class.getName());
+		this.germplasmCodeNameBatchRequestValidator.validateGermplasmNameSetting(errors, germplasmNameSetting);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 		try {
 			return this.germplasmNamingService.getNextNameInSequence(germplasmNameSetting);
 		} catch (final Exception e) {

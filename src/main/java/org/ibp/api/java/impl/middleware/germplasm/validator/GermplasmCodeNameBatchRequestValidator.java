@@ -32,21 +32,21 @@ public class GermplasmCodeNameBatchRequestValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmCodeNameBatchRequestDto.class.getName());
 		this.germplasmValidator.validateGids(this.errors, germplasmCodeNameBatchRequestDto.getGids());
 		this.validateNameType(germplasmCodeNameBatchRequestDto.getNameType());
-		this.validateGermplasmNameSetting(germplasmCodeNameBatchRequestDto.getGermplasmCodeNameSetting());
+		this.validateGermplasmNameSetting(this.errors, germplasmCodeNameBatchRequestDto.getGermplasmCodeNameSetting());
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateGermplasmNameSetting(final GermplasmNameSetting germplasmNameSetting) {
+	public void validateGermplasmNameSetting(final BindingResult errors, final GermplasmNameSetting germplasmNameSetting) {
 		if (germplasmNameSetting != null) {
 			if (StringUtils.isEmpty(germplasmNameSetting.getPrefix())) {
-				this.errors.reject("germplasm.code.name.prefix.required");
+				errors.reject("germplasm.code.name.prefix.required");
 			} else if (germplasmNameSetting.getPrefix().length() > 49) {
-				this.errors.reject("germplasm.code.name.prefix.max.length.exceeded");
+				errors.reject("germplasm.code.name.prefix.max.length.exceeded");
 			}
 			if (StringUtils.isNotEmpty(germplasmNameSetting.getSuffix()) && germplasmNameSetting.getSuffix().length() > 49) {
-				this.errors.reject("germplasm.code.name.suffix.max.length.exceeded");
+				errors.reject("germplasm.code.name.suffix.max.length.exceeded");
 			}
 		}
 	}
