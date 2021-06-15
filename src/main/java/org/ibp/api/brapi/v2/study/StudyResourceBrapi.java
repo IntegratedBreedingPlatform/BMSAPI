@@ -26,7 +26,7 @@ import org.ibp.api.brapi.v1.study.StudyMapper;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.java.study.StudyService;
+import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -62,7 +62,7 @@ import java.util.Objects;
 public class StudyResourceBrapi {
 
 	@Autowired
-	private StudyService studyService;
+	private StudyInstanceService studyInstanceService;
 
 	@Autowired
 	private LocationService locationService;
@@ -74,11 +74,13 @@ public class StudyResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/studies/{studyDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
+	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
+		@PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
+		final StudyDetailsDto mwStudyDetails = this.studyInstanceService.getStudyDetailsByGeolocation(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
-			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());;
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+			;
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
@@ -134,9 +136,8 @@ public class StudyResourceBrapi {
 		final String sortBy,
 		@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder", required = false) final String sortOrder,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION) @RequestParam(value = "page", required = false) final Integer page,
-		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(value = "pageSize", required = false)
-		final Integer pageSize
-		) {
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(value = "pageSize", required = false) final Integer pageSize
+	) {
 		final String validationError = this.parameterValidation(crop, commonCropName, sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
@@ -178,12 +179,12 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyService.countStudyInstances(studySearchFilter);
+					return StudyResourceBrapi.this.studyInstanceService.countStudyInstances(studySearchFilter);
 				}
 
 				@Override
 				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
-					return StudyResourceBrapi.this.studyService.getStudyInstancesWithMetadata(studySearchFilter, pageRequest);
+					return StudyResourceBrapi.this.studyInstanceService.getStudyInstancesWithMetadata(studySearchFilter, pageRequest);
 				}
 			});
 
@@ -207,7 +208,7 @@ public class StudyResourceBrapi {
 	public ResponseEntity<EntityListResponse<StudyInstanceDto>> createStudy(@PathVariable final String crop,
 		@RequestBody final List<StudyImportRequestDTO> studyImportRequestDTOS) {
 		BaseValidator.checkNotNull(studyImportRequestDTOS, "study.import.request.null");
-		final StudyImportResponse studyImportResponse = this.studyService.createStudies(crop, studyImportRequestDTOS);
+		final StudyImportResponse studyImportResponse = this.studyInstanceService.createStudies(crop, studyImportRequestDTOS);
 		final Result<StudyInstanceDto> results = new Result<StudyInstanceDto>().withData(studyImportResponse.getStudyInstanceDtos());
 
 		final List<Map<String, String>> status = new ArrayList<>();

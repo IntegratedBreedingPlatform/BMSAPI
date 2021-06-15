@@ -27,7 +27,6 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -44,6 +43,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.ontology.VariableService;
+import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -116,6 +116,9 @@ public class StudyResourceBrapi {
 	@Autowired
 	private StudyInstanceService studyInstanceService;
 
+	@Autowired
+	private org.generationcp.middleware.service.api.study.StudyInstanceService middlewareStudyInstanceService;
+
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
 	@ResponseBody
@@ -175,12 +178,12 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyService.countStudyInstances(studySearchFilter);
+					return StudyResourceBrapi.this.studyInstanceService.countStudyInstances(studySearchFilter);
 				}
 
 				@Override
 				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
-					return StudyResourceBrapi.this.studyService.getStudyInstances(studySearchFilter, pageRequest);
+					return StudyResourceBrapi.this.studyInstanceService.getStudyInstances(studySearchFilter, pageRequest);
 				}
 			});
 
@@ -256,7 +259,7 @@ public class StudyResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
+		final StudyDetailsDto mwStudyDetails = this.studyInstanceService.getStudyDetailsByGeolocation(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 			;
@@ -375,7 +378,7 @@ public class StudyResourceBrapi {
 
 		// Resolve the datasetId in which StudyDbId belongs to. (In BRAPI, studyDbId is nd_geolocation_id)
 		final Optional<Integer> datasetIdForInstance =
-			this.studyInstanceService.getDatasetIdForInstanceIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+			this.middlewareStudyInstanceService.getDatasetIdForInstanceIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
 		final Integer datasetId = datasetIdForInstance.isPresent() ? datasetIdForInstance.get() : null;
 		if (datasetId == null) {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
