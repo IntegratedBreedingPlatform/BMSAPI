@@ -3,6 +3,7 @@ package org.ibp.api.rest.audit;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameChangeDTO;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.audit.AuditService;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameRequestValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class AuditResource {
 	@Autowired
 	private AuditService auditService;
 
+	@Autowired
+	private GermplasmNameRequestValidator germplasmNameRequestValidator;
+
 	@ResponseBody
 	@RequestMapping(
 		value = "/crops/{cropName}/germplasm/{gid}/name/{nameId}/changes",
@@ -38,17 +42,19 @@ public class AuditResource {
 		@PathVariable final Integer nameId,
 		final Pageable pageable) {
 
+		this.germplasmNameRequestValidator.validateNameBelongsToGermplasm(gid, nameId);
+
 		final PagedResult<GermplasmNameChangeDTO> resultPage =
 			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmNameChangeDTO>() {
 
 				@Override
 				public long getCount() {
-					return AuditResource.this.auditService.countNameChangesByGidAndNameId(gid, nameId);
+					return AuditResource.this.auditService.countNameChangesByNameId(nameId);
 				}
 
 				@Override
 				public List<GermplasmNameChangeDTO> getResults(final PagedResult<GermplasmNameChangeDTO> pagedResult) {
-					return AuditResource.this.auditService.getNameChangesByGidAndNameId(gid, nameId, pageable);
+					return AuditResource.this.auditService.getNameChangesByNameId(nameId, pageable);
 				}
 			});
 

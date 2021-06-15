@@ -17,13 +17,13 @@ public class AuditServiceImpl implements AuditService {
 	private org.generationcp.middleware.service.api.audit.AuditService auditService;
 
 	@Override
-	public List<GermplasmNameChangeDTO> getNameChangesByGidAndNameId(final Integer gid, final Integer nameId, final Pageable pageable) {
-		return this.auditService.getNameChangesByGidAndNameId(gid, nameId, pageable);
+	public List<GermplasmNameChangeDTO> getNameChangesByNameId(final Integer nameId, final Pageable pageable) {
+		return this.auditService.getNameChangesByNameId(nameId, pageable);
 	}
 
 	@Override
-	public long countNameChangesByGidAndNameId(final Integer gid, final Integer nameId) {
-		return this.auditService.countNameChangesByGidAndNameId(gid, nameId);
+	public long countNameChangesByNameId(final Integer nameId) {
+		return this.auditService.countNameChangesByNameId(nameId);
 	}
 
 }
