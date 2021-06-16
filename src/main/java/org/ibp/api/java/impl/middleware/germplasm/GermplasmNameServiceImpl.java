@@ -1,17 +1,17 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import org.ibp.api.java.germplasm.GermplasmCodeGenerationService;
 import org.generationcp.commons.service.GermplasmNamingService;
 import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
+import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
-import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
+import org.generationcp.middleware.service.api.GermplasmCodingResult;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.germplasm.GermplasmCodeGenerationService;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmCodeNameBatchRequestValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameRequestValidator;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +36,6 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 	@Autowired
 	private LocationValidator locationValidator;
-
-	@Autowired
-	private SecurityService securityService;
 
 	@Autowired
 	private GermplasmCodeGenerationService germplasmCodeGenerationService;
@@ -72,13 +69,10 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public List<GermplasmGroupNamingResult> createCodeNames(final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
+	public List<GermplasmCodingResult> createCodeNames(final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
 		this.germplasmCodeNameBatchRequestValidator.validate(germplasmCodeNameBatchRequestDto);
-		try {
-			return this.germplasmCodeGenerationService.createCodeNames(germplasmCodeNameBatchRequestDto);
-		} catch (final Exception e) {
-			throw new ApiRuntimeException("An error has occurred when trying generate code names", e);
-		}
+		return this.germplasmCodeGenerationService.createCodeNames(germplasmCodeNameBatchRequestDto);
+
 	}
 
 	@Override
@@ -90,7 +84,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		}
 		try {
 			return this.germplasmNamingService.getNextNameInSequence(germplasmNameSetting);
-		} catch (final Exception e) {
+		} catch (final InvalidGermplasmNameSettingException e) {
 			throw new ApiRuntimeException("An error has occurred when trying generate next name in sequence", e);
 		}
 	}

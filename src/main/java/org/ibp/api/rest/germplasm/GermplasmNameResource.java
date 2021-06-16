@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
-import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
+import org.generationcp.middleware.service.api.GermplasmCodingResult;
 import org.ibp.api.java.impl.middleware.germplasm.GermplasmNameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,14 +42,14 @@ public class GermplasmNameResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'CODE_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/coding", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<List<GermplasmGroupNamingResult>> createGermplasmCodeNames(@PathVariable final String cropName,
+	public ResponseEntity<List<GermplasmCodingResult>> createGermplasmCodeNames(@PathVariable final String cropName,
 		@RequestBody final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
 		return new ResponseEntity<>(this.germplasmNameService.createCodeNames(germplasmCodeNameBatchRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get next code name sequence based on the specified name settings")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'CODE_GERMPLASM')")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/coding/sequence", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/names/next-name-generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<String> getNextSequence(@PathVariable final String cropName,
 		@RequestBody final GermplasmNameSetting germplasmNameSetting) {
