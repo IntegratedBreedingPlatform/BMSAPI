@@ -9,12 +9,10 @@ import org.generationcp.commons.ruleengine.impl.RulesServiceImpl;
 import org.generationcp.commons.ruleengine.service.RulesService;
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.commons.service.CsvExportSampleListService;
-import org.generationcp.commons.service.GermplasmCodeGenerationService;
 import org.generationcp.commons.service.GermplasmNamingService;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
-import org.generationcp.commons.service.impl.GermplasmCodeGenerationServiceImpl;
 import org.generationcp.commons.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
@@ -111,7 +109,6 @@ import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFac
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
-import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
@@ -128,6 +125,7 @@ import org.generationcp.middleware.service.impl.derived_variables.FormulaService
 import org.generationcp.middleware.service.impl.inventory.LotServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl;
+import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
 import org.generationcp.middleware.service.impl.rpackage.RPackageServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
@@ -142,6 +140,8 @@ import org.generationcp.middleware.service.impl.workbench.WorkbenchServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SessionFactory;
+import org.ibp.api.java.germplasm.GermplasmCodeGenerationService;
+import org.ibp.api.java.impl.middleware.germplasm.GermplasmCodeGenerationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -390,7 +390,6 @@ public class MiddlewareFactory {
 	public ProgramService getProgramService() {
 		return new ProgramServiceImpl(this.getWorkbenchSessionProvider());
 	}
-
 
 	@Bean
 	@DependsOn("WORKBENCH_SessionFactory")
@@ -684,7 +683,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmCodeGenerationService getGermplasmCodeGenerationService() {
-		return new GermplasmCodeGenerationServiceImpl(this.getCropDatabaseSessionProvider());
+		return new GermplasmCodeGenerationServiceImpl();
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import org.generationcp.commons.service.GermplasmCodeGenerationService;
+import org.ibp.api.java.germplasm.GermplasmCodeGenerationService;
 import org.generationcp.commons.service.GermplasmNamingService;
 import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
