@@ -7,16 +7,16 @@ import org.generationcp.commons.ruleengine.RuleFactory;
 import org.generationcp.commons.ruleengine.coding.CodingRuleExecutionContext;
 import org.generationcp.commons.ruleengine.service.RulesService;
 import org.generationcp.commons.service.GermplasmNamingService;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
-import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.service.api.GermplasmCodingResult;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.NamingConfigurationService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,16 +50,16 @@ public class GermplasmCodeGenerationServiceImplTest {
 	private RuleFactory ruleFactory;
 
 	@Mock
-	private NamingConfigurationDAO namingConfigurationDAO;
-
-	@Mock
 	private GermplasmGroupingService germplasmGroupingService;
 
 	@Mock
 	private GermplasmNamingService germplasmNamingService;
 
 	@Mock
-	private GermplasmDataManager germplasmDataManager;
+	private NamingConfigurationService namingConfigurationService;
+
+	@Mock
+	private GermplasmService germplasmService;
 
 	@InjectMocks
 	private final GermplasmCodeGenerationServiceImpl germplasmCodeGenerationService = new GermplasmCodeGenerationServiceImpl();
@@ -77,6 +77,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 		this.setupCodeNameType();
 
 		final String nextNameInSequence = this.getExpectedName(NEXT_NUMBER);
+		Mockito.doReturn(this.namingConfiguration).when(this.namingConfigurationService).getNamingConfigurationByName(Mockito.any());
 		Mockito.doReturn(nextNameInSequence).when(this.germplasmNamingService)
 			.generateNextNameAndIncrementSequence(this.germplasmNameSetting);
 		Mockito.doReturn(nextNameInSequence).when(this.germplasmNamingService).getNextNameInSequence(this.germplasmNameSetting);
@@ -101,7 +102,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 			germplasmMap.put(gid, germplasm);
 			oldPreferredNames.put(gid, g1Name);
 
-			Mockito.when(this.germplasmDataManager.getGermplasmByGID(gid)).thenReturn(germplasm);
+			Mockito.when(this.germplasmService.getGermplasmByGID(gid)).thenReturn(germplasm);
 		}
 		Mockito.when(this.germplasmNamingService.generateNextNameAndIncrementSequence(this.germplasmNameSetting))
 			.thenReturn(this.getExpectedName(startNumber), this.getExpectedName(startNumber + 1), this.getExpectedName(startNumber + 2),
@@ -154,7 +155,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 			germplasmMap.put(gid, germplasm);
 			oldPreferredNames.put(gid, g1Name);
 
-			Mockito.when(this.germplasmDataManager.getGermplasmByGID(gid)).thenReturn(germplasm);
+			Mockito.when(this.germplasmService.getGermplasmByGID(gid)).thenReturn(germplasm);
 		}
 		Mockito.when(this.ruleFactory.getRuleSequenceForNamespace(GermplasmCodeGenerationServiceImpl.CODING_RULE_SEQUENCE))
 			.thenReturn(new String[] {});
@@ -196,7 +197,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 		final Germplasm g1 = new Germplasm();
 		g1.setGid(1);
 
-		Mockito.when(this.germplasmDataManager.getGermplasmByGID(g1.getGid())).thenReturn(g1);
+		Mockito.when(this.germplasmService.getGermplasmByGID(g1.getGid())).thenReturn(g1);
 
 		final GermplasmCodingResult result =
 			this.germplasmCodeGenerationService.applyGroupName(g1.getGid(), this.codeNameType, RandomStringUtils.randomAlphabetic(10));
@@ -220,7 +221,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 		g1Name.setNstat(1);
 		g1.getNames().add(g1Name);
 
-		Mockito.when(this.germplasmDataManager.getGermplasmByGID(g1.getGid())).thenReturn(g1);
+		Mockito.when(this.germplasmService.getGermplasmByGID(g1.getGid())).thenReturn(g1);
 
 		final Germplasm g2 = new Germplasm();
 		g2.setGid(2);
@@ -268,7 +269,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 		g1.setGid(1);
 		g1.setMgid(mgid);
 
-		Mockito.when(this.germplasmDataManager.getGermplasmByGID(g1.getGid())).thenReturn(g1);
+		Mockito.when(this.germplasmService.getGermplasmByGID(g1.getGid())).thenReturn(g1);
 
 		final Germplasm g2 = new Germplasm();
 		g2.setGid(2);
