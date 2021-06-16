@@ -36,16 +36,6 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private StudyInstanceService studyInstanceService;
 
-	@Configuration
-	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public StudyInstanceService studyInstanceService() {
-			return Mockito.mock(StudyInstanceService.class);
-		}
-	}
-
 
 	private final Random random = new Random();
 

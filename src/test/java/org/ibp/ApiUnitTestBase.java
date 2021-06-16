@@ -28,6 +28,7 @@ import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.java.rpackage.RPackageService;
 import org.ibp.api.java.study.StudyEntryService;
+import org.ibp.api.java.study.StudyInstanceService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -208,6 +209,12 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public StudyEntryService studyEntryService() {
 			return Mockito.mock(StudyEntryService.class);
+		}
+
+		@Bean
+		@Primary
+		public StudyInstanceService studyInstanceService() {
+			return Mockito.mock(StudyInstanceService.class);
 		}
 
 		@Bean

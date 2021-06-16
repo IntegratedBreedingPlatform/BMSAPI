@@ -65,12 +65,6 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		public LocationService locationService() {
 			return Mockito.mock(LocationService.class);
 		}
-
-		@Bean
-		@Primary
-		public StudyInstanceService getStudyInstanceService() {
-			return Mockito.mock(StudyInstanceService.class);
-		}
 	}
 
 
