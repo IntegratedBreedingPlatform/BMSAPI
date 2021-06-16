@@ -5,16 +5,18 @@ import org.generationcp.commons.ruleengine.RuleFactory;
 import org.generationcp.commons.ruleengine.coding.CodingRuleExecutionContext;
 import org.generationcp.commons.ruleengine.service.RulesService;
 import org.generationcp.commons.service.GermplasmNamingService;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
 import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.service.api.GermplasmCodingResult;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.NamingConfigurationService;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmCodeGenerationService;
@@ -23,8 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -50,7 +54,13 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 	private GermplasmNamingService germplasmNamingService;
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
+	private GermplasmNameTypeService germplasmNameTypeService;
+
+	@Autowired
+	private NamingConfigurationService namingConfigurationService;
+
+	@Autowired
+	private GermplasmService germplasmService;
 
 	public GermplasmCodeGenerationServiceImpl() {
 		// do nothing
@@ -59,30 +69,31 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 	@Override
 	public List<GermplasmCodingResult> createCodeNames(final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
 
-		final UserDefinedField nameType =
-			this.germplasmDataManager
-				.getUserDefinedFieldByTableTypeAndCode("NAMES", "NAME", germplasmCodeNameBatchRequestDto.getNameType());
+		final Optional<GermplasmNameTypeDTO> germplasmNameTypeDTO =
+			this.germplasmNameTypeService.getNameTypeByCode(germplasmCodeNameBatchRequestDto.getNameType());
 
-		try {
-			// For manual code naming
-			if (germplasmCodeNameBatchRequestDto.getGermplasmCodeNameSetting() != null) {
-				return this.applyGroupNamesForManualNaming(new HashSet<>(germplasmCodeNameBatchRequestDto.getGids()),
-					germplasmCodeNameBatchRequestDto.getGermplasmCodeNameSetting(), nameType);
-			} else {
-				// For automatic code naming
-				return this.applyGroupNamesForAutomaticNaming(new HashSet<>(germplasmCodeNameBatchRequestDto.getGids()),
-					nameType);
+		if (germplasmNameTypeDTO.isPresent()) {
+			try {
+				// For manual code naming
+				if (germplasmCodeNameBatchRequestDto.getGermplasmCodeNameSetting() != null) {
+					return this.applyGroupNamesForManualNaming(new HashSet<>(germplasmCodeNameBatchRequestDto.getGids()),
+						germplasmCodeNameBatchRequestDto.getGermplasmCodeNameSetting(), germplasmNameTypeDTO.get());
+				} else {
+					// For automatic code naming
+					return this.applyGroupNamesForAutomaticNaming(new HashSet<>(germplasmCodeNameBatchRequestDto.getGids()),
+						germplasmNameTypeDTO.get());
+				}
+			} catch (final Exception e) {
+				throw new ApiRuntimeException("An error has occurred when trying generate code names", e);
 			}
-		} catch (final Exception e) {
-			throw new ApiRuntimeException("An error has occurred when trying generate code names", e);
 		}
-
+		return Collections.emptyList();
 	}
 
 	protected List<GermplasmCodingResult> applyGroupNamesForAutomaticNaming(final Set<Integer> gidsToProcess,
-		final UserDefinedField nameType) throws RuleException {
+		final GermplasmNameTypeDTO nameType) throws RuleException {
 
-		final NamingConfiguration namingConfiguration = this.germplasmDataManager.getNamingConfigurationByName(nameType.getFname());
+		final NamingConfiguration namingConfiguration = this.namingConfigurationService.getNamingConfigurationByName(nameType.getName());
 
 		final List<String> executionOrder = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace(CODING_RULE_SEQUENCE));
 		final CodingRuleExecutionContext codingRuleExecutionContext = new CodingRuleExecutionContext(executionOrder, namingConfiguration);
@@ -98,7 +109,7 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 	}
 
 	protected List<GermplasmCodingResult> applyGroupNamesForManualNaming(final Set<Integer> gids, final GermplasmNameSetting setting,
-		final UserDefinedField nameType) throws InvalidGermplasmNameSettingException {
+		final GermplasmNameTypeDTO nameType) throws InvalidGermplasmNameSettingException {
 		final List<GermplasmCodingResult> assignCodesResultsList = new ArrayList<>();
 		final boolean startNumberSpecified = setting.getStartNumber() != null;
 		Integer startNumber = setting.getStartNumber();
@@ -119,12 +130,12 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 	}
 
 	protected GermplasmCodingResult applyGroupName(final Integer gid,
-		final UserDefinedField nameType, final String generatedCodeName) {
+		final GermplasmNameTypeDTO nameType, final String generatedCodeName) {
 
 		final GermplasmCodingResult result = new GermplasmCodingResult();
 		result.setGid(gid);
 
-		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(gid);
+		final Germplasm germplasm = this.germplasmService.getGermplasmByGID(gid);
 
 		if (germplasm.getMgid() == null || germplasm.getMgid() == 0) {
 			result.addMessage(String.format(GERMPLASM_NOT_PART_OF_MANAGEMENT_GROUP, germplasm.getGid()));
@@ -143,7 +154,7 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 
 	}
 
-	private void addName(final Germplasm germplasm, final String groupName, final UserDefinedField nameType,
+	private void addName(final Germplasm germplasm, final String groupName, final GermplasmNameTypeDTO nameType,
 		final GermplasmCodingResult result) {
 
 		final List<Name> currentNames = germplasm.getNames();
@@ -151,7 +162,7 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 		Name existingNameOfGivenType = null;
 		if (!currentNames.isEmpty() && nameType != null) {
 			for (final Name name : currentNames) {
-				if (nameType.getFldno().equals(name.getTypeId())) {
+				if (nameType.getId().equals(name.getTypeId())) {
 					existingNameOfGivenType = name;
 					break;
 				}
@@ -168,7 +179,7 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 
 			final Name name = new Name();
 			name.setGermplasm(germplasm);
-			name.setTypeId(nameType.getFldno());
+			name.setTypeId(nameType.getId());
 			name.setNval(groupName);
 			// nstat = 1 means it is preferred name.
 			name.setNstat(1);
@@ -178,13 +189,13 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 			name.setReferenceId(0);
 
 			germplasm.getNames().add(name);
-			this.germplasmDataManager.save(germplasm);
+			this.germplasmService.saveGermplasm(germplasm);
 			result.addMessage(
 				String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.", germplasm.getGid(),
-					groupName, nameType.getFcode()));
+					groupName, nameType.getCode()));
 		} else {
 			result.addMessage(String.format("Germplasm (gid: %s) already has existing name %s of type %s. Supplied name %s was not added.",
-				germplasm.getGid(), existingNameOfGivenType.getNval(), nameType.getFcode(), groupName));
+				germplasm.getGid(), existingNameOfGivenType.getNval(), nameType.getCode(), groupName));
 		}
 	}
 

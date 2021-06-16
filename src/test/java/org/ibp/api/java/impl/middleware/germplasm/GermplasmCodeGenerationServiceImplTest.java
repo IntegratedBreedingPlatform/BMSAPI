@@ -7,12 +7,12 @@ import org.generationcp.commons.ruleengine.RuleFactory;
 import org.generationcp.commons.ruleengine.coding.CodingRuleExecutionContext;
 import org.generationcp.commons.ruleengine.service.RulesService;
 import org.generationcp.commons.service.GermplasmNamingService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.service.api.GermplasmCodingResult;
@@ -67,7 +67,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 	private GermplasmNameSetting germplasmNameSetting;
 	private NamingConfiguration namingConfiguration;
 	private CodingRuleExecutionContext codingRuleExecutionContext;
-	private UserDefinedField codeNameType;
+	private GermplasmNameTypeDTO codeNameType;
 
 	@Before
 	public void setUp() throws InvalidGermplasmNameSettingException {
@@ -120,7 +120,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 				expectedCodedName,
 				germplasm.findPreferredName().getNval());
 			Assert.assertEquals("Expected germplasm " + germplasmCodingResult.getGid() + " to have a coded name with coded name type.",
-				this.codeNameType.getFldno(),
+				this.codeNameType.getId(),
 				germplasm.findPreferredName().getTypeId());
 			Assert.assertEquals(
 				"Expected existing preferred name of germplasm " + germplasmCodingResult.getGid() + " to be set as non-preferred.",
@@ -130,7 +130,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 			Assert.assertEquals(1, germplasmCodingResult.getMessages().size());
 			Assert.assertEquals(
 				String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.", germplasm.getGid(),
-					expectedCodedName, this.codeNameType.getFcode()), germplasmCodingResult.getMessages().get(0));
+					expectedCodedName, this.codeNameType.getCode()), germplasmCodingResult.getMessages().get(0));
 		}
 
 	}
@@ -176,7 +176,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 				expectedCodedName,
 				germplasm.findPreferredName().getNval());
 			Assert.assertEquals("Expected germplasm " + germplasmCodingResult.getGid() + " to have a coded name with coded name type.",
-				this.codeNameType.getFldno(),
+				this.codeNameType.getId(),
 				germplasm.findPreferredName().getTypeId());
 			Assert.assertEquals(
 				"Expected existing preferred name of germplasm " + germplasmCodingResult.getGid() + " to be set as non-preferred.",
@@ -186,7 +186,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 			Assert.assertEquals(1, germplasmCodingResult.getMessages().size());
 			Assert.assertEquals(
 				String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.", germplasm.getGid(),
-					expectedCodedName, this.codeNameType.getFcode()), germplasmCodingResult.getMessages().get(0));
+					expectedCodedName, this.codeNameType.getCode()), germplasmCodingResult.getMessages().get(0));
 		}
 
 	}
@@ -240,24 +240,24 @@ public class GermplasmCodeGenerationServiceImplTest {
 
 		Assert.assertEquals("Expected germplasm g1 to have a coded name assigned as preferred name.", expectedCodedName,
 			g1.findPreferredName().getNval());
-		Assert.assertEquals("Expected germplasm g1 to have a coded name with coded name type.", this.codeNameType.getFldno(),
+		Assert.assertEquals("Expected germplasm g1 to have a coded name with coded name type.", this.codeNameType.getId(),
 			g1.findPreferredName().getTypeId());
 		Assert.assertEquals("Expected existing preferred name of germplasm g1 to be set as non-preferred.", new Integer(0),
 			g1Name.getNstat());
 		Assert.assertEquals(String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.", g1.getGid(),
-			expectedCodedName, this.codeNameType.getFcode()), result.getMessages().get(0));
+			expectedCodedName, this.codeNameType.getCode()), result.getMessages().get(0));
 
 		Assert.assertEquals("Expected germplasm g2 to have a coded name assigned.", expectedCodedName, g2.findPreferredName().getNval());
-		Assert.assertEquals("Expected germplasm g2 to have a coded name with coded name type.", this.codeNameType.getFldno(),
+		Assert.assertEquals("Expected germplasm g2 to have a coded name with coded name type.", this.codeNameType.getId(),
 			g2.findPreferredName().getTypeId());
 		Assert.assertEquals(String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.", g2.getGid(),
-			expectedCodedName, this.codeNameType.getFcode()), result.getMessages().get(1));
+			expectedCodedName, this.codeNameType.getCode()), result.getMessages().get(1));
 
 		Assert.assertEquals("Expected germplasm g3 to have a coded name assigned.", expectedCodedName, g3.findPreferredName().getNval());
-		Assert.assertEquals("Expected germplasm g3 to have a coded name with coded name type.", this.codeNameType.getFldno(),
+		Assert.assertEquals("Expected germplasm g3 to have a coded name with coded name type.", this.codeNameType.getId(),
 			g3.findPreferredName().getTypeId());
 		Assert.assertEquals(String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.", g3.getGid(),
-			expectedCodedName, this.codeNameType.getFcode()), result.getMessages().get(2));
+			expectedCodedName, this.codeNameType.getCode()), result.getMessages().get(2));
 	}
 
 	@Test
@@ -281,7 +281,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 		// Lets setup the third member with existing coded name.
 		final Name g3CodedName = new Name();
 		// same name type
-		g3CodedName.setTypeId(this.codeNameType.getFldno());
+		g3CodedName.setTypeId(this.codeNameType.getId());
 		// but different name
 		final String existingCodedNameOfG3 = "ExistingCodedNameOfG3";
 		g3CodedName.setNval(existingCodedNameOfG3);
@@ -298,16 +298,16 @@ public class GermplasmCodeGenerationServiceImplTest {
 
 		Assert.assertEquals("Expected germplasm g1 to have a coded name assigned as preferred name.", expectedCodedName,
 			g1.findPreferredName().getNval());
-		Assert.assertEquals("Expected germplasm g1 to have a coded name with coded name type.", this.codeNameType.getFldno(),
+		Assert.assertEquals("Expected germplasm g1 to have a coded name with coded name type.", this.codeNameType.getId(),
 			g1.findPreferredName().getTypeId());
 		Assert.assertEquals(String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.", g1.getGid(),
-			expectedCodedName, this.codeNameType.getFcode()), result.getMessages().get(0));
+			expectedCodedName, this.codeNameType.getCode()), result.getMessages().get(0));
 
 		Assert.assertEquals("Expected germplasm g2 to have a coded name assigned.", expectedCodedName, g2.findPreferredName().getNval());
-		Assert.assertEquals("Expected germplasm g2 to have a coded name with coded name type.", this.codeNameType.getFldno(),
+		Assert.assertEquals("Expected germplasm g2 to have a coded name with coded name type.", this.codeNameType.getId(),
 			g2.findPreferredName().getTypeId());
 		Assert.assertEquals(String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.", g2.getGid(),
-			expectedCodedName, this.codeNameType.getFcode()), result.getMessages().get(1));
+			expectedCodedName, this.codeNameType.getCode()), result.getMessages().get(1));
 
 		Assert.assertEquals("Expected existing coded name of g3 to be retained.", existingCodedNameOfG3, g3.findPreferredName().getNval());
 		Assert.assertTrue(
@@ -326,9 +326,9 @@ public class GermplasmCodeGenerationServiceImplTest {
 	}
 
 	private void setupCodeNameType() {
-		this.codeNameType = new UserDefinedField();
-		this.codeNameType.setFldno(41);
-		this.codeNameType.setFcode("CODE1");
+		this.codeNameType = new GermplasmNameTypeDTO();
+		this.codeNameType.setId(41);
+		this.codeNameType.setCode("CODE1");
 	}
 
 	private GermplasmNameSetting createGermplasmNameSetting() {
