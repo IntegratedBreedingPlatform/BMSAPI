@@ -8,12 +8,12 @@ import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.java.study.StudyInstanceService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,8 +68,8 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public org.generationcp.middleware.service.api.study.StudyInstanceService getStudyInstanceServiceMW() {
-			return Mockito.mock(org.generationcp.middleware.service.api.study.StudyInstanceService.class);
+		public StudyInstanceService getStudyInstanceService() {
+			return Mockito.mock(StudyInstanceService.class);
 		}
 	}
 
@@ -197,7 +197,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<Location> locations = StudyTestDataProvider.getLocationList();
 		final Location location = locations.get(0);
 
-		Mockito.when(this.studyInstanceService.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId()))
+		Mockito.when(this.studyInstanceService.getStudyDetailsByGeolocation(studyDetailsDto.getMetadata().getStudyDbId()))
 			.thenReturn(studyDetailsDto);
 		Mockito.when(this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10))).thenReturn(locations);
 
