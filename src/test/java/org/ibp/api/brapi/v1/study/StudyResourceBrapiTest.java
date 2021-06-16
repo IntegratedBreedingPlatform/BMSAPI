@@ -65,6 +65,12 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		public LocationService locationService() {
 			return Mockito.mock(LocationService.class);
 		}
+
+		@Bean
+		@Primary
+		public org.generationcp.middleware.service.api.study.StudyInstanceService getStudyInstanceServiceMW() {
+			return Mockito.mock(org.generationcp.middleware.service.api.study.StudyInstanceService.class);
+		}
 	}
 
 

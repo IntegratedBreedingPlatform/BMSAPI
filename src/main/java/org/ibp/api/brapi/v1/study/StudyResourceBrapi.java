@@ -262,7 +262,6 @@ public class StudyResourceBrapi {
 		final StudyDetailsDto mwStudyDetails = this.studyInstanceService.getStudyDetailsByGeolocation(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-			;
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
