@@ -20,6 +20,7 @@ public class GermplasmCodeNameBatchRequestValidator {
 	protected static final String CODE_1 = "CODE1";
 	protected static final String CODE_2 = "CODE2";
 	protected static final String CODE_3 = "CODE3";
+	public static final int MAX_LENGTH = 49;
 
 	private BindingResult errors;
 
@@ -42,10 +43,10 @@ public class GermplasmCodeNameBatchRequestValidator {
 		if (germplasmNameSetting != null) {
 			if (StringUtils.isEmpty(germplasmNameSetting.getPrefix())) {
 				errors.reject("germplasm.code.name.prefix.required");
-			} else if (germplasmNameSetting.getPrefix().length() > 49) {
+			} else if (germplasmNameSetting.getPrefix().length() > MAX_LENGTH) {
 				errors.reject("germplasm.code.name.prefix.max.length.exceeded");
 			}
-			if (StringUtils.isNotEmpty(germplasmNameSetting.getSuffix()) && germplasmNameSetting.getSuffix().length() > 49) {
+			if (StringUtils.isNotEmpty(germplasmNameSetting.getSuffix()) && germplasmNameSetting.getSuffix().length() > MAX_LENGTH) {
 				errors.reject("germplasm.code.name.suffix.max.length.exceeded");
 			}
 		}

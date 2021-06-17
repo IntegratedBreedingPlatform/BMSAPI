@@ -40,7 +40,7 @@ public class GermplasmNameResource {
 
 	@ApiOperation(value = "Create code name (CODE1, CODE2, CODE2) for specified list of germplasm")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'CODE_GERMPLASM')")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/coding", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/codes", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmCodingResult>> createGermplasmCodeNames(@PathVariable final String cropName,
 		@RequestBody final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
@@ -49,7 +49,7 @@ public class GermplasmNameResource {
 
 	@ApiOperation(value = "Get next code name sequence based on the specified name settings")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'CODE_GERMPLASM')")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/names/next-name-generation", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/names/next-generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<String> getNextSequence(@PathVariable final String cropName,
 		@RequestBody final GermplasmNameSetting germplasmNameSetting) {

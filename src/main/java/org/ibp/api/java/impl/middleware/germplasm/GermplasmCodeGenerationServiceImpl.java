@@ -5,13 +5,15 @@ import org.generationcp.commons.ruleengine.RuleFactory;
 import org.generationcp.commons.ruleengine.coding.CodingRuleExecutionContext;
 import org.generationcp.commons.ruleengine.service.RulesService;
 import org.generationcp.commons.service.GermplasmNamingService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.service.api.GermplasmCodingResult;
@@ -21,15 +23,20 @@ import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmCodeGenerationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Service to generate Code Names (aka. Group Names)
@@ -37,9 +44,15 @@ import java.util.Set;
 @Transactional
 public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerationService {
 
-	private static final String GERMPLASM_NOT_PART_OF_MANAGEMENT_GROUP =
-		"Germplasm (gid: %s) is not part of a management group. Can not assign group name.";
 	protected static final String CODING_RULE_SEQUENCE = "coding";
+	protected static final String GERMPLASM_CODE_NAME_GERMPLASM_NOT_PART_OF_MANAGEMENT_GROUP =
+		"germplasm.code.name.germplasm.not.part.of.management.group";
+	protected static final String GERMPLASM_CODE_NAME_GERMPLASM_HAS_EXISTING_NAME_FOR_NAME_TYPE =
+		"germplasm.code.name.germplasm.has.existing.name.for.name.type";
+	protected static final String GERMPLASM_CODE_NAME_SUCCESSFULLY_ASSIGNED_NAME = "germplasm.code.name.successfully.assigned.name";
+
+	@Autowired
+	private ResourceBundleMessageSource messageSource;
 
 	@Autowired
 	private RulesService rulesService;
@@ -58,6 +71,9 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 
 	@Autowired
 	private NamingConfigurationService namingConfigurationService;
+
+	@Autowired
+	private GermplasmNameService germplasmNameService;
 
 	@Autowired
 	private GermplasmService germplasmService;
@@ -111,15 +127,14 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 	protected List<GermplasmCodingResult> applyGroupNamesForManualNaming(final Set<Integer> gids, final GermplasmNameSetting setting,
 		final GermplasmNameTypeDTO nameType) throws InvalidGermplasmNameSettingException {
 		final List<GermplasmCodingResult> assignCodesResultsList = new ArrayList<>();
-		final boolean startNumberSpecified = setting.getStartNumber() != null;
-		Integer startNumber = setting.getStartNumber();
-
+		final Optional<Integer> startNumberOptional = Optional.ofNullable(setting.getStartNumber());
 		// Call this method to check first if the name settings are valid.
 		this.germplasmNamingService.getNextNameInSequence(setting);
 
 		for (final Integer gid : gids) {
 			// Increment start number of succeeding germplasm processed based on initial start # specified, if any
-			if (startNumberSpecified) {
+			if (startNumberOptional.isPresent()) {
+				int startNumber = setting.getStartNumber();
 				setting.setStartNumber(startNumber++);
 			}
 			final String nameWithSequence = this.germplasmNamingService.generateNextNameAndIncrementSequence(setting);
@@ -135,68 +150,71 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 		final GermplasmCodingResult result = new GermplasmCodingResult();
 		result.setGid(gid);
 
-		final Germplasm germplasm = this.germplasmService.getGermplasmByGID(gid);
+		final GermplasmDto germplasm = this.germplasmService.getGermplasmDtoById(gid);
 
-		if (germplasm.getMgid() == null || germplasm.getMgid() == 0) {
-			result.addMessage(String.format(GERMPLASM_NOT_PART_OF_MANAGEMENT_GROUP, germplasm.getGid()));
+		if (germplasm.getGroupId() == null || germplasm.getGroupId() == 0) {
+			result.addMessage(this.messageSource
+				.getMessage(GERMPLASM_CODE_NAME_GERMPLASM_NOT_PART_OF_MANAGEMENT_GROUP, new String[] {String.valueOf(germplasm.getGid())},
+					LocaleContextHolder.getLocale()));
 			return result;
 		}
 
-		final List<Germplasm> groupMembers =
-			this.germplasmGroupingService.getDescendantGroupMembers(germplasm.getGid(), germplasm.getMgid());
-		groupMembers.add(0, germplasm);
+		final List<Integer> groupMembersGids =
+			this.germplasmGroupingService.getDescendantGroupMembersGids(germplasm.getGid(), germplasm.getGroupId());
 
-		for (final Germplasm member : groupMembers) {
-			this.addName(member, generatedCodeName, nameType, result);
+		groupMembersGids.add(germplasm.getGid());
+
+		final Map<Integer, List<GermplasmNameDto>> germplasmNameMapByGids =
+			this.germplasmNameService.getGermplasmNamesByGids(groupMembersGids).stream()
+				.collect(Collectors.groupingBy(GermplasmNameDto::getGid));
+
+		for (final Integer groupMemberGid : groupMembersGids) {
+			final Optional<GermplasmNameDto> existingGermplasmNameDto =
+				this.getGermplasmNameDtoByType(germplasmNameMapByGids.get(groupMemberGid), nameType.getCode());
+			if (!existingGermplasmNameDto.isPresent()) {
+				this.addName(groupMemberGid, generatedCodeName, nameType, result);
+			} else {
+				result.addMessage(this.messageSource
+					.getMessage(GERMPLASM_CODE_NAME_GERMPLASM_HAS_EXISTING_NAME_FOR_NAME_TYPE,
+						new String[] {
+							String.valueOf(groupMemberGid), existingGermplasmNameDto.get().getName(), nameType.getCode(),
+							generatedCodeName},
+						LocaleContextHolder.getLocale()));
+
+			}
 		}
 
 		return result;
 
 	}
 
-	private void addName(final Germplasm germplasm, final String groupName, final GermplasmNameTypeDTO nameType,
-		final GermplasmCodingResult result) {
-
-		final List<Name> currentNames = germplasm.getNames();
-
-		Name existingNameOfGivenType = null;
-		if (!currentNames.isEmpty() && nameType != null) {
-			for (final Name name : currentNames) {
-				if (nameType.getId().equals(name.getTypeId())) {
-					existingNameOfGivenType = name;
-					break;
-				}
-			}
+	private Optional<GermplasmNameDto> getGermplasmNameDtoByType(final List<GermplasmNameDto> germplasmNameDtoList,
+		final String nameTypeCode) {
+		if (!CollectionUtils.isEmpty(germplasmNameDtoList)) {
+			return germplasmNameDtoList.stream().filter(germplasmNameDto -> germplasmNameDto.getNameTypeCode().equals(nameTypeCode))
+				.findAny();
 		}
-
-		if (existingNameOfGivenType == null) {
-			// Make the current preferred name as non-preferred by setting nstat = 0
-			final Name currentPreferredName = germplasm.findPreferredName();
-			if (currentPreferredName != null) {
-				// nstat = 0 means it is not a preferred name.
-				currentPreferredName.setNstat(0);
-			}
-
-			final Name name = new Name();
-			name.setGermplasm(germplasm);
-			name.setTypeId(nameType.getId());
-			name.setNval(groupName);
-			// nstat = 1 means it is preferred name.
-			name.setNstat(1);
-			// Hard coded to zero for now.
-			name.setLocationId(0);
-			name.setNdate(Util.getCurrentDateAsIntegerValue());
-			name.setReferenceId(0);
-
-			germplasm.getNames().add(name);
-			this.germplasmService.saveGermplasm(germplasm);
-			result.addMessage(
-				String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.", germplasm.getGid(),
-					groupName, nameType.getCode()));
-		} else {
-			result.addMessage(String.format("Germplasm (gid: %s) already has existing name %s of type %s. Supplied name %s was not added.",
-				germplasm.getGid(), existingNameOfGivenType.getNval(), nameType.getCode(), groupName));
-		}
+		return Optional.empty();
 	}
 
+	private void addName(final Integer gid, final String groupName, final GermplasmNameTypeDTO nameType,
+		final GermplasmCodingResult result) {
+		final GermplasmNameRequestDto germplasmNameRequestDto = new GermplasmNameRequestDto();
+		germplasmNameRequestDto.setName(groupName);
+		germplasmNameRequestDto.setNameTypeCode(nameType.getCode());
+		germplasmNameRequestDto.setPreferredName(true);
+		germplasmNameRequestDto.setLocationId(0);
+		germplasmNameRequestDto.setDate(String.valueOf(Util.getCurrentDateAsIntegerValue()));
+		this.germplasmNameService.createName(germplasmNameRequestDto, gid);
+		result.addMessage(this.messageSource
+			.getMessage(GERMPLASM_CODE_NAME_SUCCESSFULLY_ASSIGNED_NAME,
+				new String[] {
+					String.valueOf(gid),
+					groupName, nameType.getCode()},
+				LocaleContextHolder.getLocale()));
+	}
+
+	public void setMessageSource(final ResourceBundleMessageSource messageSource) {
+		this.messageSource = messageSource;
+	}
 }
