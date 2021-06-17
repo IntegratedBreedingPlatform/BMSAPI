@@ -1,10 +1,17 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.generationcp.commons.service.GermplasmNamingService;
+import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
+import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
+import org.generationcp.middleware.service.api.GermplasmCodingResult;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.germplasm.GermplasmCodeGenerationService;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmCodeNameBatchRequestValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameRequestValidator;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 @Transactional
@@ -24,32 +32,60 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	private GermplasmNameRequestValidator germplasmNameRequestValidator;
 
 	@Autowired
+	private GermplasmCodeNameBatchRequestValidator germplasmCodeNameBatchRequestValidator;
+
+	@Autowired
 	private LocationValidator locationValidator;
 
 	@Autowired
-	private SecurityService securityService;
+	private GermplasmCodeGenerationService germplasmCodeGenerationService;
+
+	@Autowired
+	private GermplasmNamingService germplasmNamingService;
 
 	@Override
 	public void deleteName(final Integer gid, final Integer nameId) {
 		this.germplasmNameRequestValidator.validateNameDeletable(gid, nameId);
-		germplasmNameService.deleteName(nameId);
+		this.germplasmNameService.deleteName(nameId);
 	}
 
 	@Override
-	public void updateName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Integer nameId) {
+	public void updateName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid,
+		final Integer nameId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		germplasmNameRequestValidator.validate(programUUID, germplasmNameRequestDto, gid, nameId);
+		this.germplasmNameRequestValidator.validate(programUUID, germplasmNameRequestDto, gid, nameId);
 		if (germplasmNameRequestDto.getLocationId() != null) {
-			locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
+			this.locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
 		}
-		germplasmNameService.updateName(germplasmNameRequestDto, gid, nameId);
+		this.germplasmNameService.updateName(germplasmNameRequestDto, gid, nameId);
 	}
 
 	@Override
 	public Integer createName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		germplasmNameRequestValidator.validate(programUUID, germplasmNameRequestDto, gid, null);
-		locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
-		return germplasmNameService.createName(germplasmNameRequestDto, gid);
+		this.germplasmNameRequestValidator.validate(programUUID, germplasmNameRequestDto, gid, null);
+		this.locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
+		return this.germplasmNameService.createName(germplasmNameRequestDto, gid);
+	}
+
+	@Override
+	public List<GermplasmCodingResult> createCodeNames(final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
+		this.germplasmCodeNameBatchRequestValidator.validate(germplasmCodeNameBatchRequestDto);
+		return this.germplasmCodeGenerationService.createCodeNames(germplasmCodeNameBatchRequestDto);
+
+	}
+
+	@Override
+	public String getNextNameInSequence(final GermplasmNameSetting germplasmNameSetting) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmNameSetting.class.getName());
+		this.germplasmCodeNameBatchRequestValidator.validateGermplasmNameSetting(errors, germplasmNameSetting);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		try {
+			return this.germplasmNamingService.getNextNameInSequence(germplasmNameSetting);
+		} catch (final InvalidGermplasmNameSettingException e) {
+			throw new ApiRuntimeException("An error has occurred when trying generate next name in sequence", e);
+		}
 	}
 }
