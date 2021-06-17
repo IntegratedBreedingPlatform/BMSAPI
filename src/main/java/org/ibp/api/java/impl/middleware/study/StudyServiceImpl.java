@@ -174,7 +174,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public TrialImportResponse createTrials(String cropName, List<TrialImportRequestDTO> trialImportRequestDTOs) {
+	public TrialImportResponse createTrials(final String cropName, final List<TrialImportRequestDTO> trialImportRequestDTOs) {
 		final TrialImportResponse response = new TrialImportResponse();
 		final int originalListSize = trialImportRequestDTOs.size();
 		int noOfCreatedTrials = 0;

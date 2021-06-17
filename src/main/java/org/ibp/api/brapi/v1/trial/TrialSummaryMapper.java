@@ -52,7 +52,7 @@ public class TrialSummaryMapper {
 		public List<StudySummaryDto> convert(final MappingContext<List<InstanceMetadata>, List<StudySummaryDto>> context) {
 
 			final List<StudySummaryDto> studySummaries = new ArrayList<>();
-			if(!CollectionUtils.isEmpty(context.getSource())) {
+			if (!CollectionUtils.isEmpty(context.getSource())) {
 				for (final InstanceMetadata instance : context.getSource()) {
 					final StudySummaryDto studyMetadata = new StudySummaryDto();
 					studyMetadata.setStudyDbId(instance.getInstanceDbId());

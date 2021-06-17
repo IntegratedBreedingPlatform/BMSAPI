@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -50,71 +49,71 @@ public class TrialImportRequestValidator {
 			final Integer index = importRequestByIndexMap.get(t) + 1;
 
 			if (StringUtils.isEmpty(t.getTrialName())) {
-				errors.reject("trial.import.name.null", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.name.null", new String[] {index.toString()}, "");
 				return true;
 			}
 			if (t.getTrialName().length() > TRIAL_NAME_MAX_LENGTH) {
-				errors.reject("trial.import.name.exceed.length", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.name.exceed.length", new String[] {index.toString()}, "");
 				return true;
 			}
 
 			if (trialNames.contains(t.getTrialName())) {
-				errors.reject("trial.import.name.duplicate.import", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.name.duplicate.import", new String[] {index.toString()}, "");
 				return true;
 			}
 
 			if (StringUtils.isEmpty(t.getProgramDbId())) {
-				errors.reject("trial.import.program.dbid.null", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.program.dbid.null", new String[] {index.toString()}, "");
 				return true;
 			}
 
-			Project project = this.workbenchDataManager.getProjectByUuidAndCrop(t.getProgramDbId(), crop);
+			final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(t.getProgramDbId(), crop);
 			if (project == null) {
-				errors.reject("trial.import.program.dbid.invalid", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.program.dbid.invalid", new String[] {index.toString()}, "");
 				return true;
 			}
 
 			final Integer trialDbId = this.fieldbookService.getProjectIdByNameAndProgramUUID(t.getTrialName(), t.getProgramDbId());
 			if (trialDbId != null) {
-				errors.reject("trial.import.name.duplicate.not.unique", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.name.duplicate.not.unique", new String[] {index.toString()}, "");
 				return true;
 			}
 
 			if (StringUtils.isEmpty(t.getTrialDescription())) {
-				errors.reject("trial.import.description.null", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.description.null", new String[] {index.toString()}, "");
 				return true;
 			}
 			if (t.getTrialDescription().length() > TRIAL_DESCRIPTION_MAX_LENGTH) {
-				errors.reject("trial.import.description.exceed.length", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.description.exceed.length", new String[] {index.toString()}, "");
 				return true;
 			}
 			if (StringUtils.isEmpty(t.getStartDate())) {
-				errors.reject("trial.import.start.date.null", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.start.date.null", new String[] {index.toString()}, "");
 				return true;
 			}
 			final Date startDate = Util.tryParseDate(t.getStartDate(), Util.FRONTEND_DATE_FORMAT);
 			if (startDate == null) {
-				errors.reject("trial.import.start.date.invalid.format", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.start.date.invalid.format", new String[] {index.toString()}, "");
 				return true;
 			}
 
 			if (StringUtils.isNotEmpty(t.getEndDate())) {
 				final Date endDate = Util.tryParseDate(t.getEndDate(), Util.FRONTEND_DATE_FORMAT);
 				if (endDate == null) {
-					errors.reject("trial.import.end.date.invalid.format", new String[] {index.toString()}, "");
+					this.errors.reject("trial.import.end.date.invalid.format", new String[] {index.toString()}, "");
 					return true;
 				}
 				if (endDate.compareTo(startDate) < 0) {
-					errors.reject("trial.import.end.date.invalid.date", new String[] {index.toString()}, "");
+					this.errors.reject("trial.import.end.date.invalid.date", new String[] {index.toString()}, "");
 					return true;
 				}
 			}
 
-			if (isAnyAdditionalInfoInvalid(t, index)) {
+			if (this.isAnyAdditionalInfoInvalid(t, index)) {
 				return true;
 			}
 
-			if (isAnyExternalReferenceInvalid(t, index)) {
+			if (this.isAnyExternalReferenceInvalid(t, index)) {
 				return true;
 			}
 
@@ -131,15 +130,15 @@ public class TrialImportRequestValidator {
 		if (t.getExternalReferences() != null) {
 			return t.getExternalReferences().stream().anyMatch(r -> {
 				if (r == null || StringUtils.isEmpty(r.getReferenceID()) || StringUtils.isEmpty(r.getReferenceSource())) {
-					errors.reject("trial.import.reference.null", new String[] {index.toString(), "externalReference"}, "");
+					this.errors.reject("trial.import.reference.null", new String[] {index.toString(), "externalReference"}, "");
 					return true;
 				}
 				if (StringUtils.isNotEmpty(r.getReferenceID()) && r.getReferenceID().length() > 2000) {
-					errors.reject("trial.import.reference.id.exceeded.length", new String[] {index.toString(), "referenceID"}, "");
+					this.errors.reject("trial.import.reference.id.exceeded.length", new String[] {index.toString(), "referenceID"}, "");
 					return true;
 				}
 				if (StringUtils.isNotEmpty(r.getReferenceSource()) && r.getReferenceSource().length() > 255) {
-					errors.reject("trial.import.reference.source.exceeded.length", new String[] {index.toString(), "referenceSource"},
+					this.errors.reject("trial.import.reference.source.exceeded.length", new String[] {index.toString(), "referenceSource"},
 						"");
 					return true;
 				}
@@ -152,17 +151,17 @@ public class TrialImportRequestValidator {
 	private boolean isAnyAdditionalInfoInvalid(final TrialImportRequestDTO t, final Integer index) {
 		if (t.getAdditionalInfo() != null) {
 			if (t.getAdditionalInfo().keySet().stream().anyMatch(Objects::isNull)) {
-				errors.reject("trial.import.additional.info.null", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.additional.info.null", new String[] {index.toString()}, "");
 				return true;
 			}
 			if (t.getAdditionalInfo().keySet().stream().anyMatch(String::isEmpty)) {
-				errors.reject("trial.import.additional.info.null", new String[] {index.toString()}, "");
+				this.errors.reject("trial.import.additional.info.null", new String[] {index.toString()}, "");
 				return true;
 			}
 
 			return t.getAdditionalInfo().keySet().stream().anyMatch(k -> {
 				if (StringUtils.isNotEmpty(t.getAdditionalInfo().get(k)) && t.getAdditionalInfo().get(k).length() > 255) {
-					errors.reject("trial.import.additional.info.value.exceeded.length", new String[] {index.toString(), k}, "");
+					this.errors.reject("trial.import.additional.info.value.exceeded.length", new String[] {index.toString(), k}, "");
 					return true;
 				}
 				return false;

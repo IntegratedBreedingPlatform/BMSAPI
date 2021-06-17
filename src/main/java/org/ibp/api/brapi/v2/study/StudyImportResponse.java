@@ -19,7 +19,7 @@ public class StudyImportResponse {
 	}
 
 	public String getStatus() {
-		return status;
+		return this.status;
 	}
 
 	public void setStatus(final String status) {
@@ -27,7 +27,7 @@ public class StudyImportResponse {
 	}
 
 	public List<ObjectError> getErrors() {
-		return errors;
+		return this.errors;
 	}
 
 	public void setErrors(final List<ObjectError> errors) {

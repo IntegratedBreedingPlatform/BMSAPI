@@ -212,7 +212,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		if (!CollectionUtils.isEmpty(studyImportRequestDTOS)) {
 
 			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-			final List<StudyInstanceDto> instances = this.middlewareStudyInstanceService.saveStudyInstances(cropName, studyImportRequestDTOS, user.getUserid());
+			final List<StudyInstanceDto> instances =
+				this.middlewareStudyInstanceService.saveStudyInstances(cropName, studyImportRequestDTOS, user.getUserid());
 			if (!CollectionUtils.isEmpty(instances)) {
 				noOfCreatedStudies = instances.size();
 			}
@@ -248,17 +249,17 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		return instanceDescriptorData;
 	}
 
-	private void validateInstanceData(final Integer studyId, final Integer instanceId, final InstanceVariableData instanceVariableData, final VariableType variableType) {
+	private void validateInstanceData(final Integer studyId, final Integer instanceId, final InstanceVariableData instanceVariableData,
+		final VariableType variableType) {
 		this.studyValidator.validate(studyId, true);
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));
 
 		final Integer datasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		final Integer variableId = instanceVariableData.getVariableId();
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
-				variableId));
+			variableId));
 		this.observationValidator.validateVariableValue(variableId, instanceVariableData.getValue());
 		this.datasetValidator.validateVariableBelongsToVariableType(datasetId, variableId, variableType.getId());
 	}
-
 
 }

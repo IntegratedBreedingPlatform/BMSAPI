@@ -35,7 +35,7 @@ public class StudyImportRequestValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), StudyImportRequestDTO.class.getName());
 
 		Integer index = 1;
-		Iterator<StudyImportRequestDTO> iterator = studyImportRequestDTOS.iterator();
+		final Iterator<StudyImportRequestDTO> iterator = studyImportRequestDTOS.iterator();
 		while (iterator.hasNext()) {
 			final StudyImportRequestDTO s = iterator.next();
 			if (StringUtils.isEmpty(s.getTrialDbId())) {
@@ -66,7 +66,7 @@ public class StudyImportRequestValidator {
 				}
 			}
 
-			if(!CollectionUtils.isEmpty(s.getSeasons()) && s.getSeasons().size() > 1) {
+			if (!CollectionUtils.isEmpty(s.getSeasons()) && s.getSeasons().size() > 1) {
 				this.errors.reject("study.import.season.invalid", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
