@@ -97,6 +97,7 @@ import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.MethodService;
+import org.generationcp.middleware.service.api.NamingConfigurationService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
@@ -109,7 +110,6 @@ import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFac
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
-import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
@@ -119,6 +119,7 @@ import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmS
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
+import org.generationcp.middleware.service.impl.NamingConfigurationServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
@@ -126,6 +127,7 @@ import org.generationcp.middleware.service.impl.derived_variables.FormulaService
 import org.generationcp.middleware.service.impl.inventory.LotServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl;
+import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
 import org.generationcp.middleware.service.impl.rpackage.RPackageServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
@@ -140,6 +142,8 @@ import org.generationcp.middleware.service.impl.workbench.WorkbenchServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SessionFactory;
+import org.ibp.api.java.germplasm.GermplasmCodeGenerationService;
+import org.ibp.api.java.impl.middleware.germplasm.GermplasmCodeGenerationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -311,7 +315,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmGroupingService getGermplasmGroupingService() {
-		return new GermplasmGroupingServiceImpl(this.getCropDatabaseSessionProvider());
+		return new GermplasmGroupingServiceImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
 	}
 
 	@Bean
@@ -388,7 +392,6 @@ public class MiddlewareFactory {
 	public ProgramService getProgramService() {
 		return new ProgramServiceImpl(this.getWorkbenchSessionProvider());
 	}
-
 
 	@Bean
 	@DependsOn("WORKBENCH_SessionFactory")
@@ -677,6 +680,18 @@ public class MiddlewareFactory {
 	@DependsOn("WORKBENCH_SessionFactory")
 	public ReleaseNoteService getReleaseNoteService() {
 		return new ReleaseNoteServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmCodeGenerationService getGermplasmCodeGenerationService() {
+		return new GermplasmCodeGenerationServiceImpl();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public NamingConfigurationService getNamingConfigurationService() {
+		return new NamingConfigurationServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
