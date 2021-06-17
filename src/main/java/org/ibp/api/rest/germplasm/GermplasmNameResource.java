@@ -47,7 +47,7 @@ public class GermplasmNameResource {
 		return new ResponseEntity<>(this.germplasmNameService.createCodeNames(germplasmCodeNameBatchRequestDto), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get next code name sequence based on the specified name settings")
+	@ApiOperation(value = "Get next name sequence based on the specified name settings")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'CODE_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/names/next-generation", method = RequestMethod.POST)
 	@ResponseBody
