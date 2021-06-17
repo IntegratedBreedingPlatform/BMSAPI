@@ -6,6 +6,7 @@ rule-engine:
   ruleSequenceConfiguration:
     naming: ${naming.rules}
     stockid: ${stockid.rules}
+    coding: ${coding.rules}
 
 germplasm-naming-properties:
   germplasmOriginStudiesDefault: '${germplasm.origin.studies.default}'

@@ -2,7 +2,10 @@ package org.ibp.api.rest.germplasm;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
+import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
+import org.generationcp.middleware.service.api.GermplasmCodingResult;
 import org.ibp.api.java.impl.middleware.germplasm.GermplasmNameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @Api(value = "Germplasm name Services")
 @Controller
@@ -31,6 +36,24 @@ public class GermplasmNameResource {
 		@RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @RequestBody final GermplasmNameRequestDto germplasmNameRequestDto) {
 		return new ResponseEntity<>(this.germplasmNameService.createName(programUUID, germplasmNameRequestDto, gid), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Create code name (CODE1, CODE2, CODE2) for specified list of germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'CODE_GERMPLASM')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/codes", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmCodingResult>> createGermplasmCodeNames(@PathVariable final String cropName,
+		@RequestBody final GermplasmCodeNameBatchRequestDto germplasmCodeNameBatchRequestDto) {
+		return new ResponseEntity<>(this.germplasmNameService.createCodeNames(germplasmCodeNameBatchRequestDto), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get next name sequence based on the specified name settings")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'CODE_GERMPLASM')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/names/next-generation", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<String> getNextSequence(@PathVariable final String cropName,
+		@RequestBody final GermplasmNameSetting germplasmNameSetting) {
+		return new ResponseEntity<>(this.germplasmNameService.getNextNameInSequence(germplasmNameSetting), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update name for a specified Germplasm")
