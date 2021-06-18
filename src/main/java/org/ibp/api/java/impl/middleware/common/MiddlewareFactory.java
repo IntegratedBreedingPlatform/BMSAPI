@@ -315,7 +315,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmGroupingService getGermplasmGroupingService() {
-		return new GermplasmGroupingServiceImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
+		return new GermplasmGroupingServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
