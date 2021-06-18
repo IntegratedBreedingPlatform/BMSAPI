@@ -205,7 +205,7 @@ public class StudyResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/studies", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<StudyInstanceDto>> createStudy(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<StudyInstanceDto>> createStudies(@PathVariable final String crop,
 		@RequestBody final List<StudyImportRequestDTO> studyImportRequestDTOS) {
 		BaseValidator.checkNotNull(studyImportRequestDTOS, "study.import.request.null");
 		final StudyImportResponse studyImportResponse = this.studyInstanceService.createStudies(crop, studyImportRequestDTOS);

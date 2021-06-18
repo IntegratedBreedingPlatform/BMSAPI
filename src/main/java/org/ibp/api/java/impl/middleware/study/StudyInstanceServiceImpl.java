@@ -175,8 +175,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsByInstance(final Integer geolocationId) {
-		return this.middlewareStudyInstanceService.getStudyDetailsByInstance(geolocationId);
+	public StudyDetailsDto getStudyDetailsByInstance(final Integer instanceId) {
+		return this.middlewareStudyInstanceService.getStudyDetailsByInstance(instanceId);
 	}
 
 	@Override

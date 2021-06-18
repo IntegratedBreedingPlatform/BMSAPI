@@ -33,7 +33,7 @@ public interface StudyInstanceService {
 	InstanceDescriptorData updateInstanceDescriptorData(Integer studyId, Integer instanceId, Integer descriptorDataId,
 		InstanceDescriptorData instanceDescriptorData);
 
-	StudyDetailsDto getStudyDetailsByInstance(Integer geolocationId);
+	StudyDetailsDto getStudyDetailsByInstance(Integer instanceId);
 
 	long countStudyInstances(StudySearchFilter studySearchFilter);
 
