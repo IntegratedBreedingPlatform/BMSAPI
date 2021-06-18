@@ -191,7 +191,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<Location> locations = StudyTestDataProvider.getLocationList();
 		final Location location = locations.get(0);
 
-		Mockito.when(this.studyInstanceService.getStudyDetailsByGeolocation(studyDetailsDto.getMetadata().getStudyDbId()))
+		Mockito.when(this.studyInstanceService.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId()))
 			.thenReturn(studyDetailsDto);
 		Mockito.when(this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10))).thenReturn(locations);
 

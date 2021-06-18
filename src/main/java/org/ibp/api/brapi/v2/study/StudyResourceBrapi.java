@@ -77,7 +77,7 @@ public class StudyResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyInstanceService.getStudyDetailsByGeolocation(studyDbId);
+		final StudyDetailsDto mwStudyDetails = this.studyInstanceService.getStudyDetailsByInstance(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 			;

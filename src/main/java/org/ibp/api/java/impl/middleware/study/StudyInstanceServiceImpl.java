@@ -15,7 +15,6 @@ import org.ibp.api.brapi.v2.study.StudyImportResponse;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
@@ -54,9 +53,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Resource
 	private WorkbenchDataManager workbenchDataManager;
-
-	@Resource
-	private DatasetService datasetService;
 
 	@Resource
 	private StudyValidator studyValidator;
@@ -179,7 +175,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsByGeolocation(final Integer geolocationId) {
+	public StudyDetailsDto getStudyDetailsByInstance(final Integer geolocationId) {
 		return this.middlewareStudyInstanceService.getStudyDetailsByInstance(geolocationId);
 	}
 
@@ -205,7 +201,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		int noOfCreatedStudies = 0;
 
 		// Remove studies that fails any validation. They will be excluded from creation
-		final BindingResult bindingResult = this.studyImportRequestValidator.pruneStudiesInvalidForImport(studyImportRequestDTOS, cropName);
+		final BindingResult bindingResult = this.studyImportRequestValidator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		if (bindingResult.hasErrors()) {
 			response.setErrors(bindingResult.getAllErrors());
 		}

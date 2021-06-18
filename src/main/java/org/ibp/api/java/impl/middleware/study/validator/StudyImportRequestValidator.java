@@ -18,9 +18,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class StudyImportRequestValidator {
+
+	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
+	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
+	private static final int MAX_ENVIRONMENT_PARAMETER_LENGTH = 255;
 
 	@Autowired
 	private StudyService studyService;
@@ -30,9 +37,16 @@ public class StudyImportRequestValidator {
 
 	protected BindingResult errors;
 
-	public BindingResult pruneStudiesInvalidForImport(final List<StudyImportRequestDTO> studyImportRequestDTOS, final String crop) {
+	public BindingResult pruneStudiesInvalidForImport(final List<StudyImportRequestDTO> studyImportRequestDTOS) {
 		BaseValidator.checkNotEmpty(studyImportRequestDTOS, "study.import.request.null");
 		this.errors = new MapBindingResult(new HashMap<>(), StudyImportRequestDTO.class.getName());
+
+		final List<String> trialDbIds = studyImportRequestDTOS.stream().filter(s -> StringUtils.isNotEmpty(s.getTrialDbId()))
+			.map(StudyImportRequestDTO::getTrialDbId).collect(Collectors.toList());
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setTrialDbIds(trialDbIds);
+		final Map<String, StudySummary> trialsMap = this.studyService.getStudies(studySearchFilter, null).stream()
+			.collect(Collectors.toMap(s -> String.valueOf(s.getTrialDbId()), Function.identity()));
 
 		Integer index = 1;
 		final Iterator<StudyImportRequestDTO> iterator = studyImportRequestDTOS.iterator();
@@ -43,11 +57,7 @@ public class StudyImportRequestValidator {
 				iterator.remove();
 				continue;
 			}
-
-			final StudySearchFilter filter = new StudySearchFilter();
-			filter.setTrialDbIds(Collections.singletonList(s.getTrialDbId()));
-			final List<StudySummary> studies = this.studyService.getStudies(filter, null);
-			if (CollectionUtils.isEmpty(studies)) {
+			if (!trialsMap.containsKey(s.getTrialDbId())) {
 				this.errors.reject("study.import.trialDbId.invalid", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
@@ -56,8 +66,8 @@ public class StudyImportRequestValidator {
 			if (StringUtils.isNotEmpty(s.getLocationDbId())) {
 				final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 				locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(s.getLocationDbId())));
-				//Get the progamUUID from the Study where the environment will be added
-				locationSearchRequest.setProgramUUID(studies.get(0).getProgramDbId());
+				//Get the programUUID from the Study where the environment will be added
+				locationSearchRequest.setProgramUUID(trialsMap.get(s.getTrialDbId()).getProgramDbId());
 
 				if (CollectionUtils.isEmpty(this.locationService.getFilteredLocations(locationSearchRequest, null))) {
 					this.errors.reject("study.import.locationDbId.invalid", new String[] {index.toString()}, "");
@@ -94,11 +104,11 @@ public class StudyImportRequestValidator {
 					this.errors.reject("study.import.reference.null", new String[] {index.toString(), "externalReference"}, "");
 					return true;
 				}
-				if (StringUtils.isNotEmpty(r.getReferenceID()) && r.getReferenceID().length() > 2000) {
+				if (StringUtils.isNotEmpty(r.getReferenceID()) && r.getReferenceID().length() > MAX_REFERENCE_ID_LENGTH) {
 					this.errors.reject("study.import.reference.id.exceeded.length", new String[] {index.toString(), "referenceID"}, "");
 					return true;
 				}
-				if (StringUtils.isNotEmpty(r.getReferenceSource()) && r.getReferenceSource().length() > 255) {
+				if (StringUtils.isNotEmpty(r.getReferenceSource()) && r.getReferenceSource().length() > MAX_REFERENCE_SOURCE_LENGTH) {
 					this.errors.reject("study.import.reference.source.exceeded.length", new String[] {index.toString(), "referenceSource"},
 						"");
 					return true;
@@ -116,7 +126,7 @@ public class StudyImportRequestValidator {
 					this.errors.reject("study.import.environment.parameter.pui.null", new String[] {index.toString()}, "");
 					return true;
 				}
-				if (StringUtils.isNotEmpty(e.getValue()) && e.getValue().length() > 255) {
+				if (StringUtils.isNotEmpty(e.getValue()) && e.getValue().length() > MAX_ENVIRONMENT_PARAMETER_LENGTH) {
 					this.errors.reject("study.import.environment.parameter.value.exceeded.length", new String[] {index.toString()}, "");
 					return true;
 				}

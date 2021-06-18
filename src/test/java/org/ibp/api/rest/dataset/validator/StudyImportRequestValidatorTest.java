@@ -30,7 +30,6 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class StudyImportRequestValidatorTest {
 
-	private static final String CROP = "maize";
 	private static final String TRIAL_DBID = "1";
 	private static final String LOCATION_DBID = "1";
 
@@ -47,8 +46,10 @@ public class StudyImportRequestValidatorTest {
 	public void setUp() {
 		final StudySearchFilter filter = new StudySearchFilter();
 		filter.setTrialDbIds(Collections.singletonList(TRIAL_DBID));
+		final StudySummary studySummary = new StudySummary();
+		studySummary.setTrialDbId(Integer.valueOf(TRIAL_DBID));
 		Mockito.when(this.studyService.getStudies(ArgumentMatchers.eq(filter), ArgumentMatchers.eq(null)))
-			.thenReturn(Collections.singletonList(new StudySummary()));
+			.thenReturn(Collections.singletonList(studySummary));
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(LOCATION_DBID)));
 		Mockito.when(this.locationService.getFilteredLocations(locationSearchRequest, null))
@@ -58,7 +59,7 @@ public class StudyImportRequestValidatorTest {
 	@Test
 	public void testPruneStudiesInvalidForImport_Success() {
 		final List<StudyImportRequestDTO> studyImportRequestDTOS = this.createStudyImportRequestDTOList();
-		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		Assert.assertFalse(result.hasErrors());
 	}
 
@@ -66,7 +67,7 @@ public class StudyImportRequestValidatorTest {
 	public void testPruneStudiesInvalidForImport_WhereTrialDbIdIsNull() {
 		final List<StudyImportRequestDTO> studyImportRequestDTOS = this.createStudyImportRequestDTOList();
 		studyImportRequestDTOS.get(0).setTrialDbId(null);
-		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.import.trialDbId.required", result.getAllErrors().get(0).getCode());
 	}
@@ -75,7 +76,7 @@ public class StudyImportRequestValidatorTest {
 	public void testPruneStudiesInvalidForImport_WhereTrialDbIdIsInvalid() {
 		final List<StudyImportRequestDTO> studyImportRequestDTOS = this.createStudyImportRequestDTOList();
 		studyImportRequestDTOS.get(0).setTrialDbId("2");
-		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.import.trialDbId.invalid", result.getAllErrors().get(0).getCode());
 	}
@@ -84,7 +85,7 @@ public class StudyImportRequestValidatorTest {
 	public void testPruneStudiesInvalidForImport_WhereLocationDbIdIsInvalid() {
 		final List<StudyImportRequestDTO> studyImportRequestDTOS = this.createStudyImportRequestDTOList();
 		studyImportRequestDTOS.get(0).setLocationDbId("2");
-		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.import.locationDbId.invalid", result.getAllErrors().get(0).getCode());
 	}
@@ -95,7 +96,7 @@ public class StudyImportRequestValidatorTest {
 		final List<ExternalReferenceDTO> externalReferenceDTOS = new ArrayList<>();
 		externalReferenceDTOS.add(new ExternalReferenceDTO());
 		studyImportRequestDTOS.get(0).setExternalReferences(externalReferenceDTOS);
-		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.import.reference.null", result.getAllErrors().get(0).getCode());
 	}
@@ -109,7 +110,7 @@ public class StudyImportRequestValidatorTest {
 		externalReferenceDTO.setReferenceSource(RandomStringUtils.randomAlphabetic(200));
 		externalReferenceDTOS.add(externalReferenceDTO);
 		studyImportRequestDTOS.get(0).setExternalReferences(externalReferenceDTOS);
-		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.import.reference.id.exceeded.length", result.getAllErrors().get(0).getCode());
 	}
@@ -123,7 +124,7 @@ public class StudyImportRequestValidatorTest {
 		externalReferenceDTO.setReferenceSource(RandomStringUtils.randomAlphabetic(256));
 		externalReferenceDTOS.add(externalReferenceDTO);
 		studyImportRequestDTOS.get(0).setExternalReferences(externalReferenceDTOS);
-		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.import.reference.source.exceeded.length", result.getAllErrors().get(0).getCode());
 	}
@@ -135,7 +136,7 @@ public class StudyImportRequestValidatorTest {
 		final EnvironmentParameter environmentParameter = new EnvironmentParameter();
 		environmentParameters.add(environmentParameter);
 		studyImportRequestDTOS.get(0).setEnvironmentParameters(environmentParameters);
-		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.import.environment.parameter.pui.null", result.getAllErrors().get(0).getCode());
 	}
@@ -149,7 +150,7 @@ public class StudyImportRequestValidatorTest {
 		environmentParameter.setValue(RandomStringUtils.randomAlphabetic(256));
 		environmentParameters.add(environmentParameter);
 		studyImportRequestDTOS.get(0).setEnvironmentParameters(environmentParameters);
-		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.import.environment.parameter.value.exceeded.length", result.getAllErrors().get(0).getCode());
 	}
@@ -158,7 +159,7 @@ public class StudyImportRequestValidatorTest {
 	public void testPruneStudiesInvalidForImport_WhereSeasonsValuesAreMoreThanOne() {
 		final List<StudyImportRequestDTO> studyImportRequestDTOS = this.createStudyImportRequestDTOList();
 		studyImportRequestDTOS.get(0).setSeasons(Arrays.asList("DRY", "WET"));
-		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS, CROP);
+		final BindingResult result = this.validator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.import.season.invalid", result.getAllErrors().get(0).getCode());
 	}

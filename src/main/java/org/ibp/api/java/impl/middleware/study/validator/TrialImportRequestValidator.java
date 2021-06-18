@@ -26,6 +26,9 @@ public class TrialImportRequestValidator {
 
 	private static final Integer TRIAL_NAME_MAX_LENGTH = 225;
 	private static final Integer TRIAL_DESCRIPTION_MAX_LENGTH = 225;
+	private static final int MAX_ADDITIONAL_INFO_LENGTH = 255;
+	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
+	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -133,11 +136,11 @@ public class TrialImportRequestValidator {
 					this.errors.reject("trial.import.reference.null", new String[] {index.toString(), "externalReference"}, "");
 					return true;
 				}
-				if (StringUtils.isNotEmpty(r.getReferenceID()) && r.getReferenceID().length() > 2000) {
+				if (StringUtils.isNotEmpty(r.getReferenceID()) && r.getReferenceID().length() > MAX_REFERENCE_ID_LENGTH) {
 					this.errors.reject("trial.import.reference.id.exceeded.length", new String[] {index.toString(), "referenceID"}, "");
 					return true;
 				}
-				if (StringUtils.isNotEmpty(r.getReferenceSource()) && r.getReferenceSource().length() > 255) {
+				if (StringUtils.isNotEmpty(r.getReferenceSource()) && r.getReferenceSource().length() > MAX_REFERENCE_SOURCE_LENGTH) {
 					this.errors.reject("trial.import.reference.source.exceeded.length", new String[] {index.toString(), "referenceSource"},
 						"");
 					return true;
@@ -160,7 +163,7 @@ public class TrialImportRequestValidator {
 			}
 
 			return t.getAdditionalInfo().keySet().stream().anyMatch(k -> {
-				if (StringUtils.isNotEmpty(t.getAdditionalInfo().get(k)) && t.getAdditionalInfo().get(k).length() > 255) {
+				if (StringUtils.isNotEmpty(t.getAdditionalInfo().get(k)) && t.getAdditionalInfo().get(k).length() > MAX_ADDITIONAL_INFO_LENGTH) {
 					this.errors.reject("trial.import.additional.info.value.exceeded.length", new String[] {index.toString(), k}, "");
 					return true;
 				}
