@@ -3,6 +3,8 @@ package org.ibp.api.rest.labelprinting;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -55,6 +57,9 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 	@Autowired
 	private LotService lotService;
+
+	@Autowired
+	private GermplasmService germplasmService;
 
 	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
@@ -210,7 +215,9 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final Integer searchRequestId = labelsInfoInput.getSearchRequestId();
 		final LotsSearchDto searchDto =
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
-		final List<Variable> germplasmAttributeVariables = this.lotService.getGermplasmAttributeVariables(searchDto, labelsInfoInput.getProgramUUID());
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
+		final Set<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet());
+		final List<Variable> germplasmAttributeVariables = this.germplasmService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), labelsInfoInput.getProgramUUID());
 
 		// Build label list
 

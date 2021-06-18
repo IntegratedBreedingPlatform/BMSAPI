@@ -95,6 +95,9 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	@Autowired
 	private GermplasmService germplasmService;
 
+	@Autowired
+	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmServiceMiddleware;
+
 	public static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
 	@PostConstruct
@@ -153,7 +156,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 
-		final List<Variable> attributeVariables = this.germplasmSearchService.getGermplasmAttributeVariables(germplasmSearchRequest, labelsInfoInput.getProgramUUID());
+		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, null);
+		final Set<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toSet());
+
+		final List<Variable> attributeVariables = this.germplasmServiceMiddleware.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), labelsInfoInput.getProgramUUID());
 		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest);
 
 		// Germplasm Details labels

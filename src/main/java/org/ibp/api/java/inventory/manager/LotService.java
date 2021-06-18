@@ -20,8 +20,6 @@ public interface LotService {
 
 	long countSearchLots(LotsSearchDto lotsSearchDto);
 
-	List<Variable> getGermplasmAttributeVariables(LotsSearchDto searchDto, String programUUID);
-
 	Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(LotsSearchDto searchDto);
 
 	String saveLot(String programUUID, LotGeneratorInputDto lotGeneratorInputDto);
