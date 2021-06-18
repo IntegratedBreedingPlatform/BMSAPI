@@ -42,8 +42,8 @@ public class SampleObservationMapper {
 			protected void configure() {
 				this.map().setStudyDbId(this.source.getStudyDbId());
 				this.map().setLocationDbId(this.source.getLocationDbId());
-				this.map().setObsUnitId(this.source.getObsUnitId());
-				this.map().setSampleId(this.source.getSampleBusinessKey());
+				this.map().setObservationUnitDbId(this.source.getObsUnitId());
+				this.map().setSampleDbId(this.source.getSampleBusinessKey());
 				this.map().setTakenBy(this.source.getTakenBy());
 				this.using(this.toDateConverter).map(this.source.getSampleDate()).setSampleDate(null);
 				this.map().setSampleType(this.source.getSampleType());

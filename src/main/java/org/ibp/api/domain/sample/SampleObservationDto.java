@@ -13,9 +13,9 @@ public class SampleObservationDto implements Serializable {
 
 	private Integer studyDbId;
 	private Integer locationDbId;
-	private String obsUnitId;
-	private String plantId;
-	private String sampleId;
+	private String observationUnitDbId;
+	private String plantDbId;
+	private String sampleDbId;
 	private String takenBy;
 	private String sampleDate;
 	private String sampleType;
@@ -34,11 +34,11 @@ public class SampleObservationDto implements Serializable {
 
 	}
 
-	public SampleObservationDto(final Integer studyDbId, final String obsUnitId, final String plantId, final String sampleId) {
+	public SampleObservationDto(final Integer studyDbId, final String obsUnitId, final String plantId, final String sampleDbId) {
 		this.studyDbId = studyDbId;
-		this.obsUnitId = obsUnitId;
-		this.plantId = plantId;
-		this.sampleId = sampleId;
+		this.observationUnitDbId = obsUnitId;
+		this.plantDbId = plantId;
+		this.sampleDbId = sampleDbId;
 	}
 
 	public Integer getStudyDbId() {
@@ -57,28 +57,28 @@ public class SampleObservationDto implements Serializable {
 		this.locationDbId = locationDbId;
 	}
 
-	public String getObsUnitId() {
-		return this.obsUnitId;
+	public String getObservationUnitDbId() {
+		return this.observationUnitDbId;
 	}
 
-	public void setObsUnitId(final String obsUnitId) {
-		this.obsUnitId = obsUnitId;
+	public void setObservationUnitDbId(final String observationUnitDbId) {
+		this.observationUnitDbId = observationUnitDbId;
 	}
 
-	public String getPlantId() {
-		return this.plantId;
+	public String getPlantDbId() {
+		return this.plantDbId;
 	}
 
-	public void setPlantId(final String plantId) {
-		this.plantId = plantId;
+	public void setPlantDbId(final String plantDbId) {
+		this.plantDbId = plantDbId;
 	}
 
-	public String getSampleId() {
-		return this.sampleId;
+	public String getSampleDbId() {
+		return this.sampleDbId;
 	}
 
-	public void setSampleId(final String sampleId) {
-		this.sampleId = sampleId;
+	public void setSampleDbId(final String sampleDbId) {
+		this.sampleDbId = sampleDbId;
 	}
 
 	public String getTakenBy() {
@@ -194,9 +194,9 @@ public class SampleObservationDto implements Serializable {
 		return new EqualsBuilder()
 			.append(this.studyDbId, sampleObservationDto.studyDbId)
 			.append(this.locationDbId, sampleObservationDto.locationDbId)
-			.append(this.obsUnitId, sampleObservationDto.obsUnitId)
-			.append(this.plantId, sampleObservationDto.plantId)
-			.append(this.sampleId, sampleObservationDto.sampleId)
+			.append(this.observationUnitDbId, sampleObservationDto.observationUnitDbId)
+			.append(this.plantDbId, sampleObservationDto.plantDbId)
+			.append(this.sampleDbId, sampleObservationDto.sampleDbId)
 			.append(this.germplasmDbId, sampleObservationDto.germplasmDbId).isEquals();
 	}
 
@@ -205,9 +205,9 @@ public class SampleObservationDto implements Serializable {
 		return new HashCodeBuilder()
 			.append(this.studyDbId)
 			.append(this.locationDbId)
-			.append(this.obsUnitId)
-			.append(this.plantId)
-			.append(this.sampleId)
+			.append(this.observationUnitDbId)
+			.append(this.plantDbId)
+			.append(this.sampleDbId)
 			.append(this.germplasmDbId).hashCode();
 	}
 
