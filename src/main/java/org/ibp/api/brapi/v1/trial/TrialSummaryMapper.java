@@ -10,6 +10,7 @@ import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.spi.MappingContext;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,18 +52,18 @@ public class TrialSummaryMapper {
 		public List<StudySummaryDto> convert(final MappingContext<List<InstanceMetadata>, List<StudySummaryDto>> context) {
 
 			final List<StudySummaryDto> studySummaries = new ArrayList<>();
-
-			for (final InstanceMetadata instance : context.getSource()) {
-				final StudySummaryDto studyMetadata = new StudySummaryDto();
-				studyMetadata.setStudyDbId(instance.getInstanceDbId());
-				studyMetadata.setStudyName(instance.getTrialName() + " Environment Number " + instance.getInstanceNumber());
-				studyMetadata.setLocationName(
-					instance.getLocationName() != null ? instance.getLocationName() : instance.getLocationAbbreviation());
-				studyMetadata.setLocationDbId(String.valueOf(instance.getLocationDbId()));
-				studySummaries.add(studyMetadata);
+			if (!CollectionUtils.isEmpty(context.getSource())) {
+				for (final InstanceMetadata instance : context.getSource()) {
+					final StudySummaryDto studyMetadata = new StudySummaryDto();
+					studyMetadata.setStudyDbId(instance.getInstanceDbId());
+					studyMetadata.setStudyName(instance.getTrialName() + " Environment Number " + instance.getInstanceNumber());
+					studyMetadata.setLocationName(
+						instance.getLocationName() != null ? instance.getLocationName() : instance.getLocationAbbreviation());
+					studyMetadata.setLocationDbId(String.valueOf(instance.getLocationDbId()));
+					studySummaries.add(studyMetadata);
+				}
 			}
 			return context.getMappingEngine().map(context.create(studySummaries, context.getDestinationType()));
-
 		}
 
 	}
