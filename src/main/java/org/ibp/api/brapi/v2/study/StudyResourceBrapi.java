@@ -7,6 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
@@ -24,24 +25,32 @@ import org.ibp.api.brapi.v1.study.StudyDetailsData;
 import org.ibp.api.brapi.v1.study.StudyMapper;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ResourceNotFoundException;
-import org.ibp.api.java.study.StudyService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -53,20 +62,25 @@ import java.util.Objects;
 public class StudyResourceBrapi {
 
 	@Autowired
-	private StudyService studyService;
+	private StudyInstanceService studyInstanceService;
 
 	@Autowired
 	private LocationService locationService;
+
+	@Autowired
+	private ResourceBundleMessageSource messageSource;
 
 	@ApiOperation(value = "Get the details for a specific Study", notes = "Get the details for a specific Study")
 	@RequestMapping(value = "/{crop}/brapi/v2/studies/{studyDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
+	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
+		@PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsByGeolocation(studyDbId);
+		final StudyDetailsDto mwStudyDetails = this.studyInstanceService.getStudyDetailsByInstance(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
-			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());;
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+			;
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
@@ -122,9 +136,8 @@ public class StudyResourceBrapi {
 		final String sortBy,
 		@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder", required = false) final String sortOrder,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION) @RequestParam(value = "page", required = false) final Integer page,
-		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(value = "pageSize", required = false)
-		final Integer pageSize
-		) {
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(value = "pageSize", required = false) final Integer pageSize
+	) {
 		final String validationError = this.parameterValidation(crop, commonCropName, sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
@@ -166,12 +179,12 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyService.countStudyInstances(studySearchFilter);
+					return StudyResourceBrapi.this.studyInstanceService.countStudyInstances(studySearchFilter);
 				}
 
 				@Override
 				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
-					return StudyResourceBrapi.this.studyService.getStudyInstancesWithMetadata(studySearchFilter, pageRequest);
+					return StudyResourceBrapi.this.studyInstanceService.getStudyInstancesWithMetadata(studySearchFilter, pageRequest);
 				}
 			});
 
@@ -183,6 +196,38 @@ public class StudyResourceBrapi {
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 		final EntityListResponse<StudyInstanceDto> entityListResponse = new EntityListResponse<>(metadata, result);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Create new Studies", notes = "Create new Studies.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/brapi/v2/studies", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<EntityListResponse<StudyInstanceDto>> createStudies(@PathVariable final String crop,
+		@RequestBody final List<StudyImportRequestDTO> studyImportRequestDTOS) {
+		BaseValidator.checkNotNull(studyImportRequestDTOS, "study.import.request.null");
+		final StudyImportResponse studyImportResponse = this.studyInstanceService.createStudies(crop, studyImportRequestDTOS);
+		final Result<StudyInstanceDto> results = new Result<StudyInstanceDto>().withData(studyImportResponse.getStudyInstanceDtos());
+
+		final List<Map<String, String>> status = new ArrayList<>();
+		final Map<String, String> messageInfo = new HashMap<>();
+		messageInfo.put("message", studyImportResponse.getStatus());
+		messageInfo.put("messageType", "INFO");
+		status.add(messageInfo);
+		if (!CollectionUtils.isEmpty(studyImportResponse.getErrors())) {
+			int index = 1;
+			for (final ObjectError error : studyImportResponse.getErrors()) {
+				final Map<String, String> messageError = new HashMap<>();
+				messageError.put("message", "ERROR" + index++ + " " + this.messageSource
+					.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale()));
+				messageError.put("messageType", "ERROR");
+				status.add(messageError);
+			}
+		}
+		final Metadata metadata = new Metadata().withStatus(status);
+		final EntityListResponse<StudyInstanceDto> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}

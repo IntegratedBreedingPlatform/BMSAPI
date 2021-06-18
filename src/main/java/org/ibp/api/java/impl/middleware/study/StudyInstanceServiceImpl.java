@@ -1,26 +1,35 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.generationcp.middleware.domain.dms.InstanceVariableData;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
+import org.ibp.api.brapi.v2.study.StudyImportResponse;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyImportRequestValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -46,9 +55,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Resource
-	private DatasetService datasetService;
-
-	@Resource
 	private StudyValidator studyValidator;
 
 	@Resource
@@ -62,6 +68,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private StudyImportRequestValidator studyImportRequestValidator;
+
+	@Autowired
+	private SecurityService securityService;
 
 	@Override
 	public List<StudyInstance> createStudyInstances(final String cropName, final int studyId, final Integer numberOfInstancesToGenerate) {
@@ -163,6 +175,51 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
+	public StudyDetailsDto getStudyDetailsByInstance(final Integer instanceId) {
+		return this.middlewareStudyInstanceService.getStudyDetailsByInstance(instanceId);
+	}
+
+	@Override
+	public long countStudyInstances(final StudySearchFilter studySearchFilter) {
+		return this.middlewareStudyInstanceService.countStudyInstances(studySearchFilter);
+	}
+
+	@Override
+	public List<StudyInstanceDto> getStudyInstances(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		return this.middlewareStudyInstanceService.getStudyInstances(studySearchFilter, pageable);
+	}
+
+	@Override
+	public List<StudyInstanceDto> getStudyInstancesWithMetadata(final StudySearchFilter studySearchFilter, final Pageable pageable) {
+		return this.middlewareStudyInstanceService.getStudyInstancesWithMetadata(studySearchFilter, pageable);
+	}
+
+	@Override
+	public StudyImportResponse createStudies(String cropName, List<StudyImportRequestDTO> studyImportRequestDTOS) {
+		final StudyImportResponse response = new StudyImportResponse();
+		final int originalListSize = studyImportRequestDTOS.size();
+		int noOfCreatedStudies = 0;
+
+		// Remove studies that fails any validation. They will be excluded from creation
+		final BindingResult bindingResult = this.studyImportRequestValidator.pruneStudiesInvalidForImport(studyImportRequestDTOS);
+		if (bindingResult.hasErrors()) {
+			response.setErrors(bindingResult.getAllErrors());
+		}
+		if (!CollectionUtils.isEmpty(studyImportRequestDTOS)) {
+
+			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+			final List<StudyInstanceDto> instances =
+				this.middlewareStudyInstanceService.saveStudyInstances(cropName, studyImportRequestDTOS, user.getUserid());
+			if (!CollectionUtils.isEmpty(instances)) {
+				noOfCreatedStudies = instances.size();
+			}
+			response.setStudyInstanceDtos(instances);
+		}
+		response.setStatus(noOfCreatedStudies + " out of " + originalListSize + " studies created successfully.");
+		return response;
+	}
+
+	@Override
 	public InstanceDescriptorData updateInstanceDescriptorData(final Integer studyId, final Integer instanceId,
 		final Integer descriptorDataId,
 		final InstanceDescriptorData instanceDescriptorData) {
@@ -188,17 +245,17 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		return instanceDescriptorData;
 	}
 
-	private void validateInstanceData(final Integer studyId, final Integer instanceId, final InstanceVariableData instanceVariableData, final VariableType variableType) {
+	private void validateInstanceData(final Integer studyId, final Integer instanceId, final InstanceVariableData instanceVariableData,
+		final VariableType variableType) {
 		this.studyValidator.validate(studyId, true);
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));
 
 		final Integer datasetId = this.studyService.getEnvironmentDatasetId(studyId);
 		final Integer variableId = instanceVariableData.getVariableId();
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
-				variableId));
+			variableId));
 		this.observationValidator.validateVariableValue(variableId, instanceVariableData.getValue());
 		this.datasetValidator.validateVariableBelongsToVariableType(datasetId, variableId, variableType.getId());
 	}
-
 
 }
