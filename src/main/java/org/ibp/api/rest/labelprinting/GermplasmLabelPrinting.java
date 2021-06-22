@@ -160,7 +160,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final Set<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toSet());
 
 		final List<Variable> attributeVariables = this.germplasmServiceMiddleware.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), labelsInfoInput.getProgramUUID());
-		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest);
+		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest, labelsInfoInput.getProgramUUID());
 
 		// Germplasm Details labels
 		final LabelType germplasmType = new LabelType(germplasmPropValue, germplasmPropValue);
