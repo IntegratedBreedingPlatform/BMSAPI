@@ -156,7 +156,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 
-		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, null);
+		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, labelsInfoInput.getProgramUUID());
 		final Set<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toSet());
 
 		final List<Variable> attributeVariables = this.germplasmServiceMiddleware.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), labelsInfoInput.getProgramUUID());
