@@ -251,7 +251,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 			cell.setCellStyle(cellStyle);
 			cell.setCellValue(dataTypeCode);
 
-			final String expectedRange = this.getExpectedRange(variableDetails.getScale().getDataType().getName(), variableDetails);
+			final String expectedRange = this.getExpectedRange(variableDetails);
 			cell = row.createCell(7, CellType.STRING);
 			cell.setCellStyle(cellStyle);
 			cell.setCellValue(expectedRange);
@@ -313,10 +313,9 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		return rowNumIndex;
 	}
 
-	private String getExpectedRange(final String dataTypeName, final VariableDetails variableDetails) {
+	private String getExpectedRange(final VariableDetails variableDetails) {
 
-		final DataType dataType = DataType.getByName(dataTypeName);
-		switch(dataType){
+		switch (DataType.getByName(variableDetails.getScale().getDataType().getName())) {
 			case CATEGORICAL_VARIABLE:
 				final List<Category> categories = variableDetails.getScale().getValidValues().getCategories();
 				final List<String> values = categories.stream().map(Category::getName).collect(Collectors.toList());
