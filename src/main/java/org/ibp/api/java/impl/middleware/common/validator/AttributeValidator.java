@@ -80,7 +80,7 @@ public class AttributeValidator {
 	}
 
 	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto) {
-		//TODO Implement new service to get by gid and variable
+		//FIXME Search by gid and variableId, to be addressed in IBP-4659
 		final List<GermplasmAttributeDto> germplasmAttributeDtos =
 			this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
 		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
@@ -104,7 +104,7 @@ public class AttributeValidator {
 
 	void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
 		final Integer attributeId) {
-		//TODO Implement new service to get by attribute id
+		//FIXME Search by attributeId, to be addressed in IBP-4659
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
 
 		// Filter by germplasm attribute id
