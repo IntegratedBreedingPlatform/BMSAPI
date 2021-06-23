@@ -188,8 +188,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput) {
-		super.validateLabelsGeneratorInputData(labelsGeneratorInput);
+	void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
+		super.validateLabelsGeneratorInputData(labelsGeneratorInput, programUUID);
 	}
 
 	@Override
@@ -209,7 +209,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput) {
+	List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 
 		// Get attributtes
 		final Integer searchRequestId = labelsInfoInput.getSearchRequestId();
@@ -217,7 +217,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 		final Set<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet());
-		final List<Variable> germplasmAttributeVariables = this.germplasmService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), labelsInfoInput.getProgramUUID());
+		final List<Variable> germplasmAttributeVariables = this.germplasmService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
 
 		// Build label list
 
@@ -237,7 +237,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput) {
+	LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
 		// Get raw data
 		final Integer searchRequestId = labelsGeneratorInput.getSearchRequestId();
 		final LotsSearchDto searchDto =

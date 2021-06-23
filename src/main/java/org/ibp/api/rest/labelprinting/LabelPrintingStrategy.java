@@ -72,18 +72,20 @@ public abstract class LabelPrintingStrategy {
 	 * Given labelInfoInput, it will get the available LabelTypes (fields organized in lists), so that the user can
 	 * select from them the ones he would like to include in her labels
 	 * @param labelsInfoInput
+	 * @param programUUID
 	 * @return List<LabelType>
 	 */
-	abstract List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput);
+	abstract List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput, final String programUUID);
 
 	/**
 	 * Given labelsGeneratorInput (user selection for labels creation), it will get all the data from the database to be able
 	 * to build the labels.
 	 * It will also include data for the barcode generation
 	 * @param labelsGeneratorInput
+	 * @param programUUID
 	 * @return LabelsData
 	 */
-	abstract LabelsData getLabelsData (final LabelsGeneratorInput labelsGeneratorInput);
+	abstract LabelsData getLabelsData (final LabelsGeneratorInput labelsGeneratorInput, final String programUUID);
 
 	/**
 	 * List all the supported file types for a particular strategy.
@@ -102,11 +104,12 @@ public abstract class LabelPrintingStrategy {
 	 * Validate LabelsGeneratorInput
 	 * Throws an exception when a validation problem is found
 	 * @param labelsGeneratorInput
+	 * @param programUUID
 	 */
-	void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput) {
+	void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
 		this.validateLabelsInfoInputData(labelsGeneratorInput);
 
-		final Set<Integer> availableKeys = this.getAvailableLabelTypes(labelsGeneratorInput)
+		final Set<Integer> availableKeys = this.getAvailableLabelTypes(labelsGeneratorInput, programUUID)
 			.stream().flatMap(labelType -> labelType.getFields().stream())
 			.map(field -> field.getId())
 			.collect(Collectors.toSet());
@@ -169,9 +172,9 @@ public abstract class LabelPrintingStrategy {
 		}
 	};
 
-	Set<Field> getAllAvailableFields(final LabelsInfoInput labelsInfoInput) {
+	Set<Field> getAllAvailableFields(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final Set<Field> availableFields = new HashSet<>();
-		this.getAvailableLabelTypes(labelsInfoInput).forEach(labelType -> availableFields.addAll(labelType.getFields()));
+		this.getAvailableLabelTypes(labelsInfoInput, programUUID).forEach(labelType -> availableFields.addAll(labelType.getFields()));
 		return availableFields;
 	}
 
