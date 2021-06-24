@@ -9,9 +9,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.util.VariableValueUtil;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.After;
@@ -39,9 +37,6 @@ public class AttributeValidatorTest {
 
 	private static final String GERMPLASM_ATTRIBUTE_VALUE = "value";
 	private static final String GERMPLASM_ATTRIBUTE_DATE = "20210316";
-
-	@Mock
-	private GermplasmDataManager germplasmDataManager;
 
 	@Mock
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -85,7 +80,7 @@ public class AttributeValidatorTest {
 	public void testValidateAttributeId_WhenAttributeIdIsInvalid() throws MiddlewareQueryException {
 		final Integer attributeById = Integer.valueOf(RandomStringUtils.randomNumeric(1));
 
-		Mockito.doReturn(null).when(this.germplasmDataManager).getAttributeById(attributeById);
+		Mockito.doReturn(Lists.newArrayList()).when(this.ontologyVariableDataManager).getWithFilter(Mockito.any());
 
 		this.attributeValidator.validateAttributeIds(this.errors, Lists.newArrayList(String.valueOf(attributeById)));
 		Assert.assertEquals("attribute.invalid", this.errors.getAllErrors().get(0).getCode());
@@ -97,10 +92,10 @@ public class AttributeValidatorTest {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
 		final Integer attributeById = Integer.valueOf(RandomStringUtils.randomNumeric(1));
 
-		final Attribute attribute = new Attribute();
-		attribute.setAid(attributeById);
-		final List<Attribute> attributeLists = Lists.newArrayList(attribute);
-		Mockito.doReturn(attributeLists).when(this.germplasmDataManager).getAttributeByIds(Lists.newArrayList(attributeById));
+		final Variable variable = new Variable();
+		variable.setId(attributeById);
+		final List<Variable> attributeLists = Lists.newArrayList(variable);
+		Mockito.doReturn(attributeLists).when(this.ontologyVariableDataManager).getWithFilter(Mockito.any());
 
 		this.attributeValidator.validateAttributeIds(bindingResult, Lists.newArrayList(String.valueOf(attributeById)));
 

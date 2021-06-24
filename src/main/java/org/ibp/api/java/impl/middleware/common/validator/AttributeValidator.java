@@ -7,9 +7,8 @@ import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.VariableValueUtil;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +31,6 @@ public class AttributeValidator {
 	private static final Integer GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH = 255;
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
 	private GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
@@ -55,7 +51,11 @@ public class AttributeValidator {
 		final List<Integer> ids =
 			attributeIds.stream().map(attributeId -> Integer.valueOf(attributeId)).distinct().collect(Collectors.toList());
 
-		final List<Attribute> attributes = this.germplasmDataManager.getAttributeByIds(ids);
+		final VariableFilter variableFilter = new VariableFilter();
+		ids.forEach(variableFilter::addVariableId);
+		ALLOWED_ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+
+		final List<Variable> attributes = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 		if (attributes.size() != ids.size()) {
 			errors.reject("attribute.invalid", "");
 		}
