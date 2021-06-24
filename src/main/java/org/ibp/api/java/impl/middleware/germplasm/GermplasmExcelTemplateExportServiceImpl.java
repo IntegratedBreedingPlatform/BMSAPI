@@ -181,16 +181,14 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		passportFilter.addVariableType(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT);
 		final List<Variable> passportVariables = this.ontologyVariableDataManager.getWithFilter(passportFilter);
 
-		this.writeOntologyVariableSheet("export.germplasm.list.template.sheet.passport",
-			"export.germplasm.list.template.variable.germplasm.passport", passportVariables);
+		this.writeOntologyVariableSheet("export.germplasm.list.template.sheet.passport", passportVariables);
 
 		final VariableFilter attributeFilter = new VariableFilter();
 		attributeFilter.setProgramUuid(programUUID);
 		attributeFilter.addVariableType(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE);
 		final List<Variable> attributeVariables = this.ontologyVariableDataManager.getWithFilter(attributeFilter);
 
-		this.writeOntologyVariableSheet("export.germplasm.list.template.sheet.attributes",
-			"export.germplasm.list.template.variable.germplasm.attributes", attributeVariables);
+		this.writeOntologyVariableSheet("export.germplasm.list.template.sheet.attributes", attributeVariables);
 
 		this.writeOtherCodesSheet(cropName, programUUID, isGermplasmUpdateFormat);
 
@@ -201,13 +199,13 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		return file;
 	}
 
-	private void writeOntologyVariableSheet(final String sheetName, final String headerNameColumn, final List<Variable> variableList) {
+	private void writeOntologyVariableSheet(final String sheetName, final List<Variable> variableList) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet hSSFSheet = this.wb.createSheet(this.getMessageSource().getMessage(sheetName, null, locale));
 		hSSFSheet.setDefaultRowHeightInPoints(16);
 		int currentRowNum = 0;
 
-		currentRowNum = this.writeOntologyVariableHeader(hSSFSheet, currentRowNum, headerNameColumn);
+		currentRowNum = this.writeOntologyVariableHeader(hSSFSheet, currentRowNum);
 		int count = variableList.size();
 
 		for (final Variable variable : variableList) {
@@ -217,11 +215,13 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 				this.sheetStylesMap.get(ExcelCellStyle.STYLE_OLIVE_GREEN_WITH_LATERAL_AND_BOTTOM_BORDER);
 
 			HSSFCell cell = row.createCell(0, CellType.STRING);
-			cell.setCellStyle(cellStyle);
+			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_BORDER) :
+				this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_AND_BOTTOM_BORDER));
 			cell.setCellValue(variable.getName());
 
 			cell = row.createCell(1, CellType.STRING);
-			cell.setCellStyle(cellStyle);
+			cell.setCellStyle(count != 1 ? this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_BORDER) :
+				this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_WITH_LATERAL_AND_BOTTOM_BORDER));
 			cell.setCellValue(variable.getAlias());
 
 			cell = row.createCell(2, CellType.STRING);
@@ -253,24 +253,18 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		}
 	}
 
-	private int writeOntologyVariableHeader(final HSSFSheet sheet, final int currentRowNum, final String variableTypeName) {
+	private int writeOntologyVariableHeader(final HSSFSheet sheet, final int currentRowNum) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		int rowNumIndex = currentRowNum;
-		sheet.addMergedRegion(new CellRangeAddress(currentRowNum, 0, 0, 7));
 		HSSFRow row = sheet.createRow(rowNumIndex++);
 
 		HSSFCell cell = row.createCell(0, CellType.STRING);
 		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_GREEN_WITH_BORDER));
-		cell.setCellValue(this.getMessageSource().getMessage(variableTypeName, null, locale));
-
-		row = sheet.createRow(rowNumIndex++);
-		cell = row.createCell(0, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_OLIVE_GREEN));
 		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.variable", null, locale));
 		sheet.setColumnWidth(0, (cell.getStringCellValue().length() + COLUMN_WIDTH_PADDING) * CHARACTER_WIDTH * 2);
 
 		cell = row.createCell(1, CellType.STRING);
-		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.HEADING_STYLE_OLIVE_GREEN));
+		cell.setCellStyle(this.sheetStylesMap.get(ExcelCellStyle.STYLE_AQUA_GREEN_WITH_BORDER));
 		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.alias", null, locale));
 		sheet.setColumnWidth(1, (cell.getStringCellValue().length() + COLUMN_WIDTH_PADDING) * CHARACTER_WIDTH * 2);
 
