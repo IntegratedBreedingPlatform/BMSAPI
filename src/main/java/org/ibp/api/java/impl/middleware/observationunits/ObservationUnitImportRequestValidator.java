@@ -69,21 +69,28 @@ public class ObservationUnitImportRequestValidator {
 		final Iterator<ObservationUnitImportRequestDto> iterator = observationUnitImportRequestDtos.iterator();
 		while (iterator.hasNext()) {
 			final ObservationUnitImportRequestDto dto = iterator.next();
-			if (StringUtils.isEmpty(dto.getStudyDbId())) {
-				this.errors.reject("observation.unit.import.studyDbId.null", new String[] {index.toString()}, "");
-				iterator.remove();
-				continue;
-			}
-
 			if (StringUtils.isEmpty(dto.getProgramDbId())) {
 				this.errors.reject("observation.unit.import.programDbId.null", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
 			}
 
-			if (!studyInstancesMap.containsKey(dto.getStudyDbId()) ||
-				!studyInstancesMap.get(dto.getStudyDbId()).getProgramDbId().equalsIgnoreCase(dto.getProgramDbId())) {
-				this.errors.reject("observation.unit.import.invalid.studyDbId.and.programDbId", new String[] {index.toString()}, "");
+			if (StringUtils.isEmpty(dto.getTrialDbId())) {
+				this.errors.reject("observation.unit.import.trialDbId.null", new String[] {index.toString()}, "");
+				iterator.remove();
+				continue;
+			}
+
+			if (StringUtils.isEmpty(dto.getStudyDbId())) {
+				this.errors.reject("observation.unit.import.studyDbId.null", new String[] {index.toString()}, "");
+				iterator.remove();
+				continue;
+			}
+
+			if (!studyInstancesMap.containsKey(dto.getStudyDbId())
+				|| !studyInstancesMap.get(dto.getStudyDbId()).getProgramDbId().equalsIgnoreCase(dto.getProgramDbId())
+				|| !studyInstancesMap.get(dto.getStudyDbId()).getTrialDbId().equals(dto.getTrialDbId())) {
+				this.errors.reject("observation.unit.import.no.study", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
 			}
