@@ -11,7 +11,6 @@ import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearc
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
-import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,12 +23,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
 public class ObservationUnitImportRequestValidator {
+
 	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
 
@@ -52,8 +51,9 @@ public class ObservationUnitImportRequestValidator {
 		final List<String> studyDbIds = observationUnitImportRequestDtos.stream().filter(obs -> StringUtils.isNotEmpty(obs.getStudyDbId()))
 			.map(ObservationUnitImportRequestDto::getStudyDbId).collect(Collectors.toList());
 
-		final List<String> germplasmDbIds = observationUnitImportRequestDtos.stream().filter(obs -> StringUtils.isNotEmpty(obs.getGermplasmDbId()))
-			.map(ObservationUnitImportRequestDto::getGermplasmDbId).collect(Collectors.toList());
+		final List<String> germplasmDbIds =
+			observationUnitImportRequestDtos.stream().filter(obs -> StringUtils.isNotEmpty(obs.getGermplasmDbId()))
+				.map(ObservationUnitImportRequestDto::getGermplasmDbId).collect(Collectors.toList());
 		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDto.setGermplasmDbIds(germplasmDbIds);
 		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchFilteredGermplasm(germplasmSearchRequestDto, null)
@@ -111,7 +111,6 @@ public class ObservationUnitImportRequestValidator {
 				iterator.remove();
 				continue;
 			}
-
 
 			if (this.isAnyExternalReferenceInvalid(dto, index)) {
 				iterator.remove();
