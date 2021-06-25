@@ -1,10 +1,12 @@
 package org.ibp.api.rest.audit;
 
 import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.audit.GermplasmAuditService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameRequestValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -38,6 +40,9 @@ public class GermplasmAuditResource {
 
 	@Autowired
 	private AttributeValidator attributeValidator;
+
+	@Autowired
+	private GermplasmValidator germplasmValidator;
 
 	@ResponseBody
 	@RequestMapping(
@@ -97,6 +102,39 @@ public class GermplasmAuditResource {
 				@Override
 				public List<GermplasmAttributeAuditDTO> getResults(final PagedResult<GermplasmAttributeAuditDTO> pagedResult) {
 					return GermplasmAuditResource.this.auditService.getAttributeChangesByAttributeId(attributeId, pageable);
+				}
+			});
+
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
+		return new ResponseEntity<>(resultPage.getPageResults(), headers, HttpStatus.OK);
+	}
+
+	@ResponseBody
+	@RequestMapping(
+		value = "/crops/{cropName}/germplasm/{gid}/basic-details/changes",
+		method = RequestMethod.GET)
+	@PreAuthorize(HAS_VIEW_CHANGE_HISTORY)
+	public ResponseEntity<List<GermplasmBasicDetailsAuditDTO>> getBasicDetailsChanges(
+		@PathVariable final String cropName,
+		@PathVariable final Integer gid,
+		final Pageable pageable) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGermplasmId(errors, gid);
+
+		final PagedResult<GermplasmBasicDetailsAuditDTO> resultPage =
+			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmBasicDetailsAuditDTO>() {
+
+				@Override
+				public long getCount() {
+					return GermplasmAuditResource.this.auditService.countBasicDetailsChangesByGid(gid);
+				}
+
+				@Override
+				public List<GermplasmBasicDetailsAuditDTO> getResults(final PagedResult<GermplasmBasicDetailsAuditDTO> pagedResult) {
+					return GermplasmAuditResource.this.auditService.getBasicDetailsChangesByGid(gid, pageable);
 				}
 			});
 

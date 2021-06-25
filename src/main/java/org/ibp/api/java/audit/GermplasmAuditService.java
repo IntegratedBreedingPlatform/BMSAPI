@@ -1,6 +1,7 @@
 package org.ibp.api.java.audit;
 
 import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
 import org.springframework.data.domain.Pageable;
 
@@ -15,5 +16,9 @@ public interface GermplasmAuditService {
 	List<GermplasmAttributeAuditDTO> getAttributeChangesByAttributeId(Integer attributeId, Pageable pageable);
 
 	long countAttributeChangesByNameId(Integer attributeId);
+
+	List<GermplasmBasicDetailsAuditDTO> getBasicDetailsChangesByGid(Integer gid, Pageable pageable);
+
+	long countBasicDetailsChangesByGid(Integer gid);
 
 }
