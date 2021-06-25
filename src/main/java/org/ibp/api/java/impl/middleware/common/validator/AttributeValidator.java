@@ -53,10 +53,12 @@ public class AttributeValidator {
 
 		final VariableFilter variableFilter = new VariableFilter();
 		ids.forEach(variableFilter::addVariableId);
-		ALLOWED_ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
 
-		final List<Variable> attributes = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-		if (attributes.size() != ids.size()) {
+		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+		final boolean anyVariableWithNoAllowedType =
+			variables.stream().anyMatch(v -> !v.getVariableTypes().contains(VariableType.GERMPLASM_ATTRIBUTE) &&
+				!v.getVariableTypes().contains(VariableType.GERMPLASM_PASSPORT));
+		if (variables.size() != ids.size() || anyVariableWithNoAllowedType) {
 			errors.reject("attribute.invalid", "");
 		}
 	}
