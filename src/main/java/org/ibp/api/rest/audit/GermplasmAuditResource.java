@@ -26,11 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 @RestController
 public class GermplasmAuditResource {
 
-	private static final String HAS_VIEW_CHANGE_HISTORY = "hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'VIEW_CHANGE_HISTORY')";
+	private static final String HAS_VIEW_CHANGE_HISTORY =
+		"hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'VIEW_CHANGE_HISTORY')";
 
 	@Autowired
 	private GermplasmAuditService auditService;
@@ -57,24 +59,9 @@ public class GermplasmAuditResource {
 
 		this.germplasmNameRequestValidator.validateNameBelongsToGermplasm(gid, nameId);
 
-		final PagedResult<GermplasmNameAuditDTO> resultPage =
-			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmNameAuditDTO>() {
-
-				@Override
-				public long getCount() {
-					return GermplasmAuditResource.this.auditService.countNameChangesByNameId(nameId);
-				}
-
-				@Override
-				public List<GermplasmNameAuditDTO> getResults(final PagedResult<GermplasmNameAuditDTO> pagedResult) {
-					return GermplasmAuditResource.this.auditService.getNameChangesByNameId(nameId, pageable);
-				}
-			});
-
-
-		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
-		return new ResponseEntity<>(resultPage.getPageResults(), headers, HttpStatus.OK);
+		return this.getPagedResult(() -> this.auditService.countNameChangesByNameId(nameId),
+			() -> this.auditService.getNameChangesByNameId(nameId, pageable),
+			pageable);
 	}
 
 	@ResponseBody
@@ -91,24 +78,9 @@ public class GermplasmAuditResource {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.attributeValidator.validateGermplasmAttributeExists(errors, gid, attributeId);
 
-		final PagedResult<GermplasmAttributeAuditDTO> resultPage =
-			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmAttributeAuditDTO>() {
-
-				@Override
-				public long getCount() {
-					return GermplasmAuditResource.this.auditService.countAttributeChangesByNameId(attributeId);
-				}
-
-				@Override
-				public List<GermplasmAttributeAuditDTO> getResults(final PagedResult<GermplasmAttributeAuditDTO> pagedResult) {
-					return GermplasmAuditResource.this.auditService.getAttributeChangesByAttributeId(attributeId, pageable);
-				}
-			});
-
-
-		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
-		return new ResponseEntity<>(resultPage.getPageResults(), headers, HttpStatus.OK);
+		return this.getPagedResult(() -> this.auditService.countAttributeChangesByNameId(attributeId),
+			() -> this.auditService.getAttributeChangesByAttributeId(attributeId, pageable),
+			pageable);
 	}
 
 	@ResponseBody
@@ -124,20 +96,26 @@ public class GermplasmAuditResource {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGermplasmId(errors, gid);
 
-		final PagedResult<GermplasmBasicDetailsAuditDTO> resultPage =
-			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmBasicDetailsAuditDTO>() {
+		return this.getPagedResult(() -> this.auditService.countBasicDetailsChangesByGid(gid),
+			() -> this.auditService.getBasicDetailsChangesByGid(gid, pageable),
+			pageable);
+	}
+
+	private <T> ResponseEntity<List<T>> getPagedResult(final Supplier<Long> countSupplier, final Supplier<List<T>> resultsSupplier,
+		final Pageable pageable) {
+		final PagedResult<T> resultPage =
+			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<T>() {
 
 				@Override
 				public long getCount() {
-					return GermplasmAuditResource.this.auditService.countBasicDetailsChangesByGid(gid);
+					return countSupplier.get();
 				}
 
 				@Override
-				public List<GermplasmBasicDetailsAuditDTO> getResults(final PagedResult<GermplasmBasicDetailsAuditDTO> pagedResult) {
-					return GermplasmAuditResource.this.auditService.getBasicDetailsChangesByGid(gid, pageable);
+				public List<T> getResults(final PagedResult<T> pagedResult) {
+					return resultsSupplier.get();
 				}
 			});
-
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
