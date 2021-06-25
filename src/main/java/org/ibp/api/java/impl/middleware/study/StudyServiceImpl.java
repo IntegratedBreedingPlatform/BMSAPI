@@ -200,20 +200,4 @@ public class StudyServiceImpl implements StudyService {
 		return response;
 	}
 
-	public void setStudyDataManager(final StudyDataManager studyDataManager) {
-		this.studyDataManager = studyDataManager;
-	}
-
-	public void setStudyValidator(final StudyValidator studyValidator) {
-		this.studyValidator = studyValidator;
-	}
-
-	public void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
-		this.middlewareStudyService = middlewareStudyService;
-	}
-
-	public void setGermplasmValidator(final GermplasmValidator germplasmValidator) {
-		this.germplasmValidator = germplasmValidator;
-	}
-
 }
