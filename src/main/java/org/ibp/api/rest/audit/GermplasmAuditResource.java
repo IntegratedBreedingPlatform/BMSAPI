@@ -3,6 +3,7 @@ package org.ibp.api.rest.audit;
 import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmReferenceAuditDTO;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.audit.GermplasmAuditService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
@@ -98,6 +99,24 @@ public class GermplasmAuditResource {
 
 		return this.getPagedResult(() -> this.auditService.countBasicDetailsChangesByGid(gid),
 			() -> this.auditService.getBasicDetailsChangesByGid(gid, pageable),
+			pageable);
+	}
+
+	@ResponseBody
+	@RequestMapping(
+		value = "/crops/{cropName}/germplasm/{gid}/reference/changes",
+		method = RequestMethod.GET)
+	@PreAuthorize(HAS_VIEW_CHANGE_HISTORY)
+	public ResponseEntity<List<GermplasmReferenceAuditDTO>> getReferenceChanges(
+		@PathVariable final String cropName,
+		@PathVariable final Integer gid,
+		final Pageable pageable) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGermplasmId(errors, gid);
+
+		return this.getPagedResult(() -> this.auditService.countReferenceChangesByGid(gid),
+			() -> this.auditService.getReferenceChangesByGid(gid, pageable),
 			pageable);
 	}
 

@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.audit;
 import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmReferenceAuditDTO;
 import org.ibp.api.java.audit.GermplasmAuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -48,4 +49,13 @@ public class GermplasmAuditServiceImpl implements GermplasmAuditService {
 		return this.germplasmAuditService.countBasicDetailsChangesByGid(gid);
 	}
 
+	@Override
+	public List<GermplasmReferenceAuditDTO> getReferenceChangesByGid(final Integer gid, final Pageable pageable) {
+		return this.germplasmAuditService.getReferenceChangesByGid(gid, pageable);
+	}
+
+	@Override
+	public long countReferenceChangesByGid(final Integer gid) {
+		return this.germplasmAuditService.countReferenceChangesByGid(gid);
+	}
 }
