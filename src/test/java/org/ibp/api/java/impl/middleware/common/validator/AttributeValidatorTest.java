@@ -15,12 +15,14 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -38,6 +40,9 @@ public class AttributeValidatorTest {
 	private static final String GERMPLASM_ATTRIBUTE_VALUE = "value";
 	private static final String GERMPLASM_ATTRIBUTE_DATE = "20210316";
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule();
+
 	@Mock
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
@@ -51,7 +56,6 @@ public class AttributeValidatorTest {
 
 	@Before
 	public void beforeEachTest() {
-		MockitoAnnotations.initMocks(this);
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 	}
 
@@ -94,6 +98,7 @@ public class AttributeValidatorTest {
 
 		final Variable variable = new Variable();
 		variable.setId(attributeById);
+		variable.getVariableTypes().add(VariableType.GERMPLASM_ATTRIBUTE);
 		final List<Variable> attributeLists = Lists.newArrayList(variable);
 		Mockito.doReturn(attributeLists).when(this.ontologyVariableDataManager).getWithFilter(Mockito.any());
 
