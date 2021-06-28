@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware;
 
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
-import org.ibp.api.domain.sample.SampleObservationDto;
 
 import java.util.Date;
 
@@ -9,27 +8,6 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 
 public abstract class SampleTestDataGenerator {
-
-	public static SampleObservationDto createRandomSampleObservation() {
-		final SampleObservationDto sampleObservationDto =
-			new SampleObservationDto(Integer.valueOf(randomNumeric(6)), randomAlphanumeric(6), randomAlphanumeric(6),
-				randomAlphanumeric(6));
-		sampleObservationDto.setTakenBy(randomAlphanumeric(6));
-		sampleObservationDto.setSampleDate(randomAlphanumeric(10));
-		sampleObservationDto.setSampleType(randomAlphanumeric(6));
-		sampleObservationDto.setTissueType(randomAlphanumeric(6));
-		sampleObservationDto.setNotes(randomAlphanumeric(6));
-		sampleObservationDto.setStudyName(randomAlphanumeric(6));
-		sampleObservationDto.setSeason(randomAlphanumeric(6));
-		sampleObservationDto.setLocationName(randomAlphanumeric(6));
-		sampleObservationDto.setEntryNumber(Integer.valueOf(randomNumeric(6)));
-		sampleObservationDto.setPlotNumber(Integer.valueOf(randomNumeric(6)));
-
-		sampleObservationDto.setGermplasmDbId(randomAlphanumeric(6));
-		sampleObservationDto.setPlantingDate(randomAlphanumeric(6));
-		sampleObservationDto.setHarvestDate(randomAlphanumeric(6));
-		return sampleObservationDto;
-	}
 
 	public static SampleDetailsDTO createRandomSampleDetails() {
 		final SampleDetailsDTO sampleDetailsDTO =

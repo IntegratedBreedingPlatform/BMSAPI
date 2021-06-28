@@ -30,7 +30,7 @@ public class SampleObservationDto implements Serializable {
 	private String plantingDate;
 	private String harvestDate;
 
-	public SampleObservationDto(){
+	public SampleObservationDto() {
 
 	}
 
