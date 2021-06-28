@@ -35,7 +35,7 @@ public class SampleObservationMapperTest {
 		assertThat(sampleObservationDto.getLocationName(), equalTo(sampleDetailsDTO.getLocationName()));
 		assertThat(sampleObservationDto.getEntryNumber(), equalTo(sampleDetailsDTO.getEntryNo()));
 		assertThat(sampleObservationDto.getPlotNumber(), equalTo(sampleDetailsDTO.getPlotNo()));
-		assertThat(sampleObservationDto.getGermplasmDbId(), equalTo(sampleDetailsDTO.getGid()));
+		assertThat(sampleObservationDto.getGermplasmDbId(), equalTo(sampleDetailsDTO.getGermplasmUUID()));
 		assertThat(sampleObservationDto.getPlantingDate(), equalTo(sampleDetailsDTO.getSeedingDate()));
 		assertThat(sampleObservationDto.getHarvestDate(), equalTo(sampleDetailsDTO.getHarvestDate()));
 	}

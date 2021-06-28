@@ -46,6 +46,7 @@ public abstract class SampleTestDataGenerator {
 		sampleDetailsDTO.setPlotNo(Integer.valueOf(randomNumeric(6)));
 
 		sampleDetailsDTO.setGid(Integer.valueOf(randomNumeric(6)));
+		sampleDetailsDTO.setGermplasmUUID(randomAlphanumeric(6));
 		sampleDetailsDTO.setSeedingDate(randomAlphanumeric(6));
 		sampleDetailsDTO.setHarvestDate(randomAlphanumeric(6));
 		return sampleDetailsDTO;
