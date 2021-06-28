@@ -6,8 +6,8 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitP
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -15,7 +15,6 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -97,14 +96,14 @@ public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testSearchObservationUnits() throws Exception {
 
-		final PhenotypeSearchDTO phenotypeSearchDTO = new PhenotypeSearchDTO();
-		phenotypeSearchDTO.setProgramDbId("04136e3f-55f9-4a80-9c24-5066a253ce6f");
-		phenotypeSearchDTO.setTrialDbId("25008");
-		phenotypeSearchDTO.setTrialName("Trial Name");
+		final ObservationUnitDto observationUnitDto = new ObservationUnitDto();
+		observationUnitDto.setProgramDbId("04136e3f-55f9-4a80-9c24-5066a253ce6f");
+		observationUnitDto.setTrialDbId("25008");
+		observationUnitDto.setTrialName("Trial Name");
 		final int searchResultsDbId = nextInt();
 		doReturn(new ObservationUnitsSearchRequestDto()).when(this.searchRequestService).getSearchRequest(searchResultsDbId, ObservationUnitsSearchRequestDto.class);
-		when(this.studyService.searchPhenotypes(Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE), Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER), any(
-			PhenotypeSearchRequestDTO.class))).thenReturn(Arrays.asList(phenotypeSearchDTO));
+		when(this.observationUnitService.searchObservationUnits(Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE), Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER), any(
+			ObservationUnitSearchRequestDTO.class))).thenReturn(Arrays.asList(observationUnitDto));
 		this.mockMvc.perform(
 			MockMvcRequestBuilders.get("/{crop}/brapi/v2/search/observationunits/{searchResultsDbId}", this.cropName, searchResultsDbId)
 				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk())

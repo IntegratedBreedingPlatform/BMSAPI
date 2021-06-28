@@ -10,8 +10,8 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUni
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -20,10 +20,8 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
-import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
-import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -52,13 +50,7 @@ import java.util.Map;
 public class ObservationUnitResourceBrapi {
 
 	@Autowired
-	private DatasetService datasetService;
-
-	@Autowired
 	private SearchRequestService searchRequestService;
-
-	@Autowired
-	private StudyService studyService;
 
 	@Autowired
 	private ObservationUnitService observationUnitService;
@@ -91,7 +83,7 @@ public class ObservationUnitResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> getObservationUnitsSearch(
+	public ResponseEntity<EntityListResponse<ObservationUnitDto>> getObservationUnitsSearch(
 		@PathVariable final String crop, @PathVariable final String searchResultsDbId,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
@@ -108,24 +100,24 @@ public class ObservationUnitResourceBrapi {
 					.getSearchRequest(Integer.valueOf(searchResultsDbId), ObservationUnitsSearchRequestDto.class);
 		} catch (final NumberFormatException | MiddlewareException e) {
 			return new ResponseEntity<>(
-				new EntityListResponse<>(new Result<>(new ArrayList<PhenotypeSearchDTO>())).withMessage("no search request found"),
+				new EntityListResponse<>(new Result<>(new ArrayList<ObservationUnitDto>())).withMessage("no search request found"),
 				HttpStatus.NOT_FOUND);
 		}
 
 		final ModelMapper mapper = ObservationUnitMapper.getInstance();
-		final PhenotypeSearchRequestDTO phenotypeSearchRequestDTO =
-			mapper.map(observationUnitsSearchRequestDto, PhenotypeSearchRequestDTO.class);
+		final ObservationUnitSearchRequestDTO phenotypeSearchRequestDTO =
+			mapper.map(observationUnitsSearchRequestDto, ObservationUnitSearchRequestDTO.class);
 
-		final PagedResult<PhenotypeSearchDTO> resultPage =
+		final PagedResult<ObservationUnitDto> resultPage =
 			this.getObservationUnitDtoPagedResult(phenotypeSearchRequestDTO, currentPage, pageSize);
 
-		final Result<PhenotypeSearchDTO> results = new Result<PhenotypeSearchDTO>().withData(resultPage.getPageResults());
+		final Result<ObservationUnitDto> results = new Result<ObservationUnitDto>().withData(resultPage.getPageResults());
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
-		final EntityListResponse<PhenotypeSearchDTO> entityListResponse = new EntityListResponse<>(metadata, results);
+		final EntityListResponse<ObservationUnitDto> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 
@@ -135,14 +127,14 @@ public class ObservationUnitResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/observationunits", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<PhenotypeSearchDTO>> createObservationUnits(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<ObservationUnitDto>> createObservationUnits(@PathVariable final String crop,
 		@RequestBody final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos) {
 		BaseValidator.checkNotNull(observationUnitImportRequestDtos, "observation.unit.import.request.null");
 
 		final ObservationUnitImportResponse observationUnitImportResponse =
 			this.observationUnitService.createObservationUnits(crop, observationUnitImportRequestDtos);
-		final Result<PhenotypeSearchDTO> results =
-			new Result<PhenotypeSearchDTO>().withData(observationUnitImportResponse.getObservationUnits());
+		final Result<ObservationUnitDto> results =
+			new Result<ObservationUnitDto>().withData(observationUnitImportResponse.getObservationUnits());
 
 		final List<Map<String, String>> status = new ArrayList<>();
 		final Map<String, String> messageInfo = new HashMap<>();
@@ -160,29 +152,29 @@ public class ObservationUnitResourceBrapi {
 			}
 		}
 		final Metadata metadata = new Metadata().withStatus(status);
-		final EntityListResponse<PhenotypeSearchDTO> entityListResponse = new EntityListResponse<>(metadata, results);
+		final EntityListResponse<ObservationUnitDto> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
-	private PagedResult<PhenotypeSearchDTO> getObservationUnitDtoPagedResult(
-		final PhenotypeSearchRequestDTO phenotypeSearchDTO,
+	private PagedResult<ObservationUnitDto> getObservationUnitDtoPagedResult(
+		final ObservationUnitSearchRequestDTO phenotypeSearchDTO,
 		final Integer currentPage, final Integer pageSize) {
 		final Integer finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final Integer finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 		return new PaginatedSearch()
 			.executeBrapiSearch(finalPageNumber, finalPageSize,
-				new SearchSpec<PhenotypeSearchDTO>() {
+				new SearchSpec<ObservationUnitDto>() {
 
 					@Override
 					public long getCount() {
-						return ObservationUnitResourceBrapi.this.studyService.countPhenotypes(phenotypeSearchDTO);
+						return ObservationUnitResourceBrapi.this.observationUnitService.countObservationUnits(phenotypeSearchDTO);
 					}
 
 					@Override
-					public List<PhenotypeSearchDTO> getResults(final PagedResult<PhenotypeSearchDTO> pagedResult) {
-						return ObservationUnitResourceBrapi.this.studyService
-							.searchPhenotypes(finalPageSize, finalPageNumber, phenotypeSearchDTO);
+					public List<ObservationUnitDto> getResults(final PagedResult<ObservationUnitDto> pagedResult) {
+						return ObservationUnitResourceBrapi.this.observationUnitService
+							.searchObservationUnits(finalPageSize, finalPageNumber, phenotypeSearchDTO);
 					}
 				});
 	}

@@ -2,6 +2,8 @@ package org.ibp.api.java.impl.middleware.observationunits;
 
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportResponse;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	@Autowired
 	private ObservationUnitImportRequestValidator observationUnitImportRequestValidator;
+
+	@Autowired
+	private org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService middlewareObservationUnitService;
 
 	@Override
 	public ObservationUnitImportResponse createObservationUnits(final String cropName,
@@ -38,6 +43,17 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 		response.setStatus(noOfCreatedStudies + " out of " + originalListSize + " observation units created successfully.");
 		return response;
+	}
+
+	@Override
+	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
+		final ObservationUnitSearchRequestDTO requestDTO) {
+		return this.middlewareObservationUnitService.searchObservationUnits(pageSize, pageNumber, requestDTO);
+	}
+
+	@Override
+	public long countObservationUnits(final ObservationUnitSearchRequestDTO requestDTO) {
+		return this.middlewareObservationUnitService.countObservationUnits(requestDTO);
 	}
 
 }

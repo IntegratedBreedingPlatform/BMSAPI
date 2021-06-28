@@ -19,8 +19,8 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v2.trial.TrialImportResponse;
@@ -94,17 +94,6 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public long countStudies(final StudySearchFilter studySearchFilter) {
 		return this.middlewareStudyService.countStudies(studySearchFilter);
-	}
-
-	@Override
-	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber,
-		final PhenotypeSearchRequestDTO requestDTO) {
-		return this.middlewareStudyService.searchPhenotypes(pageSize, pageNumber, requestDTO);
-	}
-
-	@Override
-	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
-		return this.middlewareStudyService.countPhenotypes(requestDTO);
 	}
 
 	@Override
