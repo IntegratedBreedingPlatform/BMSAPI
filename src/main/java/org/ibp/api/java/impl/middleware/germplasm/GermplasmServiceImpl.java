@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
@@ -22,7 +21,6 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
-import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -40,7 +38,6 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
-import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateDtoValidator;
@@ -74,9 +71,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
-
-	@Autowired
-	private AttributeValidator attributeValidator;
 
 	@Autowired
 	private GermplasmUpdateDtoValidator germplasmUpdateDtoValidator;
@@ -302,20 +296,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<AttributeDTO> getAttributesByGUID(
-			final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
-		this.validateGuidAndAttributes(germplasmUUID, attributeDbIds);
-		return this.germplasmService.getAttributesByGUID(germplasmUUID, attributeDbIds, pageable);
-
-	}
-
-	@Override
-	public long countAttributesByGUID(final String germplasmUUID, final List<String> attributeDbIds) {
-		this.validateGermplasmUUID(germplasmUUID);
-		return this.germplasmService.countAttributesByGUID(germplasmUUID, attributeDbIds);
-	}
-
-	@Override
 	public Set<Integer> importGermplasmUpdates(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		this.germplasmUpdateDtoValidator.validate(programUUID, germplasmUpdateDTOList);
@@ -430,18 +410,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		return this.germplasmService.getGermplasmProgenitorDetails(gid);
-	}
-
-	private void validateGuidAndAttributes(final String germplasmGUID, final List<String> attributeDbIds) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
-		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmGUID);
-		if (this.errors.hasErrors()) {
-			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-		}
-		this.attributeValidator.validateAttributeIds(this.errors, attributeDbIds);
-		if (this.errors.hasErrors()) {
-			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-		}
 	}
 
 	@Override

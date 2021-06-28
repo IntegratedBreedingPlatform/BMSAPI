@@ -24,6 +24,7 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -55,6 +56,9 @@ public class GermplasmResourceBrapi {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private GermplasmAttributeService germplasmAttributeService;
 
 	@Deprecated
 	@ApiOperation(value = "Search germplasms", notes = "Search germplasms. <p>DEPRECATED: use /search/germplasm</p> ")
@@ -406,12 +410,12 @@ public class GermplasmResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return GermplasmResourceBrapi.this.germplasmService.countAttributesByGUID(germplasmDbId, attributeDbIds);
+					return GermplasmResourceBrapi.this.germplasmAttributeService.countAttributesByGUID(germplasmDbId, attributeDbIds);
 				}
 
 				@Override
 				public List<AttributeDTO> getResults(final PagedResult<AttributeDTO> pagedResult) {
-					return GermplasmResourceBrapi.this.germplasmService
+					return GermplasmResourceBrapi.this.germplasmAttributeService
 						.getAttributesByGUID(germplasmDbId, attributeDbIds, new PageRequest(finalPageNumber, finalPageSize));
 				}
 			});

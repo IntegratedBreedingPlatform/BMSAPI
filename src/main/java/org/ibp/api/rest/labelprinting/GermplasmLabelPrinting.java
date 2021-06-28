@@ -4,12 +4,12 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
@@ -84,7 +84,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	private ResourceBundleMessageSource messageSource;
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
+	private GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
 	private SearchRequestService searchRequestService;
@@ -94,9 +94,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	@Autowired
 	private GermplasmService germplasmService;
-
-	@Autowired
-	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmServiceMiddleware;
 
 	public static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
@@ -159,7 +156,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 		final Set<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toSet());
 
-		final List<Variable> attributeVariables = this.germplasmServiceMiddleware.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
+		final List<Variable> attributeVariables =
+			this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
 		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest, programUUID);
 
 		// Germplasm Details labels

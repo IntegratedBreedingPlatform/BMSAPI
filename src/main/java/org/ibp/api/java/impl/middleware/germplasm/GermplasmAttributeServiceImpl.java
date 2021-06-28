@@ -1,12 +1,15 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -31,6 +34,8 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 
 	@Autowired
 	private LocationValidator locationValidator;
+
+	private BindingResult errors;
 
 	@Override
 	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId, final String programUUID) {
@@ -64,6 +69,36 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.attributeValidator.validateGermplasmAttributeExists(errors, gid, attributeId);
 		this.germplasmAttributeService.deleteGermplasmAttribute(attributeId);
+	}
+
+	@Override
+	public List<AttributeDTO> getAttributesByGUID(
+		final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
+		this.validateGuidAndAttributes(germplasmUUID, attributeDbIds);
+		return this.germplasmAttributeService.getAttributesByGUID(germplasmUUID, attributeDbIds, pageable);
+
+	}
+
+	@Override
+	public long countAttributesByGUID(final String germplasmUUID, final List<String> attributeDbIds) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmUUID);
+		if (this.errors.hasErrors()) {
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+		return this.germplasmAttributeService.countAttributesByGUID(germplasmUUID, attributeDbIds);
+	}
+
+	private void validateGuidAndAttributes(final String germplasmGUID, final List<String> attributeDbIds) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), AttributeDTO.class.getName());
+		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmGUID);
+		if (this.errors.hasErrors()) {
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+		this.attributeValidator.validateAttributeIds(this.errors, attributeDbIds);
+		if (this.errors.hasErrors()) {
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
 	}
 
 }

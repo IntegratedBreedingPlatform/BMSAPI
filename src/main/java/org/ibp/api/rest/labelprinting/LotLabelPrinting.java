@@ -3,12 +3,10 @@ package org.ibp.api.rest.labelprinting;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.api.germplasm.GermplasmService;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
@@ -50,16 +48,13 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	private ResourceBundleMessageSource messageSource;
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
+	private GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
 	private SearchRequestService searchRequestService;
 
 	@Autowired
 	private LotService lotService;
-
-	@Autowired
-	private GermplasmService germplasmService;
 
 	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
@@ -85,7 +80,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		LAST_DEPOSIT_DATE(14, "Last deposit date"),
 		LAST_WITHDRAWAL_DATE(15, "Last withdrawal date");
 
-		private static Map<Integer, LOT_FIELD> byId =
+		private static final Map<Integer, LOT_FIELD> byId =
 			Arrays.stream(LOT_FIELD.values()).collect(Collectors.toMap(LOT_FIELD::getId, Function.identity()));
 
 		private final int id;
@@ -111,7 +106,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 
 	// Lot fields
-	private static LabelType LOT_FIXED_LABEL_TYPES = new LabelType("Lot", "Lot")
+	private static final LabelType LOT_FIXED_LABEL_TYPES = new LabelType("Lot", "Lot")
 		.withFields(Arrays.stream(LOT_FIELD.values())
 			.map(field -> new Field(field.getId(), field.getName()))
 			.collect(Collectors.toList()));
@@ -129,7 +124,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		// LOT_ID(22) in lot group
 		;
 
-		private static Map<Integer, GERMPLASM_FIELD> byId =
+		private static final Map<Integer, GERMPLASM_FIELD> byId =
 			Arrays.stream(GERMPLASM_FIELD.values()).collect(Collectors.toMap(GERMPLASM_FIELD::getId, Function.identity()));
 
 		private final int id;
@@ -155,7 +150,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 
 	// Germplasm fields
-	private static LabelType GERMPLASM_FIXED_LABEL_TYPES = new LabelType("Germplasm", "Germplasm")
+	private static final LabelType GERMPLASM_FIXED_LABEL_TYPES = new LabelType("Germplasm", "Germplasm")
 		.withFields(Arrays.stream(GERMPLASM_FIELD.values())
 			.map(field -> new Field(field.getId(), field.getName()))
 			.collect(Collectors.toList()));
@@ -217,7 +212,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 		final Set<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet());
-		final List<Variable> germplasmAttributeVariables = this.germplasmService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
+		final List<Variable> germplasmAttributeVariables =
+			this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
 
 		// Build label list
 
