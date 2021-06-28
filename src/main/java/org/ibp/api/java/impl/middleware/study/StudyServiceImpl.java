@@ -193,26 +193,11 @@ public class StudyServiceImpl implements StudyService {
 			if (!CollectionUtils.isEmpty(studySummaries)) {
 				noOfCreatedTrials = studySummaries.size();
 			}
-			response.setStudySummaries(studySummaries);
+			response.setEntityList(studySummaries);
 		}
-		response.setStatus(noOfCreatedTrials + " out of " + originalListSize + " trials created successfully.");
+		response.setImportListSize(originalListSize);
+		response.setCreatedSize(noOfCreatedTrials);
 		return response;
-	}
-
-	public void setStudyDataManager(final StudyDataManager studyDataManager) {
-		this.studyDataManager = studyDataManager;
-	}
-
-	public void setStudyValidator(final StudyValidator studyValidator) {
-		this.studyValidator = studyValidator;
-	}
-
-	public void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
-		this.middlewareStudyService = middlewareStudyService;
-	}
-
-	public void setGermplasmValidator(final GermplasmValidator germplasmValidator) {
-		this.germplasmValidator = germplasmValidator;
 	}
 
 }
