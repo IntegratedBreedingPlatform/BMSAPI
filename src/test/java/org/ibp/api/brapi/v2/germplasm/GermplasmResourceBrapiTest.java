@@ -1,7 +1,6 @@
 package org.ibp.api.brapi.v2.germplasm;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
@@ -22,7 +21,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.validation.ObjectError;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -100,8 +98,9 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		final List<GermplasmImportRequest> requestList = Lists.newArrayList(importRequest);
 		final String cropName = "maize";
 		final GermplasmImportResponse response = new GermplasmImportResponse();
-		response.setGermplasmList(list);
-		response.setStatus(RandomStringUtils.randomAlphabetic(30));
+		response.setEntityList(list);
+		response.setCreatedSize(10);
+		response.setImportListSize(12);
 		doReturn(response).when(this.germplasmService).createGermplasm(cropName, requestList);
 
 
@@ -112,7 +111,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status", IsCollectionWithSize.hasSize(1)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].messageType", Matchers.is("INFO")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is(response.getStatus())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("10 out of 12 germplasm created successfully.")))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(list.size())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmDbId",
 				Matchers.is(germplasmDbId)))
@@ -152,7 +151,8 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		final List<GermplasmImportRequest> requestList = Lists.newArrayList(importRequest);
 		final String cropName = "maize";
 		final GermplasmImportResponse response = new GermplasmImportResponse();
-		response.setStatus(RandomStringUtils.randomAlphabetic(30));
+		response.setCreatedSize(0);
+		response.setImportListSize(1);
 		final ObjectError error = new ObjectError("defaultDisplayName",  new String[] {"germplasm.create.null.name.types"}, new String[] {"1"}, "");
 		response.setErrors(Lists.newArrayList(error));
 		doReturn(response).when(this.germplasmService).createGermplasm(cropName, requestList);
@@ -164,7 +164,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status", IsCollectionWithSize.hasSize(2)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].messageType", Matchers.is("INFO")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is(response.getStatus())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("0 out of 1 germplasm created successfully.")))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[1].messageType", Matchers.is("ERROR")))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[1].message", Matchers.is("ERROR1 Germplasm at position 1 is invalid because there is one or more null type in synonyms.")))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(0)));
