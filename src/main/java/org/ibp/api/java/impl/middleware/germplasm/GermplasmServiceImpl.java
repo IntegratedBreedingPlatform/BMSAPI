@@ -399,9 +399,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.populateGermplasmPedigree(germplasmDTOList);
 				noOfCreatedGermplasm = germplasmDTOList.size();
 			}
-			response.setGermplasmList(germplasmDTOList);
+			response.setEntityList(germplasmDTOList);
 		}
-		response.setStatus(noOfCreatedGermplasm + " out of " + originalListSize + " germplasm created successfully.");
+		response.setCreatedSize(noOfCreatedGermplasm);
+		response.setImportListSize(originalListSize);
 		return response;
 	}
 
