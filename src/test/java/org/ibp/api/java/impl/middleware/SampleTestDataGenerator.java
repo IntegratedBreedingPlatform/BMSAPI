@@ -25,7 +25,7 @@ public abstract class SampleTestDataGenerator {
 		sampleObservationDto.setEntryNumber(Integer.valueOf(randomNumeric(6)));
 		sampleObservationDto.setPlotNumber(Integer.valueOf(randomNumeric(6)));
 
-		sampleObservationDto.setGermplasmDbId(Integer.valueOf(randomNumeric(6)));
+		sampleObservationDto.setGermplasmDbId(randomAlphanumeric(6));
 		sampleObservationDto.setPlantingDate(randomAlphanumeric(6));
 		sampleObservationDto.setHarvestDate(randomAlphanumeric(6));
 		return sampleObservationDto;
