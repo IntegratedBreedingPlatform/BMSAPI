@@ -23,7 +23,7 @@ public class VariableFilter {
 		return programUuid;
 	}
 
-	public void setProgramUuid(String programUuid) {
+	public void setProgramUuid(final String programUuid) {
 		this.programUuid = programUuid;
 	}
 
@@ -31,7 +31,7 @@ public class VariableFilter {
 		return fetchAll;
 	}
 
-	public void setFetchAll(boolean fetchAll) {
+	public void setFetchAll(final boolean fetchAll) {
 		this.fetchAll = fetchAll;
 	}
 
@@ -39,7 +39,7 @@ public class VariableFilter {
 		return favoritesOnly;
 	}
 
-	public void setFavoritesOnly(boolean favoritesOnly) {
+	public void setFavoritesOnly(final boolean favoritesOnly) {
 		this.favoritesOnly = favoritesOnly;
 	}
 
@@ -47,7 +47,7 @@ public class VariableFilter {
 		return methodIds;
 	}
 
-	public void addMethodId(Integer id) {
+	public void addMethodId(final Integer id) {
 		this.methodIds.add(id);
 	}
 
@@ -55,7 +55,7 @@ public class VariableFilter {
 		return propertyIds;
 	}
 
-	public void addPropertyId(Integer id) {
+	public void addPropertyId(final Integer id) {
 		this.propertyIds.add(id);
 	}
 
@@ -63,7 +63,7 @@ public class VariableFilter {
 		return scaleIds;
 	}
 
-	public void addScaleId(Integer id) {
+	public void addScaleId(final Integer id) {
 		this.scaleIds.add(id);
 	}
 
@@ -71,7 +71,7 @@ public class VariableFilter {
 		return variableIds;
 	}
 
-	public void addVariableId(Integer id) {
+	public void addVariableId(final Integer id) {
 		this.variableIds.add(id);
 	}
 
@@ -79,7 +79,7 @@ public class VariableFilter {
 		return excludedVariableIds;
 	}
 
-	public void addExcludedVariableId(Integer id) {
+	public void addExcludedVariableId(final Integer id) {
 		this.excludedVariableIds.add(id);
 	}
 
@@ -87,7 +87,7 @@ public class VariableFilter {
 		return dataTypesIds;
 	}
 
-	public void addDataType(Integer dataType) {
+	public void addDataType(final Integer dataType) {
 		this.dataTypesIds.add(dataType);
 	}
 
@@ -95,7 +95,7 @@ public class VariableFilter {
 		return variableTypeIds;
 	}
 
-	public void addVariableType(Integer variableType) {
+	public void addVariableType(final Integer variableType) {
 		this.variableTypeIds.add(variableType);
 	}
 
@@ -103,15 +103,15 @@ public class VariableFilter {
 		return propertyClasses;
 	}
 
-	public void addPropertyClass(String className) {
+	public void addPropertyClass(final String className) {
 		this.propertyClasses.add(className);
 	}
 
-	public void addName(String name) {
+	public void addName(final String name) {
 		this.names.add(name);
 	}
 
-	public void addVariableIds(List<Integer> variableIds) {
+	public void addVariableIds(final List<Integer> variableIds) {
 		this.variableIds.addAll(variableIds);
 	}
 
@@ -136,7 +136,8 @@ public class VariableFilter {
 			'}';
 	}
 
-	@Override public boolean equals(Object o) {
+	@Override
+	public boolean equals(final Object o) {
 		if (this == o) {
 			return true;
 		}
@@ -144,7 +145,7 @@ public class VariableFilter {
 			return false;
 		}
 
-		VariableFilter that = (VariableFilter) o;
+		final VariableFilter that = (VariableFilter) o;
 
 		if (fetchAll != that.fetchAll) {
 			return false;

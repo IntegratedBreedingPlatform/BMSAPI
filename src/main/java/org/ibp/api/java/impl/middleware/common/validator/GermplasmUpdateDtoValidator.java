@@ -26,7 +26,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,9 +37,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class GermplasmUpdateDtoValidator {
-
-	private static final List<VariableType> ATTRIBUTE_TYPES =
-		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
 
 	@Autowired
 	private GermplasmService germplasmService;
@@ -104,7 +100,7 @@ public class GermplasmUpdateDtoValidator {
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(programUUID);
-		ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+		VariableType.getAttributeVariableTypes().forEach(variableFilter::addVariableType);
 		attributesCodes.forEach(variableFilter::addName);
 
 		final List<Variable> existingAttributeVariables =

@@ -22,9 +22,6 @@ import java.util.stream.Collectors;
 @Component
 public class AttributeValidator {
 
-	private static final List<VariableType> ALLOWED_ATTRIBUTE_TYPES =
-		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
-
 	private static final List<Integer> ALLOWED_ATTRIBUTE_TYPES_IDS =
 		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId());
 
@@ -68,7 +65,7 @@ public class AttributeValidator {
 			errors.reject("attribute.variable.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		if (!CollectionUtils.containsAny(variable.getVariableTypes(), ALLOWED_ATTRIBUTE_TYPES)) {
+		if (!CollectionUtils.containsAny(variable.getVariableTypes(), VariableType.getAttributeVariableTypes())) {
 			errors.reject("attribute.variable.type.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -82,7 +79,7 @@ public class AttributeValidator {
 	}
 
 	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto) {
-		//FIXME Search by gid and variableId, to be addressed in IBP-4659
+		//FIXME Search by gid and variableId, to be addressed in IBP-4765
 		final List<GermplasmAttributeDto> germplasmAttributeDtos =
 			this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
 		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
@@ -106,7 +103,7 @@ public class AttributeValidator {
 
 	void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
 		final Integer attributeId) {
-		//FIXME Search by attributeId, to be addressed in IBP-4659
+		//FIXME Search by attributeId, to be addressed in IBP-4765
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
 
 		// Filter by germplasm attribute id
