@@ -49,9 +49,8 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 			boolean hasUsage = false,
 					isReferred = false;
 			if (Objects.equals(request.getCvId(), CvId.VARIABLES.getId())) {
-				hasUsage = this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(request.getId())) || //
-				 this.ontologyVariableDataManager.isVariableUsedInGermplasm(Integer.valueOf(request.getId())) || //
-				 this.ontologyVariableDataManager.isVariableUsedInBreedingMethods(Integer.valueOf(request.getId()));
+				final Integer variableId = Integer.valueOf(request.getId());
+				hasUsage = this.ontologyVariableDataManager.hasUsage(variableId);
 			} else {
 				isReferred = this.termDataManager.isTermReferred(StringUtil.parseInt(request.getId(), null));
 			}
