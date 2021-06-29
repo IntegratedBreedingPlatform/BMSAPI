@@ -2,8 +2,10 @@ package org.ibp.api.java.impl.middleware.observationunits;
 
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportResponse;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,12 +25,15 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	@Autowired
 	private org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService middlewareObservationUnitService;
 
+	@Autowired
+	private SecurityService securityService;
+
 	@Override
 	public ObservationUnitImportResponse createObservationUnits(final String cropName,
 		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos) {
 		final ObservationUnitImportResponse response = new ObservationUnitImportResponse();
 		final int originalListSize = observationUnitImportRequestDtos.size();
-		int noOfCreatedStudies = 0;
+		int noOfCreatedObservationUnits = 0;
 
 		// Remove observation units that fails any validation. They will be excluded from creation
 		final BindingResult bindingResult =
@@ -38,10 +43,16 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 
 		if (!CollectionUtils.isEmpty(observationUnitImportRequestDtos)) {
-			// add call to method that creates observation units
+			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+			final List<ObservationUnitDto> observationUnitDtos =
+				this.middlewareObservationUnitService.importObservationUnits(cropName, observationUnitImportRequestDtos, user.getUserid());
+			if (!CollectionUtils.isEmpty(observationUnitDtos)) {
+				noOfCreatedObservationUnits = observationUnitDtos.size();
+			}
+			response.setObservationUnits(observationUnitDtos);
 		}
 
-		response.setStatus(noOfCreatedStudies + " out of " + originalListSize + " observation units created successfully.");
+		response.setStatus(noOfCreatedObservationUnits + " out of " + originalListSize + " observation units created successfully.");
 		return response;
 	}
 
