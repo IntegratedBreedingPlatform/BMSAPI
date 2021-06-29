@@ -4,8 +4,14 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -38,6 +44,9 @@ public class ObservationUnitImportRequestValidatorTest {
 	@Mock
 	private GermplasmService germplasmService;
 
+	@Mock
+	private OntologyService ontologyService;
+
 	@InjectMocks
 	private ObservationUnitImportRequestValidator validator;
 
@@ -59,6 +68,12 @@ public class ObservationUnitImportRequestValidatorTest {
 		germplasmSearchRequestDto.setGermplasmDbIds(Collections.singletonList(GERMPLASM_DBID));
 		Mockito.when(this.germplasmService.searchFilteredGermplasm(germplasmSearchRequestDto, null))
 			.thenReturn(Collections.singletonList(germplasmDTO));
+
+		final StandardVariable standardVariable = new StandardVariable();
+		final Enumeration enumeration = new Enumeration();
+		enumeration.setDescription(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+		standardVariable.setEnumerations(Collections.singletonList(enumeration));
+		Mockito.when(this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), PROGRAM_DBID)).thenReturn(standardVariable);
 	}
 
 	@Test
@@ -123,6 +138,24 @@ public class ObservationUnitImportRequestValidatorTest {
 	}
 
 	@Test
+	public void testPruneStudiesInvalidForImport_WhereEntryTypeIsNull() {
+		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
+		observationUnitImportRequestDtos.get(0).setObservationUnitPosition(null);
+		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("observation.unit.import.entry.type.required", result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
+	public void testPruneStudiesInvalidForImport_WhereEntryTypeIsInvalid() {
+		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
+		observationUnitImportRequestDtos.get(0).getObservationUnitPosition().setEntryType("T");
+		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("observation.unit.import.entry.type.invalid", result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
 	public void testPruneStudiesInvalidForImport_WhereExternalReferenceHasMissingInfo() {
 		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
 		final List<ExternalReferenceDTO> externalReferenceDTOS = new ArrayList<>();
@@ -169,6 +202,10 @@ public class ObservationUnitImportRequestValidatorTest {
 		dto.setStudyDbId(STUDY_DBID);
 		dto.setGermplasmDbId(GERMPLASM_DBID);
 		dto.setGermplasmDbId(GERMPLASM_DBID);
+
+		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
+		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+		dto.setObservationUnitPosition(observationUnitPosition);
 		observationUnitImportRequestDtos.add(dto);
 		return observationUnitImportRequestDtos;
 	}

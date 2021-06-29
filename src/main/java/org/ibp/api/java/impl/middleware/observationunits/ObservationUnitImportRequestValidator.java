@@ -5,7 +5,10 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -33,6 +36,9 @@ public class ObservationUnitImportRequestValidator {
 
 	@Autowired
 	private GermplasmService germplasmService;
+
+	@Autowired
+	private OntologyService ontologyService;
 
 	protected BindingResult errors;
 
@@ -99,6 +105,23 @@ public class ObservationUnitImportRequestValidator {
 				iterator.remove();
 				continue;
 			}
+
+			if(dto.getObservationUnitPosition() == null || StringUtils.isEmpty(dto.getObservationUnitPosition().getEntryType())) {
+				this.errors.reject("observation.unit.import.entry.type.required", new String[] {index.toString()}, "");
+				iterator.remove();
+				continue;
+			}
+
+			final List<String> entryTypes =
+				this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
+					.stream().map(Enumeration::getDescription).collect(Collectors.toList());
+
+			if(!entryTypes.contains(dto.getObservationUnitPosition().getEntryType())) {
+				this.errors.reject("observation.unit.import.entry.type.invalid", new String[] {index.toString()}, "");
+				iterator.remove();
+				continue;
+			}
+
 
 			if (this.isAnyExternalReferenceInvalid(dto, index)) {
 				iterator.remove();
