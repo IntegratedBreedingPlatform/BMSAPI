@@ -51,7 +51,7 @@ public class GermplasmAuditResource {
 
 	@ResponseBody
 	@RequestMapping(
-		value = "/crops/{cropName}/germplasm/{gid}/name/{nameId}/changes",
+		value = "/crops/{cropName}/germplasm/{gid}/names/{nameId}/changes",
 		method = RequestMethod.GET)
 	@PreAuthorize(HAS_VIEW_CHANGE_HISTORY)
 	public ResponseEntity<List<GermplasmNameAuditDTO>> getNameChanges(
@@ -69,7 +69,7 @@ public class GermplasmAuditResource {
 
 	@ResponseBody
 	@RequestMapping(
-		value = "/crops/{cropName}/germplasm/{gid}/attribute/{attributeId}/changes",
+		value = "/crops/{cropName}/germplasm/{gid}/attributes/{attributeId}/changes",
 		method = RequestMethod.GET)
 	@PreAuthorize(HAS_VIEW_CHANGE_HISTORY)
 	public ResponseEntity<List<GermplasmAttributeAuditDTO>> getAttributeChanges(
