@@ -5,10 +5,7 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
-import org.generationcp.middleware.api.location.LocationService;
-import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -34,13 +31,9 @@ public class ObservationUnitImportRequestValidatorTest {
 	private static final String TRIAL_DBID = "1";
 	private static final String STUDY_DBID = "1";
 	private static final String PROGRAM_DBID = RandomStringUtils.randomAlphabetic(10);
-	private static final String LOCATION_DBID = "1";
 
 	@Mock
 	private StudyInstanceService studyInstanceService;
-
-	@Mock
-	private LocationService locationService;
 
 	@Mock
 	private GermplasmService germplasmService;
@@ -59,12 +52,6 @@ public class ObservationUnitImportRequestValidatorTest {
 		filter.setStudyDbIds(Collections.singletonList(STUDY_DBID));
 		Mockito.when(this.studyInstanceService.getStudyInstances(filter, null))
 			.thenReturn(Collections.singletonList(studyInstanceDto));
-
-		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(LOCATION_DBID)));
-		locationSearchRequest.setProgramUUID(PROGRAM_DBID);
-		Mockito.when(this.locationService.getFilteredLocations(locationSearchRequest, null))
-			.thenReturn(Collections.singletonList(new Location()));
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
 		germplasmDTO.setGermplasmDbId(GERMPLASM_DBID);
@@ -182,7 +169,6 @@ public class ObservationUnitImportRequestValidatorTest {
 		dto.setStudyDbId(STUDY_DBID);
 		dto.setGermplasmDbId(GERMPLASM_DBID);
 		dto.setGermplasmDbId(GERMPLASM_DBID);
-		dto.setLocationDbId(LOCATION_DBID);
 		observationUnitImportRequestDtos.add(dto);
 		return observationUnitImportRequestDtos;
 	}

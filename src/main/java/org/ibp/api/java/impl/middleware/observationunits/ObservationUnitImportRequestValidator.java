@@ -5,8 +5,6 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
-import org.generationcp.middleware.api.location.LocationService;
-import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
@@ -14,11 +12,9 @@ import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,9 +30,6 @@ public class ObservationUnitImportRequestValidator {
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
-
-	@Autowired
-	private LocationService locationService;
 
 	@Autowired
 	private GermplasmService germplasmService;
@@ -57,13 +50,13 @@ public class ObservationUnitImportRequestValidator {
 		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDto.setGermplasmDbIds(germplasmDbIds);
 		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchFilteredGermplasm(germplasmSearchRequestDto, null)
-			.stream().collect(Collectors.toMap(g -> g.getGermplasmDbId(), Function.identity()));
+			.stream().collect(Collectors.toMap(GermplasmDTO::getGermplasmDbId, Function.identity()));
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		studySearchFilter.setStudyDbIds(studyDbIds);
 		final Map<String, StudyInstanceDto> studyInstancesMap =
 			this.studyInstanceService.getStudyInstances(studySearchFilter, null).stream()
-				.collect(Collectors.toMap(s -> s.getStudyDbId(), Function.identity()));
+				.collect(Collectors.toMap(StudyInstanceDto::getStudyDbId, Function.identity()));
 
 		Integer index = 1;
 		final Iterator<ObservationUnitImportRequestDto> iterator = observationUnitImportRequestDtos.iterator();
@@ -95,18 +88,6 @@ public class ObservationUnitImportRequestValidator {
 				continue;
 			}
 
-			if (StringUtils.isNotEmpty(dto.getLocationDbId())) {
-				final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-				locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(dto.getLocationDbId())));
-				locationSearchRequest.setProgramUUID(dto.getProgramDbId());
-
-				if (CollectionUtils.isEmpty(this.locationService.getFilteredLocations(locationSearchRequest, null))) {
-					this.errors.reject("observation.unit.import.locationDbId.invalid", new String[] {index.toString()}, "");
-					iterator.remove();
-					continue;
-				}
-			}
-
 			if (StringUtils.isEmpty(dto.getGermplasmDbId())) {
 				this.errors.reject("observation.unit.import.germplasmDbId.null", new String[] {index.toString()}, "");
 				iterator.remove();
@@ -121,7 +102,6 @@ public class ObservationUnitImportRequestValidator {
 
 			if (this.isAnyExternalReferenceInvalid(dto, index)) {
 				iterator.remove();
-				continue;
 			}
 		}
 
