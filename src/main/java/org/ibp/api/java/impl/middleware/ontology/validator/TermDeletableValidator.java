@@ -47,9 +47,10 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 			}
 
 			boolean hasUsage = false,
-					isReferred = false;
+					isReferred = false,
+					germplasmDeleted = false;
+			final Integer variableId = Integer.valueOf(request.getId());
 			if (Objects.equals(request.getCvId(), CvId.VARIABLES.getId())) {
-				final Integer variableId = Integer.valueOf(request.getId());
 				hasUsage = this.ontologyVariableDataManager.hasUsage(variableId);
 			} else {
 				isReferred = this.termDataManager.isTermReferred(StringUtil.parseInt(request.getId(), null));
@@ -57,6 +58,14 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 
 			if (hasUsage || isReferred) {
 				this.addCustomError(errors, BaseValidator.RECORD_IS_NOT_DELETABLE, new Object[] {request.getTermName(), request.getId()});
+			}else{
+				// Temporal condition to validate when try delete a attribute that had a relation with germplasm deleted.
+				germplasmDeleted = this.ontologyVariableDataManager.hasVariableAttributeGermplasmDeleted(variableId);
+
+				if(germplasmDeleted){
+					this.addCustomError(errors, BaseValidator.RECORD_RELATED_WITH_A_GERMPLASM_DELETED, new Object[] {request.getTermName(), request.getId()});
+
+				}
 			}
 
 			final List<FormulaDto> formulas = this.formulaService.getByInputId(Integer.valueOf(request.getId()));
