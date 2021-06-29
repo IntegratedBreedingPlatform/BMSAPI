@@ -18,6 +18,7 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.germplasm.Germplasm;
+import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -25,14 +26,11 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,9 +39,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Api(value = "BrAPI v2 Gerplasm Services")
 @Controller(value = "GermplasmResourceBrapiV2")
@@ -53,7 +49,7 @@ public class GermplasmResourceBrapi {
 	private GermplasmService germplasmService;
 
 	@Autowired
-	private ResourceBundleMessageSource messageSource;
+	private BrapiResponseMessageGenerator<GermplasmDTO> responseMessageGenerator;
 
 	@ApiOperation(value = "Get a filtered list of Germplasm", notes = "Get a filtered list of Germplasm")
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm", method = RequestMethod.GET)
@@ -126,24 +122,10 @@ public class GermplasmResourceBrapi {
 		BaseValidator.checkNotNull(germplasmImportRequestList, "germplasm.import.list.null");
 
 		final GermplasmImportResponse germplasmImportResponse = this.germplasmService.createGermplasm(crop, germplasmImportRequestList);
-		final List<Germplasm> germplasmList = this.mapGermplasm(germplasmImportResponse.getGermplasmList());
+		final List<Germplasm> germplasmList = this.mapGermplasm(germplasmImportResponse.getEntityList());
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 
-		final List<Map<String, String>> status = new ArrayList<>();
-		final Map<String, String> messageInfo = new HashMap<>();
-		messageInfo.put("message", germplasmImportResponse.getStatus());
-		messageInfo.put("messageType", "INFO");
-		status.add(messageInfo);
-		if (!CollectionUtils.isEmpty(germplasmImportResponse.getErrors())) {
-			int index = 1;
-			for (final ObjectError error : germplasmImportResponse.getErrors()) {
-				final Map<String, String> messageError = new HashMap<>();
-				messageError.put("message", "ERROR" + index++ + " " + this.getMessage(error.getCode(), error.getArguments()));
-				messageError.put("messageType", "ERROR");
-				status.add(messageError);
-			}
-		}
-		final Metadata metadata = new Metadata().withStatus(status);
+		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(germplasmImportResponse));
 		final EntityListResponse<Germplasm> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
@@ -211,10 +193,6 @@ public class GermplasmResourceBrapi {
 							.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(finalPageNumber, finalPageSize));
 					}
 				});
-	}
-
-	private String getMessage(final String code, final Object[] arguments) {
-		return this.messageSource.getMessage(code, arguments, LocaleContextHolder.getLocale());
 	}
 
 	private List<Germplasm> mapGermplasm(final List<GermplasmDTO> germplasmDTOList) {
