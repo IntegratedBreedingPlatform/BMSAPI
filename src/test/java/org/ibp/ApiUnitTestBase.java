@@ -21,6 +21,7 @@ import org.generationcp.middleware.util.Debug;
 import org.ibp.api.brapi.v2.validation.CropValidator;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.design.runner.DesignRunner;
+import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
@@ -232,6 +233,13 @@ public abstract class ApiUnitTestBase {
 
 		@Bean
 		@Primary
+		public GermplasmAttributeService germplasmAttributeService() {
+			return Mockito.mock(GermplasmAttributeService.class);
+
+		}
+
+		@Bean
+		@Primary
 		public org.generationcp.middleware.api.germplasm.GermplasmService germplasmMiddlewareService() {
 			return Mockito.mock(org.generationcp.middleware.api.germplasm.GermplasmService.class);
 
@@ -278,7 +286,7 @@ public abstract class ApiUnitTestBase {
 	public void loadPreAuthorizedRole() {
 		final List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority("ADMIN"));
-		UsernamePasswordAuthenticationToken loggedInUser =
+		final UsernamePasswordAuthenticationToken loggedInUser =
 			new UsernamePasswordAuthenticationToken("User", "Password@##@$@%$%$#^", authorities);
 		SecurityContextHolder.getContext().setAuthentication(loggedInUser);
 	}

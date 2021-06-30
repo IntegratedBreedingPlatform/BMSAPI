@@ -13,13 +13,11 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -48,6 +46,9 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	@Autowired
 	private GermplasmService germplasmService;
+
+	@Autowired
+	private GermplasmAttributeService germplasmAttributeService;
 
 	@Test
 	public void testGetPedigree() throws Exception {
@@ -152,9 +153,9 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 	public void testGetGermplasmAttributes() throws Exception {
 		final int gid = nextInt();
 		final String germplasmDbId = String.valueOf(gid);
-		final List<AttributeDTO> attributeDTOS = this.createAttributes(germplasmDbId);
+		final List<AttributeDTO> attributeDTOS = this.createAttributes();
 
-		doReturn(attributeDTOS).when(this.germplasmService)
+		doReturn(attributeDTOS).when(this.germplasmAttributeService)
 				.getAttributesByGUID(germplasmDbId, null, new PageRequest(0, BrapiPagedResult.DEFAULT_PAGE_SIZE));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/attributes")
@@ -172,7 +173,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		;
 	}
 
-	private List<AttributeDTO> createAttributes( final String germplasmDbId){
+	private List<AttributeDTO> createAttributes() {
 		final AttributeDTO attributeDTO = new AttributeDTO();
 		attributeDTO.setAttributeCode(randomAlphabetic(3));
 		attributeDTO.setAttributeDbId(Integer.parseInt(randomNumeric(3)));
