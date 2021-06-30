@@ -34,7 +34,7 @@ public class AttributeValidator {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	public void validateAttributeType(final BindingResult errors, final Integer attributeType) {
-		if (!AttributeValidator.ALLOWED_ATTRIBUTE_TYPES_IDS.contains(attributeType)) {
+		if (attributeType != null && !AttributeValidator.ALLOWED_ATTRIBUTE_TYPES_IDS.contains(attributeType)) {
 			errors.reject("attribute.variable.type.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -96,7 +96,7 @@ public class AttributeValidator {
 		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if(existingGermplasmAttributes.isEmpty()) {
-			errors.reject("attribute.id.invalid.not.existing", new Integer[] {attributeId}, "");
+			errors.reject("attribute.id.invalid.not.existing", new String[] {String.valueOf(attributeId)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
@@ -110,7 +110,7 @@ public class AttributeValidator {
 		List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if(existingGermplasmAttributes.isEmpty()) {
-			errors.reject("attribute.id.invalid.not.existing", new Integer[] {attributeId}, "");
+			errors.reject("attribute.id.invalid.not.existing", new String[] {String.valueOf(attributeId)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
@@ -118,7 +118,7 @@ public class AttributeValidator {
 		existingGermplasmAttributes = existingGermplasmAttributes.stream()
 			.filter(existing -> existing.getVariableId().equals(dto.getVariableId())).collect(Collectors.toList());
 		if (existingGermplasmAttributes.isEmpty()) {
-			errors.reject("attribute.variable.id.invalid.not.existing", new Integer[] {dto.getVariableId()}, "");
+			errors.reject("attribute.variable.id.invalid.not.existing", new String[] {String.valueOf(dto.getVariableId())}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}

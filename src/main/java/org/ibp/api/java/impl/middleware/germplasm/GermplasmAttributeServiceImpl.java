@@ -49,6 +49,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto,
 		final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.attributeValidator.validateAttribute(errors, gid, dto, null);
 		this.locationValidator.validateLocation(errors, dto.getLocationId(), programUUID);
 		this.germplasmAttributeService.createGermplasmAttribute(gid, dto);
@@ -58,6 +59,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Override
 	public GermplasmAttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId, final GermplasmAttributeRequestDto dto, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.attributeValidator.validateAttribute(errors, gid, dto, attributeId);
 		this.locationValidator.validateLocation(errors, dto.getLocationId(), programUUID);
 		this.germplasmAttributeService.updateGermplasmAttribute(attributeId, dto);
@@ -67,6 +69,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Override
 	public void deleteGermplasmAttribute(final Integer gid, final Integer attributeId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.attributeValidator.validateGermplasmAttributeExists(errors, gid, attributeId);
 		this.germplasmAttributeService.deleteGermplasmAttribute(attributeId);
 	}
