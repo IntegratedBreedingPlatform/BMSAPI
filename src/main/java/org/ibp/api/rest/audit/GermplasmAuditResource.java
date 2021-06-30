@@ -4,7 +4,7 @@ import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorDetailsAuditDTO;
-import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorsAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmOtherProgenitorsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmReferenceAuditDTO;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.audit.GermplasmAuditService;
@@ -142,10 +142,10 @@ public class GermplasmAuditResource {
 
 	@ResponseBody
 	@RequestMapping(
-		value = "/crops/{cropName}/germplasm/{gid}/progenitors/changes",
+		value = "/crops/{cropName}/germplasm/{gid}/progenitors-other/changes",
 		method = RequestMethod.GET)
 	@PreAuthorize(HAS_VIEW_CHANGE_HISTORY)
-	public ResponseEntity<List<GermplasmProgenitorsAuditDTO>> getProgenitorsChanges(
+	public ResponseEntity<List<GermplasmOtherProgenitorsAuditDTO>> getOtherProgenitorsChanges(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
 		final Pageable pageable) {
@@ -153,8 +153,8 @@ public class GermplasmAuditResource {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGermplasmId(errors, gid);
 
-		return this.getPagedResult(() -> this.auditService.countProgenitorsChangesByGid(gid),
-			() -> this.auditService.getProgenitorsByGid(gid, pageable),
+		return this.getPagedResult(() -> this.auditService.countOtherProgenitorsChangesByGid(gid),
+			() -> this.auditService.getOtherProgenitorsByGid(gid, pageable),
 			pageable);
 	}
 

@@ -4,7 +4,7 @@ import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorDetailsAuditDTO;
-import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorsAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmOtherProgenitorsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmReferenceAuditDTO;
 import org.ibp.api.java.audit.GermplasmAuditService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,12 +72,12 @@ public class GermplasmAuditServiceImpl implements GermplasmAuditService {
 	}
 
 	@Override
-	public List<GermplasmProgenitorsAuditDTO> getProgenitorsByGid(final Integer gid, final Pageable pageable) {
-		return this.germplasmAuditService.getProgenitorsByGid(gid, pageable);
+	public List<GermplasmOtherProgenitorsAuditDTO> getOtherProgenitorsByGid(final Integer gid, final Pageable pageable) {
+		return this.germplasmAuditService.getOtherProgenitorsByGid(gid, pageable);
 	}
 
 	@Override
-	public long countProgenitorsChangesByGid(final Integer gid) {
-		return this.germplasmAuditService.countProgenitorsChangesByGid(gid);
+	public long countOtherProgenitorsChangesByGid(final Integer gid) {
+		return this.germplasmAuditService.countOtherProgenitorsChangesByGid(gid);
 	}
 }
