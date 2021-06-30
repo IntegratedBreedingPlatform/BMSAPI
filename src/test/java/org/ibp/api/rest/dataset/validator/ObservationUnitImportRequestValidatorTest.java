@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPositionImportRequestDto;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -203,7 +204,7 @@ public class ObservationUnitImportRequestValidatorTest {
 		dto.setGermplasmDbId(GERMPLASM_DBID);
 		dto.setGermplasmDbId(GERMPLASM_DBID);
 
-		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
+		final ObservationUnitPositionImportRequestDto observationUnitPosition = new ObservationUnitPositionImportRequestDto();
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
 		dto.setObservationUnitPosition(observationUnitPosition);
 		observationUnitImportRequestDtos.add(dto);
