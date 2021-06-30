@@ -1,18 +1,8 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
-import static org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE;
-import static org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
@@ -40,8 +30,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import static org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE;
+import static org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE;
 
 /**
  * Validate data of API Services and pass data to middleware services
@@ -133,12 +132,12 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 			final List<Integer> variablesIds = this.getVariablesIds(relationships);
 
-			editable = !this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
+			editable = !this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds) && !this.ontologyVariableDataManager.areVariablesUsedInAttributes(variablesIds);
 
 			// If scale is categorical, determine which categories could be edited (ie. those not used in existing studies)
 			if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId()) && !editable) {
-				final List<String> categories = this.termDataManager.getCategoriesUsedInStudies(scaleId);
-				
+				final Set<String> categories = this.termDataManager.getCategoriesInUse(scaleId);
+
 				for (final Category category : scaleDetails.getValidValues().getCategories()) {
 					if (categories.contains(category.getName())) {
 						category.setEditable(Boolean.FALSE);

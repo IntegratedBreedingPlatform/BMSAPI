@@ -1,16 +1,12 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.validator.routines.DateValidator;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.util.VariableValueUtil;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,30 +62,10 @@ public class ObservationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		final Variable var = this.ontologyVariableDataManager.getVariable(ContextHolder.getCurrentProgram(), variableId, true);
 
-		if (!isValidValue(var, value)) {
-			this.errors.reject("invalid.observation.value");
+		if (!VariableValueUtil.isValidObservationValue(var, value)) {
+			this.errors.reject("invalid.variable.value");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private static boolean isValidValue(final Variable var, final String value) {
-		if (StringUtils.isBlank(value)) {
-			return true;
-		}
-		if (var.getMinValue() != null && var.getMaxValue() != null) {
-			return validateIfValueIsMissingOrNumber(value.trim());
-		} else if (var.getScale().getDataType() == DataType.NUMERIC_VARIABLE) {
-			return validateIfValueIsMissingOrNumber(value.trim());
-		} else if (var.getScale().getDataType() == DataType.DATE_TIME_VARIABLE) {
-			return new DateValidator().isValid(value, "yyyyMMdd");
-		}
-		return true;
-	}
-
-	private static boolean validateIfValueIsMissingOrNumber(final String value) {
-		if (MeasurementData.MISSING_VALUE.equals(value.trim())) {
-			return true;
-		}
-		return NumberUtils.isNumber(value);
-	}
 }

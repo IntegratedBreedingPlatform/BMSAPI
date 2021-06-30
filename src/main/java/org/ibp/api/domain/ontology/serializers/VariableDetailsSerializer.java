@@ -266,6 +266,12 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 		jsonGenerator.writeNumberField("datasets", !Util.isNullOrEmpty(variableDetails.getMetadata().getUsage().getDatasets()) ?
 				variableDetails.getMetadata().getUsage().getDatasets() :
 				0);
+		jsonGenerator.writeNumberField("germplasm", !Util.isNullOrEmpty(variableDetails.getMetadata().getUsage().getGermplasm()) ?
+			variableDetails.getMetadata().getUsage().getGermplasm() :
+			0);
+		jsonGenerator.writeNumberField("breedingMethods", !Util.isNullOrEmpty(variableDetails.getMetadata().getUsage().getBreedingMethods()) ?
+			variableDetails.getMetadata().getUsage().getBreedingMethods() :
+			0);
 		jsonGenerator.writeEndObject();
 		jsonGenerator.writeEndObject();
 
