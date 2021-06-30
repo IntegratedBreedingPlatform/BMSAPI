@@ -23,6 +23,7 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.study.StudyDetailsData;
 import org.ibp.api.brapi.v1.study.StudyMapper;
+import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -31,18 +32,14 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +47,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +64,7 @@ public class StudyResourceBrapi {
 	private LocationService locationService;
 
 	@Autowired
-	private ResourceBundleMessageSource messageSource;
+	private BrapiResponseMessageGenerator<StudyInstanceDto> responseMessageGenerator;
 
 	@ApiOperation(value = "Get the details for a specific Study", notes = "Get the details for a specific Study")
 	@RequestMapping(value = "/{crop}/brapi/v2/studies/{studyDbId}", method = RequestMethod.GET)
@@ -208,25 +204,11 @@ public class StudyResourceBrapi {
 	public ResponseEntity<EntityListResponse<StudyInstanceDto>> createStudies(@PathVariable final String crop,
 		@RequestBody final List<StudyImportRequestDTO> studyImportRequestDTOS) {
 		BaseValidator.checkNotNull(studyImportRequestDTOS, "study.import.request.null");
-		final StudyImportResponse studyImportResponse = this.studyInstanceService.createStudies(crop, studyImportRequestDTOS);
-		final Result<StudyInstanceDto> results = new Result<StudyInstanceDto>().withData(studyImportResponse.getStudyInstanceDtos());
+		final StudyImportResponse
+			studyImportResponse = this.studyInstanceService.createStudies(crop, studyImportRequestDTOS);
+		final Result<StudyInstanceDto> results = new Result<StudyInstanceDto>().withData(studyImportResponse.getEntityList());
 
-		final List<Map<String, String>> status = new ArrayList<>();
-		final Map<String, String> messageInfo = new HashMap<>();
-		messageInfo.put("message", studyImportResponse.getStatus());
-		messageInfo.put("messageType", "INFO");
-		status.add(messageInfo);
-		if (!CollectionUtils.isEmpty(studyImportResponse.getErrors())) {
-			int index = 1;
-			for (final ObjectError error : studyImportResponse.getErrors()) {
-				final Map<String, String> messageError = new HashMap<>();
-				messageError.put("message", "ERROR" + index++ + " " + this.messageSource
-					.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale()));
-				messageError.put("messageType", "ERROR");
-				status.add(messageError);
-			}
-		}
-		final Metadata metadata = new Metadata().withStatus(status);
+		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(studyImportResponse));
 		final EntityListResponse<StudyInstanceDto> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);

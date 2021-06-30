@@ -184,8 +184,9 @@ public class GermplasmServiceImplTest {
 		final GermplasmImportResponse importResponse = this.germplasmServiceImpl.createGermplasm(cropName, germplasmList);
 		Mockito.verify(this.middlewareGermplasmService).createGermplasm(cropName, germplasmList);
 		final int size = germplasmList.size();
-		Assert.assertThat(importResponse.getStatus(), is(size + " out of " + size + " germplasm created successfully."));
-		Assert.assertThat(importResponse.getGermplasmList(), iterableWithSize(germplasmDTOList.size()));
+		Assert.assertThat(importResponse.getCreatedSize(), is(size));
+		Assert.assertThat(importResponse.getImportListSize(), is(size));
+		Assert.assertThat(importResponse.getEntityList(), iterableWithSize(germplasmDTOList.size()));
 		Assert.assertThat(importResponse.getErrors(), nullValue());
 	}
 
@@ -219,8 +220,9 @@ public class GermplasmServiceImplTest {
 		final GermplasmImportResponse importResponse = this.germplasmServiceImpl.createGermplasm(cropName, germplasmList);
 		Mockito.verify(this.middlewareGermplasmService).createGermplasm(cropName, germplasmList);
 		final int size = germplasmList.size();
-		Assert.assertThat(importResponse.getStatus(), is(germplasmDTOList.size() + " out of " + size + " germplasm created successfully."));
-		Assert.assertThat(importResponse.getGermplasmList(), iterableWithSize(germplasmDTOList.size()));
+		Assert.assertThat(importResponse.getCreatedSize(), is(germplasmDTOList.size()));
+		Assert.assertThat(importResponse.getImportListSize(), is(size));
+		Assert.assertThat(importResponse.getEntityList(), iterableWithSize(germplasmDTOList.size()));
 		Assert.assertThat(importResponse.getErrors(), is(Lists.newArrayList(error)));
 	}
 

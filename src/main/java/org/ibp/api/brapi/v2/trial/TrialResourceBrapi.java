@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,6 +19,7 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.trial.TrialSummary;
 import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
+import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.study.StudyService;
@@ -27,8 +27,6 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -37,7 +35,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +45,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +56,7 @@ public class TrialResourceBrapi {
 	private StudyService studyService;
 
 	@Autowired
-	private ResourceBundleMessageSource messageSource;
+	private BrapiResponseMessageGenerator<StudySummary> responseMessageGenerator;
 
 	@ApiOperation(value = "Retrieve a filtered list of breeding Trials", notes = "Retrieve a filtered list of breeding Trials. A Trial is a collection of Studies")
 	@RequestMapping(value = "/{crop}/brapi/v2/trials", method = RequestMethod.GET)
@@ -165,25 +161,10 @@ public class TrialResourceBrapi {
 		BaseValidator.checkNotNull(trialImportRequestDTOs, "trial.import.request.null");
 
 		final TrialImportResponse trialImportResponse = this.studyService.createTrials(crop, trialImportRequestDTOs);
-		final List<TrialSummary> trialSummaries = this.translateResults(trialImportResponse.getStudySummaries(), crop);
+		final List<TrialSummary> trialSummaries = this.translateResults(trialImportResponse.getEntityList(), crop);
 		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaries);
 
-		final List<Map<String, String>> status = new ArrayList<>();
-		final Map<String, String> messageInfo = new HashMap<>();
-		messageInfo.put("message", trialImportResponse.getStatus());
-		messageInfo.put("messageType", "INFO");
-		status.add(messageInfo);
-		if (!CollectionUtils.isEmpty(trialImportResponse.getErrors())) {
-			int index = 1;
-			for (final ObjectError error : trialImportResponse.getErrors()) {
-				final Map<String, String> messageError = new HashMap<>();
-				messageError.put("message", "ERROR" + index++ + " " + this.messageSource
-					.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale()));
-				messageError.put("messageType", "ERROR");
-				status.add(messageError);
-			}
-		}
-		final Metadata metadata = new Metadata().withStatus(status);
+		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(trialImportResponse));
 		final EntityListResponse<TrialSummary> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
