@@ -84,6 +84,23 @@
         ]
       },
       {
+        "call": "samples",
+        "dataTypes": [
+          "application/json"
+        ],
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.0",
+          "1.1",
+          "1.3"
+        ]
+      },
+      {
         "call": "samples/{sampleDbId}",
         "dataTypes": [
           "application/json"
