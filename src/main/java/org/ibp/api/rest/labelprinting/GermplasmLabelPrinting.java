@@ -232,8 +232,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 
 		if (fieldsContainsNamesOrAttributes) {
-			attributeValues = this.germplasmSearchService.getGermplasmAttributeValues(germplasmSearchRequest, programUUID);
-			nameValues = this.germplasmSearchService.getGermplasmNameValues(germplasmSearchRequest, programUUID);
+			attributeValues = this.germplasmSearchService.getGermplasmSearchAttributeValues(germplasmSearchRequest, programUUID);
+			nameValues = this.germplasmSearchService.getGermplasmSearchNameValues(germplasmSearchRequest, programUUID);
 		}
 
 		// Data to be exported
