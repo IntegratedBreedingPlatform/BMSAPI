@@ -114,9 +114,9 @@ public class ObservationUnitImportRequestValidator {
 
 			final List<String> entryTypes =
 				this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
-					.stream().map(Enumeration::getDescription).collect(Collectors.toList());
+					.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList());
 
-			if(!entryTypes.contains(dto.getObservationUnitPosition().getEntryType())) {
+			if(!entryTypes.contains(dto.getObservationUnitPosition().getEntryType().toUpperCase())) {
 				this.errors.reject("observation.unit.import.entry.type.invalid", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
