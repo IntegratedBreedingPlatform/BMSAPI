@@ -34,7 +34,7 @@ public class AttributeValidator {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	public void validateAttributeType(final BindingResult errors, final Integer attributeType) {
-		if (attributeType != null && !AttributeValidator.ALLOWED_ATTRIBUTE_TYPES_IDS.contains(attributeType)) {
+		if (!AttributeValidator.ALLOWED_ATTRIBUTE_TYPES_IDS.contains(attributeType)) {
 			errors.reject("attribute.variable.type.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}

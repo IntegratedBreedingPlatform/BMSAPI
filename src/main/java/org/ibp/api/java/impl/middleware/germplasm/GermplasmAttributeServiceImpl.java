@@ -41,7 +41,9 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
-		this.attributeValidator.validateAttributeType(errors, variableTypeId);
+		if (variableTypeId != null) {
+			this.attributeValidator.validateAttributeType(errors, variableTypeId);
+		}
 		return this.germplasmAttributeService.getGermplasmAttributeDtos(gid, variableTypeId, programUUID);
 	}
 
