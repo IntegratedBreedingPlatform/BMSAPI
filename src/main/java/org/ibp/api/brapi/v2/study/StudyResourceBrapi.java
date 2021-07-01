@@ -124,7 +124,7 @@ public class StudyResourceBrapi {
 		@ApiParam(value = "Filter to only return studies associated with given study PUI")
 		@RequestParam(value = "studyPUI", required = false) final String studyPUI,
 		@ApiParam(value = "Filter to only return studies associated with given germplasm id")
-		@RequestParam(value = "germplasmDbid", required = false) final Integer germplasmDbid,
+		@RequestParam(value = "germplasmDbid", required = false) final String germplasmDbid,
 		@ApiParam(value = "Filter to only return studies associated with given observation variable id")
 		@RequestParam(value = "observationVariableDbId", required = false) final Integer observationVariableDbId,
 		@ApiParam(value = "Filter active status true/false") @RequestParam(value = "active", required = false) final Boolean active,
