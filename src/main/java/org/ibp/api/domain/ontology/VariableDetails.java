@@ -145,4 +145,8 @@ public class VariableDetails extends TermSummary {
 		this.allowsFormula = allowsFormula;
 	}
 
+	public boolean hasVariableType(final String variableTypeName) {
+		return this.getVariableTypes().stream().anyMatch(variableType -> variableType.getName().equals(variableTypeName));
+	}
+
 }

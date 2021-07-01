@@ -24,6 +24,12 @@ public class Usage {
 	// datasets of variable
 	private Integer datasets;
 
+	// germplasms of variable
+	private Integer germplasm;
+
+	// breeding methods of variable
+	private Integer breedingMethods;
+
 	public void addUsage(TermSummary variable) {
 		// Note: Do not add null value of variable
 		if (variable != null) {
@@ -39,7 +45,7 @@ public class Usage {
 		return this.observations;
 	}
 
-	public void setObservations(Integer observations) {
+	public void setObservations(final Integer observations) {
 		this.observations = observations;
 	}
 
@@ -47,7 +53,7 @@ public class Usage {
 		return this.studies;
 	}
 
-	public void setStudies(Integer studies) {
+	public void setStudies(final Integer studies) {
 		this.studies = studies;
 	}
 
@@ -55,7 +61,23 @@ public class Usage {
 		return this.datasets;
 	}
 
-	public void setDatasets(Integer datasets) {
+	public void setDatasets(final Integer datasets) {
 		this.datasets = datasets;
+	}
+
+	public Integer getGermplasm() {
+		return this.germplasm;
+	}
+
+	public void setGermplasm(final Integer germplasm) {
+		this.germplasm = germplasm;
+	}
+
+	public Integer getBreedingMethods() {
+		return this.breedingMethods;
+	}
+
+	public void setBreedingMethods(final Integer breedingMethods) {
+		this.breedingMethods = breedingMethods;
 	}
 }

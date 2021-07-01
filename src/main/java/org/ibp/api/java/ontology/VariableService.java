@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.ontology;
 
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
@@ -85,4 +86,6 @@ public interface VariableService {
 	long countAllVariables(final List<Integer> variableTypes);
 
 	List<VariableDTO> getAllVariables(String cropname, final List<Integer> variableTypes, int pageSize, int pageNumber);
+
+	List<Variable> searchAttributeVariables(String query, String programUUID);
 }

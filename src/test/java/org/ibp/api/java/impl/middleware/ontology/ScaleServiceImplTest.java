@@ -1,9 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.oms.TermSummary;
@@ -26,6 +24,10 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 public class ScaleServiceImplTest {
 
@@ -129,9 +131,9 @@ public class ScaleServiceImplTest {
 		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(ScaleServiceImplTest.CATEGORICAL_SCALE);
 		Mockito.doReturn(true).when(this.ontologyVariableDataManager).areVariablesUsedInStudy(Matchers.anyListOf(Integer.class));
 		// Only 3 out of 5 valid values are being used in non-deleted studies
-		final List<String> usedCategories = Arrays.asList("1", "2", "3");
+		final Set<String> usedCategories = Sets.newHashSet("1", "2", "3");
 		Mockito.doReturn(usedCategories).when(this.termDataManager)
-				.getCategoriesUsedInStudies(ScaleServiceImplTest.CATEGORICAL_SCALE);
+				.getCategoriesInUse(ScaleServiceImplTest.CATEGORICAL_SCALE);
 
 		// Method to test
 		final ScaleDetails scaleDetails = this.scaleServiceImpl.getScaleById(ScaleServiceImplTest.CATEGORICAL_SCALE.toString());

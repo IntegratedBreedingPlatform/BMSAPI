@@ -55,6 +55,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE = "variable.scale.system.datatype";
 	private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE = "variable.type.analysis.can.not.club.with.other";
 
+	private static final String VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE = "variable.type.germplasm.attribute.can.not.club.with.other";
+	private static final String VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE = "variable.type.germplasm.passport.can.not.club.with.other";
+
 	private static final Integer NAME_TEXT_LIMIT = 32;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
 
@@ -68,7 +71,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
 		org.generationcp.middleware.domain.ontology.VariableType.TRAIT.getId(), //
 		org.generationcp.middleware.domain.ontology.VariableType.SELECTION_METHOD.getId(), //
-		org.generationcp.middleware.domain.ontology.VariableType.ENVIRONMENT_CONDITION.getId());
+		org.generationcp.middleware.domain.ontology.VariableType.ENVIRONMENT_CONDITION.getId(), //
+		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getId(), //
+		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getId());
 
 	@Override
 	public boolean supports(final Class<?> aClass) {
@@ -366,6 +371,13 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE, new Object[]{"Variable Type"});
 		}
 
+		if (this.isGermplasmAttributeVariable(variable) && variable.getVariableTypes().size() > 1) {
+			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+		}
+
+		if (this.isGermplasmPassportVariable(variable) && variable.getVariableTypes().size() > 1) {
+			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+		}
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -532,13 +544,16 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	}
 
 	private boolean isAnalysisVariable(final VariableDetails variable) {
-        for(final org.ibp.api.domain.ontology.VariableType type : variable.getVariableTypes()){
-            if(Objects.equals(StringUtil.parseInt(type.getId(), 0), org.generationcp.middleware.domain.ontology.VariableType.ANALYSIS.getId())){
-                return true;
-            }
-        }
-        return false;
+		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.ANALYSIS.getName());
     }
+
+	private boolean isGermplasmAttributeVariable(final VariableDetails variable) {
+		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getName());
+	}
+
+	private boolean isGermplasmPassportVariable(final VariableDetails variable) {
+		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getName());
+	}
 
     private boolean areAllPreviousVariableTypesPresent(Set<org.generationcp.middleware.domain.ontology.VariableType> previousTypeList, List<VariableType> currentTypeList){
         for (org.generationcp.middleware.domain.ontology.VariableType variableType : previousTypeList) {
@@ -558,4 +573,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
         return true;
     }
 
+	public void checkVariableExist(final String Name, final Integer variableId, Integer cvId, Errors errors) {
+		this.checkTermExist(Name, String.valueOf(variableId), cvId, errors);
+	}
 }

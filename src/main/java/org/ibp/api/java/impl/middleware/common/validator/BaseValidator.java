@@ -25,6 +25,7 @@ public abstract class BaseValidator {
 	protected static final String NAME_ALREADY_EXIST = "name.already.exist";
 	protected static final String RECORD_IS_NOT_EDITABLE = "record.is.not.editable";
 	protected static final String RECORD_IS_NOT_DELETABLE = "record.is.not.deletable";
+	protected static final String RECORD_RELATED_WITH_A_GERMPLASM_DELETED = "record.with.germplasm.deleted";
 	protected static final String LIST_SHOULD_NOT_BE_EMPTY = "list.should.not.be.empty";
 	protected static final String MIN_MAX_NOT_VALID = "min.max.not.valid";
 	protected static final String MIN_SHOULD_NOT_GREATER_THEN_MAX = "min.should.not.be.greater.than.max";

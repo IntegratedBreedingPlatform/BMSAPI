@@ -1,11 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-
-import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -24,6 +19,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+
+import java.util.Collections;
+import java.util.HashMap;
 
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doReturn;
@@ -105,8 +103,7 @@ public class TermDeletableValidatorTest {
 	public void testWithVariableTermHasUsage() throws MiddlewareException {
 		Term variableTerm = TestDataProvider.getVariableTerm();
 		doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());
-		doReturn(true).when(this.ontologyVariableDataManager).isVariableUsedInStudy(variableTerm.getId());
-
+		doReturn(true).when(this.ontologyVariableDataManager).hasUsage(variableTerm.getId());
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(variableTerm.getId()), "variableName", CvId.VARIABLES.getId()),
 				bindingResult);

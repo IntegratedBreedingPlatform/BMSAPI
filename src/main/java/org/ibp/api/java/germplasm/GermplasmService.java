@@ -1,7 +1,6 @@
 
 package org.ibp.api.java.germplasm;
 
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
@@ -37,8 +36,6 @@ public interface GermplasmService {
 
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
-	List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(String name);
-
 	List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(String name);
 
 	PedigreeDTO getPedigree(String germplasmUUID, String notation, Boolean includeSiblings);
@@ -54,11 +51,6 @@ public interface GermplasmService {
 	long countGermplasmByStudy(Integer studyDbId);
 
 	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, Pageable pageable);
-
-	List<AttributeDTO> getAttributesByGUID(
-		String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
-
-	long countAttributesByGUID(String germplasmUUID, List<String> attributeDbIds);
 
 	Set<Integer> importGermplasmUpdates(String programUUID, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
