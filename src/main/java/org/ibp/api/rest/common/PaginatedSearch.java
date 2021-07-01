@@ -3,6 +3,13 @@ package org.ibp.api.rest.common;
 
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.domain.common.PagedResult;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Contains the general pattern for executing paginated searches.
@@ -58,4 +65,26 @@ public class PaginatedSearch {
 		pagedResult.addPageResults(searchSpec.getResults(pagedResult));
 		return pagedResult;
 	}
+
+	public <T> ResponseEntity<List<T>> getPagedResult(final Supplier<Long> countSupplier, final Supplier<List<T>> resultsSupplier,
+		final Pageable pageable) {
+		final PagedResult<T> resultPage =
+			this.execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<T>() {
+
+				@Override
+				public long getCount() {
+					return countSupplier.get();
+				}
+
+				@Override
+				public List<T> getResults(final PagedResult<T> pagedResult) {
+					return resultsSupplier.get();
+				}
+			});
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
+		return new ResponseEntity<>(resultPage.getPageResults(), headers, HttpStatus.OK);
+	}
+
 }

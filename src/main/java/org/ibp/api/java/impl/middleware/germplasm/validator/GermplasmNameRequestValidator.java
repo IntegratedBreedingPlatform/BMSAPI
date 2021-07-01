@@ -92,9 +92,6 @@ public class GermplasmNameRequestValidator {
 	}
 
 	public void validateNameBelongsToGermplasm(final Integer gid, final Integer nameId) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		this.germplasmValidator.validateGermplasmId(this.errors, gid);
-
 		final Name name = this.germplasmNameService.getNameById(nameId);
 		this.validateNameBelongsToGermplasm(gid, name);
 	}
