@@ -1,8 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.Objects;
-
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
@@ -17,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
-import com.google.common.base.Strings;
+import java.util.Objects;
 
 public abstract class OntologyValidator extends BaseValidator {
 
@@ -78,6 +77,29 @@ public abstract class OntologyValidator extends BaseValidator {
 			}
 
 			this.addCustomError(errors, "name", BaseValidator.NAME_ALREADY_EXIST, new Object[] {termName});
+		} catch (MiddlewareException e) {
+			OntologyValidator.LOGGER.error("Error checking uniqueness of term name", e);
+		}
+	}
+
+	protected void checkTermUniqueness(final String fieldName, final String termName, final Integer id, final String name,
+		final Integer cvId, final Errors errors) {
+
+		try {
+			Term term = this.termDataManager.getTermByNameAndCvId(name, cvId);
+			if (term == null) {
+				return;
+			}
+
+			if (Objects.equals(id, null) && Objects.equals(term, null)) {
+				return;
+			}
+
+			if (id != null && Objects.equals(id, term.getId())) {
+				return;
+			}
+
+			this.addCustomError(errors, fieldName, BaseValidator.NAME_ALREADY_EXIST, new Object[] {termName});
 		} catch (MiddlewareException e) {
 			OntologyValidator.LOGGER.error("Error checking uniqueness of term name", e);
 		}
