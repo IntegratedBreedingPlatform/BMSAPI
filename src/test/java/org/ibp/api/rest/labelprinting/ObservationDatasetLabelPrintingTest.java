@@ -70,7 +70,7 @@ public class ObservationDatasetLabelPrintingTest {
 
 		Mockito.when(this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
 
-		final List<LabelType> labelTypes = this.observationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
+		final List<LabelType> labelTypes = this.observationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput, null);
 		Mockito.verify(this.middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
 		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));

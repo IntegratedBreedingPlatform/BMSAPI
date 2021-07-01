@@ -55,11 +55,16 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	private static final String VARIABLE_NAME = "Variable";
 	private static final String ERROR_MESSAGE = "Error!";
-	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.ENVIRONMENT_CONDITION);
+	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.ENVIRONMENT_CONDITION, VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
 	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId(), //
-		VariableType.ENVIRONMENT_CONDITION.getId());
+		VariableType.ENVIRONMENT_CONDITION.getId(), //
+		VariableType.GERMPLASM_ATTRIBUTE.getId(), //
+		VariableType.GERMPLASM_PASSPORT.getId());
+
+	private static List NOT_EDITABLE_AND_DELETABLE_VARIABLES =
+		Arrays.asList("PLOT_NUMBER_AP_text", "INSTANCE_NUMBER_AP_text", "REP_NUMBER_AP_text", "PLANT_NUMBER_AP_text", "PLOT_CODE_AP_text");
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -216,6 +221,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			ModelMapper mapper = OntologyMapper.getInstance();
 			VariableDetails response = mapper.map(ontologyVariable, VariableDetails.class);
 
+			if (NOT_EDITABLE_AND_DELETABLE_VARIABLES.contains(ontologyVariable.getName())) {
+				response.getMetadata().setDeletable(false);
+				return response;
+			}
+
 			if (!deletable) {
 				if (CollectionUtils.containsAny(ontologyVariable.getVariableTypes(), VariableServiceImpl.EDITABLE_VARIABLES_TYPES)) {
 					response.getMetadata().addEditableField("alias");
@@ -235,6 +245,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				response.getMetadata().addEditableField("scale");
 				response.getMetadata().addEditableField("expectedRange");
 			}
+
 			response.getMetadata().setDeletable(deletable);
 			return response;
 		} catch (MiddlewareException e) {
@@ -483,53 +494,40 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		middlewareVariableFilter.setProgramUuid(variableFilter.getProgramUuid());
 
 		if (!Util.isNullOrEmpty(variableFilter.getPropertyIds())) {
-			for (Integer i : variableFilter.getPropertyIds()) {
-				middlewareVariableFilter.addPropertyId(i);
-			}
+			variableFilter.getPropertyIds().forEach(middlewareVariableFilter::addPropertyId);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getMethodIds())) {
-			for (Integer i : variableFilter.getMethodIds()) {
-				middlewareVariableFilter.addMethodId(i);
-			}
+			variableFilter.getMethodIds().forEach(middlewareVariableFilter::addMethodId);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getScaleIds())) {
-			for (Integer i : variableFilter.getScaleIds()) {
-				middlewareVariableFilter.addScaleId(i);
-			}
+			variableFilter.getScaleIds().forEach(middlewareVariableFilter::addScaleId);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getVariableIds())) {
-			for (Integer i : variableFilter.getVariableIds()) {
-				middlewareVariableFilter.addVariableId(i);
-			}
+			variableFilter.getVariableIds().forEach(middlewareVariableFilter::addVariableId);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getExcludedVariableIds())) {
-			for (Integer i : variableFilter.getExcludedVariableIds()) {
-				middlewareVariableFilter.addExcludedVariableId(i);
-			}
+			variableFilter.getExcludedVariableIds().forEach(middlewareVariableFilter::addExcludedVariableId);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getDataTypes())) {
-			for (Integer i : variableFilter.getDataTypes()) {
-				middlewareVariableFilter.addDataType(DataType.getById(i));
-			}
+			variableFilter.getDataTypes().stream().map(DataType::getById).forEach(middlewareVariableFilter::addDataType);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getVariableTypes())) {
-			for (Integer i : variableFilter.getVariableTypes()) {
-				middlewareVariableFilter.addVariableType(VariableType.getById(i));
-			}
+			variableFilter.getVariableTypes().stream().map(VariableType::getById).forEach(middlewareVariableFilter::addVariableType);
 		}
 
 		if (!Util.isNullOrEmpty(variableFilter.getPropertyClasses())) {
-			for (String s : variableFilter.getPropertyClasses()) {
-				middlewareVariableFilter.addPropertyClass(s);
-			}
+			variableFilter.getPropertyClasses().forEach(middlewareVariableFilter::addPropertyClass);
 		}
 
+		if (!Util.isNullOrEmpty(variableFilter.getNames())) {
+			variableFilter.getNames().forEach(middlewareVariableFilter::addName);
+		}
 	}
 
 	@Override
@@ -575,6 +573,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			variableDTO.setCrop(cropname);
 		}
 		return variableDTOs;
+	}
+
+	@Override
+	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
+		return this.ontologyVariableDataManager.searchAttributeVariables(query, programUUID);
 	}
 
 }

@@ -1,25 +1,11 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import static org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE;
-import static org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE;
-import static org.springframework.util.CollectionUtils.isEmpty;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -38,7 +24,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
-import com.google.common.base.Strings;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import static org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE;
+import static org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE;
 
 /**
  * Add Scale/Update Scale Validation rules for Scale request Refer: http://confluence.leafnode.io/display/CD/Services+Validation 1. Name is
@@ -330,7 +327,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 					final String min = scaleDetails.getValidValues().getMin();
 					final String max = scaleDetails.getValidValues().getMax();
 					if (min != null && max != null
-							&& !this.checkScaleRangesWithVariableRanges(scaleDetails.getId(), min, max, variablesIds)) {
+						&& !this.checkScaleRangesWithVariableRanges(min, max, variablesIds)) {
 						this.addCustomError(errors, "validValues", ScaleValidator.SCALE_RANGE_NOT_VALID,
 								new Object[] {"scale", "ValidValues"});
 
@@ -500,8 +497,8 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		}
 		return StringUtil.parseInt(dataType.getId(), null);
 	}
-	
-	private boolean checkScaleRangesWithVariableRanges(final String scaleId, final String minValue, final String maxValue,
+
+	private boolean checkScaleRangesWithVariableRanges(final String minValue, final String maxValue,
 			final List<Integer> variablesIds) {
 		boolean ok = true;
 

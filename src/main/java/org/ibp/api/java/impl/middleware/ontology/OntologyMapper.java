@@ -142,6 +142,8 @@ public class OntologyMapper {
 				// Mapping datasets this through metadata instead of creating a new set as it is in studies and observations
 				// since it was failing in some environments
 				this.map().getMetadata().setDatasets(this.source.getDatasets());
+				this.map().getMetadata().setGermplasm(this.source.getGermplasm());
+				this.map().getMetadata().setBreedingMethods(this.source.getBreedingMethods());
 			}
 		});
 	}

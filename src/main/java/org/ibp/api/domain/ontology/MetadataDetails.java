@@ -64,4 +64,20 @@ public class MetadataDetails extends MetadataSummary {
 	public void setDatasets(final Integer datasets) {
 		this.usage.setDatasets(datasets);
 	}
+
+	public Integer getGermplasm() {
+		return this.usage.getGermplasm();
+	}
+
+	public void setGermplasm(final Integer germplasm) {
+		this.usage.setGermplasm(germplasm);
+	}
+
+	public Integer getBreedingMethods() {
+		return this.usage.getBreedingMethods();
+	}
+
+	public void setBreedingMethods(final Integer breedingMethods) {
+		this.usage.setBreedingMethods(breedingMethods);
+	}
 }
