@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.observationunits;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPositionImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -106,7 +107,9 @@ public class ObservationUnitImportRequestValidator {
 				continue;
 			}
 
-			if(dto.getObservationUnitPosition() == null || StringUtils.isEmpty(dto.getObservationUnitPosition().getEntryType())) {
+			final ObservationUnitPositionImportRequestDto position = dto.getObservationUnitPosition();
+
+			if(position == null || StringUtils.isEmpty(position.getEntryType())) {
 				this.errors.reject("observation.unit.import.entry.type.required", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
@@ -116,8 +119,15 @@ public class ObservationUnitImportRequestValidator {
 				this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
 					.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList());
 
-			if(!entryTypes.contains(dto.getObservationUnitPosition().getEntryType().toUpperCase())) {
+			if(!entryTypes.contains(position.getEntryType().toUpperCase())) {
 				this.errors.reject("observation.unit.import.entry.type.invalid", new String[] {index.toString()}, "");
+				iterator.remove();
+				continue;
+			}
+
+			if((StringUtils.isEmpty(position.getPositionCoordinateX()) && StringUtils.isNotEmpty(position.getPositionCoordinateY()))
+				|| (StringUtils.isEmpty(position.getPositionCoordinateY()) && StringUtils.isNotEmpty(position.getPositionCoordinateX()))) {
+				this.errors.reject("observation.unit.import.position.invalid", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
 			}

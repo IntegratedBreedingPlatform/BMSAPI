@@ -156,6 +156,24 @@ public class ObservationUnitImportRequestValidatorTest {
 	}
 
 	@Test
+	public void testPruneStudiesInvalidForImport_WherePositionCoordinateXIsNull() {
+		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
+		observationUnitImportRequestDtos.get(0).getObservationUnitPosition().setPositionCoordinateX(null);
+		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("observation.unit.import.position.invalid", result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
+	public void testPruneStudiesInvalidForImport_WherePositionCoordinateYIsNull() {
+		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
+		observationUnitImportRequestDtos.get(0).getObservationUnitPosition().setPositionCoordinateY(null);
+		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("observation.unit.import.position.invalid", result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
 	public void testPruneStudiesInvalidForImport_WhereExternalReferenceHasMissingInfo() {
 		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
 		final List<ExternalReferenceDTO> externalReferenceDTOS = new ArrayList<>();
@@ -205,6 +223,8 @@ public class ObservationUnitImportRequestValidatorTest {
 
 		final ObservationUnitPositionImportRequestDto observationUnitPosition = new ObservationUnitPositionImportRequestDto();
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+		observationUnitPosition.setPositionCoordinateX("1");
+		observationUnitPosition.setPositionCoordinateY("1");
 		dto.setObservationUnitPosition(observationUnitPosition);
 		observationUnitImportRequestDtos.add(dto);
 		return observationUnitImportRequestDtos;
