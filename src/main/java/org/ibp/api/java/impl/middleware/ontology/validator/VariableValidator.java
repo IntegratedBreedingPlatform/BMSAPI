@@ -382,7 +382,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private void aliasValidationProcessor(final VariableDetails variable, final Errors errors) {
+	private void aliasValidation(final VariableDetails variable, final Errors errors) {
 
 		if (!this.isNullOrEmpty(variable.getAlias())) {
 			// Trim alias
@@ -430,7 +430,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			final boolean isEditable = !oldVariable.getHasUsage();
 			if (isEditable) {
 				// Alias validation
-				this.aliasValidationProcessor(variable, errors);
+				this.aliasValidation(variable, errors);
 				return;
 			}
 
