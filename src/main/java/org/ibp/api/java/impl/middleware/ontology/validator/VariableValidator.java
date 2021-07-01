@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
@@ -203,7 +204,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	private void checkVariableAliasUniqueness(final String fieldName, final String variableId, final String alias, final String programUUUid, final Errors errors) {
 		final Integer varId = StringUtils.isNotBlank(variableId) ? Integer.valueOf(variableId) : null;
-		final List<VariableOverrides> variableOverridesList =
+		final List<VariableOverridesDto> variableOverridesList =
 			this.ontologyVariableDataManager.getVariableOverridesByAliasAndProgram(alias, programUUUid);
 
 		if (variableOverridesList.size() >= 1) {
