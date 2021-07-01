@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
@@ -87,6 +88,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		final boolean nameValidationResult = this.nameValidationProcessor(variable, errors);
 
+		final boolean aliasValidationResult = this.aliasValidationProcessor(variable, errors);
+
 		final boolean descriptionValidationResult = this.descriptionValidationProcessor(variable, errors);
 
 		final boolean propertyValidationResult = this.propertyIdValidationProcessor(variable, errors);
@@ -109,7 +112,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		final boolean variableTypeValidationResult = this.variableTypeValidationProcessor(variable, errors);
 
-		if (nameValidationResult && descriptionValidationResult && combinationValidationResult && scaleDataTypeValidationResult
+		if (nameValidationResult && aliasValidationResult && descriptionValidationResult && combinationValidationResult && scaleDataTypeValidationResult
 				&& variableTypeValidationResult) {
 
 			// 19. Name, property, method, scale, alias and expected range cannot be changed if the variable is already in use
@@ -146,10 +149,68 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return false;
 		}
 
+		// 3.1. The alias must be unique
+		this.checkVariableAliasUniqueness("name", variable.getId(), variable.getName(), variable.getProgramUuid(), errors);
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
 		// 4. Name must only contain alphanumeric characters, underscores and cannot start with a number
 		this.fieldShouldHaveValidPattern("name", variable.getName(), "Name", errors);
 
 		return errors.getErrorCount() == initialCount;
+	}
+
+	private boolean aliasValidationProcessor(final VariableDetails variable, final Errors errors) {
+
+		if (StringUtils.isBlank(variable.getAlias())) {
+			return true;
+		}
+
+		final Integer initialCount = errors.getErrorCount();
+
+		// Trim name
+		variable.setAlias(variable.getAlias().trim());
+
+		// Name is no more than 32 characters
+		this.fieldShouldNotOverflow("alias", variable.getAlias(), VariableValidator.NAME_TEXT_LIMIT, errors);
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		// Name must only contain alphanumeric characters, underscores and cannot start with a number
+		this.fieldShouldHaveValidPattern("alias", variable.getAlias(), "alias", errors);
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		// The name must be unique
+		this.checkTermUniqueness("alias","Variable", StringUtil.parseInt(variable.getId(), null), variable.getAlias(), CvId.VARIABLES.getId(),
+			errors);
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		// The alias must be unique
+		this.checkVariableAliasUniqueness("alias", variable.getId(), variable.getAlias(), variable.getProgramUuid(), errors);
+
+		return errors.getErrorCount() == initialCount;
+	}
+
+	private void checkVariableAliasUniqueness(final String fieldName, final String variableId, final String alias, final String programUUUid, final Errors errors) {
+		final Integer varId = StringUtils.isNotBlank(variableId) ? Integer.valueOf(variableId) : null;
+		final List<VariableOverrides> variableOverridesList =
+			this.ontologyVariableDataManager.getVariableOverridesByAliasAndProgram(alias, programUUUid);
+
+		if (variableOverridesList.size() >= 1) {
+			if (!(variableOverridesList.size() == 1 && varId != null && variableOverridesList.get(0).getVariableId().equals(varId))) {
+				this.addCustomError(errors, fieldName, BaseValidator.ALIAS_ALREADY_EXIST, new Object[] {VariableValidator.VARIABLE_NAME});
+			}
+		}
 	}
 
 	// 5. Description is optional and no more than 1024 characters
