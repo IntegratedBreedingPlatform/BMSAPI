@@ -54,7 +54,7 @@ public class SampleObservationMapper {
 				this.map().setLocationName(this.source.getLocationName());
 				this.map().setEntryNumber(this.source.getEntryNo());
 				this.map().setPlotNumber(this.source.getPlotNo());
-				this.map().setGermplasmDbId(this.source.getGid());
+				this.map().setGermplasmDbId(this.source.getGermplasmUUID());
 				this.map().setPlantingDate(this.source.getSeedingDate());
 				this.map().setHarvestDate(this.source.getHarvestDate());
 			}
