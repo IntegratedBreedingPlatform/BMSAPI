@@ -91,7 +91,11 @@ public class TrialResourceBrapi {
 		final Integer pageSize,
 		@ApiParam(value = "Sort order. Name of the field to sort by.") @RequestParam(value = "sortBy", required = false)
 		final String sortBy,
-		@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder", required = false) final String sortOrder) {
+		@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder", required = false) final String sortOrder,
+		@ApiParam(value = "Filter to only return trials associated with given external reference ID. Could be a simple string or a URI. (use with externalReferenceSource parameter")
+		@RequestParam(value = "externalReferenceID", required = false) final String externalReferenceID,
+		@ApiParam(value = "An identifier for the source system or database of an external reference (use with externalReferenceID parameter")
+		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource) {
 		final boolean isSortOrderValid =
 			"ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
 		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
@@ -116,6 +120,8 @@ public class TrialResourceBrapi {
 		filter.setContactDbId(contactDbId);
 		filter.setSearchDateRangeStart(searchDateRangeStart);
 		filter.setSearchDateRangeEnd(searchDateRangeEnd);
+		filter.setExternalReferenceID(externalReferenceID);
+		filter.setExternalReferenceSource(externalReferenceSource);
 		filter.setActive(active);
 
 		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
