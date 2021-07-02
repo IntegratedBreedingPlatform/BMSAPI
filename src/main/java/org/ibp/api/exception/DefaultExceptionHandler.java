@@ -4,6 +4,7 @@ package org.ibp.api.exception;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import org.apache.commons.io.FileUtils;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
@@ -246,7 +247,7 @@ public class DefaultExceptionHandler {
 	@ResponseBody
 	public ErrorResponse handleMultipartException(final MultipartException ex) {
 		final ErrorResponse response = new ErrorResponse();
-		response.addError(this.getMessage("file.upload.too-large", new String[] {String.valueOf(this.maxFileSize)}));
+		response.addError(this.getMessage("file.upload.too-large", new String[] {FileUtils.byteCountToDisplaySize(this.maxFileSize)}));
 		return response;
 	}
 
