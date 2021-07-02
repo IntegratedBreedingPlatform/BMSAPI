@@ -339,8 +339,6 @@ public class VariableValidatorTest {
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableDetails.getProgramUuid(),
-				StringUtil.parseInt(variableDetails.getId(), null), true);
 		Mockito.doReturn(variableOverridesDtos).when(this.ontologyVariableDataManager)
 			.getVariableOverridesByAliasAndProgram(variableDetails.getName(), variableDetails.getProgramUuid());
 		this.variableValidator.validate(variableDetails, bindingResult);
