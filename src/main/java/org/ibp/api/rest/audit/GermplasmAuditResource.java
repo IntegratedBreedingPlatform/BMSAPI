@@ -21,6 +21,7 @@ import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,6 +55,7 @@ public class GermplasmAuditResource {
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
 		@PathVariable final Integer nameId,
+		@RequestParam final String programUUID,
 		final Pageable pageable) {
 
 		final MapBindingResult errors =
@@ -75,6 +77,7 @@ public class GermplasmAuditResource {
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
 		@PathVariable final Integer attributeId,
+		@RequestParam final String programUUID,
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -93,6 +96,7 @@ public class GermplasmAuditResource {
 	public ResponseEntity<List<GermplasmBasicDetailsAuditDTO>> getBasicDetailsChanges(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
+		@RequestParam final String programUUID,
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -111,6 +115,7 @@ public class GermplasmAuditResource {
 	public ResponseEntity<List<GermplasmReferenceAuditDTO>> getReferenceChanges(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
+		@RequestParam final String programUUID,
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -129,6 +134,7 @@ public class GermplasmAuditResource {
 	public ResponseEntity<List<GermplasmProgenitorDetailsAuditDTO>> getProgenitorDetailsChanges(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
+		@RequestParam final String programUUID,
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -147,6 +153,7 @@ public class GermplasmAuditResource {
 	public ResponseEntity<List<GermplasmOtherProgenitorsAuditDTO>> getOtherProgenitorsChanges(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
+		@RequestParam final String programUUID,
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
