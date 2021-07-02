@@ -82,7 +82,7 @@ public abstract class OntologyValidator extends BaseValidator {
 		}
 	}
 
-	protected void checkTermUniqueness(final String fieldName, final String termName, final Integer id, final String name,
+	protected void checkTermUniqueness(final String fieldName, final String propertyName, final Integer id, final String name,
 		final Integer cvId, final Errors errors) {
 
 		try {
@@ -99,7 +99,7 @@ public abstract class OntologyValidator extends BaseValidator {
 				return;
 			}
 
-			this.addCustomError(errors, fieldName, BaseValidator.NAME_ALREADY_EXIST, new Object[] {termName});
+			this.addCustomError(errors, fieldName, BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, propertyName});
 		} catch (MiddlewareException e) {
 			OntologyValidator.LOGGER.error("Error checking uniqueness of term name", e);
 		}
