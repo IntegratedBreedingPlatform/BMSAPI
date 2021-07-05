@@ -89,7 +89,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		IMPORT_HEADERS.put("export.germplasm.list.template.units.column", ExcelCellStyle.HEADING_STYLE_BLUE);
 		IMPORT_HEADERS.put("export.germplasm.list.template.amount.column", ExcelCellStyle.HEADING_STYLE_BLUE);
 		IMPORT_HEADERS.put("export.germplasm.list.template.stock.id.column", ExcelCellStyle.HEADING_STYLE_BLUE);
-		IMPORT_HEADERS.put("export.germplasm.list.template.guid.column", ExcelCellStyle.HEADING_STYLE_ORANGE);
+		IMPORT_HEADERS.put("export.germplasm.list.template.pui.column", ExcelCellStyle.HEADING_STYLE_ORANGE);
 	}
 
 	private static final Map<String, ExcelCellStyle> IMPORT_HEADERS_FOR_UPDATE;
