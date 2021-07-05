@@ -165,15 +165,16 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	private boolean aliasValidationProcessor(final VariableDetails variable, final Errors errors) {
 
+		final Integer initialCount = errors.getErrorCount();
+
 		if (StringUtils.isBlank(variable.getAlias())) {
 			return true;
 		}
 
 		if(variable.getAlias().equalsIgnoreCase(variable.getName())){
 			this.addCustomError(errors, "alias", BaseValidator.NAME_AND_ALIAS_ARE_EQUALS, null);
+			return false;
 		}
-
-		final Integer initialCount = errors.getErrorCount();
 
 		// Trim name
 		variable.setAlias(variable.getAlias().trim());
