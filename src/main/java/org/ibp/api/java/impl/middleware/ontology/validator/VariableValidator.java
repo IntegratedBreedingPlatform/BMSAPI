@@ -168,6 +168,10 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return true;
 		}
 
+		if(variable.getAlias().equalsIgnoreCase(variable.getName())){
+			this.addCustomError(errors, "alias", BaseValidator.NAME_AND_ALIAS_ARE_EQUALS, null);
+		}
+
 		final Integer initialCount = errors.getErrorCount();
 
 		// Trim name
