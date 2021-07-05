@@ -38,11 +38,11 @@ public class GermplasmNameRequestValidator {
 	private GermplasmService germplasmService;
 
 	public void validate(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Integer nameId) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		germplasmValidator.validateGermplasmId(errors, gid);
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmNameRequestDto.class.getName());
+		this.germplasmValidator.validateGermplasmId(this.errors, gid);
 
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (nameId != null) {
@@ -76,17 +76,17 @@ public class GermplasmNameRequestValidator {
 
 	public void validatePreferredName(final GermplasmNameRequestDto germplasmNameRequestDto) {
 		if (germplasmNameRequestDto.isPreferredName() == null) {
-			errors.reject("germplasm.name.preferred.required", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("germplasm.name.preferred.required", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
 	public void validateNameDeletable(final Integer gid, final Integer nameId) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
-		germplasmValidator.validateGermplasmId(errors, gid);
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmNameRequestDto.class.getName());
+		this.germplasmValidator.validateGermplasmId(this.errors, gid);
 
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		final Name name = this.germplasmNameService.getNameById(nameId);
@@ -97,53 +97,53 @@ public class GermplasmNameRequestValidator {
 
 	protected void validateNameBelongsToGermplasm(final Integer gid, final Name name) {
 		if (name == null || name.getGermplasm() == null || !name.getGermplasm().getGid().equals(gid)) {
-			errors.reject("germplasm.name.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("germplasm.name.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 
 		}
 	}
 
 	protected void validateDeletepreferredName(final Name name) {
-		if (new Integer(1).equals(name.getNstat())) {
-			errors.reject("germplasm.name.preferred.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+		if (Integer.valueOf(1).equals(name.getNstat())) {
+			this.errors.reject("germplasm.name.preferred.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 
 		}
 	}
 
 	protected void validatePreferredNameUpdatable(final GermplasmNameRequestDto germplasmNameRequestDto,
 		final Name name) {
-		if (!germplasmNameRequestDto.isPreferredName() && name.getNstat().equals(1)) {
-			errors.reject("germplasm.name.preferred.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+		if (!Boolean.TRUE.equals(germplasmNameRequestDto.isPreferredName()) && name.getNstat().equals(1)) {
+			this.errors.reject("germplasm.name.preferred.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
 	protected void validateNameLength(final GermplasmNameRequestDto germplasmNameRequestDto) {
 		if (StringUtils.isBlank(germplasmNameRequestDto.getName())) {
-			errors.reject("germplasm.name.required", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("germplasm.name.required", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 
 		}
 
 		if (germplasmNameRequestDto.getName().length() > NAME_MAX_LENGTH) {
-			errors.reject("germplasm.name.length", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("germplasm.name.length", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 
 		}
 	}
 
 	protected void validateNameDate(final GermplasmNameRequestDto germplasmNameRequestDto) {
 		if (germplasmNameRequestDto.getDate() == null) {
-			errors.reject("germplasm.name.date.required", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("germplasm.name.date.required", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (!DateUtil.isValidDate(germplasmNameRequestDto.getDate().toString())) {
-			errors.reject("germplasm.name.date.invalid", new Object[] {
-					germplasmNameRequestDto.getDate().toString()},
+		if (!DateUtil.isValidDate(germplasmNameRequestDto.getDate())) {
+			this.errors.reject("germplasm.name.date.invalid", new Object[] {
+					germplasmNameRequestDto.getDate()},
 				"Invalid date value found.");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
@@ -189,11 +189,10 @@ public class GermplasmNameRequestValidator {
 	}
 
 	protected void validateNameTypeCode(final GermplasmNameRequestDto germplasmNameRequestDto) {
-		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmService.filterGermplasmNameTypes(codes);
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmService.filterGermplasmNameTypes(Collections.singleton(germplasmNameRequestDto.getNameTypeCode()));
 		if (germplasmNameTypeDTOs == null || germplasmNameTypeDTOs.isEmpty()) {
-			errors.reject("germplasm.name.type.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("germplasm.name.type.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 

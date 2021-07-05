@@ -77,7 +77,7 @@ public class GermplasmImportRequestDtoValidator {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	public void validateBeforeSaving(final String programUUID, final GermplasmImportRequestDto germplasmImportRequestDto) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequestDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmImportRequestDto.class.getName());
 
 		BaseValidator.checkNotNull(germplasmImportRequestDto, "germplasm.import.request.null");
 		BaseValidator.checkNotEmpty(germplasmImportRequestDto.getGermplasmList(), "germplasm.import.list.null");
@@ -194,12 +194,11 @@ public class GermplasmImportRequestDtoValidator {
 				}
 			}
 
-			if (germplasmImportRequestDto.getConnectUsing() == GermplasmImportRequestDto.PedigreeConnectionType.GID) {
-				if ((StringUtils.isNotEmpty(g.getProgenitor1()) && !StringUtils.isNumeric(g.getProgenitor1())) || (
-					StringUtils.isNotEmpty(g.getProgenitor2()) && !StringUtils.isNumeric(g.getProgenitor2()))) {
-					this.errors.reject("germplasm.import.progenitor.must.be.numeric.when.connecting.by.gid", "");
-					return true;
-				}
+			if (germplasmImportRequestDto.getConnectUsing() == GermplasmImportRequestDto.PedigreeConnectionType.GID
+				&& ((StringUtils.isNotEmpty(g.getProgenitor1()) && !StringUtils.isNumeric(g.getProgenitor1())) || (
+				StringUtils.isNotEmpty(g.getProgenitor2()) && !StringUtils.isNumeric(g.getProgenitor2())))) {
+				this.errors.reject("germplasm.import.progenitor.must.be.numeric.when.connecting.by.gid", "");
+				return true;
 			}
 
 			return false;
@@ -223,7 +222,7 @@ public class GermplasmImportRequestDtoValidator {
 
 	public void validateImportLoadedData(final String programUUID,
 		final List<GermplasmInventoryImportDTO> germplasmInventoryImportDTOList) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmInventoryImportDTO.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmInventoryImportDTO.class.getName());
 
 		BaseValidator.checkNotEmpty(germplasmInventoryImportDTOList, "germplasm.import.list.null");
 
@@ -323,7 +322,7 @@ public class GermplasmImportRequestDtoValidator {
 		final Set<String> nameTypes = new HashSet<>();
 		germplasmImportDTOList.forEach(g -> {
 			if (g.getNames() != null && !g.getNames().isEmpty())
-				nameTypes.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList()));
+				nameTypes.addAll(g.getNames().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
 		});
 		if (!nameTypes.isEmpty()) {
 			final List<String> existingGermplasmNameTypes =
@@ -418,7 +417,7 @@ public class GermplasmImportRequestDtoValidator {
 	private void validateAllAttributesExists(final String programUUID, final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
 		final Set<String> attributes = new HashSet<>();
 		germplasmImportDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
-			.forEach(g -> attributes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+			.forEach(g -> attributes.addAll(g.getAttributes().keySet().stream().map(String::toUpperCase).collect(Collectors.toList())));
 		if (!attributes.isEmpty()) {
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.setProgramUuid(programUUID);
@@ -545,16 +544,13 @@ public class GermplasmImportRequestDtoValidator {
 					.reject("germplasm.import.duplicated.attributes", new String[] {(id != null) ? String.valueOf(id) : "Unknown"}, "");
 				return true;
 			}
-			if (attributes.values().stream().anyMatch(n -> {
+			return attributes.values().stream().anyMatch(n -> {
 				if (StringUtils.isNotEmpty(n) && n.length() > ATTRIBUTE_MAX_LENGTH) {
 					this.errors.reject("germplasm.import.attribute.value.invalid.length", "");
 					return true;
 				}
 				return false;
-			})) {
-				return true;
-			}
-			return false;
+			});
 		}
 		return false;
 	}

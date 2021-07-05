@@ -593,7 +593,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("germplasm.import.existent.pui"));
+				hasItem("germplasm.import.existent.puis"));
 		}
 	}
 
@@ -958,7 +958,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 				.validateImportLoadedData(this.programUUID, Lists.newArrayList(germplasmInventoryImportDTO1, germplasmInventoryImportDTO2));
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("germplasm.import.duplicated.pui"));
+				hasItem("germplasm.import.duplicated.puis"));
 		}
 	}
 
