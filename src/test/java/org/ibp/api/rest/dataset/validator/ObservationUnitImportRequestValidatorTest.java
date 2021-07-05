@@ -4,7 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
-import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPositionImportRequestDto;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -221,7 +221,7 @@ public class ObservationUnitImportRequestValidatorTest {
 		dto.setGermplasmDbId(GERMPLASM_DBID);
 		dto.setGermplasmDbId(GERMPLASM_DBID);
 
-		final ObservationUnitPositionImportRequestDto observationUnitPosition = new ObservationUnitPositionImportRequestDto();
+		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
 		observationUnitPosition.setPositionCoordinateX("1");
 		observationUnitPosition.setPositionCoordinateY("1");

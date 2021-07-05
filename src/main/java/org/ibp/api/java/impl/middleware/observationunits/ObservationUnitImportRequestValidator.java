@@ -3,10 +3,9 @@ package org.ibp.api.java.impl.middleware.observationunits;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
-import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPositionImportRequestDto;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
-import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.OntologyService;
@@ -107,7 +106,7 @@ public class ObservationUnitImportRequestValidator {
 				continue;
 			}
 
-			final ObservationUnitPositionImportRequestDto position = dto.getObservationUnitPosition();
+			final ObservationUnitPosition position = dto.getObservationUnitPosition();
 
 			if(position == null || StringUtils.isEmpty(position.getEntryType())) {
 				this.errors.reject("observation.unit.import.entry.type.required", new String[] {index.toString()}, "");
