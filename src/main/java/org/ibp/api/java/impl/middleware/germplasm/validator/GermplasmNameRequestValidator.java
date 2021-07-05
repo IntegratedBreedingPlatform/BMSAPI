@@ -36,7 +36,7 @@ public class GermplasmNameRequestValidator {
 	@Autowired
 	private GermplasmService germplasmService;
 
-	public void validate(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Integer nameId) {
+	public void validate(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Integer nameId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmNameRequestDto.class.getName());
 		germplasmValidator.validateGermplasmId(errors, gid);
 
