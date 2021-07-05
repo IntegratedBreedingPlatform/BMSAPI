@@ -93,7 +93,7 @@ public class TrialResourceBrapi {
 		final String sortBy,
 		@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder", required = false) final String sortOrder,
 		@ApiParam(value = "Filter to only return trials associated with given external reference ID. Could be a simple string or a URI. (use with externalReferenceSource parameter")
-		@RequestParam(value = "externalReferenceID", required = false) final String externalReferenceID,
+		@RequestParam(value = "externalReferenceId", required = false) final String externalReferenceId,
 		@ApiParam(value = "An identifier for the source system or database of an external reference (use with externalReferenceID parameter")
 		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource) {
 		final boolean isSortOrderValid =
@@ -120,7 +120,7 @@ public class TrialResourceBrapi {
 		filter.setContactDbId(contactDbId);
 		filter.setSearchDateRangeStart(searchDateRangeStart);
 		filter.setSearchDateRangeEnd(searchDateRangeEnd);
-		filter.setExternalReferenceID(externalReferenceID);
+		filter.setExternalReferenceID(externalReferenceId);
 		filter.setExternalReferenceSource(externalReferenceSource);
 		filter.setActive(active);
 
