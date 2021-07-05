@@ -142,7 +142,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 3. The name must be unique
-		this.checkTermUniqueness("name", "name", StringUtil.parseInt(variable.getId(), null), variable.getName(),
+		this.checkTermUniqueness("Name", "a Name", StringUtil.parseInt(variable.getId(), null), variable.getName(),
 			CvId.VARIABLES.getId(), errors); //
 
 		if (errors.getErrorCount() > initialCount) {
@@ -150,7 +150,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 3.1. The alias must be unique
-		this.checkVariableAliasUniqueness("name","alias", variable.getId(), variable.getName(), variable.getProgramUuid(), errors);
+		this.checkVariableAliasUniqueness("Name", "an Alias", variable.getId(), variable.getName(), variable.getProgramUuid(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -192,7 +192,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// The name must be unique
-		this.checkTermUniqueness("alias", "name", StringUtil.parseInt(variable.getId(), null), variable.getAlias(),
+		this.checkTermUniqueness("Alias", "a Name", StringUtil.parseInt(variable.getId(), null), variable.getAlias(),
 			CvId.VARIABLES.getId(), errors); //
 
 		if (errors.getErrorCount() > initialCount) {
@@ -200,19 +200,19 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// The alias must be unique
-		this.checkVariableAliasUniqueness("alias", "alias", variable.getId(), variable.getAlias(), variable.getProgramUuid(), errors);
+		this.checkVariableAliasUniqueness("Alias", "an Alias", variable.getId(), variable.getAlias(), variable.getProgramUuid(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private void checkVariableAliasUniqueness(final String fieldName, final String propertyName, final String variableId, final String alias, final String programUUUid, final Errors errors) {
+	private void checkVariableAliasUniqueness(final String fieldName, final String termName, final String variableId, final String alias, final String programUUUid, final Errors errors) {
 		final Integer varId = StringUtils.isNotBlank(variableId) ? Integer.valueOf(variableId) : null;
 		final List<VariableOverridesDto> variableOverridesList =
 			this.ontologyVariableDataManager.getVariableOverridesByAliasAndProgram(alias, programUUUid);
 
 		if (variableOverridesList.size() >= 1) {
 			if (!(variableOverridesList.size() == 1 && varId != null && variableOverridesList.get(0).getVariableId().equals(varId))) {
-				this.addCustomError(errors, fieldName, BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, propertyName});
+				this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, termName});
 			}
 		}
 	}
