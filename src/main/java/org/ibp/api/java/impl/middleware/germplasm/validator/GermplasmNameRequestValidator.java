@@ -11,19 +11,20 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class GermplasmNameRequestValidator {
 
 	private static final Integer NAME_MAX_LENGTH = 255;
+	public static final String PUI = "PUI";
+	public static final String GERMPLASM_PUI_DUPLICATE = "germplasm.name.pui.duplicate";
 
 	private BindingResult errors;
 
@@ -62,11 +63,14 @@ public class GermplasmNameRequestValidator {
 			if (germplasmNameRequestDto.isPreferredName() != null) {
 				this.validatePreferredNameUpdatable(germplasmNameRequestDto, name);
 			}
+			this.enforcePUIUniqueness(germplasmNameRequestDto, name);
 		} else {
 			this.validateNameTypeCode(germplasmNameRequestDto);
 			this.validateNameLength(germplasmNameRequestDto);
 			this.validateNameDate(germplasmNameRequestDto);
 			this.validatePreferredName(germplasmNameRequestDto);
+			this.enforcePUIUniqueness(germplasmNameRequestDto);
+
 		}
 	}
 
@@ -141,6 +145,47 @@ public class GermplasmNameRequestValidator {
 				"Invalid date value found.");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+	}
+
+	protected void enforcePUIUniqueness(final GermplasmNameRequestDto germplasmNameRequestDto) {
+		if (PUI.equalsIgnoreCase(germplasmNameRequestDto.getNameTypeCode()) && !StringUtils.isEmpty(germplasmNameRequestDto.getName())
+			&& this.puiExists(germplasmNameRequestDto.getName())) {
+			this.errors.reject(GERMPLASM_PUI_DUPLICATE, new Object[] {
+				germplasmNameRequestDto.getName()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	protected void enforcePUIUniqueness(final GermplasmNameRequestDto germplasmNameRequestDto, final Name existingName) {
+		if (!StringUtils.isEmpty(germplasmNameRequestDto.getName()) && !existingName.getNval().equals(germplasmNameRequestDto.getName())) {
+			// Case 1: Request name type = PUI, name value being updated --> Validate that name in request doesn't exist as PUI
+			this.enforcePUIUniqueness(germplasmNameRequestDto);
+
+			// Case 2: Request name type = empty, name value is being updated and name type in DB is PUI --> validate that new name is unique
+			if (StringUtils.isEmpty(germplasmNameRequestDto.getNameTypeCode())) {
+				final List<GermplasmNameTypeDTO> puiNameType =
+					this.germplasmService.filterGermplasmNameTypes(Collections.singleton(PUI));
+				if (!CollectionUtils.isEmpty(puiNameType) && puiNameType.get(0).getId().equals(existingName.getTypeId()) && this
+					.puiExists(germplasmNameRequestDto.getName())) {
+					this.errors.reject(GERMPLASM_PUI_DUPLICATE, new Object[] {
+						germplasmNameRequestDto.getName()}, "");
+					throw new ApiRequestValidationException(this.errors.getAllErrors());
+				}
+			}
+
+
+		// Case 3: Request name type = PUI, name = empty --> Validate that existing name in DB is unique
+		} else if (PUI.equalsIgnoreCase(germplasmNameRequestDto.getNameTypeCode()) && StringUtils.isEmpty(germplasmNameRequestDto.getName())
+			&& this.puiExists(existingName.getNval())) {
+			this.errors.reject(GERMPLASM_PUI_DUPLICATE, new Object[] {
+				existingName.getNval()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+
+	private boolean puiExists(final String pui) {
+		return !this.germplasmNameService.getExistingGermplasmPUIs(Collections.singletonList(pui)).isEmpty();
 	}
 
 	protected void validateNameTypeCode(final GermplasmNameRequestDto germplasmNameRequestDto) {
