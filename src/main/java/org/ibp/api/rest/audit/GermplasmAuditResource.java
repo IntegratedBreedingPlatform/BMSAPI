@@ -55,7 +55,7 @@ public class GermplasmAuditResource {
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
 		@PathVariable final Integer nameId,
-		@RequestParam final String programUUID,
+		@RequestParam(required = false) final String programUUID,
 		final Pageable pageable) {
 
 		final MapBindingResult errors =
@@ -77,7 +77,7 @@ public class GermplasmAuditResource {
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
 		@PathVariable final Integer attributeId,
-		@RequestParam final String programUUID,
+		@RequestParam(required = false) final String programUUID,
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -96,7 +96,7 @@ public class GermplasmAuditResource {
 	public ResponseEntity<List<GermplasmBasicDetailsAuditDTO>> getBasicDetailsChanges(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
-		@RequestParam final String programUUID,
+		@RequestParam(required = false) final String programUUID,
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -115,7 +115,7 @@ public class GermplasmAuditResource {
 	public ResponseEntity<List<GermplasmReferenceAuditDTO>> getReferenceChanges(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
-		@RequestParam final String programUUID,
+		@RequestParam(required = false) final String programUUID,
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -134,7 +134,7 @@ public class GermplasmAuditResource {
 	public ResponseEntity<List<GermplasmProgenitorDetailsAuditDTO>> getProgenitorDetailsChanges(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
-		@RequestParam final String programUUID,
+		@RequestParam(required = false) final String programUUID,
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -153,7 +153,7 @@ public class GermplasmAuditResource {
 	public ResponseEntity<List<GermplasmOtherProgenitorsAuditDTO>> getOtherProgenitorsChanges(
 		@PathVariable final String cropName,
 		@PathVariable final Integer gid,
-		@RequestParam final String programUUID,
+		@RequestParam(required = false) final String programUUID,
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
