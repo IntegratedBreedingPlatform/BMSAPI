@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -142,7 +143,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 3. The name must be unique
-		this.checkTermUniqueness("Name", "a Name", StringUtil.parseInt(variable.getId(), null), variable.getName(),
+		this.checkVariableUniqueness("Name", "a Name", StringUtil.parseInt(variable.getId(), null), variable.getName(),
 			CvId.VARIABLES.getId(), errors); //
 
 		if (errors.getErrorCount() > initialCount) {
@@ -192,7 +193,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// The name must be unique
-		this.checkTermUniqueness("Alias", "a Name", StringUtil.parseInt(variable.getId(), null), variable.getAlias(),
+		this.checkVariableUniqueness("Alias", "a Name", StringUtil.parseInt(variable.getId(), null), variable.getAlias(),
 			CvId.VARIABLES.getId(), errors); //
 
 		if (errors.getErrorCount() > initialCount) {
@@ -640,5 +641,25 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	public void checkVariableExist(final String Name, final Integer variableId, Integer cvId, Errors errors) {
 		this.checkTermExist(Name, String.valueOf(variableId), cvId, errors);
+	}
+
+	protected void checkVariableUniqueness(final String fieldName, final String fieldUsedAs, final Integer id, final String nameOrAlias,
+		final Integer cvId, final Errors errors) {
+
+		Term term = this.termDataManager.getTermByNameAndCvId(nameOrAlias, cvId);
+		if (term == null) {
+			return;
+		}
+
+		if (Objects.equals(id, null) && Objects.equals(term, null)) {
+			return;
+		}
+
+		if (id != null && Objects.equals(id, term.getId())) {
+			return;
+		}
+
+		this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, fieldUsedAs});
+
 	}
 }
