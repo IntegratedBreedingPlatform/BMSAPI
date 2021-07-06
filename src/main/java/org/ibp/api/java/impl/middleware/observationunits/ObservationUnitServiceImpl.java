@@ -2,10 +2,8 @@ package org.ibp.api.java.impl.middleware.observationunits;
 
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportResponse;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,9 +23,6 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	@Autowired
 	private org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService middlewareObservationUnitService;
 
-	@Autowired
-	private SecurityService securityService;
-
 	@Override
 	public ObservationUnitImportResponse createObservationUnits(final String cropName,
 		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos) {
@@ -43,9 +38,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 
 		if (!CollectionUtils.isEmpty(observationUnitImportRequestDtos)) {
-			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 			final List<ObservationUnitDto> observationUnitDtos =
-				this.middlewareObservationUnitService.importObservationUnits(cropName, observationUnitImportRequestDtos, user.getUserid());
+				this.middlewareObservationUnitService.importObservationUnits(cropName, observationUnitImportRequestDtos);
 			if (!CollectionUtils.isEmpty(observationUnitDtos)) {
 				noOfCreatedObservationUnits = observationUnitDtos.size();
 			}
