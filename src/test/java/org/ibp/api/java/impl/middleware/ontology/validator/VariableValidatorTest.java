@@ -303,11 +303,8 @@ public class VariableValidatorTest {
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
 
-	/**
-	 * Test for variables with the same Name
-	 */
 	@Test
-	public void testForVariablesWithTheSameName() throws MiddlewareException {
+	public void testVariableShouldNotBeSavedWithDuplicatedName() throws MiddlewareException {
 
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
@@ -348,7 +345,7 @@ public class VariableValidatorTest {
 	}
 
 	@Test
-	public void testForVariablesWithTheSameAlias() throws MiddlewareException {
+	public void testVariableShouldNotBeSavedWithDuplicatedAlias() throws MiddlewareException {
 
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
