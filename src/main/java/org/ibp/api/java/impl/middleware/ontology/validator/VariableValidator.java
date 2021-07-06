@@ -208,14 +208,13 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	}
 
 	private void checkVariableAliasUniqueness(final String fieldName, final String termName, final String variableId, final String alias, final String programUUUid, final Errors errors) {
-		final Integer varId = StringUtils.isNotBlank(variableId) ? Integer.valueOf(variableId) : null;
+		final Integer varId = StringUtils.isNotBlank(variableId) ? Integer.parseInt(variableId) : null;
 		final List<VariableOverridesDto> variableOverridesList =
 			this.ontologyVariableDataManager.getVariableOverridesByAliasAndProgram(alias, programUUUid);
 
-		if (variableOverridesList.size() >= 1) {
-			if (!(variableOverridesList.size() == 1 && varId != null && variableOverridesList.get(0).getVariableId().equals(varId))) {
-				this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, termName});
-			}
+		if (!variableOverridesList.isEmpty() && //
+			(variableOverridesList.size() != 1 || varId == null || !variableOverridesList.get(0).getVariableId().equals(varId))) {
+			this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, termName});
 		}
 	}
 
