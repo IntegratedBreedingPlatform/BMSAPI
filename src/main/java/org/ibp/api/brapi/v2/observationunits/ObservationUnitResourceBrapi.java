@@ -184,7 +184,7 @@ public class ObservationUnitResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/observationunits/{observationUnitDbId}", method = RequestMethod.PATCH)
 	public ResponseEntity<SingleEntityResponse<ObservationUnitPatchRequestDTO>> patchObservationUnit(
 		@PathVariable final String crop,
-		@PathVariable String observationUnitDbId,
+		@PathVariable final String observationUnitDbId,
 		@RequestBody final ObservationUnitPatchRequestDTO requestDTO) {
 
 		final ModelMapper mapper = new ModelMapper();

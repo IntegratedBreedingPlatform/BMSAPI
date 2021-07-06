@@ -64,7 +64,7 @@ public class ObservationUnitImportRequestValidator {
 			this.studyInstanceService.getStudyInstances(studySearchFilter, null).stream()
 				.collect(Collectors.toMap(StudyInstanceDto::getStudyDbId, Function.identity()));
 
-		Integer index = 1;
+		final Integer index = 1;
 		final Iterator<ObservationUnitImportRequestDto> iterator = observationUnitImportRequestDtos.iterator();
 		while (iterator.hasNext()) {
 			final ObservationUnitImportRequestDto dto = iterator.next();
@@ -108,7 +108,7 @@ public class ObservationUnitImportRequestValidator {
 
 			final ObservationUnitPosition position = dto.getObservationUnitPosition();
 
-			if(position == null || StringUtils.isEmpty(position.getEntryType())) {
+			if (position == null || StringUtils.isEmpty(position.getEntryType())) {
 				this.errors.reject("observation.unit.import.entry.type.required", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
@@ -118,26 +118,25 @@ public class ObservationUnitImportRequestValidator {
 				this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
 					.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList());
 
-			if(!entryTypes.contains(position.getEntryType().toUpperCase())) {
+			if (!entryTypes.contains(position.getEntryType().toUpperCase())) {
 				this.errors.reject("observation.unit.import.entry.type.invalid", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
 			}
 
-			if((StringUtils.isEmpty(position.getPositionCoordinateX()) && StringUtils.isNotEmpty(position.getPositionCoordinateY()))
+			if ((StringUtils.isEmpty(position.getPositionCoordinateX()) && StringUtils.isNotEmpty(position.getPositionCoordinateY()))
 				|| (StringUtils.isEmpty(position.getPositionCoordinateY()) && StringUtils.isNotEmpty(position.getPositionCoordinateX()))) {
 				this.errors.reject("observation.unit.import.position.invalid", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
 			}
 
-
 			if (this.isAnyExternalReferenceInvalid(dto, index)) {
 				iterator.remove();
 			}
 		}
 
-		return errors;
+		return this.errors;
 	}
 
 	private boolean isAnyExternalReferenceInvalid(final ObservationUnitImportRequestDto dto, final Integer index) {

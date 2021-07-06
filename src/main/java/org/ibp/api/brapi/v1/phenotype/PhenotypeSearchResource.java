@@ -12,7 +12,6 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.observationunits.ObservationUnitService;
-import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import java.util.List;
 @Controller
 public class PhenotypeSearchResource {
 
-
 	@Autowired
 	private ObservationUnitService observationUnitService;
 
@@ -41,7 +39,6 @@ public class PhenotypeSearchResource {
 	@JsonView(BrapiView.BrapiV1_2.class)
 	public ResponseEntity<EntityListResponse<ObservationUnitDto>> searchPhenotypes(@PathVariable final String crop,
 		@RequestBody final ObservationUnitSearchRequestDTO requestDTO) {
-
 
 		final PagedResult<ObservationUnitDto> resultPage =
 			new PaginatedSearch().executeBrapiSearch(requestDTO.getPage(), requestDTO.getPageSize(), new SearchSpec<ObservationUnitDto>() {
@@ -55,7 +52,8 @@ public class PhenotypeSearchResource {
 				public List<ObservationUnitDto> getResults(final PagedResult<ObservationUnitDto> pagedResult) {
 					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
 					final int pageNumber = pagedResult.getPageNumber() + 1;
-					return PhenotypeSearchResource.this.observationUnitService.searchObservationUnits(pagedResult.getPageSize(), pageNumber, requestDTO);
+					return PhenotypeSearchResource.this.observationUnitService
+						.searchObservationUnits(pagedResult.getPageSize(), pageNumber, requestDTO);
 				}
 			});
 
@@ -71,6 +69,5 @@ public class PhenotypeSearchResource {
 
 		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 	}
-
 
 }
