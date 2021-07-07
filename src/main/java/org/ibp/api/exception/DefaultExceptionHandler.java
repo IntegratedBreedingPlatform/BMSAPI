@@ -59,6 +59,18 @@ public class DefaultExceptionHandler {
 	}
 
 	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ApiRuntime2Exception.class)
+	@ResponseStatus(value = INTERNAL_SERVER_ERROR)
+	@ResponseBody
+	public ErrorResponse handleApiRuntime2Exception(final ApiRuntime2Exception ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
+		final String message = this.getMessage(ex.getErrorCode(), ex.getParams());
+		response.addError(message);
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ExceptionHandler(AccessDeniedException.class)
 	@ResponseStatus(value = FORBIDDEN)
 	@ResponseBody
