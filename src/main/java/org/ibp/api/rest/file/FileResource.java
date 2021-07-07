@@ -3,11 +3,13 @@ package org.ibp.api.rest.file;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.ibp.api.java.file.FileStorageService;
+import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.Map;
 
 @Api("File services")
@@ -29,12 +32,16 @@ public class FileResource {
 	@Autowired
 	private FileStorageService fileStorageService;
 
+	@Autowired
+	private FileValidator fileValidator;
+
 	@RequestMapping(value = "/files", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Map<String, String>> upload(
 		@RequestPart("file") final MultipartFile file,
 		@ApiParam("store file under this name / key") @RequestParam final String key
 	) {
+		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
 		return new ResponseEntity<>(this.fileStorageService.upload(file, key), HttpStatus.CREATED);
 	}
 

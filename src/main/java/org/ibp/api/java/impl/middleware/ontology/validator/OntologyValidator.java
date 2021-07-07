@@ -1,8 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.Objects;
-
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
@@ -17,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
-import com.google.common.base.Strings;
+import java.util.Objects;
 
 public abstract class OntologyValidator extends BaseValidator {
 
