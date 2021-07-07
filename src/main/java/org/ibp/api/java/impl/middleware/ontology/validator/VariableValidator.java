@@ -4,9 +4,11 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
@@ -87,6 +89,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		final boolean nameValidationResult = this.nameValidationProcessor(variable, errors);
 
+		final boolean aliasValidationResult = this.aliasValidationProcessor(variable, errors);
+
 		final boolean descriptionValidationResult = this.descriptionValidationProcessor(variable, errors);
 
 		final boolean propertyValidationResult = this.propertyIdValidationProcessor(variable, errors);
@@ -109,7 +113,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		final boolean variableTypeValidationResult = this.variableTypeValidationProcessor(variable, errors);
 
-		if (nameValidationResult && descriptionValidationResult && combinationValidationResult && scaleDataTypeValidationResult
+		if (nameValidationResult && aliasValidationResult && descriptionValidationResult && combinationValidationResult && scaleDataTypeValidationResult
 				&& variableTypeValidationResult) {
 
 			// 19. Name, property, method, scale, alias and expected range cannot be changed if the variable is already in use
@@ -139,8 +143,15 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 3. The name must be unique
-		this.checkTermUniqueness("Variable", StringUtil.parseInt(variable.getId(), null), variable.getName(), CvId.VARIABLES.getId(),
-				errors);
+		this.checkVariableUniqueness("Name", "a Name", StringUtil.parseInt(variable.getId(), null), variable.getName(),
+			CvId.VARIABLES.getId(), errors); //
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		// 3.1. The alias must be unique
+		this.checkVariableAliasUniqueness("Name", "an Alias", variable.getId(), variable.getName(), variable.getProgramUuid(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -150,6 +161,61 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		this.fieldShouldHaveValidPattern("name", variable.getName(), "Name", errors);
 
 		return errors.getErrorCount() == initialCount;
+	}
+
+	private boolean aliasValidationProcessor(final VariableDetails variable, final Errors errors) {
+
+		final Integer initialCount = errors.getErrorCount();
+
+		if (StringUtils.isBlank(variable.getAlias())) {
+			return true;
+		}
+
+		if(variable.getAlias().equalsIgnoreCase(variable.getName())){
+			this.addCustomError(errors, "alias", BaseValidator.NAME_AND_ALIAS_ARE_EQUALS, null);
+			return false;
+		}
+
+		// Trim name
+		variable.setAlias(variable.getAlias().trim());
+
+		// Name is no more than 32 characters
+		this.fieldShouldNotOverflow("alias", variable.getAlias(), VariableValidator.NAME_TEXT_LIMIT, errors);
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		// Name must only contain alphanumeric characters, underscores and cannot start with a number
+		this.fieldShouldHaveValidPattern("alias", variable.getAlias(), "alias", errors);
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		// The name must be unique
+		this.checkVariableUniqueness("Alias", "a Name", StringUtil.parseInt(variable.getId(), null), variable.getAlias(),
+			CvId.VARIABLES.getId(), errors); //
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		// The alias must be unique
+		this.checkVariableAliasUniqueness("Alias", "an Alias", variable.getId(), variable.getAlias(), variable.getProgramUuid(), errors);
+
+		return errors.getErrorCount() == initialCount;
+	}
+
+	private void checkVariableAliasUniqueness(final String fieldName, final String termName, final String variableId, final String alias, final String programUUUid, final Errors errors) {
+		final Integer varId = StringUtils.isNotBlank(variableId) ? Integer.parseInt(variableId) : null;
+		final List<VariableOverridesDto> variableOverridesList =
+			this.ontologyVariableDataManager.getVariableOverridesByAliasAndProgram(alias, programUUUid);
+
+		if (!variableOverridesList.isEmpty() && //
+			(variableOverridesList.size() != 1 || varId == null || !variableOverridesList.get(0).getVariableId().equals(varId))) {
+			this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, termName});
+		}
 	}
 
 	// 5. Description is optional and no more than 1024 characters
@@ -382,7 +448,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private void aliasValidationProcessor(final VariableDetails variable, final Errors errors) {
+	private void aliasValidation(final VariableDetails variable, final Errors errors) {
 
 		if (!this.isNullOrEmpty(variable.getAlias())) {
 			// Trim alias
@@ -430,7 +496,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			final boolean isEditable = !oldVariable.getHasUsage();
 			if (isEditable) {
 				// Alias validation
-				this.aliasValidationProcessor(variable, errors);
+				this.aliasValidation(variable, errors);
 				return;
 			}
 
@@ -575,5 +641,25 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	public void checkVariableExist(final String Name, final Integer variableId, Integer cvId, Errors errors) {
 		this.checkTermExist(Name, String.valueOf(variableId), cvId, errors);
+	}
+
+	protected void checkVariableUniqueness(final String fieldName, final String fieldUsedAs, final Integer id, final String nameOrAlias,
+		final Integer cvId, final Errors errors) {
+
+		Term term = this.termDataManager.getTermByNameAndCvId(nameOrAlias, cvId);
+		if (term == null) {
+			return;
+		}
+
+		if (Objects.equals(id, null) && Objects.equals(term, null)) {
+			return;
+		}
+
+		if (id != null && Objects.equals(id, term.getId())) {
+			return;
+		}
+
+		this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, fieldUsedAs});
+
 	}
 }
