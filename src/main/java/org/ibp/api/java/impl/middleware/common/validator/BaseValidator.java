@@ -23,8 +23,11 @@ public abstract class BaseValidator {
 	protected static final String TEXTUAL_FIELD_IS_TOO_LONG = "textual.field.is.too.long";
 	protected static final String LIST_TEXTUAL_FIELD_IS_TOO_LONG = "list.textual.field.is.too.long";
 	protected static final String NAME_ALREADY_EXIST = "name.already.exist";
+	protected static final String NAME_OR_ALIAS_ALREADY_EXIST = "name.or.alias.already.exist";
+	protected static final String NAME_AND_ALIAS_ARE_EQUALS = "name.and.alias.equals";
 	protected static final String RECORD_IS_NOT_EDITABLE = "record.is.not.editable";
 	protected static final String RECORD_IS_NOT_DELETABLE = "record.is.not.deletable";
+	protected static final String RECORD_RELATED_WITH_A_GERMPLASM_DELETED = "record.with.germplasm.deleted";
 	protected static final String LIST_SHOULD_NOT_BE_EMPTY = "list.should.not.be.empty";
 	protected static final String MIN_MAX_NOT_VALID = "min.max.not.valid";
 	protected static final String MIN_SHOULD_NOT_GREATER_THEN_MAX = "min.should.not.be.greater.than.max";

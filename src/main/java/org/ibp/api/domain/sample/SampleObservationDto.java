@@ -26,11 +26,11 @@ public class SampleObservationDto implements Serializable {
 	private String locationName;
 	private Integer entryNumber;
 	private Integer plotNumber;
-	private Integer germplasmDbId;
+	private String germplasmDbId;
 	private String plantingDate;
 	private String harvestDate;
 
-	public SampleObservationDto(){
+	public SampleObservationDto() {
 
 	}
 
@@ -161,11 +161,11 @@ public class SampleObservationDto implements Serializable {
 		this.plotNumber = plotNumber;
 	}
 
-	public Integer getGermplasmDbId() {
+	public String getGermplasmDbId() {
 		return this.germplasmDbId;
 	}
 
-	public void setGermplasmDbId(final Integer germplasmDbId) {
+	public void setGermplasmDbId(final String germplasmDbId) {
 		this.germplasmDbId = germplasmDbId;
 	}
 
