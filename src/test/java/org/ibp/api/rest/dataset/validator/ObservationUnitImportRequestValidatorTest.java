@@ -3,6 +3,7 @@ package org.ibp.api.rest.dataset.validator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
@@ -216,6 +217,15 @@ public class ObservationUnitImportRequestValidatorTest {
 		Assert.assertEquals("observation.unit.import.reference.source.exceeded.length", result.getAllErrors().get(0).getCode());
 	}
 
+	@Test
+	public void testPruneStudiesInvalidForImport_WherePlotNoIsNotIncluded() {
+		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
+		observationUnitImportRequestDtos.get(0).getObservationUnitPosition().setObservationLevelRelationships(null);
+		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("observation.unit.import.no.plot.no", result.getAllErrors().get(0).getCode());
+	}
+
 	private List<ObservationUnitImportRequestDto> createObservationUnitImportRequestDtos() {
 		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = new ArrayList<>();
 		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
@@ -229,7 +239,11 @@ public class ObservationUnitImportRequestValidatorTest {
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
 		observationUnitPosition.setPositionCoordinateX("1");
 		observationUnitPosition.setPositionCoordinateY("1");
+		final ObservationLevelRelationship relationship =  new ObservationLevelRelationship("1", "PLOT_NO", null);
+		observationUnitPosition.setObservationLevelRelationships(Collections.singletonList(relationship));
 		dto.setObservationUnitPosition(observationUnitPosition);
+
+
 		observationUnitImportRequestDtos.add(dto);
 		return observationUnitImportRequestDtos;
 	}

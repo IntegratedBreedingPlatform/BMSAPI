@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.observationunits;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
@@ -15,6 +16,7 @@ import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -30,6 +32,7 @@ public class ObservationUnitImportRequestValidator {
 
 	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
+	public static final String PLOT_NO = "PLOT_NO";
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
@@ -134,6 +137,12 @@ public class ObservationUnitImportRequestValidator {
 				}
 			}
 
+			if(!containsPlotNo(position.getObservationLevelRelationships())) {
+				this.errors.reject("observation.unit.import.no.plot.no", new String[] {index.toString()}, "");
+				iterator.remove();
+				continue;
+			}
+
 			if ((StringUtils.isEmpty(position.getPositionCoordinateX()) && StringUtils.isNotEmpty(position.getPositionCoordinateY()))
 				|| (StringUtils.isEmpty(position.getPositionCoordinateY()) && StringUtils.isNotEmpty(position.getPositionCoordinateX()))) {
 				this.errors.reject("observation.unit.import.position.invalid", new String[] {index.toString()}, "");
@@ -147,6 +156,17 @@ public class ObservationUnitImportRequestValidator {
 		}
 
 		return this.errors;
+	}
+
+	private boolean containsPlotNo(final List<ObservationLevelRelationship> observationLevelRelationships) {
+		if(!CollectionUtils.isEmpty(observationLevelRelationships)) {
+			for(final ObservationLevelRelationship relationship: observationLevelRelationships) {
+				if(relationship.getLevelName().equalsIgnoreCase(PLOT_NO)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean isAnyExternalReferenceInvalid(final ObservationUnitImportRequestDto dto, final Integer index) {
