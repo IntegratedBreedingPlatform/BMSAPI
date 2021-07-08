@@ -3,8 +3,6 @@ package org.ibp.api.java.impl.middleware.name;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.DaoFactory;
 import org.ibp.api.java.impl.middleware.name.validator.NameTypeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
