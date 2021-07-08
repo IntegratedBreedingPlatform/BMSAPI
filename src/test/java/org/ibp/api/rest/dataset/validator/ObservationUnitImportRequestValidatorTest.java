@@ -69,6 +69,10 @@ public class ObservationUnitImportRequestValidatorTest {
 		Mockito.when(this.germplasmService.searchFilteredGermplasm(germplasmSearchRequestDto, null))
 			.thenReturn(Collections.singletonList(germplasmDTO));
 
+		final StandardVariable s = new StandardVariable();
+		s.setEnumerations(new ArrayList<>());
+		Mockito.when(this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), null)).thenReturn(s);
+
 		final StandardVariable standardVariable = new StandardVariable();
 		final Enumeration enumeration = new Enumeration();
 		enumeration.setDescription(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());

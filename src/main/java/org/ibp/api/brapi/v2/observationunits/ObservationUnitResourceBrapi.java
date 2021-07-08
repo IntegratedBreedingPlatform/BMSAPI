@@ -5,7 +5,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
-import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportResponse;
 import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -18,6 +17,7 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
+import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -26,13 +26,9 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,9 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Api(value = "BrAPI Observation Unit Services")
 @Controller
@@ -59,7 +53,8 @@ public class ObservationUnitResourceBrapi {
 	private org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService middlewareObservationUnitService;
 
 	@Autowired
-	private ResourceBundleMessageSource messageSource;
+	private BrapiResponseMessageGenerator<ObservationUnitDto> responseMessageGenerator;
+
 
 	@ApiOperation(value = "Post observation units search", notes = "Post observation units search")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits", method = RequestMethod.POST)
@@ -105,11 +100,11 @@ public class ObservationUnitResourceBrapi {
 		}
 
 		final ModelMapper mapper = ObservationUnitMapper.getInstance();
-		final ObservationUnitSearchRequestDTO phenotypeSearchRequestDTO =
+		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO =
 			mapper.map(observationUnitsSearchRequestDto, ObservationUnitSearchRequestDTO.class);
 
 		final PagedResult<ObservationUnitDto> resultPage =
-			this.getObservationUnitDtoPagedResult(phenotypeSearchRequestDTO, currentPage, pageSize);
+			this.getObservationUnitDtoPagedResult(observationUnitSearchRequestDTO, currentPage, pageSize);
 
 		final Result<ObservationUnitDto> results = new Result<ObservationUnitDto>().withData(resultPage.getPageResults());
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
@@ -134,24 +129,10 @@ public class ObservationUnitResourceBrapi {
 		final ObservationUnitImportResponse observationUnitImportResponse =
 			this.observationUnitService.createObservationUnits(crop, observationUnitImportRequestDtos);
 		final Result<ObservationUnitDto> results =
-			new Result<ObservationUnitDto>().withData(observationUnitImportResponse.getObservationUnits());
+			new Result<ObservationUnitDto>().withData(observationUnitImportResponse.getEntityList());
 
-		final List<Map<String, String>> status = new ArrayList<>();
-		final Map<String, String> messageInfo = new HashMap<>();
-		messageInfo.put("message", observationUnitImportResponse.getStatus());
-		messageInfo.put("messageType", "INFO");
-		status.add(messageInfo);
-		if (!CollectionUtils.isEmpty(observationUnitImportResponse.getErrors())) {
-			int index = 1;
-			for (final ObjectError error : observationUnitImportResponse.getErrors()) {
-				final Map<String, String> messageError = new HashMap<>();
-				messageError.put("message", "ERROR" + index++ + " " + this.messageSource
-					.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale()));
-				messageError.put("messageType", "ERROR");
-				status.add(messageError);
-			}
-		}
-		final Metadata metadata = new Metadata().withStatus(status);
+
+		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(observationUnitImportResponse));
 		final EntityListResponse<ObservationUnitDto> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);

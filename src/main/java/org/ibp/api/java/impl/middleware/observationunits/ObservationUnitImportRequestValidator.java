@@ -66,6 +66,13 @@ public class ObservationUnitImportRequestValidator {
 
 		final Integer index = 1;
 		final Iterator<ObservationUnitImportRequestDto> iterator = observationUnitImportRequestDtos.iterator();
+
+		final List<String> entryTypes =
+			this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), null).getEnumerations()
+				.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList());
+
+		final Map<String, List<String>> entryTypesMap = new HashMap<>();
+
 		while (iterator.hasNext()) {
 			final ObservationUnitImportRequestDto dto = iterator.next();
 			if (StringUtils.isEmpty(dto.getProgramDbId())) {
@@ -114,14 +121,17 @@ public class ObservationUnitImportRequestValidator {
 				continue;
 			}
 
-			final List<String> entryTypes =
-				this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
-					.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList());
-
 			if (!entryTypes.contains(position.getEntryType().toUpperCase())) {
-				this.errors.reject("observation.unit.import.entry.type.invalid", new String[] {index.toString()}, "");
-				iterator.remove();
-				continue;
+				if(!entryTypesMap.containsKey(dto.getProgramDbId())) {
+					entryTypesMap.put(dto.getProgramDbId(),
+						this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
+						.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList()));
+				}
+				if(!entryTypesMap.get(dto.getProgramDbId()).contains(position.getEntryType().toUpperCase())) {
+					this.errors.reject("observation.unit.import.entry.type.invalid", new String[] {index.toString()}, "");
+					iterator.remove();
+					continue;
+				}
 			}
 
 			if ((StringUtils.isEmpty(position.getPositionCoordinateX()) && StringUtils.isNotEmpty(position.getPositionCoordinateY()))

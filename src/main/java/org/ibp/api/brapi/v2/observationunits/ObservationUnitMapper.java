@@ -34,6 +34,8 @@ public class ObservationUnitMapper {
 				this.map().setProgramDbIds(this.source.getProgramDbIds());
 				this.map().setStudyDbIds(this.source.getStudyDbIds());
 				this.map().setTrialDbIds(this.source.getTrialDbIds());
+				this.map().setExternalReferenceIDs(this.source.getExternalReferenceIDs());
+				this.map().setExternalReferenceSources(this.source.getExternalReferenceSources());
 			}
 		});
 	}

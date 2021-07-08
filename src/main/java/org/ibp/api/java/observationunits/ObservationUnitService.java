@@ -1,7 +1,7 @@
 package org.ibp.api.java.observationunits;
 
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
-import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportResponse;
+import org.ibp.api.brapi.v2.observationunits.ObservationUnitImportResponse;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 

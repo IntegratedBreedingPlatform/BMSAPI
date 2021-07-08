@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.observationunits;
 
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
-import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportResponse;
+import org.ibp.api.brapi.v2.observationunits.ObservationUnitImportResponse;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.ibp.api.java.observationunits.ObservationUnitService;
@@ -43,10 +43,11 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			if (!CollectionUtils.isEmpty(observationUnitDtos)) {
 				noOfCreatedObservationUnits = observationUnitDtos.size();
 			}
-			response.setObservationUnits(observationUnitDtos);
+			response.setEntityList(observationUnitDtos);
 		}
 
-		response.setStatus(noOfCreatedObservationUnits + " out of " + originalListSize + " observation units created successfully.");
+		response.setImportListSize(originalListSize);
+		response.setCreatedSize(noOfCreatedObservationUnits);
 		return response;
 	}
 
