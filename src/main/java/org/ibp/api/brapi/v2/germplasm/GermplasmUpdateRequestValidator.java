@@ -100,6 +100,9 @@ public class GermplasmUpdateRequestValidator {
 		if (!StringUtils.isEmpty(g.getPedigree()) && this.nameExceedsLength(g.getPedigree())) {
 			this.errors.reject("germplasm.update.name.exceeded.length", new String[] {"pedigree"}, "");
 		}
+		if (!StringUtils.isEmpty(g.getGermplasmPUI()) && this.nameExceedsLength(g.getGermplasmPUI())) {
+			this.errors.reject("germplasm.update.name.exceeded.length", new String[] {"germplasmPUI"}, "");
+		}
 	}
 
 	private void validateCustomAttributeFields(final GermplasmUpdateRequest g) {
