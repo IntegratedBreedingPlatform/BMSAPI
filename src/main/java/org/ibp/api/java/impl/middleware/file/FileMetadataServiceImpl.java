@@ -35,8 +35,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	public Image updateImageContent(final String imageDbId, final byte[] imageContent) {
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getFileMetadataByUUID(imageDbId);
 		this.fileStorageService.upload(FileUtils.wrapAsMultipart(imageContent), fileMetadataDTO.getPath());
-
-		// TODO save phenotype
+		this.fileMetadataService.linkFileToObservation(fileMetadataDTO);
 
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		return fileMetadataMapper.map(fileMetadataDTO);

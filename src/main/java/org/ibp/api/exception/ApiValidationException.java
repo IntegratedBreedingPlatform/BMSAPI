@@ -12,6 +12,7 @@ public class ApiValidationException extends RuntimeException {
 	private final String errorCode;
 	private final Object[] params;
 
+	// TODO merge with ApiRequestValidationException, add another constructor there
 	public ApiValidationException(final String logMessage, final String errorCode, final Object... params) {
 		super(logMessage);
 		this.errorCode = errorCode;
