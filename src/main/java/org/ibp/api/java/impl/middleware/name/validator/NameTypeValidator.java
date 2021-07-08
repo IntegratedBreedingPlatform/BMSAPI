@@ -54,13 +54,10 @@ public class NameTypeValidator {
 
 		this.validateIfNameAlreadyExists(germplasmNameTypeRequestDTO.getName());
 
-		if (StringUtils.isBlank(germplasmNameTypeRequestDTO.getDescription())) {
-			this.errors.reject("name.type.field.invalid", new String[] {"description"}, "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-		if (germplasmNameTypeRequestDTO.getDescription().length() > NameTypeValidator.DESCRPTION_MAX_LENGTH) {
-			this.errors.reject("name.type.field.length.invalid", new String[] {"description", NameTypeValidator.DESCRPTION_MAX_LENGTH.toString()}, "");
+		if (StringUtils.isNotBlank(germplasmNameTypeRequestDTO.getDescription()) && //
+			germplasmNameTypeRequestDTO.getDescription().length() > NameTypeValidator.DESCRPTION_MAX_LENGTH) {
+			this.errors.reject("name.type.field.length.invalid",
+				new String[] {"description", NameTypeValidator.DESCRPTION_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
