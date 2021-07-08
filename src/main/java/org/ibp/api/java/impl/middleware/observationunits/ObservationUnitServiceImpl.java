@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,10 +39,15 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 
 		if (!CollectionUtils.isEmpty(observationUnitImportRequestDtos)) {
-			final List<ObservationUnitDto> observationUnitDtos =
+			final List<String> observationUnitDbIds =
 				this.middlewareObservationUnitService.importObservationUnits(cropName, observationUnitImportRequestDtos);
-			if (!CollectionUtils.isEmpty(observationUnitDtos)) {
-				noOfCreatedObservationUnits = observationUnitDtos.size();
+			List<ObservationUnitDto> observationUnitDtos = new ArrayList<>();
+			if (!CollectionUtils.isEmpty(observationUnitDbIds)) {
+				noOfCreatedObservationUnits = observationUnitDbIds.size();
+				final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
+				searchRequestDTO.setObservationUnitDbIds(observationUnitDbIds);
+				observationUnitDtos = this.middlewareObservationUnitService.searchObservationUnits(null, null, searchRequestDTO);
+
 			}
 			response.setEntityList(observationUnitDtos);
 		}
