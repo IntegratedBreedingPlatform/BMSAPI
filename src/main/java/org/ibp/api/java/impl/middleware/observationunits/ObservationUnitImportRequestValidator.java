@@ -32,7 +32,7 @@ public class ObservationUnitImportRequestValidator {
 
 	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
-	public static final String PLOT_NO = "PLOT_NO";
+	public static final String PLOT = "PLOT";
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
@@ -138,7 +138,7 @@ public class ObservationUnitImportRequestValidator {
 			}
 
 			if(!containsPlotNo(position.getObservationLevelRelationships())) {
-				this.errors.reject("observation.unit.import.no.plot.no", new String[] {index.toString()}, "");
+				this.errors.reject("observation.unit.import.no.plot", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
 			}
@@ -161,7 +161,7 @@ public class ObservationUnitImportRequestValidator {
 	private boolean containsPlotNo(final List<ObservationLevelRelationship> observationLevelRelationships) {
 		if(!CollectionUtils.isEmpty(observationLevelRelationships)) {
 			for(final ObservationLevelRelationship relationship: observationLevelRelationships) {
-				if(relationship.getLevelName().equalsIgnoreCase(PLOT_NO)) {
+				if(relationship.getLevelName().equalsIgnoreCase(PLOT)) {
 					return true;
 				}
 			}

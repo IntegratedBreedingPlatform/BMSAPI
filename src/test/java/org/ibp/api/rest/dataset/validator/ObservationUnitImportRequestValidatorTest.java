@@ -223,7 +223,7 @@ public class ObservationUnitImportRequestValidatorTest {
 		observationUnitImportRequestDtos.get(0).getObservationUnitPosition().setObservationLevelRelationships(null);
 		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
 		Assert.assertTrue(result.hasErrors());
-		Assert.assertEquals("observation.unit.import.no.plot.no", result.getAllErrors().get(0).getCode());
+		Assert.assertEquals("observation.unit.import.no.plot", result.getAllErrors().get(0).getCode());
 	}
 
 	private List<ObservationUnitImportRequestDto> createObservationUnitImportRequestDtos() {
@@ -239,10 +239,9 @@ public class ObservationUnitImportRequestValidatorTest {
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
 		observationUnitPosition.setPositionCoordinateX("1");
 		observationUnitPosition.setPositionCoordinateY("1");
-		final ObservationLevelRelationship relationship =  new ObservationLevelRelationship("1", "PLOT_NO", null);
+		final ObservationLevelRelationship relationship = new ObservationLevelRelationship(null, "1", "PLOT", null);
 		observationUnitPosition.setObservationLevelRelationships(Collections.singletonList(relationship));
 		dto.setObservationUnitPosition(observationUnitPosition);
-
 
 		observationUnitImportRequestDtos.add(dto);
 		return observationUnitImportRequestDtos;
