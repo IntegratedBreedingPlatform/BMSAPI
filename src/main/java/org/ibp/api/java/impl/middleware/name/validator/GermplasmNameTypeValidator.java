@@ -73,7 +73,7 @@ public class GermplasmNameTypeValidator {
 
 	protected void validateIfNameAlreadyExists(final String name) {
 		final List<GermplasmNameTypeDTO> nameTypeDTOS = this.germplasmNameTypeService.filterGermplasmNameTypesByName(name);
-		if (nameTypeDTOS != null && !nameTypeDTOS.isEmpty()) {
+		if (!nameTypeDTOS.isEmpty()) {
 			this.errors.reject("name.type.name.invalid", new String[] {name}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
