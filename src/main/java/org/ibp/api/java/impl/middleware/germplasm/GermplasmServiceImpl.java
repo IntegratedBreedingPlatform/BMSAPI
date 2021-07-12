@@ -305,7 +305,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public List<GermplasmNameTypeDTO> filterGermplasmNameTypes(final Set<String> codes) {
-		return this.germplasmService.filterGermplasmNameTypes(codes);
+		return this.germplasmNameTypeService.filterGermplasmNameTypes(codes);
 	}
 
 	@Override
