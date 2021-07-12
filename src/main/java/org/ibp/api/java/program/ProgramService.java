@@ -2,7 +2,7 @@
 package org.ibp.api.java.program;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
-import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,5 +27,5 @@ public interface ProgramService {
 
 	void saveOrUpdateProjectUserInfo(Integer userId, String  programUUID);
 
-	ProgramDTO getProjectByUuid(String programUUID);
+	List<ProgramMemberDto> getProgramMembers(String programUUID, Pageable pageable);
 }
