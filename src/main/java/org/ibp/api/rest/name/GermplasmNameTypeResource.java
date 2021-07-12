@@ -9,15 +9,12 @@ import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.name.GermplasmNameTypeService;
 import org.ibp.api.rest.common.PaginatedSearch;
-import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,24 +57,9 @@ public class GermplasmNameTypeResource {
 	public ResponseEntity<List<GermplasmNameTypeDTO>> getNameTypes(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@ApiIgnore
-		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable){
-		final PagedResult<GermplasmNameTypeDTO> resultPage =
-			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmNameTypeDTO>(){
-
-				@Override
-				public long getCount() {
-					return GermplasmNameTypeResource.this.germplasmNameTypeService.countAllNameTypes();
-				}
-
-				@Override
-				public List<GermplasmNameTypeDTO> getResults(final PagedResult<GermplasmNameTypeDTO> pagedResult) {
-					return GermplasmNameTypeResource.this.germplasmNameTypeService.getNameTypes(pageable);
-				}
-			});
-
-		final List<GermplasmNameTypeDTO> nameTypeDTOList = resultPage.getPageResults();
-		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Filtered-Count", Long.toString(resultPage.getFilteredResults()));
-		return new ResponseEntity<>(nameTypeDTOList, headers, HttpStatus.OK);
+		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+		return new PaginatedSearch().getPagedResult(() -> this.germplasmNameTypeService.countAllNameTypes(),
+			() -> this.germplasmNameTypeService.getNameTypes(pageable),
+			pageable);
 	}
 }
