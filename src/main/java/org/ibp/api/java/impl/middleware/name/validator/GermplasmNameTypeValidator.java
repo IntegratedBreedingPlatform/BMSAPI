@@ -30,25 +30,27 @@ public class GermplasmNameTypeValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmNameTypeRequestDTO.class.getName());
 
 		if (StringUtils.isBlank(germplasmNameTypeRequestDTO.getCode())) {
-			this.errors.reject("name.type.field.invalid", new String[] {"code"}, "");
+			this.errors.reject("germplasm.name.type.code.field.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 
 		}
 
 		if (germplasmNameTypeRequestDTO.getCode().length() > GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH) {
-			this.errors.reject("name.type.field.length.invalid", new String[] {"code", GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
+			this.errors.reject("germplasm.name.type.name.field.invalid",
+				new String[] {"code", GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		this.validateIfCodeAlreadyExists(germplasmNameTypeRequestDTO.getCode());
 
 		if (StringUtils.isBlank(germplasmNameTypeRequestDTO.getName())) {
-			this.errors.reject("name.type.field.invalid", new String[] {"name"}, "");
+			this.errors.reject("name.type.field.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (germplasmNameTypeRequestDTO.getName().length() > GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH) {
-			this.errors.reject("name.type.field.length.invalid", new String[] {"name", GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
+			this.errors.reject("germplasm.name.type.name.field.length.invalid",
+				new String[] {GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
@@ -56,8 +58,8 @@ public class GermplasmNameTypeValidator {
 
 		if (StringUtils.isNotBlank(germplasmNameTypeRequestDTO.getDescription()) && //
 			germplasmNameTypeRequestDTO.getDescription().length() > GermplasmNameTypeValidator.DESCRIPTION_MAX_LENGTH) {
-			this.errors.reject("name.type.field.length.invalid",
-				new String[] {"description", GermplasmNameTypeValidator.DESCRIPTION_MAX_LENGTH.toString()}, "");
+			this.errors.reject("germplasm.name.type.description.length.invalid",
+				new String[] {GermplasmNameTypeValidator.DESCRIPTION_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -66,7 +68,7 @@ public class GermplasmNameTypeValidator {
 		final Set<String> codes = new HashSet<>(Arrays.asList(code));
 		final List<GermplasmNameTypeDTO> nameTypeDTOS = this.germplasmNameTypeService.filterGermplasmNameTypes(codes);
 		if (nameTypeDTOS != null && !nameTypeDTOS.isEmpty()) {
-			this.errors.reject("name.type.code.invalid", new String[] {code}, "");
+			this.errors.reject("germplasm.name.type.code.invalid", new String[] {code}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -74,7 +76,7 @@ public class GermplasmNameTypeValidator {
 	protected void validateIfNameAlreadyExists(final String name) {
 		final List<GermplasmNameTypeDTO> nameTypeDTOS = this.germplasmNameTypeService.filterGermplasmNameTypesByName(name);
 		if (!nameTypeDTOS.isEmpty()) {
-			this.errors.reject("name.type.name.invalid", new String[] {name}, "");
+			this.errors.reject("germplasm.name.type.name.invalid", new String[] {name}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
