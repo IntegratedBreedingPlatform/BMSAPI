@@ -24,7 +24,7 @@ public class GermplasmNameTypeValidator {
 	private BindingResult errors;
 
 	@Autowired
-	GermplasmNameTypeService germplasmNameTypeService;
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	public void validate(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmNameTypeRequestDTO.class.getName());
