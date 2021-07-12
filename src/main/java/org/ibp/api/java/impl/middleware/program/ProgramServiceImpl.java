@@ -155,11 +155,15 @@ public class ProgramServiceImpl implements ProgramService {
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
-
 	}
 
 	@Override
 	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable) {
 		return userService.getProgramMembers(programUUID, pageable);
+	}
+
+	@Override
+	public long countAllProgramMembers(final String programUUID) {
+		return userService.countAllProgramMembers(programUUID);
 	}
 }

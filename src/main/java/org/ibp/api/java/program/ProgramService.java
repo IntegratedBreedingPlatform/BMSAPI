@@ -28,4 +28,6 @@ public interface ProgramService {
 	void saveOrUpdateProjectUserInfo(Integer userId, String  programUUID);
 
 	List<ProgramMemberDto> getProgramMembers(String programUUID, Pageable pageable);
+
+	long countAllProgramMembers(String programUUID);
 }
