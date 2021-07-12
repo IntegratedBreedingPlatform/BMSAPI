@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.name;
 
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
-import org.ibp.api.java.impl.middleware.name.validator.NameTypeValidator;
+import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,10 +15,10 @@ import java.util.List;
 public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	@Autowired
-	org.generationcp.middleware.api.nametype.GermplasmNameTypeService germplasmNameTypeService;
+	private org.generationcp.middleware.api.nametype.GermplasmNameTypeService germplasmNameTypeService;
 
 	@Autowired
-	NameTypeValidator nameTypeValidator;
+	private GermplasmNameTypeValidator germplasmNameTypeValidator;
 
 	@Override
 	public List<GermplasmNameTypeDTO> getNameTypes(final Pageable pageable) {
@@ -32,7 +32,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	@Override
 	public Integer createNameType(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
-		this.nameTypeValidator.validate(germplasmNameTypeRequestDTO);
+		this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO);
 		return this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
 	}
 }

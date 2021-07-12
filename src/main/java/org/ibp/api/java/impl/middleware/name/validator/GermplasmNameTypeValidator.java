@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class NameTypeValidator {
+public class GermplasmNameTypeValidator {
 
 	private static final Integer CODE_OR_NAME_MAX_LENGTH = 50;
 	private static final Integer DESCRPTION_MAX_LENGTH = 255;
@@ -35,8 +35,8 @@ public class NameTypeValidator {
 
 		}
 
-		if (germplasmNameTypeRequestDTO.getCode().length() > NameTypeValidator.CODE_OR_NAME_MAX_LENGTH) {
-			this.errors.reject("name.type.field.length.invalid", new String[] {"code", NameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
+		if (germplasmNameTypeRequestDTO.getCode().length() > GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH) {
+			this.errors.reject("name.type.field.length.invalid", new String[] {"code", GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
@@ -47,17 +47,17 @@ public class NameTypeValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (germplasmNameTypeRequestDTO.getName().length() > NameTypeValidator.CODE_OR_NAME_MAX_LENGTH) {
-			this.errors.reject("name.type.field.length.invalid", new String[] {"name", NameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
+		if (germplasmNameTypeRequestDTO.getName().length() > GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH) {
+			this.errors.reject("name.type.field.length.invalid", new String[] {"name", GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		this.validateIfNameAlreadyExists(germplasmNameTypeRequestDTO.getName());
 
 		if (StringUtils.isNotBlank(germplasmNameTypeRequestDTO.getDescription()) && //
-			germplasmNameTypeRequestDTO.getDescription().length() > NameTypeValidator.DESCRPTION_MAX_LENGTH) {
+			germplasmNameTypeRequestDTO.getDescription().length() > GermplasmNameTypeValidator.DESCRPTION_MAX_LENGTH) {
 			this.errors.reject("name.type.field.length.invalid",
-				new String[] {"description", NameTypeValidator.DESCRPTION_MAX_LENGTH.toString()}, "");
+				new String[] {"description", GermplasmNameTypeValidator.DESCRPTION_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
