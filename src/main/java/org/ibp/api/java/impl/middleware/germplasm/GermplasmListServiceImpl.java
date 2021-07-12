@@ -14,6 +14,8 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -661,6 +663,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(this.errors, Collections.singletonList(gid));
 		return this.germplasmListService.getGermplasmLists(gid);
+	}
+
+	@Override
+	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest,
+		final Pageable pageable,
+		final String programUUID) {
+		return this.germplasmListService.searchGermplasmList(germplasmListSearchRequest, pageable, programUUID);
+	}
+
+	@Override
+	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmSearchRequest, final String programUUID) {
+		return this.germplasmListService.countSearchGermplasmList(germplasmSearchRequest, programUUID);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {

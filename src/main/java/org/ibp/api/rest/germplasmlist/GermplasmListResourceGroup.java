@@ -9,6 +9,8 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
@@ -206,6 +208,30 @@ GermplasmListResourceGroup {
 		@RequestBody final UserTreeState treeState) {
 		this.germplasmListService.saveGermplasmListTreeState(crop, programUUID, treeState);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation("Search germplasm lists")
+	//TODO: check permissions
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/search", method = RequestMethod.POST)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. ")
+	})
+	@ResponseBody
+	public ResponseEntity<List<GermplasmListSearchResponse>> getGermplasmLists(
+		@PathVariable final String cropName,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListSearchRequest germplasmListSearchRequest,
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
+	) {
+		return new PaginatedSearch().getPagedResult(() -> this.germplasmListService.countSearchGermplasmList(germplasmListSearchRequest, programUUID),
+			() -> this.germplasmListService.searchGermplasmList(germplasmListSearchRequest, pageable, programUUID),
+			pageable);
 	}
 
 }
