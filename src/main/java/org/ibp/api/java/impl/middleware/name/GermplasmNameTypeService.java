@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface NameTypeService {
+public interface GermplasmNameTypeService {
 
 
 	List<GermplasmNameTypeDTO> getNameTypes(Pageable pageable);

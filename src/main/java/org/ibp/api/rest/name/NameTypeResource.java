@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.java.impl.middleware.name.NameTypeService;
+import org.ibp.api.java.impl.middleware.name.GermplasmNameTypeService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ import java.util.List;
 public class NameTypeResource {
 
 	@Autowired
-	private NameTypeService nameTypeService;
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	@ApiOperation(value = "Create a new name type", notes = "Create a new name type")
 	@RequestMapping(value = "/crops/{cropName}/name-types", method = RequestMethod.POST)
@@ -41,7 +41,7 @@ public class NameTypeResource {
 	@ResponseBody
 	public ResponseEntity<Integer> createNameType(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID, @RequestBody final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
-		return new ResponseEntity<>(this.nameTypeService.createNameType(germplasmNameTypeRequestDTO), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve all name types", notes = "It will retrieve all name types")
@@ -65,12 +65,12 @@ public class NameTypeResource {
 
 				@Override
 				public long getCount() {
-					return NameTypeResource.this.nameTypeService.countNameTypes();
+					return NameTypeResource.this.germplasmNameTypeService.countNameTypes();
 				}
 
 				@Override
 				public List<GermplasmNameTypeDTO> getResults(final PagedResult<GermplasmNameTypeDTO> pagedResult) {
-					return NameTypeResource.this.nameTypeService.getNameTypes(pageable);
+					return NameTypeResource.this.germplasmNameTypeService.getNameTypes(pageable);
 				}
 			});
 

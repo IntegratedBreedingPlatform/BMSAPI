@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.name;
 
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.ibp.api.java.impl.middleware.name.validator.NameTypeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -13,10 +12,10 @@ import java.util.List;
 
 @Service
 @Transactional
-public class NameTypeServiceImpl implements NameTypeService {
+public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	@Autowired
-	GermplasmNameTypeService germplasmNameTypeService;
+	org.generationcp.middleware.api.nametype.GermplasmNameTypeService germplasmNameTypeService;
 
 	@Autowired
 	NameTypeValidator nameTypeValidator;
