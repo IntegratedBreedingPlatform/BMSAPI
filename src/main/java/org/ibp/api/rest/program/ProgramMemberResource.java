@@ -38,7 +38,7 @@ public class ProgramMemberResource {
 	})
 	@ApiOperation(value = "List program members", notes = "Get the list or program members")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
 	public ResponseEntity<List<ProgramMemberDto>> getProgramMembers(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@ApiIgnore
