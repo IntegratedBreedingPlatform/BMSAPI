@@ -20,7 +20,7 @@ import java.util.Set;
 public class GermplasmNameTypeValidator {
 
 	private static final Integer CODE_OR_NAME_MAX_LENGTH = 50;
-	private static final Integer DESCRPTION_MAX_LENGTH = 255;
+	private static final Integer DESCRIPTION_MAX_LENGTH = 255;
 	private BindingResult errors;
 
 	@Autowired
@@ -55,9 +55,9 @@ public class GermplasmNameTypeValidator {
 		this.validateIfNameAlreadyExists(germplasmNameTypeRequestDTO.getName());
 
 		if (StringUtils.isNotBlank(germplasmNameTypeRequestDTO.getDescription()) && //
-			germplasmNameTypeRequestDTO.getDescription().length() > GermplasmNameTypeValidator.DESCRPTION_MAX_LENGTH) {
+			germplasmNameTypeRequestDTO.getDescription().length() > GermplasmNameTypeValidator.DESCRIPTION_MAX_LENGTH) {
 			this.errors.reject("name.type.field.length.invalid",
-				new String[] {"description", GermplasmNameTypeValidator.DESCRPTION_MAX_LENGTH.toString()}, "");
+				new String[] {"description", GermplasmNameTypeValidator.DESCRIPTION_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
