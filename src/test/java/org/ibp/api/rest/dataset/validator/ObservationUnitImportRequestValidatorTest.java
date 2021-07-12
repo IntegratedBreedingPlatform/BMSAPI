@@ -218,6 +218,15 @@ public class ObservationUnitImportRequestValidatorTest {
 	}
 
 	@Test
+	public void testPruneStudiesInvalidForImport_WhereInvalidLevelName() {
+		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
+		observationUnitImportRequestDtos.get(0).getObservationUnitPosition().getObservationLevelRelationships().get(0).setLevelName("REP_NO");
+		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("observation.unit.import.invalid.observation.level.name", result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
 	public void testPruneStudiesInvalidForImport_WherePlotNoIsNotIncluded() {
 		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
 		observationUnitImportRequestDtos.get(0).getObservationUnitPosition().setObservationLevelRelationships(null);

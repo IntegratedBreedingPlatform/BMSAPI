@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +34,7 @@ public class ObservationUnitImportRequestValidator {
 	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
 	public static final String PLOT = "PLOT";
+	private static final List<String> OBSERVATION_LEVEL_NAMES = Arrays.asList("PLOT", "BLOCK", "REP");
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
@@ -137,8 +139,7 @@ public class ObservationUnitImportRequestValidator {
 				}
 			}
 
-			if(!containsPlotNo(position.getObservationLevelRelationships())) {
-				this.errors.reject("observation.unit.import.no.plot", new String[] {index.toString()}, "");
+			if(!isObservationLevelRelationshipNamesValid(position.getObservationLevelRelationships(), index)) {
 				iterator.remove();
 				continue;
 			}
@@ -158,14 +159,23 @@ public class ObservationUnitImportRequestValidator {
 		return this.errors;
 	}
 
-	private boolean containsPlotNo(final List<ObservationLevelRelationship> observationLevelRelationships) {
+	private boolean isObservationLevelRelationshipNamesValid(final List<ObservationLevelRelationship> observationLevelRelationships, final Integer index) {
+		boolean hasPlot = false;
 		if(!CollectionUtils.isEmpty(observationLevelRelationships)) {
 			for(final ObservationLevelRelationship relationship: observationLevelRelationships) {
 				if(relationship.getLevelName().equalsIgnoreCase(PLOT)) {
-					return true;
+					hasPlot = true;
+				}
+				if(!OBSERVATION_LEVEL_NAMES.contains(relationship.getLevelName().toUpperCase())) {
+					this.errors.reject("observation.unit.import.invalid.observation.level.name", new String[] {index.toString()}, "");
+					return false;
 				}
 			}
+			if(hasPlot) {
+				return true;
+			}
 		}
+		this.errors.reject("observation.unit.import.no.plot", new String[] {index.toString()}, "");
 		return false;
 	}
 
