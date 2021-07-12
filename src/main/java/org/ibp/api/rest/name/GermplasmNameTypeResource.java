@@ -24,13 +24,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
-@Api(value = "Name Type Services")
-@Controller
-public class NameTypeResource {
+@Api(value = "Germplasm Name Type Services")
+@RestController
+public class GermplasmNameTypeResource {
 
 	@Autowired
 	private GermplasmNameTypeService germplasmNameTypeService;
@@ -65,12 +66,12 @@ public class NameTypeResource {
 
 				@Override
 				public long getCount() {
-					return NameTypeResource.this.germplasmNameTypeService.countAllNameTypes();
+					return GermplasmNameTypeResource.this.germplasmNameTypeService.countAllNameTypes();
 				}
 
 				@Override
 				public List<GermplasmNameTypeDTO> getResults(final PagedResult<GermplasmNameTypeDTO> pagedResult) {
-					return NameTypeResource.this.germplasmNameTypeService.getNameTypes(pageable);
+					return GermplasmNameTypeResource.this.germplasmNameTypeService.getNameTypes(pageable);
 				}
 			});
 
