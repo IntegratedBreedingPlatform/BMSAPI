@@ -8,10 +8,9 @@ import java.util.List;
 
 public interface GermplasmNameTypeService {
 
-
 	List<GermplasmNameTypeDTO> getNameTypes(Pageable pageable);
 
-	long countNameTypes();
+	long countAllNameTypes();
 
 	Integer createNameType(GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
 

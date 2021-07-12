@@ -26,8 +26,8 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public long countNameTypes() {
-		return this.germplasmNameTypeService.countNameTypes();
+	public long countAllNameTypes() {
+		return this.germplasmNameTypeService.countAllNameTypes();
 	}
 
 	@Override

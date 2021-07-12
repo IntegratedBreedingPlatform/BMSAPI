@@ -65,7 +65,7 @@ public class NameTypeResource {
 
 				@Override
 				public long getCount() {
-					return NameTypeResource.this.germplasmNameTypeService.countNameTypes();
+					return NameTypeResource.this.germplasmNameTypeService.countAllNameTypes();
 				}
 
 				@Override
