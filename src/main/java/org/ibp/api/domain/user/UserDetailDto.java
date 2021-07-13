@@ -2,7 +2,6 @@ package org.ibp.api.domain.user;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.domain.workbench.CropDto;
-import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 
 import java.io.Serializable;
@@ -10,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class UserDetailDto implements Serializable, Comparable<UserDto> {
+public class UserDetailDto implements Serializable, Comparable<UserDetailDto> {
 
 	private static final long serialVersionUID = -1086700590088326865L;
 
@@ -89,8 +88,8 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	}
 
 	@Override
-	public int compareTo(final UserDto o) {
-		final int compareId = o.getUserId();
+	public int compareTo(final UserDetailDto o) {
+		final int compareId = o.getId();
 		return Integer.valueOf(this.getId()).compareTo(compareId);
 	}
 
@@ -122,10 +121,7 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 			return false;
 		}
 		final UserDetailDto other = (UserDetailDto) obj;
-		if (this.id != other.id) {
-			return false;
-		}
-		return true;
+		return this.id == other.id;
 	}
 
 	@Override
