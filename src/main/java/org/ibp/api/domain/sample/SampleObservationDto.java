@@ -1,219 +1,164 @@
 package org.ibp.api.domain.sample;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.util.serializer.TimestampPropertySerializer;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.io.Serializable;
+import java.util.Date;
 
+@AutoProperty
 public class SampleObservationDto implements Serializable {
 
-	private static final long serialVersionUID = 2340381705850740790L;
+    private static final long serialVersionUID = 2340381705850740790L;
 
-	private Integer studyDbId;
-	private Integer locationDbId;
-	private String observationUnitDbId;
-	private String plantDbId;
-	private String sampleDbId;
-	private String takenBy;
-	private String sampleDate;
-	private String sampleType;
-	private String tissueType;
-	private String notes;
-	private String studyName;
-	private String season;
-	private String locationName;
-	private Integer entryNumber;
-	private Integer plotNumber;
-	private String germplasmDbId;
-	private String plantingDate;
-	private String harvestDate;
+    private Integer studyDbId;
+    private String observationUnitDbId;
+    private String plantDbId;
+    private String sampleDbId;
+    private String takenBy;
+    private String sampleType;
+    private String tissueType;
+    private String notes;
+    private String germplasmDbId;
+    private String plateDbId;
+    private Integer plateIndex;
+    private String plotDbId;
+    @JsonSerialize(using = TimestampPropertySerializer.class)
+    private Date sampleTimestamp;
 
-	public SampleObservationDto() {
+    public SampleObservationDto() {
 
-	}
+    }
 
-	public SampleObservationDto(final Integer studyDbId, final String obsUnitId, final String plantId, final String sampleDbId) {
-		this.studyDbId = studyDbId;
-		this.observationUnitDbId = obsUnitId;
-		this.plantDbId = plantId;
-		this.sampleDbId = sampleDbId;
-	}
+    public SampleObservationDto(final Integer studyDbId, final String obsUnitId, final String plantId, final String sampleDbId) {
+        this.studyDbId = studyDbId;
+        this.observationUnitDbId = obsUnitId;
+        this.plantDbId = plantId;
+        this.sampleDbId = sampleDbId;
+    }
 
-	public Integer getStudyDbId() {
-		return this.studyDbId;
-	}
+    public Integer getStudyDbId() {
+        return this.studyDbId;
+    }
 
-	public void setStudyDbId(final Integer studyDbId) {
-		this.studyDbId = studyDbId;
-	}
+    public void setStudyDbId(final Integer studyDbId) {
+        this.studyDbId = studyDbId;
+    }
 
-	public Integer getLocationDbId() {
-		return this.locationDbId;
-	}
+    public String getObservationUnitDbId() {
+        return this.observationUnitDbId;
+    }
 
-	public void setLocationDbId(final Integer locationDbId) {
-		this.locationDbId = locationDbId;
-	}
+    public void setObservationUnitDbId(final String observationUnitDbId) {
+        this.observationUnitDbId = observationUnitDbId;
+    }
 
-	public String getObservationUnitDbId() {
-		return this.observationUnitDbId;
-	}
+    public String getPlantDbId() {
+        return this.plantDbId;
+    }
 
-	public void setObservationUnitDbId(final String observationUnitDbId) {
-		this.observationUnitDbId = observationUnitDbId;
-	}
+    public void setPlantDbId(final String plantDbId) {
+        this.plantDbId = plantDbId;
+    }
 
-	public String getPlantDbId() {
-		return this.plantDbId;
-	}
+    public String getSampleDbId() {
+        return this.sampleDbId;
+    }
 
-	public void setPlantDbId(final String plantDbId) {
-		this.plantDbId = plantDbId;
-	}
+    public void setSampleDbId(final String sampleDbId) {
+        this.sampleDbId = sampleDbId;
+    }
 
-	public String getSampleDbId() {
-		return this.sampleDbId;
-	}
+    public String getTakenBy() {
+        return this.takenBy;
+    }
 
-	public void setSampleDbId(final String sampleDbId) {
-		this.sampleDbId = sampleDbId;
-	}
+    public void setTakenBy(final String takenBy) {
+        this.takenBy = takenBy;
+    }
 
-	public String getTakenBy() {
-		return this.takenBy;
-	}
+    public String getSampleType() {
+        return this.sampleType;
+    }
 
-	public void setTakenBy(final String takenBy) {
-		this.takenBy = takenBy;
-	}
+    public void setSampleType(final String sampleType) {
+        this.sampleType = sampleType;
+    }
 
-	public String getSampleDate() {
-		return this.sampleDate;
-	}
+    public String getTissueType() {
+        return this.tissueType;
+    }
 
-	public void setSampleDate(final String sampleDate) {
-		this.sampleDate = sampleDate;
-	}
+    public void setTissueType(final String tissueType) {
+        this.tissueType = tissueType;
+    }
 
-	public String getSampleType() {
-		return this.sampleType;
-	}
+    public String getNotes() {
+        return this.notes;
+    }
 
-	public void setSampleType(final String sampleType) {
-		this.sampleType = sampleType;
-	}
+    public void setNotes(final String notes) {
+        this.notes = notes;
+    }
 
-	public String getTissueType() {
-		return this.tissueType;
-	}
+    public String getGermplasmDbId() {
+        return this.germplasmDbId;
+    }
 
-	public void setTissueType(final String tissueType) {
-		this.tissueType = tissueType;
-	}
+    public void setGermplasmDbId(final String germplasmDbId) {
+        this.germplasmDbId = germplasmDbId;
+    }
 
-	public String getNotes() {
-		return this.notes;
-	}
+    public String getPlateDbId() {
+        return plateDbId;
+    }
 
-	public void setNotes(final String notes) {
-		this.notes = notes;
-	}
+    public void setPlateDbId(String plateDbId) {
+        this.plateDbId = plateDbId;
+    }
 
-	public String getStudyName() {
-		return this.studyName;
-	}
+    public Integer getPlateIndex() {
+        return plateIndex;
+    }
 
-	public void setStudyName(final String studyName) {
-		this.studyName = studyName;
-	}
+    public void setPlateIndex(Integer plateIndex) {
+        this.plateIndex = plateIndex;
+    }
 
-	public String getSeason() {
-		return this.season;
-	}
+    public String getPlotDbId() {
+        return plotDbId;
+    }
 
-	public void setSeason(final String season) {
-		this.season = season;
-	}
+    public void setPlotDbId(String plotDbId) {
+        this.plotDbId = plotDbId;
+    }
 
-	public String getLocationName() {
-		return this.locationName;
-	}
+    public Date getSampleTimestamp() {
+        return sampleTimestamp;
+    }
 
-	public void setLocationName(final String locationName) {
-		this.locationName = locationName;
-	}
+    public void setSampleTimestamp(Date sampleTimestamp) {
+        this.sampleTimestamp = sampleTimestamp;
+    }
 
-	public Integer getEntryNumber() {
-		return this.entryNumber;
-	}
+    @Override
+    public int hashCode() {
+        return Pojomatic.hashCode(this);
+    }
 
-	public void setEntryNumber(final Integer entryNumber) {
-		this.entryNumber = entryNumber;
-	}
+    @Override
+    public String toString() {
+        return Pojomatic.toString(this);
+    }
 
-	public Integer getPlotNumber() {
-		return this.plotNumber;
-	}
-
-	public void setPlotNumber(final Integer plotNumber) {
-		this.plotNumber = plotNumber;
-	}
-
-	public String getGermplasmDbId() {
-		return this.germplasmDbId;
-	}
-
-	public void setGermplasmDbId(final String germplasmDbId) {
-		this.germplasmDbId = germplasmDbId;
-	}
-
-	public String getPlantingDate() {
-		return this.plantingDate;
-	}
-
-	public void setPlantingDate(final String plantingDate) {
-		this.plantingDate = plantingDate;
-	}
-
-	public String getHarvestDate() {
-		return this.harvestDate;
-	}
-
-	public void setHarvestDate(final String harvestDate) {
-		this.harvestDate = harvestDate;
-	}
-
-	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof SampleObservationDto)) {
-			return false;
-		}
-		final SampleObservationDto sampleObservationDto = (SampleObservationDto) other;
-		return new EqualsBuilder()
-			.append(this.studyDbId, sampleObservationDto.studyDbId)
-			.append(this.locationDbId, sampleObservationDto.locationDbId)
-			.append(this.observationUnitDbId, sampleObservationDto.observationUnitDbId)
-			.append(this.plantDbId, sampleObservationDto.plantDbId)
-			.append(this.sampleDbId, sampleObservationDto.sampleDbId)
-			.append(this.germplasmDbId, sampleObservationDto.germplasmDbId).isEquals();
-	}
-
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(this.studyDbId)
-			.append(this.locationDbId)
-			.append(this.observationUnitDbId)
-			.append(this.plantDbId)
-			.append(this.sampleDbId)
-			.append(this.germplasmDbId).hashCode();
-	}
-
-	@Override
-	public String toString() {
-		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
-	}
+    @Override
+    public boolean equals(Object o) {
+        return Pojomatic.equals(this, o);
+    }
 }
-

@@ -22,22 +22,17 @@ public class SampleObservationMapperTest {
 		final SampleObservationDto sampleObservationDto = mapper.map(sampleDetailsDTO, SampleObservationDto.class);
 
 		assertThat(sampleObservationDto.getStudyDbId(), equalTo(sampleDetailsDTO.getStudyDbId()));
-		assertThat(sampleObservationDto.getLocationDbId(), equalTo(sampleDetailsDTO.getLocationDbId()));
 		assertThat(sampleObservationDto.getObservationUnitDbId(), equalTo(sampleDetailsDTO.getObsUnitId()));
 		assertThat(sampleObservationDto.getSampleDbId(), equalTo(sampleDetailsDTO.getSampleBusinessKey()));
 		assertThat(sampleObservationDto.getTakenBy(), equalTo(sampleDetailsDTO.getTakenBy()));
-		assertThat(sampleObservationDto.getSampleDate(), equalTo(DATE_FORMAT.format(sampleDetailsDTO.getSampleDate())));
 		assertThat(sampleObservationDto.getSampleType(), equalTo(sampleDetailsDTO.getSampleType()));
 		assertThat(sampleObservationDto.getTissueType(), equalTo(sampleDetailsDTO.getTissueType()));
 		assertThat(sampleObservationDto.getNotes(), equalTo(sampleDetailsDTO.getNotes()));
-		assertThat(sampleObservationDto.getStudyName(), equalTo(sampleDetailsDTO.getStudyName()));
-		assertThat(sampleObservationDto.getSeason(), equalTo(sampleDetailsDTO.getSeason()));
-		assertThat(sampleObservationDto.getLocationName(), equalTo(sampleDetailsDTO.getLocationName()));
-		assertThat(sampleObservationDto.getEntryNumber(), equalTo(sampleDetailsDTO.getEntryNo()));
-		assertThat(sampleObservationDto.getPlotNumber(), equalTo(sampleDetailsDTO.getPlotNo()));
 		assertThat(sampleObservationDto.getGermplasmDbId(), equalTo(sampleDetailsDTO.getGermplasmUUID()));
-		assertThat(sampleObservationDto.getPlantingDate(), equalTo(sampleDetailsDTO.getSeedingDate()));
-		assertThat(sampleObservationDto.getHarvestDate(), equalTo(sampleDetailsDTO.getHarvestDate()));
+		assertThat(sampleObservationDto.getSampleTimestamp(), equalTo(sampleDetailsDTO.getSampleDate()));
+		assertThat(sampleObservationDto.getPlateDbId(), equalTo(sampleDetailsDTO.getPlateId()));
+		assertThat(sampleObservationDto.getPlateIndex(), equalTo(sampleDetailsDTO.getSampleNumber()));
+		assertThat(sampleObservationDto.getPlotDbId(), equalTo(sampleDetailsDTO.getPlotNo().toString()));
 	}
 
 }

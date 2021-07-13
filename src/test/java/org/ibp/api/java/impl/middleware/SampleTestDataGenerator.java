@@ -27,6 +27,8 @@ public abstract class SampleTestDataGenerator {
 		sampleDetailsDTO.setGermplasmUUID(randomAlphanumeric(6));
 		sampleDetailsDTO.setSeedingDate(randomAlphanumeric(6));
 		sampleDetailsDTO.setHarvestDate(randomAlphanumeric(6));
+		sampleDetailsDTO.setPlateId(randomAlphanumeric(6));
+		sampleDetailsDTO.setSampleNumber(Integer.valueOf(randomNumeric(6)));
 		return sampleDetailsDTO;
 	}
 }
