@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,5 +166,15 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public long countAllProgramMembers(final String programUUID) {
 		return userService.countAllProgramMembers(programUUID);
+	}
+
+	@Override
+	public List<UserDetailDto> getMembersEligibleUsers(final String programUUID, final Pageable pageable) {
+		return null;
+	}
+
+	@Override
+	public long countAllMembersEligibleUsers(final String programUUID) {
+		return 0;
 	}
 }

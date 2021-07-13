@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,29 @@ public class ProgramMemberResource {
 
 		return new PaginatedSearch().getPagedResult(() -> this.programService.countAllProgramMembers(programUUID),
 			() -> this.programService.getProgramMembers(programUUID, pageable),
+			pageable);
+	}
+
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "Results page you want to retrieve (0..N)"),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property(,asc|desc). " +
+				"Default sort order is ascending. " +
+				"Multiple sort criteria are supported.")
+	})
+	@ApiOperation(value = "List users eligible to be program members", notes = "List users eligible to be program members")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members/eligible-users", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	public ResponseEntity<List<UserDetailDto>> getMembersEligibleUsersUsers(@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@ApiIgnore
+		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+
+		return new PaginatedSearch().getPagedResult(() -> this.programService.countAllMembersEligibleUsers(programUUID),
+			() -> this.programService.getMembersEligibleUsers(programUUID, pageable),
 			pageable);
 	}
 
