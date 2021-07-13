@@ -95,6 +95,11 @@ public class GermplasmNameRequestValidator {
 
 	}
 
+	public void validateNameBelongsToGermplasm(final Integer gid, final Integer nameId) {
+		final Name name = this.germplasmNameService.getNameById(nameId);
+		this.validateNameBelongsToGermplasm(gid, name);
+	}
+
 	protected void validateNameBelongsToGermplasm(final Integer gid, final Name name) {
 		if (name == null || name.getGermplasm() == null || !name.getGermplasm().getGid().equals(gid)) {
 			this.errors.reject("germplasm.name.invalid", "");
