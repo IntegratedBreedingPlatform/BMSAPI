@@ -60,6 +60,18 @@
     ]
   },
   {
+    "service": "observationunits",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
     "service": "search/observationunits",
     "dataTypes": [
       "application/json"
