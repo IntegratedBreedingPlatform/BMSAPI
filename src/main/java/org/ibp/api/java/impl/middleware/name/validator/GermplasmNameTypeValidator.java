@@ -36,15 +36,15 @@ public class GermplasmNameTypeValidator {
 		}
 
 		if (germplasmNameTypeRequestDTO.getCode().length() > GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH) {
-			this.errors.reject("germplasm.name.type.name.field.invalid",
-				new String[] {"code", GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
+			this.errors.reject("germplasm.name.type.code.field.length.invalid",
+				new String[] {GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		this.validateIfCodeAlreadyExists(germplasmNameTypeRequestDTO.getCode());
 
 		if (StringUtils.isBlank(germplasmNameTypeRequestDTO.getName())) {
-			this.errors.reject("name.type.field.invalid", "");
+			this.errors.reject("germplasm.name.type.name.field.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
