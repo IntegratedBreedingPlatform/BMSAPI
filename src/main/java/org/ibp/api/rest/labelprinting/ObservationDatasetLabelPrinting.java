@@ -137,8 +137,8 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	public void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput) {
-		super.validateLabelsGeneratorInputData(labelsGeneratorInput);
+	public void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
+		super.validateLabelsGeneratorInputData(labelsGeneratorInput, programUUID);
 	}
 
 	@Override
@@ -203,7 +203,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	public List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput) {
+	public List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final List<LabelType> labelTypes = new LinkedList<>();
 
 		final String studyDetailsPropValue = this.getMessage("label.printing.study.details");
@@ -272,7 +272,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	public LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput) {
+	public LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsGeneratorInput.getStudyId());
 
 		final Integer obsDatasetUnitIdFieldKey = TermId.OBS_UNIT_ID.getId();

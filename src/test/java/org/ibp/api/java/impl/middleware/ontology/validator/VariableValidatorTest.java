@@ -1,17 +1,12 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
@@ -34,6 +29,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VariableValidatorTest {
@@ -302,11 +303,8 @@ public class VariableValidatorTest {
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
 
-	/**
-	 * Test for Alias contain special character and start with digit
-	 */
 	@Test
-	public void testWithSpecialCharacterAnsStartWithDigitVariableAlias() throws MiddlewareException {
+	public void testVariableShouldNotBeSavedWithDuplicatedName() throws MiddlewareException {
 
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
@@ -314,8 +312,11 @@ public class VariableValidatorTest {
 		variableDetails.setId("11");
 		variableDetails.setProgramUuid("uuid");
 		variableDetails.setName("Variable_Name");
-		variableDetails.setAlias("2lia");
+		variableDetails.setAlias("Variable_Name_Alias");
 
+		final List<VariableOverridesDto> variableOverridesDtos = new ArrayList<>();
+		variableOverridesDtos.add(new VariableOverridesDto());
+		variableOverridesDtos.add(new VariableOverridesDto());
 		final Term methodTerm = TestDataProvider.getMethodTerm();
 		final Term propertyTerm = TestDataProvider.getPropertyTerm();
 		final Term scaleTerm = TestDataProvider.getScaleTerm();
@@ -335,10 +336,53 @@ public class VariableValidatorTest {
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableDetails.getProgramUuid(),
-				StringUtil.parseInt(variableDetails.getId(), null), true);
+		Mockito.doReturn(variableOverridesDtos).when(this.ontologyVariableDataManager)
+			.getVariableOverridesByAliasAndProgram(variableDetails.getName(), variableDetails.getProgramUuid());
 		this.variableValidator.validate(variableDetails, bindingResult);
-		Assert.assertEquals(0, bindingResult.getErrorCount());
+		Assert.assertTrue(bindingResult.hasErrors());
+		Assert.assertEquals(1, bindingResult.getErrorCount());
+		Assert.assertNotNull(bindingResult.getFieldError("name"));
+	}
+
+	@Test
+	public void testVariableShouldNotBeSavedWithDuplicatedAlias() throws MiddlewareException {
+
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		variableDetails.setId("11");
+		variableDetails.setProgramUuid("uuid");
+		variableDetails.setName("Variable_Name");
+		variableDetails.setAlias("Variable_Name_Alias");
+
+		final List<VariableOverridesDto> variableOverridesDtos = new ArrayList<>();
+		variableOverridesDtos.add(new VariableOverridesDto());
+		variableOverridesDtos.add(new VariableOverridesDto());
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
+
+		final Scale scale = TestDataProvider.getTestScale();
+
+		final Variable variable = TestDataProvider.getTestVariable();
+		variable.setMethod(new Method(methodTerm));
+		variable.setProperty(new Property(propertyTerm));
+		variable.setScale(scale);
+		variable.setHasUsage(true);
+
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
+		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
+		Mockito.doReturn(variableOverridesDtos).when(this.ontologyVariableDataManager)
+			.getVariableOverridesByAliasAndProgram(variableDetails.getAlias(), variableDetails.getProgramUuid());
+		this.variableValidator.validate(variableDetails, bindingResult);
+		Assert.assertTrue(bindingResult.hasErrors());
+		Assert.assertEquals(1, bindingResult.getErrorCount());
+		Assert.assertNotNull(bindingResult.getFieldError("alias"));
 	}
 
 	/**

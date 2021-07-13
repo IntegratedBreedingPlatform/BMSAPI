@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.germplasm.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
-import org.generationcp.middleware.api.attribute.AttributeDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -13,13 +12,16 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportD
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
@@ -49,6 +51,8 @@ public class GermplasmImportRequestDtoValidator {
 	static final Integer REFERENCE_MAX_LENGTH = 255;
 	static final Integer NAME_MAX_LENGTH = 255;
 	static final Integer ATTRIBUTE_MAX_LENGTH = 255;
+	private static final List<VariableType> ATTRIBUTE_TYPES =
+		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
 
 	private BindingResult errors;
 
@@ -68,10 +72,10 @@ public class GermplasmImportRequestDtoValidator {
 	private InventoryCommonValidator inventoryCommonValidator;
 
 	@Autowired
-	private GermplasmAttributeService germplasmAttributeService;
+	private LotService lotService;
 
 	@Autowired
-	private LotService lotService;
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	public void validateBeforeSaving(final String programUUID, final GermplasmImportRequestDto germplasmImportRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequestDto.class.getName());
@@ -214,7 +218,7 @@ public class GermplasmImportRequestDtoValidator {
 		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmImportDTOList);
 		this.validateAllLocationAbbreviationsExists(programUUID, germplasmImportDTOList);
 		this.validateAllNameTypesExists(germplasmImportDTOList);
-		this.validateAllAttributesExists(germplasmImportDTOList);
+		this.validateAllAttributesExists(programUUID, germplasmImportDTOList);
 
 	}
 
@@ -311,7 +315,7 @@ public class GermplasmImportRequestDtoValidator {
 		this.validateAllLocationAbbreviationsExists(programUUID, germplasmInventoryImportDTOList);
 		this.validateAllStorageLocationAbbreviationsExists(programUUID, germplasmInventoryImportDTOList);
 		this.validateAllNameTypesExists(germplasmInventoryImportDTOList);
-		this.validateAllAttributesExists(germplasmInventoryImportDTOList);
+		this.validateAllAttributesExists(programUUID, germplasmInventoryImportDTOList);
 		this.validateStockIds(germplasmInventoryImportDTOList);
 		this.validateUnits(germplasmInventoryImportDTOList);
 	}
@@ -328,9 +332,9 @@ public class GermplasmImportRequestDtoValidator {
 					Collectors.toList());
 			if (existingGermplasmNameTypes.size() != nameTypes.size()) {
 				nameTypes.removeAll(existingGermplasmNameTypes);
-			this.errors.reject("germplasm.import.name.types.not.exist",
+				this.errors.reject("germplasm.import.name.types.not.exist",
 					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(nameTypes), 3)}, "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
 	}
@@ -353,7 +357,7 @@ public class GermplasmImportRequestDtoValidator {
 				breedingMethodsAbbrs.removeAll(existingBreedingMethodsCodes);
 				this.errors.reject("germplasm.import.breeding.methods.not.exist",
 					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(breedingMethodsAbbrs), 3)}, "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 
 			final Map<String, BreedingMethodDTO> methodsMapByAbbreviation =
@@ -383,9 +387,9 @@ public class GermplasmImportRequestDtoValidator {
 					Collectors.toList());
 			if (locationAbbrs.size() != existingLocations.size()) {
 				locationAbbrs.removeAll(existingLocations);
-			this.errors.reject("germplasm.import.location.abbreviations.not.exist",
+				this.errors.reject("germplasm.import.location.abbreviations.not.exist",
 					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(locationAbbrs), 3)}, "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
 	}
@@ -412,24 +416,37 @@ public class GermplasmImportRequestDtoValidator {
 		}
 	}
 
-	private void validateAllAttributesExists(final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
+	private void validateAllAttributesExists(final String programUUID, final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
 		final Set<String> attributes = new HashSet<>();
 		germplasmImportDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
 			.forEach(g -> attributes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
 		if (!attributes.isEmpty()) {
-			final List<String> existingGermplasmAttributes =
-				this.germplasmAttributeService.filterGermplasmAttributes(attributes, null).stream().map(AttributeDTO::getCode).collect(
-					Collectors.toList());
-			final Set<String> repeatedAttributes =
-				existingGermplasmAttributes.stream().filter(i -> Collections.frequency(existingGermplasmAttributes, i) > 1)
-					.collect(Collectors.toSet());
-			if (!repeatedAttributes.isEmpty()) {
-				this.errors.reject("germplasm.import.attributes.duplicated.found",
-					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(repeatedAttributes), 3)}, "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
-			if (existingGermplasmAttributes.size() != attributes.size()) {
-				attributes.removeAll(existingGermplasmAttributes);
+			final VariableFilter variableFilter = new VariableFilter();
+			variableFilter.setProgramUuid(programUUID);
+			ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+			attributes.forEach(variableFilter::addName);
+
+			final List<Variable> existingAttributeVariables =
+				this.ontologyVariableDataManager.getWithFilter(variableFilter);
+
+			if (existingAttributeVariables.size() != attributes.size()) {
+				//Check if same variable was used by name or alias
+				existingAttributeVariables.forEach(v -> {
+					if (attributes.contains(v.getName().toUpperCase()) && StringUtils.isNotEmpty(v.getAlias()) && attributes
+						.contains(v.getAlias().toUpperCase())) {
+						this.errors.reject("germplasm.import.two.columns.referring.to.same.variable",
+							new String[] {v.getName(), v.getAlias()}, "");
+						throw new ApiRequestValidationException(this.errors.getAllErrors());
+					}
+				});
+
+				attributes.removeAll(existingAttributeVariables.stream()
+					.map(v -> v.getName().toUpperCase())
+					.collect(Collectors.toSet()));
+
+				attributes.removeAll(existingAttributeVariables.stream().filter(va -> StringUtils.isNotEmpty(va.getAlias()))
+					.map(v -> v.getAlias().toUpperCase())
+					.collect(Collectors.toSet()));
 				this.errors.reject("germplasm.import.attributes.not.exist",
 					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributes), 3)}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -531,11 +548,7 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 			if (attributes.values().stream().anyMatch(n -> {
-				if (StringUtils.isEmpty(n)) {
-					this.errors.reject("germplasm.import.attribute.value.null.empty", "");
-					return true;
-				}
-				if (n.length() > ATTRIBUTE_MAX_LENGTH) {
+				if (StringUtils.isNotEmpty(n) && n.length() > ATTRIBUTE_MAX_LENGTH) {
 					this.errors.reject("germplasm.import.attribute.value.invalid.length", "");
 					return true;
 				}

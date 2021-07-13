@@ -4,11 +4,12 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
@@ -83,7 +84,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	private ResourceBundleMessageSource messageSource;
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
+	private GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
 	private SearchRequestService searchRequestService;
@@ -142,7 +143,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	public List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput) {
+	public List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final List<LabelType> labelTypes = new LinkedList<>();
 		final String germplasmPropValue = this.getMessage("label.printing.germplasm.details");
 		final String pedigreePropValue = this.getMessage("label.printing.pedigree.details");
@@ -152,8 +153,12 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 
-		final List<UserDefinedField> attributeTypes = this.germplasmSearchService.getGermplasmAttributeTypes(germplasmSearchRequest);
-		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest);
+		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
+		final Set<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toSet());
+
+		final List<Variable> attributeVariables =
+			this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
+		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest, programUUID);
 
 		// Germplasm Details labels
 		final LabelType germplasmType = new LabelType(germplasmPropValue, germplasmPropValue);
@@ -176,8 +181,9 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		// Attribiutes labels
 		final LabelType attirbutesType = new LabelType(attributesPropValue, attributesPropValue);
 		attirbutesType.setFields(new ArrayList<>());
-		attirbutesType.getFields().addAll(attributeTypes.stream()
-			.map(attributeType -> new Field(toKey(attributeType.getFldno()), attributeType.getFcode()))
+		attirbutesType.getFields().addAll(attributeVariables.stream()
+			.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
+				StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 			.collect(Collectors.toList()));
 		labelTypes.add(attirbutesType);
 
@@ -186,7 +192,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	public LabelsData getLabelsData(
-		final LabelsGeneratorInput labelsGeneratorInput) {
+		final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
 		// Get raw data
 		final Integer searchRequestId = labelsGeneratorInput.getSearchRequestId();
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
@@ -220,14 +226,14 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		}
 
 		final List<GermplasmSearchResponse> responseList =
-			this.germplasmService.searchGermplasm(germplasmSearchRequest, pageRequest, null);
+			this.germplasmService.searchGermplasm(germplasmSearchRequest, pageRequest, programUUID);
 
 		Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 
 		if (fieldsContainsNamesOrAttributes) {
-			attributeValues = this.germplasmSearchService.getGermplasmAttributeValues(germplasmSearchRequest);
-			nameValues = this.germplasmSearchService.getGermplasmNameValues(germplasmSearchRequest);
+			attributeValues = this.germplasmSearchService.getGermplasmSearchAttributeValues(germplasmSearchRequest, programUUID);
+			nameValues = this.germplasmSearchService.getGermplasmSearchNameValues(germplasmSearchRequest, programUUID);
 		}
 
 		// Data to be exported

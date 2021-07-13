@@ -195,7 +195,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public StudyImportResponse createStudies(String cropName, List<StudyImportRequestDTO> studyImportRequestDTOS) {
+	public StudyImportResponse createStudies(final String cropName, final List<StudyImportRequestDTO> studyImportRequestDTOS) {
 		final StudyImportResponse response = new StudyImportResponse();
 		final int originalListSize = studyImportRequestDTOS.size();
 		int noOfCreatedStudies = 0;
@@ -213,9 +213,10 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			if (!CollectionUtils.isEmpty(instances)) {
 				noOfCreatedStudies = instances.size();
 			}
-			response.setStudyInstanceDtos(instances);
+			response.setEntityList(instances);
 		}
-		response.setStatus(noOfCreatedStudies + " out of " + originalListSize + " studies created successfully.");
+		response.setCreatedSize(noOfCreatedStudies);
+		response.setImportListSize(originalListSize);
 		return response;
 	}
 

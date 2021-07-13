@@ -5,7 +5,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
-        <version>18.1</version>
+        <version>18.2</version>
 	<name>BMS API</name>
 
 	<properties>
@@ -177,7 +177,12 @@
 			<version>3.8.0</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+    		<groupId>org.mockito</groupId>
+    		<artifactId>mockito-inline</artifactId>
+    		<version>3.8.0</version>
+    		<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest</artifactId>
