@@ -1,7 +1,7 @@
 package org.ibp.api.brapi.v2.observationunits;
 
 import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -22,7 +22,7 @@ public class ObservationUnitMapper {
 	}
 
 	private static void addObservationMapper(final ModelMapper mapper) {
-		mapper.addMappings(new PropertyMap<PhenotypeSearchRequestDTO, ObservationUnitsSearchRequestDto>() {
+		mapper.addMappings(new PropertyMap<ObservationUnitSearchRequestDTO, ObservationUnitsSearchRequestDto>() {
 
 			@Override
 			protected void configure() {
@@ -34,6 +34,8 @@ public class ObservationUnitMapper {
 				this.map().setProgramDbIds(this.source.getProgramDbIds());
 				this.map().setStudyDbIds(this.source.getStudyDbIds());
 				this.map().setTrialDbIds(this.source.getTrialDbIds());
+				this.map().setExternalReferenceIDs(this.source.getExternalReferenceIDs());
+				this.map().setExternalReferenceSources(this.source.getExternalReferenceSources());
 			}
 		});
 	}
