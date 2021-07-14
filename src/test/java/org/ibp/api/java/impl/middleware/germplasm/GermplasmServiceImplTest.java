@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -75,6 +76,9 @@ public class GermplasmServiceImplTest {
 	@InjectMocks
 	private GermplasmServiceImpl germplasmServiceImpl;
 
+	@Mock
+	private GermplasmNameTypeService germplasmNameTypeService;
+
 	@Test
 	public void testSearchGermplasmDTO() {
 
@@ -111,7 +115,7 @@ public class GermplasmServiceImplTest {
 		nameTypeDTO.setName("LINE NAME");
 
 		final Set<String> types = Collections.singleton(UDTableType.NAMES_NAME.getType());
-		Mockito.when(this.middlewareGermplasmService.filterGermplasmNameTypes(codes)).thenReturn(Arrays.asList(nameTypeDTO));
+		Mockito.when(this.germplasmNameTypeService.filterGermplasmNameTypes(codes)).thenReturn(Arrays.asList(nameTypeDTO));
 
 		final List<GermplasmNameTypeDTO> germplasmListTypes = this.germplasmServiceImpl.filterGermplasmNameTypes(codes);
 		assertNotNull(germplasmListTypes);
@@ -121,7 +125,7 @@ public class GermplasmServiceImplTest {
 		assertThat(actualGermplasmListTypeDTO.getId(), is(nameTypeDTO.getId()));
 		assertThat(actualGermplasmListTypeDTO.getName(), is(nameTypeDTO.getName()));
 
-		Mockito.verify(this.middlewareGermplasmService).filterGermplasmNameTypes(codes);
+		Mockito.verify(this.germplasmNameTypeService).filterGermplasmNameTypes(codes);
 		Mockito.verifyNoMoreInteractions(this.middlewareGermplasmService);
 	}
 

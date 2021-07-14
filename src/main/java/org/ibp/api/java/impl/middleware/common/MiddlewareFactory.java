@@ -91,6 +91,7 @@ import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.MethodServiceImpl;
+import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
@@ -98,6 +99,7 @@ import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.NamingConfigurationService;
+import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
@@ -257,6 +259,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public TermDataManager getTermDataManager() {
 		return new TermDataManagerImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyService getOntologyService() {
+		return new OntologyServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
