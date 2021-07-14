@@ -43,14 +43,14 @@ public class SampleResourceBrapi {
 			final SampleSummaryDto sampleSummaryDto = new SampleSummaryDto().setMetadata(metadata);
 			return new ResponseEntity<>(sampleSummaryDto, HttpStatus.NOT_FOUND);
 		}
-		ModelMapper mapper = SampleObservationMapper.getInstance();
-		SampleObservationDto sampleObservationDto = mapper.map(sampleDetailsDTO, SampleObservationDto.class);
+		final ModelMapper mapper = SampleObservationMapper.getInstance();
+		final SampleObservationDto sampleObservationDto = mapper.map(sampleDetailsDTO, SampleObservationDto.class);
 		final int resultNumber = 1;
-		Pagination pagination =
+		final Pagination pagination =
 			new Pagination().withPageNumber(1).withPageSize(resultNumber).withTotalCount((long) resultNumber).withTotalPages(1);
 
-		Metadata metadata = new Metadata().withPagination(pagination);
-		SampleSummaryDto sampleSummaryDto = new SampleSummaryDto().setMetadata(metadata).setResult(sampleObservationDto);
+		final Metadata metadata = new Metadata().withPagination(pagination);
+		final SampleSummaryDto sampleSummaryDto = new SampleSummaryDto().setMetadata(metadata).setResult(sampleObservationDto);
 		return new ResponseEntity<>(sampleSummaryDto, HttpStatus.OK);
 	}
 }

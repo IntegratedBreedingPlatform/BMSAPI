@@ -111,34 +111,34 @@ public class SampleObservationDto implements Serializable {
     }
 
     public String getPlateDbId() {
-        return plateDbId;
+        return this.plateDbId;
     }
 
-    public void setPlateDbId(String plateDbId) {
+    public void setPlateDbId(final String plateDbId) {
         this.plateDbId = plateDbId;
     }
 
     public Integer getPlateIndex() {
-        return plateIndex;
+        return this.plateIndex;
     }
 
-    public void setPlateIndex(Integer plateIndex) {
+    public void setPlateIndex(final Integer plateIndex) {
         this.plateIndex = plateIndex;
     }
 
     public String getPlotDbId() {
-        return plotDbId;
+        return this.plotDbId;
     }
 
-    public void setPlotDbId(String plotDbId) {
+    public void setPlotDbId(final String plotDbId) {
         this.plotDbId = plotDbId;
     }
 
     public Date getSampleTimestamp() {
-        return sampleTimestamp;
+        return this.sampleTimestamp;
     }
 
-    public void setSampleTimestamp(Date sampleTimestamp) {
+    public void setSampleTimestamp(final Date sampleTimestamp) {
         this.sampleTimestamp = sampleTimestamp;
     }
 
@@ -153,7 +153,7 @@ public class SampleObservationDto implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         return Pojomatic.equals(this, o);
     }
 }
