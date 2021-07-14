@@ -13,7 +13,6 @@ import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,34 +55,11 @@ public class GermplasmStudySourceResource {
 		final @ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
 		germplasmStudySourceSearchRequest.setStudyId(studyId);
-
-		final PagedResult<GermplasmStudySourceDto> pageResult =
-			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<GermplasmStudySourceDto>() {
-
-				@Override
-				public long getCount() {
-					return GermplasmStudySourceResource.this.germplasmStudySourceService
-						.countGermplasmStudySources(germplasmStudySourceSearchRequest);
-				}
-
-				@Override
-				public long getFilteredCount() {
-					return GermplasmStudySourceResource.this.germplasmStudySourceService
-						.countFilteredGermplasmStudySources(germplasmStudySourceSearchRequest);
-				}
-
-				@Override
-				public List<GermplasmStudySourceDto> getResults(final PagedResult<GermplasmStudySourceDto> pagedResult) {
-					return GermplasmStudySourceResource.this.germplasmStudySourceService
-						.getGermplasmStudySources(germplasmStudySourceSearchRequest, pageable);
-				}
-			});
-
-		final HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Filtered-Count", Long.toString(pageResult.getFilteredResults()));
-		headers.add("X-Total-Count", Long.toString(pageResult.getTotalResults()));
-		return new ResponseEntity<>(pageResult.getPageResults(), headers, HttpStatus.OK);
-
+		return new PaginatedSearch()
+			.getPagedResult(() -> this.germplasmStudySourceService.countGermplasmStudySources(germplasmStudySourceSearchRequest),
+				() -> this.germplasmStudySourceService.countFilteredGermplasmStudySources(germplasmStudySourceSearchRequest),
+				() -> this.germplasmStudySourceService.getGermplasmStudySources(germplasmStudySourceSearchRequest, pageable), pageable
+			);
 	}
 
 }
