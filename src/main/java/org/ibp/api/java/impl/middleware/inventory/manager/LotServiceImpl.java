@@ -8,7 +8,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
-import org.generationcp.middleware.domain.inventory.common.SearchTypeComposeDto;
+import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
@@ -54,6 +54,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 
 @Service
 @Transactional
@@ -145,11 +147,11 @@ public class LotServiceImpl implements LotService {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(lotGeneratorBatchRequestDto.getSearchComposite(), errors);
 
-		final SearchCompositeDto<SearchTypeComposeDto, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
+		final SearchCompositeDto<SearchOriginCompositeDto, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
 		List<Integer> gids = null;
 
 		if (searchComposite.getSearchRequest() != null) {
-			switch (SearchTypeComposeDto.SearchType.getEnumByCode(searchComposite.getSearchRequest().getSearchType())) {
+			switch (searchComposite.getSearchRequest().getSearchOrigin()) {
 				case GERMPLASM_SEARCH:
 					final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), GermplasmSearchRequest.class);
@@ -157,6 +159,7 @@ public class LotServiceImpl implements LotService {
 					final List<GermplasmSearchResponse> germplasmSearchResponses =
 						this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 					gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
+					checkArgument(!gids.isEmpty(), "list.gid.empty");
 					break;
 
 				case MANAGE_STUDY:
@@ -164,14 +167,16 @@ public class LotServiceImpl implements LotService {
 						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), GermplasmStudySourceSearchRequest.class);
 					gids = this.germplasmStudySourceService.getGermplasmStudySources(germplasmStudySourceSearchRequest, null).stream().map(
 						GermplasmStudySourceDto::getGid).collect(Collectors.toList());
+					checkArgument(!gids.isEmpty(), "list.gid.empty");
 					break;
 				default:
+					break;
 			}
 		} else {
 			gids = new ArrayList<>(searchComposite.getItemIds());
+			this.germplasmValidator.validateGids(errors, gids);
 		}
 
-		this.germplasmValidator.validateGids(errors, gids);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
