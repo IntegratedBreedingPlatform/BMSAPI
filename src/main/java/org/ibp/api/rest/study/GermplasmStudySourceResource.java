@@ -4,13 +4,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.study.GermplasmStudySourceService;
 import org.ibp.api.rest.common.PaginatedSearch;
-import org.ibp.api.rest.common.SearchSpec;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -34,6 +37,9 @@ public class GermplasmStudySourceResource {
 
 	@Resource
 	private GermplasmStudySourceService germplasmStudySourceService;
+
+	@Autowired
+	private SearchRequestService searchRequestService;
 
 	@ApiOperation(value = "It will retrieve all generated germplasm in a study",
 		notes = "It will retrieve all generated germplasm in a study")
@@ -60,6 +66,26 @@ public class GermplasmStudySourceResource {
 				() -> this.germplasmStudySourceService.countFilteredGermplasmStudySources(germplasmStudySourceSearchRequest),
 				() -> this.germplasmStudySourceService.getGermplasmStudySources(germplasmStudySourceSearchRequest, pageable), pageable
 			);
+	}
+
+
+	@ApiOperation(value = "Post generated germplasm in a study search", notes = "Post generated germplasm in a study search")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/germplasm-sources/search", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')"
+		+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<SearchDto>> postGermplasmStudySourceTable(final @PathVariable String cropname,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @RequestBody final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest
+	) {
+		final String searchRequestId =
+			this.searchRequestService.saveSearchRequest(germplasmStudySourceSearchRequest, GermplasmStudySourceSearchRequest.class).toString();
+
+		final SearchDto searchDto = new SearchDto(searchRequestId);
+		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse <SearchDto>(searchDto);
+
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+
 	}
 
 }
