@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.program.ProgramService;
+import org.ibp.api.java.user.UserService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,9 @@ public class ProgramMemberResource {
 
 	@Autowired
 	private ProgramService programService;
+
+	@Autowired
+	private UserService userService;
 
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -68,8 +72,8 @@ public class ProgramMemberResource {
 		@ApiIgnore
 		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
 
-		return new PaginatedSearch().getPagedResult(() -> this.programService.countAllMembersEligibleUsers(programUUID),
-			() -> this.programService.getMembersEligibleUsers(programUUID, pageable),
+		return new PaginatedSearch().getPagedResult(() -> this.userService.countAllMembersEligibleUsers(programUUID),
+			() -> this.userService.getMembersEligibleUsers(programUUID, pageable),
 			pageable);
 	}
 

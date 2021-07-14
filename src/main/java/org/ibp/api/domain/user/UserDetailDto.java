@@ -1,5 +1,6 @@
 package org.ibp.api.domain.user;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UserDetailDto implements Serializable, Comparable<UserDetailDto> {
 
 	private static final long serialVersionUID = -1086700590088326865L;
