@@ -1,11 +1,6 @@
 package org.ibp.api.domain.sample;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import org.generationcp.middleware.util.serializer.TimestampPropertySerializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -29,7 +24,7 @@ public class SampleObservationDto implements Serializable {
     private String plateDbId;
     private Integer plateIndex;
     private String plotDbId;
-    @JsonSerialize(using = TimestampPropertySerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private Date sampleTimestamp;
 
     public SampleObservationDto() {
