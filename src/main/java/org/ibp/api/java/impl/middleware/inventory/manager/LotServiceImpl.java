@@ -3,8 +3,12 @@ package org.ibp.api.java.impl.middleware.inventory.manager;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.common.SearchTypeComposeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
@@ -14,7 +18,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -23,7 +27,6 @@ import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
-import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
@@ -98,6 +101,12 @@ public class LotServiceImpl implements LotService {
 	@Autowired
 	private GermplasmStudySourceService germplasmStudySourceService;
 
+	@Autowired
+	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private GermplasmSearchService germplasmSearchService;
+
 	private static final String DEFAULT_STOCKID_PREFIX = "SID";
 
 	@Override
@@ -131,23 +140,41 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public List<String> createLots(final String programUUID, final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto) {
 		// validations
-		final SearchCompositeDto<Integer, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
+
 		this.lotInputValidator.validate(programUUID, lotGeneratorBatchRequestDto);
-		List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
-		if (Util.isEmpty(gids) && lotGeneratorBatchRequestDto.getStudyId() != null) {
-			final GermplasmStudySourceSearchRequest searchRequest = new GermplasmStudySourceSearchRequest();
-			searchRequest.setStudyId(Integer.valueOf(lotGeneratorBatchRequestDto.getStudyId()));
-			gids = this.germplasmStudySourceService.getGermplasmStudySources(searchRequest, null).stream().map(
-				GermplasmStudySourceDto::getGid).collect(Collectors.toList());
-		} else {
-			final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
-			this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, errors);
-			this.germplasmValidator.validateGids(errors, gids);
-			if (errors.hasErrors()) {
-				throw new ApiRequestValidationException(errors.getAllErrors());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(lotGeneratorBatchRequestDto.getSearchComposite(), errors);
+
+		final SearchCompositeDto<SearchTypeComposeDto, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
+		List<Integer> gids = null;
+
+		if (searchComposite.getSearchRequest() != null) {
+			switch (SearchTypeComposeDto.SearchType.getEnumByCode(searchComposite.getSearchRequest().getSearchType())) {
+				case GERMPLASM_SEARCH:
+					final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
+						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), GermplasmSearchRequest.class);
+
+					final List<GermplasmSearchResponse> germplasmSearchResponses =
+						this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
+					gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
+					break;
+
+				case MANAGE_STUDY:
+					final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest = (GermplasmStudySourceSearchRequest) this.searchRequestService
+						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), GermplasmStudySourceSearchRequest.class);
+					gids = this.germplasmStudySourceService.getGermplasmStudySources(germplasmStudySourceSearchRequest, null).stream().map(
+						GermplasmStudySourceDto::getGid).collect(Collectors.toList());
+					break;
+				default:
 			}
+		} else {
+			gids = new ArrayList<>(searchComposite.getItemIds());
 		}
 
+		this.germplasmValidator.validateGids(errors, gids);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 
 		final LotGeneratorInputDto lotGeneratorInput = lotGeneratorBatchRequestDto.getLotGeneratorInput();
 
