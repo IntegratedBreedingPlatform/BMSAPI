@@ -152,6 +152,9 @@ public class GermplasmResourceBrapi {
 		if (!StringUtils.isEmpty(commonCropName)) {
 			germplasmSearchRequestDTO.setCommonCropNames(Lists.newArrayList(commonCropName));
 		}
+		if (!StringUtils.isEmpty(germplasmPUI)) {
+			germplasmSearchRequestDTO.setGermplasmPUIs(Lists.newArrayList(germplasmPUI));
+		}
 
 		final PagedResult<GermplasmDTO> resultPage = this.getGermplasmDTOPagedResult(germplasmSearchRequestDTO, currentPage, pageSize);
 		final List<Germplasm> germplasmList = new ArrayList<>();
