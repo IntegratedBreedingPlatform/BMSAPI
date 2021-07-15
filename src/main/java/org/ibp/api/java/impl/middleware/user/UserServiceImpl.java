@@ -145,6 +145,11 @@ public class UserServiceImpl implements UserService {
 		this.userService.updateUser(userDto);
 	}
 
+	@Override
+	public WorkbenchUser getUserById(final Integer userId) {
+		return this.userService.getUserById(userId);
+	}
+
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
 		final UserDto userdto = new UserDto();
 		userdto.setUserId(user.getId());

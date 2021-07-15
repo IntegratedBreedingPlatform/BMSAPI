@@ -20,4 +20,13 @@ public interface UserService {
 	UserDetailDto getUserWithAuthorities(final String cropName, final String programUuid);
 
 	void updateUserProfile(final UserProfileUpdateRequestDTO userProfileUpdateRequestDTO, final WorkbenchUser workbenchUser);
+
+	/**
+	 * Gets the user by id.
+	 *
+	 * @param userId - the user id to match
+	 * @return the user matching the given id
+	 */
+	WorkbenchUser getUserById(final Integer userId);
+
 }
