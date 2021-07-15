@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -13,6 +14,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -35,6 +37,9 @@ public class StudyValidator {
 
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private UserService userService;
 
 	private BindingResult errors;
 
@@ -129,6 +134,30 @@ public class StudyValidator {
 		if (this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())) {
 			errors.reject("study.has.means.dataset");
 			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	public void validateDelete(final Integer studyId) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final Study study = this.studyDataManager.getStudy(studyId, false);
+
+		if(study== null){
+			errors.reject("study.id.not.exists", new String[] {studyId.toString()}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (StringUtils.isBlank(study.getProgramUUID())) {
+			errors.reject("study.template.delete.not.permitted");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final Integer studyUserId = study.getUser();
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		if (studyUserId != null && !studyUserId.equals(user)) {
+			final WorkbenchUser workbenchUser = this.userService.getUserById(studyUserId);
+			errors.reject("study.delete.not.permitted", new String[] {workbenchUser.getPerson().getDisplayName()}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+
 		}
 	}
 
