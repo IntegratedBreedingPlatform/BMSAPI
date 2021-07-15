@@ -84,7 +84,7 @@
         ]
       },
       {
-        "call": "samples/{sampleId}",
+        "call": "samples/{sampleDbId}",
         "dataTypes": [
           "application/json"
         ],
@@ -95,8 +95,7 @@
           "GET"
         ],
         "versions": [
-          "1.0",
-          "1.1"
+          "1.3"
         ]
       },
       {
