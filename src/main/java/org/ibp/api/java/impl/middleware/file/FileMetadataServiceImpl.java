@@ -10,6 +10,7 @@ import org.ibp.api.java.file.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -39,5 +40,15 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		return fileMetadataMapper.map(fileMetadataDTO);
+	}
+
+	@Override
+	public String save(final MultipartFile file, final String key, final String observationUnitId) {
+		final FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
+		fileMetadataDTO.setName(file.getOriginalFilename());
+		fileMetadataDTO.setMimeType(file.getContentType());
+		fileMetadataDTO.setSize((int) file.getSize());
+		fileMetadataDTO.setPath(key);
+		return this.fileMetadataService.save(fileMetadataDTO, observationUnitId);
 	}
 }

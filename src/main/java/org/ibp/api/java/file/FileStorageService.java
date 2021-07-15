@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface FileStorageService {
 
-	Map<String, String> upload(MultipartFile file, String key);
+	void upload(MultipartFile file, String key);
 
 	byte[] getFile(String key);
 

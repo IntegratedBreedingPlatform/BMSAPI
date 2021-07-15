@@ -9,7 +9,7 @@ import java.util.Map;
 public class NoneFileStorageServiceImpl implements FileStorageService {
 
 	@Override
-	public Map<String, String> upload(final MultipartFile file, final String key) {
+	public void upload(final MultipartFile file, final String key) {
 		throw new ApiRuntime2Exception("", "file.storage.not.configured");
 	}
 

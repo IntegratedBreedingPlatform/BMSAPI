@@ -38,7 +38,7 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 	private JSch jsch;
 
 	@Override
-	public Map<String, String> upload(final MultipartFile file, final String key) {
+	public void upload(final MultipartFile file, final String key) {
 		ChannelSftp channelSftp = null;
 		try {
 			channelSftp = this.setupJsch();
@@ -59,7 +59,6 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 		} finally {
 			close(channelSftp);
 		}
-		return Collections.singletonMap("key", key);
 	}
 
 	@Override
