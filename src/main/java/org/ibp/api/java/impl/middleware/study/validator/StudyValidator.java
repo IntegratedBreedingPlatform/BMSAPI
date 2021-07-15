@@ -137,7 +137,7 @@ public class StudyValidator {
 		}
 	}
 
-	public void validateDelete(final Integer studyId) {
+	public void validateDeleteStudy(final Integer studyId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final Study study = this.studyDataManager.getStudy(studyId, false);
 

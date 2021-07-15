@@ -189,7 +189,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public void deleteStudy(final Integer studyId) {
-		this.studyValidator.validateDelete(studyId);
+		this.studyValidator.validateDeleteStudy(studyId);
 		this.studyDataManager.deleteStudy(studyId);
 
 	}
