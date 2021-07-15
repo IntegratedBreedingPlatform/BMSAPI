@@ -132,6 +132,6 @@ public class StudyResource {
 	public ResponseEntity<Void> deleteStudy(final @PathVariable String cropName, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
 		this.studyService.deleteStudy(studyId);
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
