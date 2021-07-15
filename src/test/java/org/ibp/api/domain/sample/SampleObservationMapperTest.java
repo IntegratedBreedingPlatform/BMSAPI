@@ -21,7 +21,7 @@ public class SampleObservationMapperTest {
         final SampleDetailsDTO sampleDetailsDTO = SampleTestDataGenerator.createRandomSampleDetails();
         final SampleObservationDto sampleObservationDto = mapper.map(sampleDetailsDTO, SampleObservationDto.class);
 
-        assertThat(sampleObservationDto.getStudyDbId(), equalTo(sampleDetailsDTO.getStudyDbId()));
+        assertThat(sampleObservationDto.getStudyDbId(), equalTo(sampleDetailsDTO.getStudyDbId().toString()));
         assertThat(sampleObservationDto.getObservationUnitDbId(), equalTo(sampleDetailsDTO.getObsUnitId()));
         assertThat(sampleObservationDto.getSampleDbId(), equalTo(sampleDetailsDTO.getSampleBusinessKey()));
         assertThat(sampleObservationDto.getTakenBy(), equalTo(sampleDetailsDTO.getTakenBy()));

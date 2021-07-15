@@ -54,7 +54,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.studyDbId", Matchers.is(sampleDetailsDTO.getStudyDbId()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.studyDbId", Matchers.is(sampleDetailsDTO.getStudyDbId().toString()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.locationDbId", Matchers.is(sampleDetailsDTO.getLocationDbId()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.obsUnitId", Matchers.is(sampleDetailsDTO.getObsUnitId()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleId", Matchers.is(sampleDetailsDTO.getSampleBusinessKey()))) //
