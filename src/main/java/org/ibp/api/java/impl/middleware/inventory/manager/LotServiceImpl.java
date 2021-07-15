@@ -159,7 +159,7 @@ public class LotServiceImpl implements LotService {
 					final List<GermplasmSearchResponse> germplasmSearchResponses =
 						this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 					gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
-					checkArgument(!gids.isEmpty(), "list.gid.empty");
+					checkArgument(!gids.isEmpty(), "searchrequestid.no.results");
 					break;
 
 				case MANAGE_STUDY:
@@ -167,7 +167,7 @@ public class LotServiceImpl implements LotService {
 						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), GermplasmStudySourceSearchRequest.class);
 					gids = this.germplasmStudySourceService.getGermplasmStudySources(germplasmStudySourceSearchRequest, null).stream().map(
 						GermplasmStudySourceDto::getGid).collect(Collectors.toList());
-					checkArgument(!gids.isEmpty(), "list.gid.empty");
+					checkArgument(!gids.isEmpty(), "searchrequestid.no.results");
 					break;
 				default:
 					break;
