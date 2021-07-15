@@ -242,13 +242,7 @@ public class GermplasmImportRequestValidator {
 
 	private List<String> collectGermplasmPUIs(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
 		final List<String> puisList = new ArrayList<>();
-		germplasmImportRequestDtoList.forEach(i -> {
-			if (!StringUtils.isEmpty(i.getGermplasmPUI())) {
-				puisList.add(i.getGermplasmPUI());
-			}
-			final Optional<String> germplasmPUIFromSynonym = i.getGermplasmPUIFromSynonyms();
-			germplasmPUIFromSynonym.ifPresent(puisList::add);
-		});
+		germplasmImportRequestDtoList.forEach(i -> puisList.addAll(i.collectGermplasmPUIs()));
 		return puisList;
 	}
 
