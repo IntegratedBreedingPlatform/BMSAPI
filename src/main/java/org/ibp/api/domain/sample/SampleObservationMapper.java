@@ -25,7 +25,7 @@ public class SampleObservationMapper {
 
             @Override
             protected void configure() {
-                this.map().setStudyDbId(this.source.getStudyDbId());
+                this.map().setStudyDbId(this.source.getStudyDbId().toString());
                 this.map().setObservationUnitDbId(this.source.getObsUnitId());
                 this.map().setSampleDbId(this.source.getSampleBusinessKey());
                 this.map().setTakenBy(this.source.getTakenBy());

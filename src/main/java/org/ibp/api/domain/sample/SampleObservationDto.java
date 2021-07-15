@@ -12,7 +12,7 @@ public class SampleObservationDto implements Serializable {
 
     private static final long serialVersionUID = 2340381705850740790L;
 
-    private Integer studyDbId;
+    private String studyDbId;
     private String observationUnitDbId;
     private String plantDbId;
     private String sampleDbId;
@@ -31,18 +31,18 @@ public class SampleObservationDto implements Serializable {
 
     }
 
-    public SampleObservationDto(final Integer studyDbId, final String obsUnitId, final String plantId, final String sampleDbId) {
+    public SampleObservationDto(final String studyDbId, final String obsUnitId, final String plantId, final String sampleDbId) {
         this.studyDbId = studyDbId;
         this.observationUnitDbId = obsUnitId;
         this.plantDbId = plantId;
         this.sampleDbId = sampleDbId;
     }
 
-    public Integer getStudyDbId() {
+    public String getStudyDbId() {
         return this.studyDbId;
     }
 
-    public void setStudyDbId(final Integer studyDbId) {
+    public void setStudyDbId(final String studyDbId) {
         this.studyDbId = studyDbId;
     }
 
