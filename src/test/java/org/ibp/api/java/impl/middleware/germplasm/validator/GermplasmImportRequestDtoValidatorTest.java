@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.germplasm.validator;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -578,7 +579,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 	}
 
 	@Test
-	public void testValidateBeforeSaving_ThrowsException_WhenPUIsExists() {
+	public void testValidateBeforeSaving_ThrowsException_WhenPUIExists() {
 		try {
 			final String germplasmPUI = RandomStringUtils.randomAlphabetic(100);
 			final Map<String, String> names = new HashMap<>();
@@ -586,6 +587,27 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
 			germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GID);
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, germplasmPUI, "ARG", "MUT",
+				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
+				"20201212", null, null)));
+
+			Mockito.when(this.germplasmNameService.getExistingGermplasmPUIs(Mockito.anyList())).thenReturn(Collections.singletonList(germplasmPUI));
+			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("germplasm.import.existent.puis"));
+		}
+	}
+
+	@Test
+	public void testValidateBeforeSaving_ThrowsException_WhenPuiInNamesExists() {
+		try {
+			final String germplasmPUI = RandomStringUtils.randomAlphabetic(100);
+			final Map<String, String> names = new HashMap<>();
+			names.put("LNAME", "MYNAME");
+			names.put(GermplasmImportRequest.PUI_NAME_TYPE, germplasmPUI);
+			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
+			germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GID);
+			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
 				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
 				"20201212", null, null)));
 

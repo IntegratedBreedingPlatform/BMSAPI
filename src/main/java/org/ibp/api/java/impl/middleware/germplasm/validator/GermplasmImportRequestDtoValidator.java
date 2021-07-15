@@ -466,11 +466,8 @@ public class GermplasmImportRequestDtoValidator {
 	}
 
 	private void validatePUINotExists(final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
-		final List<String> puisList  =
-			germplasmImportDTOList.stream().filter(g -> !StringUtils.isEmpty(g.getGermplasmPUI()))
-				.map(GermplasmImportDTO::getGermplasmPUI)
-				.collect(
-					Collectors.toList());
+		final List<String> puisList = new ArrayList<>();
+			germplasmImportDTOList.stream().forEach(g -> puisList.addAll(g.collectGermplasmPUIs()));
 		final List<String> existingGermplasmPUIs = this.germplasmNameService.getExistingGermplasmPUIs(puisList);
 		if (!existingGermplasmPUIs.isEmpty()) {
 			this.errors.reject("germplasm.import.existent.puis",
