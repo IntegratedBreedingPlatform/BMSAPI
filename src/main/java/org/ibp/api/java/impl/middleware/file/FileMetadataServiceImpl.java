@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.generationcp.middleware.api.file.FileMetadataMapper;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.file.FileStorageService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,12 +44,18 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public String save(final MultipartFile file, final String key, final String observationUnitId) {
+	public String save(final MultipartFile file, final String path, final String observationUnitId) {
 		final FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
 		fileMetadataDTO.setName(file.getOriginalFilename());
 		fileMetadataDTO.setMimeType(file.getContentType());
 		fileMetadataDTO.setSize((int) file.getSize());
-		fileMetadataDTO.setPath(key);
+		fileMetadataDTO.setPath(path);
 		return this.fileMetadataService.save(fileMetadataDTO, observationUnitId);
+	}
+
+	@Override
+	public String getFilePath(final String observationUnitId, final Integer termId, final String fileName) {
+		BaseValidator.checkNotNull(fileName, "param.null", new String[] {"fileName"});
+		return this.fileMetadataService.getFilePath(observationUnitId, termId, fileName);
 	}
 }

@@ -6,9 +6,9 @@ import java.util.Map;
 
 public interface FileStorageService {
 
-	void upload(MultipartFile file, String key);
+	void upload(MultipartFile file, String path);
 
-	byte[] getFile(String key);
+	byte[] getFile(String path);
 
 	/**
 	 * @return true if a file storage service is configured correctly. {@link org.ibp.api.java.impl.middleware.common.FileStorageServiceFactory}

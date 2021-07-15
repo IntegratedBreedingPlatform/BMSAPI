@@ -12,5 +12,7 @@ public interface FileMetadataService {
 
 	Image updateImageContent(String imageDbId, byte[] imageContent);
 
-	String save(MultipartFile file, final String key, String observationUnitId);
+	String save(MultipartFile file, String path, String observationUnitId);
+
+	String getFilePath(String observationUnitId, Integer termId, String fileName);
 }

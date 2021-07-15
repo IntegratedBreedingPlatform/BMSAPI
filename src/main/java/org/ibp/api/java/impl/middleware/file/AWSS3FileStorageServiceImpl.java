@@ -39,13 +39,13 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 	private String region;
 
 	@Override
-	public void upload(final MultipartFile file, final String key) {
+	public void upload(final MultipartFile file, final String path) {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 
 			final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
 				.bucket(this.bucketName)
-				.key(key)
+				.key(path)
 				.build();
 			final PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
 		} catch (final SdkClientException e) {
@@ -58,13 +58,13 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 	}
 
 	@Override
-	public byte[] getFile(final String key) {
+	public byte[] getFile(final String path) {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 
 			final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
 				.bucket(this.bucketName)
-				.key(key)
+				.key(path)
 				.build();
 			final ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
 

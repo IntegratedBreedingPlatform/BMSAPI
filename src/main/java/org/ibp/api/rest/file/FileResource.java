@@ -1,8 +1,8 @@
 package org.ibp.api.rest.file;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
@@ -51,12 +51,12 @@ public class FileResource {
 	public ResponseEntity<Map<String, String>> upload(
 		@PathVariable final String cropName,
 		@RequestPart("file") final MultipartFile file,
-		@ApiParam("store file under this name / key") @RequestParam final String key,
+		@ApiParam("store file under this path") @RequestParam final String path,
 		@RequestParam final String observationUnitId
 	) {
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
-		this.fileStorageService.upload(file, key);
-		final String fileUUID = this.fileMetadataService.save(file, key, observationUnitId);
+		this.fileStorageService.upload(file, path);
+		final String fileUUID = this.fileMetadataService.save(file, path, observationUnitId);
 		return new ResponseEntity<>(Collections.singletonMap("fileUUID", fileUUID), HttpStatus.CREATED);
 	}
 
@@ -66,13 +66,28 @@ public class FileResource {
 		@PathVariable final String cropName,
 		final HttpServletRequest request
 	) {
-		final String key = getKey(request);
-		return this.fileStorageService.getFile(key);
+		final String path = getPath(request);
+		return this.fileStorageService.getFile(path);
 	}
 
-	private static String getKey(final HttpServletRequest request) {
-		final String key = request.getRequestURI().split(".*\\/files\\/")[1];
-		return URLDecoder.decode(key);
+	/**
+	 * @return Map<String, String> to overcome angularjs limitation
+	 */
+	@ApiOperation(value = "Get predetermined file path based on parameters")
+	@RequestMapping(value = "/filepath", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, String>> getFilePath(
+		@PathVariable final String cropName,
+		@RequestParam final String observationUnitId,
+		@RequestParam final Integer termId,
+		@RequestParam final String fileName
+	) {
+		final String path = this.fileMetadataService.getFilePath(observationUnitId, termId, fileName);
+		return new ResponseEntity<>(Collections.singletonMap("path", path), HttpStatus.OK);
+	}
+
+	private static String getPath(final HttpServletRequest request) {
+		final String path = request.getRequestURI().split(".*\\/files\\/")[1];
+		return URLDecoder.decode(path);
 	}
 
 }
