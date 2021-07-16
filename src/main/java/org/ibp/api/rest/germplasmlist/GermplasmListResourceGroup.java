@@ -228,8 +228,8 @@ GermplasmListResourceGroup {
 		@RequestBody final GermplasmListSearchRequest germplasmListSearchRequest,
 		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
 	) {
-		return new PaginatedSearch().getPagedResult(() -> this.germplasmListService.countSearchGermplasmList(germplasmListSearchRequest, programUUID),
-			() -> this.germplasmListService.searchGermplasmList(germplasmListSearchRequest, pageable, programUUID),
+		return new PaginatedSearch().getPagedResult(() -> this.germplasmListService.countSearchGermplasmList(germplasmListSearchRequest),
+			() -> this.germplasmListService.searchGermplasmList(germplasmListSearchRequest, pageable),
 			pageable);
 	}
 

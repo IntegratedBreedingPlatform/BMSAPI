@@ -58,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -667,14 +666,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest,
-		final Pageable pageable,
-		final String programUUID) {
-		return this.germplasmListService.searchGermplasmList(germplasmListSearchRequest, pageable, programUUID);
+		final Pageable pageable) {
+		return this.germplasmListService.searchGermplasmList(germplasmListSearchRequest, pageable);
 	}
 
 	@Override
-	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmSearchRequest, final String programUUID) {
-		return this.germplasmListService.countSearchGermplasmList(germplasmSearchRequest, programUUID);
+	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmSearchRequest) {
+		return this.germplasmListService.countSearchGermplasmList(germplasmSearchRequest);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
