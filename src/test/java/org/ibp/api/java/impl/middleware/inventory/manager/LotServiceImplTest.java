@@ -300,7 +300,7 @@ public class LotServiceImplTest {
 		}
 	}
 
-	public static LotGeneratorBatchRequestDto buildLotGeneratorBatchRequestDto() {
+	private LotGeneratorBatchRequestDto buildLotGeneratorBatchRequestDto() {
 		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = new LotGeneratorBatchRequestDto();
 		final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
 		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<>();
