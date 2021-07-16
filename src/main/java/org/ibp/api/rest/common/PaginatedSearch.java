@@ -87,4 +87,28 @@ public class PaginatedSearch {
 		return new ResponseEntity<>(resultPage.getPageResults(), headers, HttpStatus.OK);
 	}
 
+	public <T> ResponseEntity<List<T>> getPagedResult(final Supplier<Long> countSupplier, final Supplier<Long> countFilteredSupplier, final Supplier<List<T>> resultsSupplier,
+		final Pageable pageable) {
+		final PagedResult<T> resultPage =
+			this.execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<T>() {
+
+				@Override
+				public long getCount() {
+					return countSupplier.get();
+				}
+
+				@Override
+				public long getFilteredCount(){ return countFilteredSupplier.get(); }
+
+				@Override
+				public List<T> getResults(final PagedResult<T> pagedResult) {
+					return resultsSupplier.get();
+				}
+			});
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Filtered-Count", Long.toString(resultPage.getFilteredResults()));
+		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
+		return new ResponseEntity<>(resultPage.getPageResults(), headers, HttpStatus.OK);
+	}
 }
