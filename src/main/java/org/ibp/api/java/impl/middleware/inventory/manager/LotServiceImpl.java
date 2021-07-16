@@ -151,7 +151,13 @@ public class LotServiceImpl implements LotService {
 		List<Integer> gids = null;
 
 		if (searchComposite.getSearchRequest() != null) {
-			switch (searchComposite.getSearchRequest().getSearchOrigin()) {
+			final SearchOriginCompositeDto.SearchOrigin searchOrigin = searchComposite.getSearchRequest().getSearchOrigin();
+			if (searchComposite.getSearchRequest().getSearchOrigin() == null) {
+				errors.reject("search.origin.no.defined", searchComposite.getSearchRequest().getSearchOrigin().values(), "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+
+			switch (searchOrigin) {
 				case GERMPLASM_SEARCH:
 					final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), GermplasmSearchRequest.class);
@@ -163,8 +169,10 @@ public class LotServiceImpl implements LotService {
 					break;
 
 				case MANAGE_STUDY:
-					final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest = (GermplasmStudySourceSearchRequest) this.searchRequestService
-						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), GermplasmStudySourceSearchRequest.class);
+					final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest =
+						(GermplasmStudySourceSearchRequest) this.searchRequestService
+							.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(),
+								GermplasmStudySourceSearchRequest.class);
 					gids = this.germplasmStudySourceService.getGermplasmStudySources(germplasmStudySourceSearchRequest, null).stream().map(
 						GermplasmStudySourceDto::getGid).collect(Collectors.toList());
 					checkArgument(!gids.isEmpty(), "searchrequestid.no.results");
