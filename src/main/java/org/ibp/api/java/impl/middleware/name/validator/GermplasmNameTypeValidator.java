@@ -19,8 +19,8 @@ import java.util.Set;
 @Component
 public class GermplasmNameTypeValidator {
 
-	private static final Integer CODE_OR_NAME_MAX_LENGTH = 50;
-	private static final Integer DESCRIPTION_MAX_LENGTH = 255;
+	public static final Integer CODE_OR_NAME_MAX_LENGTH = 50;
+	public static final Integer DESCRIPTION_MAX_LENGTH = 255;
 	private BindingResult errors;
 
 	@Autowired
@@ -30,13 +30,13 @@ public class GermplasmNameTypeValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmNameTypeRequestDTO.class.getName());
 
 		if (StringUtils.isBlank(germplasmNameTypeRequestDTO.getCode())) {
-			this.errors.reject("germplasm.name.type.code.field.invalid", "");
+			this.errors.reject("germplasm.name.type.code.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 
 		}
 
 		if (germplasmNameTypeRequestDTO.getCode().length() > GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH) {
-			this.errors.reject("germplasm.name.type.code.field.length.invalid",
+			this.errors.reject("germplasm.name.type.code.length.invalid",
 				new String[] {GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -44,12 +44,12 @@ public class GermplasmNameTypeValidator {
 		this.validateIfCodeAlreadyExists(germplasmNameTypeRequestDTO.getCode());
 
 		if (StringUtils.isBlank(germplasmNameTypeRequestDTO.getName())) {
-			this.errors.reject("germplasm.name.type.name.field.invalid", "");
+			this.errors.reject("germplasm.name.type.name.empty", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (germplasmNameTypeRequestDTO.getName().length() > GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH) {
-			this.errors.reject("germplasm.name.type.name.field.length.invalid",
+			this.errors.reject("germplasm.name.type.name.length.invalid",
 				new String[] {GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
