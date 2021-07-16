@@ -67,7 +67,7 @@ public class ProgramMemberResource {
 	@ApiOperation(value = "List users eligible to be program members", notes = "List users eligible to be program members")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members/eligible-users", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
-	public ResponseEntity<List<UserDetailDto>> getMembersEligibleUsersUsers(@PathVariable final String cropName,
+	public ResponseEntity<List<UserDetailDto>> getMembersEligibleUsers(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@ApiIgnore
 		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
