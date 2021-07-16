@@ -240,97 +240,75 @@ public class LotServiceImplTest {
         assertThat(depositLotLotIds, contains(newSplitExtendedLotDto.getLotId()));
     }
 
-    @Test
-    public void testCreateLots_ThrowsException_When_SearchOriginIsNull() {
-        final String keepLotUUID = "keepLotUUID";
-        final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = new LotGeneratorBatchRequestDto();
-        final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
-        final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<>();
-        final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
-        searchOriginCompositeDto.setSearchOrigin(null);
-        searchOriginCompositeDto.setSearchRequestId(new Random().nextInt());
+	@Test
+	public void testCreateLots_ThrowsException_When_SearchOriginIsNull() {
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+		searchOriginCompositeDto.setSearchRequestId(new Random().nextInt());
+		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
 
-        searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
-        lotGeneratorInputDto.setStockPrefix(UUID.randomUUID().toString());
-        lotGeneratorInputDto.setLocationId(new Random().nextInt());
+		try {
+			this.lotService.createLots(LotServiceImplTest.PROGRAM_UUID, lotGeneratorBatchRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("search.origin.no.defined"));
+		}
+	}
 
-        lotGeneratorBatchRequestDto.setLotGeneratorInput(lotGeneratorInputDto);
-        lotGeneratorBatchRequestDto.setSearchComposite(searchCompositeDto);
-        try {
-        this.lotService.createLots(keepLotUUID, lotGeneratorBatchRequestDto);
-        } catch (final ApiRequestValidationException e) {
-            assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("search.origin.no.defined"));
-        }
-    }
+	@Test
+	public void testCreateLots_ThrowsException_WhenForGermplasmsearchTheSearchRequestIdNoReturnGids() {
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.GERMPLASM_SEARCH);
+		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
 
-    @Test
-    public void testCreateLots_ThrowsException_WhenForGermplasmsearchTheSearchRequestIdNoReturnGids() {
-        final String keepLotUUID = "keepLotUUID";
-        final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = new LotGeneratorBatchRequestDto();
-        final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
-        final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<>();
-        final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
-        searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.GERMPLASM_SEARCH);
-        searchOriginCompositeDto.setSearchRequestId(new Random().nextInt());
+		try {
+			this.lotService.createLots(LotServiceImplTest.PROGRAM_UUID, lotGeneratorBatchRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("searchrequestid.no.results"));
+		}
+	}
 
-        searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
-        lotGeneratorInputDto.setStockPrefix(UUID.randomUUID().toString());
-        lotGeneratorInputDto.setLocationId(new Random().nextInt());
+	@Test
+	public void testCreateLots_ThrowsException_WhenForManageStudyTheSearchRequestIdNoReturnGids() {
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY);
+		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
 
-        lotGeneratorBatchRequestDto.setLotGeneratorInput(lotGeneratorInputDto);
-        lotGeneratorBatchRequestDto.setSearchComposite(searchCompositeDto);
-        try {
-            this.lotService.createLots(keepLotUUID, lotGeneratorBatchRequestDto);
-        } catch (final ApiRequestValidationException e) {
-            assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("searchrequestid.no.results"));
-        }
-    }
+		try {
+			this.lotService.createLots(LotServiceImplTest.PROGRAM_UUID, lotGeneratorBatchRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("searchrequestid.no.results"));
+		}
+	}
 
-    @Test
-    public void testCreateLots_ThrowsException_WhenForManageStudyTheSearchRequestIdNoReturnGids() {
-        final String keepLotUUID = "keepLotUUID";
-        final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = new LotGeneratorBatchRequestDto();
-        final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
-        final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<>();
-        final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
-        searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY);
-        searchOriginCompositeDto.setSearchRequestId(new Random().nextInt());
+	@Test
+	public void testCreateLots_ThrowsException_WhenSearchRequestIsNullAndItemsAreInvalid() {
+		final Set items = Sets.newSet(new Random().nextInt());
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		lotGeneratorBatchRequestDto.getSearchComposite().setItemIds(items);
 
-        searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
-        lotGeneratorInputDto.setStockPrefix(UUID.randomUUID().toString());
-        lotGeneratorInputDto.setLocationId(new Random().nextInt());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
+		errors.reject("gids.invalid", new String[] {}, "");
+		Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(this.germplasmValidator)
+			.validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.any());
 
-        lotGeneratorBatchRequestDto.setLotGeneratorInput(lotGeneratorInputDto);
-        lotGeneratorBatchRequestDto.setSearchComposite(searchCompositeDto);
-        try {
-            this.lotService.createLots(keepLotUUID, lotGeneratorBatchRequestDto);
-        } catch (final ApiRequestValidationException e) {
-            assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("searchrequestid.no.results"));
-        }
-    }
+		try {
+			this.lotService.createLots(LotServiceImplTest.PROGRAM_UUID, lotGeneratorBatchRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("gids.invalid"));
+		}
+	}
 
-    @Test
-    public void testCreateLots_ThrowsException_WhenSearchRequestIsNullAndItemsAreInvalid() {
-        final String keepLotUUID = "keepLotUUID";
-        final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = new LotGeneratorBatchRequestDto();
-        final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
-        final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<>();
+	public static LotGeneratorBatchRequestDto buildLotGeneratorBatchRequestDto() {
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = new LotGeneratorBatchRequestDto();
+		final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
+		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<>();
 
-        searchCompositeDto.setItemIds(Sets.newSet(new Random().nextInt()));
-        lotGeneratorInputDto.setStockPrefix(UUID.randomUUID().toString());
-        lotGeneratorInputDto.setLocationId(new Random().nextInt());
-
-        lotGeneratorBatchRequestDto.setLotGeneratorInput(lotGeneratorInputDto);
-        lotGeneratorBatchRequestDto.setSearchComposite(searchCompositeDto);
-        final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
-        errors.reject("gids.invalid", new String[] {Util.buildErrorMessageFromList(new ArrayList<>(searchCompositeDto.getItemIds()), 3)}, "");
-        Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(this.germplasmValidator)
-            .validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.any());
-
-        try {
-            this.lotService.createLots(keepLotUUID, lotGeneratorBatchRequestDto);
-        } catch (final ApiRequestValidationException e) {
-            assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("gids.invalid"));
-        }
-    }
+		lotGeneratorInputDto.setStockPrefix(UUID.randomUUID().toString());
+		lotGeneratorInputDto.setLocationId(new Random().nextInt());
+		lotGeneratorBatchRequestDto.setLotGeneratorInput(lotGeneratorInputDto);
+		lotGeneratorBatchRequestDto.setSearchComposite(searchCompositeDto);
+		return lotGeneratorBatchRequestDto;
+	}
 }
