@@ -3,25 +3,34 @@ package org.ibp.api.java.impl.middleware.inventory.manager;
 import factory.ExtendedLotDtoDummyFactory;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
-import org.hamcrest.collection.IsArrayContaining;
 import org.hamcrest.collection.IsMapContaining;
+import org.ibp.api.Util;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotSplitValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,15 +41,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.util.collections.Sets;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -69,6 +85,12 @@ public class LotServiceImplTest {
     private LotInputValidator lotInputValidator;
 
     @Mock
+    private SearchCompositeDtoValidator searchCompositeDtoValidator;
+
+    @Mock
+    private GermplasmValidator germplasmValidator;
+
+    @Mock
     private SecurityService securityService;
 
     @Mock
@@ -82,6 +104,18 @@ public class LotServiceImplTest {
 
     @Mock
     private StockService stockService;
+
+    @Mock
+    private GermplasmSearchRequest germplasmSearchRequest;
+
+    @Mock
+    private SearchRequestService searchRequestService;
+
+    @Mock
+    private GermplasmSearchService germplasmSearchService;
+
+    @Mock
+    private GermplasmStudySourceService germplasmStudySourceService;
 
     @Captor
     private ArgumentCaptor<Set> setCollectionArgumentCaptor;
@@ -206,4 +240,97 @@ public class LotServiceImplTest {
         assertThat(depositLotLotIds, contains(newSplitExtendedLotDto.getLotId()));
     }
 
+    @Test
+    public void testCreateLots_ThrowsException_When_SearchOriginIsNull() {
+        final String keepLotUUID = "keepLotUUID";
+        final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = new LotGeneratorBatchRequestDto();
+        final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
+        final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<>();
+        final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+        searchOriginCompositeDto.setSearchOrigin(null);
+        searchOriginCompositeDto.setSearchRequestId(new Random().nextInt());
+
+        searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
+        lotGeneratorInputDto.setStockPrefix(UUID.randomUUID().toString());
+        lotGeneratorInputDto.setLocationId(new Random().nextInt());
+
+        lotGeneratorBatchRequestDto.setLotGeneratorInput(lotGeneratorInputDto);
+        lotGeneratorBatchRequestDto.setSearchComposite(searchCompositeDto);
+        try {
+        this.lotService.createLots(keepLotUUID, lotGeneratorBatchRequestDto);
+        } catch (final ApiRequestValidationException e) {
+            assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("search.origin.no.defined"));
+        }
+    }
+
+    @Test
+    public void testCreateLots_ThrowsException_WhenForGermplasmsearchTheSearchRequestIdNoReturnGids() {
+        final String keepLotUUID = "keepLotUUID";
+        final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = new LotGeneratorBatchRequestDto();
+        final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
+        final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<>();
+        final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+        searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.GERMPLASM_SEARCH);
+        searchOriginCompositeDto.setSearchRequestId(new Random().nextInt());
+
+        searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
+        lotGeneratorInputDto.setStockPrefix(UUID.randomUUID().toString());
+        lotGeneratorInputDto.setLocationId(new Random().nextInt());
+
+        lotGeneratorBatchRequestDto.setLotGeneratorInput(lotGeneratorInputDto);
+        lotGeneratorBatchRequestDto.setSearchComposite(searchCompositeDto);
+        try {
+            this.lotService.createLots(keepLotUUID, lotGeneratorBatchRequestDto);
+        } catch (final ApiRequestValidationException e) {
+            assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("searchrequestid.no.results"));
+        }
+    }
+
+    @Test
+    public void testCreateLots_ThrowsException_WhenForManageStudyTheSearchRequestIdNoReturnGids() {
+        final String keepLotUUID = "keepLotUUID";
+        final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = new LotGeneratorBatchRequestDto();
+        final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
+        final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<>();
+        final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+        searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY);
+        searchOriginCompositeDto.setSearchRequestId(new Random().nextInt());
+
+        searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
+        lotGeneratorInputDto.setStockPrefix(UUID.randomUUID().toString());
+        lotGeneratorInputDto.setLocationId(new Random().nextInt());
+
+        lotGeneratorBatchRequestDto.setLotGeneratorInput(lotGeneratorInputDto);
+        lotGeneratorBatchRequestDto.setSearchComposite(searchCompositeDto);
+        try {
+            this.lotService.createLots(keepLotUUID, lotGeneratorBatchRequestDto);
+        } catch (final ApiRequestValidationException e) {
+            assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("searchrequestid.no.results"));
+        }
+    }
+
+    @Test
+    public void testCreateLots_ThrowsException_WhenSearchRequestIsNullAndItemsAreInvalid() {
+        final String keepLotUUID = "keepLotUUID";
+        final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = new LotGeneratorBatchRequestDto();
+        final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto();
+        final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<>();
+
+        searchCompositeDto.setItemIds(Sets.newSet(new Random().nextInt()));
+        lotGeneratorInputDto.setStockPrefix(UUID.randomUUID().toString());
+        lotGeneratorInputDto.setLocationId(new Random().nextInt());
+
+        lotGeneratorBatchRequestDto.setLotGeneratorInput(lotGeneratorInputDto);
+        lotGeneratorBatchRequestDto.setSearchComposite(searchCompositeDto);
+        final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
+        errors.reject("gids.invalid", new String[] {Util.buildErrorMessageFromList(new ArrayList<>(searchCompositeDto.getItemIds()), 3)}, "");
+        Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(this.germplasmValidator)
+            .validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.any());
+
+        try {
+            this.lotService.createLots(keepLotUUID, lotGeneratorBatchRequestDto);
+        } catch (final ApiRequestValidationException e) {
+            assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("gids.invalid"));
+        }
+    }
 }
