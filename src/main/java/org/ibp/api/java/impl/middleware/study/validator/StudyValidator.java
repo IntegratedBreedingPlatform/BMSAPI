@@ -9,12 +9,12 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.ibp.api.java.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -153,7 +153,7 @@ public class StudyValidator {
 
 		final Integer studyUserId = study.getUser();
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-		if (studyUserId != null && !studyUserId.equals(user.getUserid())) {
+		if (!user.getUserid().equals(studyUserId)) {
 			final WorkbenchUser workbenchUser = this.userService.getUserById(studyUserId);
 			this.errors.reject("study.delete.not.permitted", new String[] {workbenchUser.getPerson().getDisplayName()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
