@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearc
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.brapi.GermplasmServiceBrapi;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
 import org.ibp.api.brapi.v2.germplasm.GermplasmUpdateRequestValidator;

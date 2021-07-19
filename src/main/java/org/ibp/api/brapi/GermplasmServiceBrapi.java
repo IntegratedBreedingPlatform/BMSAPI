@@ -1,4 +1,4 @@
-package org.ibp.api.java.impl.middleware.germplasm.brapi;
+package org.ibp.api.brapi;
 
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
@@ -16,6 +16,7 @@ public interface GermplasmServiceBrapi {
 	GermplasmImportResponse createGermplasm(String cropName, List<GermplasmImportRequest> germplasmImportRequestList);
 
 	GermplasmDTO updateGermplasm(String germplasmDbId, GermplasmUpdateRequest germplasmUpdateRequest);
+
 	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
 
 	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);

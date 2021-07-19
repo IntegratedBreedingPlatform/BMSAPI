@@ -21,7 +21,7 @@ import org.ibp.api.brapi.v1.germplasm.Germplasm;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.java.impl.middleware.germplasm.brapi.GermplasmServiceBrapi;
+import org.ibp.api.brapi.GermplasmServiceBrapi;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
