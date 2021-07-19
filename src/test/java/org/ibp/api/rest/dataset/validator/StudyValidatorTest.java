@@ -236,7 +236,7 @@ public class StudyValidatorTest {
 	}
 
 	@Test
-	public void testvalidateDeleteStudy_ThrowsException_WhenStudynotExist() {
+	public void testValidateDeleteStudy_ThrowsException_WhenStudyNotExist() {
 		try {
 			final Integer studyId = RandomUtils.nextInt();
 			this.studyValidator.validateDeleteStudy(studyId);
@@ -246,7 +246,7 @@ public class StudyValidatorTest {
 	}
 
 	@Test
-	public void testvalidateDeleteStudy_ThrowsException_WhenStudyHasProgramIUUD() {
+	public void testValidateDeleteStudy_ThrowsException_WhenStudyHasProgramUUD() {
 		try {
 			final Integer studyId = RandomUtils.nextInt();
 			final Study study = new Study();
@@ -260,7 +260,7 @@ public class StudyValidatorTest {
 	}
 
 	@Test
-	public void testvalidateDeleteStudy_ThrowsException_WhenTheUserIsNotOwnerOfStudy() {
+	public void testValidateDeleteStudy_ThrowsException_WhenTheUserIsNotOwnerOfStudy() {
 		try {
 			final Integer studyId = RandomUtils.nextInt();
 			final Study study = new Study();
@@ -268,9 +268,6 @@ public class StudyValidatorTest {
 			final WorkbenchUser userStudy = new WorkbenchUser();
 
 			final Person person = new Person();
-			person.setFirstName(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(8));
-			person.setMiddleName(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(1));
-			person.setLastName(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(8));
 
 			userStudy.setPerson(person);
 			userLogged.setUserid(RandomUtils.nextInt());
