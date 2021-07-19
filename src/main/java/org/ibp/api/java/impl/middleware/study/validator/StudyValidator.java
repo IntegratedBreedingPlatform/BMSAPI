@@ -142,8 +142,8 @@ public class StudyValidator {
 		final Study study = this.studyDataManager.getStudy(studyId, false);
 
 		if (study == null) {
-			this.errors.reject("study.id.not.exists", new String[] {studyId.toString()}, "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+			this.errors.reject("study.not.exist", "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 
 		if (StringUtils.isBlank(study.getProgramUUID())) {
