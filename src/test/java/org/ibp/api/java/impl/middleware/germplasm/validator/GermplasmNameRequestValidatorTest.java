@@ -1,9 +1,10 @@
 package org.ibp.api.java.impl.middleware.germplasm.validator;
 
-import org.apache.commons.lang.StringUtils;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
@@ -53,7 +54,9 @@ public class GermplasmNameRequestValidatorTest {
 	@Before
 	public void setup() {
 		Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.any()))
-			.thenReturn(Collections.singletonList(new GermplasmNameTypeDTO()));
+				.thenReturn(Collections.singletonList(
+						new GermplasmNameTypeDTO(GermplasmNameRequestValidatorTest.PUI_ID, GermplasmNameRequestValidatorTest.PUI_NAME,
+								RandomStringUtils.randomAlphabetic(10))));
 
 	}
 
@@ -155,6 +158,26 @@ public class GermplasmNameRequestValidatorTest {
 				null);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.pui.duplicate"));
+		}
+	}
+
+	@Test
+	public void testValidateCreateName_ThrowsException_WhenGermplasmHasExistingPUIName() {
+		try {
+
+			final GermplasmNameRequestDto germplasmNameRequestDto = this.createNewGermplasmNameRequestDto();
+			germplasmNameRequestDto.setNameTypeCode(PUI_NAME);
+
+			final GermplasmNameDto exsitingPUIName = new GermplasmNameDto();
+			exsitingPUIName.setName(RandomStringUtils.randomAlphabetic(20));
+			exsitingPUIName.setNameTypeCode(PUI_NAME);
+
+			Mockito.when(this.germplasmNameService.getGermplasmNamesByGids(Lists.newArrayList(GERMPLASM_ID)))
+					.thenReturn(Collections.singletonList(exsitingPUIName));
+			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
+					null);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.has.pui"));
 		}
 	}
 
@@ -341,6 +364,33 @@ public class GermplasmNameRequestValidatorTest {
 				GermplasmNameRequestValidatorTest.NAME_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.pui.duplicate"));
+		}
+	}
+
+	@Test
+	public void testValidateUpdateName_ThrowsException_WhenUpdatingToPUINameTypeAndHasExistingPUIName() {
+		try {
+
+			final GermplasmNameRequestDto germplasmNameRequestDto = new GermplasmNameRequestDto();
+			germplasmNameRequestDto.setNameTypeCode(PUI_NAME);
+			germplasmNameRequestDto.setName(RandomStringUtils.randomAlphabetic(20));
+
+			final Name name = new Name(GermplasmNameRequestValidatorTest.NAME_ID);
+			name.setNval(RandomStringUtils.randomAlphabetic(20));
+			name.setGermplasm(this.mockGermplasm());
+			name.setNstat(1);
+
+			final GermplasmNameDto exsitingPUIName = new GermplasmNameDto();
+			exsitingPUIName.setName(RandomStringUtils.randomAlphabetic(20));
+			exsitingPUIName.setNameTypeCode(PUI_NAME);
+
+			Mockito.when(this.germplasmNameService.getNameById(Mockito.any())).thenReturn(name);
+			Mockito.when(this.germplasmNameService.getGermplasmNamesByGids(Lists.newArrayList(GERMPLASM_ID)))
+					.thenReturn(Collections.singletonList(exsitingPUIName));
+			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
+					GermplasmNameRequestValidatorTest.NAME_ID);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.has.pui"));
 		}
 	}
 
