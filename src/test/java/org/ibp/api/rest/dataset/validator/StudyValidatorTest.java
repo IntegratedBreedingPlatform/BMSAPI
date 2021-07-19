@@ -246,7 +246,7 @@ public class StudyValidatorTest {
 	}
 
 	@Test
-	public void testValidateDeleteStudy_ThrowsException_WhenStudyHasProgramUUD() {
+	public void testValidateDeleteStudy_ThrowsException_WhenStudyHasProgramUUID() {
 		try {
 			final Integer studyId = RandomUtils.nextInt();
 			final Study study = new Study();
