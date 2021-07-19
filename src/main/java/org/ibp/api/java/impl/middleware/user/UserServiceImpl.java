@@ -19,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,6 @@ import org.springframework.validation.MapBindingResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -143,6 +143,20 @@ public class UserServiceImpl implements UserService {
 		}
 
 		this.userService.updateUser(userDto);
+	}
+
+	@Override
+	public List<UserDetailDto> getMembersEligibleUsers(final String programUUID, final Pageable pageable) {
+		final List<UserDetailDto> result = new ArrayList<>();
+		final ModelMapper mapper = UserMapper.getInstance();
+		final List<UserDto> users = this.userService.getProgramMembersEligibleUsers(programUUID, pageable);
+		users.forEach(u -> result.add(mapper.map(u, UserDetailDto.class)));
+		return result;
+	}
+
+	@Override
+	public long countAllMembersEligibleUsers(final String programUUID) {
+		return this.userService.countProgramMembersEligibleUsers(programUUID);
 	}
 
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
