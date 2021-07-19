@@ -34,12 +34,7 @@ public class GermplasmNameTypeValidatorTest {
 	private GermplasmNameTypeService germplasmNameTypeService;
 
 	@InjectMocks
-	GermplasmNameTypeValidator germplasmNameTypeValidator;
-
-	@Before
-	public void setUp() {
-		MockitoAnnotations.initMocks(this);
-	}
+	private GermplasmNameTypeValidator germplasmNameTypeValidator;
 
 	@Test
 	public void testValidate_ThrowsException_WhenCodeIsNull(){
@@ -53,7 +48,7 @@ public class GermplasmNameTypeValidatorTest {
 	}
 
 	@Test
-	public void testValidate_ThrowsException_WhenCodeIsBlanck(){
+	public void testValidate_ThrowsException_WhenCodeIsBlank(){
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = buildGermplasmNameTypeRequestDTO();
 		germplasmNameTypeRequestDTO.setCode("");
 		try {
@@ -102,7 +97,7 @@ public class GermplasmNameTypeValidatorTest {
 	}
 
 	@Test
-	public void testValidate_ThrowsException_WhenNameIsBlanck(){
+	public void testValidate_ThrowsException_WhenNameIsBlank(){
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = buildGermplasmNameTypeRequestDTO();
 		germplasmNameTypeRequestDTO.setName("");
 
