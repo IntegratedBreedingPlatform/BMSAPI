@@ -25,7 +25,7 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
-import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.java.impl.middleware.germplasm.brapi.GermplasmServiceBrapi;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -49,7 +49,7 @@ import java.util.List;
 public class GermplasmResourceBrapi {
 
 	@Autowired
-	private GermplasmService germplasmService;
+	private GermplasmServiceBrapi germplasmService;
 
 	@Autowired
 	private SearchRequestService searchRequestService;

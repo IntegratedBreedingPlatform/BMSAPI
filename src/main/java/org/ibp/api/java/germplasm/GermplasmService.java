@@ -38,20 +38,6 @@ public interface GermplasmService {
 
 	List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(String name);
 
-	PedigreeDTO getPedigree(String germplasmUUID, String notation, Boolean includeSiblings);
-
-	ProgenyDTO getProgeny(String germplasmUUID);
-
-	GermplasmDTO getGermplasmDTObyGUID(String germplasmUUID);
-
-	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
-
-	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
-
-	long countGermplasmByStudy(Integer studyDbId);
-
-	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, Pageable pageable);
-
 	Set<Integer> importGermplasmUpdates(String programUUID, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
@@ -62,10 +48,6 @@ public interface GermplasmService {
 	long countGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto);
 
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
-
-	GermplasmImportResponse createGermplasm(String cropName, List<GermplasmImportRequest> germplasmImportRequestList);
-
-	GermplasmDTO updateGermplasm(String germplasmUUID, GermplasmUpdateRequest germplasmUpdateRequest);
 
 	GermplasmDeleteResponse deleteGermplasm(List<Integer> gids);
 
