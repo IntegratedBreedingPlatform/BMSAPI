@@ -2,10 +2,10 @@
 package org.ibp.api.java.impl.middleware.program;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -156,11 +155,16 @@ public class ProgramServiceImpl implements ProgramService {
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
-
 	}
 
-	public ProgramDTO getProjectByUuid(final String programUUID) {
-		final Project project = this.workbenchDataManager.getProjectByUuid(programUUID);
-		return project != null ? new ProgramDTO(project) : null;
+	@Override
+	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable) {
+		return this.userService.getProgramMembers(programUUID, pageable);
 	}
+
+	@Override
+	public long countAllProgramMembers(final String programUUID) {
+		return this.userService.countAllProgramMembers(programUUID);
+	}
+
 }

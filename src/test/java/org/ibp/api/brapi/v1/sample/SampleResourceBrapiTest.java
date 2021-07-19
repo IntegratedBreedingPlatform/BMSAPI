@@ -34,7 +34,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 
-	private static final SimpleDateFormat DATE_FORMAT = DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT_3);
+	private static final SimpleDateFormat DATE_FORMAT = DateUtil.getSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
 	@Autowired
 	private SampleService sampleService;
@@ -54,25 +54,19 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.studyDbId", Matchers.is(sampleDetailsDTO.getStudyDbId()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.locationDbId", Matchers.is(sampleDetailsDTO.getLocationDbId()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.obsUnitId", Matchers.is(sampleDetailsDTO.getObsUnitId()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleId", Matchers.is(sampleDetailsDTO.getSampleBusinessKey()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.studyDbId", Matchers.is(sampleDetailsDTO.getStudyDbId().toString()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.observationUnitDbId", Matchers.is(sampleDetailsDTO.getObsUnitId()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleDbId", Matchers.is(sampleDetailsDTO.getSampleBusinessKey()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.takenBy", Matchers.is(sampleDetailsDTO.getTakenBy()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleDate",
-				Matchers.is(SampleResourceBrapiTest.DATE_FORMAT.format(sampleDetailsDTO.getSampleDate())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleType", Matchers.is(sampleDetailsDTO.getSampleType()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.tissueType", Matchers.is(sampleDetailsDTO.getTissueType()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.notes", Matchers.is(sampleDetailsDTO.getNotes()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.studyName", Matchers.is(sampleDetailsDTO.getStudyName()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.season", Matchers.is(sampleDetailsDTO.getSeason()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.locationName", Matchers.is(sampleDetailsDTO.getLocationName()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.entryNumber", Matchers.is(sampleDetailsDTO.getEntryNo()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.plotNumber", Matchers.is(sampleDetailsDTO.getPlotNo()))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmDbId", Matchers.is(sampleDetailsDTO.getGermplasmUUID()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.plantingDate", Matchers.is(sampleDetailsDTO.getSeedingDate()))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.harvestDate", Matchers.is(sampleDetailsDTO.getHarvestDate()))) //
-
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.plateDbId", Matchers.is(sampleDetailsDTO.getPlateId()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.plateIndex", Matchers.is(sampleDetailsDTO.getSampleNumber()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.plotDbId", Matchers.is(sampleDetailsDTO.getPlotNo().toString()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleTimestamp",
+				Matchers.is(SampleResourceBrapiTest.DATE_FORMAT.format(sampleDetailsDTO.getSampleDate())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.currentPage", Matchers.is(1))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.pageSize", Matchers.is(1))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalCount", Matchers.is(1))) //
