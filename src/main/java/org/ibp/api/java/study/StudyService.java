@@ -46,4 +46,7 @@ public interface StudyService {
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 
 	TrialImportResponse createTrials(String cropName, List<TrialImportRequestDTO> trialImportRequestDTOs);
+
+	void deleteStudy(Integer studyId);
+
 }

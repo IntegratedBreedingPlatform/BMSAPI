@@ -125,4 +125,13 @@ public class StudyResource {
 		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK );
 	}
 
+	@ApiOperation(value = "Delete a study", notes = "Delete a study")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@ResponseBody
+	public ResponseEntity<Void> deleteStudy(final @PathVariable String cropName, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId) {
+		this.studyService.deleteStudy(studyId);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
 }
