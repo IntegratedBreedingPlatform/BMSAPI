@@ -49,8 +49,6 @@ public class GermplasmNameRequestValidatorTest {
 	@InjectMocks
 	private GermplasmNameRequestValidator germplasmNameRequestValidator;
 
-	private final String programUUID = RandomStringUtils.randomAlphabetic(10);
-
 	@Before
 	public void setup() {
 		Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.any()))

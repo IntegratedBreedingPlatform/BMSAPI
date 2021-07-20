@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.inventory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.hamcrest.CoreMatchers;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -27,11 +26,6 @@ import java.util.List;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 public class GermplasmValidatorTest {
-
-	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
-	public static final int LOCATION_ID = 6000;
-	public static final String STOCK_ID = "ABCD";
-	public static final String COMMENTS = "Comments";
 
 	@Mock
 	private GermplasmService germplasmService;

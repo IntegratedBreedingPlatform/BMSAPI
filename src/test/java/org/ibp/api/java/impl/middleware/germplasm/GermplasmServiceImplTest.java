@@ -7,8 +7,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -37,17 +35,8 @@ import static org.junit.Assert.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class GermplasmServiceImplTest {
 
-	private static final int PAGE_SIZE = 10;
-	private static final int PAGE = 1;
-
 	@Mock
 	private GermplasmService middlewareGermplasmService;
-
-	@Mock
-	private PedigreeService pedigreeService;
-
-	@Mock
-	private CrossExpansionProperties crossExpansionProperties;
 
 	@Mock
 	private GermplasmDeleteValidator germplasmDeleteValidator;
