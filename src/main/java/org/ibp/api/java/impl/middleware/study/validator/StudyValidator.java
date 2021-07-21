@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -8,6 +9,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
@@ -36,11 +38,14 @@ public class StudyValidator {
 	@Autowired
 	private StudyService studyService;
 
+	@Autowired
+	private UserService userService;
+
 	private BindingResult errors;
 
 	public void validate(final Integer studyId, final Boolean shouldBeUnlocked) {
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
 		if (studyId == null) {
 			this.errors.reject("study.required", "");
@@ -77,7 +82,7 @@ public class StudyValidator {
 
 	private void checkIfStudyIsLockedForCurrentUser(final Study study) {
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 
 		if (study.isLocked()
@@ -96,7 +101,7 @@ public class StudyValidator {
 			final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 			final List<Integer> restrictedInstances =
 				studyInstances.stream().filter(instance -> BooleanUtils.isFalse(instance.getCanBeDeleted()))
-					.map(instance -> instance.getInstanceNumber()).collect(Collectors.toList());
+					.map(StudyInstance::getInstanceNumber).collect(Collectors.toList());
 			if (!restrictedInstances.isEmpty()) {
 				this.errors.reject("at.least.one.instance.cannot.be.deleted");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -108,7 +113,7 @@ public class StudyValidator {
 		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 		final List<Integer> restrictedInstances =
 			studyInstances.stream().filter(instance -> BooleanUtils.isTrue(instance.isHasExperimentalDesign()))
-				.map(instance -> instance.getInstanceNumber()).collect(Collectors.toList());
+				.map(StudyInstance::getInstanceNumber).collect(Collectors.toList());
 		if (!restrictedInstances.isEmpty()) {
 			this.errors.reject("study.must.not.have.observation");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -117,18 +122,42 @@ public class StudyValidator {
 	}
 
 	public void validateHasNoCrossesOrSelections(final Integer studyId) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		if (this.studyService.hasCrossesOrSelections(studyId)) {
-			errors.reject("study.has.crosses.or.selections");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("study.has.crosses.or.selections");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
 	public void validateStudyHasNoMeansDataset(final Integer studyId) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		if (this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId())) {
-			errors.reject("study.has.means.dataset");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("study.has.means.dataset");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validateDeleteStudy(final Integer studyId) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		final Study study = this.studyDataManager.getStudy(studyId, false);
+
+		if (study == null) {
+			this.errors.reject("study.not.exist", "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+
+		if (StringUtils.isBlank(study.getProgramUUID())) {
+			this.errors.reject("study.template.delete.not.permitted");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		final Integer studyUserId = study.getUser();
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		if (!user.getUserid().equals(studyUserId)) {
+			final WorkbenchUser workbenchUser = this.userService.getUserById(studyUserId);
+			this.errors.reject("study.delete.not.permitted", new String[] {workbenchUser.getPerson().getDisplayName()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+
 		}
 	}
 

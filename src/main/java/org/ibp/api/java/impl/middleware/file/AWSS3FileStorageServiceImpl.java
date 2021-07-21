@@ -39,16 +39,15 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 	private String region;
 
 	@Override
-	public Map<String, String> upload(final MultipartFile file, final String key) {
+	public void upload(final MultipartFile file, final String path) {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 
 			final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
 				.bucket(this.bucketName)
-				.key(key)
+				.key(path)
 				.build();
 			final PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
-			return Collections.singletonMap("key", key);
 		} catch (final SdkClientException e) {
 			// Amazon S3 couldn't be contacted for a response, or the client
 			// couldn't parse the response from Amazon S3.
@@ -59,13 +58,13 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 	}
 
 	@Override
-	public byte[] getFile(final String key) {
+	public byte[] getFile(final String path) {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 
 			final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
 				.bucket(this.bucketName)
-				.key(key)
+				.key(path)
 				.build();
 			final ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
 

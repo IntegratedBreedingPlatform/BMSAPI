@@ -1,19 +1,17 @@
 
 package org.ibp.api.exception;
 
-import org.springframework.validation.ObjectError;
-
-import java.util.List;
-
-public class ApiValidationException extends RuntimeException {
+/**
+ * TODO migrate {@link ApiRuntimeException} and rename this to ApiRuntimeException
+ */
+public class ApiRuntime2Exception extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
 	private final String errorCode;
 	private final Object[] params;
 
-	// TODO merge with ApiRequestValidationException, add another constructor there
-	public ApiValidationException(final String logMessage, final String errorCode, final Object... params) {
+	public ApiRuntime2Exception(final String logMessage, final String errorCode, final Object... params) {
 		super(logMessage);
 		this.errorCode = errorCode;
 		this.params = params;

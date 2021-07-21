@@ -38,18 +38,18 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 	private JSch jsch;
 
 	@Override
-	public Map<String, String> upload(final MultipartFile file, final String key) {
+	public void upload(final MultipartFile file, final String path) {
 		ChannelSftp channelSftp = null;
 		try {
 			channelSftp = this.setupJsch();
 			channelSftp.connect();
 
-			final String[] keyParts = key.split("/");
-			if (keyParts.length > 1) {
-				this.createFolders(channelSftp, Arrays.copyOfRange(keyParts, 0, keyParts.length - 1));
+			final String[] pathParts = path.split("/");
+			if (pathParts.length > 1) {
+				this.createFolders(channelSftp, Arrays.copyOfRange(pathParts, 0, pathParts.length - 1));
 			}
 
-			channelSftp.put(file.getInputStream(), keyParts[keyParts.length - 1]);
+			channelSftp.put(file.getInputStream(), pathParts[pathParts.length - 1]);
 		} catch (final JSchException e) {
 			throw new ApiRuntimeException("", e);
 		} catch (final SftpException e) {
@@ -59,17 +59,16 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 		} finally {
 			close(channelSftp);
 		}
-		return Collections.singletonMap("key", key);
 	}
 
 	@Override
-	public byte[] getFile(final String key) {
+	public byte[] getFile(final String path) {
 		ChannelSftp channelSftp = null;
 		byte[] bytes;
 		try {
 			channelSftp = this.setupJsch();
 			channelSftp.connect();
-			final InputStream inputStream = channelSftp.get(key);
+			final InputStream inputStream = channelSftp.get(path);
 			bytes = IOUtils.toByteArray(inputStream);
 		} catch (final JSchException e) {
 			throw new ApiRuntimeException("", e);
