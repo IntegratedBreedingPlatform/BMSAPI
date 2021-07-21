@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.file.validator;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,7 @@ public class FileValidator {
 	private void validateExtension(final BindingResult errors, final String fileName) {
 		final String extension = FilenameUtils.getExtension(fileName);
 		if (!this.supportedFileTypes.contains(extension.toLowerCase())) {
-			errors.reject("file.upload.not-supported",  new String[] {Util.buildErrorMessageFromList(this.supportedFileTypes, this.supportedFileTypes.size())}, "");
+			errors.reject("file.upload.not-supported",  new String[] {StringUtils.join(this.supportedFileTypes, ", ")}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
