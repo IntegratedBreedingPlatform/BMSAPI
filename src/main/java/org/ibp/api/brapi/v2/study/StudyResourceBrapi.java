@@ -127,6 +127,10 @@ public class StudyResourceBrapi {
 		@RequestParam(value = "germplasmDbid", required = false) final String germplasmDbid,
 		@ApiParam(value = "Filter to only return studies associated with given observation variable id")
 		@RequestParam(value = "observationVariableDbId", required = false) final Integer observationVariableDbId,
+		@ApiParam(value = "Filter to only return studies associated with given external reference ID. Could be a simple string or a URI. (use with externalReferenceSource parameter")
+		@RequestParam(value = "externalReferenceId", required = false) final String externalReferenceId,
+		@ApiParam(value = "An identifier for the source system or database of an external reference (use with externalReferenceID parameter")
+		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource,
 		@ApiParam(value = "Filter active status true/false") @RequestParam(value = "active", required = false) final Boolean active,
 		@ApiParam(value = "Sort order. Name of the field to sort by.") @RequestParam(value = "sortBy", required = false)
 		final String sortBy,
@@ -159,6 +163,8 @@ public class StudyResourceBrapi {
 		studySearchFilter.setObservationVariableDbId(observationVariableDbId);
 		studySearchFilter.setTrialName(trialName);
 		studySearchFilter.setStudyPUI(studyPUI);
+		studySearchFilter.setExternalReferenceID(externalReferenceId);
+		studySearchFilter.setExternalReferenceSource(externalReferenceSource);
 
 		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
