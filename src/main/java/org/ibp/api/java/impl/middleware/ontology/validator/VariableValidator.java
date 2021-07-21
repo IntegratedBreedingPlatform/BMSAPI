@@ -78,7 +78,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getId());
 
 	private static final List<Integer> VARIABLE_TYPES_WITH_FILE_DATA_TYPE_RESTRICTION = Arrays.asList( //
-			org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getId(),
+		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getId(), //
 		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getId());
 
 	@Override
