@@ -31,6 +31,7 @@ public abstract class BaseValidator {
 	protected static final String LIST_SHOULD_NOT_BE_EMPTY = "list.should.not.be.empty";
 	protected static final String MIN_MAX_NOT_VALID = "min.max.not.valid";
 	protected static final String MIN_SHOULD_NOT_GREATER_THEN_MAX = "min.should.not.be.greater.than.max";
+	protected static final String SCALE_TYPE_INVALID_COMBINATION_WITH_VARIABLE_TYPE = "scale.type.invalid.with.specific.variable.type";
 
 	protected boolean isNonNullValidNumericString(Object value) {
 		return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));

@@ -77,6 +77,10 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getId(), //
 		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getId());
 
+	private static final List<Integer> VARIABLE_TYPES_WITH_FILE_DATA_TYPE_RESTRICTION = Arrays.asList( //
+			org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getId(),
+		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getId());
+
 	@Override
 	public boolean supports(final Class<?> aClass) {
 		return VariableDetails.class.equals(aClass);
@@ -386,6 +390,18 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				// range maximum must be greater than or equal to the expected range minimum
 				if (variableExpectedMin != null && variableExpectedMax != null && variableExpectedMin.compareTo(variableExpectedMax) == 1) {
 					this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME, BaseValidator.MIN_SHOULD_NOT_GREATER_THEN_MAX, null);
+				}
+			}
+
+			final boolean isFileType = Objects.equals(scale.getDataType(), DataType.FILE_VARIABLE);
+			// Temporally restriction for Germplasm Attributes and Passport Variable Types.
+			if (isFileType) {
+				final boolean isAttributeOrPassport = variable.getVariableTypes().stream().anyMatch(variableType ->
+					VARIABLE_TYPES_WITH_FILE_DATA_TYPE_RESTRICTION.contains(Integer.valueOf(variableType.getId())));
+
+				if (isAttributeOrPassport) {
+					this.addCustomError(errors, "scale", BaseValidator.SCALE_TYPE_INVALID_COMBINATION_WITH_VARIABLE_TYPE, null);
+					return false;
 				}
 			}
 
