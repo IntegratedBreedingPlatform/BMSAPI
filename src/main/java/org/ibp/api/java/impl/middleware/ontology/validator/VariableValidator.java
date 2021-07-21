@@ -70,6 +70,10 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String SCALE_ID_NAME = "scaleId";
 	private static final String EXPECTED_RANGE_NAME = "expectedRange";
 	private static final String VARIABLE_NAME = "variable";
+	private static final String VARIABLE_TYPES_NAME = "variableTypes";
+	private static final String ALIAS_NAME = "alias";
+	private static final String VARIABLE_TYPE = "Variable Type";
+
 	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
 		org.generationcp.middleware.domain.ontology.VariableType.TRAIT.getId(), //
 		org.generationcp.middleware.domain.ontology.VariableType.SELECTION_METHOD.getId(), //
@@ -147,7 +151,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 3. The name must be unique
-		this.checkVariableUniqueness("Name", "a Name", StringUtil.parseInt(variable.getId(), null), variable.getName(),
+		this.checkVariableUniqueness("Name", StringUtil.parseInt(variable.getId(), null), variable.getName(),
 			CvId.VARIABLES.getId(), errors); //
 
 		if (errors.getErrorCount() > initialCount) {
@@ -155,7 +159,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 3.1. The alias must be unique
-		this.checkVariableAliasUniqueness("Name", "an Alias", variable.getId(), variable.getName(), variable.getProgramUuid(), errors);
+		this.checkVariableAliasUniqueness("Name", variable.getId(), variable.getName(), variable.getProgramUuid(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -176,7 +180,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		if(variable.getAlias().equalsIgnoreCase(variable.getName())){
-			this.addCustomError(errors, "alias", BaseValidator.NAME_AND_ALIAS_ARE_EQUALS, null);
+			this.addCustomError(errors, VariableValidator.ALIAS_NAME, BaseValidator.NAME_AND_ALIAS_ARE_EQUALS, null);
 			return false;
 		}
 
@@ -184,21 +188,21 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		variable.setAlias(variable.getAlias().trim());
 
 		// Name is no more than 32 characters
-		this.fieldShouldNotOverflow("alias", variable.getAlias(), VariableValidator.NAME_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow(VariableValidator.ALIAS_NAME, variable.getAlias(), VariableValidator.NAME_TEXT_LIMIT, errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		// Name must only contain alphanumeric characters, underscores and cannot start with a number
-		this.fieldShouldHaveValidPattern("alias", variable.getAlias(), "alias", errors);
+		this.fieldShouldHaveValidPattern(VariableValidator.ALIAS_NAME, variable.getAlias(), VariableValidator.ALIAS_NAME, errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		// The name must be unique
-		this.checkVariableUniqueness("Alias", "a Name", StringUtil.parseInt(variable.getId(), null), variable.getAlias(),
+		this.checkVariableUniqueness("Alias", StringUtil.parseInt(variable.getId(), null), variable.getAlias(),
 			CvId.VARIABLES.getId(), errors); //
 
 		if (errors.getErrorCount() > initialCount) {
@@ -206,19 +210,19 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// The alias must be unique
-		this.checkVariableAliasUniqueness("Alias", "an Alias", variable.getId(), variable.getAlias(), variable.getProgramUuid(), errors);
+		this.checkVariableAliasUniqueness("Alias", variable.getId(), variable.getAlias(), variable.getProgramUuid(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private void checkVariableAliasUniqueness(final String fieldName, final String termName, final String variableId, final String alias, final String programUUUid, final Errors errors) {
+	private void checkVariableAliasUniqueness(final String fieldName, final String variableId, final String alias, final String programUUUid, final Errors errors) {
 		final Integer varId = StringUtils.isNotBlank(variableId) ? Integer.parseInt(variableId) : null;
 		final List<VariableOverridesDto> variableOverridesList =
 			this.ontologyVariableDataManager.getVariableOverridesByAliasAndProgram(alias, programUUUid);
 
 		if (!variableOverridesList.isEmpty() && //
 			(variableOverridesList.size() != 1 || varId == null || !variableOverridesList.get(0).getVariableId().equals(varId))) {
-			this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, termName});
+			this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, "an Alias"});
 		}
 	}
 
@@ -344,7 +348,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 				final String variableMin = variable.getExpectedRange().getMin() == null ? null : variable.getExpectedRange().getMin();
 
-				if (!this.isNullOrEmpty(variableMin)) {
+				if (!BaseValidator.isNullOrEmpty(variableMin)) {
 					variableExpectedMin = StringUtil.parseBigDecimal(variableMin, null);
 					if (variableExpectedMin == null) {
 						this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME + ".min", BaseValidator.FIELD_SHOULD_BE_NUMERIC,
@@ -354,7 +358,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 				final String variableMax = variable.getExpectedRange().getMax() == null ? null : variable.getExpectedRange().getMax();
 
-				if (!this.isNullOrEmpty(variableMax)) {
+				if (!BaseValidator.isNullOrEmpty(variableMax)) {
 					variableExpectedMax = StringUtil.parseBigDecimal(variableMax, null);
 					if (variableExpectedMax == null) {
 						this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME + ".max", BaseValidator.FIELD_SHOULD_BE_NUMERIC,
@@ -418,7 +422,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		// 17. Variable type IDs is required
 		if (variable.getVariableTypes().isEmpty()) {
-			this.addCustomError(errors, "variableTypes", BaseValidator.LIST_SHOULD_NOT_BE_EMPTY, new Object[] {"variable type"});
+			this.addCustomError(errors, VariableValidator.VARIABLE_TYPES_NAME, BaseValidator.LIST_SHOULD_NOT_BE_EMPTY, new Object[] {"variable type"});
 		}
 
 		if (errors.getErrorCount() > initialCount) {
@@ -434,7 +438,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			final org.generationcp.middleware.domain.ontology.VariableType type =
 				org.generationcp.middleware.domain.ontology.VariableType.getById(this.parseVariableTypeAsInteger(variableType));
 			if (type == null) {
-				this.addCustomError(errors, "variableTypes", BaseValidator.INVALID_TYPE_ID, new Object[] {"Variable Type"});
+				this.addCustomError(errors, VariableValidator.VARIABLE_TYPES_NAME, BaseValidator.INVALID_TYPE_ID, new Object[] {VariableValidator.VARIABLE_TYPE});
 			} else if (type.equals(org.generationcp.middleware.domain.ontology.VariableType.TRAIT)) {
 				isTrait = true;
 			}
@@ -445,20 +449,20 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true);
 
 			if (oldVariable.getFormula() != null) {
-				this.addCustomError(errors, "variableTypes", "variable.type.formula", new Object[] {});
+				this.addCustomError(errors, VariableValidator.VARIABLE_TYPES_NAME, "variable.type.formula", new Object[] {});
 			}
 		}
 
         if(this.isAnalysisVariable(variable) && variable.getVariableTypes().size() > 1) {
-				this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE, new Object[]{"Variable Type"});
+				this.addCustomError(errors, VariableValidator.VARIABLE_TYPES_NAME, VariableValidator.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE, new Object[]{VariableValidator.VARIABLE_TYPE});
 		}
 
 		if (this.isGermplasmAttributeVariable(variable) && variable.getVariableTypes().size() > 1) {
-			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+			this.addCustomError(errors, VariableValidator.VARIABLE_TYPES_NAME, VariableValidator.VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {VariableValidator.VARIABLE_TYPE});
 		}
 
 		if (this.isGermplasmPassportVariable(variable) && variable.getVariableTypes().size() > 1) {
-			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+			this.addCustomError(errors, VariableValidator.VARIABLE_TYPES_NAME, VariableValidator.VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE, new Object[] {VariableValidator.VARIABLE_TYPE});
 		}
 
 		return errors.getErrorCount() == initialCount;
@@ -466,15 +470,15 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	private void aliasValidation(final VariableDetails variable, final Errors errors) {
 
-		if (!this.isNullOrEmpty(variable.getAlias())) {
+		if (!BaseValidator.isNullOrEmpty(variable.getAlias())) {
 			// Trim alias
 			variable.setAlias(variable.getAlias().trim());
 
 			// 20. Alias is no more than 32 characters
-			this.fieldShouldNotOverflow("alias", variable.getAlias(), VariableValidator.NAME_TEXT_LIMIT, errors);
+			this.fieldShouldNotOverflow(VariableValidator.ALIAS_NAME, variable.getAlias(), VariableValidator.NAME_TEXT_LIMIT, errors);
 
 			// 21. Alias must only contain alphanumeric characters, underscores and cannot start with a number
-			this.fieldShouldHaveValidPattern("alias", variable.getAlias(), "Alias", errors);
+			this.fieldShouldHaveValidPattern(VariableValidator.ALIAS_NAME, variable.getAlias(), "Alias", errors);
 		}
 	}
 
@@ -531,9 +535,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			final boolean propertyEqual = Objects.equals(propertyId, oldVariable.getProperty().getId());
 			final boolean methodEqual = Objects.equals(methodId, oldVariable.getMethod().getId());
 			final boolean scaleEqual = Objects.equals(scaleId, oldVariable.getScale().getId());
-			final boolean minValuesEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
-			final boolean maxValuesEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
-			final boolean aliasEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getAlias(), oldVariable.getAlias());
+			final boolean minValuesEqual = editableVariable ? editableVariable : StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
+			final boolean maxValuesEqual = editableVariable ? editableVariable : StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
+			final boolean aliasEqual = editableVariable ? editableVariable : StringUtil.areBothEmptyOrEqual(variable.getAlias(), oldVariable.getAlias());
 
 			if (!nameEqual) {
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
@@ -542,7 +546,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			}
 
 			if (!aliasEqual) {
-				this.addCustomError(errors, "alias", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
+				this.addCustomError(errors, VariableValidator.ALIAS_NAME, BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
 						"Alias"});
 				return;
 			}
@@ -571,7 +575,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			}
             
             if (! areAllPreviousVariableTypesPresent(oldVariable.getVariableTypes(), variable.getVariableTypes())) {
-                this.addCustomError(errors, "variableTypes", "variable.type.in.use", new Object[] {});
+                this.addCustomError(errors, VariableValidator.VARIABLE_TYPES_NAME, "variable.type.in.use", new Object[] {});
             }
 
 		} catch (final Exception e) {
@@ -659,7 +663,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		this.checkTermExist(Name, String.valueOf(variableId), cvId, errors);
 	}
 
-	protected void checkVariableUniqueness(final String fieldName, final String fieldUsedAs, final Integer id, final String nameOrAlias,
+	protected void checkVariableUniqueness(final String fieldName, final Integer id, final String nameOrAlias,
 		final Integer cvId, final Errors errors) {
 
 		Term term = this.termDataManager.getTermByNameAndCvId(nameOrAlias, cvId);
@@ -667,15 +671,15 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return;
 		}
 
-		if (Objects.equals(id, null) && Objects.equals(term, null)) {
+		if (Objects.equals(id, null)) {
 			return;
 		}
 
-		if (id != null && Objects.equals(id, term.getId())) {
+		if (Objects.equals(id, term.getId())) {
 			return;
 		}
 
-		this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, fieldUsedAs});
+		this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, "a Name"});
 
 	}
 }
