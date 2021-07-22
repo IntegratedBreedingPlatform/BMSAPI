@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.nullValue;
 
 @RunWith(MockitoJUnitRunner.class)
-public class GermplasmServieBrapiImplTest {
+public class GermplasmServiceBrapiImplTest {
 
 	private static final int PAGE_SIZE = 10;
 	private static final int PAGE = 1;
