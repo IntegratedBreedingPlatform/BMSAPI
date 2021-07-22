@@ -42,6 +42,26 @@ public class GermplasmNameTypeResource {
 		return new ResponseEntity<>(this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Update a name type", notes = "Update a name type")
+	@RequestMapping(value = "/crops/{cropName}/name-types/{nameTypeId}", method = RequestMethod.PATCH)
+	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	@ResponseBody
+	public ResponseEntity<Void> updateNameType(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId, @RequestBody final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
+		this.germplasmNameTypeService.updateNameType(germplasmNameTypeRequestDTO,nameTypeId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Delete a name type", notes = "Delete a name type")
+	@RequestMapping(value = "/crops/{cropName}/name-types/{nameTypeId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	@ResponseBody
+	public ResponseEntity<Void> deleteNameType(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId) {
+		this.germplasmNameTypeService.deleteNameType(nameTypeId);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
 	@ApiOperation(value = "It will retrieve all name types", notes = "It will retrieve all name types")
 	@RequestMapping(value = "/crops/{cropName}/name-types", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN')")

@@ -14,4 +14,8 @@ public interface GermplasmNameTypeService {
 
 	Integer createNameType(GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
 
+	void updateNameType(GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO, Integer nameTypeId);
+
+	void deleteNameType(Integer nameTypeId);
+
 }
