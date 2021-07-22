@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 @Component
 public class GermplasmUpdateRequestValidator {
 
+	public static final String GERMPLASM_UPDATE_NAME_EXCEEDED_LENGTH = "germplasm.update.name.exceeded.length";
+	public static final String GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH = "germplasm.update.attribute.exceeded.length";
 	private BindingResult errors;
 
 	@Autowired
@@ -37,7 +39,7 @@ public class GermplasmUpdateRequestValidator {
 
 	public void validate(final GermplasmUpdateRequest germplasmUpdateRequest) {
 		BaseValidator.checkNotNull(germplasmUpdateRequest, "germplasm.update.request.null");
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmUpdateRequest.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmUpdateRequest.class.getName());
 
 		final Set<String> nameKeys = new HashSet<>();
 
@@ -65,13 +67,13 @@ public class GermplasmUpdateRequestValidator {
 			this.errors.reject("germplasm.update.duplicated.name.types");
 		}
 		if (this.areNameValuesInvalid(germplasmUpdateRequest.getSynonyms().stream().map(Synonym::getSynonym).collect(Collectors.toList()))) {
-			this.errors.reject("germplasm.update.name.exceeded.length", new String[] {"synonyms"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_NAME_EXCEEDED_LENGTH, new String[] {"synonyms"}, "");
 		}
 
 		// Validations on attributes
 		this.validateCustomAttributeFields(germplasmUpdateRequest);
 		if (this.areAttributesInvalid(germplasmUpdateRequest.getAdditionalInfo())) {
-			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"additionalInfo"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"additionalInfo"}, "");
 		}
 
 		if (this.errors.hasErrors()) {
@@ -81,49 +83,49 @@ public class GermplasmUpdateRequestValidator {
 
 	private void validateCustomNameFields(final GermplasmUpdateRequest g) {
 		if (!StringUtils.isEmpty(g.getDefaultDisplayName()) && this.nameExceedsLength(g.getDefaultDisplayName())) {
-			this.errors.reject("germplasm.update.name.exceeded.length", new String[] {"defaultDisplayName"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_NAME_EXCEEDED_LENGTH, new String[] {"defaultDisplayName"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getAccessionNumber()) && this.nameExceedsLength(g.getAccessionNumber())) {
-			this.errors.reject("germplasm.update.name.exceeded.length", new String[] {"accessionNumber"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_NAME_EXCEEDED_LENGTH, new String[] {"accessionNumber"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getGenus()) && this.nameExceedsLength(g.getGenus())) {
-			this.errors.reject("germplasm.update.name.exceeded.length", new String[] {"genus"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_NAME_EXCEEDED_LENGTH, new String[] {"genus"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getPedigree()) && this.nameExceedsLength(g.getPedigree())) {
-			this.errors.reject("germplasm.update.name.exceeded.length", new String[] {"pedigree"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_NAME_EXCEEDED_LENGTH, new String[] {"pedigree"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getGermplasmPUI()) && this.nameExceedsLength(g.getGermplasmPUI())) {
-			this.errors.reject("germplasm.update.name.exceeded.length", new String[] {"germplasmPUI"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_NAME_EXCEEDED_LENGTH, new String[] {"germplasmPUI"}, "");
 		}
 	}
 
 	private void validateCustomAttributeFields(final GermplasmUpdateRequest g) {
 		if (!StringUtils.isEmpty(g.getCommonCropName()) && this.attributeExceedsLength(g.getCommonCropName())) {
-			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"commonCropName"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"commonCropName"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getGermplasmOrigin()) && this.attributeExceedsLength(g.getGermplasmOrigin())) {
-			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"germplasmOrigin"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"germplasmOrigin"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getInstituteCode()) && this.attributeExceedsLength(g.getInstituteCode())) {
-			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"instituteCode"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"instituteCode"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getInstituteName()) && this.attributeExceedsLength(g.getInstituteName())) {
-			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"instituteName"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"instituteName"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getSeedSource()) && this.attributeExceedsLength(g.getSeedSource())) {
-			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"seedSource"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"seedSource"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getSpecies()) && this.attributeExceedsLength(g.getSpecies())) {
-			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"species"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"species"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getSpeciesAuthority()) && this.attributeExceedsLength(g.getSpeciesAuthority())) {
-			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"speciesAuthority"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"speciesAuthority"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getSubtaxa()) && this.attributeExceedsLength(g.getSubtaxa())) {
-			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"subtaxa"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"subtaxa"}, "");
 		}
 		if (!StringUtils.isEmpty(g.getSubtaxaAuthority()) && this.attributeExceedsLength(g.getSubtaxaAuthority())) {
-			this.errors.reject("germplasm.update.attribute.exceeded.length", new String[] {"subtaxaAuthority"}, "");
+			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"subtaxaAuthority"}, "");
 		}
 	}
 
@@ -146,9 +148,7 @@ public class GermplasmUpdateRequestValidator {
 
 
 	protected boolean areNameValuesInvalid(final Collection<String> values) {
-		return values.stream().anyMatch(n -> {
-			return this.nameExceedsLength(n);
-		});
+		return values.stream().anyMatch(this::nameExceedsLength);
 	}
 
 	protected boolean areAttributesInvalid(final Map<String, String> attributes) {
@@ -162,18 +162,9 @@ public class GermplasmUpdateRequestValidator {
 			if (attributes.keySet().size() != attributeKeys.size()) {
 				return true;
 			}
-			if (attributes.values().stream().anyMatch(n -> {
-				if (StringUtils.isEmpty(n)) {
-					return true;
-				}
-				if (this.attributeExceedsLength(n)) {
-					return true;
-				}
-				return false;
-			})) {
-				return true;
-			}
-			return false;
+			return (attributes.values().stream().anyMatch(n ->
+				StringUtils.isEmpty(n) || this.attributeExceedsLength(n)
+			));
 		}
 		return false;
 	}
