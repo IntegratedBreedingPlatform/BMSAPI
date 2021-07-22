@@ -14,7 +14,7 @@ import org.ibp.api.brapi.GermplasmServiceBrapi;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
 import org.ibp.api.brapi.v2.germplasm.GermplasmUpdateRequestValidator;
-import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
@@ -56,8 +56,6 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 
 	@Autowired
 	private InstanceValidator instanceValidator;
-
-	private BindingResult errors;
 
 	@Override
 	public GermplasmImportResponse createGermplasm(final String cropName, final List<GermplasmImportRequest> germplasmImportRequestList) {
@@ -128,7 +126,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to search germplasm", e);
+			throw new ApiRuntime2Exception("", "An error has occurred when trying to search germplasm");
 		}
 	}
 
@@ -137,7 +135,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 		try {
 			return this.germplasmServiceBrapi.countGermplasmDTOs(germplasmSearchRequestDTO);
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to count germplasm", e);
+			throw new ApiRuntime2Exception("", "An error has occurred when trying to count germplasm");
 		}
 	}
 
@@ -146,7 +144,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 		try {
 			return this.germplasmServiceBrapi.countGermplasmByStudy(studyDbId);
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to count germplasm", e);
+			throw new ApiRuntime2Exception("", "An error has occurred when trying to count germplasm");
 		}
 	}
 
@@ -162,7 +160,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to search germplasm", e);
+			throw new ApiRuntime2Exception("", "An error has occurred when trying to search germplasm");
 		}
 	}
 
@@ -178,10 +176,10 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 	}
 
 	private void validateGermplasmUUID(final String germplasmUUID) {
-		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmUUID);
-		if (this.errors.hasErrors()) {
-			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGermplasmUUID(errors, germplasmUUID);
+		if (errors.hasErrors()) {
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 	}
 

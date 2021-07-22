@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -35,6 +34,8 @@ public class GermplasmImportRequestValidator {
 
 	public static final Integer NAME_MAX_LENGTH = 255;
 	public static final Integer ATTRIBUTE_MAX_LENGTH = 255;
+	public static final String GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH = "germplasm.create.name.exceeded.length";
+	public static final String GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH = "germplasm.create.attribute.exceeded.length";
 
 	protected BindingResult errors;
 
@@ -49,7 +50,7 @@ public class GermplasmImportRequestValidator {
 
 	public BindingResult pruneGermplasmInvalidForImport(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
 		BaseValidator.checkNotEmpty(germplasmImportRequestDtoList, "germplasm.import.list.null");
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequest.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmImportRequest.class.getName());
 
 		if (!germplasmImportRequestDtoList.stream().filter(i -> Collections.frequency(germplasmImportRequestDtoList, i) > 1)
 			.collect(Collectors.toSet()).isEmpty()) {
@@ -118,7 +119,7 @@ public class GermplasmImportRequestValidator {
 				return true;
 			}
 			if (this.areNameValuesInvalid(g.getSynonyms().stream().map(Synonym::getSynonym).collect(Collectors.toList()))) {
-				this.errors.reject("germplasm.create.name.exceeded.length", new String[] {index.toString(), "synonyms"}, "");
+				this.errors.reject(GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH, new String[] {index.toString(), "synonyms"}, "");
 				return true;
 			}
 
@@ -126,15 +127,11 @@ public class GermplasmImportRequestValidator {
 			if (this.isAnyCustomAttributeFieldInvalid(g, index))
 				return true;
 			if (this.areAttributesInvalid(g.getAdditionalInfo())) {
-				this.errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "additionalInfo"}, "");
+				this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "additionalInfo"}, "");
 				return true;
 			}
 
-			if (this.isAnyExternalReferenceInvalid(g, index)) {
-				return true;
-			}
-
-			return false;
+			return this.isAnyExternalReferenceInvalid(g, index);
 		});
 
 		return this.errors;
@@ -164,19 +161,19 @@ public class GermplasmImportRequestValidator {
 
 	private boolean isAnyCustomNameFieldInvalid(final GermplasmImportRequest g, final Integer index) {
 		if (this.nameExceedsLength(g.getDefaultDisplayName())) {
-			this.errors.reject("germplasm.create.name.exceeded.length", new String[] {index.toString(), "defaultDisplayName"}, "");
+			this.errors.reject(GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH, new String[] {index.toString(), "defaultDisplayName"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getAccessionNumber()) && this.nameExceedsLength(g.getAccessionNumber())) {
-			this.errors.reject("germplasm.create.name.exceeded.length", new String[] {index.toString(), "accessionNumber"}, "");
+			this.errors.reject(GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH, new String[] {index.toString(), "accessionNumber"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getGenus()) && this.nameExceedsLength(g.getGenus())) {
-			this.errors.reject("germplasm.create.name.exceeded.length", new String[] {index.toString(), "genus"}, "");
+			this.errors.reject(GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH, new String[] {index.toString(), "genus"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getPedigree()) && this.nameExceedsLength(g.getPedigree())) {
-			this.errors.reject("germplasm.create.name.exceeded.length", new String[] {index.toString(), "pedigree"}, "");
+			this.errors.reject(GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH, new String[] {index.toString(), "pedigree"}, "");
 			return true;
 		}
 		return false;
@@ -184,39 +181,39 @@ public class GermplasmImportRequestValidator {
 
 	protected boolean isAnyCustomAttributeFieldInvalid(final GermplasmImportRequest g, final Integer index) {
 		if (!StringUtils.isEmpty(g.getCommonCropName()) && this.attributeExceedsLength(g.getCommonCropName())) {
-			this.errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "commonCropName"}, "");
+			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "commonCropName"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getGermplasmOrigin()) && this.attributeExceedsLength(g.getGermplasmOrigin())) {
-			this.errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "germplasmOrigin"}, "");
+			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "germplasmOrigin"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getInstituteCode()) && this.attributeExceedsLength(g.getInstituteCode())) {
-			this.errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "instituteCode"}, "");
+			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "instituteCode"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getInstituteName()) && this.attributeExceedsLength(g.getInstituteName())) {
-			this.errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "instituteName"}, "");
+			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "instituteName"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getSeedSource()) && this.attributeExceedsLength(g.getSeedSource())) {
-			this.errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "seedSource"}, "");
+			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "seedSource"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getSpecies()) && this.attributeExceedsLength(g.getSpecies())) {
-			this.errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "species"}, "");
+			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "species"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getSpeciesAuthority()) && this.attributeExceedsLength(g.getSpeciesAuthority())) {
-			this.errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "speciesAuthority"}, "");
+			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "speciesAuthority"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getSubtaxa()) && this.attributeExceedsLength(g.getSubtaxa())) {
-			this.errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "subtaxa"}, "");
+			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "subtaxa"}, "");
 			return true;
 		}
 		if (!StringUtils.isEmpty(g.getSubtaxaAuthority()) && this.attributeExceedsLength(g.getSubtaxaAuthority())) {
-			this.errors.reject("germplasm.create.attribute.exceeded.length", new String[] {index.toString(), "subtaxaAuthority"}, "");
+			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "subtaxaAuthority"}, "");
 			return true;
 		}
 		return false;
@@ -241,9 +238,7 @@ public class GermplasmImportRequestValidator {
 	}
 
 	private List<String> collectGermplasmPUIs(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
-		final List<String> puisList = new ArrayList<>();
-		germplasmImportRequestDtoList.forEach(i -> puisList.addAll(i.collectGermplasmPUIs()));
-		return puisList;
+		return germplasmImportRequestDtoList.stream().map(GermplasmImportRequest::collectGermplasmPUIs).flatMap(List::stream).collect(Collectors.toList());
 	}
 
 	protected Set<String> getDuplicatedGermplasmPUIs(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
@@ -271,10 +266,7 @@ public class GermplasmImportRequestValidator {
 			if (StringUtils.isEmpty(n)) {
 				return true;
 			}
-			if (this.nameExceedsLength(n)) {
-				return true;
-			}
-			return false;
+			return this.nameExceedsLength(n);
 		});
 	}
 
@@ -289,15 +281,7 @@ public class GermplasmImportRequestValidator {
 			if (attributes.keySet().size() != attributeKeys.size()) {
 				return true;
 			}
-			if (attributes.values().stream().anyMatch(n -> {
-				if (StringUtils.isNotEmpty(n) && this.attributeExceedsLength(n)) {
-					return true;
-				}
-				return false;
-			})) {
-				return true;
-			}
-			return false;
+			return attributes.values().stream().anyMatch(n -> StringUtils.isNotEmpty(n) && this.attributeExceedsLength(n));
 		}
 		return false;
 	}

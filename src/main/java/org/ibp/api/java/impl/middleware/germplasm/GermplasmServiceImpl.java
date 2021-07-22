@@ -212,7 +212,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public long countGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto) {
 		BaseValidator.checkNotNull(germplasmMatchRequestDto, "germplasm.match.request.null");
 		if (!germplasmMatchRequestDto.isValid()) {
-			this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
+			this.errors = new MapBindingResult(new HashMap<>(), GermplasmMatchRequestDto.class.getName());
 			this.errors.reject("germplasm.match.request.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -223,7 +223,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmDto> findGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto, final Pageable pageable) {
 		BaseValidator.checkNotNull(germplasmMatchRequestDto, "germplasm.match.request.null");
 		if (!germplasmMatchRequestDto.isValid()) {
-			this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmMatchRequestDto.class.getName());
+			this.errors = new MapBindingResult(new HashMap<>(), GermplasmMatchRequestDto.class.getName());
 			this.errors.reject("germplasm.match.request.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -248,39 +248,31 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return new GermplasmDeleteResponse(invalidGidsForDeletion, validGermplasmForDeletion);
 	}
 
-	private void validateGermplasmUUID(final String germplasmUUID) {
-		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmUUID);
-		if (this.errors.hasErrors()) {
-			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-		}
-	}
-
 	@Override
 	public GermplasmDto getGermplasmDtoById(final Integer gid) {
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
 		final GermplasmDto germplasmDto = this.germplasmService.getGermplasmDtoById(gid);
 
 		if (germplasmDto == null) {
-			errors.reject("gids.invalid", new String[] {gid.toString()}, "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+			this.errors.reject("gids.invalid", new String[] {gid.toString()}, "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 		return germplasmDto;
 	}
 
 	@Override
 	public ProgenitorsDetailsDto getGermplasmProgenitorDetails(final Integer gid) {
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(this.errors, Collections.singletonList(gid));
 		return this.germplasmService.getGermplasmProgenitorDetails(gid);
 	}
 
 	@Override
 	public boolean updateGermplasmBasicDetails(final String programUUID, final Integer gid,
 		final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(this.errors, Collections.singletonList(gid));
 		this.germplasmBasicDetailsValidator.validate(programUUID, germplasmBasicDetailsDto);
 		if (germplasmBasicDetailsDto.allAttributesNull()) {
 			return false;
@@ -292,8 +284,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public boolean updateGermplasmPedigree(final String programUUID, final Integer gid,
 		final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto) {
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.germplasmValidator.validateGids(this.errors, Collections.singletonList(gid));
 		if (Objects.nonNull(progenitorsUpdateRequestDto) && progenitorsUpdateRequestDto.allAttributesNull()) {
 			return false;
 		}
