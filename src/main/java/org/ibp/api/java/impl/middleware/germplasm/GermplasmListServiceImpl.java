@@ -14,6 +14,8 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.program.ProgramDTO;
@@ -665,14 +667,25 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest,
+	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest request,
 		final Pageable pageable) {
-		return this.germplasmListService.searchGermplasmList(germplasmListSearchRequest, pageable);
+		return this.germplasmListService.searchGermplasmList(request, pageable);
 	}
 
 	@Override
-	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmSearchRequest) {
-		return this.germplasmListService.countSearchGermplasmList(germplasmSearchRequest);
+	public long countSearchGermplasmList(final GermplasmListSearchRequest request) {
+		return this.germplasmListService.countSearchGermplasmList(request);
+	}
+
+	@Override
+	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest request,
+		final Pageable pageable) {
+		return this.germplasmListService.searchGermplasmListData(listId, request, pageable);
+	}
+
+	@Override
+	public long countSearchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest request) {
+		return this.germplasmListService.countSearchGermplasmListData(listId, request);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
