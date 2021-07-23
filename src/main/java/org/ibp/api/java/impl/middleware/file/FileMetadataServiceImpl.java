@@ -37,25 +37,27 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	public Image updateImageContent(final String imageDbId, final byte[] imageContent) {
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getFileMetadataByUUID(imageDbId);
 		this.fileStorageService.upload(FileUtils.wrapAsMultipart(imageContent), fileMetadataDTO.getPath());
-		this.fileMetadataService.saveFilenameToObservation(fileMetadataDTO);
+		this.fileMetadataService.linkToObservation(fileMetadataDTO, null);
 
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		return fileMetadataMapper.map(fileMetadataDTO);
 	}
 
 	@Override
-	public String save(final MultipartFile file, final String path, final String observationUnitId) {
-		final FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
+	public FileMetadataDTO save(final MultipartFile file, final String path, final String observationUnitUUID, final Integer termId) {
+		FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
 		fileMetadataDTO.setName(file.getOriginalFilename());
 		fileMetadataDTO.setMimeType(file.getContentType());
 		fileMetadataDTO.setSize((int) file.getSize());
 		fileMetadataDTO.setPath(path);
-		return this.fileMetadataService.save(fileMetadataDTO, observationUnitId);
+		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID);
+		this.fileMetadataService.linkToObservation(fileMetadataDTO, termId);
+		return fileMetadataDTO;
 	}
 
 	@Override
-	public String getFilePath(final String observationUnitId, final Integer termId, final String fileName) {
+	public String getFilePath(final String observationUnitUUID, final Integer termId, final String fileName) {
 		BaseValidator.checkNotNull(fileName, "param.null", new String[] {"fileName"});
-		return this.fileMetadataService.getFilePath(observationUnitId, termId, fileName);
+		return this.fileMetadataService.getFilePath(observationUnitUUID, termId, fileName);
 	}
 }

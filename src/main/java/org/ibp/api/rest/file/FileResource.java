@@ -3,6 +3,7 @@ package org.ibp.api.rest.file;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
@@ -43,21 +44,19 @@ public class FileResource {
 	@Autowired
 	private FileValidator fileValidator;
 
-	/**
-	 * @return Map<String, String> to overcome angularjs limitation
-	 */
 	@RequestMapping(value = "/files", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Map<String, String>> upload(
+	public ResponseEntity<FileMetadataDTO> upload(
 		@PathVariable final String cropName,
 		@RequestPart("file") final MultipartFile file,
-		@ApiParam("store file under this path") @RequestParam final String path,
-		@RequestParam final String observationUnitId
+		@RequestParam final String observationUnitUUID,
+		@RequestParam final Integer termId
 	) {
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
+		final String path = this.fileMetadataService.getFilePath(observationUnitUUID, termId, file.getOriginalFilename());
 		this.fileStorageService.upload(file, path);
-		final String fileUUID = this.fileMetadataService.save(file, path, observationUnitId);
-		return new ResponseEntity<>(Collections.singletonMap("fileUUID", fileUUID), HttpStatus.CREATED);
+		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.save(file, path, observationUnitUUID, termId);
+		return new ResponseEntity<>(fileMetadataDTO, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/files/**", method = RequestMethod.GET)
@@ -70,6 +69,7 @@ public class FileResource {
 		return this.fileStorageService.getFile(path);
 	}
 
+	// TODO remove if not needed anymore
 	/**
 	 * @return Map<String, String> to overcome angularjs limitation
 	 */

@@ -259,6 +259,7 @@ public class DefaultExceptionHandler {
 	@ResponseBody
 	public ErrorResponse handleMultipartException(final MultipartException ex) {
 		final ErrorResponse response = new ErrorResponse();
+		// FIXME not all MultipartException are because of max size (e.g file is not multipart)
 		response.addError(this.getMessage("file.upload.too-large", new String[] {FileUtils.byteCountToDisplaySize(this.maxFileSize)}));
 		return response;
 	}

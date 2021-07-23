@@ -2,6 +2,7 @@ package org.ibp.api.java.file;
 
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
+import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FileMetadataService {
@@ -12,7 +13,7 @@ public interface FileMetadataService {
 
 	Image updateImageContent(String imageDbId, byte[] imageContent);
 
-	String save(MultipartFile file, String path, String observationUnitId);
+	FileMetadataDTO save(MultipartFile file, String path, String observationUnitUUID, Integer termId);
 
-	String getFilePath(String observationUnitId, Integer termId, String fileName);
+	String getFilePath(String observationUnitUUID, Integer termId, String fileName);
 }
