@@ -688,6 +688,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.germplasmListService.countSearchGermplasmListData(listId, request);
 	}
 
+	@Override
+	public boolean toggleGermplasmListStatus(final Integer listId) {
+		return this.germplasmListService.toggleGermplasmListStatus(listId);
+	}
+
 	private void validateProgram(final String cropName, final String programUUID) {
 		if (!StringUtils.isEmpty(programUUID)) {
 			this.programValidator.validate(new ProgramDTO(cropName, programUUID), this.errors);

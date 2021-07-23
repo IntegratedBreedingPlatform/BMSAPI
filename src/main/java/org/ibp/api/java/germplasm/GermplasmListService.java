@@ -58,4 +58,6 @@ public interface GermplasmListService {
 
 	long countSearchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request);
 
+	boolean toggleGermplasmListStatus(Integer listId);
+
 }

@@ -267,5 +267,13 @@ GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmListById(listId), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Locks or unlocks the list depending the current status of it")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/toggle-status", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Boolean> toggleGermplasmListStatus(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmListService.toggleGermplasmListStatus(listId), HttpStatus.OK);
+	}
 
 }
