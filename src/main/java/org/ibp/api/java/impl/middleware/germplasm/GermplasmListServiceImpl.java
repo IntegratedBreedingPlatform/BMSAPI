@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -277,6 +278,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		folders.forEach(nodeId -> this.validateNodeId(nodeId.toUpperCase(), programUUID, ListNodeType.PARENT, true));
 	}
 
+	@Deprecated
 	@Override
 	public GermplasmList getGermplasmList(final Integer germplasmListId) {
 		return this.germplasmListManager.getGermplasmListById(germplasmListId);
@@ -480,18 +482,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite, final String programUUID) {
 
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		if (!Util.isPositiveInteger(String.valueOf(germplasmListId))) {
-			this.errors.reject("list.id.invalid", new String[] {germplasmListId.toString()}, "");
-			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-		}
 
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, this.errors);
-
-		final GermplasmList germplasmList = this.germplasmListService.getGermplasmListById(germplasmListId)
-			.orElseThrow(() -> {
-				this.errors.reject("list.id.invalid", new String[] {germplasmListId.toString()}, "");
-				return new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-			});
+		final GermplasmList germplasmList = this.validateGermplasmList(germplasmListId);
 
 		if (germplasmList.isFolder()) {
 			this.errors.reject("list.invalid", "");
@@ -660,6 +653,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public GermplasmListDto getGermplasmListById(final Integer listId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		final GermplasmList germplasmList = this.validateGermplasmList(listId);
+		return GermplasmListFunction.INSTANCE.apply(germplasmList);
+	}
+
+	@Override
 	public List<GermplasmListDto> getGermplasmLists(final Integer gid) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(this.errors, Collections.singletonList(gid));
@@ -775,6 +775,19 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 	}
 
+	private GermplasmList validateGermplasmList(final Integer germplasmListId) {
+		if (!Util.isPositiveInteger(String.valueOf(germplasmListId))) {
+			this.errors.reject("list.id.invalid", new String[] {String.valueOf(germplasmListId)}, "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+
+		return this.germplasmListService.getGermplasmListById(germplasmListId)
+			.orElseThrow(() -> {
+				this.errors.reject("list.id.invalid", new String[] {germplasmListId.toString()}, "");
+				return new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+			});
+	}
+
 	private Integer getFolderIdAsInteger(final String folderId) {
 		return (CROP_LISTS.equals(folderId) || PROGRAM_LISTS.equals(folderId)) ? null : Integer.valueOf(folderId);
 	}
@@ -790,4 +803,22 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
 		this.germplasmDataManager = germplasmDataManager;
 	}
+
+	private static class GermplasmListFunction implements Function<GermplasmList, GermplasmListDto> {
+
+		private static final GermplasmListFunction INSTANCE = new GermplasmListFunction();
+
+		@Override
+		public GermplasmListDto apply(final GermplasmList input) {
+			GermplasmListDto output = new GermplasmListDto();
+			output.setListId(input.getId());
+			output.setListName(input.getName());
+			output.setCreationDate(input.parseDate());
+			output.setDescription(input.getDescription());
+			output.setProgramUUID(input.getProgramUUID());
+			output.setLocked(input.isLockedList());
+			return output;
+		}
+	}
+
 }

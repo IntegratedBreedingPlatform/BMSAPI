@@ -64,11 +64,16 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.times;
 
 public class GermplasmListServiceImplTest {
 
+	private static final int GERMPLASM_LIST_ID = new Random().nextInt(Integer.MAX_VALUE);
+	private static final String GERMPLASM_LIST_NAME = UUID.randomUUID().toString();
+	private static final Date GERMPLASM_LIST_DATE = new Date();
+	private static final String GERMPLASM_LIST_DESCRIPTION = UUID.randomUUID().toString();
 	private static final String GERMPLASM_LIST_TYPE = "LST";
 	private static final int GID1 = 1;
 	private static final int GID2 = 2;
@@ -1275,15 +1280,19 @@ public class GermplasmListServiceImplTest {
 
 	@Test
 	public void testAddGermplasmEntriesToList_InvalidGermplasmListId_FAIL() {
+		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite = Mockito.mock(SearchCompositeDto.class);
+
 		try {
-			this.germplasmListService.addGermplasmEntriesToList(-1, Mockito.mock(SearchCompositeDto.class), PROGRAM_UUID);
+			this.germplasmListService.addGermplasmEntriesToList(-1, searchComposite, PROGRAM_UUID);
 			Assert.fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ResourceNotFoundException.class));
 			MatcherAssert.assertThat(((ResourceNotFoundException) e).getError().getCode(), is("list.id.invalid"));
 		}
 
-		Mockito.verifyZeroInteractions(this.searchCompositeDtoValidator);
+		Mockito.verify(this.searchCompositeDtoValidator).validateSearchCompositeDto(ArgumentMatchers.eq(searchComposite),
+			ArgumentMatchers.any(MapBindingResult.class));
+		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
 		Mockito.verifyZeroInteractions(this.germplasmListServiceMiddleware);
 		Mockito.verifyZeroInteractions(this.germplasmValidator);
 	}
@@ -1563,6 +1572,47 @@ public class GermplasmListServiceImplTest {
 		}
 	}
 
+	@Test
+	public void getGermplasmListById() {
+		final GermplasmList germplasmList = this.createGermplasmListMock();
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(GERMPLASM_LIST_ID)).thenReturn(Optional.of(germplasmList));
+
+		final GermplasmListDto dto = this.germplasmListService.getGermplasmListById(GERMPLASM_LIST_ID);
+		assertNotNull(dto);
+		assertThat(dto.getListId(), is(GERMPLASM_LIST_ID));
+		assertThat(dto.getListName(), is(GERMPLASM_LIST_NAME));
+		assertThat(dto.getCreationDate(), is(GERMPLASM_LIST_DATE));
+		assertThat(dto.getDescription(), is(GERMPLASM_LIST_DESCRIPTION));
+		assertThat(dto.getProgramUUID(), is(PROGRAM_UUID));
+		assertTrue(dto.isLocked());
+
+		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListById(GERMPLASM_LIST_ID);
+	}
+
+	@Test
+	public void getGermplasmListById_invalidGermplasmListId() {
+		try {
+			this.germplasmListService.getGermplasmListById(null);
+			Assert.fail("Should have thrown validation exception but did not.");
+		} catch (final ResourceNotFoundException e) {
+			Assert.assertThat(((ResourceNotFoundException) e).getError().getCode(), is("list.id.invalid"));
+			Mockito.verify(this.germplasmListServiceMiddleware, Mockito.never()).getGermplasmListById(ArgumentMatchers.anyInt());
+		}
+	}
+
+	@Test
+	public void getGermplasmListById_germplasmListNotFound() {
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(GERMPLASM_LIST_ID)).thenReturn(Optional.empty());
+
+		try {
+			this.germplasmListService.getGermplasmListById(GERMPLASM_LIST_ID);
+			Assert.fail("Should have thrown validation exception but did not.");
+		} catch (final ResourceNotFoundException e) {
+			Assert.assertThat(((ResourceNotFoundException) e).getError().getCode(), is("list.id.invalid"));
+			Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListById(GERMPLASM_LIST_ID);
+		}
+	}
+
 	private GermplasmListGeneratorDTO createGermplasmList() {
 		final GermplasmListGeneratorDTO list = new GermplasmListGeneratorDTO();
 		list.setName(RandomStringUtils.random(50));
@@ -1581,6 +1631,17 @@ public class GermplasmListServiceImplTest {
 		entries.add(entry2);
 		list.setEntries(entries);
 		return list;
+	}
+
+	private GermplasmList createGermplasmListMock() {
+		final GermplasmList mock = Mockito.mock(GermplasmList.class);
+		Mockito.when(mock.getId()).thenReturn(GERMPLASM_LIST_ID);
+		Mockito.when(mock.getName()).thenReturn(GERMPLASM_LIST_NAME);
+		Mockito.when(mock.parseDate()).thenReturn(GERMPLASM_LIST_DATE);
+		Mockito.when(mock.getDescription()).thenReturn(GERMPLASM_LIST_DESCRIPTION);
+		Mockito.when(mock.getProgramUUID()).thenReturn(PROGRAM_UUID);
+		Mockito.when(mock.isLockedList()).thenReturn(true);
+		return mock;
 	}
 
 }
