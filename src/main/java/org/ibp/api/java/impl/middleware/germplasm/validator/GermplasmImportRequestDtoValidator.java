@@ -5,6 +5,7 @@ import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -56,6 +57,9 @@ public class GermplasmImportRequestDtoValidator {
 
 	@Autowired
 	private GermplasmService germplasmService;
+
+	@Autowired
+	private GermplasmNameService germplasmNameService;
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
@@ -200,6 +204,10 @@ public class GermplasmImportRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
+		if (!germplasmImportRequestDto.isSkipIfExists()) {
+			this.validatePUINotExists(germplasmImportDTOList);
+		}
+		this.validateNotDuplicatedPUI(germplasmImportDTOList);
 		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmImportDTOList);
 		this.validateAllLocationAbbreviationsExists(programUUID, germplasmImportDTOList);
 		this.validateAllNameTypesExists(germplasmImportDTOList);
@@ -295,6 +303,7 @@ public class GermplasmImportRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
+		this.validateNotDuplicatedPUI(germplasmInventoryImportDTOList);
 		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmInventoryImportDTOList);
 		this.validateAllLocationAbbreviationsExists(programUUID, germplasmInventoryImportDTOList);
 		this.validateAllStorageLocationAbbreviationsExists(programUUID, germplasmInventoryImportDTOList);
@@ -435,6 +444,31 @@ public class GermplasmImportRequestDtoValidator {
 					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributes), 3)}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
+		}
+	}
+
+	private void validateNotDuplicatedPUI(final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
+		final List<String> puiList =
+			germplasmImportDTOList.stream().filter(g -> !StringUtils.isEmpty(g.getGermplasmPUI()))
+				.map(GermplasmImportDTO::getGermplasmPUI)
+				.collect(
+					Collectors.toList());
+		if (!puiList.stream().filter(i -> Collections.frequency(puiList, i) > 1)
+			.collect(Collectors.toSet()).isEmpty()) {
+			this.errors.reject("germplasm.import.duplicated.puis", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validatePUINotExists(final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
+		final List<String> puisList = new ArrayList<>();
+			germplasmImportDTOList.stream().forEach(g -> puisList.addAll(g.collectGermplasmPUIs()));
+		final List<String> existingGermplasmPUIs = this.germplasmNameService.getExistingGermplasmPUIs(puisList);
+		if (!existingGermplasmPUIs.isEmpty()) {
+			this.errors.reject("germplasm.import.existent.puis",
+				new String[] {
+					Util.buildErrorMessageFromList(existingGermplasmPUIs, 3)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 

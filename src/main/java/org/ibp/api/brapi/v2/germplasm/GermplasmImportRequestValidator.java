@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.pojos.Location;
@@ -44,6 +45,9 @@ public class GermplasmImportRequestValidator {
 	@Autowired
 	private LocationService locationService;
 
+	@Autowired
+	private GermplasmNameService germplasmNameService;
+
 	public BindingResult pruneGermplasmInvalidForImport(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
 		BaseValidator.checkNotEmpty(germplasmImportRequestDtoList, "germplasm.import.list.null");
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmImportRequest.class.getName());
@@ -55,6 +59,8 @@ public class GermplasmImportRequestValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
+		final Set<String> duplicatedPUIs = this.getDuplicatedGermplasmPUIs(germplasmImportRequestDtoList);
+		final List<String> existingPUIs = this.getExistingGermplasmPUIs(germplasmImportRequestDtoList);
 		final List<String> validBreedingMethodIds = this.getValidBreedingMethodDbIds(germplasmImportRequestDtoList);
 		final List<String> validLocationAbbreviations = this.getValidLocationAbbreviations(germplasmImportRequestDtoList);
 
@@ -66,6 +72,14 @@ public class GermplasmImportRequestValidator {
 
 			final Integer index = importRequestByIndexMap.get(g) + 1;
 
+			if (g.isGermplasmPUIInList(duplicatedPUIs)) {
+				this.errors.reject("germplasm.create.duplicated.pui", new String[] {index.toString()}, "");
+				return true;
+			}
+			if (g.isGermplasmPUIInList(existingPUIs)) {
+				this.errors.reject("germplasm.create.existing.pui", new String[] {index.toString()}, "");
+				return true;
+			}
 			if (StringUtils.isEmpty(g.getDefaultDisplayName())) {
 				this.errors.reject("germplasm.create.null.name.types", new String[] {index.toString()}, "");
 				return true;
@@ -162,10 +176,6 @@ public class GermplasmImportRequestValidator {
 			this.errors.reject(GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH, new String[] {index.toString(), "pedigree"}, "");
 			return true;
 		}
-		if (!StringUtils.isEmpty(g.getGermplasmPUI()) && this.nameExceedsLength(g.getGermplasmPUI())) {
-			this.errors.reject(GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH, new String[] {index.toString(), "germplasmPUI"}, "");
-			return true;
-		}
 		return false;
 	}
 
@@ -220,6 +230,20 @@ public class GermplasmImportRequestValidator {
 			this.breedingMethodService.getBreedingMethods(searchRequest, null).stream().map(m -> m.getMid().toString())
 				.collect(Collectors.toList());
 
+	}
+
+	protected List<String> getExistingGermplasmPUIs(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
+		final List<String> puisList = this.collectGermplasmPUIs(germplasmImportRequestDtoList);
+		return this.germplasmNameService.getExistingGermplasmPUIs(puisList);
+	}
+
+	private List<String> collectGermplasmPUIs(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
+		return germplasmImportRequestDtoList.stream().map(GermplasmImportRequest::collectGermplasmPUIs).flatMap(List::stream).collect(Collectors.toList());
+	}
+
+	protected Set<String> getDuplicatedGermplasmPUIs(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
+		final List<String> puisList = this.collectGermplasmPUIs(germplasmImportRequestDtoList);
+		return puisList.stream().filter(i -> Collections.frequency(puisList, i) > 1).collect(Collectors.toSet());
 	}
 
 	protected List<String> getValidLocationAbbreviations(final List<GermplasmImportRequest> germplasmImportRequestDtoList) {
