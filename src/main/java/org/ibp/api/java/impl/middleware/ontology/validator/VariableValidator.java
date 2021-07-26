@@ -399,7 +399,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			final boolean isFileType = Objects.equals(scale.getDataType(), DataType.FILE_VARIABLE);
 			// Temporal restriction for Germplasm Attributes and Passport Variable Types.
-			// This restriction should be removed when implementing this ticket IBP-4798.
+			// This restriction should be removed when implementing the IBP-4798.
 			if (isFileType) {
 				final boolean isAttributeOrPassport = variable.getVariableTypes().stream().anyMatch(variableType ->
 					VARIABLE_TYPES_WITH_FILE_DATA_TYPE_RESTRICTION.contains(Integer.valueOf(variableType.getId())));
