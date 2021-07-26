@@ -370,22 +370,6 @@ public class GermplasmImportRequestDtoValidatorTest {
 	}
 
 	@Test
-	public void testValidateBeforeSaving_ThrowsException_WhenGermplasmPUIIsZero() {
-		try {
-			final Map<String, String> names = new HashMap<>();
-			names.put("LNAME", RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.NAME_MAX_LENGTH));
-			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-			germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GID);
-			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, "0", "ARG", "MUT",
-				RandomStringUtils.randomAlphabetic(GermplasmImportRequestDtoValidator.REFERENCE_MAX_LENGTH), "LNAME", names, null,
-				"20201212", null, null)));
-			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.import.pui.invalid.zero"));
-		}
-	}
-
-	@Test
 	public void testValidateBeforeSaving_ThrowsException_WhenNamesContainsNullKeys() {
 		try {
 			final Map<String, String> names = new HashMap<>();

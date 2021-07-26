@@ -148,11 +148,6 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
-			if (!StringUtil.isEmpty(g.getGermplasmPUI()) && g.getGermplasmPUI().equals("0")) {
-				this.errors.reject("germplasm.import.pui.invalid.zero", "");
-				return true;
-			}
-
 			if (g.getNames().keySet().stream().anyMatch(Objects::isNull)) {
 				this.errors.reject("germplasm.import.null.name.types", new String[] {g.getClientId().toString()}, "");
 				return true;
