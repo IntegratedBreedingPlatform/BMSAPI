@@ -5,7 +5,6 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
-import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.pojos.Location;
 import org.hamcrest.CoreMatchers;
@@ -19,12 +18,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
@@ -37,9 +36,6 @@ public class GermplasmImportRequestValidatorTest {
 
 	@Mock
 	private LocationService locationService;
-
-	@Mock
-	private GermplasmNameService germplasmNameService;
 
 	@InjectMocks
 	private GermplasmImportRequestValidator germplasmImportRequestValidator;
@@ -149,71 +145,74 @@ public class GermplasmImportRequestValidatorTest {
 	}
 
 	@Test
-	public void testPruneGermplasmInvalidForImport_DuplicatedPUI(){
+	public void testValidate_InvalidNameLengths(){
 		final GermplasmImportRequest importRequest1 = new GermplasmImportRequest();
-		importRequest1.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(40));
-		importRequest1.setGermplasmPUI(RandomStringUtils.randomAlphanumeric(20));
+		importRequest1.setAcquisitionDate("2021-02-21");
+		importRequest1.setBreedingMethodDbId(String.valueOf(MID));
+		importRequest1.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
+		// Invalid default display name
+		importRequest1.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(260));
 
 		final GermplasmImportRequest importRequest2 = new GermplasmImportRequest();
-		importRequest2.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(40));
-		importRequest2.setGermplasmPUI(RandomStringUtils.randomAlphanumeric(20));
+		importRequest2.setAcquisitionDate("2021-02-21");
+		importRequest2.setBreedingMethodDbId(String.valueOf(MID));
+		importRequest2.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
+		importRequest2.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(20));
+		// Invalid accession number
+		importRequest2.setAccessionNumber(RandomStringUtils.randomAlphabetic(260));
 
-		// Use the same PUI as 1st germplasm
 		final GermplasmImportRequest importRequest3 = new GermplasmImportRequest();
-		importRequest3.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(40));
-		importRequest3.setGermplasmPUI(importRequest1.getGermplasmPUI());
+		importRequest3.setAcquisitionDate("2021-02-21");
+		importRequest3.setBreedingMethodDbId(String.valueOf(MID));
+		importRequest3.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
+		importRequest3.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(20));
+		importRequest3.setAccessionNumber(RandomStringUtils.randomAlphabetic(20));
+		// Invalid genus
+		importRequest3.setGenus(RandomStringUtils.randomAlphabetic(260));
 
 		final GermplasmImportRequest importRequest4 = new GermplasmImportRequest();
-		importRequest4.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(40));
-		importRequest4.getSynonyms().add(new Synonym(importRequest2.getGermplasmPUI(), GermplasmImportRequest.PUI_NAME_TYPE));
+		importRequest4.setAcquisitionDate("2021-02-21");
+		importRequest4.setBreedingMethodDbId(String.valueOf(MID));
+		importRequest4.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
+		importRequest4.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(20));
+		importRequest4.setAccessionNumber(RandomStringUtils.randomAlphabetic(20));
+		importRequest4.setGenus(RandomStringUtils.randomAlphabetic(20));
+		// Invalid pedigree
+		importRequest4.setPedigree(RandomStringUtils.randomAlphabetic(260));
+
+		final GermplasmImportRequest importRequest5 = new GermplasmImportRequest();
+		importRequest5.setAcquisitionDate("2021-02-21");
+		importRequest5.setBreedingMethodDbId(String.valueOf(MID));
+		importRequest5.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
+		importRequest5.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(20));
+		importRequest5.setAccessionNumber(RandomStringUtils.randomAlphabetic(20));
+		importRequest5.setGenus(RandomStringUtils.randomAlphabetic(20));
+		importRequest5.setPedigree(RandomStringUtils.randomAlphabetic(20));
+		// Invalid germplasm PUI
+		importRequest5.setGermplasmPUI(RandomStringUtils.randomAlphabetic(260));
+
+		Mockito.doReturn(Optional.of(new BreedingMethodDTO())).when(this.breedingMethodService).getBreedingMethod(ArgumentMatchers.anyInt());
+		Mockito.doReturn(1L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any());
 
 		final List<GermplasmImportRequest> list = new ArrayList<>();
 		list.add(importRequest1);
 		list.add(importRequest2);
 		list.add(importRequest3);
 		list.add(importRequest4);
+		list.add(importRequest5);
 		final BindingResult bindingResult = this.germplasmImportRequestValidator.pruneGermplasmInvalidForImport(list);
 		Assert.assertEquals(0, list.size());
-		Assert.assertEquals(4, bindingResult.getErrorCount());
-		for (final ObjectError error : bindingResult.getAllErrors()) {
-			Assert.assertEquals("germplasm.create.duplicated.pui", error.getCode());
-		}
-	}
 
-	@Test
-	public void testPruneGermplasmInvalidForImport_ExistingPUI(){
-		final String pui1 = RandomStringUtils.randomAlphanumeric(20);
-		final GermplasmImportRequest importRequest1 = new GermplasmImportRequest();
-		importRequest1.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(40));
-		importRequest1.setGermplasmPUI(pui1);
-
-		final GermplasmImportRequest importRequest2 = new GermplasmImportRequest();
-		importRequest2.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(200));
-		importRequest2.setAcquisitionDate("2021-02-21");
-		importRequest2.setBreedingMethodDbId(String.valueOf(MID));
-		importRequest2.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
-		importRequest2.setAccessionNumber(RandomStringUtils.randomAlphabetic(200));
-		importRequest2.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(200));
-		importRequest2.setGermplasmPUI(RandomStringUtils.randomAlphanumeric(20));
-
-		final String pui2 = RandomStringUtils.randomAlphanumeric(20);
-		final GermplasmImportRequest importRequest3 = new GermplasmImportRequest();
-		importRequest3.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(40));
-		importRequest3.getSynonyms().add(new Synonym(pui2, GermplasmImportRequest.PUI_NAME_TYPE));
-
-		Mockito.doReturn(Arrays.asList(pui1, pui2)).when(this.germplasmNameService).getExistingGermplasmPUIs(ArgumentMatchers.anyList());
-
-		final List<GermplasmImportRequest> list = new ArrayList<>();
-		list.add(importRequest1);
-		list.add(importRequest2);
-		list.add(importRequest3);
-		final BindingResult bindingResult = this.germplasmImportRequestValidator.pruneGermplasmInvalidForImport(list);
-		Assert.assertEquals(1, list.size());
-		Assert.assertTrue(list.contains(importRequest2));
-		Assert.assertEquals(2, bindingResult.getErrorCount());
-		for (final ObjectError error : bindingResult.getAllErrors()) {
-			Assert.assertEquals("germplasm.create.existing.pui", error.getCode());
-		}
+		Assert.assertEquals("germplasm.create.name.exceeded.length", bindingResult.getAllErrors().get(0).getCode());
+		Assert.assertEquals(new String[]{"1", "defaultDisplayName"}, bindingResult.getAllErrors().get(0).getArguments());
+		Assert.assertEquals("germplasm.create.name.exceeded.length", bindingResult.getAllErrors().get(1).getCode());
+		Assert.assertEquals(new String[]{"2", "accessionNumber"}, bindingResult.getAllErrors().get(1).getArguments());
+		Assert.assertEquals("germplasm.create.name.exceeded.length", bindingResult.getAllErrors().get(2).getCode());
+		Assert.assertEquals(new String[]{"3", "genus"}, bindingResult.getAllErrors().get(2).getArguments());
+		Assert.assertEquals("germplasm.create.name.exceeded.length", bindingResult.getAllErrors().get(3).getCode());
+		Assert.assertEquals(new String[]{"4", "pedigree"}, bindingResult.getAllErrors().get(3).getArguments());
+		Assert.assertEquals("germplasm.create.name.exceeded.length", bindingResult.getAllErrors().get(4).getCode());
+		Assert.assertEquals(new String[]{"5", "germplasmPUI"}, bindingResult.getAllErrors().get(4).getArguments());
 	}
 
 
