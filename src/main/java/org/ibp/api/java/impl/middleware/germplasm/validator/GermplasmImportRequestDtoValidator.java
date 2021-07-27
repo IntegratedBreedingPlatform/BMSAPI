@@ -5,6 +5,7 @@ import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -16,7 +17,6 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.util.StringUtil;
@@ -45,9 +45,8 @@ import java.util.stream.Collectors;
 @Component
 public class GermplasmImportRequestDtoValidator {
 
-	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
+	private static final Set<Integer> STORAGE_LOCATION_TYPE = Collections.singleton(1500);
 	static final Integer STOCK_ID_MAX_LENGTH = 35;
-	static final Integer GUID_MAX_LENGTH = 36;
 	static final Integer REFERENCE_MAX_LENGTH = 255;
 	static final Integer NAME_MAX_LENGTH = 255;
 	static final Integer ATTRIBUTE_MAX_LENGTH = 255;
@@ -60,7 +59,7 @@ public class GermplasmImportRequestDtoValidator {
 	private GermplasmService germplasmService;
 
 	@Autowired
-	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmServiceMw;
+	private GermplasmNameService germplasmNameService;
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
@@ -78,7 +77,7 @@ public class GermplasmImportRequestDtoValidator {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	public void validateBeforeSaving(final String programUUID, final GermplasmImportRequestDto germplasmImportRequestDto) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmImportRequestDto.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmImportRequestDto.class.getName());
 
 		BaseValidator.checkNotNull(germplasmImportRequestDto, "germplasm.import.request.null");
 		BaseValidator.checkNotEmpty(germplasmImportRequestDto.getGermplasmList(), "germplasm.import.list.null");
@@ -148,13 +147,8 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
-			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().length() > GUID_MAX_LENGTH) {
-				this.errors.reject("germplasm.import.guid.invalid.length", "");
-				return true;
-			}
-
-			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().equals("0")) {
-				this.errors.reject("germplasm.import.guid.invalid.zero", "");
+			if (!StringUtil.isEmpty(g.getGermplasmPUI()) && g.getGermplasmPUI().length() > NAME_MAX_LENGTH) {
+				this.errors.reject("germplasm.import.pui.invalid.length", "");
 				return true;
 			}
 
@@ -195,12 +189,11 @@ public class GermplasmImportRequestDtoValidator {
 				}
 			}
 
-			if (germplasmImportRequestDto.getConnectUsing() == GermplasmImportRequestDto.PedigreeConnectionType.GID) {
-				if ((StringUtils.isNotEmpty(g.getProgenitor1()) && !StringUtils.isNumeric(g.getProgenitor1())) || (
-					StringUtils.isNotEmpty(g.getProgenitor2()) && !StringUtils.isNumeric(g.getProgenitor2()))) {
-					this.errors.reject("germplasm.import.progenitor.must.be.numeric.when.connecting.by.gid", "");
-					return true;
-				}
+			if (germplasmImportRequestDto.getConnectUsing() == GermplasmImportRequestDto.PedigreeConnectionType.GID
+				&& ((StringUtils.isNotEmpty(g.getProgenitor1()) && !StringUtils.isNumeric(g.getProgenitor1())) || (
+				StringUtils.isNotEmpty(g.getProgenitor2()) && !StringUtils.isNumeric(g.getProgenitor2())))) {
+				this.errors.reject("germplasm.import.progenitor.must.be.numeric.when.connecting.by.gid", "");
+				return true;
 			}
 
 			return false;
@@ -212,9 +205,9 @@ public class GermplasmImportRequestDtoValidator {
 		}
 
 		if (!germplasmImportRequestDto.isSkipIfExists()) {
-			this.validateGUIDNotExists(germplasmImportDTOList);
+			this.validatePUINotExists(germplasmImportDTOList);
 		}
-		this.validateNotDuplicatedGUID(germplasmImportDTOList);
+		this.validateNotDuplicatedPUI(germplasmImportDTOList);
 		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmImportDTOList);
 		this.validateAllLocationAbbreviationsExists(programUUID, germplasmImportDTOList);
 		this.validateAllNameTypesExists(germplasmImportDTOList);
@@ -224,7 +217,7 @@ public class GermplasmImportRequestDtoValidator {
 
 	public void validateImportLoadedData(final String programUUID,
 		final List<GermplasmInventoryImportDTO> germplasmInventoryImportDTOList) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmInventoryImportDTO.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmInventoryImportDTO.class.getName());
 
 		BaseValidator.checkNotEmpty(germplasmInventoryImportDTOList, "germplasm.import.list.null");
 
@@ -257,13 +250,13 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 
-			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().length() > GUID_MAX_LENGTH) {
-				this.errors.reject("germplasm.import.guid.invalid.length", "");
+			if (!StringUtil.isEmpty(g.getGermplasmPUI()) && g.getGermplasmPUI().length() > NAME_MAX_LENGTH) {
+				this.errors.reject("germplasm.import.pui.invalid.length", "");
 				return true;
 			}
 
-			if (!StringUtil.isEmpty(g.getGermplasmUUID()) && g.getGermplasmUUID().equals("0")) {
-				this.errors.reject("germplasm.import.guid.invalid.zero", "");
+			if (!StringUtil.isEmpty(g.getGermplasmPUI()) && g.getGermplasmPUI().equals("0")) {
+				this.errors.reject("germplasm.import.pui.invalid.zero", "");
 				return true;
 			}
 
@@ -310,7 +303,7 @@ public class GermplasmImportRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.validateNotDuplicatedGUID(germplasmInventoryImportDTOList);
+		this.validateNotDuplicatedPUI(germplasmInventoryImportDTOList);
 		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmInventoryImportDTOList);
 		this.validateAllLocationAbbreviationsExists(programUUID, germplasmInventoryImportDTOList);
 		this.validateAllStorageLocationAbbreviationsExists(programUUID, germplasmInventoryImportDTOList);
@@ -324,7 +317,7 @@ public class GermplasmImportRequestDtoValidator {
 		final Set<String> nameTypes = new HashSet<>();
 		germplasmImportDTOList.forEach(g -> {
 			if (g.getNames() != null && !g.getNames().isEmpty())
-				nameTypes.addAll(g.getNames().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList()));
+				nameTypes.addAll(g.getNames().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
 		});
 		if (!nameTypes.isEmpty()) {
 			final List<String> existingGermplasmNameTypes =
@@ -419,7 +412,7 @@ public class GermplasmImportRequestDtoValidator {
 	private void validateAllAttributesExists(final String programUUID, final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
 		final Set<String> attributes = new HashSet<>();
 		germplasmImportDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
-			.forEach(g -> attributes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+			.forEach(g -> attributes.addAll(g.getAttributes().keySet().stream().map(String::toUpperCase).collect(Collectors.toList())));
 		if (!attributes.isEmpty()) {
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.setProgramUuid(programUUID);
@@ -454,38 +447,34 @@ public class GermplasmImportRequestDtoValidator {
 		}
 	}
 
-	private void validateNotDuplicatedGUID(final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
-		final List<String> guidsList =
-			germplasmImportDTOList.stream().filter(g -> !StringUtils.isEmpty(g.getGermplasmUUID()))
-				.map(GermplasmImportDTO::getGermplasmUUID)
+	private void validateNotDuplicatedPUI(final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
+		final List<String> puiList =
+			germplasmImportDTOList.stream().filter(g -> !StringUtils.isEmpty(g.getGermplasmPUI()))
+				.map(GermplasmImportDTO::getGermplasmPUI)
 				.collect(
 					Collectors.toList());
-		if (!guidsList.stream().filter(i -> Collections.frequency(guidsList, i) > 1)
+		if (!puiList.stream().filter(i -> Collections.frequency(puiList, i) > 1)
 			.collect(Collectors.toSet()).isEmpty()) {
-			this.errors.reject("germplasm.import.duplicated.guids", "");
+			this.errors.reject("germplasm.import.duplicated.puis", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateGUIDNotExists(final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
-		final List<String> guidsList =
-			germplasmImportDTOList.stream().filter(g -> !StringUtils.isEmpty(g.getGermplasmUUID()))
-				.map(GermplasmImportDTO::getGermplasmUUID)
-				.collect(
-					Collectors.toList());
-		final List<Germplasm> germplasmDTOS = this.germplasmServiceMw.getGermplasmByGUIDs(guidsList);
-		if (!germplasmDTOS.isEmpty()) {
-			this.errors.reject("germplasm.import.existent.guids",
+	private void validatePUINotExists(final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
+		final List<String> puisList = new ArrayList<>();
+			germplasmImportDTOList.stream().forEach(g -> puisList.addAll(g.collectGermplasmPUIs()));
+		final List<String> existingGermplasmPUIs = this.germplasmNameService.getExistingGermplasmPUIs(puisList);
+		if (!existingGermplasmPUIs.isEmpty()) {
+			this.errors.reject("germplasm.import.existent.puis",
 				new String[] {
-					Util.buildErrorMessageFromList(germplasmDTOS.stream().map(Germplasm::getGermplasmUUID).collect(Collectors.toList()),
-						3)}, "");
+					Util.buildErrorMessageFromList(existingGermplasmPUIs, 3)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
 	private void validateStockIds(final List<GermplasmInventoryImportDTO> germplasmInventoryImportDTOList) {
 		final List<String> stockIds =
-			germplasmInventoryImportDTOList.stream().filter(g -> StringUtils.isNotEmpty(g.getStockId())).map(g -> g.getStockId())
+			germplasmInventoryImportDTOList.stream().filter(g -> StringUtils.isNotEmpty(g.getStockId())).map(GermplasmInventoryImportDTO::getStockId)
 				.collect(Collectors.toList());
 
 		if (!stockIds.isEmpty()) {
@@ -495,7 +484,7 @@ public class GermplasmImportRequestDtoValidator {
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 
-			if (uniqueNotNullStockIds.stream().filter(c -> c.length() > STOCK_ID_MAX_LENGTH).count() > 0) {
+			if (uniqueNotNullStockIds.stream().anyMatch(c -> c.length() > STOCK_ID_MAX_LENGTH)) {
 				this.errors.reject("lot.stock.id.length.higher.than.maximum", new String[] {String.valueOf(STOCK_ID_MAX_LENGTH)}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
@@ -512,7 +501,7 @@ public class GermplasmImportRequestDtoValidator {
 
 	private void validateUnits(final List<GermplasmInventoryImportDTO> germplasmInventoryImportDTOList) {
 		final List<String> units =
-			germplasmInventoryImportDTOList.stream().filter(g -> StringUtils.isNotEmpty(g.getUnit())).map(g -> g.getUnit()).distinct()
+			germplasmInventoryImportDTOList.stream().filter(g -> StringUtils.isNotEmpty(g.getUnit())).map(GermplasmInventoryImportDTO::getUnit).distinct()
 				.collect(Collectors.toList());
 		if (!units.isEmpty()) {
 			this.inventoryCommonValidator.validateUnitNames(new ArrayList<>(units), this.errors);
@@ -547,16 +536,13 @@ public class GermplasmImportRequestDtoValidator {
 					.reject("germplasm.import.duplicated.attributes", new String[] {(id != null) ? String.valueOf(id) : "Unknown"}, "");
 				return true;
 			}
-			if (attributes.values().stream().anyMatch(n -> {
+			return attributes.values().stream().anyMatch(n -> {
 				if (StringUtils.isNotEmpty(n) && n.length() > ATTRIBUTE_MAX_LENGTH) {
 					this.errors.reject("germplasm.import.attribute.value.invalid.length", "");
 					return true;
 				}
 				return false;
-			})) {
-				return true;
-			}
-			return false;
+			});
 		}
 		return false;
 	}

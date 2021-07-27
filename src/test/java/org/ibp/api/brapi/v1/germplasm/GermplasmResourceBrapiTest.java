@@ -14,7 +14,7 @@ import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
-import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.brapi.GermplasmServiceBrapi;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 	private SearchRequestService searchRequestService;
 
 	@Autowired
-	private GermplasmService germplasmService;
+	private GermplasmServiceBrapi germplasmService;
 
 	@Autowired
 	private GermplasmAttributeService germplasmAttributeService;
