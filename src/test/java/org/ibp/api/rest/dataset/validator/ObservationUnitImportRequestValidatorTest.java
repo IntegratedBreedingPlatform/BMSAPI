@@ -1,12 +1,12 @@
 package org.ibp.api.rest.dataset.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
-import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
@@ -43,7 +43,7 @@ public class ObservationUnitImportRequestValidatorTest {
 	private StudyInstanceService studyInstanceService;
 
 	@Mock
-	private GermplasmService germplasmService;
+	private GermplasmServiceBrapi germplasmService;
 
 	@Mock
 	private OntologyService ontologyService;
@@ -67,7 +67,7 @@ public class ObservationUnitImportRequestValidatorTest {
 		germplasmDTO.setGermplasmDbId(GERMPLASM_DBID);
 		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDto.setGermplasmDbIds(Collections.singletonList(GERMPLASM_DBID));
-		Mockito.when(this.germplasmService.searchFilteredGermplasm(germplasmSearchRequestDto, null))
+		Mockito.when(this.germplasmService.searchGermplasmDTO(germplasmSearchRequestDto, null))
 			.thenReturn(Collections.singletonList(germplasmDTO));
 
 		final StandardVariable s = new StandardVariable();

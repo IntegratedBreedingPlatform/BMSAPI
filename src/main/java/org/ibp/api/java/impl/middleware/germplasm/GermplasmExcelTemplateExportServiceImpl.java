@@ -16,7 +16,6 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -89,7 +88,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		IMPORT_HEADERS.put("export.germplasm.list.template.units.column", ExcelCellStyle.HEADING_STYLE_BLUE);
 		IMPORT_HEADERS.put("export.germplasm.list.template.amount.column", ExcelCellStyle.HEADING_STYLE_BLUE);
 		IMPORT_HEADERS.put("export.germplasm.list.template.stock.id.column", ExcelCellStyle.HEADING_STYLE_BLUE);
-		IMPORT_HEADERS.put("export.germplasm.list.template.guid.column", ExcelCellStyle.HEADING_STYLE_ORANGE);
+		IMPORT_HEADERS.put("export.germplasm.list.template.pui.column", ExcelCellStyle.HEADING_STYLE_ORANGE);
 	}
 
 	private static final Map<String, ExcelCellStyle> IMPORT_HEADERS_FOR_UPDATE;
