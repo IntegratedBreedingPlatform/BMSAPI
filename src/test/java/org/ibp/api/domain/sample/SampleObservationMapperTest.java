@@ -2,6 +2,7 @@ package org.ibp.api.domain.sample;
 
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.ibp.api.java.impl.middleware.SampleTestDataGenerator;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;

@@ -1,6 +1,7 @@
 package org.ibp.api.domain.sample;
 
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;

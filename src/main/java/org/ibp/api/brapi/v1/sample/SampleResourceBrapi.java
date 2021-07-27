@@ -1,13 +1,15 @@
 package org.ibp.api.brapi.v1.sample;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
-import org.ibp.api.domain.sample.SampleObservationDto;
+import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.ibp.api.domain.sample.SampleObservationMapper;
 import org.ibp.api.domain.sample.SampleSummaryDto;
 import org.ibp.api.java.impl.middleware.sample.SampleService;
@@ -34,6 +36,7 @@ public class SampleResourceBrapi {
 
 	@ApiOperation(value = "Get a sample by sampleDbId", notes = "Get a sample by sampleDbId")
 	@RequestMapping(value = "/{crop}/brapi/v1/samples/{sampleDbId}", method = RequestMethod.GET)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	@ResponseBody
 	public ResponseEntity<SampleSummaryDto> getSampleBySampleId(@PathVariable final String crop, final @PathVariable String sampleDbId) {
 		final SampleDetailsDTO sampleDetailsDTO = this.sampleService.getSampleObservation(sampleDbId);
