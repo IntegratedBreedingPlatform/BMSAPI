@@ -176,6 +176,10 @@ public class GermplasmImportRequestValidator {
 			this.errors.reject(GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH, new String[] {index.toString(), "pedigree"}, "");
 			return true;
 		}
+		if (!StringUtils.isEmpty(g.getGermplasmPUI()) && this.nameExceedsLength(g.getGermplasmPUI())) {
+			this.errors.reject(GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH, new String[] {index.toString(), "germplasmPUI"}, "");
+			return true;
+		}
 		return false;
 	}
 
