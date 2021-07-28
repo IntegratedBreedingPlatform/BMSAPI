@@ -1,7 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.program;
 
-import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
@@ -179,9 +178,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public void addNewProgramMembers(final String programUUID, final AddProgramMemberRequestDto requestDto) {
 		this.addProgramMemberRequestDtoValidator.validate(programUUID, requestDto);
-		final String userName = SecurityUtil.getLoggedInUserName();
-		final WorkbenchUser workbenchUser = this.userService.getUserByUsername(userName);
-		this.programService.addProgramMembers(workbenchUser, programUUID, requestDto);
+		this.programService.addProgramMembers(programUUID, requestDto);
 	}
 
 	@Override
