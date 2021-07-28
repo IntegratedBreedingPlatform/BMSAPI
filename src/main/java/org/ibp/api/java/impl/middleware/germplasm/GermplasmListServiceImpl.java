@@ -690,6 +690,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public boolean toggleGermplasmListStatus(final Integer listId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		final GermplasmList germplasmList = this.validateGermplasmList(listId);
+
+		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
+		if (!germplasmList.getUserId().equals(createdBy.getUserid())) {
+			this.errors.reject("list.toggle.status.not.owner", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
 		return this.germplasmListService.toggleGermplasmListStatus(listId);
 	}
 
