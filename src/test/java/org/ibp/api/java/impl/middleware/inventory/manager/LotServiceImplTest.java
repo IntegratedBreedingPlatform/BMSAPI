@@ -142,7 +142,7 @@ public class LotServiceImplTest {
         );
 
         Mockito.doNothing().when(this.lotMergeValidator).validate(keepLotUUID, extendedLotDtos);
-        Mockito.when(this.lotService.searchLots(lotsSearchDto, null)).thenReturn(extendedLotDtos);
+        Mockito.when(this.middlewareLotService.searchLots(lotsSearchDto, null)).thenReturn(extendedLotDtos);
         Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(new WorkbenchUser(USER_ID));
 
         this.lotService.mergeLots(keepLotUUID, lotsSearchDto);
@@ -192,7 +192,7 @@ public class LotServiceImplTest {
             ArgumentMatchers.any(Set.class), ArgumentMatchers.eq(5D), ArgumentMatchers.isNull());
 
         final ExtendedLotDto newSplitExtendedLotDto = ExtendedLotDtoDummyFactory.create(lotActualBalance);
-        Mockito.when(this.lotService.searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull()))
+        Mockito.when(this.middlewareLotService.searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull(), ArgumentMatchers.anyBoolean()))
             .thenReturn(Arrays.asList(splitExtendedLotDto))
             .thenReturn(Arrays.asList(newSplitExtendedLotDto));
 
