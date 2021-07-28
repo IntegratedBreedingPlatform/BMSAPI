@@ -1,13 +1,10 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.hamcrest.CoreMatchers;
-import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.junit.Assert;
@@ -25,16 +22,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 public class GermplasmValidatorTest {
-
-	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
-	public static final int LOCATION_ID = 6000;
-	public static final String STOCK_ID = "ABCD";
-	public static final String COMMENTS = "Comments";
 
 	@Mock
 	private GermplasmService germplasmService;
@@ -57,7 +48,7 @@ public class GermplasmValidatorTest {
 		Mockito.when(this.germplasmService.getGermplasmByGIDs(Arrays.asList(GERMPLASM_ID))).thenReturn(Arrays.asList(germplasm));
 		this.germplasmValidator.validateGermplasmId(this.errors, GERMPLASM_ID);
 
-		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
+		Assert.assertEquals(0, this.errors.getAllErrors().size());
 	}
 
 	@Test
@@ -66,7 +57,7 @@ public class GermplasmValidatorTest {
 		final Integer germplasmId = null;
 		this.germplasmValidator.validateGermplasmId(this.errors, germplasmId);
 
-		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
+		Assert.assertEquals(1, this.errors.getAllErrors().size());
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("germplasm.required"));
 	}
@@ -77,7 +68,7 @@ public class GermplasmValidatorTest {
 		Mockito.when(this.germplasmService.getGermplasmByGIDs(Arrays.asList(GERMPLASM_ID))).thenReturn(null);
 		this.germplasmValidator.validateGermplasmId(this.errors, GERMPLASM_ID);
 
-		Assert.assertEquals(this.errors.getAllErrors().size(),  1);
+		Assert.assertEquals(1, this.errors.getAllErrors().size());
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("germplasm.invalid"));
 	}
@@ -100,7 +91,7 @@ public class GermplasmValidatorTest {
 	public void testValidateGermplasmUUID() {
 		final String germplasmDbId = RandomStringUtils.randomAlphabetic(20);
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		Mockito.when(this.germplasmService.getGermplasmDTOByGUID(germplasmDbId)).thenReturn(Optional.of(new GermplasmDTO()));
+		Mockito.when(this.germplasmService.getGermplasmByGUIDs(Collections.singletonList(germplasmDbId))).thenReturn(Collections.singletonList(new Germplasm()));
 		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmDbId);
 		Assert.assertEquals(0, this.errors.getAllErrors().size());
 	}
@@ -109,7 +100,7 @@ public class GermplasmValidatorTest {
 	public void testValidateGermplasmUUID_Invalid() {
 		final String germplasmDbId = RandomStringUtils.randomAlphabetic(20);
 		this.errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		Mockito.when(this.germplasmService.getGermplasmDTOByGUID(germplasmDbId)).thenReturn(Optional.empty());
+		Mockito.when(this.germplasmService.getGermplasmByGUIDs(Collections.singletonList(germplasmDbId))).thenReturn(Collections.emptyList());
 		this.germplasmValidator.validateGermplasmUUID(this.errors, germplasmDbId);
 
 		Assert.assertEquals(1, this.errors.getAllErrors().size());
