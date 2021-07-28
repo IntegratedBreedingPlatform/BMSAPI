@@ -2,14 +2,14 @@ package org.ibp.api.java.impl.middleware.program.validator;
 
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.RoleType;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.Util;
-import org.ibp.api.domain.role.RoleDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.java.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -28,7 +28,7 @@ public class AddProgramMemberRequestDtoValidator {
 	private UserService userService;
 
 	@Autowired
-	private RoleService roleService;
+	private WorkbenchDataManager workbenchDataManager;
 
 	public void validate(final String programUUID, final AddProgramMemberRequestDto addProgramMemberRequestDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), AddProgramMemberRequestDto.class.getName());
@@ -60,7 +60,7 @@ public class AddProgramMemberRequestDtoValidator {
 		}
 
 		//role is a program role
-		final RoleDto role = this.roleService.getRole(addProgramMemberRequestDto.getRoleId());
+		final Role role = this.workbenchDataManager.getRoleById(addProgramMemberRequestDto.getRoleId());
 		if (role == null) {
 			errors.reject("program.member.role.do.not.exist", new String[] {String.valueOf(addProgramMemberRequestDto.getRoleId())}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
