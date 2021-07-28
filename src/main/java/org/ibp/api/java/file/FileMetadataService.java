@@ -16,4 +16,6 @@ public interface FileMetadataService {
 	FileMetadataDTO save(MultipartFile file, String path, String observationUnitUUID, Integer termId);
 
 	String getFilePath(String observationUnitUUID, Integer termId, String fileName);
+
+	void delete(String fileUUID);
 }

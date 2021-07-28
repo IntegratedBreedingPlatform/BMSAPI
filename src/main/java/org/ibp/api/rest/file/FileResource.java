@@ -53,12 +53,15 @@ public class FileResource {
 		@RequestParam final Integer termId
 	) {
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
+
 		final String path = this.fileMetadataService.getFilePath(observationUnitUUID, termId, file.getOriginalFilename());
+		// FIXME move two steps inside fileMetadataService and use file storage there (transactional)
 		this.fileStorageService.upload(file, path);
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.save(file, path, observationUnitUUID, termId);
 		return new ResponseEntity<>(fileMetadataDTO, HttpStatus.CREATED);
 	}
 
+	// TODO now that we file_metadata, we can GET /files/{fileUUID}
 	@RequestMapping(value = "/files/**", method = RequestMethod.GET)
 	@ResponseBody
 	public byte[] getFile(
@@ -67,6 +70,15 @@ public class FileResource {
 	) {
 		final String path = getPath(request);
 		return this.fileStorageService.getFile(path);
+	}
+
+	@RequestMapping(value = "/files/{fileUUID}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity<Void> deleteFile(
+		@PathVariable final String fileUUID
+	) {
+		this.fileMetadataService.delete(fileUUID);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	// TODO remove if not needed anymore

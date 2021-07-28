@@ -35,7 +35,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 	@Override
 	public Image updateImageContent(final String imageDbId, final byte[] imageContent) {
-		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getFileMetadataByUUID(imageDbId);
+		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(imageDbId);
 		this.fileStorageService.upload(FileUtils.wrapAsMultipart(imageContent), fileMetadataDTO.getPath());
 		this.fileMetadataService.linkToObservation(fileMetadataDTO, null);
 
@@ -60,4 +60,13 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		BaseValidator.checkNotNull(fileName, "param.null", new String[] {"fileName"});
 		return this.fileMetadataService.getFilePath(observationUnitUUID, termId, fileName);
 	}
+
+	@Override
+	public void delete(final String fileUUID) {
+		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(fileUUID);
+		this.fileMetadataService.delete(fileUUID);
+		// delete file storage last as it is not possible to rollback
+		this.fileStorageService.deleteFile(fileMetadataDTO.getPath());
+	}
+
 }

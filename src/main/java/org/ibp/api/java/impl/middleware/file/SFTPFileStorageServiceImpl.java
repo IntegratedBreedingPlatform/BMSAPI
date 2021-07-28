@@ -6,7 +6,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import org.apache.commons.io.IOUtils;
-import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.java.file.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,8 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -51,11 +49,11 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 
 			channelSftp.put(file.getInputStream(), pathParts[pathParts.length - 1]);
 		} catch (final JSchException e) {
-			throw new ApiRuntimeException("", e);
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
 		} catch (final SftpException e) {
-			throw new ApiRuntimeException("", e);
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
 		} catch (final IOException e) {
-			throw new ApiRuntimeException("", e);
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.format");
 		} finally {
 			close(channelSftp);
 		}
@@ -71,15 +69,31 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 			final InputStream inputStream = channelSftp.get(path);
 			bytes = IOUtils.toByteArray(inputStream);
 		} catch (final JSchException e) {
-			throw new ApiRuntimeException("", e);
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
 		} catch (final SftpException e) {
-			throw new ApiRuntimeException("", e);
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
 		} catch (final IOException e) {
-			throw new ApiRuntimeException("", e);
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.get");
 		} finally {
 			close(channelSftp);
 		}
 		return bytes;
+	}
+
+	@Override
+	public void deleteFile(final String path) {
+
+		try {
+			final ChannelSftp channelSftp = this.setupJsch();
+			channelSftp.connect();
+			channelSftp.rm(path);
+		} catch (final JSchException e) {
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
+		} catch (final SftpException e) {
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
+		} catch (final IOException e) {
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.delete");
+		}
 	}
 
 	@Override

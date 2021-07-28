@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.file;
 
+import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.file.FileStorageService;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -49,11 +51,9 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 				.build();
 			final PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
 		} catch (final SdkClientException e) {
-			// Amazon S3 couldn't be contacted for a response, or the client
-			// couldn't parse the response from Amazon S3.
-			throw new ApiRuntimeException("Something went wrong while contacting Amazon S3, please contact your administrator", e);
+			throw new ApiRuntime2Exception("", "file.storage.aws.error.connection");
 		} catch (final IOException e) {
-			throw new ApiRuntimeException("Your file format is not supported", e);
+			throw new ApiRuntime2Exception("", "file.storage.aws.error.file.format");
 		}
 	}
 
@@ -70,15 +70,31 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 
 			return IoUtils.toByteArray(response);
 		} catch (final SdkClientException e) {
-			throw new ApiRuntimeException("Something went wrong while contacting Amazon S3, please contact your administrator", e);
+			throw new ApiRuntime2Exception("", "file.storage.aws.error.connection");
 		} catch (final IOException e) {
-			throw new ApiRuntimeException("Something was wrong while retrieving the image", e);
+			throw new ApiRuntime2Exception("", "file.storage.aws.error.file.get");
 		}
 	}
 
 	@Override
 	public boolean isConfigured() {
 		return true;
+	}
+
+	@Override
+	public void deleteFile(final String path) {
+
+		try {
+			final S3Client s3Client = this.buildS3Client();
+
+			final DeleteObjectRequest deleteObjectResponse = DeleteObjectRequest.builder()
+				.bucket(this.bucketName)
+				.key(path)
+				.build();
+			s3Client.deleteObject(deleteObjectResponse);
+		} catch (final SdkClientException e) {
+			throw new ApiRuntime2Exception("", "file.storage.aws.error.connection");
+		}
 	}
 
 	/*
