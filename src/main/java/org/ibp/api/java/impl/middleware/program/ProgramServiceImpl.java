@@ -187,7 +187,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public void removeProgramMembers(final String programUUID, final Set<Integer> userIds) {
 		this.removeProgramMembersValidator.validate(programUUID, userIds);
-		this.programService.removeUsersFromProgram(new ArrayList<>(userIds), programUUID);
+		this.programService.removeProgramMembers(new ArrayList<>(userIds), programUUID);
 	}
 
 }
