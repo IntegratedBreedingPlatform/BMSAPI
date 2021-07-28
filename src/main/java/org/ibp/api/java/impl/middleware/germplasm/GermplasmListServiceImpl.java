@@ -831,6 +831,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			output.setDescription(input.getDescription());
 			output.setProgramUUID(input.getProgramUUID());
 			output.setLocked(input.isLockedList());
+			output.setOwnerId(input.getUserId());
 			return output;
 		}
 	}
