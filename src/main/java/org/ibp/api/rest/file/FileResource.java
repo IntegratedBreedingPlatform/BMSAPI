@@ -2,7 +2,6 @@ package org.ibp.api.rest.file;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.file.FileStorageService;
@@ -53,11 +52,7 @@ public class FileResource {
 		@RequestParam final Integer termId
 	) {
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
-
-		final String path = this.fileMetadataService.getFilePath(observationUnitUUID, termId, file.getOriginalFilename());
-		// FIXME move two steps inside fileMetadataService and use file storage there (transactional)
-		this.fileStorageService.upload(file, path);
-		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.save(file, path, observationUnitUUID, termId);
+		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.upload(file, observationUnitUUID, termId);
 		return new ResponseEntity<>(fileMetadataDTO, HttpStatus.CREATED);
 	}
 

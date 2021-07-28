@@ -44,7 +44,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public FileMetadataDTO save(final MultipartFile file, final String path, final String observationUnitUUID, final Integer termId) {
+	public FileMetadataDTO upload(final MultipartFile file, final String observationUnitUUID, final Integer termId) {
+		final String path = this.getFilePath(observationUnitUUID, termId, file.getOriginalFilename());
+
 		FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
 		fileMetadataDTO.setName(file.getOriginalFilename());
 		fileMetadataDTO.setMimeType(file.getContentType());
@@ -52,6 +54,10 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		fileMetadataDTO.setPath(path);
 		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID);
 		this.fileMetadataService.linkToObservation(fileMetadataDTO, termId);
+
+		// save file storage last as it is outside the transaction
+		this.fileStorageService.upload(file, path);
+
 		return fileMetadataDTO;
 	}
 
@@ -65,7 +71,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	public void delete(final String fileUUID) {
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(fileUUID);
 		this.fileMetadataService.delete(fileUUID);
-		// delete file storage last as it is not possible to rollback
+		// save file storage last as it is outside the transaction
 		this.fileStorageService.deleteFile(fileMetadataDTO.getPath());
 	}
 
