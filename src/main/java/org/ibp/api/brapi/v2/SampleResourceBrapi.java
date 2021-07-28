@@ -8,13 +8,18 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRe
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.ibp.api.brapi.v1.common.*;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.sample.SampleService;
+import org.ibp.api.rest.common.PaginatedSearch;
+import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Api(value = "BrAPI v2 Sample Services")
 @Controller(value = "SampleResourceBrapiV2")
@@ -52,15 +57,26 @@ public class SampleResourceBrapi {
 
         final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
         final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
-
         final PageRequest pageRequest = new PageRequest(finalPageNumber, finalPageSize);
+        final PagedResult<SampleObservationDto> resultPage =
+                new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<SampleObservationDto>() {
 
-        final Result<SampleObservationDto> result = new Result<SampleObservationDto>();
-        final Pagination pagination = new Pagination();
+                    @Override
+                    public long getCount() {
+                        return SampleResourceBrapi.this.sampleService.countSampleObservations(requestDTO);
+                    }
+
+                    @Override
+                    public List<SampleObservationDto> getResults(final PagedResult<SampleObservationDto> pagedResult) {
+                        return SampleResourceBrapi.this.sampleService.getSampleObservations(requestDTO, pageRequest);
+                    }
+                });
+
+        final Result<SampleObservationDto> results = new Result<SampleObservationDto>().withData(resultPage.getPageResults());
+        final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+                .withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
         final Metadata metadata = new Metadata().withPagination(pagination);
-        final EntityListResponse<SampleObservationDto> entityListResponse = new EntityListResponse<>(metadata, result);
-
-        return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+        return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
     }
 }
