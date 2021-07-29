@@ -189,7 +189,7 @@ public class LotServiceImplTest {
             ArgumentMatchers.any(Set.class), ArgumentMatchers.eq(5D), ArgumentMatchers.isNull());
 
         final ExtendedLotDto newSplitExtendedLotDto = ExtendedLotDtoDummyFactory.create(lotActualBalance);
-        Mockito.when(this.middlewareLotService.searchLotsApplyExportResultsLimit(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull()))
+        Mockito.when(this.middlewareLotService.searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull()))
             .thenReturn(Arrays.asList(splitExtendedLotDto))
             .thenReturn(Arrays.asList(newSplitExtendedLotDto));
 
