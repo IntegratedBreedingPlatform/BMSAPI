@@ -11,6 +11,7 @@ import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -28,6 +29,7 @@ public class AddProgramMemberRequestDtoValidator {
 	private UserService userService;
 
 	@Autowired
+	@Lazy
 	private WorkbenchDataManager workbenchDataManager;
 
 	public void validate(final String programUUID, final AddProgramMemberRequestDto addProgramMemberRequestDto) {
