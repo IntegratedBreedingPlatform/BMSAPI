@@ -183,7 +183,7 @@ public class GermplasmNameTypeValidatorTest {
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
 			.thenReturn(Optional.of(germplasmNameTypeDTO));
 
-		Mockito.when(this.germplasmNameTypeService.existNameTypeUsedInListDataProp(Mockito.any()))
+		Mockito.when(this.germplasmNameTypeService.isNameTypeUsedInListDataProp(Mockito.any()))
 			.thenReturn(true);
 		try {
 			this.germplasmNameTypeValidator.deletable(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);

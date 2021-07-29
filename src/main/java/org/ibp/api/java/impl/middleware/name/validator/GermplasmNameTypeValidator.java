@@ -148,7 +148,7 @@ public class GermplasmNameTypeValidator {
 
 	private void validateNameTypeBelongsToGermplasmList(final String name) {
 		final boolean isNameTypeAssociatedToList =
-			this.germplasmNameTypeService.existNameTypeUsedInListDataProp(name);
+			this.germplasmNameTypeService.isNameTypeUsedInListDataProp(name);
 
 		if (isNameTypeAssociatedToList) {
 			this.errors.reject("germplasm.name.type.asociated.to.list", "");
