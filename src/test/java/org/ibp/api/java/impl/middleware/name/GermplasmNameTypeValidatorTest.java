@@ -195,7 +195,7 @@ public class GermplasmNameTypeValidatorTest {
 	@Test
 	public void ValidateDeletable_ThrowsException_WhenNameTypeIdIsUsedBySystem() {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
-		germplasmNameTypeDTO.setCode(GermplasmNameTypeValidator.NAME_TYPES_USED_FOR_THE_SYSTEM.get(0));
+		germplasmNameTypeDTO.setCode(GermplasmNameTypeValidator.SYSTEM_NAME_TYPES.get(0));
 
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
 			.thenReturn(Optional.of(germplasmNameTypeDTO));

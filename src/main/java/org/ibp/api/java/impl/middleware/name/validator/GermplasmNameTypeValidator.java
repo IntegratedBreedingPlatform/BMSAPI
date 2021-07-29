@@ -25,7 +25,7 @@ public class GermplasmNameTypeValidator {
 
 	public static final Integer CODE_OR_NAME_MAX_LENGTH = 50;
 	public static final Integer DESCRIPTION_MAX_LENGTH = 255;
-	public static final List<String> NAME_TYPES_USED_FOR_THE_SYSTEM = Collections.unmodifiableList(
+	public static final List<String> SYSTEM_NAME_TYPES = Collections.unmodifiableList(
 		Arrays.asList("LNAME", "CODE1", "CODE2", "CODE3", "PEDIGREE", "CROSS NAME", "CROSSING NAME", "DERIVATIVE NAME"));
 
 	private BindingResult errors;
@@ -132,7 +132,7 @@ public class GermplasmNameTypeValidator {
 	}
 
 	private void validateNameTypeBelongsToSystem(final String code) {
-		if (GermplasmNameTypeValidator.NAME_TYPES_USED_FOR_THE_SYSTEM.contains(code)) {
+		if (GermplasmNameTypeValidator.SYSTEM_NAME_TYPES.contains(code)) {
 			this.errors.reject("germplasm.name.type.used.for.the.system", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
