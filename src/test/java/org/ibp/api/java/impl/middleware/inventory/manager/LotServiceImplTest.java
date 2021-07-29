@@ -21,7 +21,6 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.hamcrest.collection.IsMapContaining;
-import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
@@ -43,11 +42,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.collections.Sets;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -192,7 +189,7 @@ public class LotServiceImplTest {
             ArgumentMatchers.any(Set.class), ArgumentMatchers.eq(5D), ArgumentMatchers.isNull());
 
         final ExtendedLotDto newSplitExtendedLotDto = ExtendedLotDtoDummyFactory.create(lotActualBalance);
-        Mockito.when(this.middlewareLotService.searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull(), ArgumentMatchers.anyBoolean()))
+        Mockito.when(this.middlewareLotService.searchLotsApplyExportResultsLimit(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull()))
             .thenReturn(Arrays.asList(splitExtendedLotDto))
             .thenReturn(Arrays.asList(newSplitExtendedLotDto));
 
