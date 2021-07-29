@@ -48,7 +48,7 @@ public class GermplasmNameTypeResource {
 	@ResponseBody
 	public ResponseEntity<Void> updateNameType(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId, @RequestBody final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
-		this.germplasmNameTypeService.updateNameType(germplasmNameTypeRequestDTO,nameTypeId);
+		this.germplasmNameTypeService.updateNameType(nameTypeId, germplasmNameTypeRequestDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
