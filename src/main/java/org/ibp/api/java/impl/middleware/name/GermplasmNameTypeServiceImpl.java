@@ -44,7 +44,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	@Override
 	public void deleteNameType(final Integer nameTypeId) {
-		this.germplasmNameTypeValidator.deletable(nameTypeId);
+		this.germplasmNameTypeValidator.validateCanBeDeleted(nameTypeId);
 		this.germplasmNameTypeService.deleteNameType(nameTypeId);
 	}
 }

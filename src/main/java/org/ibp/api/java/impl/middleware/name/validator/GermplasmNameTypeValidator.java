@@ -156,7 +156,7 @@ public class GermplasmNameTypeValidator {
 		}
 	}
 
-	public void deletable(final Integer nameTypeId) {
+	public void validateCanBeDeleted(final Integer nameTypeId) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmNameTypeRequestDTO.class.getName());
 		this.validateExistingNameType(nameTypeId);
 	}

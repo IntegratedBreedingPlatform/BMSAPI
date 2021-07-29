@@ -153,7 +153,7 @@ public class GermplasmNameTypeValidatorTest {
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
 			.thenReturn(Optional.empty());
 		try {
-			this.germplasmNameTypeValidator.deletable(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
+			this.germplasmNameTypeValidator.validateCanBeDeleted(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.invalid"));
 		}
@@ -170,7 +170,7 @@ public class GermplasmNameTypeValidatorTest {
 			.thenReturn(Arrays.asList(new Name()));
 
 		try {
-			this.germplasmNameTypeValidator.deletable(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
+			this.germplasmNameTypeValidator.validateCanBeDeleted(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.is.in.used"));
 		}
@@ -186,7 +186,7 @@ public class GermplasmNameTypeValidatorTest {
 		Mockito.when(this.germplasmNameTypeService.isNameTypeUsedInListDataProp(Mockito.any()))
 			.thenReturn(true);
 		try {
-			this.germplasmNameTypeValidator.deletable(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
+			this.germplasmNameTypeValidator.validateCanBeDeleted(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.asociated.to.list"));
 		}
@@ -201,7 +201,7 @@ public class GermplasmNameTypeValidatorTest {
 			.thenReturn(Optional.of(germplasmNameTypeDTO));
 
 		try {
-			this.germplasmNameTypeValidator.deletable(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
+			this.germplasmNameTypeValidator.validateCanBeDeleted(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.used.for.the.system"));
 		}
