@@ -2,12 +2,14 @@
 package org.ibp.api.java.program;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ProgramService {
 
@@ -30,5 +32,9 @@ public interface ProgramService {
 	List<ProgramMemberDto> getProgramMembers(String programUUID, Pageable pageable);
 
 	long countAllProgramMembers(String programUUID);
+
+	void addNewProgramMembers(String programUUID, AddProgramMemberRequestDto requestDto);
+
+	void removeProgramMembers(String programUUID, Set<Integer> userIds);
 
 }

@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.program;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -11,6 +12,8 @@ import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.program.validator.AddProgramMemberRequestDtoValidator;
+import org.ibp.api.java.impl.middleware.program.validator.RemoveProgramMembersValidator;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -38,6 +41,12 @@ public class ProgramServiceImpl implements ProgramService {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private AddProgramMemberRequestDtoValidator addProgramMemberRequestDtoValidator;
+
+	@Autowired
+	private RemoveProgramMembersValidator removeProgramMembersValidator;
+
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	@Override
@@ -58,7 +67,6 @@ public class ProgramServiceImpl implements ProgramService {
 			throw new ApiRuntimeException("Error!", e);
 		}
 	}
-
 
 	List<ProgramDTO> convertToProgramSummaries(final List<Project> workbenchProgramList) {
 		final List<ProgramDTO> programSummaries = new ArrayList<>();
@@ -165,6 +173,18 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public long countAllProgramMembers(final String programUUID) {
 		return this.userService.countAllProgramMembers(programUUID);
+	}
+
+	@Override
+	public void addNewProgramMembers(final String programUUID, final AddProgramMemberRequestDto requestDto) {
+		this.addProgramMemberRequestDtoValidator.validate(programUUID, requestDto);
+		this.programService.addProgramMembers(programUUID, requestDto);
+	}
+
+	@Override
+	public void removeProgramMembers(final String programUUID, final Set<Integer> userIds) {
+		this.removeProgramMembersValidator.validate(programUUID, userIds);
+		this.programService.removeProgramMembers(programUUID, new ArrayList<>(userIds));
 	}
 
 }
