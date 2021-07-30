@@ -109,8 +109,7 @@ public class GermplasmNameTypeValidator {
 	protected void validateIfCodeAlreadyExists(final String code, final Integer nameTypeId) {
 		final Set<String> codes = new HashSet<>(Arrays.asList(code));
 		final List<GermplasmNameTypeDTO> nameTypeDTOS = this.germplasmNameTypeService.filterGermplasmNameTypes(codes);
-
-		if (nameTypeDTOS.size() >=1 && nameTypeId != null && !nameTypeDTOS.get(0).getId().equals(nameTypeId)) {
+		if (!nameTypeDTOS.isEmpty() && (nameTypeId == null || !nameTypeDTOS.get(0).getId().equals(nameTypeId))) {
 			this.errors.reject("germplasm.name.type.code.invalid", new String[] {code}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -118,7 +117,7 @@ public class GermplasmNameTypeValidator {
 
 	protected void validateIfNameAlreadyExists(final String name, final Integer nameTypeId) {
 		final List<GermplasmNameTypeDTO> nameTypeDTOS = this.germplasmNameTypeService.filterGermplasmNameTypesByName(name);
-		if (nameTypeDTOS.size() >= 1 && nameTypeId != null && !nameTypeDTOS.get(0).getId().equals(nameTypeId)) {
+		if (!nameTypeDTOS.isEmpty() && (nameTypeId == null || !nameTypeDTOS.get(0).getId().equals(nameTypeId))) {
 			this.errors.reject("germplasm.name.type.name.invalid", new String[] {name}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
