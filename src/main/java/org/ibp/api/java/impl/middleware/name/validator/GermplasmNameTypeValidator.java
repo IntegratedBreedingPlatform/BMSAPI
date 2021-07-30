@@ -98,6 +98,12 @@ public class GermplasmNameTypeValidator {
 				new String[] {GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+
+		final String codeTrimmed = StringUtils.deleteWhitespace(germplasmNameTypeRequestDTO.getCode());
+		if (germplasmNameTypeRequestDTO.getCode().length() != codeTrimmed.length()) {
+			this.errors.reject("germplasm.name.type.code.whitespace", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	protected void validateIfCodeAlreadyExists(final String code, final Integer nameTypeId) {
