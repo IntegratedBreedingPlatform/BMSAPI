@@ -3,6 +3,7 @@ package org.ibp.api.brapi.v2.germplasm;
 import com.google.common.collect.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
@@ -70,17 +71,19 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 				Matchers.is(germplasmDTO.getGenus())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmName",
 				Matchers.is(germplasmDTO.getGermplasmName())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.type",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinateUncertainty",
+				Matchers.is(StringUtils.EMPTY)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.type",
 				Matchers.is("Feature")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.geometry.type",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.geometry.type",
 				Matchers.is("Polygon")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.geometry.coordinates[0][0]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.geometry.coordinates[0][0]",
 				Matchers.containsInAnyOrder(1.0, 2.0)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.geometry.coordinates[0][1]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.geometry.coordinates[0][1]",
 				Matchers.containsInAnyOrder(3.0, 4.0)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.geometry.coordinates[0][2]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.geometry.coordinates[0][2]",
 				Matchers.containsInAnyOrder(5.0, 6.0)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.geometry.coordinates[0][3]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.geometry.coordinates[0][3]",
 				Matchers.containsInAnyOrder(7.0, 8.0)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].countryOfOriginCode",
 				Matchers.is(germplasmDTO.getCountryOfOriginCode())))
@@ -138,17 +141,19 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 				Matchers.is(germplasmDTO.getGenus())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmName",
 				Matchers.is(germplasmDTO.getGermplasmName())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.type",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinateUncertainty",
+				Matchers.is(StringUtils.EMPTY)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.type",
 				Matchers.is("Feature")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.geometry.type",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.geometry.type",
 				Matchers.is("Polygon")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.geometry.coordinates[0][0]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.geometry.coordinates[0][0]",
 				Matchers.containsInAnyOrder(1.0, 2.0)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.geometry.coordinates[0][1]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.geometry.coordinates[0][1]",
 				Matchers.containsInAnyOrder(3.0, 4.0)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.geometry.coordinates[0][2]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.geometry.coordinates[0][2]",
 				Matchers.containsInAnyOrder(5.0, 6.0)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.geometry.coordinates[0][3]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmOrigin.coordinates.geometry.coordinates[0][3]",
 				Matchers.containsInAnyOrder(7.0, 8.0)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].countryOfOriginCode",
 				Matchers.is(germplasmDTO.getCountryOfOriginCode())))
@@ -224,17 +229,19 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 				Matchers.is(germplasmDTO.getGenus())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmName",
 				Matchers.is(germplasmDTO.getGermplasmName())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.type",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.coordinateUncertainty",
+				Matchers.is(StringUtils.EMPTY)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.coordinates.type",
 				Matchers.is("Feature")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.geometry.type",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.coordinates.geometry.type",
 				Matchers.is("Polygon")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.geometry.coordinates[0][0]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.coordinates.geometry.coordinates[0][0]",
 				Matchers.containsInAnyOrder(1.0, 2.0)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.geometry.coordinates[0][1]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.coordinates.geometry.coordinates[0][1]",
 				Matchers.containsInAnyOrder(3.0, 4.0)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.geometry.coordinates[0][2]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.coordinates.geometry.coordinates[0][2]",
 				Matchers.containsInAnyOrder(5.0, 6.0)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.geometry.coordinates[0][3]",
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmOrigin.coordinates.geometry.coordinates[0][3]",
 				Matchers.containsInAnyOrder(7.0, 8.0)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.countryOfOriginCode",
 				Matchers.is(germplasmDTO.getCountryOfOriginCode())))

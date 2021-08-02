@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.util.serializer.JsonStringSerializer;
 import org.generationcp.middleware.util.serializer.SynonymPropertySerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -54,8 +53,7 @@ public class Germplasm {
 	private String collection;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	@JsonSerialize(using = JsonStringSerializer.class)
-	private String germplasmOrigin;
+	private GermplasmOrigin germplasmOrigin;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String germplasmPreProcessing;
@@ -99,7 +97,7 @@ public class Germplasm {
 	private String seedSourceDescription;
 
 	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
-	private final static String documentationURL = null;
+	private String documentationURL;
 
 	@JsonView(BrapiView.BrapiV1_3.class)
 	private String entryNumber;
@@ -159,6 +157,10 @@ public class Germplasm {
 
 	public String getDocumentationURL() {
 		return this.documentationURL;
+	}
+
+	public void setDocumentationURL(final String documentationURL) {
+		this.documentationURL = documentationURL;
 	}
 
 	public String getGermplasmDbId() {
@@ -385,11 +387,11 @@ public class Germplasm {
 		this.collection = collection;
 	}
 
-	public String getGermplasmOrigin() {
+	public GermplasmOrigin getGermplasmOrigin() {
 		return this.germplasmOrigin;
 	}
 
-	public void setGermplasmOrigin(final String germplasmOrigin) {
+	public void setGermplasmOrigin(final GermplasmOrigin germplasmOrigin) {
 		this.germplasmOrigin = germplasmOrigin;
 	}
 
