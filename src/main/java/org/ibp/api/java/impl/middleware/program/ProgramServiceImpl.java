@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.program;
 
+import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.program.validator.AddProgramMemberRequestDtoValidator;
+import org.ibp.api.java.impl.middleware.program.validator.ProgramBasicDetailsDtoValidator;
 import org.ibp.api.java.impl.middleware.program.validator.RemoveProgramMembersValidator;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,9 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Autowired
 	private RemoveProgramMembersValidator removeProgramMembersValidator;
+
+	@Autowired
+	private ProgramBasicDetailsDtoValidator programBasicDetailsDtoValidator;
 
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -186,5 +191,15 @@ public class ProgramServiceImpl implements ProgramService {
 		this.removeProgramMembersValidator.validate(programUUID, userIds);
 		this.programService.removeProgramMembers(programUUID, new ArrayList<>(userIds));
 	}
+
+	@Override
+	public ProgramDTO createProgram(final String crop, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		//validate
+		//create
+		//
+		return null;
+	}
+
+
 
 }

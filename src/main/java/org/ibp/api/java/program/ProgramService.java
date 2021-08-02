@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.program;
 
+import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
@@ -36,5 +37,7 @@ public interface ProgramService {
 	void addNewProgramMembers(String programUUID, AddProgramMemberRequestDto requestDto);
 
 	void removeProgramMembers(String programUUID, Set<Integer> userIds);
+
+	ProgramDTO createProgram(String crop, ProgramBasicDetailsDto programBasicDetailsDto);
 
 }
