@@ -24,6 +24,8 @@ public class ObservationUnitRow {
 
 	private String samplesCount;
 
+	private Integer fileCount;
+
 	private String stockId;
 
 	private Map<String, ObservationUnitData> variables;
@@ -85,6 +87,14 @@ public class ObservationUnitRow {
 
 	public String getSamplesCount() {
 		return samplesCount;
+	}
+
+	public Integer getFileCount() {
+		return this.fileCount;
+	}
+
+	public void setFileCount(final Integer fileCount) {
+		this.fileCount = fileCount;
 	}
 
 	public void setSamplesCount(final String samplesCount) {

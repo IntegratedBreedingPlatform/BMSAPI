@@ -49,7 +49,7 @@ public class FileResource {
 		@PathVariable final String cropName,
 		@RequestPart("file") final MultipartFile file,
 		@RequestParam final String observationUnitUUID,
-		@RequestParam final Integer termId
+		@RequestParam(required = false) final Integer termId
 	) {
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.upload(file, observationUnitUUID, termId);
@@ -76,20 +76,13 @@ public class FileResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	// TODO remove if not needed anymore
 	/**
 	 * @return Map<String, String> to overcome angularjs limitation
 	 */
-	@ApiOperation(value = "Get predetermined file path based on parameters")
-	@RequestMapping(value = "/filepath", method = RequestMethod.GET)
-	public ResponseEntity<Map<String, String>> getFilePath(
-		@PathVariable final String cropName,
-		@RequestParam final String observationUnitId,
-		@RequestParam final Integer termId,
-		@RequestParam final String fileName
-	) {
-		final String path = this.fileMetadataService.getFilePath(observationUnitId, termId, fileName);
-		return new ResponseEntity<>(Collections.singletonMap("path", path), HttpStatus.OK);
+	@ApiOperation("Get file storage status: true => active")
+	@RequestMapping(value = "/filestorage/status", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Boolean>> getFileStorageStatus() {
+		return new ResponseEntity<>(Collections.singletonMap("status", this.fileStorageService.isConfigured()), HttpStatus.OK);
 	}
 
 	private static String getPath(final HttpServletRequest request) {

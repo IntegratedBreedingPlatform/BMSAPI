@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.generationcp.middleware.api.file.FileMetadataMapper;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.file.FileStorageService;
-import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +36,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	public Image updateImageContent(final String imageDbId, final byte[] imageContent) {
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(imageDbId);
 		this.fileStorageService.upload(FileUtils.wrapAsMultipart(imageContent), fileMetadataDTO.getPath());
-		this.fileMetadataService.linkToObservation(fileMetadataDTO, null);
 
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		return fileMetadataMapper.map(fileMetadataDTO);
@@ -45,26 +43,20 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 	@Override
 	public FileMetadataDTO upload(final MultipartFile file, final String observationUnitUUID, final Integer termId) {
-		final String path = this.getFilePath(observationUnitUUID, termId, file.getOriginalFilename());
+		final String path = this.fileMetadataService.getFilePath(observationUnitUUID, file.getOriginalFilename());
 
 		FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
 		fileMetadataDTO.setName(file.getOriginalFilename());
 		fileMetadataDTO.setMimeType(file.getContentType());
 		fileMetadataDTO.setSize((int) file.getSize());
 		fileMetadataDTO.setPath(path);
+		// TODO link to termid
 		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID);
-		this.fileMetadataService.linkToObservation(fileMetadataDTO, termId);
 
 		// save file storage last as it is outside the transaction
 		this.fileStorageService.upload(file, path);
 
 		return fileMetadataDTO;
-	}
-
-	@Override
-	public String getFilePath(final String observationUnitUUID, final Integer termId, final String fileName) {
-		BaseValidator.checkNotNull(fileName, "param.null", new String[] {"fileName"});
-		return this.fileMetadataService.getFilePath(observationUnitUUID, termId, fileName);
 	}
 
 	@Override
