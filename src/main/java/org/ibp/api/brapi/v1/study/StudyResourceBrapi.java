@@ -30,6 +30,7 @@ import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
+import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -45,7 +46,6 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.study.StudyInstanceService;
-import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -100,7 +100,7 @@ public class StudyResourceBrapi {
 	private StudyDataManager studyDataManager;
 
 	@Autowired
-	private StudyService studyService;
+	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
 	private VariableService variableService;
@@ -239,7 +239,7 @@ public class StudyResourceBrapi {
 			throw new Exception("studyDbId " + studyDbId + " does not exist");
 		}
 
-		final TrialObservationTable trialObservationTable = this.studyService.getTrialObservationTable(trialDbId, studyDbId);
+		final TrialObservationTable trialObservationTable = this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId);
 
 		final int resultNumber = trialObservationTable == null ? 0 : 1;
 

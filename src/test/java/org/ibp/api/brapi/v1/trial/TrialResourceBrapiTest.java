@@ -9,12 +9,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.util.Util;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -35,7 +35,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 	private static final String MAIZE_BRAPI_V1_TRIALS = "/maize/brapi/v1/trials";
 	private static final String MAIZE_BRAPI_V2_TRIALS = "/maize/brapi/v2/trials";
 	@Autowired
-	private StudyService studyServiceMW;
+	private TrialServiceBrapi trialServiceBrapi;
 
 	@Test
 	public void testListStudySummaries() throws Exception {
@@ -72,8 +72,8 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		studySummary.setInstanceMetaData(Lists.newArrayList(instanceMetadata));
 
 		final List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
-		Mockito.when(this.studyServiceMW.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
-		Mockito.when(this.studyServiceMW.countStudies(ArgumentMatchers.any())).thenReturn(200L);
+		Mockito.when(this.trialServiceBrapi.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
+		Mockito.when(this.trialServiceBrapi.countStudies(ArgumentMatchers.any())).thenReturn(200L);
 
 		final int pageSize = 10;
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(TrialResourceBrapiTest.MAIZE_BRAPI_V1_TRIALS)
@@ -147,8 +147,8 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 
 		final List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
 		final int count = 200;
-		Mockito.when(this.studyServiceMW.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
-		Mockito.when(this.studyServiceMW.countStudies(ArgumentMatchers.any())).thenReturn(new Long(count));
+		Mockito.when(this.trialServiceBrapi.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
+		Mockito.when(this.trialServiceBrapi.countStudies(ArgumentMatchers.any())).thenReturn(new Long(count));
 
 		final int page = 1;
 		final int pageSize = 10;
@@ -202,7 +202,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		final TrialObservationTable mwStudyObservationTable = new TrialObservationTable().setStudyDbId(trialDbId)
 			.setObservationVariableDbIds(observationVariablesId).setObservationVariableNames(observationVariableName).setData(data);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId)).thenReturn(mwStudyObservationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId)).thenReturn(mwStudyObservationTable);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/trials/{trialDbId}/table")
 			.buildAndExpand(ImmutableMap.<String, Object>builder().put("trialDbId", trialDbId).build()).encode();
@@ -239,7 +239,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 			new TrialObservationTable().setStudyDbId(trialDbId).setObservationVariableDbIds(Lists.<Integer>newArrayList())
 				.setObservationVariableNames(Lists.<String>newArrayList()).setData(Lists.<List<String>>newArrayList());
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId)).thenReturn(mwStudyObservationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId)).thenReturn(mwStudyObservationTable);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/trials/{trialDbId}/table")
 			.buildAndExpand(ImmutableMap.<String, Object>builder().put("trialDbId", trialDbId).build()).encode();
@@ -323,8 +323,8 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		studySummary.setInstanceMetaData(Lists.newArrayList(instanceMetadata));
 
 		final List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
-		Mockito.when(this.studyServiceMW.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
-		Mockito.when(this.studyServiceMW.countStudies(ArgumentMatchers.any())).thenReturn(200L);
+		Mockito.when(this.trialServiceBrapi.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
+		Mockito.when(this.trialServiceBrapi.countStudies(ArgumentMatchers.any())).thenReturn(200L);
 
 		final int pageSize = 10;
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(TrialResourceBrapiTest.MAIZE_BRAPI_V2_TRIALS)

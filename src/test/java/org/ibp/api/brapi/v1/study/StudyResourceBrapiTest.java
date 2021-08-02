@@ -2,6 +2,7 @@ package org.ibp.api.brapi.v1.study;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
@@ -46,7 +47,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 	private StudyDataManager studyDataManager;
 
 	@Autowired
-	private StudyService studyServiceMW;
+	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
@@ -88,7 +89,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 			new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
 				.setObservationVariableNames(observationVariableName).setData(data);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
 
 		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
 
@@ -132,7 +133,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 			new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
 				.setObservationVariableNames(observationVariableName).setData(data);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
 
 		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
 
@@ -166,7 +167,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 			new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
 				.setObservationVariableNames(observationVariableName).setData(data);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
 
 		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
 
@@ -258,7 +259,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.setObservationVariableNames(observationVariableName).setData(data);
 		observationTable.setHeaderRow(headerRow);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
 
 		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
 
@@ -307,7 +308,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.setObservationVariableNames(observationVariableName).setData(data);
 		observationTable.setHeaderRow(headerRow);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
 
 		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
 
