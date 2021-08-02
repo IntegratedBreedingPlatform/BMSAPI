@@ -5,7 +5,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
-import org.generationcp.middleware.pojos.Name;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -144,8 +143,8 @@ public class GermplasmNameTypeValidator {
 	}
 
 	private void validateNameTypeBelongsToGermplasm(final Integer nameTypeId) {
-		final List<Name> names = this.germplasmNameService.getGermplasmNamesByNameTypeId(nameTypeId);
-		if (!names.isEmpty()) {
+		final boolean isNameTypeUsedInGermplasmName = this.germplasmNameService.isNameTypeUsedAsGermplasmName(nameTypeId);
+		if (isNameTypeUsedInGermplasmName) {
 			this.errors.reject("germplasm.name.type.is.in.used", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
