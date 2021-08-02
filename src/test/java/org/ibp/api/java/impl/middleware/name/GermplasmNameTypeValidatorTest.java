@@ -166,8 +166,8 @@ public class GermplasmNameTypeValidatorTest {
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
 			.thenReturn(Optional.of(germplasmNameTypeDTO));
 
-		Mockito.when(this.germplasmNameService.getGermplasmNamesByNameTypeId(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
-			.thenReturn(Arrays.asList(new Name()));
+		Mockito.when(this.germplasmNameService.isNameTypeUsedAsGermplasmName(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
+			.thenReturn(false);
 
 		try {
 			this.germplasmNameTypeValidator.validateCanBeDeleted(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
