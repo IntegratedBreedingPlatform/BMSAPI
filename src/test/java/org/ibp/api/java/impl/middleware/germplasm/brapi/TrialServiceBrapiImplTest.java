@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.brapi.v2.trial.TrialImportResponse;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.brapi.TrialServiceBrapiImpl;
 import org.ibp.api.java.impl.middleware.study.validator.TrialImportRequestValidator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +45,7 @@ public class TrialServiceBrapiImplTest {
 	private SecurityService securityService;
 
 	@InjectMocks
-	private org.ibp.api.brapi.TrialServiceBrapi trialServiceBrapi;
+	private org.ibp.api.brapi.TrialServiceBrapi trialServiceBrapi = new TrialServiceBrapiImpl();
 
 	private WorkbenchUser testUser;
 

@@ -2,7 +2,6 @@ package org.ibp.api.brapi.v1.study;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
@@ -14,6 +13,7 @@ import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.StudyServiceBrapi;
+import org.ibp.api.brapi.TrialServiceBrapi;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

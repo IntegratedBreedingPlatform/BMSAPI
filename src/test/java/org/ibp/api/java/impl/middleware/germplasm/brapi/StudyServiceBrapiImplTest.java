@@ -8,6 +8,7 @@ import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.ibp.api.brapi.StudyServiceBrapi;
 import org.ibp.api.brapi.v2.study.StudyImportResponse;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.brapi.StudyServiceBrapiImpl;
 import org.ibp.api.java.impl.middleware.study.validator.StudyImportRequestValidator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +45,7 @@ public class StudyServiceBrapiImplTest {
 	private org.generationcp.middleware.api.brapi.StudyServiceBrapi middlewareStudyServiceBrapi;
 
 	@InjectMocks
-	private StudyServiceBrapi studyServiceBrapi;
+	private StudyServiceBrapi studyServiceBrapi = new StudyServiceBrapiImpl();
 
 	private WorkbenchUser testUser;
 
