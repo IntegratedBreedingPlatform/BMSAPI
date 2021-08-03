@@ -25,7 +25,7 @@ public class GermplasmNameTypeValidator {
 	public static final Integer CODE_OR_NAME_MAX_LENGTH = 50;
 	public static final Integer DESCRIPTION_MAX_LENGTH = 255;
 	public static final List<String> SYSTEM_NAME_TYPES = Collections.unmodifiableList(
-		Arrays.asList("LNAME", "CODE1", "CODE2", "CODE3", "PEDIGREE", "CROSS NAME", "CROSSING NAME", "DERIVATIVE NAME"));
+		Arrays.asList("LNAME", "CODE1", "CODE2", "CODE3", "PEDIGREE", "CROSS NAME", "CROSSING NAME", "DERIVATIVE NAME", "SELHISFIX"));
 
 	private BindingResult errors;
 
