@@ -1,12 +1,18 @@
 
 package org.ibp.api.java.impl.middleware.program;
 
+import org.generationcp.commons.util.InstallationDirectoryUtil;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
@@ -50,9 +56,18 @@ public class ProgramServiceImpl implements ProgramService {
 	private RemoveProgramMembersValidator removeProgramMembersValidator;
 
 	@Autowired
+	private LocationService locationService;
+
+	@Autowired
+	private ProgramFavoriteService programFavoriteService;
+
+	@Autowired
 	private ProgramBasicDetailsDtoValidator programBasicDetailsDtoValidator;
 
+	private final InstallationDirectoryUtil installationDirectoryUtil = new InstallationDirectoryUtil();
+
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
 
 	@Override
 	public List<ProgramDTO> listProgramsByCropName(final String cropName) {
@@ -194,12 +209,21 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public ProgramDTO createProgram(final String crop, final ProgramBasicDetailsDto programBasicDetailsDto) {
-		//validate
-		//create
-		//
-		return null;
+		programBasicDetailsDtoValidator.validate(crop, programBasicDetailsDto);
+
+		final ProgramDTO programDTO = this.programService.addProject(crop, programBasicDetailsDto);
+
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationName(UNSPECIFIED_LOCATION);
+		final List<Location> locations = this.locationService.getFilteredLocations(locationSearchRequest, null);
+		if (!locations.isEmpty()) {
+			programFavoriteService
+				.addProgramFavorite(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, locations.get(0).getLocid());
+		}
+
+		this.installationDirectoryUtil.createWorkspaceDirectoriesForProject(crop, programBasicDetailsDto.getName());
+
+		return programDTO;
 	}
-
-
 
 }
