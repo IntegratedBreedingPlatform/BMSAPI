@@ -14,8 +14,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
+import org.ibp.api.brapi.StudyServiceBrapi;
 import org.ibp.api.java.impl.middleware.observationunits.ObservationUnitImportRequestValidator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class ObservationUnitImportRequestValidatorTest {
 	private static final String PROGRAM_DBID = RandomStringUtils.randomAlphabetic(10);
 
 	@Mock
-	private StudyInstanceService studyInstanceService;
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Mock
 	private GermplasmServiceBrapi germplasmService;
@@ -60,7 +60,7 @@ public class ObservationUnitImportRequestValidatorTest {
 
 		final StudySearchFilter filter = new StudySearchFilter();
 		filter.setStudyDbIds(Collections.singletonList(STUDY_DBID));
-		Mockito.when(this.studyInstanceService.getStudyInstances(filter, null))
+		Mockito.when(this.studyServiceBrapi.getStudyInstances(filter, null))
 			.thenReturn(Collections.singletonList(studyInstanceDto));
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();

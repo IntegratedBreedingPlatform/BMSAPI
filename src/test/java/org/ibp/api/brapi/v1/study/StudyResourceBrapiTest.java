@@ -10,11 +10,10 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.study.StudyInstanceService;
+import org.ibp.api.brapi.StudyServiceBrapi;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +49,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
-	private StudyInstanceService studyInstanceService;
-
-	@Test
-	public void testListStudySummaries() throws Exception {
-
-		// TODO with StudyResourceBrapi implementation
-	}
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Configuration
 	public static class TestConfiguration {
@@ -192,7 +185,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<Location> locations = StudyTestDataProvider.getLocationList();
 		final Location location = locations.get(0);
 
-		Mockito.when(this.studyInstanceService.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId()))
+		Mockito.when(this.studyServiceBrapi.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId()))
 			.thenReturn(studyDetailsDto);
 		Mockito.when(this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10))).thenReturn(locations);
 
@@ -341,9 +334,9 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<StudyInstanceDto> studyInstanceDtos = StudyTestDataProvider.getListStudyDto();
 		final StudyInstanceDto studyInstanceDto = studyInstanceDtos.get(0);
 
-		Mockito.when(this.studyInstanceService.getStudyInstances(Mockito.any(StudySearchFilter.class), Mockito.any(PageRequest.class)))
+		Mockito.when(this.studyServiceBrapi.getStudyInstances(Mockito.any(StudySearchFilter.class), Mockito.any(PageRequest.class)))
 			.thenReturn(studyInstanceDtos);
-		Mockito.when(this.studyInstanceService.countStudyInstances(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
+		Mockito.when(this.studyServiceBrapi.countStudyInstances(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies")
 			.build().encode();

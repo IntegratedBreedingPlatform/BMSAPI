@@ -30,6 +30,7 @@ import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
+import org.ibp.api.brapi.StudyServiceBrapi;
 import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
@@ -45,7 +46,6 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -115,7 +115,7 @@ public class StudyResourceBrapi {
 	private InstanceValidator instanceValidator;
 
 	@Autowired
-	private StudyInstanceService studyInstanceService;
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Autowired
 	private ObservationUnitService observationUnitService;
@@ -181,12 +181,12 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyInstanceService.countStudyInstances(studySearchFilter);
+					return StudyResourceBrapi.this.studyServiceBrapi.countStudyInstances(studySearchFilter);
 				}
 
 				@Override
 				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
-					return StudyResourceBrapi.this.studyInstanceService.getStudyInstances(studySearchFilter, pageRequest);
+					return StudyResourceBrapi.this.studyServiceBrapi.getStudyInstances(studySearchFilter, pageRequest);
 				}
 			});
 
@@ -262,7 +262,7 @@ public class StudyResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyInstanceService.getStudyDetailsByInstance(studyDbId);
+		final StudyDetailsDto mwStudyDetails = this.studyServiceBrapi.getStudyDetailsByInstance(studyDbId);
 		if (Objects.isNull(mwStudyDetails)) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 			errors.reject("studydbid.invalid", "");
