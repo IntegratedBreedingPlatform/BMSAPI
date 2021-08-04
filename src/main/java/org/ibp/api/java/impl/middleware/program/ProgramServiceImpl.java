@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.program;
 
 import org.generationcp.commons.util.InstallationDirectoryUtil;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
@@ -15,8 +16,10 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.program.validator.AddProgramMemberRequestDtoValidator;
@@ -63,6 +66,15 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Autowired
 	private ProgramBasicDetailsDtoValidator programBasicDetailsDtoValidator;
+
+	@Autowired
+	private StudyService studyService;
+
+	@Autowired
+	private MethodService methodService;
+
+	@Autowired
+	private GermplasmListService germplasmListService;
 
 	private final InstallationDirectoryUtil installationDirectoryUtil = new InstallationDirectoryUtil();
 
@@ -209,7 +221,7 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public ProgramDTO createProgram(final String crop, final ProgramBasicDetailsDto programBasicDetailsDto) {
-		programBasicDetailsDtoValidator.validate(crop, programBasicDetailsDto);
+		this.programBasicDetailsDtoValidator.validate(crop, programBasicDetailsDto);
 
 		final ProgramDTO programDTO = this.programService.addProject(crop, programBasicDetailsDto);
 
@@ -217,13 +229,23 @@ public class ProgramServiceImpl implements ProgramService {
 		locationSearchRequest.setLocationName(UNSPECIFIED_LOCATION);
 		final List<Location> locations = this.locationService.getFilteredLocations(locationSearchRequest, null);
 		if (!locations.isEmpty()) {
-			programFavoriteService
+			this.programFavoriteService
 				.addProgramFavorite(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, locations.get(0).getLocid());
 		}
 
 		this.installationDirectoryUtil.createWorkspaceDirectoriesForProject(crop, programBasicDetailsDto.getName());
 
 		return programDTO;
+	}
+
+	@Override
+	public void deleteProgram(final String programUUID) {
+		this.studyService.deleteProgramStudies(programUUID);
+		this.programFavoriteService.deleteAllProgramFavorites(programUUID);
+		this.locationService.deleteProgramLocations(programUUID);
+		this.methodService.deleteProgramMethods(programUUID);
+		this.germplasmListService.deleteProgramGermplasmLists(programUUID);
+		this.programService.deleteProjectAndDependencies(programUUID);
 	}
 
 }

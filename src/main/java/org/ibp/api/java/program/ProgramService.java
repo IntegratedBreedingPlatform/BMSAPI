@@ -40,4 +40,5 @@ public interface ProgramService {
 
 	ProgramDTO createProgram(String crop, ProgramBasicDetailsDto programBasicDetailsDto);
 
+	void deleteProgram(String programUUID);
 }

@@ -107,6 +107,15 @@ public class ProgramResource {
         return new ResponseEntity<>(programDTO, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Delete program", notes = "Delete program")
+    @RequestMapping(value = "/crops/{cropName}/programs/{programUUID}", method = RequestMethod.DELETE)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
+    public ResponseEntity<Void> deleteProgram(@PathVariable final String cropName,
+        @PathVariable final String programUUID) {
+        this.programService.deleteProgram(programUUID);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     private boolean hasAdmin() {
         return request.isUserInRole(PermissionsEnum.ADMIN.name())
             || request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())

@@ -69,6 +69,9 @@ public class StudyServiceImpl implements StudyService {
 	@Autowired
 	private TrialImportRequestValidator trialImportRequestDtoValidator;
 
+	@Autowired
+	private org.generationcp.middleware.service.api.study.StudyService studyService;
+
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
 	}
@@ -190,8 +193,7 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public void deleteStudy(final Integer studyId) {
 		this.studyValidator.validateDeleteStudy(studyId);
-		this.studyDataManager.deleteStudy(studyId);
-
+		this.studyService.deleteStudy(studyId);
 	}
 
 }
