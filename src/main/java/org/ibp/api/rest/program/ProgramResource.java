@@ -100,7 +100,7 @@ public class ProgramResource {
 
     @ApiOperation(value = "Create program", notes = "Create program")
     @RequestMapping(value = "/crops/{cropName}/programs", method = RequestMethod.POST)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
     public ResponseEntity<ProgramDTO> createProgram(@PathVariable final String cropName,
         @RequestBody final ProgramBasicDetailsDto programBasicDetailsDto) {
         final ProgramDTO programDTO = this.programService.createProgram(cropName, programBasicDetailsDto);
