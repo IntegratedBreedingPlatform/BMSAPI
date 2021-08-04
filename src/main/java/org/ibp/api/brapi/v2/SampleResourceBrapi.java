@@ -53,7 +53,8 @@ public class SampleResourceBrapi {
         @ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
         @RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
-        final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO(sampleDbId, observationUnitDbId, plateDbId, germplasmDbId, studyDbId, externalReferenceID, externalReferenceSource);
+        final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO(sampleDbId, observationUnitDbId, plateDbId,
+                germplasmDbId, studyDbId, externalReferenceID, externalReferenceSource);
 
         final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
         final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
