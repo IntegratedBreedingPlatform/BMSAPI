@@ -16,16 +16,17 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.ibp.api.brapi.GermplasmServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
+import org.ibp.api.brapi.v2.germplasm.GermplasmMapper;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
-import org.ibp.api.brapi.GermplasmServiceBrapi;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -96,16 +97,7 @@ public class GermplasmResourceBrapi {
 		}
 
 		final PagedResult<GermplasmDTO> resultPage = this.getGermplasmDTOPagedResult(germplasmSearchRequestDTO, currentPage, pageSize);
-
-		final List<Germplasm> germplasmList = new ArrayList<>();
-
-		if (resultPage.getPageResults() != null) {
-			final ModelMapper mapper = new ModelMapper();
-			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
-				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasmList.add(germplasm);
-			}
-		}
+		final List<Germplasm> germplasmList = GermplasmMapper.mapGermplasm(resultPage.getPageResults());
 
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
@@ -157,15 +149,7 @@ public class GermplasmResourceBrapi {
 		}
 
 		final PagedResult<GermplasmDTO> resultPage = this.getGermplasmDTOPagedResult(germplasmSearchRequestDTO, currentPage, pageSize);
-		final List<Germplasm> germplasmList = new ArrayList<>();
-
-		if (resultPage.getPageResults() != null) {
-			final ModelMapper mapper = new ModelMapper();
-			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
-				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasmList.add(germplasm);
-			}
-		}
+		final List<Germplasm> germplasmList = GermplasmMapper.mapGermplasm(resultPage.getPageResults());
 
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
@@ -190,8 +174,8 @@ public class GermplasmResourceBrapi {
 		final GermplasmDTO germplasmDTO = this.germplasmService.getGermplasmDTObyGUID(germplasmDbId);
 
 		if (germplasmDTO != null) {
-			final ModelMapper mapper = new ModelMapper();
-			final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+			final ModelMapper modelMapper = GermplasmMapper.getInstance();
+			final Germplasm germplasm = modelMapper.map(germplasmDTO, Germplasm.class);
 			final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
 
 			return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
@@ -287,15 +271,7 @@ public class GermplasmResourceBrapi {
 
 		final PagedResult<GermplasmDTO> resultPage = this.getGermplasmDTOPagedResult(germplasmSearchRequestDTO, currentPage, pageSize);
 
-		final List<Germplasm> germplasmList = new ArrayList<>();
-
-		if (resultPage.getPageResults() != null) {
-			final ModelMapper mapper = new ModelMapper();
-			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
-				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasmList.add(germplasm);
-			}
-		}
+		final List<Germplasm> germplasmList = GermplasmMapper.mapGermplasm(resultPage.getPageResults());
 
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
@@ -361,15 +337,7 @@ public class GermplasmResourceBrapi {
 				}
 			});
 
-		final List<Germplasm> germplasmList = new ArrayList<>();
-
-		if (resultPage.getPageResults() != null) {
-			final ModelMapper mapper = new ModelMapper();
-			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
-				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasmList.add(germplasm);
-			}
-		}
+		final List<Germplasm> germplasmList = GermplasmMapper.mapGermplasm(resultPage.getPageResults());
 
 		final StudyMetadata studyMetadataForEnvironmentId = this.studyDataManager.getStudyMetadataForInstance(studyDbId);
 		final GermplasmSummaryList germplasmSummaryList = new GermplasmSummaryList();
