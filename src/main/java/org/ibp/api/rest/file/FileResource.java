@@ -56,7 +56,7 @@ public class FileResource {
 		return new ResponseEntity<>(fileMetadataDTO, HttpStatus.CREATED);
 	}
 
-	// TODO now that we file_metadata, we can GET /files/{fileUUID}
+	// TODO now that we have file_metadata, we can GET /files/{fileUUID} instead of using path
 	@RequestMapping(value = "/files/**", method = RequestMethod.GET)
 	@ResponseBody
 	public byte[] getFile(

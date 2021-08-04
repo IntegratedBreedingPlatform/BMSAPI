@@ -28,8 +28,9 @@ public class FileMetadataResource {
 	@RequestMapping(value = "/filemetadata", method = RequestMethod.GET)
 	public ResponseEntity<List<FileMetadataDTO>> list(
 		@PathVariable final String cropName,
-		@RequestParam final String observationUnitUUID
+		@RequestParam final String observationUnitUUID,
+		@RequestParam(required = false) final String programUUID
 	) {
-		return new ResponseEntity<>(this.fileMetadataService.list(observationUnitUUID), HttpStatus.OK);
+		return new ResponseEntity<>(this.fileMetadataService.list(observationUnitUUID, programUUID), HttpStatus.OK);
 	}
 }

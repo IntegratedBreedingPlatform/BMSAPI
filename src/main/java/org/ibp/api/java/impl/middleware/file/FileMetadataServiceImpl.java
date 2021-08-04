@@ -50,8 +50,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		fileMetadataDTO.setMimeType(file.getContentType());
 		fileMetadataDTO.setSize((int) file.getSize());
 		fileMetadataDTO.setPath(path);
-		// TODO link to termid
-		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID);
+		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID, termId);
 
 		// save file storage last as it is outside the transaction
 		this.fileStorageService.upload(file, path);
@@ -63,7 +62,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	public void delete(final String fileUUID) {
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(fileUUID);
 		this.fileMetadataService.delete(fileUUID);
-		// save file storage last as it is outside the transaction
+		// delete file storage last as it is outside the transaction
 		this.fileStorageService.deleteFile(fileMetadataDTO.getPath());
 	}
 
