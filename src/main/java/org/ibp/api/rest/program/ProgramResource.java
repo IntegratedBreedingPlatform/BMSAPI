@@ -116,6 +116,15 @@ public class ProgramResource {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Edit a program", notes = "Edit a program")
+    @RequestMapping(value = "/crops/{cropName}/programs/{programUUID}", method = RequestMethod.PATCH)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
+    public ResponseEntity<Void> editProgram(@PathVariable final String cropName, @PathVariable final String programUUID,
+        @RequestBody final ProgramBasicDetailsDto programBasicDetailsDto) {
+        this.programService.editProgram(cropName, programUUID, programBasicDetailsDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     private boolean hasAdmin() {
         return request.isUserInRole(PermissionsEnum.ADMIN.name())
             || request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())

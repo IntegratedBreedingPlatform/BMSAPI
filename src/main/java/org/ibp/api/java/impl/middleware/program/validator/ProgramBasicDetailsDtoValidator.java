@@ -23,20 +23,44 @@ public class ProgramBasicDetailsDtoValidator {
 	@Autowired
 	private ProgramService programService;
 
-	public void validate(final String cropName, final ProgramBasicDetailsDto programBasicDetailsDto) {
+	public void validateCreation(final String cropName, final ProgramBasicDetailsDto programBasicDetailsDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), AddProgramMemberRequestDto.class.getName());
 
 		BaseValidator.checkNotNull(programBasicDetailsDto, "param.null", new String[] {"request body"});
 		BaseValidator.checkNotEmpty(programBasicDetailsDto.getName(), "param.null", new String[] {"name"});
 		BaseValidator.checkNotEmpty(programBasicDetailsDto.getStartDate(), "param.null", new String[] {"startDate"});
 
-		if (programBasicDetailsDto.getName().trim().isEmpty()) {
-			errors.reject("program.name.empty", "");
+		this.validateStartDate(errors, programBasicDetailsDto);
+		this.validateProgramName(errors, programBasicDetailsDto);
+
+		final Optional<ProgramDTO> programDTOOptional = this.programService.getProgram(cropName, programBasicDetailsDto.getName());
+		if (programDTOOptional.isPresent()) {
+			errors.reject("program.name.already.exists", new String[] {programBasicDetailsDto.getName(), cropName}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+	}
 
-		if (Util.tryParseDate(programBasicDetailsDto.getStartDate(), Util.FRONTEND_DATE_FORMAT) == null) {
-			errors.reject("program.start.date.invalid", "");
+	public void validateEdition(final String cropName, final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), AddProgramMemberRequestDto.class.getName());
+
+		if (programBasicDetailsDto.getStartDate() != null) {
+			this.validateStartDate(errors, programBasicDetailsDto);
+		}
+
+		if (programBasicDetailsDto.getName() != null) {
+			this.validateProgramName(errors, programBasicDetailsDto);
+			final Optional<ProgramDTO> programDTOOptional = this.programService.getProgram(cropName, programBasicDetailsDto.getName());
+			if (programDTOOptional.isPresent() && !programUUID.equalsIgnoreCase(programDTOOptional.get().getUniqueID())) {
+				errors.reject("program.name.already.exists", new String[] {programBasicDetailsDto.getName(), cropName}, "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+		}
+
+	}
+
+	private void validateProgramName(final BindingResult errors, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		if (programBasicDetailsDto.getName().trim().isEmpty()) {
+			errors.reject("program.name.empty", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
@@ -44,13 +68,12 @@ public class ProgramBasicDetailsDtoValidator {
 			errors.reject("program.name.max.length.exceeded", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-
-		final Optional<ProgramDTO> programDTOOptional = this.programService.getProject(cropName, programBasicDetailsDto.getName());
-		if (programDTOOptional.isPresent()) {
-			errors.reject("program.name.already.exists", new String[] {programBasicDetailsDto.getName(), cropName}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
 	}
 
+	private void validateStartDate(final BindingResult errors, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		if (Util.tryParseDate(programBasicDetailsDto.getStartDate(), Util.FRONTEND_DATE_FORMAT) == null) {
+			errors.reject("program.start.date.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
 }

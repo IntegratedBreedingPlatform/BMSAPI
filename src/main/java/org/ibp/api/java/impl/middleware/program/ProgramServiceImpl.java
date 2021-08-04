@@ -221,9 +221,9 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public ProgramDTO createProgram(final String crop, final ProgramBasicDetailsDto programBasicDetailsDto) {
-		this.programBasicDetailsDtoValidator.validate(crop, programBasicDetailsDto);
+		this.programBasicDetailsDtoValidator.validateCreation(crop, programBasicDetailsDto);
 
-		final ProgramDTO programDTO = this.programService.addProject(crop, programBasicDetailsDto);
+		final ProgramDTO programDTO = this.programService.addProgram(crop, programBasicDetailsDto);
 
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationName(UNSPECIFIED_LOCATION);
@@ -245,7 +245,11 @@ public class ProgramServiceImpl implements ProgramService {
 		this.locationService.deleteProgramLocations(programUUID);
 		this.methodService.deleteProgramMethods(programUUID);
 		this.germplasmListService.deleteProgramGermplasmLists(programUUID);
-		this.programService.deleteProjectAndDependencies(programUUID);
+		this.programService.deleteProgramAndDependencies(programUUID);
 	}
 
+	@Override
+	public void editProgram(final String cropName, final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		this.programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
+	}
 }
