@@ -29,6 +29,8 @@ public class TrialImportRequestValidator {
 	private static final int MAX_ADDITIONAL_INFO_LENGTH = 255;
 	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
+	private static final int MAX_CONTACT_INFO_LENGTH = 255;
+	public static final String CONTACT_INFO_VALUE_EXCEEDED_LENGTH = "trial.import.contact.info.value.exceeded.length";
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -157,6 +159,44 @@ public class TrialImportRequestValidator {
 				}
 				return false;
 			});
+		}
+		return false;
+	}
+
+	private boolean isAnyContactsInvalid(final TrialImportRequestDTO t, final Integer index) {
+		return t.getContacts().stream().anyMatch(c -> {
+			if (c == null ) {
+				this.errors.reject("trial.import.contact.info.null", new String[] {index.toString()}, "");
+				return true;
+			}
+			if (StringUtils.isEmpty(c.getEmail()) && StringUtils.isEmpty(c.getName()) && StringUtils.isEmpty(c.getInstituteName()) && StringUtils.isEmpty(c.getType())) {
+				this.errors.reject("trial.import.contact.info.empty.values", new String[] {index.toString()}, "");
+				return true;
+			}
+			return this.anyContactFieldExceededLength(index, c);
+		});
+	}
+
+	private boolean anyContactFieldExceededLength(final Integer index, final org.generationcp.middleware.service.api.user.ContactDto c) {
+		if (StringUtils.isNotEmpty(c.getEmail()) && c.getEmail().length() > MAX_CONTACT_INFO_LENGTH) {
+			this.errors.reject(CONTACT_INFO_VALUE_EXCEEDED_LENGTH, new String[] {index.toString(), "email"},
+				"");
+			return true;
+		}
+		if (StringUtils.isNotEmpty(c.getName()) && c.getName().length() > MAX_CONTACT_INFO_LENGTH) {
+			this.errors.reject(CONTACT_INFO_VALUE_EXCEEDED_LENGTH, new String[] {index.toString(), "name"},
+				"");
+			return true;
+		}
+		if (StringUtils.isNotEmpty(c.getType()) && c.getType().length() > MAX_CONTACT_INFO_LENGTH) {
+			this.errors.reject(CONTACT_INFO_VALUE_EXCEEDED_LENGTH, new String[] {index.toString(), "type"},
+				"");
+			return true;
+		}
+		if (StringUtils.isNotEmpty(c.getInstituteName()) && c.getInstituteName().length() > MAX_CONTACT_INFO_LENGTH) {
+			this.errors.reject(CONTACT_INFO_VALUE_EXCEEDED_LENGTH, new String[] {index.toString(), "instituteName"},
+				"");
+			return true;
 		}
 		return false;
 	}

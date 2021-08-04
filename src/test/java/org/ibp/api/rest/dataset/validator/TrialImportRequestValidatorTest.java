@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.java.impl.middleware.study.validator.TrialImportRequestValidator;
 import org.junit.Assert;
@@ -20,6 +21,7 @@ import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,17 @@ public class TrialImportRequestValidatorTest {
 	@Test
 	public void testPruneTrialsInvalidForImport_Success() {
 		final List<TrialImportRequestDTO> trialImportRequestDTOList = this.createTrialImportRequestDTOList();
+		// Valid external references
+		final ExternalReferenceDTO externalReferenceDTO = new ExternalReferenceDTO();
+		externalReferenceDTO.setReferenceID(RandomStringUtils.randomAlphabetic(200));
+		externalReferenceDTO.setReferenceSource(RandomStringUtils.randomAlphabetic(200));
+		trialImportRequestDTOList.get(0).setExternalReferences(Collections.singletonList(externalReferenceDTO));
+		// Valid additional Info
+		trialImportRequestDTOList.get(0).setAdditionalInfo(Collections.singletonMap(RandomStringUtils.randomAlphabetic(50), RandomStringUtils.randomAlphabetic(200)));
+		// Valid Contact
+		trialImportRequestDTOList.get(0).setContacts(Collections.singletonList(
+			new ContactDto(RandomStringUtils.randomAlphabetic(50), RandomStringUtils.randomAlphabetic(50),
+				RandomStringUtils.randomAlphabetic(50), RandomStringUtils.randomAlphabetic(50))));
 		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(trialImportRequestDTOList, CROP);
 		Assert.assertFalse(result.hasErrors());
 	}
@@ -223,6 +236,72 @@ public class TrialImportRequestValidatorTest {
 		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("trial.import.reference.source.exceeded.length", result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
+	public void testPruneTrialsInvalidForImport_WhereContactIsNull() {
+		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
+		dtoList.get(0).setContacts(Collections.singletonList(null));
+		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("trial.import.contact.info.null", result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
+	public void testPruneTrialsInvalidForImport_WhereContactFieldsAreEmpty() {
+		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
+		dtoList.get(0).setContacts(Collections.singletonList(new ContactDto()));
+		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("trial.import.contact.info.empty.values", result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
+	public void testPruneTrialsInvalidForImport_WhereContactNameExceedsLength() {
+		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
+		final ContactDto contact = new ContactDto();
+		contact.setName(RandomStringUtils.randomAlphabetic(260));
+		dtoList.get(0).setContacts(Collections.singletonList(contact));
+		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("trial.import.contact.info.value.exceeded.length", result.getAllErrors().get(0).getCode());
+		Assert.assertEquals(new String [] {"1", "name"}, result.getAllErrors().get(0).getArguments());
+	}
+
+	@Test
+	public void testPruneTrialsInvalidForImport_WhereContactEmailExceedsLength() {
+		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
+		final ContactDto contact = new ContactDto();
+		contact.setEmail(RandomStringUtils.randomAlphabetic(260));
+		dtoList.get(0).setContacts(Collections.singletonList(contact));
+		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("trial.import.contact.info.value.exceeded.length", result.getAllErrors().get(0).getCode());
+		Assert.assertEquals(new String [] {"1", "email"}, result.getAllErrors().get(0).getArguments());
+	}
+
+	@Test
+	public void testPruneTrialsInvalidForImport_WhereContactInstituteExceedsLength() {
+		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
+		final ContactDto contact = new ContactDto();
+		contact.setInstituteName(RandomStringUtils.randomAlphabetic(260));
+		dtoList.get(0).setContacts(Collections.singletonList(contact));
+		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("trial.import.contact.info.value.exceeded.length", result.getAllErrors().get(0).getCode());
+		Assert.assertEquals(new String [] {"1", "instituteName"}, result.getAllErrors().get(0).getArguments());
+	}
+
+	@Test
+	public void testPruneTrialsInvalidForImport_WhereContactTypeExceedsLength() {
+		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
+		final ContactDto contact = new ContactDto();
+		contact.setType(RandomStringUtils.randomAlphabetic(260));
+		dtoList.get(0).setContacts(Collections.singletonList(contact));
+		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("trial.import.contact.info.value.exceeded.length", result.getAllErrors().get(0).getCode());
+		Assert.assertEquals(new String [] {"1", "type"}, result.getAllErrors().get(0).getArguments());
 	}
 
 	public List<TrialImportRequestDTO> createTrialImportRequestDTOList() {
