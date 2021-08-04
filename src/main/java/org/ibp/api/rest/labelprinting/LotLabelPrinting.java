@@ -218,7 +218,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final Integer searchRequestId = labelsInfoInput.getSearchRequestId();
 		final LotsSearchDto searchDto =
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
-		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLotsApplyExportResultsLimit(searchDto, null);
 
 		if (!extendedLotDtos.isEmpty()) {
 			final Set<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet());
@@ -239,7 +239,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final Integer searchRequestId = labelsGeneratorInput.getSearchRequestId();
 		final LotsSearchDto searchDto =
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
-		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLotsApplyExportResultsLimit(searchDto, null);
 		final Map<Integer, Map<Integer, String>> attributeValues = this.lotService.getGermplasmAttributeValues(searchDto);
 
 		// Data to be exported
