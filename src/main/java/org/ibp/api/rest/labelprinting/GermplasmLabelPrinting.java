@@ -154,11 +154,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 
 		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
-		final Set<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toSet());
 
-		final List<Variable> attributeVariables =
-			this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
-		final List<UserDefinedField> nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest, programUUID);
+
 
 		// Germplasm Details labels
 		final LabelType germplasmType = new LabelType(germplasmPropValue, germplasmPropValue);
@@ -173,20 +170,27 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		// Names labels
 		final LabelType namesType = new LabelType(namesPropValue, namesPropValue);
 		namesType.setFields(new ArrayList<>());
-		namesType.getFields().addAll(nameTypes.stream()
-			.map(nameType -> new Field(toKey(nameType.getFldno()), nameType.getFcode()))
-			.collect(Collectors.toList()));
 		labelTypes.add(namesType);
 
 		// Attribiutes labels
 		final LabelType attirbutesType = new LabelType(attributesPropValue, attributesPropValue);
 		attirbutesType.setFields(new ArrayList<>());
-		attirbutesType.getFields().addAll(attributeVariables.stream()
-			.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
-				StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
-			.collect(Collectors.toList()));
 		labelTypes.add(attirbutesType);
 
+		if (!germplasmSearchResponses.isEmpty()) {
+			final Set<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toSet());
+			final List<Variable> attributeVariables = this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
+			final List<UserDefinedField>  nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest, programUUID);
+
+			namesType.getFields().addAll(nameTypes.stream()
+				.map(nameType -> new Field(toKey(nameType.getFldno()), nameType.getFcode()))
+				.collect(Collectors.toList()));
+
+			attirbutesType.getFields().addAll(attributeVariables.stream()
+				.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
+					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
+				.collect(Collectors.toList()));
+		}
 		return labelTypes;
 	}
 

@@ -1,12 +1,12 @@
 package org.ibp.api.java.impl.middleware.observationunits;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
-import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.OntologyService;
@@ -40,7 +40,7 @@ public class ObservationUnitImportRequestValidator {
 	private StudyInstanceService studyInstanceService;
 
 	@Autowired
-	private GermplasmService germplasmService;
+	private GermplasmServiceBrapi germplasmService;
 
 	@Autowired
 	private OntologyService ontologyService;
@@ -60,7 +60,7 @@ public class ObservationUnitImportRequestValidator {
 				.map(ObservationUnitImportRequestDto::getGermplasmDbId).collect(Collectors.toList());
 		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDto.setGermplasmDbIds(germplasmDbIds);
-		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchFilteredGermplasm(germplasmSearchRequestDto, null)
+		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchGermplasmDTO(germplasmSearchRequestDto, null)
 			.stream().collect(Collectors.toMap(GermplasmDTO::getGermplasmDbId, Function.identity()));
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
@@ -139,7 +139,7 @@ public class ObservationUnitImportRequestValidator {
 				}
 			}
 
-			if(!isObservationLevelRelationshipNamesValid(position.getObservationLevelRelationships(), index)) {
+			if(!this.isObservationLevelRelationshipNamesValid(position.getObservationLevelRelationships(), index)) {
 				iterator.remove();
 				continue;
 			}
