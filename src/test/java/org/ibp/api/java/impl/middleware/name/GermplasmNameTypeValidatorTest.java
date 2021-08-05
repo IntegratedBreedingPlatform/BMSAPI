@@ -149,7 +149,7 @@ public class GermplasmNameTypeValidatorTest {
 	}
 
 	@Test
-	public void ValidateDeletable_ThrowsException_WhenNameTypeIdIsInvalid() {
+	public void testValidate_Deletable_ThrowsException_WhenNameTypeIdIsInvalid() {
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
 			.thenReturn(Optional.empty());
 		try {
@@ -160,7 +160,7 @@ public class GermplasmNameTypeValidatorTest {
 	}
 
 	@Test
-	public void ValidateDeletable_ThrowsException_WhenNameTypeIsUsedInGermplasm() {
+	public void testValidate_Deletable_ThrowsException_WhenNameTypeIsUsedInGermplasm() {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
 
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
@@ -177,7 +177,7 @@ public class GermplasmNameTypeValidatorTest {
 	}
 
 	@Test
-	public void ValidateDeletable_ThrowsException_WhenNameTypeIsUsedInList() {
+	public void testValidate_Deletable_ThrowsException_WhenNameTypeIsUsedInList() {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
 
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
@@ -193,7 +193,7 @@ public class GermplasmNameTypeValidatorTest {
 	}
 
 	@Test
-	public void ValidateDeletable_ThrowsException_WhenNameTypeIdIsUsedBySystem() {
+	public void testValidate_Deletable_ThrowsException_WhenNameTypeIdIsUsedBySystem() {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
 		germplasmNameTypeDTO.setCode(GermplasmNameTypeValidator.SYSTEM_NAME_TYPES.get(0));
 
