@@ -79,7 +79,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -262,13 +261,14 @@ public class StudyResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyServiceBrapi.getStudyDetailsByInstance(studyDbId);
-		if (Objects.isNull(mwStudyDetails)) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+
+		final Optional<StudyDetailsDto> mwStudyDetailsOptional = this.studyServiceBrapi.getStudyDetailsByInstance(studyDbId);
+		if (!mwStudyDetailsOptional.isPresent()) {
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
-
+		final StudyDetailsDto mwStudyDetails = mwStudyDetailsOptional.get();
 		//Add environment parameters to addtionalInfo
 		final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
 			Collectors.toMap(MeasurementVariable::getName, MeasurementVariable::getValue));

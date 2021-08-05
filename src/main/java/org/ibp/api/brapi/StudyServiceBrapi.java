@@ -8,16 +8,18 @@ import org.ibp.api.brapi.v2.study.StudyImportResponse;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StudyServiceBrapi {
 
-	StudyDetailsDto getStudyDetailsByInstance(Integer instanceId);
+	Optional<StudyDetailsDto> getStudyDetailsByInstance(Integer instanceId);
 
 	long countStudyInstances(StudySearchFilter studySearchFilter);
 
 	List<StudyInstanceDto> getStudyInstances(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	List<StudyInstanceDto> getStudyInstancesWithMetadata(StudySearchFilter studySearchFilter, Pageable pageable);
+
 	StudyImportResponse createStudies(String cropName, List<StudyImportRequestDTO> studyImportRequestDTOS);
 
 }

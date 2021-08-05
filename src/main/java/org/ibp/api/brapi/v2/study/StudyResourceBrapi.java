@@ -51,7 +51,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 
 @Api(value = "BrAPI v2 Study Services")
 @Controller(value = "StudyResourceBrapiV2")
@@ -73,14 +73,14 @@ public class StudyResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyServiceBrapi.getStudyDetailsByInstance(studyDbId);
-		if (Objects.isNull(mwStudyDetails)) {
+
+		final Optional<StudyDetailsDto> mwStudyDetailsOptional = this.studyServiceBrapi.getStudyDetailsByInstance(studyDbId);
+		if (!mwStudyDetailsOptional.isPresent()) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-			;
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
-
+		final StudyDetailsDto mwStudyDetails = mwStudyDetailsOptional.get();
 		final Metadata metadata = new Metadata();
 		final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 		metadata.setPagination(pagination);

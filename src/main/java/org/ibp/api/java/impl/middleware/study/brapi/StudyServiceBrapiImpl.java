@@ -18,6 +18,7 @@ import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -33,7 +34,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 	private SecurityService securityService;
 
 	@Override
-	public StudyDetailsDto getStudyDetailsByInstance(final Integer instanceId) {
+	public Optional<StudyDetailsDto> getStudyDetailsByInstance(final Integer instanceId) {
 		return this.middlewareStudyServiceBrapi.getStudyDetailsByInstance(instanceId);
 	}
 
