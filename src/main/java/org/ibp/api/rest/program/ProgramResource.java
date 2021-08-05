@@ -121,8 +121,8 @@ public class ProgramResource {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
     public ResponseEntity<Void> editProgram(@PathVariable final String cropName, @PathVariable final String programUUID,
         @RequestBody final ProgramBasicDetailsDto programBasicDetailsDto) {
-        this.programService.editProgram(cropName, programUUID, programBasicDetailsDto);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        final boolean updateExecuted = this.programService.editProgram(cropName, programUUID, programBasicDetailsDto);
+        return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
     }
 
     private boolean hasAdmin() {

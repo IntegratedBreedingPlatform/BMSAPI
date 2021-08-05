@@ -249,7 +249,12 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public void editProgram(final String cropName, final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
+	public boolean editProgram(final String cropName, final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
 		this.programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
+		if (programBasicDetailsDto.allAttributesNull()) {
+			return false;
+		}
+		this.programService.editProgram(programUUID, programBasicDetailsDto);
+		return true;
 	}
 }

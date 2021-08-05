@@ -42,5 +42,5 @@ public interface ProgramService {
 
 	void deleteProgram(String programUUID);
 
-	void editProgram(String cropName, String programUUID, ProgramBasicDetailsDto programBasicDetailsDto);
+	boolean editProgram(String cropName, String programUUID, ProgramBasicDetailsDto programBasicDetailsDto);
 }
