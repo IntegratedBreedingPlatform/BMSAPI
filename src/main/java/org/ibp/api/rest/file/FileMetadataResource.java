@@ -29,8 +29,10 @@ public class FileMetadataResource {
 	public ResponseEntity<List<FileMetadataDTO>> list(
 		@PathVariable final String cropName,
 		@RequestParam final String observationUnitUUID,
-		@RequestParam(required = false) final String programUUID
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final String variableName,
+		@RequestParam(required = false) final String fileName
 	) {
-		return new ResponseEntity<>(this.fileMetadataService.list(observationUnitUUID, programUUID), HttpStatus.OK);
+		return new ResponseEntity<>(this.fileMetadataService.list(observationUnitUUID, programUUID, variableName, fileName), HttpStatus.OK);
 	}
 }
