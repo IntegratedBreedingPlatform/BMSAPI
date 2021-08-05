@@ -206,29 +206,30 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 
-		// Get attributtes
-		final Integer searchRequestId = labelsInfoInput.getSearchRequestId();
-		final LotsSearchDto searchDto =
-			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
-		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLotsApplyExportResultsLimit(searchDto, null);
-		final Set<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet());
-		final List<Variable> germplasmAttributeVariables =
-			this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
-
 		// Build label list
-
 		final List<LabelType> labelTypes = new LinkedList<>();
 		labelTypes.add(LOT_FIXED_LABEL_TYPES);
 
 		// Germplasm labels
 		final LabelType germplasmLabelTypes = new LabelType(GERMPLASM_FIXED_LABEL_TYPES.getTitle(), GERMPLASM_FIXED_LABEL_TYPES.getKey());
 		germplasmLabelTypes.setFields(new ArrayList<>(GERMPLASM_FIXED_LABEL_TYPES.getFields()));
-		germplasmLabelTypes.getFields().addAll(germplasmAttributeVariables.stream()
-			.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
-				StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
-			.collect(Collectors.toList()));
-		labelTypes.add(germplasmLabelTypes);
 
+		// Get attributtes
+		final Integer searchRequestId = labelsInfoInput.getSearchRequestId();
+		final LotsSearchDto searchDto =
+			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLotsApplyExportResultsLimit(searchDto, null);
+
+		if (!extendedLotDtos.isEmpty()) {
+			final Set<Integer> gids = extendedLotDtos.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet());
+			final List<Variable> germplasmAttributeVariables =
+				this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
+			germplasmLabelTypes.getFields().addAll(germplasmAttributeVariables.stream()
+				.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
+					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
+				.collect(Collectors.toList()));
+			labelTypes.add(germplasmLabelTypes);
+		}
 		return labelTypes;
 	}
 
