@@ -1,9 +1,8 @@
 package org.ibp.api.java.impl.middleware.sample;
 
 import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.ibp.api.exception.ApiRuntimeException;
+import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
+import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -37,20 +36,19 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public SampleDetailsDTO getSampleObservation(final String sampleId){
-		final SampleDetailsDTO sampleDetailsDTO;
-		try {
-			sampleDetailsDTO = this.sampleService.getSampleObservation(sampleId);
-		} catch (final MiddlewareException e) {
-			throw new ApiRuntimeException("an error happened when try to get the sample", e);
-		}
-		return sampleDetailsDTO;
-	}
-
-	@Override
 	public List<SampleDTO> getGermplasmSamples(final Integer gid) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		return this.sampleService.getByGid(gid);
+	}
+
+	@Override
+	public List<SampleObservationDto> getSampleObservations(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
+		return this.sampleService.getSampleObservations(requestDTO, pageable);
+	}
+
+	@Override
+	public long countSampleObservations(final SampleSearchRequestDTO sampleSearchRequestDTO) {
+		return this.sampleService.countSampleObservations(sampleSearchRequestDTO);
 	}
 }
