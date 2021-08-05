@@ -48,8 +48,8 @@ public class GermplasmNameTypeResource {
 	@ResponseBody
 	public ResponseEntity<Void> updateNameType(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId, @RequestBody final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
-		this.germplasmNameTypeService.updateNameType(nameTypeId, germplasmNameTypeRequestDTO);
-		return new ResponseEntity<>(HttpStatus.OK);
+		final boolean updateExecuted = this.germplasmNameTypeService.updateNameType(nameTypeId, germplasmNameTypeRequestDTO);
+		return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
 	}
 
 	@ApiOperation(value = "Delete a name type", notes = "Delete a name type")

@@ -37,9 +37,13 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public void updateNameType(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
+	public boolean updateNameType(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
 		this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, nameTypeId);
+		if (germplasmNameTypeRequestDTO.allAttributesNull()) {
+			return false;
+		}
 		this.germplasmNameTypeService.updateNameType(nameTypeId, germplasmNameTypeRequestDTO);
+		return true;
 	}
 
 	@Override
