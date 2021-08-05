@@ -31,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -192,7 +193,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final Location location = locations.get(0);
 
 		Mockito.when(this.studyInstanceService.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId()))
-			.thenReturn(studyDetailsDto);
+			.thenReturn(Optional.of(studyDetailsDto));
 		Mockito.when(this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10))).thenReturn(locations);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}")
