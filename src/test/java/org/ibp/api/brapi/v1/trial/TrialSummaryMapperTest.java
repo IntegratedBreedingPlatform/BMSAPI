@@ -33,6 +33,8 @@ public class TrialSummaryMapperTest {
 		assertThat(studySummary.getContacts().get(0).getEmail(), equalTo(contact.getEmail()));
 		assertThat(studySummary.getContacts().get(0).getName(), equalTo(contact.getName()));
 		assertThat(studySummary.getContacts().get(0).getType(), equalTo(contact.getType()));
+		assertThat(studySummary.getContacts().get(0).getOrcid(), equalTo(contact.getOrcid()));
+		assertThat(studySummary.getContacts().get(0).getInstituteName(), equalTo(contact.getInstituteName()));
 	}
 
 }

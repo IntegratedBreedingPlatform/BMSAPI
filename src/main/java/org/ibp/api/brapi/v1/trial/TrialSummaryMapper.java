@@ -38,7 +38,7 @@ public class TrialSummaryMapper {
 			final List<Contact> contacts = new ArrayList<>();
 			for (final ContactDto contactDto : context.getSource()) {
 				contacts.add(new Contact(contactDto.getContactDbId(), contactDto.getEmail(), contactDto.getName(),
-					contactDto.getType(), "", ""));
+					contactDto.getType(), contactDto.getOrcid(), contactDto.getInstituteName()));
 			}
 			return context.getMappingEngine().map(context.create(contacts, context.getDestinationType()));
 		}
