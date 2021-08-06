@@ -70,6 +70,7 @@ public class FileResource {
 	@RequestMapping(value = "/files/{fileUUID}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<Void> deleteFile(
+		@PathVariable final String cropName,
 		@PathVariable final String fileUUID
 	) {
 		this.fileMetadataService.delete(fileUUID);
@@ -81,7 +82,9 @@ public class FileResource {
 	 */
 	@ApiOperation("Get file storage status: true => active")
 	@RequestMapping(value = "/filestorage/status", method = RequestMethod.GET)
-	public ResponseEntity<Map<String, Boolean>> getFileStorageStatus() {
+	public ResponseEntity<Map<String, Boolean>> getFileStorageStatus(
+		@PathVariable final String cropName
+	) {
 		return new ResponseEntity<>(Collections.singletonMap("status", this.fileStorageService.isConfigured()), HttpStatus.OK);
 	}
 
