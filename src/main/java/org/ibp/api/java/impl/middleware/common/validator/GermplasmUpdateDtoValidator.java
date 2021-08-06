@@ -90,7 +90,7 @@ public class GermplasmUpdateDtoValidator {
 				.filter(Objects::nonNull).collect(
 				Collectors.toSet()));
 		final Set<String> existingNamesCodes =
-			this.germplasmService.filterGermplasmNameTypes(nameCodes).stream().map(GermplasmNameTypeDTO::getCode).collect(
+			this.germplasmService.filterGermplasmNameTypes(nameCodes).stream().map(nameType -> nameType.getCode().toUpperCase()).collect(
 				Collectors.toSet());
 
 		final Set<String> attributesCodes = new HashSet<>();

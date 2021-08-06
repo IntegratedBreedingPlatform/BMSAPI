@@ -32,7 +32,23 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	@Override
 	public Integer createNameType(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
-		this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO);
+		this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
 		return this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
+	}
+
+	@Override
+	public boolean updateNameType(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
+		this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, nameTypeId);
+		if (germplasmNameTypeRequestDTO.allAttributesNull()) {
+			return false;
+		}
+		this.germplasmNameTypeService.updateNameType(nameTypeId, germplasmNameTypeRequestDTO);
+		return true;
+	}
+
+	@Override
+	public void deleteNameType(final Integer nameTypeId) {
+		this.germplasmNameTypeValidator.validateCanBeDeleted(nameTypeId);
+		this.germplasmNameTypeService.deleteNameType(nameTypeId);
 	}
 }
