@@ -1,7 +1,10 @@
 package org.ibp.api.java.impl.middleware.sample;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.junit.Assert;
@@ -56,6 +59,25 @@ public class SampleServiceImplTest {
 		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class),
 			ArgumentMatchers.eq(Collections.singletonList(gid)));
 		Mockito.verify(this.middlewareSampleService).getByGid(gid);
+	}
+
+	@Test
+	public void testGetSampleObservations() {
+		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
+		Mockito.when(this.middlewareSampleService.getSampleObservations(requestDTO, null))
+				.thenReturn(Lists.newArrayList(new SampleObservationDto()));
+
+		this.sampleService.getSampleObservations(requestDTO, null);
+		Mockito.verify(this.middlewareSampleService).getSampleObservations(requestDTO, null);
+	}
+
+	@Test
+	public void testCountSampleObservations() {
+		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
+		Mockito.when(this.middlewareSampleService.countSampleObservations(requestDTO))
+				.thenReturn(new Long(0));
+		this.sampleService.countSampleObservations(requestDTO);
+		Mockito.verify(this.middlewareSampleService).countSampleObservations(requestDTO);
 	}
 
 }

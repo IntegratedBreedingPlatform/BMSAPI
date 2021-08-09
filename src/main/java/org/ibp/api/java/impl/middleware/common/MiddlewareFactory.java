@@ -16,10 +16,14 @@ import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
+import org.generationcp.middleware.api.brapi.GermplasmServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
+import org.generationcp.middleware.api.file.FileMetadataService;
+import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
@@ -111,8 +115,6 @@ import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFac
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
-import org.generationcp.middleware.service.impl.audit.GermplasmAuditServiceImpl;
-import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
@@ -123,6 +125,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.impl.NamingConfigurationServiceImpl;
+import org.generationcp.middleware.service.impl.audit.GermplasmAuditServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
@@ -130,6 +133,7 @@ import org.generationcp.middleware.service.impl.derived_variables.FormulaService
 import org.generationcp.middleware.service.impl.inventory.LotServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl;
+import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
 import org.generationcp.middleware.service.impl.rpackage.RPackageServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
@@ -620,6 +624,12 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmServiceBrapi getGermplasmServiceBrapi() {
+		return new GermplasmServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmPedigreeService getGermplasmPedigreeService() {
 		return new GermplasmPedigreeServiceImpl(this.getCropDatabaseSessionProvider());
 	}
@@ -700,6 +710,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public NamingConfigurationService getNamingConfigurationService() {
 		return new NamingConfigurationServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public FileMetadataService getFileMetadataService() {
+		return new FileMetadataServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

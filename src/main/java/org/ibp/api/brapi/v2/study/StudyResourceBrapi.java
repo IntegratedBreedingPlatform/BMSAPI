@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Api(value = "BrAPI v2 Study Services")
 @Controller(value = "StudyResourceBrapiV2")
@@ -73,14 +74,13 @@ public class StudyResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyInstanceService.getStudyDetailsByInstance(studyDbId);
-		if (Objects.isNull(mwStudyDetails)) {
+		final Optional<StudyDetailsDto> mwStudyDetailsOptional = this.studyInstanceService.getStudyDetailsByInstance(studyDbId);
+		if (!mwStudyDetailsOptional.isPresent()) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-			;
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
-
+		final StudyDetailsDto mwStudyDetails = mwStudyDetailsOptional.get();
 		final Metadata metadata = new Metadata();
 		final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 		metadata.setPagination(pagination);
@@ -127,6 +127,10 @@ public class StudyResourceBrapi {
 		@RequestParam(value = "germplasmDbid", required = false) final String germplasmDbid,
 		@ApiParam(value = "Filter to only return studies associated with given observation variable id")
 		@RequestParam(value = "observationVariableDbId", required = false) final Integer observationVariableDbId,
+		@ApiParam(value = "Filter to only return studies associated with given external reference ID. Could be a simple string or a URI. (use with externalReferenceSource parameter")
+		@RequestParam(value = "externalReferenceId", required = false) final String externalReferenceId,
+		@ApiParam(value = "An identifier for the source system or database of an external reference (use with externalReferenceID parameter")
+		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource,
 		@ApiParam(value = "Filter active status true/false") @RequestParam(value = "active", required = false) final Boolean active,
 		@ApiParam(value = "Sort order. Name of the field to sort by.") @RequestParam(value = "sortBy", required = false)
 		final String sortBy,
@@ -159,6 +163,8 @@ public class StudyResourceBrapi {
 		studySearchFilter.setObservationVariableDbId(observationVariableDbId);
 		studySearchFilter.setTrialName(trialName);
 		studySearchFilter.setStudyPUI(studyPUI);
+		studySearchFilter.setExternalReferenceID(externalReferenceId);
+		studySearchFilter.setExternalReferenceSource(externalReferenceSource);
 
 		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;

@@ -262,13 +262,13 @@ public class StudyResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyInstanceService.getStudyDetailsByInstance(studyDbId);
-		if (Objects.isNull(mwStudyDetails)) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+		final Optional<StudyDetailsDto> mwStudyDetailsOptional = this.studyInstanceService.getStudyDetailsByInstance(studyDbId);
+		if (!mwStudyDetailsOptional.isPresent()) {
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
-
+		final StudyDetailsDto mwStudyDetails = mwStudyDetailsOptional.get();
 		//Add environment parameters to addtionalInfo
 		final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
 			Collectors.toMap(MeasurementVariable::getName, MeasurementVariable::getValue));
