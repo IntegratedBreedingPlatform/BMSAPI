@@ -56,7 +56,10 @@ public class FileResource {
 		return new ResponseEntity<>(fileMetadataDTO, HttpStatus.CREATED);
 	}
 
-	// TODO now that we have file_metadata, we can GET /files/{fileUUID} instead of using path
+	/*
+	 * NOTE: with GET /files/{fileUUID} we get some url sanitization issues in the frontend:
+	 * WARNING: sanitizing unsafe URL value
+	 */
 	@RequestMapping(value = "/files/**", method = RequestMethod.GET)
 	@ResponseBody
 	public byte[] getFile(
