@@ -385,6 +385,51 @@
       "versions": [
         "1.3"
       ]
+    },
+    {
+      "call": "images",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "POST"
+      ],
+      "versions": [
+        "1.3"
+      ]
+    },
+    {
+      "call": "images/{imageDbId}",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "PUT"
+      ],
+      "versions": [
+        "1.3"
+      ]
+    },
+    {
+      "call": "images/{imageDbId}/imagecontent",
+      "dataTypes": [
+        "application/json"
+      ],
+      "datatypes": [
+        "json"
+      ],
+      "methods": [
+        "POST"
+      ],
+      "versions": [
+        "1.3"
+      ]
     }
   ]
 }

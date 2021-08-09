@@ -26,7 +26,7 @@ public class FileValidator {
 		this.validateExtension(errors, file.getOriginalFilename());
 	}
 
-	private void validateExtension(final BindingResult errors, final String fileName) {
+	public void validateExtension(final BindingResult errors, final String fileName) {
 		final String extension = FilenameUtils.getExtension(fileName);
 		if (!this.supportedFileTypes.contains(extension.toLowerCase())) {
 			errors.reject("file.upload.not-supported",  new String[] {StringUtils.join(this.supportedFileTypes, ", ")}, "");
