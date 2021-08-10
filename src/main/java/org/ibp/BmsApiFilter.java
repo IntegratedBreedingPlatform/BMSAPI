@@ -29,6 +29,7 @@ public class BmsApiFilter implements Filter {
 		response.setHeader("Access-Control-Allow-Methods", "POST, PUT, PATCH, GET, OPTIONS, DELETE");
 		response.setHeader("Access-Control-Max-Age", "3600");
 		response.setHeader("Access-Control-Allow-Headers", "x-requested-with, x-auth-token, Authorization, Content-type");
+		response.setHeader("x-frame-options", "SAMEORIGIN");
 
 		// Specific Cache control setting. An issue is caused by caching in IE9 and IE10. The GET requests to retrieve the variables,
 		// properties, methods or scales after one has been added are not executed again. IE will only execute the GET request again after
