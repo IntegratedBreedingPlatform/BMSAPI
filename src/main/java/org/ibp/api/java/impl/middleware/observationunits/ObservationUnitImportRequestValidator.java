@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.observationunits;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
+import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
@@ -11,7 +12,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class ObservationUnitImportRequestValidator {
 	private static final List<String> OBSERVATION_LEVEL_NAMES = Arrays.asList("PLOT", "BLOCK", "REP");
 
 	@Autowired
-	private StudyInstanceService studyInstanceService;
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Autowired
 	private GermplasmServiceBrapi germplasmService;
@@ -66,7 +66,7 @@ public class ObservationUnitImportRequestValidator {
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		studySearchFilter.setStudyDbIds(studyDbIds);
 		final Map<String, StudyInstanceDto> studyInstancesMap =
-			this.studyInstanceService.getStudyInstances(studySearchFilter, null).stream()
+			this.studyServiceBrapi.getStudyInstances(studySearchFilter, null).stream()
 				.collect(Collectors.toMap(StudyInstanceDto::getStudyDbId, Function.identity()));
 
 		final Integer index = 1;

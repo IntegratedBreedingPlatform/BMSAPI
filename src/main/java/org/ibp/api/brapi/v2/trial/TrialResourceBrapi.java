@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
+import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -22,7 +23,6 @@ import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -53,7 +53,7 @@ import java.util.Map;
 public class TrialResourceBrapi {
 
 	@Autowired
-	private StudyService studyService;
+	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
 	private BrapiResponseMessageGenerator<StudySummary> responseMessageGenerator;
@@ -138,12 +138,12 @@ public class TrialResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return TrialResourceBrapi.this.studyService.countStudies(filter);
+					return TrialResourceBrapi.this.trialServiceBrapi.countStudies(filter);
 				}
 
 				@Override
 				public List<StudySummary> getResults(final PagedResult<StudySummary> pagedResult) {
-					return TrialResourceBrapi.this.studyService.getStudies(filter, pageRequest);
+					return TrialResourceBrapi.this.trialServiceBrapi.getStudies(filter, pageRequest);
 				}
 			});
 
@@ -166,7 +166,7 @@ public class TrialResourceBrapi {
 		@RequestBody final List<TrialImportRequestDTO> trialImportRequestDTOs) {
 		BaseValidator.checkNotNull(trialImportRequestDTOs, "trial.import.request.null");
 
-		final TrialImportResponse trialImportResponse = this.studyService.createTrials(crop, trialImportRequestDTOs);
+		final TrialImportResponse trialImportResponse = this.trialServiceBrapi.createTrials(crop, trialImportRequestDTOs);
 		final List<TrialSummary> trialSummaries = this.translateResults(trialImportResponse.getEntityList(), crop);
 		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaries);
 

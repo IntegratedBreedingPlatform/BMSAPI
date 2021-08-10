@@ -1,5 +1,6 @@
 package org.ibp.api.brapi.v1.trial;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.user.ContactDto;
@@ -32,7 +33,9 @@ public class TrialSummaryTestDataProvider {
 
 	public static List<ContactDto> getContacts() {
 		final List<ContactDto> contacts = new ArrayList<>();
-		contacts.add(new ContactDto("1", "Maize Breeder", "admin@abc.org", "Creator"));
+		contacts.add(new ContactDto(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10),
+			RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10),
+			RandomStringUtils.randomAlphabetic(10)));
 		return contacts;
 	}
 

@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -19,7 +20,6 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -49,7 +49,7 @@ import java.util.Map;
 public class TrialResourceBrapi {
 
 	@Autowired
-	private StudyService studyService;
+	private TrialServiceBrapi trialServiceBrapi;
 
 	private static final String ORDER_BY_ASCENDING = "asc";
 	private static final String ORDER_BY_DESCENDING = "desc";
@@ -100,16 +100,16 @@ public class TrialResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return TrialResourceBrapi.this.studyService.countStudies(filter);
+					return TrialResourceBrapi.this.trialServiceBrapi.countStudies(filter);
 				}
 
 				@Override
 				public List<StudySummary> getResults(final PagedResult<StudySummary> pagedResult) {
-					return TrialResourceBrapi.this.studyService.getStudies(filter, pageRequest);
+					return TrialResourceBrapi.this.trialServiceBrapi.getStudies(filter, pageRequest);
 				}
 			});
 
-		final List<TrialSummary> trialSummaryList = this.translateResults(resultPage, sortBy, sortOrder);
+		final List<TrialSummary> trialSummaryList = this.translateResults(resultPage);
 		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaryList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
@@ -119,7 +119,7 @@ public class TrialResourceBrapi {
 
 	}
 
-	private List<TrialSummary> translateResults(final PagedResult<StudySummary> resultPage, final String sortBy, final String sortOrder) {
+	private List<TrialSummary> translateResults(final PagedResult<StudySummary> resultPage) {
 		final ModelMapper modelMapper = TrialSummaryMapper.getInstance();
 		final List<TrialSummary> trialSummaryList = new ArrayList<>();
 
@@ -155,7 +155,7 @@ public class TrialResourceBrapi {
 
 		org.ibp.api.brapi.v1.trial.TrialObservationTable trialObservationsTable = new org.ibp.api.brapi.v1.trial.TrialObservationTable();
 
-		final TrialObservationTable mwTrialObservationTable = this.studyService.getTrialObservationTable(trialDbId);
+		final TrialObservationTable mwTrialObservationTable = this.trialServiceBrapi.getTrialObservationTable(trialDbId);
 
 		final int resultNumber = mwTrialObservationTable == null ? 0 : 1;
 
