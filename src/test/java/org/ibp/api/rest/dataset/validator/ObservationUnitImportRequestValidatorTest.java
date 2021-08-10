@@ -2,6 +2,7 @@ package org.ibp.api.rest.dataset.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
+import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
@@ -14,7 +15,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.java.impl.middleware.observationunits.ObservationUnitImportRequestValidator;
 import org.junit.Assert;
@@ -40,7 +40,7 @@ public class ObservationUnitImportRequestValidatorTest {
 	private static final String PROGRAM_DBID = RandomStringUtils.randomAlphabetic(10);
 
 	@Mock
-	private StudyInstanceService studyInstanceService;
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Mock
 	private GermplasmServiceBrapi germplasmService;
@@ -60,7 +60,7 @@ public class ObservationUnitImportRequestValidatorTest {
 
 		final StudySearchFilter filter = new StudySearchFilter();
 		filter.setStudyDbIds(Collections.singletonList(STUDY_DBID));
-		Mockito.when(this.studyInstanceService.getStudyInstances(filter, null))
+		Mockito.when(this.studyServiceBrapi.getStudyInstances(filter, null))
 			.thenReturn(Collections.singletonList(studyInstanceDto));
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();

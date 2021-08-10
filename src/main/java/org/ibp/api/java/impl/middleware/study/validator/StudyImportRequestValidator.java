@@ -1,12 +1,12 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ public class StudyImportRequestValidator {
 	private static final int MAX_ENVIRONMENT_PARAMETER_LENGTH = 255;
 
 	@Autowired
-	private StudyService studyService;
+	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
 	private LocationService locationService;
@@ -45,7 +45,7 @@ public class StudyImportRequestValidator {
 			.map(StudyImportRequestDTO::getTrialDbId).collect(Collectors.toList());
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		studySearchFilter.setTrialDbIds(trialDbIds);
-		final Map<String, StudySummary> trialsMap = this.studyService.getStudies(studySearchFilter, null).stream()
+		final Map<String, StudySummary> trialsMap = this.trialServiceBrapi.getStudies(studySearchFilter, null).stream()
 			.collect(Collectors.toMap(s -> String.valueOf(s.getTrialDbId()), Function.identity()));
 
 		Integer index = 1;

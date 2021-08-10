@@ -15,6 +15,7 @@ import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
+import org.ibp.api.brapi.StudyServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -27,7 +28,6 @@ import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -51,7 +51,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 @Api(value = "BrAPI v2 Study Services")
@@ -59,7 +58,7 @@ import java.util.Optional;
 public class StudyResourceBrapi {
 
 	@Autowired
-	private StudyInstanceService studyInstanceService;
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Autowired
 	private LocationService locationService;
@@ -74,7 +73,8 @@ public class StudyResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
 
-		final Optional<StudyDetailsDto> mwStudyDetailsOptional = this.studyInstanceService.getStudyDetailsByInstance(studyDbId);
+
+		final Optional<StudyDetailsDto> mwStudyDetailsOptional = this.studyServiceBrapi.getStudyDetailsByInstance(studyDbId);
 		if (!mwStudyDetailsOptional.isPresent()) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 			errors.reject("studydbid.invalid", "");
@@ -181,12 +181,12 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyInstanceService.countStudyInstances(studySearchFilter);
+					return StudyResourceBrapi.this.studyServiceBrapi.countStudyInstances(studySearchFilter);
 				}
 
 				@Override
 				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
-					return StudyResourceBrapi.this.studyInstanceService.getStudyInstancesWithMetadata(studySearchFilter, pageRequest);
+					return StudyResourceBrapi.this.studyServiceBrapi.getStudyInstancesWithMetadata(studySearchFilter, pageRequest);
 				}
 			});
 
@@ -211,7 +211,7 @@ public class StudyResourceBrapi {
 		@RequestBody final List<StudyImportRequestDTO> studyImportRequestDTOS) {
 		BaseValidator.checkNotNull(studyImportRequestDTOS, "study.import.request.null");
 		final StudyImportResponse
-			studyImportResponse = this.studyInstanceService.createStudies(crop, studyImportRequestDTOS);
+			studyImportResponse = this.studyServiceBrapi.createStudies(crop, studyImportRequestDTOS);
 		final Result<StudyInstanceDto> results = new Result<StudyInstanceDto>().withData(studyImportResponse.getEntityList());
 
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(studyImportResponse));
