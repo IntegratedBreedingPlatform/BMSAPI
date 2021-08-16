@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.search;
 
+import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
@@ -48,8 +49,8 @@ public class SearchRequestServiceImplTest {
 	public void testSaveSearchRequest() throws MiddlewareQueryException {
 		final SearchRequest searchRequest = new SearchRequest();
 		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
-		germplasmSearchRequestDto.setPreferredName("ABC");
-		searchRequest.setParameters("{\"preferredName\":\"ABC\"}");
+		germplasmSearchRequestDto.setGermplasmNames(Lists.newArrayList("ABC", "DEF"));
+		searchRequest.setParameters("{\"germplasmNames\":[\"ABC\",\"DEF\"]}");
 		Mockito.when(this.daoFactory.getSearchRequestDAO().save(Mockito.any())).thenReturn(searchRequest);
 
 		final Integer searchRequestResult =
@@ -61,20 +62,21 @@ public class SearchRequestServiceImplTest {
 		final GermplasmSearchRequestDto dto =
 			(GermplasmSearchRequestDto) this.searchRequestServiceImpl
 				.getSearchRequest(searchRequestResult, GermplasmSearchRequestDto.class);
-		Assert.assertTrue(dto.getPreferredName().contains(germplasmSearchRequestDto.getPreferredName()));
+		Assert.assertEquals(dto.getGermplasmNames(), germplasmSearchRequestDto.getGermplasmNames());
 	}
 
 	@Test
 	public void testGetSavedSearchRequest() throws MiddlewareQueryException {
 		final SearchRequest searchRequest = new SearchRequest();
-		searchRequest.setParameters("{\"preferredName\":\"ABC\"}");
+		searchRequest.setParameters("{\"germplasmNames\":[\"ABC\",\"DEF\"]}");
 		Mockito.when(this.daoFactory.getSearchRequestDAO().getById(Mockito.anyInt())).thenReturn(searchRequest);
 
 		final Integer searchResulstDbid = 1;
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO =
 			(GermplasmSearchRequestDto) this.searchRequestServiceImpl.getSearchRequest(searchResulstDbid, GermplasmSearchRequestDto.class);
 
-		Assert.assertTrue(germplasmSearchRequestDTO.getPreferredName().equalsIgnoreCase("ABC"));
+		Assert.assertTrue(germplasmSearchRequestDTO.getGermplasmNames().contains("ABC"));
+		Assert.assertTrue(germplasmSearchRequestDTO.getGermplasmNames().contains("DEF"));
 	}
 
 }
