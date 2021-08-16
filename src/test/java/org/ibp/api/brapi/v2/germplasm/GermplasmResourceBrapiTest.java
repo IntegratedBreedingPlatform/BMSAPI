@@ -8,7 +8,7 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.GermplasmServiceBrapi;

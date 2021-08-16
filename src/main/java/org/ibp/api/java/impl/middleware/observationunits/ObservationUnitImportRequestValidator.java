@@ -9,7 +9,7 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitI
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;

@@ -6,7 +6,7 @@ import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
