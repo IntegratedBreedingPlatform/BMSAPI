@@ -25,10 +25,11 @@ public class KeySequenceResource {
 	private KeySequenceRegisterService keySequenceRegisterService;
 
 	@ApiOperation(value = "Delete Key Prefix Cache")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
-	@RequestMapping(value = "/crops/{cropName}/key-sequences", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'DELETE_GERMPLASM')")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/key-sequences", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<KeySequenceRegisterDeleteResponse> deleteKeySequence(@PathVariable final String cropName,
+		@PathVariable final String programUUID,
 		@RequestParam final List<Integer> gids,
 		@RequestParam final List<String> prefixes) {
 
