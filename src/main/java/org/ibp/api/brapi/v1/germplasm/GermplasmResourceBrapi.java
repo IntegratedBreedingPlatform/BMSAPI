@@ -10,7 +10,7 @@ import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -233,9 +233,23 @@ public class GermplasmResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasm(
-		@PathVariable final String crop, @RequestBody final GermplasmSearchRequestDto germplasmSearchRequestDto) {
+		@PathVariable final String crop,
+		@RequestBody final org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto germplasmSearchRequestDto) {
+
+		// Map v1 GermplasmSearchRequestDto to v2 GermplasmSearchRequestDto
+		final GermplasmSearchRequestDto germplasmSearchRequestDtoV2 = new GermplasmSearchRequestDto();
+		germplasmSearchRequestDtoV2.setCommonCropNames(germplasmSearchRequestDto.getCommonCropNames());
+		germplasmSearchRequestDtoV2.setAccessionNumbers(germplasmSearchRequestDto.getAccessionNumbers());
+		germplasmSearchRequestDtoV2.setGenus(germplasmSearchRequestDto.getGermplasmGenus());
+		germplasmSearchRequestDtoV2.setSpecies(germplasmSearchRequestDto.getGermplasmSpecies());
+		germplasmSearchRequestDtoV2.setGermplasmNames(germplasmSearchRequestDto.getGermplasmNames());
+		germplasmSearchRequestDtoV2.setGermplasmDbIds(germplasmSearchRequestDto.getGermplasmDbIds());
+		germplasmSearchRequestDtoV2.setGermplasmPUIs(germplasmSearchRequestDto.getGermplasmPUIs());
+		germplasmSearchRequestDtoV2.setPage(germplasmSearchRequestDto.getPage());
+		germplasmSearchRequestDtoV2.setPageSize(germplasmSearchRequestDto.getPageSize());
+
 		final String searchRequestId =
-			this.searchRequestService.saveSearchRequest(germplasmSearchRequestDto, GermplasmSearchRequestDto.class).toString();
+			this.searchRequestService.saveSearchRequest(germplasmSearchRequestDtoV2, GermplasmSearchRequestDto.class).toString();
 
 		final SearchDto searchDto = new SearchDto(searchRequestId);
 		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<>(searchDto);

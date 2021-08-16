@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
