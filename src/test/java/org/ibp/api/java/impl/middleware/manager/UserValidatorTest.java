@@ -139,7 +139,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void test_validateFieldLength_emailExceedLength_FAIL() {
-		final String email = "emailemailemailemailemailemailemailemailemail@test.com";
+		final String email = RandomStringUtils.randomAlphabetic(247) + "@test.com";
 		final UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
 			LAST_NAME_VALID, email, STATUS_VALID);
 
