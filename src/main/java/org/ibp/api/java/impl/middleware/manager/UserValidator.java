@@ -64,7 +64,7 @@ public class UserValidator {
 	public static final int FIRST_NAME_MAX_LENGTH = 20;
 	public static final int LAST_NAME_MAX_LENGTH = 50;
 	public static final int USERNAME_MAX_LENGTH = 30;
-	public static final int EMAIL_MAX_LENGTH = 40;
+	public static final int EMAIL_MAX_LENGTH = 255;
 	public static final int STATUS_MAX_LENGTH = 11;
 
 	@Autowired
