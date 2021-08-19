@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -310,7 +311,7 @@ public class StudyResourceBrapi {
 		return StudyResourceBrapi.createResponseEntityForFileDownload(file);
 	}
 
-	private File createDownloadFile(final StudyObservationTable table, final char sep, final String pathname) throws IOException {
+	private File createDownloadFile(final StudyObservationTable table, final char sep, final String filename) throws IOException {
 		// create mapper and schema
 		final CsvMapper mapper = new CsvMapper();
 		CsvSchema schema = mapper.schemaFor(List.class);
@@ -318,7 +319,9 @@ public class StudyResourceBrapi {
 
 		// output writer
 		final ObjectWriter myObjectWriter = mapper.writer(schema);
-		final File resultFile = new File(pathname);
+		final File temporaryFolder = Files.createTempDir();
+		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + filename;
+		final File resultFile = new File(fileNameFullPath);
 		final List<String> header = new ArrayList<>(table.getHeaderRow());
 
 		final Object[] variableIds = table.getObservationVariableDbIds().toArray();
