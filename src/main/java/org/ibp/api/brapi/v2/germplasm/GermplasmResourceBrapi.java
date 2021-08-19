@@ -163,7 +163,7 @@ public class GermplasmResourceBrapi {
 		return new ResponseEntity<>(singleGermplasmSearchResponse, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Search germplasm", notes = "Get the results of germplasm search request")
+	@ApiOperation(value = "Get search germplasm results", notes = "Get the results of germplasm search request")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/germplasm/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)

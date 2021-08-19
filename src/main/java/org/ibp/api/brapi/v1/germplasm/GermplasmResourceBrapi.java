@@ -49,6 +49,7 @@ import java.util.List;
 @Controller
 public class GermplasmResourceBrapi {
 
+	public static final String NO_GERMPLASM_FOUND = "no germplasm found";
 	@Autowired
 	private GermplasmServiceBrapi germplasmService;
 
@@ -180,7 +181,7 @@ public class GermplasmResourceBrapi {
 
 			return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<>(new SingleEntityResponse<Germplasm>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new SingleEntityResponse<Germplasm>().withMessage(NO_GERMPLASM_FOUND), HttpStatus.NOT_FOUND);
 		}
 
 	}
@@ -198,7 +199,6 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "includeSiblings", required = false) final Boolean includeSiblings
 	) {
 
-		// TODO
 		if (notation != null) {
 			return new ResponseEntity<>(
 				new SingleEntityResponse<PedigreeDTO>().withMessage("Search by pedigree not implemented"), HttpStatus.NOT_IMPLEMENTED);
@@ -206,7 +206,7 @@ public class GermplasmResourceBrapi {
 
 		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(germplasmDbId, null, includeSiblings);
 		if (pedigreeDTO == null) {
-			return new ResponseEntity<>(new SingleEntityResponse<PedigreeDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new SingleEntityResponse<PedigreeDTO>().withMessage(NO_GERMPLASM_FOUND), HttpStatus.NOT_FOUND);
 		}
 
 		return new ResponseEntity<>(new SingleEntityResponse<>(pedigreeDTO), HttpStatus.OK);
@@ -223,7 +223,7 @@ public class GermplasmResourceBrapi {
 
 		final ProgenyDTO progenyDTO = this.germplasmService.getProgeny(germplasmDbId);
 		if (progenyDTO == null) {
-			return new ResponseEntity<>(new SingleEntityResponse<ProgenyDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new SingleEntityResponse<ProgenyDTO>().withMessage(NO_GERMPLASM_FOUND), HttpStatus.NOT_FOUND);
 		}
 
 		return new ResponseEntity<>(new SingleEntityResponse<>(progenyDTO), HttpStatus.OK);
@@ -279,7 +279,7 @@ public class GermplasmResourceBrapi {
 					.getSearchRequest(Integer.valueOf(searchResultsDbid), GermplasmSearchRequest.class);
 		} catch (final NumberFormatException | MiddlewareException e) {
 			return new ResponseEntity<>(
-				new EntityListResponse<>(new Result<>(new ArrayList<Germplasm>())).withMessage("no search request found"),
+				new EntityListResponse<Germplasm>(new Result<>(new ArrayList<>())).withMessage("no search request found"),
 				HttpStatus.NOT_FOUND);
 		}
 
