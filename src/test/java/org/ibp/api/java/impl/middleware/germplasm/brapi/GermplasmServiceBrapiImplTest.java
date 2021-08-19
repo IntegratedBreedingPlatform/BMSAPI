@@ -6,7 +6,7 @@ import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
-import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
@@ -158,7 +158,7 @@ public class GermplasmServiceBrapiImplTest {
 	@Test
 	public void testSearchGermplasmDTO() {
 
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
 		germplasmDTO.setGermplasmDbId(RandomStringUtils.randomAlphabetic(20));
@@ -167,15 +167,16 @@ public class GermplasmServiceBrapiImplTest {
 		germplasmDTO.setGermplasmSeedSource("AF07A-412-201");
 		final List<GermplasmDTO> germplasmDTOList = Lists.newArrayList(germplasmDTO);
 
-		Mockito.when(this.middlewareGermplasmServiceBrapi.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE))).thenReturn(germplasmDTOList);
+		Mockito.when(this.middlewareGermplasmServiceBrapi.searchGermplasmDTO(germplasmSearchRequest, new PageRequest(PAGE, PAGE_SIZE))).thenReturn(germplasmDTOList);
 		final int gid = Integer.parseInt(germplasmDTO.getGid());
 		Mockito.when(this.pedigreeService.getCrossExpansions(Collections.singleton(gid), null, this.crossExpansionProperties))
 			.thenReturn(Collections.singletonMap(gid, "CB1"));
 
-		this.germplasmServiceBrapi.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE));
+		this.germplasmServiceBrapi.searchGermplasmDTO(germplasmSearchRequest, new PageRequest(PAGE, PAGE_SIZE));
 		Assert.assertEquals("CB1", germplasmDTOList.get(0).getPedigree());
 
-		Mockito.verify(this.middlewareGermplasmServiceBrapi, Mockito.times(1)).searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(PAGE, PAGE_SIZE));
+		Mockito.verify(this.middlewareGermplasmServiceBrapi, Mockito.times(1)).searchGermplasmDTO(
+			germplasmSearchRequest, new PageRequest(PAGE, PAGE_SIZE));
 	}
 
 }

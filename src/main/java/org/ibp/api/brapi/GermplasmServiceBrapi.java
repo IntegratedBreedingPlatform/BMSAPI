@@ -5,7 +5,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
-import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.ibp.api.brapi.v2.germplasm.GermplasmImportResponse;
 import org.springframework.data.domain.Pageable;
 
@@ -17,9 +17,9 @@ public interface GermplasmServiceBrapi {
 
 	GermplasmDTO updateGermplasm(String germplasmDbId, GermplasmUpdateRequest germplasmUpdateRequest);
 
-	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
+	List<GermplasmDTO> searchGermplasmDTO(GermplasmSearchRequest germplasmSearchRequest, Pageable pageable);
 
-	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
+	long countGermplasmDTOs(GermplasmSearchRequest germplasmSearchRequest);
 
 	PedigreeDTO getPedigree(String germplasmUUID, String notation, Boolean includeSiblings);
 

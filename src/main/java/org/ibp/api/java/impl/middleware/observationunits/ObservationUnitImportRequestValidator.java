@@ -9,7 +9,7 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitI
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -58,9 +58,9 @@ public class ObservationUnitImportRequestValidator {
 		final List<String> germplasmDbIds =
 			observationUnitImportRequestDtos.stream().filter(obs -> StringUtils.isNotEmpty(obs.getGermplasmDbId()))
 				.map(ObservationUnitImportRequestDto::getGermplasmDbId).collect(Collectors.toList());
-		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
-		germplasmSearchRequestDto.setGermplasmDbIds(germplasmDbIds);
-		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchGermplasmDTO(germplasmSearchRequestDto, null)
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		germplasmSearchRequest.setGermplasmDbIds(germplasmDbIds);
+		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchGermplasmDTO(germplasmSearchRequest, null)
 			.stream().collect(Collectors.toMap(GermplasmDTO::getGermplasmDbId, Function.identity()));
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();

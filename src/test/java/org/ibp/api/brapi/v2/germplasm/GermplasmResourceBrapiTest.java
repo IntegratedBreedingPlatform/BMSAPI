@@ -8,7 +8,7 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
-import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.GermplasmServiceBrapi;
@@ -41,12 +41,12 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 	public void testGetGermplasm() throws Exception {
 		final int gid = nextInt();
 		final String germplasmDbId = String.valueOf(gid);
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
-		germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		germplasmSearchRequest.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
 
 		final List<GermplasmDTO> list = this.getTestGermplasmDTOList(germplasmDbId);
 		doReturn(list).when(this.germplasmService)
-			.searchGermplasmDTO(Mockito.any(GermplasmSearchRequestDto.class), Mockito
+			.searchGermplasmDTO(Mockito.any(GermplasmSearchRequest.class), Mockito
 				.eq(new PageRequest(BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE)));
 
 		final GermplasmDTO germplasmDTO = list.get(0);

@@ -8,7 +8,7 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
-import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -101,16 +101,16 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		final int gid = nextInt();
 		final String germplasmDbId = String.valueOf(gid);
 		final int searchResultsDbid = 1;
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
-		germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		germplasmSearchRequest.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
 		final List<GermplasmDTO> list = new ArrayList<>();
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
 		germplasmDTO.setGermplasmDbId(germplasmDbId);
 		list.add(germplasmDTO);
 
-		doReturn(germplasmSearchRequestDTO).when(this.searchRequestService).getSearchRequest(searchResultsDbid, GermplasmSearchRequestDto.class);
+		doReturn(germplasmSearchRequest).when(this.searchRequestService).getSearchRequest(searchResultsDbid, GermplasmSearchRequest.class);
 		doReturn(list).when(this.germplasmService)
-			.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE));
+			.searchGermplasmDTO(germplasmSearchRequest, new PageRequest(BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/search/germplasm/" + searchResultsDbid)
 			.contentType(this.contentType)
@@ -132,9 +132,9 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		germplasmDTO.setGermplasmDbId(germplasmDbId);
 		list.add(germplasmDTO);
 
-		when(this.germplasmService.countGermplasmDTOs(any(GermplasmSearchRequestDto.class))).thenReturn(1L);
+		when(this.germplasmService.countGermplasmDTOs(any(GermplasmSearchRequest.class))).thenReturn(1L);
 		when(this.germplasmService
-			.searchGermplasmDTO(any(GermplasmSearchRequestDto.class), Mockito.eq(new PageRequest(BrapiPagedResult.DEFAULT_PAGE_NUMBER,
+			.searchGermplasmDTO(any(GermplasmSearchRequest.class), Mockito.eq(new PageRequest(BrapiPagedResult.DEFAULT_PAGE_NUMBER,
 				BrapiPagedResult.DEFAULT_PAGE_SIZE))))
 			.thenReturn(list);
 
