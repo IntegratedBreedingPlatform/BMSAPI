@@ -6,20 +6,21 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.generationcp.commons.pojo.treeview.TreeNode;
-import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.MyStudiesService;
+import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Api(value = "Study Services")
@@ -134,4 +137,32 @@ public class StudyResource {
 		this.studyService.deleteStudy(studyId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
+
+	@ApiOperation("Return a paginated list of studies.")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies", method = RequestMethod.GET)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. ")
+	})
+	@ResponseBody
+	public ResponseEntity<List<StudyDTO>> getStudies(
+		@PathVariable final String cropName,
+		@ApiParam("The program UUID") @PathVariable final String programUUID,
+		@RequestParam(required = false) final String studyNameContainsString,
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
+	) {
+
+		final StudySearchRequest studySearchRequest = new StudySearchRequest();
+		studySearchRequest.setStudyName(studyNameContainsString);
+
+		return new PaginatedSearch().getPagedResult(
+			() -> this.studyService.countFilteredStudies(programUUID, studySearchRequest),
+			() -> this.studyService.getFilteredStudies(programUUID, studySearchRequest, pageable),
+			pageable);
+	}
+
 }
