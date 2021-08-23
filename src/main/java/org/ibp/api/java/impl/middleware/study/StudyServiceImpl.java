@@ -7,6 +7,8 @@ import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
@@ -21,6 +23,7 @@ import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -133,6 +136,17 @@ public class StudyServiceImpl implements StudyService {
 		this.studyValidator.validateDeleteStudy(studyId);
 		this.studyDataManager.deleteStudy(studyId);
 
+	}
+
+	@Override
+	public List<StudyDTO> getFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest,
+		final Pageable pageable) {
+		return this.middlewareStudyService.getFilteredStudies(programUUID, studySearchRequest, pageable);
+	}
+
+	@Override
+	public long countFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
+		return this.middlewareStudyService.countFilteredStudies(programUUID, studySearchRequest);
 	}
 
 }
