@@ -169,7 +169,12 @@ public class GermplasmResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> getGermplasmSearchResults(
 		@PathVariable final String crop,
-		@PathVariable final String searchResultsDbId) {
+		@PathVariable final String searchResultsDbId,
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize) {
 
 		final GermplasmSearchRequest germplasmSearchRequest;
 		try {
@@ -183,13 +188,13 @@ public class GermplasmResourceBrapi {
 		}
 
 		final PagedResult<GermplasmDTO> resultPage =
-			this.getGermplasmDTOPagedResult(germplasmSearchRequest, germplasmSearchRequest.getPage(),
-				germplasmSearchRequest.getPageSize());
+			this.getGermplasmDTOPagedResult(germplasmSearchRequest, currentPage,
+				pageSize);
 
 		final List<Germplasm> germplasmList = GermplasmMapper.mapGermplasm(resultPage.getPageResults());
 
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
-		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+		final Pagination pagination = new Pagination().withPageNumber(currentPage).withPageSize(pageSize)
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
