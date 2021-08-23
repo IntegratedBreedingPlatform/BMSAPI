@@ -151,7 +151,7 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<List<StudyDTO>> getStudies(
 		@PathVariable final String cropName,
-		@ApiParam("The program UUID") @PathVariable final String programUUID,
+		@PathVariable final String programUUID,
 		@RequestParam(required = false) final String studyNameContainsString,
 		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
 	) {
