@@ -528,6 +528,10 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		if (!Util.isNullOrEmpty(variableFilter.getNames())) {
 			variableFilter.getNames().forEach(middlewareVariableFilter::addName);
 		}
+
+		if (!Util.isNullOrEmpty(variableFilter.getDatasetIds())) {
+			variableFilter.getDatasetIds().forEach(middlewareVariableFilter::addDatasetId);
+		}
 	}
 
 	@Override

@@ -97,7 +97,7 @@ public class VariableResource {
 		@ApiParam(value = "Use <code>GET /crop/list</code> service to retrieve possible crop name values that can be supplied here.", required = true)
 		@PathVariable final String cropname,
 
-		@ApiParam(value = "Use <code>GET /program/list</code> service to retrieve program uuid that can be supplied here.")
+		@ApiParam(value = "Use <code>GET /program/list</code> service to retrieve program uuid that can be supplied here.", required = true)
 		@RequestParam(value = "programUUID") final String programUUID,
 
 		@ApiParam(value = "Use <code>GET /ontology/{cropname}/properties</code> service "
@@ -134,7 +134,10 @@ public class VariableResource {
 
 		@ApiParam(value = "Use <code>GET /ontology/{cropname}/classes</code> service "
 			+ " to retrieve possible property class values that can be supplied here as a comma separated list.")
-		@RequestParam(value = "propertyClasses", required = false) final Set<String> propertyClasses) {
+		@RequestParam(value = "propertyClasses", required = false) final Set<String> propertyClasses,
+
+		@RequestParam(required = false) final Set<Integer> datasetIds
+	) {
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(programUUID);
@@ -173,6 +176,10 @@ public class VariableResource {
 
 		if (!Util.isNullOrEmpty(variableNames)) {
 			variableNames.forEach(variableFilter::addName);
+		}
+
+		if (!Util.isNullOrEmpty(datasetIds)) {
+			datasetIds.forEach(variableFilter::addDatasetId);
 		}
 
 		return new ResponseEntity<>(this.variableService.getVariablesByFilter(cropname, programUUID, variableFilter), HttpStatus.OK);
