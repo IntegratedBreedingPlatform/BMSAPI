@@ -156,6 +156,30 @@
     ]
   },
   {
+    "service": "search/germplasm",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "search/germplasm/{searchResultsDbId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
     "service": "samples",
     "dataTypes": [
       "application/json"
