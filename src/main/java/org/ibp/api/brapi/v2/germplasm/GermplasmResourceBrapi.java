@@ -229,7 +229,7 @@ public class GermplasmResourceBrapi {
 			germplasmSearchRequest.setExternalReferenceSources(Lists.newArrayList(externalReferenceSource));
 		}
 		if (StringUtils.isNotEmpty(synonym)) {
-			germplasmSearchRequest.setGermplasmNames(Lists.newArrayList(synonym));
+			germplasmSearchRequest.setSynonyms(Lists.newArrayList(synonym));
 		}
 		if (StringUtils.isNotEmpty(parentDbId)) {
 			germplasmSearchRequest.setParentDbIds(Lists.newArrayList(parentDbId));
