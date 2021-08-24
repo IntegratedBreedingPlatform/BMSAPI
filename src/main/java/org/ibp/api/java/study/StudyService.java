@@ -2,14 +2,12 @@
 package org.ibp.api.java.study;
 
 import org.generationcp.commons.pojo.treeview.TreeNode;
-import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.ibp.api.brapi.v2.trial.TrialImportResponse;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -33,5 +31,9 @@ public interface StudyService {
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 
 	void deleteStudy(Integer studyId);
+
+	List<StudyDTO> getFilteredStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
+
+	long countFilteredStudies(String programUUID, StudySearchRequest studySearchRequest);
 
 }
