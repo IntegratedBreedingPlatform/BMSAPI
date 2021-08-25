@@ -25,7 +25,7 @@ public class VariableFilter {
 	private final List<Integer> datasetIds = new ArrayList<>();
 
 	public String getProgramUuid() {
-		return programUuid;
+		return this.programUuid;
 	}
 
 	public void setProgramUuid(final String programUuid) {
@@ -33,7 +33,7 @@ public class VariableFilter {
 	}
 
 	public boolean isFetchAll() {
-		return fetchAll;
+		return this.fetchAll;
 	}
 
 	public void setFetchAll(final boolean fetchAll) {
@@ -41,7 +41,7 @@ public class VariableFilter {
 	}
 
 	public boolean isFavoritesOnly() {
-		return favoritesOnly;
+		return this.favoritesOnly;
 	}
 
 	public void setFavoritesOnly(final boolean favoritesOnly) {
@@ -49,7 +49,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getMethodIds() {
-		return methodIds;
+		return this.methodIds;
 	}
 
 	public void addMethodId(final Integer id) {
@@ -57,7 +57,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getPropertyIds() {
-		return propertyIds;
+		return this.propertyIds;
 	}
 
 	public void addPropertyId(final Integer id) {
@@ -65,7 +65,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getScaleIds() {
-		return scaleIds;
+		return this.scaleIds;
 	}
 
 	public void addScaleId(final Integer id) {
@@ -73,7 +73,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getVariableIds() {
-		return variableIds;
+		return this.variableIds;
 	}
 
 	public void addVariableId(final Integer id) {
@@ -81,7 +81,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getExcludedVariableIds() {
-		return excludedVariableIds;
+		return this.excludedVariableIds;
 	}
 
 	public void addExcludedVariableId(final Integer id) {
@@ -89,7 +89,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getDataTypes() {
-		return dataTypesIds;
+		return this.dataTypesIds;
 	}
 
 	public void addDataType(final Integer dataType) {
@@ -97,7 +97,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getVariableTypes() {
-		return variableTypeIds;
+		return this.variableTypeIds;
 	}
 
 	public void addVariableType(final Integer variableType) {
@@ -105,7 +105,7 @@ public class VariableFilter {
 	}
 
 	public List<String> getPropertyClasses() {
-		return propertyClasses;
+		return this.propertyClasses;
 	}
 
 	public void addPropertyClass(final String className) {
@@ -121,11 +121,11 @@ public class VariableFilter {
 	}
 
 	public List<String> getNames() {
-		return names;
+		return this.names;
 	}
 
 	public List<Integer> getDatasetIds() {
-		return datasetIds;
+		return this.datasetIds;
 	}
 
 	public void addDatasetId(final Integer datasetId) {

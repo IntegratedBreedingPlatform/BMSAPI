@@ -1,7 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections4.CollectionUtils;
@@ -55,7 +54,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	private static final String VARIABLE_NAME = "Variable";
 	private static final String ERROR_MESSAGE = "Error!";
-	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.ENVIRONMENT_CONDITION, VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
+	private static final List<VariableType> EDITABLE_VARIABLES_TYPES = Arrays
+		.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.ENVIRONMENT_CONDITION, VariableType.GERMPLASM_ATTRIBUTE,
+			VariableType.GERMPLASM_PASSPORT);
 	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId(), //
@@ -63,7 +64,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		VariableType.GERMPLASM_ATTRIBUTE.getId(), //
 		VariableType.GERMPLASM_PASSPORT.getId());
 
-	private static List NOT_EDITABLE_AND_DELETABLE_VARIABLES =
+	private static final List<String> NOT_EDITABLE_AND_DELETABLE_VARIABLES =
 		Arrays.asList("PLOT_NUMBER_AP_text", "INSTANCE_NUMBER_AP_text", "REP_NUMBER_AP_text", "PLANT_NUMBER_AP_text", "PLOT_CODE_AP_text");
 
 	@Autowired
@@ -79,11 +80,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	private OntologyScaleDataManager ontologyScaleDataManager;
 
 	@Override
-	public List<VariableDetails> getAllVariablesByFilter(String cropName, String programId, String propertyId, Boolean favourite) {
+	public List<VariableDetails> getAllVariablesByFilter(final String cropName, final String programId, final String propertyId, final Boolean favourite) {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<>(), VariableServiceImpl.VARIABLE_NAME);
 
-		ProgramDTO program = new ProgramDTO();
+		final ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
@@ -93,44 +94,44 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		setCurrentProgram(programId);
+		this.setCurrentProgram(programId);
 
 		if (!Strings.isNullOrEmpty(propertyId)) {
 			this.validateId(propertyId, VariableServiceImpl.VARIABLE_NAME);
 		}
 
 		try {
-			org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
+			final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
 					new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
 			middlewareVariableFilter.setProgramUuid(programId);
 			if (favourite != null) {
 				middlewareVariableFilter.setFavoritesOnly(favourite);
 			}
 
-			Integer property = StringUtil.parseInt(propertyId, null);
+			final Integer property = StringUtil.parseInt(propertyId, null);
 			if (property != null) {
 				middlewareVariableFilter.addPropertyId(property);
 			}
-			List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
-			List<VariableDetails> variableDetailsList = new ArrayList<>();
+			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
+			final List<VariableDetails> variableDetailsList = new ArrayList<>();
 
-			ModelMapper mapper = OntologyMapper.getInstance();
+			final ModelMapper mapper = OntologyMapper.getInstance();
 
-			for (Variable variable : variables) {
-				VariableDetails variableSummary = mapper.map(variable, VariableDetails.class);
+			for (final Variable variable : variables) {
+				final VariableDetails variableSummary = mapper.map(variable, VariableDetails.class);
 				variableDetailsList.add(variableSummary);
 			}
 			return variableDetailsList;
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
-	public List<VariableDetails> getVariablesByFilter(String cropName, String programId, VariableFilter variableFilter) {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+	public List<VariableDetails> getVariablesByFilter(final String cropName, final String programId, final VariableFilter variableFilter) {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<>(), VariableServiceImpl.VARIABLE_NAME);
 
-		ProgramDTO program = new ProgramDTO();
+		final ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
@@ -140,37 +141,37 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		setCurrentProgram(programId);
+		this.setCurrentProgram(programId);
 
 		try {
 
-			ModelMapper mapper = OntologyMapper.getInstance();
+			final ModelMapper mapper = OntologyMapper.getInstance();
 
-			org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
+			final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
 					new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
 
 			this.mapVariableFilter(variableFilter, middlewareVariableFilter);
 
-			List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
-			List<VariableDetails> variableDetailsList = new ArrayList<>();
+			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
+			final List<VariableDetails> variableDetailsList = new ArrayList<>();
 
-			for (Variable variable : variables) {
-				VariableDetails variableSummary = mapper.map(variable, VariableDetails.class);
+			for (final Variable variable : variables) {
+				final VariableDetails variableSummary = mapper.map(variable, VariableDetails.class);
 				variableDetailsList.add(variableSummary);
 			}
 			return variableDetailsList;
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
-	public VariableDetails getVariableById(String cropName, String programId, String variableId) {
+	public VariableDetails getVariableById(final String cropName, final String programId, final String variableId) {
 
 		this.validateId(variableId, VariableServiceImpl.VARIABLE_NAME);
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableServiceImpl.VARIABLE_NAME);
 
-		ProgramDTO program = new ProgramDTO();
+		final ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
@@ -180,9 +181,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		setCurrentProgram(programId);
+		this.setCurrentProgram(programId);
 
-		TermRequest term = new TermRequest(variableId, VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
+		final TermRequest term = new TermRequest(variableId, VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
 		this.termValidator.validate(term, errors);
 
 		if (errors.hasErrors()) {
@@ -190,20 +191,15 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 
 		try {
-			Integer id = StringUtil.parseInt(variableId, null);
+			final Integer id = StringUtil.parseInt(variableId, null);
 
-			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id, true);
-			ontologyVariableDataManager.fillVariableUsage(ontologyVariable);
+			final Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id, true);
+			this.ontologyVariableDataManager.fillVariableUsage(ontologyVariable);
 
 			final FormulaDto formula = ontologyVariable.getFormula();
 			if (formula != null) {
 				final Map<String, FormulaVariable> formulaVariableMap =
-					Maps.uniqueIndex(formula.getInputs(), new Function<FormulaVariable, String>() {
-
-						public String apply(FormulaVariable from) {
-							return String.valueOf(from.getId());
-						}
-					});
+					Maps.uniqueIndex(formula.getInputs(), formulaVariable -> String.valueOf(formulaVariable.getId()));
 				formula.setDefinition(DerivedVariableUtils.getEditableFormat(formula.getDefinition(), formulaVariableMap));
 
 			}
@@ -218,8 +214,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				deletable = false;
 			}
 
-			ModelMapper mapper = OntologyMapper.getInstance();
-			VariableDetails response = mapper.map(ontologyVariable, VariableDetails.class);
+			final ModelMapper mapper = OntologyMapper.getInstance();
+			final VariableDetails response = mapper.map(ontologyVariable, VariableDetails.class);
 
 			if (NOT_EDITABLE_AND_DELETABLE_VARIABLES.contains(ontologyVariable.getName())) {
 				response.getMetadata().setDeletable(false);
@@ -248,30 +244,30 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 			response.getMetadata().setDeletable(deletable);
 			return response;
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
-	public GenericResponse addVariable(String cropName, String programId, VariableDetails variable) {
+	public GenericResponse addVariable(final String cropName, final String programId, final VariableDetails variable) {
 
 		variable.setId(null);
 		variable.setProgramUuid(programId);
 
-		ProgramDTO program = new ProgramDTO();
+		final ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
 		try {
 
-			BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableServiceImpl.VARIABLE_NAME);
 			this.programValidator.validate(program, errors);
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 
-			setCurrentProgram(programId);
+			this.setCurrentProgram(programId);
 
 			this.variableValidator.validate(variable, errors);
 			if (errors.hasErrors()) {
@@ -280,11 +276,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 			this.formatVariableSummary(variable);
 
-			Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
-			Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
-			Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
+			final Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
+			final Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
+			final Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
-			OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+			final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 			variableInfo.setName(variable.getName());
 			variableInfo.setDescription(variable.getDescription());
 			variableInfo.setMethodId(methodId);
@@ -300,11 +296,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				variableInfo.setExpectedMax(variable.getExpectedRange().getMax());
 			}
 
-			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
+			for (final org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
 				variableInfo.addVariableType(VariableType.getById(this.parseVariableTypeAsInteger(variableType)));
 			}
 
-			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
+			for (final org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
 				if (VariableServiceImpl.EDITABLE_VARIABLES_TYPE_IDS.contains(Integer.valueOf(variableType.getId()))) {
 					variableInfo.setAlias(variable.getAlias());
 				}
@@ -312,24 +308,24 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 			this.ontologyVariableDataManager.addVariable(variableInfo);
 			return new GenericResponse(String.valueOf(variableInfo.getId()));
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
-	public void updateVariable(String cropName, String programId, String variableId, VariableDetails variable) {
+	public void updateVariable(final String cropName, final String programId, final String variableId, final VariableDetails variable) {
 
 		variable.setId(variableId);
 		variable.setProgramUuid(programId);
 
-		ProgramDTO program = new ProgramDTO();
+		final ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
 		try {
 
-			BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableServiceImpl.VARIABLE_NAME);
 
 			this.programValidator.validate(program, errors);
 
@@ -337,10 +333,10 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 
-			setCurrentProgram(programId);
+			this.setCurrentProgram(programId);
 
 			this.validateId(variableId, VariableServiceImpl.VARIABLE_NAME);
-			TermRequest term = new TermRequest(variableId, VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
+			final TermRequest term = new TermRequest(variableId, VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
 			this.termValidator.validate(term, errors);
 
 			if (errors.hasErrors()) {
@@ -354,13 +350,13 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 			this.formatVariableSummary(variable);
 
-			Integer id = StringUtil.parseInt(variable.getId(), null);
+			final Integer id = StringUtil.parseInt(variable.getId(), null);
 
-			Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
-			Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
-			Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
+			final Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
+			final Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
+			final Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
-			OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+			final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 			variableInfo.setId(id);
 			variableInfo.setProgramUuid(variable.getProgramUuid());
 			variableInfo.setName(variable.getName());
@@ -380,22 +376,22 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				variableInfo.setExpectedMax(variable.getExpectedRange().getMax());
 			}
 
-			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
+			for (final org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
 				variableInfo.addVariableType(VariableType.getById(this.parseVariableTypeAsInteger(variableType)));
 			}
 
 			this.ontologyVariableDataManager.updateVariable(variableInfo);
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
-	public void deleteVariable(String id) {
+	public void deleteVariable(final String id) {
 
 		// Note: Validate Id for valid format and check if variable exists or not
 		this.validateId(id, VariableServiceImpl.VARIABLE_NAME);
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableServiceImpl.VARIABLE_NAME);
 
 		// Note: Check if variable is deletable or not by checking its usage in variable
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId()),
@@ -406,17 +402,17 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		try {
 			this.ontologyVariableDataManager.deleteVariable(StringUtil.parseInt(id, null));
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
-	public void deleteVariablesFromCache(final String cropName, final Integer[] variablesIds, String programId) {
+	public void deleteVariablesFromCache(final String cropName, final Integer[] variablesIds, final String programId) {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<>(), VariableServiceImpl.VARIABLE_NAME);
 
-		ProgramDTO program = new ProgramDTO();
+		final ProgramDTO program = new ProgramDTO();
 		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
@@ -426,11 +422,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		setCurrentProgram(programId);
+		this.setCurrentProgram(programId);
 
 		for (final Integer variableId : variablesIds) {
 			this.validateId(String.valueOf(variableId), VariableServiceImpl.VARIABLE_NAME);
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableServiceImpl.VARIABLE_NAME);
 
 			final TermRequest term = new TermRequest(String.valueOf(variableId), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
 			this.termValidator.validate(term, errors);
@@ -443,21 +439,21 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		this.ontologyVariableDataManager.deleteVariablesFromCache(Arrays.asList(variablesIds));
 	}
 
-	protected void formatVariableSummary(VariableDetails variableDetails) {
+	protected void formatVariableSummary(final VariableDetails variableDetails) {
 
-		Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
+		final Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
 
 		// Should discard unwanted parameters. We do not want expected min/max values if associated data type is not numeric
 		if (scaleId != null) {
 			try {
-				Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId, true);
+				final Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId, true);
 
 				if (scale != null && !Objects.equals(scale.getDataType().getId(), DataType.NUMERIC_VARIABLE.getId())) {
 					variableDetails.setExpectedMin(null);
 					variableDetails.setExpectedMax(null);
 				}
 
-			} catch (MiddlewareException e) {
+			} catch (final MiddlewareException e) {
 				throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 			}
 		}
@@ -477,19 +473,19 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	 *
 	 * @param programId the program unique id
 	 */
-	private void setCurrentProgram(String programId) {
+	private void setCurrentProgram(final String programId) {
 		ContextHolder.setCurrentProgram(programId);
 	}
 
-	private Integer parseVariableTypeAsInteger(org.ibp.api.domain.ontology.VariableType variableType) {
+	private Integer parseVariableTypeAsInteger(final org.ibp.api.domain.ontology.VariableType variableType) {
 		if (variableType == null) {
 			return null;
 		}
 		return StringUtil.parseInt(variableType.getId(), null);
 	}
 
-	private void mapVariableFilter(VariableFilter variableFilter,
-			org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter) {
+	private void mapVariableFilter(final VariableFilter variableFilter,
+			final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter) {
 
 		middlewareVariableFilter.setProgramUuid(variableFilter.getProgramUuid());
 
@@ -536,14 +532,14 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	@Override
 	public List<VariableDetails> getVariablesByFilter(final VariableFilter  variableFilter) {
-		org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
+		final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
 				new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
 		this.mapVariableFilter(variableFilter, middlewareVariableFilter);
-		List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
-		List<VariableDetails> variableDetailsList = new ArrayList<>();
-		ModelMapper mapper = OntologyMapper.getInstance();
-		for (Variable variable : variables) {
-			VariableDetails variableSummary = mapper.map(variable, VariableDetails.class);
+		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
+		final List<VariableDetails> variableDetailsList = new ArrayList<>();
+		final ModelMapper mapper = OntologyMapper.getInstance();
+		for (final Variable variable : variables) {
+			final VariableDetails variableSummary = mapper.map(variable, VariableDetails.class);
 			variableDetailsList.add(variableSummary);
 		}
 		return variableDetailsList;
