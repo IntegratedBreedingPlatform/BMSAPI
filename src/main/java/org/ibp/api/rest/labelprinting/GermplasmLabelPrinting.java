@@ -4,14 +4,18 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -50,7 +54,6 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
-
 	public static final int MAX_GID_LIST_SIZE = 3000;
 
 	private static List<Field> DEFAULT_PEDIGREE_DETAILS_FIELDS;
@@ -95,9 +98,15 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	private GermplasmSearchService germplasmSearchService;
 
 	@Autowired
+	private GermplasmNameTypeService germplasmNameTypeService;
+
+	@Autowired
 	private GermplasmService germplasmService;
 
-	public static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
+	@Autowired
+	private GermplasmNameService germplasmNameService;
+
+	protected static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
 	@PostConstruct
 	public void initStaticFields() {
@@ -165,8 +174,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 
-
-
 		// Germplasm Details labels
 		final LabelType germplasmType = new LabelType(germplasmPropValue, germplasmPropValue);
 		germplasmType.setFields(DEFAULT_GERMPLASM_DETAILS_FIELDS);
@@ -188,12 +195,12 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		labelTypes.add(attirbutesType);
 
 		if (!germplasmSearchResponses.isEmpty()) {
-			final Set<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toSet());
-			final List<Variable> attributeVariables = this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
-			final List<UserDefinedField>  nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest, programUUID);
+			final List<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
+			final List<Variable> attributeVariables = this.germplasmAttributeService.getGermplasmAttributeVariables(gids, programUUID);
+			final List<GermplasmNameTypeDTO> nameTypes = this.germplasmNameTypeService.getNameTypesByGIDList(gids);
 
 			namesType.getFields().addAll(nameTypes.stream()
-				.map(nameType -> new Field(toKey(nameType.getFldno()), nameType.getFcode()))
+				.map(nameType -> new Field(toKey(nameType.getId()), nameType.getCode()))
 				.collect(Collectors.toList()));
 
 			attirbutesType.getFields().addAll(attributeVariables.stream()
@@ -212,17 +219,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(searchRequestId, GermplasmSearchRequest.class);
 
-		final Set<String> addedColumnsPropertyIds = new HashSet<>();
-
-		labelsGeneratorInput.getFields().forEach((listOfSelectedFields) ->
-			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, addedColumnsPropertyIds)
-		);
-
-		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
-			addedColumnsPropertyIds.add(labelsGeneratorInput.getSortBy());
-		}
-
-		germplasmSearchRequest.setAddedColumnsPropertyIds(new ArrayList<>(addedColumnsPropertyIds));
+		this.setAddedColumnsToSearchRequest(labelsGeneratorInput, germplasmSearchRequest);
 
 		final List<Integer> listOfGermplasmDetailsAndPedrigreeIds = new ArrayList<>();
 		listOfGermplasmDetailsAndPedrigreeIds.addAll(GERMPLASM_FIELD_IDS);
@@ -241,13 +238,22 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		final List<GermplasmSearchResponse> responseList =
 			this.germplasmService.searchGermplasm(germplasmSearchRequest, pageRequest, programUUID);
-
-		Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
-		Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
+		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
+		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 
 		if (fieldsContainsNamesOrAttributes) {
-			attributeValues = this.germplasmSearchService.getGermplasmSearchAttributeValues(germplasmSearchRequest, programUUID);
-			nameValues = this.germplasmSearchService.getGermplasmSearchNameValues(germplasmSearchRequest, programUUID);
+			final List<Integer> gids = responseList.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
+			final Map<Integer, List<AttributeDTO>> attributesByGIDsMap = this.germplasmAttributeService.getAttributesByGIDsMap(gids);
+			for (final Map.Entry<Integer, List<AttributeDTO>> gidAttributes : attributesByGIDsMap.entrySet()) {
+				final Map<Integer, String> attributesMap = new HashMap<>();
+				gidAttributes.getValue().forEach(attributeDTO -> attributesMap.put(attributeDTO.getAttributeDbId(), attributeDTO.getValue()));
+				attributeValues.put(gidAttributes.getKey(), attributesMap);
+			}
+			final List<GermplasmNameDto> germplasmNames = this.germplasmNameService.getGermplasmNamesByGids(gids);
+			germplasmNames.forEach(name -> {
+				nameValues.putIfAbsent(name.getGid(), new HashMap<>());
+				nameValues.get(name.getGid()).put(name.getNameTypeId(), name.getName());
+			});
 		}
 
 		// Data to be exported
@@ -267,6 +273,21 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		}
 
 		return new LabelsData(LabelPrintingStaticField.GUID.getFieldId(), data);
+	}
+
+	private void setAddedColumnsToSearchRequest(final LabelsGeneratorInput labelsGeneratorInput,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+		final Set<String> addedColumnsPropertyIds = new HashSet<>();
+
+		labelsGeneratorInput.getFields().forEach((listOfSelectedFields) ->
+			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, addedColumnsPropertyIds)
+		);
+
+		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
+			addedColumnsPropertyIds.add(labelsGeneratorInput.getSortBy());
+		}
+
+		germplasmSearchRequest.setAddedColumnsPropertyIds(new ArrayList<>(addedColumnsPropertyIds));
 	}
 
 	private Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse,
