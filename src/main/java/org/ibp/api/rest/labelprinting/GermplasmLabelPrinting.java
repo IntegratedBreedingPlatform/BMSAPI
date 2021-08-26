@@ -30,6 +30,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.PageRequest;
@@ -54,9 +55,7 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
-	public static final int MAX_GID_LIST_SIZE = 3000;
-
-	private static List<Field> DEFAULT_PEDIGREE_DETAILS_FIELDS;
+		private static List<Field> DEFAULT_PEDIGREE_DETAILS_FIELDS;
 	private static List<Field> DEFAULT_GERMPLASM_DETAILS_FIELDS;
 
 	private static List<Integer> PEDIGREE_FIELD_IDS;
@@ -106,6 +105,9 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	@Autowired
 	private GermplasmNameService germplasmNameService;
 
+	@Value("${export.germplasm.max.total.results}")
+	public int maxTotalResults;
+
 	protected static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
 	@PostConstruct
@@ -135,9 +137,9 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 
 		final long germplasmCount = this.germplasmService.countSearchGermplasm(germplasmSearchRequest, programUUID);
-		if (germplasmCount > MAX_GID_LIST_SIZE) {
+		if (germplasmCount > this.maxTotalResults) {
 			throw new ApiRequestValidationException(Arrays.asList(
-				new ObjectError("", new String[] {"exceed.germplasm.export.labels.threshold"}, new Object[]{MAX_GID_LIST_SIZE}, null))
+				new ObjectError("", new String[] {"exceed.germplasm.export.labels.threshold"}, new Object[]{this.maxTotalResults}, null))
 			);
 		}
 	}
@@ -233,7 +235,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		PageRequest pageRequest = null;
 		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
-			pageRequest = new PageRequest(0, GermplasmLabelPrinting.MAX_GID_LIST_SIZE, new Sort(Sort.Direction.ASC, labelsGeneratorInput.getSortBy()));
+			pageRequest = new PageRequest(0, this.maxTotalResults, new Sort(Sort.Direction.ASC, labelsGeneratorInput.getSortBy()));
 		}
 
 		final List<GermplasmSearchResponse> responseList =
