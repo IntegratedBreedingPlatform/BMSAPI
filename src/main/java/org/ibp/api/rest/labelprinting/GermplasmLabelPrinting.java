@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.ObjectError;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -49,7 +51,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
-	public static final int MAX_GID_LIST_SIZE = 5000;
+	public static final int MAX_GID_LIST_SIZE = 3000;
 
 	private static List<Field> DEFAULT_PEDIGREE_DETAILS_FIELDS;
 	private static List<Field> DEFAULT_GERMPLASM_DETAILS_FIELDS;
@@ -119,8 +121,16 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	public void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput) {
+	public void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput, final String programUUID) {
+		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
+			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 
+		final long germplasmCount = this.germplasmService.countSearchGermplasm(germplasmSearchRequest, programUUID);
+		if (germplasmCount > MAX_GID_LIST_SIZE) {
+			throw new ApiRequestValidationException(Arrays.asList(
+				new ObjectError("", new String[] {"exceed.germplasm.export.labels.threshold"}, new Object[]{MAX_GID_LIST_SIZE}, null))
+			);
+		}
 	}
 
 	@Override

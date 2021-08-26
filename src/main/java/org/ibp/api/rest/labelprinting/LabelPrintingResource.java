@@ -80,7 +80,7 @@ public class LabelPrintingResource {
 			@RequestBody final LabelsInfoInput labelsInfoInput) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
-		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
+		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput, programUUID);
 		final LabelsNeededSummary labelsNeededSummary = labelPrintingStrategy.getSummaryOfLabelsNeeded(labelsInfoInput);
 		final LabelsNeededSummaryResponse labelsNeededSummaryResponse =
 				labelPrintingStrategy.transformLabelsNeededSummary(labelsNeededSummary);
@@ -98,7 +98,7 @@ public class LabelPrintingResource {
 			@RequestBody final LabelsInfoInput labelsInfoInput) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
-		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
+		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput, programUUID);
 		final OriginResourceMetadata originResourceMetadata = labelPrintingStrategy.getOriginResourceMetadata(labelsInfoInput);
 
 		return new ResponseEntity<>(originResourceMetadata, HttpStatus.OK);
@@ -114,7 +114,7 @@ public class LabelPrintingResource {
 		@RequestBody final LabelsInfoInput labelsInfoInput) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
-		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
+		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput, programUUID);
 		final List<LabelType> labelTypes = labelPrintingStrategy.getAvailableLabelTypes(labelsInfoInput, programUUID);
 
 		return new ResponseEntity<>(labelTypes, HttpStatus.OK);

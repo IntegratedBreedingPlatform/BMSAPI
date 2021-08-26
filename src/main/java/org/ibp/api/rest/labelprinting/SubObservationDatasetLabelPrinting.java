@@ -134,7 +134,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	public void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput) {
+	public void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		this.studyValidator.validate(labelsInfoInput.getStudyId(), false);
 		this.datasetValidator.validateDataset(labelsInfoInput.getStudyId(), labelsInfoInput.getDatasetId());
 		this.datasetValidator.validateObservationDatasetType(labelsInfoInput.getDatasetId());

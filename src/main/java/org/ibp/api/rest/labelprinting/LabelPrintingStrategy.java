@@ -42,7 +42,7 @@ public abstract class LabelPrintingStrategy {
 	 *
 	 * @param labelsInfoInput
 	 */
-	abstract void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput);
+	abstract void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput, final String programUUID);
 
 	/**
 	 * Given a labelInfoInput, it retrieves a summarized info of the labels needed in a more readable object
@@ -107,7 +107,7 @@ public abstract class LabelPrintingStrategy {
 	 * @param programUUID
 	 */
 	void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
-		this.validateLabelsInfoInputData(labelsGeneratorInput);
+		this.validateLabelsInfoInputData(labelsGeneratorInput, programUUID);
 
 		final Set<Integer> availableKeys = this.getAvailableLabelTypes(labelsGeneratorInput, programUUID)
 			.stream().flatMap(labelType -> labelType.getFields().stream())
