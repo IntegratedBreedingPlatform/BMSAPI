@@ -20,7 +20,7 @@ public class NoneFileStorageServiceImpl implements FileStorageService {
 
 	@Override
 	public boolean isConfigured() {
-		return false;
+		return true;
 	}
 
 	@Override

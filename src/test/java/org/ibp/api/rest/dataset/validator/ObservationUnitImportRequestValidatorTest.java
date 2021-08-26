@@ -12,7 +12,7 @@ import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -65,9 +65,9 @@ public class ObservationUnitImportRequestValidatorTest {
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
 		germplasmDTO.setGermplasmDbId(GERMPLASM_DBID);
-		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
-		germplasmSearchRequestDto.setGermplasmDbIds(Collections.singletonList(GERMPLASM_DBID));
-		Mockito.when(this.germplasmService.searchGermplasmDTO(germplasmSearchRequestDto, null))
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		germplasmSearchRequest.setGermplasmDbIds(Collections.singletonList(GERMPLASM_DBID));
+		Mockito.when(this.germplasmService.searchGermplasmDTO(germplasmSearchRequest, null))
 			.thenReturn(Collections.singletonList(germplasmDTO));
 
 		final StandardVariable s = new StandardVariable();
