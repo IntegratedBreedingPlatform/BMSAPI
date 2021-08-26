@@ -24,6 +24,7 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v2.germplasm.GermplasmMapper;
+import org.ibp.api.brapi.v2.germplasm.GermplasmSearchRequestMapper;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
@@ -236,17 +237,8 @@ public class GermplasmResourceBrapi {
 		@PathVariable final String crop,
 		@RequestBody final org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto germplasmSearchRequestDto) {
 
-		// Map v1 GermplasmSearchRequestDto to v2 GermplasmSearchRequestDto
-		final GermplasmSearchRequest germplasmSearchRequestV2 = new GermplasmSearchRequest();
-		germplasmSearchRequestV2.setCommonCropNames(germplasmSearchRequestDto.getCommonCropNames());
-		germplasmSearchRequestV2.setAccessionNumbers(germplasmSearchRequestDto.getAccessionNumbers());
-		germplasmSearchRequestV2.setGenus(germplasmSearchRequestDto.getGermplasmGenus());
-		germplasmSearchRequestV2.setSpecies(germplasmSearchRequestDto.getGermplasmSpecies());
-		germplasmSearchRequestV2.setGermplasmNames(germplasmSearchRequestDto.getGermplasmNames());
-		germplasmSearchRequestV2.setGermplasmDbIds(germplasmSearchRequestDto.getGermplasmDbIds());
-		germplasmSearchRequestV2.setGermplasmPUIs(germplasmSearchRequestDto.getGermplasmPUIs());
-		germplasmSearchRequestV2.setPage(germplasmSearchRequestDto.getPage());
-		germplasmSearchRequestV2.setPageSize(germplasmSearchRequestDto.getPageSize());
+		final GermplasmSearchRequest germplasmSearchRequestV2 =
+			GermplasmSearchRequestMapper.getInstance().map(germplasmSearchRequestDto, GermplasmSearchRequest.class);
 
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(germplasmSearchRequestV2, GermplasmSearchRequest.class).toString();
