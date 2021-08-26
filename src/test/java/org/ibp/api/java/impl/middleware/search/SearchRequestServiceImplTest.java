@@ -4,7 +4,7 @@ package org.ibp.api.java.impl.middleware.search;
 import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.dao.SearchRequestDAO;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -48,21 +48,21 @@ public class SearchRequestServiceImplTest {
 	@Test
 	public void testSaveSearchRequest() throws MiddlewareQueryException {
 		final SearchRequest searchRequest = new SearchRequest();
-		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
-		germplasmSearchRequestDto.setGermplasmNames(Lists.newArrayList("ABC", "DEF"));
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		germplasmSearchRequest.setGermplasmNames(Lists.newArrayList("ABC", "DEF"));
 		searchRequest.setParameters("{\"germplasmNames\":[\"ABC\",\"DEF\"]}");
 		Mockito.when(this.daoFactory.getSearchRequestDAO().save(Mockito.any())).thenReturn(searchRequest);
 
 		final Integer searchRequestResult =
-			this.searchRequestServiceImpl.saveSearchRequest(germplasmSearchRequestDto, GermplasmSearchRequestDto.class);
+			this.searchRequestServiceImpl.saveSearchRequest(germplasmSearchRequest, GermplasmSearchRequest.class);
 
 		Mockito.when(this.daoFactory.getSearchRequestDAO().save(searchRequest).getRequestId()).thenReturn(1);
 		Mockito.when(this.daoFactory.getSearchRequestDAO().getById(searchRequestResult)).thenReturn(searchRequest);
 
-		final GermplasmSearchRequestDto dto =
-			(GermplasmSearchRequestDto) this.searchRequestServiceImpl
-				.getSearchRequest(searchRequestResult, GermplasmSearchRequestDto.class);
-		Assert.assertEquals(dto.getGermplasmNames(), germplasmSearchRequestDto.getGermplasmNames());
+		final GermplasmSearchRequest dto =
+			(GermplasmSearchRequest) this.searchRequestServiceImpl
+				.getSearchRequest(searchRequestResult, GermplasmSearchRequest.class);
+		Assert.assertEquals(dto.getGermplasmNames(), germplasmSearchRequest.getGermplasmNames());
 	}
 
 	@Test
@@ -72,8 +72,8 @@ public class SearchRequestServiceImplTest {
 		Mockito.when(this.daoFactory.getSearchRequestDAO().getById(Mockito.anyInt())).thenReturn(searchRequest);
 
 		final Integer searchResulstDbid = 1;
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO =
-			(GermplasmSearchRequestDto) this.searchRequestServiceImpl.getSearchRequest(searchResulstDbid, GermplasmSearchRequestDto.class);
+		final GermplasmSearchRequest germplasmSearchRequestDTO =
+			(GermplasmSearchRequest) this.searchRequestServiceImpl.getSearchRequest(searchResulstDbid, GermplasmSearchRequest.class);
 
 		Assert.assertTrue(germplasmSearchRequestDTO.getGermplasmNames().contains("ABC"));
 		Assert.assertTrue(germplasmSearchRequestDTO.getGermplasmNames().contains("DEF"));
