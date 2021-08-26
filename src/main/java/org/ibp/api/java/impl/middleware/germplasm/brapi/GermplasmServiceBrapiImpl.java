@@ -6,7 +6,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -117,10 +117,10 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 
 	@Override
 	public List<GermplasmDTO> searchGermplasmDTO(
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
+		final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable) {
 		try {
 
-			final List<GermplasmDTO> germplasmDTOList = this.germplasmServiceBrapi.searchGermplasmDTO(germplasmSearchRequestDTO, pageable);
+			final List<GermplasmDTO> germplasmDTOList = this.germplasmServiceBrapi.searchGermplasmDTO(germplasmSearchRequest, pageable);
 			if (germplasmDTOList != null) {
 				this.populateGermplasmPedigree(germplasmDTOList);
 			}
@@ -131,9 +131,9 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 	}
 
 	@Override
-	public long countGermplasmDTOs(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
+	public long countGermplasmDTOs(final GermplasmSearchRequest germplasmSearchRequest) {
 		try {
-			return this.germplasmServiceBrapi.countGermplasmDTOs(germplasmSearchRequestDTO);
+			return this.germplasmServiceBrapi.countGermplasmDTOs(germplasmSearchRequest);
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntime2Exception("", "An error has occurred when trying to count germplasm");
 		}
