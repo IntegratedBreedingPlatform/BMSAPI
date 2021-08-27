@@ -156,7 +156,7 @@ public class LabelPrintingResource {
 		try {
 			file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
 		} catch (final IOException e) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("cannot.export.labelPrinting", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
@@ -176,7 +176,7 @@ public class LabelPrintingResource {
 		}
 
 		if (labelPrintingTypeEnum == null) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("label.printing.type.not.supported", "");
 			throw new NotSupportedException(errors.getAllErrors().get(0));
 		}
@@ -230,7 +230,7 @@ public class LabelPrintingResource {
 		final LabelsFileGenerator labelsFileGenerator;
 		final FileType fileType = FileType.getEnum(fileExtension);
 		if (fileType == null || !labelPrintingStrategy.getSupportedFileTypes().contains(fileType)) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("file.type.not.supported", "");
 			throw new NotSupportedException(errors.getAllErrors().get(0));
 		}
