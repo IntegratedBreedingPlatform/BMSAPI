@@ -64,7 +64,7 @@ public class GermplasmNameTypeResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	@ApiOperation(value = "It will retrieve all name types", notes = "It will retrieve all name types")
+	@ApiOperation(value = "Search name types", notes = "Search name types")
 	@RequestMapping(value = "/crops/{cropName}/name-types/search", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_METADATA')")
 	@ApiImplicitParams({
