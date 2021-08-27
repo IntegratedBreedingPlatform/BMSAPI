@@ -137,7 +137,7 @@ public class Main extends WebMvcConfigurerAdapter {
 
 	private ApiInfo apiInfo() {
 		return new ApiInfo(
-				"Welcome!",
+				"BMSAPI",
 				"Try out the Breeding Management System API methods listed below!",
 				this.bmsVersion,
 				"http://bit.ly/KQX1nL",
