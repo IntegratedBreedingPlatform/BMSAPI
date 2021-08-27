@@ -174,7 +174,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput) {
+	void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		if (labelsInfoInput.getSearchRequestId() == null) {
 			throw new ApiRequestValidationException(Arrays.asList(
 				new ObjectError("", new String[] {"searchrequestid.invalid"}, null, null))

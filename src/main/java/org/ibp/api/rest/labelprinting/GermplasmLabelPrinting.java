@@ -4,15 +4,20 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
@@ -25,12 +30,14 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.ObjectError;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -48,37 +55,34 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
+	private List<Field> defaultPedigreeDetailsFields;
+	private List<Field> defaultGermplasmDetailsFields;
 
-	public static final int MAX_GID_LIST_SIZE = 5000;
+	private List<Integer> pedigreeFieldIds;
+	private List<Integer> germplasmFieldIds;
 
-	private static List<Field> DEFAULT_PEDIGREE_DETAILS_FIELDS;
-	private static List<Field> DEFAULT_GERMPLASM_DETAILS_FIELDS;
+	protected List<SortableFieldDto> sortedByFields;
 
-	private static List<Integer> PEDIGREE_FIELD_IDS;
-	private static List<Integer> GERMPLASM_FIELD_IDS;
+	public static final String GERMPLASM_DATE = "GERMPLASM DATE";
+	public static final String METHOD_ABBREV = "METHOD ABBREV";
+	public static final String METHOD_NUMBER = "METHOD NUMBER";
+	public static final String METHOD_GROUP = "METHOD GROUP";
+	public static final String PREFERRED_NAME = "PREFERRED NAME";
+	public static final String PREFERRED_ID = "PREFERRED ID";
+	public static final String GROUP_SOURCE_GID = "GROUP SOURCE GID";
+	public static final String GROUP_SOURCE = "GROUP SOURCE";
+	public static final String IMMEDIATE_SOURCE_GID = "IMMEDIATE SOURCE GID";
+	public static final String IMMEDIATE_SOURCE = "IMMEDIATE SOURCE";
 
-	public static List<SortableFieldDto> SORTED_BY;
+	public static final String GID = "GID";
+	public static final String GROUP_ID = "GROUP ID";
 
-	public final static String GERMPLASM_DATE = "GERMPLASM DATE";
-	public final static String METHOD_ABBREV = "METHOD ABBREV";
-	public final static String METHOD_NUMBER = "METHOD NUMBER";
-	public final static String METHOD_GROUP = "METHOD GROUP";
-	public final static String PREFERRED_NAME = "PREFERRED NAME";
-	public final static String PREFERRED_ID = "PREFERRED ID";
-	public final static String GROUP_SOURCE_GID = "GROUP SOURCE GID";
-	public final static String GROUP_SOURCE = "GROUP SOURCE";
-	public final static String IMMEDIATE_SOURCE_GID = "IMMEDIATE SOURCE GID";
-	public final static String IMMEDIATE_SOURCE = "IMMEDIATE SOURCE";
+	public static final String MALE_PARENT_GID = "MGID";
+	public static final String FEMALE_PARENT_GID = "FGID";
+	public static final String CROSS_MALE_PREFERRED_NAME = "CROSS-MALE PREFERRED NAME";
+	public static final String CROSS_FEMALE_PREFERRED_NAME = "CROSS-FEMALE PREFERRED NAME";
 
-	public final static String GID = "GID";
-	public final static String GROUP_ID = "GROUP ID";
-
-	public final static String MALE_PARENT_GID = "MGID";
-	public final static String FEMALE_PARENT_GID = "FGID";
-	public final static String CROSS_MALE_PREFERRED_NAME = "CROSS-MALE PREFERRED NAME";
-	public final static String CROSS_FEMALE_PREFERRED_NAME = "CROSS-FEMALE PREFERRED NAME";
-
-	public final static String ORIG_FINAL_NAME = "germplasm-labels";
+	public static final String ORIG_FINAL_NAME = "germplasm-labels";
 
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
@@ -93,9 +97,18 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	private GermplasmSearchService germplasmSearchService;
 
 	@Autowired
+	private GermplasmNameTypeService germplasmNameTypeService;
+
+	@Autowired
 	private GermplasmService germplasmService;
 
-	public static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
+	@Autowired
+	private GermplasmNameService germplasmNameService;
+
+	@Value("${export.germplasm.max.total.results}")
+	public int maxTotalResults;
+
+	protected static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
 	@PostConstruct
 	public void initStaticFields() {
@@ -104,23 +117,31 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final String groupIdPropValue = this.getMessage("label.printing.field.germplasm.group.id");
 		final String creationDatePropValue = this.getMessage("label.printing.field.germplasm.creation.date");
 
-		SORTED_BY = Arrays.asList(
+		this.sortedByFields = Arrays.asList(
 			new SortableFieldDto(gidPropValue, GermplasmLabelPrinting.GID),
 			new SortableFieldDto(preferredNamePropValue, GermplasmLabelPrinting.PREFERRED_NAME),
 			new SortableFieldDto(groupIdPropValue, GermplasmLabelPrinting.GROUP_ID),
 			new SortableFieldDto(creationDatePropValue, GermplasmLabelPrinting.GERMPLASM_DATE));
 
-		DEFAULT_GERMPLASM_DETAILS_FIELDS = this.buildGermplasmDetailsFields();
-		GERMPLASM_FIELD_IDS = DEFAULT_GERMPLASM_DETAILS_FIELDS.stream().map(Field::getId).collect(Collectors.toList());
+		this.defaultGermplasmDetailsFields = this.buildGermplasmDetailsFields();
+		this.germplasmFieldIds = this.defaultGermplasmDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
 
-		DEFAULT_PEDIGREE_DETAILS_FIELDS = this.buildPedigreeDetailsFields();
-		PEDIGREE_FIELD_IDS = DEFAULT_PEDIGREE_DETAILS_FIELDS.stream().map(Field::getId).collect(Collectors.toList());
+		this.defaultPedigreeDetailsFields = this.buildPedigreeDetailsFields();
+		this.pedigreeFieldIds = this.defaultPedigreeDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
 
 	}
 
 	@Override
-	public void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput) {
+	public void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput, final String programUUID) {
+		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
+			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 
+		final long germplasmCount = this.germplasmService.countSearchGermplasm(germplasmSearchRequest, programUUID);
+		if (germplasmCount > this.maxTotalResults) {
+			throw new ApiRequestValidationException(Arrays.asList(
+				new ObjectError("", new String[] {"exceed.germplasm.export.labels.threshold"}, new Object[]{this.maxTotalResults}, null))
+			);
+		}
 	}
 
 	@Override
@@ -155,16 +176,14 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 
-
-
 		// Germplasm Details labels
 		final LabelType germplasmType = new LabelType(germplasmPropValue, germplasmPropValue);
-		germplasmType.setFields(DEFAULT_GERMPLASM_DETAILS_FIELDS);
+		germplasmType.setFields(this.defaultGermplasmDetailsFields);
 		labelTypes.add(germplasmType);
 
 		// Pedigree labels
 		final LabelType pedigreeType = new LabelType(pedigreePropValue, pedigreePropValue);
-		pedigreeType.setFields(DEFAULT_PEDIGREE_DETAILS_FIELDS);
+		pedigreeType.setFields(this.defaultPedigreeDetailsFields);
 		labelTypes.add(pedigreeType);
 
 		// Names labels
@@ -178,12 +197,12 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		labelTypes.add(attirbutesType);
 
 		if (!germplasmSearchResponses.isEmpty()) {
-			final Set<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toSet());
-			final List<Variable> attributeVariables = this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
-			final List<UserDefinedField>  nameTypes = this.germplasmSearchService.getGermplasmNameTypes(germplasmSearchRequest, programUUID);
+			final List<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
+			final List<Variable> attributeVariables = this.germplasmAttributeService.getGermplasmAttributeVariables(gids, programUUID);
+			final List<GermplasmNameTypeDTO> nameTypes = this.germplasmNameTypeService.getNameTypesByGIDList(gids);
 
 			namesType.getFields().addAll(nameTypes.stream()
-				.map(nameType -> new Field(toKey(nameType.getFldno()), nameType.getFcode()))
+				.map(nameType -> new Field(toKey(nameType.getId()), nameType.getCode()))
 				.collect(Collectors.toList()));
 
 			attirbutesType.getFields().addAll(attributeVariables.stream()
@@ -202,42 +221,41 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(searchRequestId, GermplasmSearchRequest.class);
 
-		final Set<String> addedColumnsPropertyIds = new HashSet<>();
-
-		labelsGeneratorInput.getFields().forEach((listOfSelectedFields) ->
-			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, addedColumnsPropertyIds)
-		);
-
-		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
-			addedColumnsPropertyIds.add(labelsGeneratorInput.getSortBy());
-		}
-
-		germplasmSearchRequest.setAddedColumnsPropertyIds(new ArrayList<>(addedColumnsPropertyIds));
+		this.setAddedColumnsToSearchRequest(labelsGeneratorInput, germplasmSearchRequest);
 
 		final List<Integer> listOfGermplasmDetailsAndPedrigreeIds = new ArrayList<>();
-		listOfGermplasmDetailsAndPedrigreeIds.addAll(GERMPLASM_FIELD_IDS);
-		listOfGermplasmDetailsAndPedrigreeIds.addAll(PEDIGREE_FIELD_IDS);
+		listOfGermplasmDetailsAndPedrigreeIds.addAll(this.germplasmFieldIds);
+		listOfGermplasmDetailsAndPedrigreeIds.addAll(this.pedigreeFieldIds);
 
 		final List<Integer> selectedFieldIds =
 			labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toList());
 
 		final boolean fieldsContainsNamesOrAttributes =
-			selectedFieldIds.stream().anyMatch((fieldId) -> !listOfGermplasmDetailsAndPedrigreeIds.contains(fieldId));
+			selectedFieldIds.stream().anyMatch(fieldId -> !listOfGermplasmDetailsAndPedrigreeIds.contains(fieldId));
 
 		PageRequest pageRequest = null;
 		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
-			pageRequest = new PageRequest(0, GermplasmLabelPrinting.MAX_GID_LIST_SIZE, new Sort(Sort.Direction.ASC, labelsGeneratorInput.getSortBy()));
+			pageRequest = new PageRequest(0, this.maxTotalResults, new Sort(Sort.Direction.ASC, labelsGeneratorInput.getSortBy()));
 		}
 
 		final List<GermplasmSearchResponse> responseList =
 			this.germplasmService.searchGermplasm(germplasmSearchRequest, pageRequest, programUUID);
-
-		Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
-		Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
+		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
+		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 
 		if (fieldsContainsNamesOrAttributes) {
-			attributeValues = this.germplasmSearchService.getGermplasmSearchAttributeValues(germplasmSearchRequest, programUUID);
-			nameValues = this.germplasmSearchService.getGermplasmSearchNameValues(germplasmSearchRequest, programUUID);
+			final List<Integer> gids = responseList.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
+			final Map<Integer, List<AttributeDTO>> attributesByGIDsMap = this.germplasmAttributeService.getAttributesByGIDsMap(gids);
+			for (final Map.Entry<Integer, List<AttributeDTO>> gidAttributes : attributesByGIDsMap.entrySet()) {
+				final Map<Integer, String> attributesMap = new HashMap<>();
+				gidAttributes.getValue().forEach(attributeDTO -> attributesMap.put(attributeDTO.getAttributeDbId(), attributeDTO.getValue()));
+				attributeValues.put(gidAttributes.getKey(), attributesMap);
+			}
+			final List<GermplasmNameDto> germplasmNames = this.germplasmNameService.getGermplasmNamesByGids(gids);
+			germplasmNames.forEach(name -> {
+				nameValues.putIfAbsent(name.getGid(), new HashMap<>());
+				nameValues.get(name.getGid()).put(name.getNameTypeId(), name.getName());
+			});
 		}
 
 		// Data to be exported
@@ -259,6 +277,21 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		return new LabelsData(LabelPrintingStaticField.GUID.getFieldId(), data);
 	}
 
+	private void setAddedColumnsToSearchRequest(final LabelsGeneratorInput labelsGeneratorInput,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+		final Set<String> addedColumnsPropertyIds = new HashSet<>();
+
+		labelsGeneratorInput.getFields().forEach(listOfSelectedFields ->
+			this.addingColumnToGermplasmSearchRequest(listOfSelectedFields, addedColumnsPropertyIds)
+		);
+
+		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
+			addedColumnsPropertyIds.add(labelsGeneratorInput.getSortBy());
+		}
+
+		germplasmSearchRequest.setAddedColumnsPropertyIds(new ArrayList<>(addedColumnsPropertyIds));
+	}
+
 	private Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse,
 		final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues) {
 
@@ -266,7 +299,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		for (final Integer key : keys) {
 			final int id = toId(key);
 
-			if (GERMPLASM_FIELD_IDS.contains(id)) {
+			if (this.germplasmFieldIds.contains(id)) {
 				if (TermId.GID.getId() == id) {
 					columns.put(key, Objects.toString(germplasmSearchResponse.getGid(), ""));
 					continue;
@@ -356,7 +389,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 					columns.put(key, Objects.toString(germplasmSearchResponse.getLotCount(), ""));
 				}
 
-			} else if (PEDIGREE_FIELD_IDS.contains(id)) {
+			} else if (this.pedigreeFieldIds.contains(id)) {
 				if (LabelPrintingStaticField.CROSS.getFieldId().equals(id)) {
 					columns.put(key, Objects.toString(germplasmSearchResponse.getPedigreeString(), ""));
 					continue;
@@ -546,7 +579,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	public List<SortableFieldDto> getSortableFields() {
-		return SORTED_BY;
+		return this.sortedByFields;
 	}
 
 	/**
