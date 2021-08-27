@@ -143,7 +143,7 @@ public class Main extends WebMvcConfigurerAdapter {
 				"http://bit.ly/KQX1nL",
 				new Contact("BMS Support", "", "support@integratedbreeding.net"),
 				"GNU General Public License",
-				"http://bit.ly/8Ztv8M");
+				"https://www.gnu.org/licenses/licenses.html#GPL");
 	}
 
 	protected void setEnableSwagger(final boolean enableSwagger) {
