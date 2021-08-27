@@ -6,7 +6,9 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
+import org.generationcp.middleware.api.nametype.NameTypeMetadataFilterRequest;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.name.GermplasmNameTypeService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +65,7 @@ public class GermplasmNameTypeResource {
 	}
 
 	@ApiOperation(value = "It will retrieve all name types", notes = "It will retrieve all name types")
-	@RequestMapping(value = "/crops/{cropName}/name-types", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/name-types/search", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_METADATA')")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -74,12 +76,15 @@ public class GermplasmNameTypeResource {
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
 	@ResponseBody
-	public ResponseEntity<List<GermplasmNameTypeDTO>> getNameTypes(@PathVariable final String cropName,
+	public ResponseEntity<List<GermplasmNameTypeDTO>> searchNameTypes(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
+		@RequestBody final NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest,
 		@ApiIgnore
 		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
-		return new PaginatedSearch().getPagedResult(() -> this.germplasmNameTypeService.countAllNameTypes(),
-			() -> this.germplasmNameTypeService.getNameTypes(pageable),
+
+		BaseValidator.checkNotNull(nameTypeMetadataFilterRequest, "param.null", new String[] {"nameTypeMetadataFilterRequest"});
+		return new PaginatedSearch().getPagedResult(() -> this.germplasmNameTypeService.countSearchNameTypes(nameTypeMetadataFilterRequest),
+			() -> this.germplasmNameTypeService.searchNameTypes(nameTypeMetadataFilterRequest, pageable),
 			pageable);
 	}
 }
