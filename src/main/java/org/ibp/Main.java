@@ -140,7 +140,7 @@ public class Main extends WebMvcConfigurerAdapter {
 				"BMSAPI",
 				"Try out the Breeding Management System API methods listed below!",
 				this.bmsVersion,
-				"http://bit.ly/KQX1nL",
+				"https://www.integratedbreeding.net/1855/terms-of-use",
 				new Contact("BMS Support", "", "support@integratedbreeding.net"),
 				"GNU General Public License",
 				"https://www.gnu.org/licenses/licenses.html#GPL");
