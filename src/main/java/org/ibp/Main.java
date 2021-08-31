@@ -137,13 +137,13 @@ public class Main extends WebMvcConfigurerAdapter {
 
 	private ApiInfo apiInfo() {
 		return new ApiInfo(
-				"Welcome!",
+				"BMSAPI",
 				"Try out the Breeding Management System API methods listed below!",
 				this.bmsVersion,
-				"http://bit.ly/KQX1nL",
+				"https://www.integratedbreeding.net/1855/terms-of-use",
 				new Contact("BMS Support", "", "support@integratedbreeding.net"),
 				"GNU General Public License",
-				"http://bit.ly/8Ztv8M");
+				"https://www.gnu.org/licenses/licenses.html#GPL");
 	}
 
 	protected void setEnableSwagger(final boolean enableSwagger) {
