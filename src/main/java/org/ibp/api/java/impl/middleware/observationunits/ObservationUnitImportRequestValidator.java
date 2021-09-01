@@ -59,23 +59,8 @@ public class ObservationUnitImportRequestValidator {
 		BaseValidator.checkNotEmpty(observationUnitImportRequestDtos, "observation.unit.import.request.null");
 		this.errors = new MapBindingResult(new HashMap<>(), StudyImportRequestDTO.class.getName());
 
-		final List<String> studyDbIds = new ArrayList<>();
-		final Set<String> plotLevelCodes = new HashSet<>();
-		observationUnitImportRequestDtos
-			.stream()
-			.filter(obs -> StringUtils.isNotEmpty(obs.getStudyDbId()))
-			.forEach(obs -> {
-				studyDbIds.add(obs.getStudyDbId());
-
-				if (obs.getObservationUnitPosition() != null &&
-					obs.getObservationUnitPosition().getObservationLevelRelationships() != null) {
-					obs.getObservationUnitPosition().getObservationLevelRelationships()
-						.stream()
-						.filter(relationShip -> relationShip.getLevelName().equalsIgnoreCase(PLOT) &&
-							!StringUtils.isEmpty(relationShip.getLevelCode()))
-						.forEach(relationShip -> plotLevelCodes.add(relationShip.getLevelCode()));
-				}
-			});
+		final List<String> studyDbIds = observationUnitImportRequestDtos.stream().filter(obs -> StringUtils.isNotEmpty(obs.getStudyDbId()))
+			.map(ObservationUnitImportRequestDto::getStudyDbId).collect(Collectors.toList());
 
 		final List<String> germplasmDbIds =
 			observationUnitImportRequestDtos.stream().filter(obs -> StringUtils.isNotEmpty(obs.getGermplasmDbId()))
@@ -99,8 +84,7 @@ public class ObservationUnitImportRequestValidator {
 				.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList());
 
 		final Map<String, List<String>> plotObservationLevelRelationshipsByStudyDbIds =
-			this.middlewareObservationUnitService.getPlotObservationLevelRelationshipsByGeolocationsAndLevelCodes(new HashSet<>(studyDbIds),
-			plotLevelCodes);
+			this.middlewareObservationUnitService.getPlotObservationLevelRelationshipsByGeolocationsAndLevelCodes(new HashSet<>(studyDbIds));
 
 		final Map<String, List<String>> entryTypesMap = new HashMap<>();
 		final Map<String, Set<String>> validPlotObservationLevelRelationshipsByStudyDbIds = new HashMap<>();
