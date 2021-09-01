@@ -20,7 +20,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,7 +83,7 @@ public class ObservationUnitImportRequestValidator {
 				.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList());
 
 		final Map<String, List<String>> plotObservationLevelRelationshipsByStudyDbIds =
-			this.middlewareObservationUnitService.getPlotObservationLevelRelationshipsByGeolocationsAndLevelCodes(new HashSet<>(studyDbIds));
+			this.middlewareObservationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(studyDbIds));
 
 		final Map<String, List<String>> entryTypesMap = new HashMap<>();
 		final Map<String, Set<String>> validPlotObservationLevelRelationshipsByStudyDbIds = new HashMap<>();
