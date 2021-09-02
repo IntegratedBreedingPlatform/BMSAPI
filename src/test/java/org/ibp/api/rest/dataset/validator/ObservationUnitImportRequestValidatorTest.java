@@ -271,7 +271,7 @@ public class ObservationUnitImportRequestValidatorTest {
 	}
 
 	@Test
-	public void pruneObservationUnitsInvalidForImport_importExistingPlotCode() {
+	public void testPruneObservationUnitsInvalidForImport_importExistingPlotCode() {
 		Map<String, List<String>> plotObservationLevelRelationshipsByGeolocations = new HashMap();
 		plotObservationLevelRelationshipsByGeolocations.put(STUDY_DBID, Arrays.asList("1"));
 		Mockito.when(this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
@@ -285,7 +285,7 @@ public class ObservationUnitImportRequestValidatorTest {
 	}
 
 	@Test
-	public void pruneObservationUnitsInvalidForImport_importDuplicatedPlotCode() {
+	public void testPruneObservationUnitsInvalidForImport_importDuplicatedPlotCode() {
 		final StudyInstanceDto studyInstanceDto = new StudyInstanceDto();
 		studyInstanceDto.setTrialDbId(TRIAL_DBID);
 		studyInstanceDto.setProgramDbId(PROGRAM_DBID);
