@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
-import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.MyStudiesService;
 import org.generationcp.middleware.api.study.StudyDTO;
@@ -15,7 +14,6 @@ import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -28,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Api(value = "Study Services")
