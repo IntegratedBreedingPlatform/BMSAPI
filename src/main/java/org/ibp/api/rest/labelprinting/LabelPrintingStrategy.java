@@ -42,7 +42,7 @@ public abstract class LabelPrintingStrategy {
 	 *
 	 * @param labelsInfoInput
 	 */
-	abstract void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput);
+	abstract void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput, final String programUUID);
 
 	/**
 	 * Given a labelInfoInput, it retrieves a summarized info of the labels needed in a more readable object
@@ -107,11 +107,11 @@ public abstract class LabelPrintingStrategy {
 	 * @param programUUID
 	 */
 	void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
-		this.validateLabelsInfoInputData(labelsGeneratorInput);
+		this.validateLabelsInfoInputData(labelsGeneratorInput, programUUID);
 
 		final Set<Integer> availableKeys = this.getAvailableLabelTypes(labelsGeneratorInput, programUUID)
 			.stream().flatMap(labelType -> labelType.getFields().stream())
-			.map(field -> field.getId())
+			.map(Field::getId)
 			.collect(Collectors.toSet());
 
 		final Set<Integer> requestedFields = new HashSet<>();
@@ -123,7 +123,7 @@ public abstract class LabelPrintingStrategy {
 				totalRequestedFields++;
 			}
 		}
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		if (requestedFields.isEmpty()) {
 			// Error, at least one requested field is needed
 			errors.reject("label.fields.selection.empty");
@@ -170,7 +170,7 @@ public abstract class LabelPrintingStrategy {
 			errors.reject("common.error.invalid.filename.size", new String[] {String.valueOf(FILENAME_MAX_LENGTH)}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-	};
+	}
 
 	Set<Field> getAllAvailableFields(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final Set<Field> availableFields = new HashSet<>();
@@ -191,7 +191,7 @@ public abstract class LabelPrintingStrategy {
 	}
 
 	void validateBarcode(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) {
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		if(!labelsGeneratorInput.isAutomaticBarcode()){
 			for (final Map<Integer, String> data:labelsData.getData()){
 				final List<Integer> barcodeIds =

@@ -17,7 +17,6 @@ import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.ontology.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,22 +31,13 @@ public class ModelServiceImpl implements ModelService {
 	@Autowired
 	private TermDataManager termDataManager;
 
-	@Autowired
-	private FileStorageService fileStorageService;
-
 	@Override
 	public List<DataType> getAllDataTypes() {
-		final List<org.generationcp.middleware.domain.ontology.DataType> dataTypes =
-			new ArrayList<>(Arrays.asList(org.generationcp.middleware.domain.ontology.DataType.values()));
-
-		if (!this.fileStorageService.isConfigured()) {
-			dataTypes.removeIf(dataType -> dataType.equals(org.generationcp.middleware.domain.ontology.DataType.FILE_VARIABLE));
-		}
-
-		return Util.convertAll(dataTypes, new Function<org.generationcp.middleware.domain.ontology.DataType, DataType>() {
+		return Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.ontology.DataType.values()),
+				new Function<org.generationcp.middleware.domain.ontology.DataType, DataType>() {
 
 					@Override
-					public DataType apply(final org.generationcp.middleware.domain.ontology.DataType dataType) {
+					public DataType apply(org.generationcp.middleware.domain.ontology.DataType dataType) {
 						return new DataType(String.valueOf(dataType.getId()), dataType.getName(), dataType.isSystemDataType());
 					}
 				});

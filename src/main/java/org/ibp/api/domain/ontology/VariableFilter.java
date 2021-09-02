@@ -1,8 +1,12 @@
 package org.ibp.api.domain.ontology;
 
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@AutoProperty
 public class VariableFilter {
 
 	private String programUuid;
@@ -18,9 +22,10 @@ public class VariableFilter {
 	private final List<Integer> variableTypeIds = new ArrayList<>();
 	private final List<String> propertyClasses = new ArrayList<>();
 	private final List<String> names = new ArrayList<>();
+	private final List<Integer> datasetIds = new ArrayList<>();
 
 	public String getProgramUuid() {
-		return programUuid;
+		return this.programUuid;
 	}
 
 	public void setProgramUuid(final String programUuid) {
@@ -28,7 +33,7 @@ public class VariableFilter {
 	}
 
 	public boolean isFetchAll() {
-		return fetchAll;
+		return this.fetchAll;
 	}
 
 	public void setFetchAll(final boolean fetchAll) {
@@ -36,7 +41,7 @@ public class VariableFilter {
 	}
 
 	public boolean isFavoritesOnly() {
-		return favoritesOnly;
+		return this.favoritesOnly;
 	}
 
 	public void setFavoritesOnly(final boolean favoritesOnly) {
@@ -44,7 +49,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getMethodIds() {
-		return methodIds;
+		return this.methodIds;
 	}
 
 	public void addMethodId(final Integer id) {
@@ -52,7 +57,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getPropertyIds() {
-		return propertyIds;
+		return this.propertyIds;
 	}
 
 	public void addPropertyId(final Integer id) {
@@ -60,7 +65,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getScaleIds() {
-		return scaleIds;
+		return this.scaleIds;
 	}
 
 	public void addScaleId(final Integer id) {
@@ -68,7 +73,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getVariableIds() {
-		return variableIds;
+		return this.variableIds;
 	}
 
 	public void addVariableId(final Integer id) {
@@ -76,7 +81,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getExcludedVariableIds() {
-		return excludedVariableIds;
+		return this.excludedVariableIds;
 	}
 
 	public void addExcludedVariableId(final Integer id) {
@@ -84,7 +89,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getDataTypes() {
-		return dataTypesIds;
+		return this.dataTypesIds;
 	}
 
 	public void addDataType(final Integer dataType) {
@@ -92,7 +97,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getVariableTypes() {
-		return variableTypeIds;
+		return this.variableTypeIds;
 	}
 
 	public void addVariableType(final Integer variableType) {
@@ -100,7 +105,7 @@ public class VariableFilter {
 	}
 
 	public List<String> getPropertyClasses() {
-		return propertyClasses;
+		return this.propertyClasses;
 	}
 
 	public void addPropertyClass(final String className) {
@@ -116,89 +121,30 @@ public class VariableFilter {
 	}
 
 	public List<String> getNames() {
-		return names;
+		return this.names;
 	}
 
-	@Override public String toString() {
-		return "VariableFilter{" +
-				"programUuid='" + programUuid + '\'' +
-				", fetchAll=" + fetchAll +
-				", favoritesOnly=" + favoritesOnly +
-				", methodIds=" + methodIds +
-				", propertyIds=" + propertyIds +
-				", scaleIds=" + scaleIds +
-				", variableIds=" + variableIds +
-				", excludedVariableIds=" + excludedVariableIds +
-				", dataTypesIds=" + dataTypesIds +
-				", variableTypeIds=" + variableTypeIds +
-				", propertyClasses=" + propertyClasses +
-			", names=" + names +
-			'}';
+	public List<Integer> getDatasetIds() {
+		return this.datasetIds;
+	}
+
+	public void addDatasetId(final Integer datasetId) {
+		this.datasetIds.add(datasetId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
 	}
 
 	@Override
 	public boolean equals(final Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
+		return Pojomatic.equals(this, o);
 
-		final VariableFilter that = (VariableFilter) o;
-
-		if (fetchAll != that.fetchAll) {
-			return false;
-		}
-		if (favoritesOnly != that.favoritesOnly) {
-			return false;
-		}
-		if (programUuid != null ? !programUuid.equals(that.programUuid) : that.programUuid != null) {
-			return false;
-		}
-		if (methodIds != null ? !methodIds.equals(that.methodIds) : that.methodIds != null) {
-			return false;
-		}
-		if (propertyIds != null ? !propertyIds.equals(that.propertyIds) : that.propertyIds != null) {
-			return false;
-		}
-		if (scaleIds != null ? !scaleIds.equals(that.scaleIds) : that.scaleIds != null) {
-			return false;
-		}
-		if (variableIds != null ? !variableIds.equals(that.variableIds) : that.variableIds != null) {
-			return false;
-		}
-		if (excludedVariableIds != null ? !excludedVariableIds.equals(that.excludedVariableIds) : that.excludedVariableIds != null) {
-			return false;
-		}
-		if (dataTypesIds != null ? !dataTypesIds.equals(that.dataTypesIds) : that.dataTypesIds != null) {
-			return false;
-		}
-		if (variableTypeIds != null ? !variableTypeIds.equals(that.variableTypeIds) : that.variableTypeIds != null) {
-			return false;
-		}
-		if (names != null ? !names.equals(that.names) : that.names != null) {
-			return false;
-		}
-
-		return !(propertyClasses != null ? !propertyClasses.equals(that.propertyClasses) : that.propertyClasses != null);
-
-	}
-
-	@Override public int hashCode() {
-		int result = programUuid != null ? programUuid.hashCode() : 0;
-		result = 31 * result + (fetchAll ? 1 : 0);
-		result = 31 * result + (favoritesOnly ? 1 : 0);
-		result = 31 * result + (methodIds != null ? methodIds.hashCode() : 0);
-		result = 31 * result + (propertyIds != null ? propertyIds.hashCode() : 0);
-		result = 31 * result + (scaleIds != null ? scaleIds.hashCode() : 0);
-		result = 31 * result + (variableIds != null ? variableIds.hashCode() : 0);
-		result = 31 * result + (excludedVariableIds != null ? excludedVariableIds.hashCode() : 0);
-		result = 31 * result + (dataTypesIds != null ? dataTypesIds.hashCode() : 0);
-		result = 31 * result + (variableTypeIds != null ? variableTypeIds.hashCode() : 0);
-		result = 31 * result + (propertyClasses != null ? propertyClasses.hashCode() : 0);
-		result = 31 * result + (names != null ? names.hashCode() : 0);
-
-		return result;
 	}
 }

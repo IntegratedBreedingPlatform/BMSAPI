@@ -1,5 +1,6 @@
 package org.ibp.api.rest.preset.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -89,6 +90,10 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 	@JsonView(PresetDTO.View.Configuration.class)
 	private FilePresetConfigurationDTO fileConfiguration;
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@JsonView(PresetDTO.View.Configuration.class)
+	private String sortBy;
+
 	public FilePresetConfigurationDTO getFileConfiguration() {
 		return fileConfiguration;
 	}
@@ -119,6 +124,14 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 
 	public void setIncludeHeadings(final boolean includeHeadings) {
 		this.includeHeadings = includeHeadings;
+	}
+
+	public String getSortBy() {
+		return sortBy;
+	}
+
+	public void setSortBy(final String sortBy) {
+		this.sortBy = sortBy;
 	}
 
 	@Override

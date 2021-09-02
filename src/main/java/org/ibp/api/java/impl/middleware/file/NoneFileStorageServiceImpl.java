@@ -20,6 +20,11 @@ public class NoneFileStorageServiceImpl implements FileStorageService {
 
 	@Override
 	public boolean isConfigured() {
-		return false;
+		return true;
+	}
+
+	@Override
+	public void deleteFile(final String path) {
+		throw new ApiRuntime2Exception("", "file.storage.not.configured");
 	}
 }

@@ -6,27 +6,21 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
-import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.ibp.api.brapi.v2.trial.TrialImportResponse;
-import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
-import org.ibp.api.java.impl.middleware.study.validator.TrialImportRequestValidator;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -46,9 +40,6 @@ import java.util.List;
 public class StudyServiceImpl implements StudyService {
 
 	@Autowired
-	private SecurityService securityService;
-
-	@Autowired
 	private DatasetService middlewareDatasetService;
 
 	@Autowired
@@ -66,36 +57,11 @@ public class StudyServiceImpl implements StudyService {
 	@Autowired
 	private GermplasmValidator germplasmValidator;
 
-	@Autowired
-	private TrialImportRequestValidator trialImportRequestDtoValidator;
-
-	@Autowired
-	private org.generationcp.middleware.service.api.study.StudyService studyService;
-
-	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
-		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
-	}
-
 	@Override
 	public String getProgramUUID(final Integer studyIdentifier) {
 		return this.middlewareStudyService.getProgramUUID(studyIdentifier);
 	}
 
-	@Override
-	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, final Integer studyDbId) {
-		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier, studyDbId);
-	}
-
-	@Override
-	public List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final StudySearchFilter studySearchFilter,
-		final Pageable pageable) {
-		return this.middlewareStudyService.getStudies(studySearchFilter, pageable);
-	}
-
-	@Override
-	public long countStudies(final StudySearchFilter studySearchFilter) {
-		return this.middlewareStudyService.countStudies(studySearchFilter);
-	}
 
 	@Override
 	public Boolean isSampled(final Integer studyId) {
@@ -103,7 +69,7 @@ public class StudyServiceImpl implements StudyService {
 			this.studyValidator.validate(studyId, false);
 			return this.sampleService.studyHasSamples(studyId);
 		} catch (final MiddlewareException e) {
-			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
+			throw new ApiRuntime2Exception("", "an error happened when trying to check if a study is sampled", e);
 		}
 	}
 
@@ -112,7 +78,7 @@ public class StudyServiceImpl implements StudyService {
 		try {
 			return this.studyDataManager.getAllVisibleStudyTypes();
 		} catch (final MiddlewareException e) {
-			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
+			throw new ApiRuntime2Exception("", "an error happened when trying to check if a study is sampled", e);
 		}
 	}
 
@@ -152,7 +118,7 @@ public class StudyServiceImpl implements StudyService {
 		if (!CollectionUtils.isEmpty(datasets)) {
 			return datasets.get(0).getDatasetId();
 		} else {
-			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
+			throw new ApiRuntime2Exception("","No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
 		}
 	}
 
@@ -163,37 +129,23 @@ public class StudyServiceImpl implements StudyService {
 		return this.middlewareStudyService.getGermplasmStudies(gid);
 	}
 
-	@Override
-	public TrialImportResponse createTrials(final String cropName, final List<TrialImportRequestDTO> trialImportRequestDTOs) {
-		final TrialImportResponse response = new TrialImportResponse();
-		final int originalListSize = trialImportRequestDTOs.size();
-		int noOfCreatedTrials = 0;
 
-		// Remove trials that fails any validation. They will be excluded from creation
-		final BindingResult bindingResult =
-			this.trialImportRequestDtoValidator.pruneTrialsInvalidForImport(trialImportRequestDTOs, cropName);
-		if (bindingResult.hasErrors()) {
-			response.setErrors(bindingResult.getAllErrors());
-		}
-		if (!CollectionUtils.isEmpty(trialImportRequestDTOs)) {
-
-			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-			final List<StudySummary> studySummaries =
-				this.middlewareStudyService.saveStudies(cropName, trialImportRequestDTOs, user.getUserid());
-			if (!CollectionUtils.isEmpty(studySummaries)) {
-				noOfCreatedTrials = studySummaries.size();
-			}
-			response.setEntityList(studySummaries);
-		}
-		response.setImportListSize(originalListSize);
-		response.setCreatedSize(noOfCreatedTrials);
-		return response;
-	}
 
 	@Override
 	public void deleteStudy(final Integer studyId) {
 		this.studyValidator.validateDeleteStudy(studyId);
 		this.studyService.deleteStudy(studyId);
+	}
+
+	@Override
+	public List<StudyDTO> getFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest,
+		final Pageable pageable) {
+		return this.middlewareStudyService.getFilteredStudies(programUUID, studySearchRequest, pageable);
+	}
+
+	@Override
+	public long countFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
+		return this.middlewareStudyService.countFilteredStudies(programUUID, studySearchRequest);
 	}
 
 }

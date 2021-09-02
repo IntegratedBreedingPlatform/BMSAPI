@@ -2,16 +2,16 @@ package org.ibp.api.java.impl.middleware.observationunits;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
+import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,12 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,16 +37,19 @@ public class ObservationUnitImportRequestValidator {
 	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
 	public static final String PLOT = "PLOT";
-	private static final List<String> OBSERVATION_LEVEL_NAMES = Arrays.asList("PLOT", "BLOCK", "REP");
+	private static final List<String> OBSERVATION_LEVEL_NAMES = Arrays.asList(PLOT, "BLOCK", "REP");
 
 	@Autowired
-	private StudyInstanceService studyInstanceService;
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Autowired
 	private GermplasmServiceBrapi germplasmService;
 
 	@Autowired
 	private OntologyService ontologyService;
+
+	@Autowired
+	private org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService middlewareObservationUnitService;
 
 	protected BindingResult errors;
 
@@ -58,27 +64,33 @@ public class ObservationUnitImportRequestValidator {
 		final List<String> germplasmDbIds =
 			observationUnitImportRequestDtos.stream().filter(obs -> StringUtils.isNotEmpty(obs.getGermplasmDbId()))
 				.map(ObservationUnitImportRequestDto::getGermplasmDbId).collect(Collectors.toList());
-		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
-		germplasmSearchRequestDto.setGermplasmDbIds(germplasmDbIds);
-		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchGermplasmDTO(germplasmSearchRequestDto, null)
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		germplasmSearchRequest.setGermplasmDbIds(germplasmDbIds);
+		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchGermplasmDTO(germplasmSearchRequest, null)
 			.stream().collect(Collectors.toMap(GermplasmDTO::getGermplasmDbId, Function.identity()));
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		studySearchFilter.setStudyDbIds(studyDbIds);
 		final Map<String, StudyInstanceDto> studyInstancesMap =
-			this.studyInstanceService.getStudyInstances(studySearchFilter, null).stream()
+			this.studyServiceBrapi.getStudyInstances(studySearchFilter, null).stream()
 				.collect(Collectors.toMap(StudyInstanceDto::getStudyDbId, Function.identity()));
 
-		final Integer index = 1;
+		Integer index = 0;
 		final Iterator<ObservationUnitImportRequestDto> iterator = observationUnitImportRequestDtos.iterator();
 
 		final List<String> entryTypes =
 			this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), null).getEnumerations()
 				.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList());
 
+		final Map<String, List<String>> plotObservationLevelRelationshipsByStudyDbIds =
+			this.middlewareObservationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(studyDbIds));
+
 		final Map<String, List<String>> entryTypesMap = new HashMap<>();
+		final Map<String, Set<String>> validPlotObservationLevelRelationshipsByStudyDbIds = new HashMap<>();
 
 		while (iterator.hasNext()) {
+			index++;
+
 			final ObservationUnitImportRequestDto dto = iterator.next();
 			if (StringUtils.isEmpty(dto.getProgramDbId())) {
 				this.errors.reject("observation.unit.import.programDbId.null", new String[] {index.toString()}, "");
@@ -127,19 +139,19 @@ public class ObservationUnitImportRequestValidator {
 			}
 
 			if (!entryTypes.contains(position.getEntryType().toUpperCase())) {
-				if(!entryTypesMap.containsKey(dto.getProgramDbId())) {
+				if (!entryTypesMap.containsKey(dto.getProgramDbId())) {
 					entryTypesMap.put(dto.getProgramDbId(),
 						this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
-						.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList()));
+							.stream().map(e -> e.getDescription().toUpperCase()).collect(Collectors.toList()));
 				}
-				if(!entryTypesMap.get(dto.getProgramDbId()).contains(position.getEntryType().toUpperCase())) {
+				if (!entryTypesMap.get(dto.getProgramDbId()).contains(position.getEntryType().toUpperCase())) {
 					this.errors.reject("observation.unit.import.entry.type.invalid", new String[] {index.toString()}, "");
 					iterator.remove();
 					continue;
 				}
 			}
 
-			if(!this.isObservationLevelRelationshipNamesValid(position.getObservationLevelRelationships(), index)) {
+			if (!this.isObservationLevelRelationshipNamesValid(position.getObservationLevelRelationships(), index)) {
 				iterator.remove();
 				continue;
 			}
@@ -153,7 +165,40 @@ public class ObservationUnitImportRequestValidator {
 
 			if (this.isAnyExternalReferenceInvalid(dto, index)) {
 				iterator.remove();
+				continue;
 			}
+
+			if (this.checkPlotLevelCodeExists(plotObservationLevelRelationshipsByStudyDbIds.get(dto.getStudyDbId()),
+				dto.getObservationUnitPosition().getObservationLevelRelationships())) {
+				this.errors.reject("observation.unit.import.plot.levelCode.exists", new String[] {index.toString()}, "");
+				iterator.remove();
+				continue;
+			}
+
+			//Check for duplicate plot level codes
+			if (validPlotObservationLevelRelationshipsByStudyDbIds.containsKey(dto.getStudyDbId())) {
+				final Set<String> validPlotLevelCodes = validPlotObservationLevelRelationshipsByStudyDbIds.get(dto.getStudyDbId());
+				final Optional<ObservationLevelRelationship> duplicatedPlot =
+					dto.getObservationUnitPosition().getObservationLevelRelationships()
+						.stream()
+						.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(PLOT) &&
+							validPlotLevelCodes.contains(levelRelationship.getLevelCode()))
+						.findFirst();
+				if (duplicatedPlot.isPresent()) {
+					this.errors.reject("observation.unit.import.plot.levelCode.duplicated", new String[] {index.toString()}, "");
+					iterator.remove();
+					continue;
+				}
+			} else {
+				validPlotObservationLevelRelationshipsByStudyDbIds.put(dto.getStudyDbId(), new HashSet<>());
+			}
+
+			// Add valid plot level codes
+			position.getObservationLevelRelationships()
+				.stream()
+				.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(PLOT))
+				.forEach(levelRelationship ->
+					validPlotObservationLevelRelationshipsByStudyDbIds.get(dto.getStudyDbId()).add(levelRelationship.getLevelCode()));
 		}
 
 		return this.errors;
@@ -200,6 +245,20 @@ public class ObservationUnitImportRequestValidator {
 			});
 		}
 		return false;
+	}
+
+	private boolean checkPlotLevelCodeExists(final List<String> existingPlotObservationLevelRelationships,
+		final List<ObservationLevelRelationship> importedObservationLevelRelationships) {
+		if (existingPlotObservationLevelRelationships == null) {
+			return false;
+		}
+
+		final Optional<ObservationLevelRelationship> existingPlotLevelRelationship = importedObservationLevelRelationships
+			.stream()
+			.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(PLOT) &&
+				existingPlotObservationLevelRelationships.contains(levelRelationship.getLevelCode()))
+			.findFirst();
+		return existingPlotLevelRelationship.isPresent();
 	}
 
 }

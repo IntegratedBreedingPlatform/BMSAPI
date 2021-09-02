@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.generationcp.middleware.api.file.FileMetadataMapper;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.file.FileStorageService;
-import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,27 +34,36 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 	@Override
 	public Image updateImageContent(final String imageDbId, final byte[] imageContent) {
-		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getFileMetadataByUUID(imageDbId);
+		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(imageDbId);
 		this.fileStorageService.upload(FileUtils.wrapAsMultipart(imageContent), fileMetadataDTO.getPath());
-		this.fileMetadataService.saveFilenameToObservation(fileMetadataDTO);
 
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		return fileMetadataMapper.map(fileMetadataDTO);
 	}
 
 	@Override
-	public String save(final MultipartFile file, final String path, final String observationUnitId) {
-		final FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
+	public FileMetadataDTO upload(final MultipartFile file, final String observationUnitUUID, final Integer termId) {
+		final String path = this.fileMetadataService.getFilePath(observationUnitUUID, file.getOriginalFilename());
+
+		FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
 		fileMetadataDTO.setName(file.getOriginalFilename());
 		fileMetadataDTO.setMimeType(file.getContentType());
 		fileMetadataDTO.setSize((int) file.getSize());
 		fileMetadataDTO.setPath(path);
-		return this.fileMetadataService.save(fileMetadataDTO, observationUnitId);
+		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID, termId);
+
+		// save file storage last as it is outside the transaction
+		this.fileStorageService.upload(file, path);
+
+		return fileMetadataDTO;
 	}
 
 	@Override
-	public String getFilePath(final String observationUnitId, final Integer termId, final String fileName) {
-		BaseValidator.checkNotNull(fileName, "param.null", new String[] {"fileName"});
-		return this.fileMetadataService.getFilePath(observationUnitId, termId, fileName);
+	public void delete(final String fileUUID) {
+		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(fileUUID);
+		this.fileMetadataService.delete(fileUUID);
+		// delete file storage last as it is outside the transaction
+		this.fileStorageService.deleteFile(fileMetadataDTO.getPath());
 	}
+
 }

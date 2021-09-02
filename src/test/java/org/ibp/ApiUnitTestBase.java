@@ -19,6 +19,8 @@ import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Debug;
 import org.ibp.api.brapi.GermplasmServiceBrapi;
+import org.ibp.api.brapi.StudyServiceBrapi;
+import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v2.validation.CropValidator;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.design.runner.DesignRunner;
@@ -238,6 +240,19 @@ public abstract class ApiUnitTestBase {
 			return Mockito.mock(GermplasmServiceBrapi.class);
 
 		}
+
+		@Bean
+		@Primary
+		public TrialServiceBrapi trialServiceBrapi() {
+			return Mockito.mock(TrialServiceBrapi.class);
+		}
+
+		@Bean
+		@Primary
+		public StudyServiceBrapi studyServiceBrapi() {
+			return Mockito.mock(StudyServiceBrapi.class);
+		}
+
 
 		@Bean
 		@Primary

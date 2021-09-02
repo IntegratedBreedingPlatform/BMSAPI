@@ -2,8 +2,6 @@ package org.ibp.api.java.file;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
-
 public interface FileStorageService {
 
 	void upload(MultipartFile file, String path);
@@ -16,4 +14,6 @@ public interface FileStorageService {
 	 * Use this method instead of instanceof because of spring proxies.
 	 */
 	boolean isConfigured();
+
+	void deleteFile(String path);
 }
