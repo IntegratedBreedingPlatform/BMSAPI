@@ -122,6 +122,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		this.addParentsFromPedigreeTable(responseMap, germplasmSearchRequest);
+		this.addHasProgeny(responseMap, germplasmSearchRequest);
+		this.addUsedInStudy(responseMap, germplasmSearchRequest);
 
 		return responseList;
 	}
@@ -167,6 +169,42 @@ public class GermplasmServiceImpl implements GermplasmService {
 				response.setMaleParentGID(germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN);
 				response.setMaleParentPreferredName(germplasm.getPreferredName().getNval());
 			}
+		}
+	}
+
+	private void addHasProgeny(final Map<Integer, GermplasmSearchResponse> responseMap,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
+			|| !addedColumnsPropertyIds.contains(ColumnLabels.HAS_PROGENY.getName())) {
+			return;
+		}
+
+		final Set<Integer> gidsOfGermplasmWithDescendants =
+			this.germplasmService.getGidsOfGermplasmWithDescendants(new ArrayList<>(responseMap.keySet()));
+
+		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
+			final Integer gid = entry.getKey();
+			final GermplasmSearchResponse response = entry.getValue();
+			response.setHasProgeny(gidsOfGermplasmWithDescendants.contains(gid));
+		}
+	}
+
+	private void addUsedInStudy(final Map<Integer, GermplasmSearchResponse> responseMap,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
+			|| !addedColumnsPropertyIds.contains(ColumnLabels.USED_IN_STUDY.getName())) {
+			return;
+		}
+
+		final Set<Integer> gidsOfGermplasmUsedInStudy =
+			this.germplasmService.getGermplasmUsedInStudies(new ArrayList<>(responseMap.keySet()));
+
+		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
+			final Integer gid = entry.getKey();
+			final GermplasmSearchResponse response = entry.getValue();
+			response.setUsedInStudy(gidsOfGermplasmUsedInStudy.contains(gid));
 		}
 	}
 
