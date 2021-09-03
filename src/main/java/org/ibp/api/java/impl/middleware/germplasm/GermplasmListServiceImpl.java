@@ -61,6 +61,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -656,7 +657,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public GermplasmListDto getGermplasmListById(final Integer listId) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		final GermplasmList germplasmList = this.validateGermplasmList(listId);
-		return GermplasmListFunction.INSTANCE.apply(germplasmList);
+		final Function<GermplasmList, GermplasmListDto> function = GermplasmListServiceImpl::transformGermplasmList;
+		return function.apply(germplasmList);
 	}
 
 	@Override
@@ -806,6 +808,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return (CROP_LISTS.equals(folderId) || PROGRAM_LISTS.equals(folderId)) ? null : Integer.valueOf(folderId);
 	}
 
+	private static GermplasmListDto transformGermplasmList(GermplasmList input) {
+		GermplasmListDto output = new GermplasmListDto();
+		output.setListId(input.getId());
+		output.setListName(input.getName());
+		output.setCreationDate(input.parseDate());
+		output.setDescription(input.getDescription());
+		output.setProgramUUID(input.getProgramUUID());
+		output.setLocked(input.isLockedList());
+		output.setOwnerId(input.getUserId());
+		return output;
+	}
+
 	public void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
 		this.germplasmListManager = germplasmListManager;
 	}
@@ -816,24 +830,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
 		this.germplasmDataManager = germplasmDataManager;
-	}
-
-	private static class GermplasmListFunction implements Function<GermplasmList, GermplasmListDto> {
-
-		private static final GermplasmListFunction INSTANCE = new GermplasmListFunction();
-
-		@Override
-		public GermplasmListDto apply(final GermplasmList input) {
-			GermplasmListDto output = new GermplasmListDto();
-			output.setListId(input.getId());
-			output.setListName(input.getName());
-			output.setCreationDate(input.parseDate());
-			output.setDescription(input.getDescription());
-			output.setProgramUUID(input.getProgramUUID());
-			output.setLocked(input.isLockedList());
-			output.setOwnerId(input.getUserId());
-			return output;
-		}
 	}
 
 }
