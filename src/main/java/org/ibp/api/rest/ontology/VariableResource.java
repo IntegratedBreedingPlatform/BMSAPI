@@ -136,8 +136,9 @@ public class VariableResource {
 			+ " to retrieve possible property class values that can be supplied here as a comma separated list.")
 		@RequestParam(value = "propertyClasses", required = false) final Set<String> propertyClasses,
 
-		@RequestParam(required = false) final Set<Integer> datasetIds
-	) {
+		@RequestParam(required = false) final Set<Integer> datasetIds,
+		@RequestParam(required = false) final Set<String> germplasmUUIDs
+		) {
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(programUUID);
@@ -180,6 +181,10 @@ public class VariableResource {
 
 		if (!Util.isNullOrEmpty(datasetIds)) {
 			datasetIds.forEach(variableFilter::addDatasetId);
+		}
+
+		if (!Util.isNullOrEmpty(germplasmUUIDs)) {
+			germplasmUUIDs.forEach(variableFilter::addGermplasmUUID);
 		}
 
 		return new ResponseEntity<>(this.variableService.getVariablesByFilter(cropname, programUUID, variableFilter), HttpStatus.OK);
