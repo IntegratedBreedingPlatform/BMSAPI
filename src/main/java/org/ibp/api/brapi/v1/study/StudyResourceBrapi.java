@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,6 +31,8 @@ import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
+import org.ibp.api.brapi.StudyServiceBrapi;
+import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -44,8 +47,6 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.java.study.StudyInstanceService;
-import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -79,7 +80,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -100,7 +100,7 @@ public class StudyResourceBrapi {
 	private StudyDataManager studyDataManager;
 
 	@Autowired
-	private StudyService studyService;
+	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
 	private VariableService variableService;
@@ -115,7 +115,7 @@ public class StudyResourceBrapi {
 	private InstanceValidator instanceValidator;
 
 	@Autowired
-	private StudyInstanceService studyInstanceService;
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Autowired
 	private ObservationUnitService observationUnitService;
@@ -181,12 +181,12 @@ public class StudyResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.studyInstanceService.countStudyInstances(studySearchFilter);
+					return StudyResourceBrapi.this.studyServiceBrapi.countStudyInstances(studySearchFilter);
 				}
 
 				@Override
 				public List<StudyInstanceDto> getResults(final PagedResult<StudyInstanceDto> pagedResult) {
-					return StudyResourceBrapi.this.studyInstanceService.getStudyInstances(studySearchFilter, pageRequest);
+					return StudyResourceBrapi.this.studyServiceBrapi.getStudyInstances(studySearchFilter, pageRequest);
 				}
 			});
 
@@ -239,7 +239,7 @@ public class StudyResourceBrapi {
 			throw new Exception("studyDbId " + studyDbId + " does not exist");
 		}
 
-		final TrialObservationTable trialObservationTable = this.studyService.getTrialObservationTable(trialDbId, studyDbId);
+		final TrialObservationTable trialObservationTable = this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId);
 
 		final int resultNumber = trialObservationTable == null ? 0 : 1;
 
@@ -262,13 +262,14 @@ public class StudyResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyInstanceService.getStudyDetailsByInstance(studyDbId);
-		if (Objects.isNull(mwStudyDetails)) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+
+		final Optional<StudyDetailsDto> mwStudyDetailsOptional = this.studyServiceBrapi.getStudyDetailsByInstance(studyDbId);
+		if (!mwStudyDetailsOptional.isPresent()) {
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 			errors.reject("studydbid.invalid", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
-
+		final StudyDetailsDto mwStudyDetails = mwStudyDetailsOptional.get();
 		//Add environment parameters to addtionalInfo
 		final Map<String, String> additionalInfo = mwStudyDetails.getEnvironmentParameters().stream().collect(
 			Collectors.toMap(MeasurementVariable::getName, MeasurementVariable::getValue));
@@ -310,7 +311,7 @@ public class StudyResourceBrapi {
 		return StudyResourceBrapi.createResponseEntityForFileDownload(file);
 	}
 
-	private File createDownloadFile(final StudyObservationTable table, final char sep, final String pathname) throws IOException {
+	private File createDownloadFile(final StudyObservationTable table, final char sep, final String filename) throws IOException {
 		// create mapper and schema
 		final CsvMapper mapper = new CsvMapper();
 		CsvSchema schema = mapper.schemaFor(List.class);
@@ -318,7 +319,9 @@ public class StudyResourceBrapi {
 
 		// output writer
 		final ObjectWriter myObjectWriter = mapper.writer(schema);
-		final File resultFile = new File(pathname);
+		final File temporaryFolder = Files.createTempDir();
+		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + filename;
+		final File resultFile = new File(fileNameFullPath);
 		final List<String> header = new ArrayList<>(table.getHeaderRow());
 
 		final Object[] variableIds = table.getObservationVariableDbIds().toArray();

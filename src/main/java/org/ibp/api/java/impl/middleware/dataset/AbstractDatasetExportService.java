@@ -103,9 +103,6 @@ public abstract class AbstractDatasetExportService {
 			}
 		}
 
-		// File data column cannot be edited using export/import
-		this.removeFileDatatypeColumns(columns);
-
 		// Get data
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = this.getSelectedDatasetInstancesMap(
 			dataSet.getInstances(),
@@ -223,13 +220,6 @@ public abstract class AbstractDatasetExportService {
 		// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
 		plotDataSetColumns.add(plotDataSetColumns.indexOf(designationColumn.get()) + 1,
 			this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR,null, true));
-	}
-
-	private void removeFileDatatypeColumns(final List<MeasurementVariable> columns) {
-		columns.removeIf(variable -> {
-			return variable.getDataTypeId() != null
-				&& variable.getDataTypeId().equals(DataType.FILE_VARIABLE.getId());
-		});
 	}
 
 	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);

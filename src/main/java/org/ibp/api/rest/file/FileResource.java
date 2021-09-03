@@ -2,7 +2,7 @@ package org.ibp.api.rest.file;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
@@ -43,23 +43,23 @@ public class FileResource {
 	@Autowired
 	private FileValidator fileValidator;
 
-	/**
-	 * @return Map<String, String> to overcome angularjs limitation
-	 */
 	@RequestMapping(value = "/files", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Map<String, String>> upload(
+	public ResponseEntity<FileMetadataDTO> upload(
 		@PathVariable final String cropName,
 		@RequestPart("file") final MultipartFile file,
-		@ApiParam("store file under this path") @RequestParam final String path,
-		@RequestParam final String observationUnitId
+		@RequestParam final String observationUnitUUID,
+		@RequestParam(required = false) final Integer termId
 	) {
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
-		this.fileStorageService.upload(file, path);
-		final String fileUUID = this.fileMetadataService.save(file, path, observationUnitId);
-		return new ResponseEntity<>(Collections.singletonMap("fileUUID", fileUUID), HttpStatus.CREATED);
+		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.upload(file, observationUnitUUID, termId);
+		return new ResponseEntity<>(fileMetadataDTO, HttpStatus.CREATED);
 	}
 
+	/*
+	 * NOTE: with GET /files/{fileUUID} we get some url sanitization issues in the frontend:
+	 * WARNING: sanitizing unsafe URL value
+	 */
 	@RequestMapping(value = "/files/**", method = RequestMethod.GET)
 	@ResponseBody
 	public byte[] getFile(
@@ -70,19 +70,25 @@ public class FileResource {
 		return this.fileStorageService.getFile(path);
 	}
 
+	@RequestMapping(value = "/files/{fileUUID}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity<Void> deleteFile(
+		@PathVariable final String cropName,
+		@PathVariable final String fileUUID
+	) {
+		this.fileMetadataService.delete(fileUUID);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	/**
 	 * @return Map<String, String> to overcome angularjs limitation
 	 */
-	@ApiOperation(value = "Get predetermined file path based on parameters")
-	@RequestMapping(value = "/filepath", method = RequestMethod.GET)
-	public ResponseEntity<Map<String, String>> getFilePath(
-		@PathVariable final String cropName,
-		@RequestParam final String observationUnitId,
-		@RequestParam final Integer termId,
-		@RequestParam final String fileName
+	@ApiOperation("Get file storage status: true => active")
+	@RequestMapping(value = "/filestorage/status", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Boolean>> getFileStorageStatus(
+		@PathVariable final String cropName
 	) {
-		final String path = this.fileMetadataService.getFilePath(observationUnitId, termId, fileName);
-		return new ResponseEntity<>(Collections.singletonMap("path", path), HttpStatus.OK);
+		return new ResponseEntity<>(Collections.singletonMap("status", this.fileStorageService.isConfigured()), HttpStatus.OK);
 	}
 
 	private static String getPath(final HttpServletRequest request) {

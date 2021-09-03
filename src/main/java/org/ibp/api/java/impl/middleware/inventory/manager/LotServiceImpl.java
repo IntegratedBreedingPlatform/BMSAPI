@@ -117,6 +117,11 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
+	public List<ExtendedLotDto> searchLotsApplyExportResultsLimit(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
+		return this.lotService.searchLotsApplyExportResultsLimit(lotsSearchDto, pageable);
+	}
+
+	@Override
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		return this.lotService.countSearchLots(lotsSearchDto);
 	}

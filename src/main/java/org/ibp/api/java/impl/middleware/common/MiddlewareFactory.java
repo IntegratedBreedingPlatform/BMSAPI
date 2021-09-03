@@ -18,6 +18,10 @@ import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapiImpl;
+import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
+import org.generationcp.middleware.api.brapi.StudyServiceBrapiImpl;
+import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
+import org.generationcp.middleware.api.brapi.TrialServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -111,6 +115,9 @@ import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.inventory.LotService;
+import org.generationcp.middleware.service.api.ontology.BreedingMethodValidator;
+import org.generationcp.middleware.service.api.ontology.LocationValidator;
+import org.generationcp.middleware.service.api.ontology.PersonValidator;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
@@ -672,6 +679,24 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public PersonValidator getPersonValidator() {
+		return new PersonValidator();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public BreedingMethodValidator getBreedingMethodValidator() {
+		return new BreedingMethodValidator();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public LocationValidator getLocationValidator() {
+		return new LocationValidator();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmNameService getGermplasmNameService() {
 		return new GermplasmNameServiceImpl(this.getCropDatabaseSessionProvider());
 	}
@@ -716,6 +741,18 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public FileMetadataService getFileMetadataService() {
 		return new FileMetadataServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public TrialServiceBrapi getTrialServiceBrapi() {
+		return new TrialServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StudyServiceBrapi getStudyServiceBrapi() {
+		return new StudyServiceBrapiImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

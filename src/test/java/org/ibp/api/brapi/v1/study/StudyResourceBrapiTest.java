@@ -9,11 +9,11 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.study.StudyInstanceService;
+import org.ibp.api.brapi.StudyServiceBrapi;
+import org.ibp.api.brapi.TrialServiceBrapi;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -46,16 +47,10 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 	private StudyDataManager studyDataManager;
 
 	@Autowired
-	private StudyService studyServiceMW;
+	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
-	private StudyInstanceService studyInstanceService;
-
-	@Test
-	public void testListStudySummaries() throws Exception {
-
-		// TODO with StudyResourceBrapi implementation
-	}
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Configuration
 	public static class TestConfiguration {
@@ -88,7 +83,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 			new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
 				.setObservationVariableNames(observationVariableName).setData(data);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
 
 		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
 
@@ -132,7 +127,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 			new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
 				.setObservationVariableNames(observationVariableName).setData(data);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
 
 		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
 
@@ -166,7 +161,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 			new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
 				.setObservationVariableNames(observationVariableName).setData(data);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
 
 		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
 
@@ -191,8 +186,8 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<Location> locations = StudyTestDataProvider.getLocationList();
 		final Location location = locations.get(0);
 
-		Mockito.when(this.studyInstanceService.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId()))
-			.thenReturn(studyDetailsDto);
+		Mockito.when(this.studyServiceBrapi.getStudyDetailsByInstance(studyDetailsDto.getMetadata().getStudyDbId()))
+			.thenReturn(Optional.of(studyDetailsDto));
 		Mockito.when(this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10))).thenReturn(locations);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}")
@@ -258,7 +253,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.setObservationVariableNames(observationVariableName).setData(data);
 		observationTable.setHeaderRow(headerRow);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
 
 		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
 
@@ -307,7 +302,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.setObservationVariableNames(observationVariableName).setData(data);
 		observationTable.setHeaderRow(headerRow);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
+		Mockito.when(this.trialServiceBrapi.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(observationTable);
 
 		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
 
@@ -340,9 +335,9 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<StudyInstanceDto> studyInstanceDtos = StudyTestDataProvider.getListStudyDto();
 		final StudyInstanceDto studyInstanceDto = studyInstanceDtos.get(0);
 
-		Mockito.when(this.studyInstanceService.getStudyInstances(Mockito.any(StudySearchFilter.class), Mockito.any(PageRequest.class)))
+		Mockito.when(this.studyServiceBrapi.getStudyInstances(Mockito.any(StudySearchFilter.class), Mockito.any(PageRequest.class)))
 			.thenReturn(studyInstanceDtos);
-		Mockito.when(this.studyInstanceService.countStudyInstances(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
+		Mockito.when(this.studyServiceBrapi.countStudyInstances(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies")
 			.build().encode();

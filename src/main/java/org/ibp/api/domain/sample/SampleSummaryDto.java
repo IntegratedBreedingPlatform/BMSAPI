@@ -2,6 +2,7 @@ package org.ibp.api.domain.sample;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.pojomatic.Pojomatic;
 

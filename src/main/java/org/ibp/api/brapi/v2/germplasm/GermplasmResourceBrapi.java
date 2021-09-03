@@ -5,12 +5,15 @@ import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import liquibase.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
+import org.ibp.api.brapi.GermplasmServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -20,8 +23,8 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.germplasm.Germplasm;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.brapi.GermplasmServiceBrapi;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -30,7 +33,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +49,9 @@ public class GermplasmResourceBrapi {
 
 	@Autowired
 	private GermplasmServiceBrapi germplasmService;
+
+	@Autowired
+	private SearchRequestService searchRequestService;
 
 	@Autowired
 	private BrapiResponseMessageGenerator<GermplasmDTO> responseMessageGenerator;
@@ -88,18 +93,13 @@ public class GermplasmResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO =
-			this.getGermplasmSearchRequestDto(germplasmPUI, germplasmName, accessionNumber, studyDbId, synonym, genus, parentDbId,
+		final GermplasmSearchRequest germplasmSearchRequest =
+			this.getGermplasmSearchRequestDto(germplasmDbId, commonCropName, germplasmPUI, germplasmName, accessionNumber, studyDbId,
+				synonym, genus, parentDbId,
 				progenyDbId, externalReferenceID, externalReferenceSource);
-		if (!StringUtils.isEmpty(germplasmDbId)) {
-			germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
-		}
-		if (!StringUtils.isEmpty(commonCropName)) {
-			germplasmSearchRequestDTO.setCommonCropNames(Lists.newArrayList(commonCropName));
-		}
 
-		final PagedResult<GermplasmDTO> resultPage = this.getGermplasmDTOPagedResult(germplasmSearchRequestDTO, currentPage, pageSize);
-		final List<Germplasm> germplasmList = this.mapGermplasm(resultPage.getPageResults());
+		final PagedResult<GermplasmDTO> resultPage = this.getGermplasmDTOPagedResult(germplasmSearchRequest, currentPage, pageSize);
+		final List<Germplasm> germplasmList = GermplasmMapper.mapGermplasm(resultPage.getPageResults());
 
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
@@ -122,7 +122,7 @@ public class GermplasmResourceBrapi {
 		BaseValidator.checkNotNull(germplasmImportRequestList, "germplasm.import.list.null");
 
 		final GermplasmImportResponse germplasmImportResponse = this.germplasmService.createGermplasm(crop, germplasmImportRequestList);
-		final List<Germplasm> germplasmList = this.mapGermplasm(germplasmImportResponse.getEntityList());
+		final List<Germplasm> germplasmList = GermplasmMapper.mapGermplasm(germplasmImportResponse.getEntityList());
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(germplasmImportResponse));
@@ -141,40 +141,115 @@ public class GermplasmResourceBrapi {
 		BaseValidator.checkNotNull(germplasmUpdateRequest, "germplasm.import.list.null");
 
 		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(germplasmDbId, germplasmUpdateRequest);
-		final ModelMapper mapper = new ModelMapper();
-		final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+		final ModelMapper modelMapper = GermplasmMapper.getInstance();
+		final Germplasm germplasm = modelMapper.map(germplasmDTO, Germplasm.class);
 
 		final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
 		return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
 	}
 
-	private GermplasmSearchRequestDto getGermplasmSearchRequestDto(final String germplasmPUI, final String germplasmName,
-		final String accessionNumber, final String studyDbId, final String synonym, final String genus, final String parentDbId,
-		final String progenyDbId, final String externalReferenceId, final String externalReferenceSource) {
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
-		germplasmSearchRequestDTO.setPreferredName(germplasmName);
-		germplasmSearchRequestDTO.setStudyDbId(studyDbId);
-		germplasmSearchRequestDTO.setExternalReferenceId(externalReferenceId);
-		germplasmSearchRequestDTO.setExternalReferenceSource(externalReferenceSource);
-		if (synonym != null) {
-			germplasmSearchRequestDTO.setGermplasmNames(Lists.newArrayList(synonym));
-		}
-		germplasmSearchRequestDTO.setParentDbId(parentDbId);
-		germplasmSearchRequestDTO.setProgenyDbId(progenyDbId);
-		if (genus != null) {
-			germplasmSearchRequestDTO.setGermplasmGenus(Lists.newArrayList(genus));
-		}
-		if (accessionNumber != null) {
-			germplasmSearchRequestDTO.setAccessionNumbers(Lists.newArrayList(accessionNumber));
-		}
+	@ApiOperation(value = "Search germplasm", notes = "Submit a search request for germplasm")
+	@RequestMapping(value = "/{crop}/brapi/v2/search/germplasm", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasm(
+		@PathVariable final String crop,
+		@RequestBody final GermplasmSearchRequest germplasmSearchRequest) {
+		final SearchDto searchDto =
+			new SearchDto(this.searchRequestService.saveSearchRequest(germplasmSearchRequest, GermplasmSearchRequest.class)
+				.toString());
+		final SingleEntityResponse<SearchDto> singleGermplasmSearchResponse = new SingleEntityResponse<>(searchDto);
 
-		if (germplasmPUI != null) {
-			germplasmSearchRequestDTO.setGermplasmPUIs(Lists.newArrayList(germplasmPUI));
-		}
-		return germplasmSearchRequestDTO;
+		return new ResponseEntity<>(singleGermplasmSearchResponse, HttpStatus.OK);
 	}
 
-	private PagedResult<GermplasmDTO> getGermplasmDTOPagedResult(final GermplasmSearchRequestDto germplasmSearchRequestDTO,
+	@ApiOperation(value = "Get search germplasm results", notes = "Get the results of germplasm search request")
+	@RequestMapping(value = "/{crop}/brapi/v2/search/germplasm/{searchResultsDbId}", method = RequestMethod.GET)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<EntityListResponse<Germplasm>> getGermplasmSearchResults(
+		@PathVariable final String crop,
+		@PathVariable final String searchResultsDbId,
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize) {
+
+		final GermplasmSearchRequest germplasmSearchRequest;
+		try {
+			germplasmSearchRequest =
+				(GermplasmSearchRequest) this.searchRequestService
+					.getSearchRequest(Integer.valueOf(searchResultsDbId), GermplasmSearchRequest.class);
+		} catch (final NumberFormatException | MiddlewareException e) {
+			return new ResponseEntity<>(
+				new EntityListResponse<Germplasm>(new Result<>(new ArrayList<>())).withMessage("no search request found"),
+				HttpStatus.NOT_FOUND);
+		}
+
+		final PagedResult<GermplasmDTO> resultPage =
+			this.getGermplasmDTOPagedResult(germplasmSearchRequest, currentPage,
+				pageSize);
+
+		final List<Germplasm> germplasmList = GermplasmMapper.mapGermplasm(resultPage.getPageResults());
+
+		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
+		final Pagination pagination = new Pagination().withPageNumber(currentPage).withPageSize(pageSize)
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+
+		final EntityListResponse<Germplasm> entityListResponse = new EntityListResponse<>(metadata, results);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+
+	}
+
+	private GermplasmSearchRequest getGermplasmSearchRequestDto(final String germplasmDbId, final String commonCropName,
+		final String germplasmPUI, final String germplasmName,
+		final String accessionNumber, final String studyDbId, final String synonym, final String genus, final String parentDbId,
+		final String progenyDbId, final String externalReferenceId, final String externalReferenceSource) {
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		if (!StringUtils.isEmpty(germplasmDbId)) {
+			germplasmSearchRequest.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
+		}
+		if (!StringUtils.isEmpty(commonCropName)) {
+			germplasmSearchRequest.setCommonCropNames(Lists.newArrayList(commonCropName));
+		}
+		if (StringUtils.isNotEmpty(germplasmName)) {
+			germplasmSearchRequest.setPreferredName(germplasmName);
+		}
+		if (StringUtils.isNotEmpty(studyDbId)) {
+			germplasmSearchRequest.setStudyDbIds(Lists.newArrayList(studyDbId));
+		}
+		if (StringUtils.isNotEmpty(externalReferenceId)) {
+			germplasmSearchRequest.setExternalReferenceIDs(Lists.newArrayList(externalReferenceId));
+		}
+		if (StringUtils.isNotEmpty(externalReferenceSource)) {
+			germplasmSearchRequest.setExternalReferenceSources(Lists.newArrayList(externalReferenceSource));
+		}
+		if (StringUtils.isNotEmpty(synonym)) {
+			germplasmSearchRequest.setSynonyms(Lists.newArrayList(synonym));
+		}
+		if (StringUtils.isNotEmpty(parentDbId)) {
+			germplasmSearchRequest.setParentDbIds(Lists.newArrayList(parentDbId));
+		}
+		if (StringUtils.isNotEmpty(progenyDbId)) {
+			germplasmSearchRequest.setProgenyDbIds(Lists.newArrayList(progenyDbId));
+		}
+		if (StringUtils.isNotEmpty(genus)) {
+			germplasmSearchRequest.setGenus(Lists.newArrayList(genus));
+		}
+		if (StringUtils.isNotEmpty(accessionNumber)) {
+			germplasmSearchRequest.setAccessionNumbers(Lists.newArrayList(accessionNumber));
+		}
+		if (StringUtils.isNotEmpty(germplasmPUI)) {
+			germplasmSearchRequest.setGermplasmPUIs(Lists.newArrayList(germplasmPUI));
+		}
+		return germplasmSearchRequest;
+	}
+
+	private PagedResult<GermplasmDTO> getGermplasmDTOPagedResult(final GermplasmSearchRequest germplasmSearchRequest,
 		final Integer currentPage, final Integer pageSize) {
 		final Integer finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final Integer finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -184,27 +259,15 @@ public class GermplasmResourceBrapi {
 
 					@Override
 					public long getCount() {
-						return GermplasmResourceBrapi.this.germplasmService.countGermplasmDTOs(germplasmSearchRequestDTO);
+						return GermplasmResourceBrapi.this.germplasmService.countGermplasmDTOs(germplasmSearchRequest);
 					}
 
 					@Override
 					public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
 						return GermplasmResourceBrapi.this.germplasmService
-							.searchGermplasmDTO(germplasmSearchRequestDTO, new PageRequest(finalPageNumber, finalPageSize));
+							.searchGermplasmDTO(germplasmSearchRequest, new PageRequest(finalPageNumber, finalPageSize));
 					}
 				});
-	}
-
-	private List<Germplasm> mapGermplasm(final List<GermplasmDTO> germplasmDTOList) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		final ModelMapper mapper = new ModelMapper();
-		if (!CollectionUtils.isEmpty(germplasmDTOList)) {
-			for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
-				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-				germplasmList.add(germplasm);
-			}
-		}
-		return germplasmList;
 	}
 
 }
