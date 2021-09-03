@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.file.FileStorageService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Api("File services")
 @RestController
 @RequestMapping("/crops/{cropName}")
@@ -48,11 +51,13 @@ public class FileResource {
 	public ResponseEntity<FileMetadataDTO> upload(
 		@PathVariable final String cropName,
 		@RequestPart("file") final MultipartFile file,
-		@RequestParam final String observationUnitUUID,
+		@RequestParam(required = false) final String observationUnitUUID,
+		@RequestParam(required = false) final String germplasmUUID,
 		@RequestParam(required = false) final Integer termId
 	) {
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
-		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.upload(file, observationUnitUUID, termId);
+		BaseValidator.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID), "file.upload.entity.invalid");
+		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.upload(file, observationUnitUUID, germplasmUUID, termId);
 		return new ResponseEntity<>(fileMetadataDTO, HttpStatus.CREATED);
 	}
 

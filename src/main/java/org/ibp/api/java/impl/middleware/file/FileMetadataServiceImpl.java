@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Service
 @Transactional
 public class FileMetadataServiceImpl implements FileMetadataService {
@@ -42,15 +44,23 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public FileMetadataDTO upload(final MultipartFile file, final String observationUnitUUID, final Integer termId) {
-		final String path = this.fileMetadataService.getFilePath(observationUnitUUID, file.getOriginalFilename());
+	public FileMetadataDTO upload(
+		final MultipartFile file,
+		final String observationUnitUUID,
+		final String germplasmUUID,
+		final Integer termId
+	) {
+
+		final String path = !isBlank(observationUnitUUID) //
+			? this.fileMetadataService.getFilePath(observationUnitUUID, file.getOriginalFilename()) //
+			: this.fileMetadataService.getFilePathForGermplasm(germplasmUUID, file.getOriginalFilename());
 
 		FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
 		fileMetadataDTO.setName(file.getOriginalFilename());
 		fileMetadataDTO.setMimeType(file.getContentType());
 		fileMetadataDTO.setSize((int) file.getSize());
 		fileMetadataDTO.setPath(path);
-		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID, termId);
+		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID, germplasmUUID, termId);
 
 		// save file storage last as it is outside the transaction
 		this.fileStorageService.upload(file, path);

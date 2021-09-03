@@ -13,7 +13,7 @@ public interface FileMetadataService {
 
 	Image updateImageContent(String imageDbId, byte[] imageContent);
 
-	FileMetadataDTO upload(MultipartFile file, String observationUnitUUID, Integer termId);
+	FileMetadataDTO upload(MultipartFile file, String observationUnitUUID, String germplasmUUID, Integer termId);
 
 	void delete(String fileUUID);
 }
