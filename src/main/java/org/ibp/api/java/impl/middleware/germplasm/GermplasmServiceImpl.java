@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
@@ -330,6 +331,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
 		this.germplasmService.updateGermplasmPedigree(gid, progenitorsUpdateRequestDto);
 		return true;
+	}
+
+	@Override
+	public void mergeGermplasm(final GermplasmMergeRequestDto germplasmMergeRequestDto) {
+		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto,
+			this.pedigreeService.getCrossExpansion(germplasmMergeRequestDto.getTargetGermplasmId(), this.crossExpansionProperties));
 	}
 
 	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {

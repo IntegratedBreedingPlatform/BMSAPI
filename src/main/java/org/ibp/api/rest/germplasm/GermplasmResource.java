@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
@@ -394,6 +395,18 @@ public class GermplasmResource {
 		@RequestBody final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto) {
 		final boolean updateExecuted = this.germplasmService.updateGermplasmPedigree(programUUID, gid, progenitorsUpdateRequestDto);
 		return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
+	}
+
+	@ApiOperation(value = "Merge duplicated germplasm into a single one")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/merge", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> mergeGermplasm(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmMergeRequestDto germplasmMergeRequestDto) {
+
+		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }
