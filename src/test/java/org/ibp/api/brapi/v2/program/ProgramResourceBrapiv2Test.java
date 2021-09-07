@@ -204,6 +204,20 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
 	}
 
 	@Test
+	public void testListProgramFilterByAbbreviation() throws Exception {
+		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
+			.thenReturn(1L);
+
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiv2Test.BRAPI_V2_PROGRAMS)
+			.queryParam("abbreviation", "AAAB").build().encode();
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
+			.andExpect(MockMvcResultMatchers.status().isNotImplemented()) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("Abbreviation is not yet supported")));
+
+	}
+
+	@Test
 	public void testListProgramFilterByProgramId() throws Exception {
 		Mockito.when(this.programService.countProgramsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
 			.thenReturn(1L);
