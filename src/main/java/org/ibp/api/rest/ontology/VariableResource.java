@@ -4,6 +4,7 @@ package org.ibp.api.rest.ontology;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
@@ -45,7 +46,7 @@ public class VariableResource {
 	@ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')" + PermissionsEnum.HAS_MANAGE_GERMPLASM)
 	public ResponseEntity<VariableDetails> getVariableById(@PathVariable final String cropname,
 			@RequestParam final String programUUID, @PathVariable final String id) {
 		return new ResponseEntity<>(this.variableService.getVariableById(cropname, programUUID, id), HttpStatus.OK);
@@ -90,7 +91,7 @@ public class VariableResource {
 	}
 
 	@ApiOperation(value = "All variables using given filter", notes = "Gets all variables using filter")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'MANAGE_ONTOLOGIES', 'CROP_MANAGEMENT')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'MANAGE_ONTOLOGIES', 'CROP_MANAGEMENT')" + PermissionsEnum.HAS_MANAGE_GERMPLASM)
 	@RequestMapping(value = "/{cropname}/variables/filter", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<VariableDetails>> listAllVariablesUsingFilter(
