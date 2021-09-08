@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +38,13 @@ public class FileResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FileResource.class);
 
+	/*
+	 * To simplify, we put them all together in a single bag (studies and germplasm).
+	 * In the frontend we can differentiate between both
+	 */
+	private static final String MANAGE_FILES_PERMISSIONS = "'ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MG_MANAGE_FILES'"
+		+ ", 'STUDIES', 'MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS', 'MS_MANAGE_FILES'";
+
 	@Autowired
 	private FileStorageService fileStorageService;
 
@@ -47,6 +55,7 @@ public class FileResource {
 	private FileValidator fileValidator;
 
 	@RequestMapping(value = "/files", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority(" + MANAGE_FILES_PERMISSIONS + ")")
 	@ResponseBody
 	public ResponseEntity<FileMetadataDTO> upload(
 		@PathVariable final String cropName,
@@ -76,6 +85,7 @@ public class FileResource {
 	}
 
 	@RequestMapping(value = "/files/{fileUUID}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority(" + MANAGE_FILES_PERMISSIONS + ")")
 	@ResponseBody
 	public ResponseEntity<Void> deleteFile(
 		@PathVariable final String cropName,
