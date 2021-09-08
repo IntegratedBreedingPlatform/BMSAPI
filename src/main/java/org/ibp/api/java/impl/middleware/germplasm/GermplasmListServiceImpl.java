@@ -11,6 +11,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
@@ -61,7 +62,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -702,6 +702,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		return this.germplasmListService.toggleGermplasmListStatus(listId);
+	}
+
+	@Override
+	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateGermplasmList(listId);
+
+		return this.germplasmListService.getGermplasmListColumns(listId);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {

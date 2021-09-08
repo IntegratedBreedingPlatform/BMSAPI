@@ -2,6 +2,7 @@ package org.ibp.api.java.germplasm;
 
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
@@ -59,5 +60,7 @@ public interface GermplasmListService {
 	long countSearchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request);
 
 	boolean toggleGermplasmListStatus(Integer listId);
+
+	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId);
 
 }
