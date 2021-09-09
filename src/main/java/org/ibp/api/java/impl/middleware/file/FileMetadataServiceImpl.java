@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
@@ -52,7 +55,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	) {
 
 		final String path = !isBlank(observationUnitUUID) //
-			? this.fileMetadataService.getFilePath(observationUnitUUID, file.getOriginalFilename()) //
+			? this.fileMetadataService.getFilePathForObservationUnit(observationUnitUUID, file.getOriginalFilename()) //
 			: this.fileMetadataService.getFilePathForGermplasm(germplasmUUID, file.getOriginalFilename());
 
 		FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
@@ -74,6 +77,17 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		this.fileMetadataService.delete(fileUUID);
 		// delete file storage last as it is outside the transaction
 		this.fileStorageService.deleteFile(fileMetadataDTO.getPath());
+	}
+
+	@Override
+	public void removeFiles(final List<Integer> variableIds, final Integer observationUnitUUID, final String germplasmUUID) {
+		final List<FileMetadataDTO> fileMetadataDTOList = this.fileMetadataService.getAll(variableIds, observationUnitUUID, germplasmUUID);
+
+		this.fileMetadataService.removeFiles(variableIds, observationUnitUUID, germplasmUUID);
+
+		final List<String> paths = fileMetadataDTOList.stream().map(FileMetadataDTO::getPath).collect(toList());
+		// delete file storage last as it is outside the transaction
+		this.fileStorageService.deleteFiles(paths);
 	}
 
 }

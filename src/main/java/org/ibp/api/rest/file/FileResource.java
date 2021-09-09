@@ -84,6 +84,11 @@ public class FileResource {
 		return this.fileStorageService.getFile(path);
 	}
 
+	private static String getPath(final HttpServletRequest request) {
+		final String path = request.getRequestURI().split(".*\\/files\\/")[1];
+		return URLDecoder.decode(path);
+	}
+
 	@RequestMapping(value = "/files/{fileUUID}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority(" + MANAGE_FILES_PERMISSIONS + ")")
 	@ResponseBody
@@ -104,11 +109,6 @@ public class FileResource {
 		@PathVariable final String cropName
 	) {
 		return new ResponseEntity<>(Collections.singletonMap("status", this.fileStorageService.isConfigured()), HttpStatus.OK);
-	}
-
-	private static String getPath(final HttpServletRequest request) {
-		final String path = request.getRequestURI().split(".*\\/files\\/")[1];
-		return URLDecoder.decode(path);
 	}
 
 }

@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -94,6 +95,11 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 		} catch (final IOException e) {
 			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.delete");
 		}
+	}
+
+	@Override
+	public void deleteFiles(final List<String> paths) {
+		// TODO
 	}
 
 	@Override

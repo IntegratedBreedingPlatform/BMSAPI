@@ -5,6 +5,8 @@ import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface FileMetadataService {
 
 	Image createImage(ImageNewRequest imageNewRequest);
@@ -16,4 +18,6 @@ public interface FileMetadataService {
 	FileMetadataDTO upload(MultipartFile file, String observationUnitUUID, String germplasmUUID, Integer termId);
 
 	void delete(String fileUUID);
+
+	void removeFiles(List<Integer> variableIds, Integer observationUnitUUID, String germplasmUUID);
 }
