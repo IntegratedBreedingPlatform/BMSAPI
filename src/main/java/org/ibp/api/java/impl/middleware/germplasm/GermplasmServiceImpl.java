@@ -30,6 +30,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmMergeRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateDtoValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmBasicDetailsValidator;
@@ -98,6 +99,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private ProgenitorsUpdateRequestDtoValidator progenitorsUpdateRequestDtoValidator;
+
+	@Autowired
+	private GermplasmMergeRequestDtoValidator germplasmMergeRequestDtoValidator;
 
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
@@ -335,6 +339,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public void mergeGermplasm(final GermplasmMergeRequestDto germplasmMergeRequestDto) {
+		this.germplasmValidator.validateGermplasmId(this.errors, germplasmMergeRequestDto.getTargetGermplasmId());
+		this.germplasmValidator.validateGids(this.errors, germplasmMergeRequestDto.getNonSelectedGermplasm().stream().map(
+			GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(Collectors.toList()));
+		this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
+
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto,
 			this.pedigreeService.getCrossExpansion(germplasmMergeRequestDto.getTargetGermplasmId(), this.crossExpansionProperties));
 	}
