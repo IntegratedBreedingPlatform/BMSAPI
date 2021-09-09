@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
@@ -19,11 +20,13 @@ import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmListService;
+import org.ibp.api.java.germplasm.GermplasmListTemplateExportService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.ibp.api.rest.common.UserTreeState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
@@ -39,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.io.File;
 import java.util.List;
 
 @Api(value = "Germplasm List Services")
@@ -48,6 +52,9 @@ GermplasmListResourceGroup {
 
 	@Autowired
 	public GermplasmListService germplasmListService;
+
+	@Autowired
+	public GermplasmListTemplateExportService germplasmListTemplateExportService;
 
 	@Autowired
 	private SecurityService securityService;
@@ -277,4 +284,19 @@ GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.toggleGermplasmListStatus(listId), HttpStatus.OK);
 	}
 
+
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/templates/xls", method = RequestMethod.GET)
+	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID) {
+
+		final File file =
+			this.germplasmListTemplateExportService.export(cropName, programUUID);
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(file.getName())));
+		final FileSystemResource fileSystemResource = new FileSystemResource(file);
+		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+	}
 }
