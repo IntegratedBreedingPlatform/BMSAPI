@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.program.validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.api.program.ProgramService;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class ProgramBasicDetailsDtoValidator {
 
 	private static final Integer PROGRAM_NAME_MAX_LENGTH = 255;
+	private static final char[] INVALID_CHARS = {'\\', '/', ':', '*', '?', '"', '<', '>', '|'};
 
 	@Autowired
 	private ProgramService programService;
@@ -66,6 +68,11 @@ public class ProgramBasicDetailsDtoValidator {
 
 		if (programBasicDetailsDto.getName().length() > PROGRAM_NAME_MAX_LENGTH) {
 			errors.reject("program.name.max.length.exceeded", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (StringUtils.containsAny(programBasicDetailsDto.getName(), INVALID_CHARS)) {
+			errors.reject("program.name.invalid.characters", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}

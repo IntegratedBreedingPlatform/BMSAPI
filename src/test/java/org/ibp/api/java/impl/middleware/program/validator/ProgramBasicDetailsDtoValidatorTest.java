@@ -115,11 +115,22 @@ public class ProgramBasicDetailsDtoValidatorTest {
 	@Test
 	public void testValidateEdition_throwsException_whenProgramNameLengthInvalid() {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
-		programBasicDetailsDto.setName(RandomStringUtils.randomAlphabetic(10));
+		programBasicDetailsDto.setName(RandomStringUtils.randomAlphabetic(300));
 		try {
 			programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("param.null"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.name.max.length.exceeded"));
+		}
+	}
+
+	@Test
+	public void testValidateEdition_throwsException_whenProgramNameContainsInvalidCharacters() {
+		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
+		programBasicDetailsDto.setName("|");
+		try {
+			programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.name.invalid.characters"));
 		}
 	}
 
