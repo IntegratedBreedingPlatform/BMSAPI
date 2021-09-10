@@ -288,7 +288,7 @@ GermplasmListResourceGroup {
 	public ResponseEntity<List<GermplasmListColumnDTO>> getGermplasmListColumns(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID) {
-		return new ResponseEntity<>(this.germplasmListService.getGermplasmListColumns(listId), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmListService.getGermplasmListColumns(listId, programUUID), HttpStatus.OK);
 	}
 
 	//TODO: should be ignore in swagger?

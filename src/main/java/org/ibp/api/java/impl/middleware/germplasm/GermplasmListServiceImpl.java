@@ -706,11 +706,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId) {
+	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId, final String programUUID) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateGermplasmList(listId);
 
-		return this.germplasmListService.getGermplasmListColumns(listId);
+		return this.germplasmListService.getGermplasmListColumns(listId, programUUID);
 	}
 
 	@Override
