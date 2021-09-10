@@ -20,6 +20,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSea
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.Operation;
@@ -710,6 +711,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.validateGermplasmList(listId);
 
 		return this.germplasmListService.getGermplasmListColumns(listId);
+	}
+
+	@Override
+	public List<MeasurementVariable> getGermplasmListDataTableHeader(final Integer listId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateGermplasmList(listId);
+
+		return this.germplasmListService.getGermplasmListDataTableHeader(listId);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {

@@ -15,6 +15,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSea
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
@@ -269,6 +270,8 @@ GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmListById(listId), HttpStatus.OK);
 	}
 
+	//TODO: should be ignore in swagger?
+	//TODO: check permission
 	@ApiOperation(value = "Locks or unlocks the list depending the current status of it")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/toggle-status", method = RequestMethod.POST)
 	@ResponseBody
@@ -278,6 +281,7 @@ GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.toggleGermplasmListStatus(listId), HttpStatus.OK);
 	}
 
+	//TODO: should be ignore in swagger?
 	@ApiOperation(value = "Get a list of static, names and germplasm descriptors columns for a given list")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/columns", method = RequestMethod.GET)
 	@ResponseBody
@@ -285,6 +289,16 @@ GermplasmListResourceGroup {
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmListColumns(listId), HttpStatus.OK);
+	}
+
+	//TODO: should be ignore in swagger?
+	@ApiOperation(value = "Get the header for list table")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/table/columns", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<MeasurementVariable>> getGermplasmListDataTableHeader(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmListService.getGermplasmListDataTableHeader(listId), HttpStatus.OK);
 	}
 
 }
