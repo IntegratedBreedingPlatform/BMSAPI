@@ -2,6 +2,7 @@ package org.ibp.api.java.germplasm;
 
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
@@ -9,6 +10,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSea
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -59,5 +61,9 @@ public interface GermplasmListService {
 	long countSearchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request);
 
 	boolean toggleGermplasmListStatus(Integer listId);
+
+	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, final String programUUID);
+
+	List<MeasurementVariable> getGermplasmListDataTableHeader(Integer listId);
 
 }

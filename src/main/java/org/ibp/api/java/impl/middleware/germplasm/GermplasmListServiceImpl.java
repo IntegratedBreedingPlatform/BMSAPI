@@ -11,6 +11,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
@@ -19,6 +20,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSea
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.Operation;
@@ -61,7 +63,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -702,6 +703,22 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		return this.germplasmListService.toggleGermplasmListStatus(listId);
+	}
+
+	@Override
+	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId, final String programUUID) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateGermplasmList(listId);
+
+		return this.germplasmListService.getGermplasmListColumns(listId, programUUID);
+	}
+
+	@Override
+	public List<MeasurementVariable> getGermplasmListDataTableHeader(final Integer listId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateGermplasmList(listId);
+
+		return this.germplasmListService.getGermplasmListDataTableHeader(listId);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
