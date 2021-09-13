@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
