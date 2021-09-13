@@ -127,8 +127,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		this.addParentsFromPedigreeTable(responseMap, germplasmSearchRequest);
-		this.addHasProgeny(responseMap, germplasmSearchRequest);
-		this.addUsedInStudy(responseMap, germplasmSearchRequest);
+		this.addHasProgenyAttribute(responseMap, germplasmSearchRequest);
+		this.addUsedInStudyAttribute(responseMap, germplasmSearchRequest);
+		this.addUsedInLockedListAttribute(responseMap, germplasmSearchRequest);
 
 		return responseList;
 	}
@@ -177,7 +178,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void addHasProgeny(final Map<Integer, GermplasmSearchResponse> responseMap,
+	private void addHasProgenyAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
 		final GermplasmSearchRequest germplasmSearchRequest) {
 		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
 		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
@@ -195,7 +196,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void addUsedInStudy(final Map<Integer, GermplasmSearchResponse> responseMap,
+	private void addUsedInStudyAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
 		final GermplasmSearchRequest germplasmSearchRequest) {
 		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
 		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
@@ -210,6 +211,24 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final Integer gid = entry.getKey();
 			final GermplasmSearchResponse response = entry.getValue();
 			response.setUsedInStudy(gidsOfGermplasmUsedInStudy.contains(gid));
+		}
+	}
+
+	private void addUsedInLockedListAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
+			|| !addedColumnsPropertyIds.contains(ColumnLabels.USED_IN_LOCKED_LIST.getName())) {
+			return;
+		}
+
+		final Set<Integer> gidsOfGermplasmInLockedLists =
+			this.germplasmService.getGermplasmUsedInLockedList(new ArrayList<>(responseMap.keySet()));
+
+		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
+			final Integer gid = entry.getKey();
+			final GermplasmSearchResponse response = entry.getValue();
+			response.setUsedInLockedList(gidsOfGermplasmInLockedLists.contains(gid));
 		}
 	}
 
