@@ -20,7 +20,7 @@ public class MetadataDetails extends MetadataSummary {
 		return this.usage;
 	}
 
-	public void setUsage(Usage usage) {
+	public void setUsage(final Usage usage) {
 		this.usage = usage;
 	}
 
@@ -28,7 +28,7 @@ public class MetadataDetails extends MetadataSummary {
 		return this.editableFields;
 	}
 
-	public void addEditableField(String editableField) {
+	public void addEditableField(final String editableField) {
 		this.editableFields.add(editableField);
 	}
 
@@ -36,20 +36,28 @@ public class MetadataDetails extends MetadataSummary {
 		return this.deletable;
 	}
 
-	public void setDeletable(boolean deletable) {
+	public void setDeletable(final boolean deletable) {
 		this.deletable = deletable;
 	}
 
-	public void setObservations(Integer observations) {
+	public void setObservations(final Integer observations) {
 		this.usage.setObservations(observations);
 	}
 
-	public void setStudies(Integer studies) {
+	public void setStudies(final Integer studies) {
 		this.usage.setStudies(studies);
 	}
 
+	public void setLists(final Integer lists) {
+		this.usage.setLists(lists);
+	}
+
+	public Integer getLists() {
+		return this.usage.getLists();
+	}
+
 	public boolean isEditable() {
-		return editable;
+		return this.editable;
 	}
 
 	public MetadataDetails setEditable(final boolean editable) {
