@@ -46,6 +46,8 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.LocationServiceImpl;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
+import org.generationcp.middleware.api.program.ProgramFavoriteService;
+import org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.program.ProgramServiceImpl;
 import org.generationcp.middleware.api.study.MyStudiesService;
@@ -753,6 +755,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyServiceBrapi getStudyServiceBrapi() {
 		return new StudyServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public ProgramFavoriteService getProgramFavoriteService() {
+		return new ProgramFavoriteServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
