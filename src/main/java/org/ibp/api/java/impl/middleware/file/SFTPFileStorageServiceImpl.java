@@ -52,7 +52,7 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 		} catch (final JSchException e) {
 			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
 		} catch (final SftpException e) {
-			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.upload");
 		} catch (final IOException e) {
 			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.format");
 		} finally {
@@ -72,7 +72,7 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 		} catch (final JSchException e) {
 			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
 		} catch (final SftpException e) {
-			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.get");
 		} catch (final IOException e) {
 			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.get");
 		} finally {
@@ -91,7 +91,7 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 		} catch (final JSchException e) {
 			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
 		} catch (final SftpException e) {
-			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.delete");
 		} catch (final IOException e) {
 			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.delete");
 		}
