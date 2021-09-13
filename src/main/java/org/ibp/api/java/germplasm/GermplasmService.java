@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
@@ -55,4 +56,6 @@ public interface GermplasmService {
 		final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto);
 
 	void mergeGermplasm(GermplasmMergeRequestDto germplasmMergeRequestDto);
+
+	List<GermplasmMergeDto> getGermplasmMergeDTOs(Integer gid);
 }
