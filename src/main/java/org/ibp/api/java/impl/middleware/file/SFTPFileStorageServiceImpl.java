@@ -99,7 +99,19 @@ public class SFTPFileStorageServiceImpl implements FileStorageService {
 
 	@Override
 	public void deleteFiles(final List<String> paths) {
-		// TODO
+		try {
+			final ChannelSftp channelSftp = this.setupJsch();
+			channelSftp.connect();
+			for (final String path : paths) {
+				channelSftp.rm(path);
+			}
+		} catch (final JSchException e) {
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.connection");
+		} catch (final SftpException e) {
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.delete");
+		} catch (final IOException e) {
+			throw new ApiRuntime2Exception(e.getMessage(), "file.storage.sftp.error.file.delete");
+		}
 	}
 
 	@Override
