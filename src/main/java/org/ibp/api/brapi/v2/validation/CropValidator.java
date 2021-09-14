@@ -1,6 +1,6 @@
 package org.ibp.api.brapi.v2.validation;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
