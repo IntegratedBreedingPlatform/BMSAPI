@@ -359,9 +359,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public void mergeGermplasm(final GermplasmMergeRequestDto germplasmMergeRequestDto) {
-		this.germplasmValidator.validateGermplasmId(this.errors, germplasmMergeRequestDto.getTargetGermplasmId());
-		this.germplasmValidator.validateGids(this.errors, germplasmMergeRequestDto.getNonSelectedGermplasm().stream().map(
-			GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(Collectors.toList()));
+
+		final List<Integer> gids = germplasmMergeRequestDto.getNonSelectedGermplasm().stream().map(
+			GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(Collectors.toList());
+		gids.add(germplasmMergeRequestDto.getTargetGermplasmId());
+		this.germplasmValidator.validateGids(this.errors, gids);
 		this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
 
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto,

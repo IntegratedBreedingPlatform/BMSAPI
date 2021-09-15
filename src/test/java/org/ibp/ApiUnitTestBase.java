@@ -243,6 +243,13 @@ public abstract class ApiUnitTestBase {
 
 		@Bean
 		@Primary
+		public org.generationcp.middleware.api.germplasm.GermplasmService germplasmServiceMiddleware() {
+			return Mockito.mock(org.generationcp.middleware.api.germplasm.GermplasmService.class);
+
+		}
+
+		@Bean
+		@Primary
 		public TrialServiceBrapi trialServiceBrapi() {
 			return Mockito.mock(TrialServiceBrapi.class);
 		}
@@ -258,13 +265,6 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public GermplasmAttributeService germplasmAttributeService() {
 			return Mockito.mock(GermplasmAttributeService.class);
-
-		}
-
-		@Bean
-		@Primary
-		public org.generationcp.middleware.api.germplasm.GermplasmService germplasmMiddlewareService() {
-			return Mockito.mock(org.generationcp.middleware.api.germplasm.GermplasmService.class);
 
 		}
 

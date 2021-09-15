@@ -402,11 +402,8 @@ public class GermplasmResource {
 	@RequestMapping(value = "/crops/{cropName}/germplasm/merge", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> mergeGermplasm(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmMergeRequestDto germplasmMergeRequestDto) {
-
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto);
-
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

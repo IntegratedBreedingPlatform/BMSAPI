@@ -2,6 +2,7 @@ package org.ibp.api.rest.germplasm;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Sets;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.hamcrest.Matchers;
@@ -62,6 +63,30 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$.deletedGermplasm", Matchers.containsInAnyOrder(2, 3)))
 			.andExpect(jsonPath("$.germplasmWithErrors", Matchers.containsInAnyOrder(1)));
 
+	}
+
+	@Test
+	public void testGermplasmMergeSuccess() throws Exception {
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
+		germplasmMergeRequestDto.setTargetGermplasmId(1);
+		final GermplasmMergeRequestDto.NonSelectedGermplasm nonSelectedGermplasm = new GermplasmMergeRequestDto.NonSelectedGermplasm();
+		nonSelectedGermplasm.setGermplasmId(2);
+		nonSelectedGermplasm.setCloseLots(false);
+		nonSelectedGermplasm.setOmit(false);
+		nonSelectedGermplasm.setMigrateLots(false);
+		final GermplasmMergeRequestDto.MergeOptions mergeOptions = new GermplasmMergeRequestDto.MergeOptions();
+		mergeOptions.setMigrateAttributesData(false);
+		mergeOptions.setMigrateNameTypes(false);
+		mergeOptions.setMigratePassportData(false);
+		germplasmMergeRequestDto.setNonSelectedGermplasm(Arrays.asList(nonSelectedGermplasm));
+		germplasmMergeRequestDto.setMergeOptions(mergeOptions);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{cropName}/germplasm/merge", this.cropName)
+				.contentType(this.contentType).content(this.convertObjectToByte(germplasmMergeRequestDto)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
 }
