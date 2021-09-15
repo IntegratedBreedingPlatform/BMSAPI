@@ -205,7 +205,7 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
 
 	@Test
 	public void testListProgramFilterByAbbreviation() throws Exception {
-		Mockito.when(this.workbenchDataManager.countProjectsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
+		Mockito.when(this.programService.countProgramsByFilter(org.mockito.Matchers.any(ProgramSearchRequest.class)))
 			.thenReturn(1L);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiv2Test.BRAPI_V2_PROGRAMS)

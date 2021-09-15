@@ -4,6 +4,7 @@ package org.ibp.api.rest.program;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
@@ -18,7 +19,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -93,6 +96,33 @@ public class ProgramResource {
         headers.add("X-Total-Count", Long.toString(pagedResult.getTotalResults()));
 
         return new ResponseEntity<>(programs, headers, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Create program", notes = "Create program")
+    @RequestMapping(value = "/crops/{cropName}/programs", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'ADD_PROGRAM')")
+    public ResponseEntity<ProgramDTO> createProgram(@PathVariable final String cropName,
+        @RequestBody final ProgramBasicDetailsDto programBasicDetailsDto) {
+        final ProgramDTO programDTO = this.programService.createProgram(cropName, programBasicDetailsDto);
+        return new ResponseEntity<>(programDTO, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Delete program", notes = "Delete program")
+    @RequestMapping(value = "/crops/{cropName}/programs/{programUUID}", method = RequestMethod.DELETE)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
+    public ResponseEntity<Void> deleteProgram(@PathVariable final String cropName,
+        @PathVariable final String programUUID) {
+        this.programService.deleteProgram(programUUID);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Edit a program", notes = "Edit a program")
+    @RequestMapping(value = "/crops/{cropName}/programs/{programUUID}", method = RequestMethod.PATCH)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
+    public ResponseEntity<Void> editProgram(@PathVariable final String cropName, @PathVariable final String programUUID,
+        @RequestBody final ProgramBasicDetailsDto programBasicDetailsDto) {
+        final boolean updateExecuted = this.programService.editProgram(cropName, programUUID, programBasicDetailsDto);
+        return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
     }
 
     private boolean hasAdmin() {
