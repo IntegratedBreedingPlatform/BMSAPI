@@ -1,31 +1,26 @@
 package org.ibp.api.java.impl.middleware.file;
 
-import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
-import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -73,5 +68,10 @@ public class SFTPFileStorageServiceImplTest {
 		verify(this.channel, times(2)).cd(FOLDER_2);
 		verify(this.channel).mkdir(FOLDER_2);
 		verify(this.channel).put(nullable(InputStream.class), eq(FILENAME_PNG));
+	}
+
+	@Test
+	public void testIsConfigured() {
+		assertThat(this.sftpFileStorageService.isConfigured(), is(true));
 	}
 }
