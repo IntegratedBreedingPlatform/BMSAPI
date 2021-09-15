@@ -8,28 +8,30 @@ import java.util.List;
 
 public class NoneFileStorageServiceImpl implements FileStorageService {
 
+	public static final String FILE_STORAGE_NOT_CONFIGURED_ERROR_CODE = "file.storage.not.configured";
+
 	@Override
 	public void upload(final MultipartFile file, final String path) {
-		throw new ApiRuntime2Exception("", "file.storage.not.configured");
+		throw new ApiRuntime2Exception("", FILE_STORAGE_NOT_CONFIGURED_ERROR_CODE);
 	}
 
 	@Override
 	public byte[] getFile(final String path) {
-		throw new ApiRuntime2Exception("", "file.storage.not.configured");
+		throw new ApiRuntime2Exception("", FILE_STORAGE_NOT_CONFIGURED_ERROR_CODE);
 	}
 
 	@Override
 	public boolean isConfigured() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public void deleteFile(final String path) {
-		throw new ApiRuntime2Exception("", "file.storage.not.configured");
+		throw new ApiRuntime2Exception("", FILE_STORAGE_NOT_CONFIGURED_ERROR_CODE);
 	}
 
 	@Override
 	public void deleteFiles(final List<String> paths) {
-		throw new ApiRuntime2Exception("", "file.storage.not.configured");
+		throw new ApiRuntime2Exception("", FILE_STORAGE_NOT_CONFIGURED_ERROR_CODE);
 	}
 }
