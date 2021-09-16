@@ -3,12 +3,11 @@ package org.ibp.api.rest.file;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.file.FileMetadataDTO;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,15 +35,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @RequestMapping("/crops/{cropName}")
 public class FileResource {
 
-	private static final Logger LOG = LoggerFactory.getLogger(FileResource.class);
-
-	/*
-	 * To simplify, we put them all together in a single bag (studies and germplasm).
-	 * In the frontend we can differentiate between both
-	 */
-	private static final String MANAGE_FILES_PERMISSIONS = "'ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MG_MANAGE_FILES'"
-		+ ", 'STUDIES', 'MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS', 'MS_MANAGE_FILES'";
-
 	@Autowired
 	private FileStorageService fileStorageService;
 
@@ -55,7 +45,7 @@ public class FileResource {
 	private FileValidator fileValidator;
 
 	@RequestMapping(value = "/files", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority(" + MANAGE_FILES_PERMISSIONS + ")")
+	@PreAuthorize("hasAnyAuthority('ADMIN')" + PermissionsEnum.HAS_MANAGE_FILES)
 	@ResponseBody
 	public ResponseEntity<FileMetadataDTO> upload(
 		@PathVariable final String cropName,
@@ -67,6 +57,7 @@ public class FileResource {
 		this.validateFileStorage();
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
 		BaseValidator.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID), "file.upload.entity.invalid");
+
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.upload(file, observationUnitUUID, germplasmUUID, termId);
 		return new ResponseEntity<>(fileMetadataDTO, HttpStatus.CREATED);
 	}
@@ -92,7 +83,7 @@ public class FileResource {
 	}
 
 	@RequestMapping(value = "/files/{fileUUID}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority(" + MANAGE_FILES_PERMISSIONS + ")")
+	@PreAuthorize("hasAnyAuthority('ADMIN')" + PermissionsEnum.HAS_MANAGE_FILES)
 	@ResponseBody
 	public ResponseEntity<Void> deleteFile(
 		@PathVariable final String cropName,
