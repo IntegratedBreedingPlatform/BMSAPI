@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.generationcp.middleware.api.file.FileMetadataFilterRequest;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class FileMetadataResource {
 
 	@Autowired
 	private org.ibp.api.java.file.FileMetadataService fileMetadataService;
+
+	@Autowired
+	private FileStorageService fileStorageService;
 
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -98,8 +102,13 @@ public class FileMetadataResource {
 		@RequestParam(required = false) final String germplasmUUID
 	) {
 		BaseValidator.checkArgument((datasetId == null) != isBlank(germplasmUUID), "file.upload.detach.parameters.invalid");
+		this.validateFileStorage();
 
 		this.fileMetadataService.removeFiles(variableIds, datasetId, germplasmUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	private void validateFileStorage() {
+		BaseValidator.checkArgument(this.fileStorageService.isConfigured(), "file.storage.not.configured");
 	}
 }

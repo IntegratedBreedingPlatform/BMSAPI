@@ -64,6 +64,7 @@ public class FileResource {
 		@RequestParam(required = false) final String germplasmUUID,
 		@RequestParam(required = false) final Integer termId
 	) {
+		this.validateFileStorage();
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
 		BaseValidator.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID), "file.upload.entity.invalid");
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.upload(file, observationUnitUUID, germplasmUUID, termId);
@@ -80,6 +81,7 @@ public class FileResource {
 		@PathVariable final String cropName,
 		final HttpServletRequest request
 	) {
+		this.validateFileStorage();
 		final String path = getPath(request);
 		return this.fileStorageService.getFile(path);
 	}
@@ -96,6 +98,7 @@ public class FileResource {
 		@PathVariable final String cropName,
 		@PathVariable final String fileUUID
 	) {
+		this.validateFileStorage();
 		this.fileMetadataService.delete(fileUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -111,4 +114,7 @@ public class FileResource {
 		return new ResponseEntity<>(Collections.singletonMap("status", this.fileStorageService.isConfigured()), HttpStatus.OK);
 	}
 
+	private void validateFileStorage() {
+		BaseValidator.checkArgument(this.fileStorageService.isConfigured(), "file.storage.not.configured");
+	}
 }
