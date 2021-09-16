@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.generationcp.middleware.api.file.FileMetadataFilterRequest;
 import org.generationcp.middleware.api.file.FileMetadataService;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -16,6 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -80,6 +82,7 @@ public class FileMetadataResource {
 	}
 
 	@RequestMapping(value = "/filemetadata/variables", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN')" + PermissionsEnum.HAS_MANAGE_FILES)
 	public ResponseEntity<Void> detachFiles(
 		@PathVariable final String cropName,
 		@RequestParam final List<Integer> variableIds,
@@ -94,6 +97,7 @@ public class FileMetadataResource {
 	}
 
 	@RequestMapping(value = "/filemetadata", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN')" + PermissionsEnum.HAS_MANAGE_FILES)
 	public ResponseEntity<Void> removeFiles(
 		@PathVariable final String cropName,
 		@RequestParam final List<Integer> variableIds,
