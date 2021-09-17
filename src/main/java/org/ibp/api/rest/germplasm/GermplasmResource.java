@@ -413,7 +413,7 @@ public class GermplasmResource {
 	@RequestMapping(value = "/crops/{cropName}/germplasm/merge/{gid}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmMergeDto>> getGermplasmMergeDTOs(@PathVariable final String cropName,
-		@RequestParam(required = true) final Integer gid) {
+		@PathVariable final Integer gid) {
 		return new ResponseEntity<>(this.germplasmService.getGermplasmMergeDTOs(gid), HttpStatus.OK);
 	}
 
