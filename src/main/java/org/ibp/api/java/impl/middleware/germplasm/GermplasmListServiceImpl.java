@@ -714,11 +714,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getGermplasmListDataTableHeader(final Integer listId) {
+	public List<MeasurementVariable> getGermplasmListDataTableHeader(final Integer listId, final String programUUID) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateGermplasmList(listId);
 
-		return this.germplasmListService.getGermplasmListDataTableHeader(listId);
+		return this.germplasmListService.getGermplasmListDataTableHeader(listId, programUUID);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
