@@ -14,9 +14,11 @@ import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
@@ -413,6 +415,14 @@ public class GermplasmResource {
 	public ResponseEntity<List<GermplasmMergeDto>> getGermplasmMergeDTOs(@PathVariable final String cropName,
 		@RequestParam(required = true) final Integer gid) {
 		return new ResponseEntity<>(this.germplasmService.getGermplasmMergeDTOs(gid), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get progenies of specified germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/progenies", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmProgenyDto>> getProgenies(@PathVariable final String cropName,
+		@PathVariable final Integer gid) {
+		return new ResponseEntity<>(this.germplasmService.getGermplasmProgenyDTOs(gid), HttpStatus.OK);
 	}
 
 }
