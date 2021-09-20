@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -32,10 +31,11 @@ public class GermplasmMergeRequestDtoValidator {
 		final List<Integer> gidsOfNonSelectedGermplasm =
 			germplasmMergeRequestDto.getNonSelectedGermplasm().stream().filter(o -> !o.isOmit()).map(
 				GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(Collectors.toList());
-		final Set<Integer> germplasmWithDescendants = this.germplasmServiceMiddleware.getGidsOfGermplasmWithDescendants(gidsOfNonSelectedGermplasm);
+		final Set<Integer> germplasmWithDescendants =
+			this.germplasmServiceMiddleware.getGidsOfGermplasmWithDescendants(gidsOfNonSelectedGermplasm);
 
 		if (gidsOfNonSelectedGermplasm.size() + 1 > this.maximumGermplasmToMerge) {
-			errors.reject("germplasm.merge.maximum.number.exceeeded", new String[] { String.valueOf(this.maximumGermplasmToMerge) },"");
+			errors.reject("germplasm.merge.maximum.number.exceeeded", new String[] {String.valueOf(this.maximumGermplasmToMerge)}, "");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmWithDescendants)) {
