@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.generationcp.middleware.api.file.FileMetadataFilterRequest;
 import org.generationcp.middleware.api.file.FileMetadataService;
-import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -17,7 +16,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -46,6 +45,9 @@ public class FileMetadataResource {
 
 	@Autowired
 	private FileStorageService fileStorageService;
+
+	@Autowired
+	private HttpServletRequest request;
 
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -82,7 +84,6 @@ public class FileMetadataResource {
 	}
 
 	@RequestMapping(value = "/filemetadata/variables", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN')" + PermissionsEnum.HAS_MANAGE_FILES)
 	public ResponseEntity<Void> detachFiles(
 		@PathVariable final String cropName,
 		@RequestParam final List<Integer> variableIds,
@@ -91,13 +92,17 @@ public class FileMetadataResource {
 		@RequestParam(required = false) final String germplasmUUID
 	) {
 		BaseValidator.checkArgument((datasetId == null) != isBlank(germplasmUUID), "file.upload.detach.parameters.invalid");
+		if (datasetId != null) {
+			FileResource.verifyHasAuthorityStudy(this.request);
+		} else {
+			FileResource.verifyHasAuthorityGermplasm(this.request);
+		}
 
 		this.fileMetadataServiceMiddleware.detachFiles(variableIds, datasetId, germplasmUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/filemetadata", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN')" + PermissionsEnum.HAS_MANAGE_FILES)
 	public ResponseEntity<Void> removeFiles(
 		@PathVariable final String cropName,
 		@RequestParam final List<Integer> variableIds,
@@ -107,6 +112,11 @@ public class FileMetadataResource {
 	) {
 		BaseValidator.checkArgument((datasetId == null) != isBlank(germplasmUUID), "file.upload.detach.parameters.invalid");
 		this.validateFileStorage();
+		if (datasetId != null) {
+			FileResource.verifyHasAuthorityStudy(this.request);
+		} else {
+			FileResource.verifyHasAuthorityGermplasm(this.request);
+		}
 
 		this.fileMetadataService.removeFiles(variableIds, datasetId, germplasmUUID);
 		return new ResponseEntity<>(HttpStatus.OK);

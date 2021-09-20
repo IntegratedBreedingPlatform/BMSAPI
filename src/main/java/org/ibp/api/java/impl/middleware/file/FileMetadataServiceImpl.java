@@ -28,6 +28,11 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	private FileStorageService fileStorageService;
 
 	@Override
+	public FileMetadataDTO getByFileUUID(final String fileUUID) {
+		return this.fileMetadataService.getByFileUUID(fileUUID);
+	}
+
+	@Override
 	public Image createImage(final ImageNewRequest imageNewRequest) {
 		return this.fileMetadataService.save(imageNewRequest);
 	}

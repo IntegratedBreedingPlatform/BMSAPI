@@ -11,7 +11,7 @@ import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,17 +44,25 @@ public class FileResource {
 	@Autowired
 	private FileValidator fileValidator;
 
+	@Autowired
+	private HttpServletRequest request;
+
 	@RequestMapping(value = "/files", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN')" + PermissionsEnum.HAS_MANAGE_FILES)
 	@ResponseBody
 	public ResponseEntity<FileMetadataDTO> upload(
 		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@RequestPart("file") final MultipartFile file,
 		@RequestParam(required = false) final String observationUnitUUID,
 		@RequestParam(required = false) final String germplasmUUID,
 		@RequestParam(required = false) final Integer termId
 	) {
 		this.validateFileStorage();
+		if (!isBlank(observationUnitUUID)) {
+			FileResource.verifyHasAuthorityStudy(this.request);
+		} else {
+			FileResource.verifyHasAuthorityGermplasm(this.request);
+		}
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
 		BaseValidator.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID), "file.upload.entity.invalid");
 
@@ -70,6 +78,7 @@ public class FileResource {
 	@ResponseBody
 	public byte[] getFile(
 		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		final HttpServletRequest request
 	) {
 		this.validateFileStorage();
@@ -83,13 +92,20 @@ public class FileResource {
 	}
 
 	@RequestMapping(value = "/files/{fileUUID}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN')" + PermissionsEnum.HAS_MANAGE_FILES)
 	@ResponseBody
 	public ResponseEntity<Void> deleteFile(
 		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@PathVariable final String fileUUID
 	) {
 		this.validateFileStorage();
+		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(fileUUID);
+		if (!isBlank(fileMetadataDTO.getObservationUnitUUID())) {
+			verifyHasAuthorityStudy(this.request);
+		} else {
+			verifyHasAuthorityGermplasm(this.request);
+		}
+
 		this.fileMetadataService.delete(fileUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -100,12 +116,33 @@ public class FileResource {
 	@ApiOperation("Get file storage status: true => active")
 	@RequestMapping(value = "/filestorage/status", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Boolean>> getFileStorageStatus(
-		@PathVariable final String cropName
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID
 	) {
 		return new ResponseEntity<>(Collections.singletonMap("status", this.fileStorageService.isConfigured()), HttpStatus.OK);
 	}
 
 	private void validateFileStorage() {
 		BaseValidator.checkArgument(this.fileStorageService.isConfigured(), "file.storage.not.configured");
+	}
+
+	public static void verifyHasAuthorityGermplasm(final HttpServletRequest request) {
+		if (!(request.isUserInRole(PermissionsEnum.ADMIN.name())
+			|| request.isUserInRole(PermissionsEnum.GERMPLASM.name())
+			|| request.isUserInRole(PermissionsEnum.MANAGE_GERMPLASM.name())
+			|| request.isUserInRole(PermissionsEnum.EDIT_GERMPLASM.name())
+			|| request.isUserInRole(PermissionsEnum.MG_MANAGE_FILES.name()))) {
+			throw new AccessDeniedException("");
+		}
+	}
+
+	public static void verifyHasAuthorityStudy(final HttpServletRequest request) {
+		if (!(request.isUserInRole(PermissionsEnum.ADMIN.name())
+			|| request.isUserInRole(PermissionsEnum.STUDIES.name())
+			|| request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name())
+			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_OBSERVATION_UNITS.name())
+			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_FILES.name()))) {
+			throw new AccessDeniedException("");
+		}
 	}
 }

@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface FileMetadataService {
 
+	FileMetadataDTO getByFileUUID(String fileUUID);
+
 	Image createImage(ImageNewRequest imageNewRequest);
 
 	Image updateImage(String imageDbId, ImageNewRequest imageNewRequest);
