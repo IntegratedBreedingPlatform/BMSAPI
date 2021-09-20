@@ -56,6 +56,7 @@ public class StudyMapper {
 				environmentParameter.setValue(variable.getValue());
 				environmentParameter.setUnit(variable.getScale());
 				environmentParameter.setParameterName(variable.getName());
+				environmentParameter.setParameterPUI(String.valueOf(variable.getTermId()));
 				environmentParameters.add(environmentParameter);
 			}
 			return context.getMappingEngine().map(context.create(environmentParameters, context.getDestinationType()));
