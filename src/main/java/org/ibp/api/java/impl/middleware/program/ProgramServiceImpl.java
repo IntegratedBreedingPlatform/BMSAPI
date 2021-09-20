@@ -243,7 +243,6 @@ public class ProgramServiceImpl implements ProgramService {
 		this.studyService.deleteProgramStudies(programUUID);
 		this.programFavoriteService.deleteAllProgramFavorites(programUUID);
 		this.locationService.deleteProgramLocations(programUUID);
-		this.methodService.deleteProgramMethods(programUUID);
 		this.germplasmListService.deleteProgramGermplasmLists(programUUID);
 		this.programService.deleteProgramAndDependencies(programUUID);
 	}
