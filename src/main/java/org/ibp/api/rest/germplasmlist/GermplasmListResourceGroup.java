@@ -305,7 +305,7 @@ GermplasmListResourceGroup {
 	public ResponseEntity<List<MeasurementVariable>> getGermplasmListDataTableHeader(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID) {
-		return new ResponseEntity<>(this.germplasmListService.getGermplasmListDataTableHeader(listId), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmListService.getGermplasmListDataTableHeader(listId, programUUID), HttpStatus.OK);
 	}
 
 
