@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListVariableRequestDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
@@ -65,5 +66,7 @@ public interface GermplasmListService {
 	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, final String programUUID);
 
 	List<MeasurementVariable> getGermplasmListDataTableHeader(Integer listId, final String programUUID);
+
+	MeasurementVariable addVariableToList(Integer listId, GermplasmListVariableRequestDto germplasmListVariableRequestDto);
 
 }

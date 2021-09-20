@@ -14,6 +14,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListVariableRequestDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
@@ -721,6 +722,17 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.germplasmListService.getGermplasmListDataTableHeader(listId, programUUID);
 	}
 
+	@Override
+	public MeasurementVariable addVariableToList(final Integer listId,
+		final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
+		//list exists
+		//list is unlocked
+		//variable type is a valid one
+		//variable exists with the specified variable type
+		//list does not have the variable already associated
+		return null;
+	}
+
 	private void validateProgram(final String cropName, final String programUUID) {
 		if (!StringUtils.isEmpty(programUUID)) {
 			this.programValidator.validate(new ProgramDTO(cropName, programUUID), this.errors);
@@ -825,8 +837,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return (CROP_LISTS.equals(folderId) || PROGRAM_LISTS.equals(folderId)) ? null : Integer.valueOf(folderId);
 	}
 
-	private static GermplasmListDto transformGermplasmList(GermplasmList input) {
-		GermplasmListDto output = new GermplasmListDto();
+	private static GermplasmListDto transformGermplasmList(final GermplasmList input) {
+		final GermplasmListDto output = new GermplasmListDto();
 		output.setListId(input.getId());
 		output.setListName(input.getName());
 		output.setCreationDate(input.parseDate());

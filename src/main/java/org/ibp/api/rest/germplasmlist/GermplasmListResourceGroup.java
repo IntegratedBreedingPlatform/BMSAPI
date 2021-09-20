@@ -10,6 +10,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListVariableRequestDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
@@ -299,6 +300,40 @@ GermplasmListResourceGroup {
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmListDataTableHeader(listId, programUUID), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Add a variable to the list", notes = "Add a variable to the list")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables", method = RequestMethod.PUT)
+	public ResponseEntity<MeasurementVariable> addVariable(
+		@PathVariable final String cropName, @PathVariable final Integer listId, @RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
+		final MeasurementVariable variable = this.germplasmListService.addVariableToList(listId, germplasmListVariableRequestDto);
+		return new ResponseEntity<>(variable, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Remove list variables", notes = "Remove a set of variables from a germplasm list")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> removeVariables(
+		@PathVariable final String cropName, @PathVariable final Integer listId,
+		@RequestParam(value = "variableIds", required = true) final Integer[] variableIds,
+		@RequestParam(required = false) final String programUUID) {
+
+		//		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get the variables associated to the list filtered by variableType", notes = "Get the list variables filtered by variableType")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables", method = RequestMethod.GET)
+	public ResponseEntity<List<MeasurementVariable>> getVariables(
+		@PathVariable final String cropName, @PathVariable final Integer listId, @RequestParam final Integer variableTypeId,
+		@RequestParam(required = false) final String programUUID) {
+
+		//		final List<MeasurementVariableDto> variables =
+		//			this.studyDatasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.getById(variableTypeId));
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 
 }
