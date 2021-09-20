@@ -355,7 +355,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 					new LocationSearchRequest(programUUID, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, null, false),
 					null);
 
-		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, null, false);
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, false);
 		final List<BreedingMethodDTO> breedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest, null);
 
 		final List<GermplasmNameTypeDTO> germplasmNames = this.germplasmService.filterGermplasmNameTypes(null);
