@@ -1,11 +1,8 @@
 package org.ibp.api.java.impl.middleware.file;
 
 import org.ibp.api.exception.ApiRuntime2Exception;
-import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.file.FileStorageService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -23,8 +20,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.utils.IoUtils;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
 
 public class AWSS3FileStorageServiceImpl implements FileStorageService {
 
