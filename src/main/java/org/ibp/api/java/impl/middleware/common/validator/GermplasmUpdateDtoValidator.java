@@ -61,7 +61,7 @@ public class GermplasmUpdateDtoValidator {
 		this.validateAttributeAndNameCodes(errors, programUUID, germplasmUpdateDTOList);
 		this.validateGermplasmIdAndGermplasmUUID(errors, germplasmUpdateDTOList);
 		this.validateLocationAbbreviation(errors, programUUID, germplasmUpdateDTOList);
-		this.validateBreedingMethod(errors, programUUID, germplasmUpdateDTOList);
+		this.validateBreedingMethod(errors, germplasmUpdateDTOList);
 		this.validateCreationDate(errors, germplasmUpdateDTOList);
 		this.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateDTOList);
 		this.validateProgenitorsGids(errors, germplasmUpdateDTOList);
@@ -201,15 +201,14 @@ public class GermplasmUpdateDtoValidator {
 
 	}
 
-	protected void validateBreedingMethod(final BindingResult errors, final String programUUID,
-		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateBreedingMethod(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final List<String> breedingMethodsAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
 				.map(GermplasmUpdateDTO::getBreedingMethodAbbr).collect(Collectors.toList());
 
 		final List<String> abbreviations =
-			this.breedingMethodService.getBreedingMethods(new BreedingMethodSearchRequest(programUUID, breedingMethodsAbbrs, false), null)
+			this.breedingMethodService.getBreedingMethods(new BreedingMethodSearchRequest(null, breedingMethodsAbbrs, false), null)
 				.stream()
 				.map(BreedingMethodDTO::getCode).collect(
 				Collectors.toList());
