@@ -15,7 +15,6 @@ import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
-import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
@@ -365,6 +364,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final List<Integer> gids = germplasmMergeRequestDto.getNonSelectedGermplasm().stream().map(
 			GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(Collectors.toList());
 		gids.add(germplasmMergeRequestDto.getTargetGermplasmId());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmMergeRequestDto.class.getName());
 		this.germplasmValidator.validateGids(this.errors, gids);
 		this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
 

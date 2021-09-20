@@ -400,7 +400,8 @@ public class GermplasmResource {
 		return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
 	}
 
-	@ApiOperation(value = "Merge duplicated germplasm into a single one")
+	@ApiOperation(value = "Merge duplicate germplasm into a single germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'MERGE_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/merge", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> mergeGermplasm(@PathVariable final String cropName,
