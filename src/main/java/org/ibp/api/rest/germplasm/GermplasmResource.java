@@ -12,7 +12,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -410,11 +410,11 @@ public class GermplasmResource {
 	}
 
 	@ApiOperation(value = "Get the list of duplicate germplasm that were merged into the specified germplasm")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/merge/{gid}", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/merges", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<GermplasmMergeDto>> getGermplasmMergeDTOs(@PathVariable final String cropName,
+	public ResponseEntity<List<GermplasmMergedDto>> getGermplasmMerged(@PathVariable final String cropName,
 		@PathVariable final Integer gid) {
-		return new ResponseEntity<>(this.germplasmService.getGermplasmMergeDTOs(gid), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmService.getGermplasmMerged(gid), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get progenies of specified germplasm")
@@ -422,7 +422,7 @@ public class GermplasmResource {
 	@ResponseBody
 	public ResponseEntity<List<GermplasmProgenyDto>> getProgenies(@PathVariable final String cropName,
 		@PathVariable final Integer gid) {
-		return new ResponseEntity<>(this.germplasmService.getGermplasmProgenyDTOs(gid), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmService.getGermplasmProgenies(gid), HttpStatus.OK);
 	}
 
 }

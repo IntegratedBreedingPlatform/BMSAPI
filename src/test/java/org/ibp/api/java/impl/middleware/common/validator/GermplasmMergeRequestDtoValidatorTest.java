@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -102,10 +101,7 @@ public class GermplasmMergeRequestDtoValidatorTest {
 			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false, false),
 				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false, false)));
 
-		final Germplasm germplasm = new Germplasm();
-		// Mark germplasm as grouped
-		germplasm.setMgid(1);
-		when(this.germplasmServiceMiddleware.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
+		when(this.germplasmServiceMiddleware.getCodeFixedGidsByGidList(Mockito.anyList())).thenReturn(new HashSet<>(Arrays.asList(2, 3)));
 
 		try {
 			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
@@ -126,8 +122,7 @@ public class GermplasmMergeRequestDtoValidatorTest {
 			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false, true),
 				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false, true)));
 
-		final Germplasm germplasm = new Germplasm();
-		when(this.germplasmServiceMiddleware.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
+		when(this.germplasmServiceMiddleware.getGidsOfGermplasmWithDescendants(Mockito.anyList())).thenReturn(new HashSet<>());
 
 		try {
 			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
@@ -138,6 +133,28 @@ public class GermplasmMergeRequestDtoValidatorTest {
 				hasItem("germplasm.merge.no.germplasm.to.merge"));
 		}
 
+	}
+
+	@Test
+	public void testValidate_AnyOfNonSelectedGermplasmIsUsedInLockedList() {
+
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
+		germplasmMergeRequestDto.setTargetGermplasmId(1);
+		germplasmMergeRequestDto.setNonSelectedGermplasm(
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false, false)));
+
+		when(this.germplasmServiceMiddleware.getGermplasmUsedInLockedList(Mockito.anyList())).thenReturn(
+			new HashSet<>(Arrays.asList(2, 3)));
+
+		try {
+			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
+			fail("Method should throw an error");
+		} catch (final Exception e) {
+			assertThat(e, instanceOf(ApiRequestValidationException.class));
+			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				hasItem("germplasm.merge.cannot.merge.germplasm.is.in.locked.list"));
+		}
 	}
 
 }

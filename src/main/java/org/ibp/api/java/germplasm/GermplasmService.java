@@ -6,7 +6,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -56,7 +56,7 @@ public interface GermplasmService {
 
 	void mergeGermplasm(GermplasmMergeRequestDto germplasmMergeRequestDto);
 
-	List<GermplasmMergeDto> getGermplasmMergeDTOs(Integer gid);
+	List<GermplasmMergedDto> getGermplasmMerged(Integer gid);
 
-	List<GermplasmProgenyDto> getGermplasmProgenyDTOs(Integer gid);
+	List<GermplasmProgenyDto> getGermplasmProgenies(Integer gid);
 }

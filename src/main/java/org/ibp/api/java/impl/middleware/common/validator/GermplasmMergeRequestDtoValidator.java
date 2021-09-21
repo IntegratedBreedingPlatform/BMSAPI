@@ -1,10 +1,10 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,7 +34,7 @@ public class GermplasmMergeRequestDtoValidator {
 		final Set<Integer> germplasmWithDescendants =
 			this.germplasmServiceMiddleware.getGidsOfGermplasmWithDescendants(gidsOfNonSelectedGermplasm);
 
-		if (gidsOfNonSelectedGermplasm.isEmpty()) {
+		if (CollectionUtils.isEmpty(gidsOfNonSelectedGermplasm)) {
 			errors.reject("germplasm.merge.no.germplasm.to.merge", "");
 		}
 
@@ -43,14 +43,19 @@ public class GermplasmMergeRequestDtoValidator {
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmWithDescendants)) {
-			errors.reject("germplasm.merge.cannot.merge.germplasm.with.progeny", "");
+			errors.reject("germplasm.merge.cannot.merge.germplasm.with.progeny",
+				new String[] {StringUtils.join(germplasmWithDescendants, ", ")}, "");
 		}
 
-		final List<Germplasm> germplasmList = this.germplasmServiceMiddleware.getGermplasmByGIDs(gidsOfNonSelectedGermplasm);
-		final boolean oneOfGermplasmIsFixed =
-			germplasmList.stream().anyMatch(o -> o.getMgid() != null && !o.getMgid().equals(0));
-		if (oneOfGermplasmIsFixed) {
-			errors.reject("germplasm.merge.cannot.merge.germplasm.already.grouped", "");
+		final Set<Integer> gidsFixed = this.germplasmServiceMiddleware.getCodeFixedGidsByGidList(gidsOfNonSelectedGermplasm);
+		if (!CollectionUtils.isEmpty(gidsFixed)) {
+			errors.reject("germplasm.merge.cannot.merge.germplasm.already.grouped", new String[] {StringUtils.join(gidsFixed, ", ")}, "");
+		}
+
+		final Set<Integer> gidsLockedList = this.germplasmServiceMiddleware.getGermplasmUsedInLockedList(gidsOfNonSelectedGermplasm);
+		if (!CollectionUtils.isEmpty(gidsLockedList)) {
+			errors.reject("germplasm.merge.cannot.merge.germplasm.is.in.locked.list", new String[] {StringUtils.join(gidsLockedList, ", ")},
+				"");
 		}
 
 		if (errors.hasErrors()) {

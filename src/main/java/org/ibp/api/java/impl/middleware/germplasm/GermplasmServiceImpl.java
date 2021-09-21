@@ -9,8 +9,8 @@ import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
@@ -191,11 +191,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Set<Integer> gidsOfGermplasmWithDescendants =
 			this.germplasmService.getGidsOfGermplasmWithDescendants(new ArrayList<>(responseMap.keySet()));
 
-		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
-			final Integer gid = entry.getKey();
-			final GermplasmSearchResponse response = entry.getValue();
-			response.setHasProgeny(gidsOfGermplasmWithDescendants.contains(gid));
-		}
+		responseMap.forEach((gid, response) -> response.setHasProgeny(gidsOfGermplasmWithDescendants.contains(gid)));
+
 	}
 
 	private void addUsedInStudyAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
@@ -209,11 +206,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Set<Integer> gidsOfGermplasmUsedInStudy =
 			this.germplasmService.getGermplasmUsedInStudies(new ArrayList<>(responseMap.keySet()));
 
-		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
-			final Integer gid = entry.getKey();
-			final GermplasmSearchResponse response = entry.getValue();
-			response.setUsedInStudy(gidsOfGermplasmUsedInStudy.contains(gid));
-		}
+		responseMap.forEach((gid, response) -> response.setUsedInStudy(gidsOfGermplasmUsedInStudy.contains(gid)));
 	}
 
 	private void addUsedInLockedListAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
@@ -227,11 +220,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Set<Integer> gidsOfGermplasmInLockedLists =
 			this.germplasmService.getGermplasmUsedInLockedList(new ArrayList<>(responseMap.keySet()));
 
-		for (final Map.Entry<Integer, GermplasmSearchResponse> entry : responseMap.entrySet()) {
-			final Integer gid = entry.getKey();
-			final GermplasmSearchResponse response = entry.getValue();
-			response.setUsedInLockedList(gidsOfGermplasmInLockedLists.contains(gid));
-		}
+		responseMap.forEach((gid, response) -> response.setUsedInLockedList(gidsOfGermplasmInLockedLists.contains(gid)));
 	}
 
 	@Override
@@ -373,15 +362,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<GermplasmMergeDto> getGermplasmMergeDTOs(final Integer gid) {
+	public List<GermplasmMergedDto> getGermplasmMerged(final Integer gid) {
 		this.germplasmValidator.validateGermplasmId(this.errors, gid);
-		return this.germplasmService.getGermplasmMergeDTOs(gid);
+		return this.germplasmService.getGermplasmMerged(gid);
 	}
 
 	@Override
-	public List<GermplasmProgenyDto> getGermplasmProgenyDTOs(final Integer gid) {
+	public List<GermplasmProgenyDto> getGermplasmProgenies(final Integer gid) {
 		this.germplasmValidator.validateGermplasmId(this.errors, gid);
-		return this.germplasmService.getGermplasmProgenyDTOs(gid);
+		return this.germplasmService.getGermplasmProgenies(gid);
 	}
 
 	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
