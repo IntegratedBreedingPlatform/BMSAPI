@@ -2,6 +2,8 @@ package org.ibp.api.java.file;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface FileStorageService {
 
 	void upload(MultipartFile file, String path);
@@ -16,4 +18,6 @@ public interface FileStorageService {
 	boolean isConfigured();
 
 	void deleteFile(String path);
+
+	void deleteFiles(List<String> paths);
 }

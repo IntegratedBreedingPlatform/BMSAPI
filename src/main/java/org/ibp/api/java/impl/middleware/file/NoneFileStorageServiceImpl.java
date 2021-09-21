@@ -4,6 +4,8 @@ import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.java.file.FileStorageService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public class NoneFileStorageServiceImpl implements FileStorageService {
 
 	public static final String FILE_STORAGE_NOT_CONFIGURED_ERROR_CODE = "file.storage.not.configured";
@@ -25,6 +27,11 @@ public class NoneFileStorageServiceImpl implements FileStorageService {
 
 	@Override
 	public void deleteFile(final String path) {
+		throw new ApiRuntime2Exception("", FILE_STORAGE_NOT_CONFIGURED_ERROR_CODE);
+	}
+
+	@Override
+	public void deleteFiles(final List<String> paths) {
 		throw new ApiRuntime2Exception("", FILE_STORAGE_NOT_CONFIGURED_ERROR_CODE);
 	}
 }
