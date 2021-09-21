@@ -2,12 +2,14 @@ package org.ibp.api.java.impl.middleware.breedingmethod;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.MethodType;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
+import org.ibp.api.java.impl.middleware.common.validator.BreedingMethodValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +32,9 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	@Autowired
 	private ProgramValidator programValidator;
 
+	@Autowired
+	private BreedingMethodValidator breedingMethodValidator;
+
 	@Override
 	public List<MethodClassDTO> getMethodClasses() {
 		return this.breedingMethodService.getMethodClasses();
@@ -44,6 +49,12 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		return breedingMethodDTO.get();
+	}
+
+	@Override
+	public BreedingMethodDTO create(final BreedingMethodNewRequest breedingMethod) {
+		this.breedingMethodValidator.validate(breedingMethod);
+		return this.breedingMethodService.create(breedingMethod);
 	}
 
 	@Override

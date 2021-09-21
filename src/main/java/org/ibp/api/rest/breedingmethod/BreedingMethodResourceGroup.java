@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 import org.generationcp.middleware.pojos.MethodGroup;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +39,16 @@ public class BreedingMethodResourceGroup {
 		@RequestParam(required = false) final String programUUID
 	) {
 		return new ResponseEntity<>(this.breedingMethodService.getBreedingMethod(breedingMethodDbId), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Post breeding method")
+	@RequestMapping(value = "/crops/{cropName}/breedingmethods", method = RequestMethod.POST)
+	public ResponseEntity<BreedingMethodDTO> create(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final BreedingMethodNewRequest breedingMethod
+	) {
+		return new ResponseEntity<>(this.breedingMethodService.create(breedingMethod), HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "List breeding method types")
