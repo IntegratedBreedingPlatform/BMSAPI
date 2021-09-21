@@ -117,4 +117,27 @@ public class GermplasmMergeRequestDtoValidatorTest {
 		}
 	}
 
+	@Test
+	public void testValidate_NoGermplasmToMerge() {
+
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
+		germplasmMergeRequestDto.setTargetGermplasmId(1);
+		germplasmMergeRequestDto.setNonSelectedGermplasm(
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false, true),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false, true)));
+
+		final Germplasm germplasm = new Germplasm();
+		when(this.germplasmServiceMiddleware.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
+
+		try {
+			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
+			fail("Method should throw an error");
+		} catch (final Exception e) {
+			assertThat(e, instanceOf(ApiRequestValidationException.class));
+			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				hasItem("germplasm.merge.no.germplasm.to.merge"));
+		}
+
+	}
+
 }

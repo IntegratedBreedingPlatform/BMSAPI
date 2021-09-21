@@ -34,6 +34,10 @@ public class GermplasmMergeRequestDtoValidator {
 		final Set<Integer> germplasmWithDescendants =
 			this.germplasmServiceMiddleware.getGidsOfGermplasmWithDescendants(gidsOfNonSelectedGermplasm);
 
+		if (gidsOfNonSelectedGermplasm.isEmpty()) {
+			errors.reject("germplasm.merge.no.germplasm.to.merge", "");
+		}
+
 		if (gidsOfNonSelectedGermplasm.size() + 1 > this.maximumGermplasmToMerge) {
 			errors.reject("germplasm.merge.maximum.number.exceeeded", new String[] {String.valueOf(this.maximumGermplasmToMerge)}, "");
 		}
