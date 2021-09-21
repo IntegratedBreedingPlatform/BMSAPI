@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
@@ -16,7 +17,6 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSea
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
@@ -300,6 +300,18 @@ GermplasmListResourceGroup {
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmListDataTableHeader(listId, programUUID), HttpStatus.OK);
+	}
+
+	//TODO: should be ignore in swagger?
+	@ApiOperation(value = "Customize the view of the germplasm list data.")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/view", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> getGermplasmListDataTableHeader(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody List<GermplasmListDataUpdateViewDTO> view) {
+		this.germplasmListService.saveGermplasmListDataView(listId, view);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }
