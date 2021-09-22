@@ -20,21 +20,21 @@ import java.util.stream.Collectors;
 public class GermplasmValidator {
 
 	@Autowired
-	private GermplasmService germplasmService;
+	private GermplasmService germplasmServiceMiddleware;
 
 	public void validateGermplasmId(final BindingResult errors, final Integer germplasmId) {
 		if (germplasmId == null) {
 			errors.reject("germplasm.required", "");
 			return;
 		}
-		final List<Germplasm> germplasm = this.germplasmService.getGermplasmByGIDs(Arrays.asList(germplasmId));
+		final List<Germplasm> germplasm = this.germplasmServiceMiddleware.getGermplasmByGIDs(Arrays.asList(germplasmId));
 		if (CollectionUtils.isEmpty(germplasm)) {
 			errors.reject("germplasm.invalid", "");
 		}
 	}
 
 	public void validateGids(final BindingResult errors, final List<Integer> gids) {
-		final List<Germplasm> existingGermplasms = this.germplasmService.getGermplasmByGIDs(gids);
+		final List<Germplasm> existingGermplasms = this.germplasmServiceMiddleware.getGermplasmByGIDs(gids);
 		if (existingGermplasms.size() != gids.size() || existingGermplasms.stream().filter(Germplasm::getDeleted).count() > 0) {
 			final List<Integer> existingGids =
 				existingGermplasms.stream().filter(g -> !g.getDeleted()).map(Germplasm::getGid).collect(Collectors.toList());
@@ -49,7 +49,7 @@ public class GermplasmValidator {
 			errors.reject("germplasm.required", "");
 			return;
 		}
-		final List<Germplasm> germplasm = this.germplasmService.getGermplasmByGUIDs(Collections.singletonList(germplasmUUID));
+		final List<Germplasm> germplasm = this.germplasmServiceMiddleware.getGermplasmByGUIDs(Collections.singletonList(germplasmUUID));
 		if (CollectionUtils.isEmpty(germplasm)) {
 			errors.reject("germplasm.invalid", "");
 		}
