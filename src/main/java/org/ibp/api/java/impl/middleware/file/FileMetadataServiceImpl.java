@@ -12,6 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Service
 @Transactional
 public class FileMetadataServiceImpl implements FileMetadataService {
@@ -21,6 +26,11 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 	@Autowired
 	private FileStorageService fileStorageService;
+
+	@Override
+	public FileMetadataDTO getByFileUUID(final String fileUUID) {
+		return this.fileMetadataService.getByFileUUID(fileUUID);
+	}
 
 	@Override
 	public Image createImage(final ImageNewRequest imageNewRequest) {
@@ -42,15 +52,23 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public FileMetadataDTO upload(final MultipartFile file, final String observationUnitUUID, final Integer termId) {
-		final String path = this.fileMetadataService.getFilePath(observationUnitUUID, file.getOriginalFilename());
+	public FileMetadataDTO upload(
+		final MultipartFile file,
+		final String observationUnitUUID,
+		final String germplasmUUID,
+		final Integer termId
+	) {
+
+		final String path = !isBlank(observationUnitUUID) //
+			? this.fileMetadataService.getFilePathForObservationUnit(observationUnitUUID, file.getOriginalFilename()) //
+			: this.fileMetadataService.getFilePathForGermplasm(germplasmUUID, file.getOriginalFilename());
 
 		FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
 		fileMetadataDTO.setName(file.getOriginalFilename());
 		fileMetadataDTO.setMimeType(file.getContentType());
 		fileMetadataDTO.setSize((int) file.getSize());
 		fileMetadataDTO.setPath(path);
-		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID, termId);
+		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID, germplasmUUID, termId);
 
 		// save file storage last as it is outside the transaction
 		this.fileStorageService.upload(file, path);
@@ -64,6 +82,17 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		this.fileMetadataService.delete(fileUUID);
 		// delete file storage last as it is outside the transaction
 		this.fileStorageService.deleteFile(fileMetadataDTO.getPath());
+	}
+
+	@Override
+	public void removeFiles(final List<Integer> variableIds, final Integer observationUnitUUID, final String germplasmUUID) {
+		final List<FileMetadataDTO> fileMetadataDTOList = this.fileMetadataService.getAll(variableIds, observationUnitUUID, germplasmUUID);
+
+		this.fileMetadataService.removeFiles(variableIds, observationUnitUUID, germplasmUUID);
+
+		final List<String> paths = fileMetadataDTOList.stream().map(FileMetadataDTO::getPath).collect(toList());
+		// delete file storage last as it is outside the transaction
+		this.fileStorageService.deleteFiles(paths);
 	}
 
 }
