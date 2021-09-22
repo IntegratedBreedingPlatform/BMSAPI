@@ -11,13 +11,14 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListVariableRequestDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListVariableRequestDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
@@ -311,7 +312,7 @@ GermplasmListResourceGroup {
 	public ResponseEntity<Void> getGermplasmListDataTableHeader(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody List<GermplasmListDataUpdateViewDTO> view) {
+		@RequestBody final List<GermplasmListDataUpdateViewDTO> view) {
 		this.germplasmListService.saveGermplasmListDataView(listId, view);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
