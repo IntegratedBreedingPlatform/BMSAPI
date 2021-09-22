@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
@@ -719,6 +720,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.validateGermplasmList(listId);
 
 		return this.germplasmListService.getGermplasmListDataTableHeader(listId, programUUID);
+	}
+
+	@Override
+	public void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateGermplasmList(listId);
+
+		this.germplasmListService.saveGermplasmListDataView(listId, view);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
