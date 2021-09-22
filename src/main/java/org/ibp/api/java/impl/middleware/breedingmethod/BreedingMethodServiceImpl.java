@@ -44,7 +44,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	public BreedingMethodDTO getBreedingMethod(final Integer breedingMethodDbId) {
 		final Optional<BreedingMethodDTO> breedingMethodDTO =  this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
 		if (!breedingMethodDTO.isPresent()) {
-			final MapBindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			final MapBindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("methoddbid.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -53,8 +53,14 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 
 	@Override
 	public BreedingMethodDTO create(final BreedingMethodNewRequest breedingMethod) {
-		this.breedingMethodValidator.validate(breedingMethod);
+		this.breedingMethodValidator.validateCreation(breedingMethod);
 		return this.breedingMethodService.create(breedingMethod);
+	}
+
+	@Override
+	public BreedingMethodDTO edit(final Integer breedingMethodDbId, final BreedingMethodNewRequest breedingMethod) {
+		this.breedingMethodValidator.validateEdition(breedingMethodDbId, breedingMethod);
+		return this.breedingMethodService.edit(breedingMethodDbId, breedingMethod);
 	}
 
 	@Override

@@ -41,7 +41,7 @@ public class BreedingMethodResourceGroup {
 		return new ResponseEntity<>(this.breedingMethodService.getBreedingMethod(breedingMethodDbId), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Post breeding method")
+	@ApiOperation(value = "Create breeding method")
 	@RequestMapping(value = "/crops/{cropName}/breedingmethods", method = RequestMethod.POST)
 	public ResponseEntity<BreedingMethodDTO> create(
 		@PathVariable final String cropName,
@@ -49,6 +49,17 @@ public class BreedingMethodResourceGroup {
 		@RequestBody final BreedingMethodNewRequest breedingMethod
 	) {
 		return new ResponseEntity<>(this.breedingMethodService.create(breedingMethod), HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Edit breeding method")
+	@RequestMapping(value = "/crops/{cropName}/breedingmethods/{breedingMethodDbId}", method = RequestMethod.PATCH)
+	public ResponseEntity<BreedingMethodDTO> edit(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@PathVariable final Integer breedingMethodDbId,
+		@RequestBody final BreedingMethodNewRequest breedingMethod
+	) {
+		return new ResponseEntity<>(this.breedingMethodService.edit(breedingMethodDbId, breedingMethod), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "List breeding method types")
