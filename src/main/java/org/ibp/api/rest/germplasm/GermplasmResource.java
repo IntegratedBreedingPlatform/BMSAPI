@@ -12,6 +12,9 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
@@ -394,6 +397,32 @@ public class GermplasmResource {
 		@RequestBody final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto) {
 		final boolean updateExecuted = this.germplasmService.updateGermplasmPedigree(programUUID, gid, progenitorsUpdateRequestDto);
 		return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
+	}
+
+	@ApiOperation(value = "Merge duplicate germplasm into a single germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'MERGE_GERMPLASM')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/merge", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> mergeGermplasm(@PathVariable final String cropName,
+		@RequestBody final GermplasmMergeRequestDto germplasmMergeRequestDto) {
+		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get the list of duplicate germplasm that were merged into the specified germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/merges", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmMergedDto>> getGermplasmMerged(@PathVariable final String cropName,
+		@PathVariable final Integer gid) {
+		return new ResponseEntity<>(this.germplasmService.getGermplasmMerged(gid), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get progenies of specified germplasm")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/progenies", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmProgenyDto>> getProgenies(@PathVariable final String cropName,
+		@PathVariable final Integer gid) {
+		return new ResponseEntity<>(this.germplasmService.getGermplasmProgenies(gid), HttpStatus.OK);
 	}
 
 }

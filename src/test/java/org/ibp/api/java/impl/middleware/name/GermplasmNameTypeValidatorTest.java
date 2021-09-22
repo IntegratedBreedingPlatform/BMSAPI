@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.constant.SystemNameTypes;
 import org.generationcp.middleware.pojos.Name;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
@@ -195,7 +196,7 @@ public class GermplasmNameTypeValidatorTest {
 	@Test
 	public void testValidate_Deletable_ThrowsException_WhenNameTypeIdIsUsedBySystem() {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
-		germplasmNameTypeDTO.setCode(GermplasmNameTypeValidator.SYSTEM_NAME_TYPES.get(0));
+		germplasmNameTypeDTO.setCode(SystemNameTypes.LNAME.getType());
 
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
 			.thenReturn(Optional.of(germplasmNameTypeDTO));
