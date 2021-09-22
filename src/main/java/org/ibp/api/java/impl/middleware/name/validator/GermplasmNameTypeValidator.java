@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.constant.SystemNameTypes;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,20 +13,18 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class GermplasmNameTypeValidator {
 
 	public static final Integer CODE_OR_NAME_MAX_LENGTH = 50;
 	public static final Integer DESCRIPTION_MAX_LENGTH = 255;
-	public static final List<String> SYSTEM_NAME_TYPES = Collections.unmodifiableList(
-		Arrays.asList("LNAME", "CODE1", "CODE2", "CODE3", "PED", "CRSNM", "DRVNM", "SELHISFIX", "PUI"));
 
 	private BindingResult errors;
 
@@ -136,7 +135,7 @@ public class GermplasmNameTypeValidator {
 	}
 
 	private void validateNameTypeBelongsToSystem(final String code) {
-		if (GermplasmNameTypeValidator.SYSTEM_NAME_TYPES.contains(code)) {
+		if (SystemNameTypes.getTypes().contains(code)) {
 			this.errors.reject("germplasm.name.type.used.for.the.system", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}

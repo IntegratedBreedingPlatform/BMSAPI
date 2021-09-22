@@ -9,6 +9,9 @@ import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
@@ -29,6 +32,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmDeleteValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmMergeRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmUpdateDtoValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmBasicDetailsValidator;
@@ -98,6 +102,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Autowired
 	private ProgenitorsUpdateRequestDtoValidator progenitorsUpdateRequestDtoValidator;
 
+	@Autowired
+	private GermplasmMergeRequestDtoValidator germplasmMergeRequestDtoValidator;
+
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
 		final String programUUID) {
@@ -122,6 +129,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		this.addParentsFromPedigreeTable(responseMap, germplasmSearchRequest);
+		this.addHasProgenyAttribute(responseMap, germplasmSearchRequest);
+		this.addUsedInStudyAttribute(responseMap, germplasmSearchRequest);
+		this.addUsedInLockedListAttribute(responseMap, germplasmSearchRequest);
 
 		return responseList;
 	}
@@ -168,6 +178,49 @@ public class GermplasmServiceImpl implements GermplasmService {
 				response.setMaleParentPreferredName(germplasm.getPreferredName().getNval());
 			}
 		}
+	}
+
+	private void addHasProgenyAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
+			|| !addedColumnsPropertyIds.contains(ColumnLabels.HAS_PROGENY.getName())) {
+			return;
+		}
+
+		final Set<Integer> gidsOfGermplasmWithDescendants =
+			this.germplasmService.getGidsOfGermplasmWithDescendants(new ArrayList<>(responseMap.keySet()));
+
+		responseMap.forEach((gid, response) -> response.setHasProgeny(gidsOfGermplasmWithDescendants.contains(gid)));
+
+	}
+
+	private void addUsedInStudyAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
+			|| !addedColumnsPropertyIds.contains(ColumnLabels.USED_IN_STUDY.getName())) {
+			return;
+		}
+
+		final Set<Integer> gidsOfGermplasmUsedInStudy =
+			this.germplasmService.getGermplasmUsedInStudies(new ArrayList<>(responseMap.keySet()));
+
+		responseMap.forEach((gid, response) -> response.setUsedInStudy(gidsOfGermplasmUsedInStudy.contains(gid)));
+	}
+
+	private void addUsedInLockedListAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
+		final GermplasmSearchRequest germplasmSearchRequest) {
+		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
+		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
+			|| !addedColumnsPropertyIds.contains(ColumnLabels.USED_IN_LOCKED_LIST.getName())) {
+			return;
+		}
+
+		final Set<Integer> gidsOfGermplasmInLockedLists =
+			this.germplasmService.getGermplasmUsedInLockedList(new ArrayList<>(responseMap.keySet()));
+
+		responseMap.forEach((gid, response) -> response.setUsedInLockedList(gidsOfGermplasmInLockedLists.contains(gid)));
 	}
 
 	@Override
@@ -292,6 +345,32 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
 		this.germplasmService.updateGermplasmPedigree(gid, progenitorsUpdateRequestDto);
 		return true;
+	}
+
+	@Override
+	public void mergeGermplasm(final GermplasmMergeRequestDto germplasmMergeRequestDto) {
+
+		final List<Integer> gids = germplasmMergeRequestDto.getNonSelectedGermplasm().stream().map(
+			GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(Collectors.toList());
+		gids.add(germplasmMergeRequestDto.getTargetGermplasmId());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmMergeRequestDto.class.getName());
+		this.germplasmValidator.validateGids(this.errors, gids);
+		this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
+
+		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto,
+			this.pedigreeService.getCrossExpansion(germplasmMergeRequestDto.getTargetGermplasmId(), this.crossExpansionProperties));
+	}
+
+	@Override
+	public List<GermplasmMergedDto> getGermplasmMerged(final Integer gid) {
+		this.germplasmValidator.validateGermplasmId(this.errors, gid);
+		return this.germplasmService.getGermplasmMerged(gid);
+	}
+
+	@Override
+	public List<GermplasmProgenyDto> getGermplasmProgenies(final Integer gid) {
+		this.germplasmValidator.validateGermplasmId(this.errors, gid);
+		return this.germplasmService.getGermplasmProgenies(gid);
 	}
 
 	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
