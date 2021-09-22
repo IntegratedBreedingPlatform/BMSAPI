@@ -62,6 +62,16 @@ public class BreedingMethodResourceGroup {
 		return new ResponseEntity<>(this.breedingMethodService.edit(breedingMethodDbId, breedingMethod), HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/crops/{cropName}/breedingmethods/{breedingMethodDbId}", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> edit(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@PathVariable final Integer breedingMethodDbId
+	) {
+		this.breedingMethodService.delete(breedingMethodDbId);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
 	@ApiOperation(value = "List breeding method types")
 	@RequestMapping(value = "/crops/{cropName}/breedingmethod-types", method = RequestMethod.GET)
 	@ResponseBody

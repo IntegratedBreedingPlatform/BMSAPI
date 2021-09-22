@@ -64,6 +64,12 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
+	public void delete(final Integer breedingMethodDbId) {
+		this.breedingMethodValidator.validateDeletion(breedingMethodDbId);
+		this.breedingMethodService.delete(breedingMethodDbId);
+	}
+
+	@Override
 	public List<BreedingMethodDTO> getBreedingMethods(final String cropName, final BreedingMethodSearchRequest searchRequest,
 		final Pageable pageable) {
 		final MapBindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());

@@ -3,6 +3,9 @@ package org.ibp.api.java.impl.middleware.common.validator;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.MethodGroup;
 import org.generationcp.middleware.pojos.MethodType;
@@ -23,6 +26,9 @@ public class BreedingMethodValidator {
 	
 	@Autowired
 	private BreedingMethodService breedingMethodService;
+
+	@Autowired
+	private GermplasmService germplasmService;
 
 	public void validateCreation(final BreedingMethodNewRequest breedingMethod) {
 		checkNotNull(breedingMethod, "request.null");
@@ -91,6 +97,20 @@ public class BreedingMethodValidator {
 		}
 
 		this.validateFieldsLength(breedingMethodRequest);
+	}
+
+	public void validateDeletion(final Integer breedingMethodDbId) {
+		final Optional<BreedingMethodDTO> methodOptional = this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
+		if (!methodOptional.isPresent()) {
+			throw new ApiRequestValidationException("breeding.methods.not.exists", new Integer[] {breedingMethodDbId});
+		}
+
+		Optional<Germplasm> germplasmOptional = this.germplasmService.findOneByMethodId(breedingMethodDbId);
+		if (germplasmOptional.isPresent()) {
+			throw new ApiRequestValidationException("breeding.methods.delete.has.germplasm",
+				new String[] {germplasmOptional.get().getGid().toString()}); }
+
+		// TODO validate study STUDY_BM_CODE, BM_CODE_VTE
 	}
 
 	private void validateFieldsLength(final BreedingMethodNewRequest breedingMethod) {
