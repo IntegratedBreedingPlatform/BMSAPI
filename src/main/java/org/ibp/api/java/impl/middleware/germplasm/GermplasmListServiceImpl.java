@@ -24,11 +24,14 @@ import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
@@ -41,9 +44,12 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmListService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListVariableRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.UserTreeState;
@@ -63,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -144,6 +151,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private UserValidator userValidator;
+
+	@Autowired
+	private GermplasmListVariableRequestDtoValidator germplasmListVariableRequestDtoValidator;
+
+	@Autowired
+	private GermplasmListValidator germplasmListValidator;
+
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	private BindingResult errors;
 
@@ -487,7 +503,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, this.errors);
-		final GermplasmList germplasmList = this.validateGermplasmList(germplasmListId);
+		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(germplasmListId);
 
 		if (germplasmList.isFolder()) {
 			this.errors.reject("list.invalid", "");
@@ -658,7 +674,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public GermplasmListDto getGermplasmListById(final Integer listId) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		final GermplasmList germplasmList = this.validateGermplasmList(listId);
+		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
 		final Function<GermplasmList, GermplasmListDto> function = GermplasmListServiceImpl::transformGermplasmList;
 		return function.apply(germplasmList);
 	}
@@ -695,7 +711,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public boolean toggleGermplasmListStatus(final Integer listId) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		final GermplasmList germplasmList = this.validateGermplasmList(listId);
+		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
 
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
 		if (!germplasmList.getUserId().equals(createdBy.getUserid())) {
@@ -709,7 +725,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId, final String programUUID) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.validateGermplasmList(listId);
+		germplasmListValidator.validateGermplasmListExists(listId);
 
 		return this.germplasmListService.getGermplasmListColumns(listId, programUUID);
 	}
@@ -717,20 +733,44 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public List<MeasurementVariable> getGermplasmListDataTableHeader(final Integer listId, final String programUUID) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.validateGermplasmList(listId);
+		germplasmListValidator.validateGermplasmListExists(listId);
 
 		return this.germplasmListService.getGermplasmListDataTableHeader(listId, programUUID);
 	}
 
 	@Override
-	public MeasurementVariable addVariableToList(final Integer listId,
+	public void addVariableToList(final Integer listId,
 		final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
-		//list exists
-		//list is unlocked
-		//variable type is a valid one
-		//variable exists with the specified variable type
-		//list does not have the variable already associated
-		return null;
+		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
+		germplasmListValidator.validateListIsNotAFolder(germplasmList);
+		germplasmListValidator.validateListIsUnlocked(germplasmList);
+		germplasmListVariableRequestDtoValidator.validate(listId, germplasmListVariableRequestDto);
+		germplasmListService.addVariableToList(listId, germplasmListVariableRequestDto);
+
+	}
+
+	@Override
+	public void removeListVariables(final Integer listId, final Set<Integer> variableIds) {
+		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
+		germplasmListValidator.validateListIsNotAFolder(germplasmList);
+		germplasmListValidator.validateListIsUnlocked(germplasmList);
+		BaseValidator.checkNotEmpty(variableIds, "germplasm.list.variable.ids.can.not.be.empty");
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableIds.forEach(variableFilter::addVariableId);
+		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+		if (variables.size() != variableIds.size()) {
+			this.errors.reject("germplasm.list.invalid.variables", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		final List<Integer> listVariableIds = germplasmListService.getListOntologyVariables(listId);
+		if (listVariableIds.containsAll(variableIds)) {
+			this.errors.reject("germplasm.list.variables.not.associated", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		this.germplasmListService.removeListVariables(listId, variableIds);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
@@ -818,19 +858,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			this.errors.reject("list.folder.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-	}
-
-	private GermplasmList validateGermplasmList(final Integer germplasmListId) {
-		if (!Util.isPositiveInteger(String.valueOf(germplasmListId))) {
-			this.errors.reject("list.id.invalid", new String[] {String.valueOf(germplasmListId)}, "");
-			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-		}
-
-		return this.germplasmListService.getGermplasmListById(germplasmListId)
-			.orElseThrow(() -> {
-				this.errors.reject("list.id.invalid", new String[] {germplasmListId.toString()}, "");
-				return new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-			});
 	}
 
 	private Integer getFolderIdAsInteger(final String folderId) {

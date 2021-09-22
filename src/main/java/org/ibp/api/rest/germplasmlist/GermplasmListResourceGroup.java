@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Set;
 
 @Api(value = "Germplasm List Services")
 @Controller
@@ -305,11 +306,11 @@ GermplasmListResourceGroup {
 	@ApiOperation(value = "Add a variable to the list", notes = "Add a variable to the list")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables", method = RequestMethod.PUT)
-	public ResponseEntity<MeasurementVariable> addVariable(
+	public ResponseEntity<Void> addVariable(
 		@PathVariable final String cropName, @PathVariable final Integer listId, @RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
-		final MeasurementVariable variable = this.germplasmListService.addVariableToList(listId, germplasmListVariableRequestDto);
-		return new ResponseEntity<>(variable, HttpStatus.OK);
+		this.germplasmListService.addVariableToList(listId, germplasmListVariableRequestDto);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Remove list variables", notes = "Remove a set of variables from a germplasm list")
@@ -317,10 +318,10 @@ GermplasmListResourceGroup {
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> removeVariables(
 		@PathVariable final String cropName, @PathVariable final Integer listId,
-		@RequestParam(value = "variableIds", required = true) final Integer[] variableIds,
+		@RequestParam(value = "variableIds") final Set<Integer> variableIds,
 		@RequestParam(required = false) final String programUUID) {
 
-		//		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		this.germplasmListService.removeListVariables(listId, variableIds);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -329,7 +330,7 @@ GermplasmListResourceGroup {
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getVariables(
 		@PathVariable final String cropName, @PathVariable final Integer listId, @RequestParam final Integer variableTypeId,
-		@RequestParam(required = false) final String programUUID) {
+		@RequestParam(required = true) final String programUUID) {
 
 		//		final List<MeasurementVariableDto> variables =
 		//			this.studyDatasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.getById(variableTypeId));

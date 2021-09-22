@@ -19,6 +19,7 @@ import org.ibp.api.rest.common.UserTreeState;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface GermplasmListService {
 
@@ -67,6 +68,8 @@ public interface GermplasmListService {
 
 	List<MeasurementVariable> getGermplasmListDataTableHeader(Integer listId, final String programUUID);
 
-	MeasurementVariable addVariableToList(Integer listId, GermplasmListVariableRequestDto germplasmListVariableRequestDto);
+	void addVariableToList(Integer listId, GermplasmListVariableRequestDto germplasmListVariableRequestDto);
+
+	void removeListVariables(Integer listId, Set<Integer> variableIds);
 
 }
