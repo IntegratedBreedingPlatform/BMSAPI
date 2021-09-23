@@ -372,7 +372,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		if (CollectionUtils.isEmpty(request.getEntries())) {
 			if (!CollectionUtils.isEmpty(searchComposite.getItemIds())) {
-				request.setEntries(searchComposite.getItemIds().stream().map(gid -> {
+				List<Integer> gidsList = new ArrayList<Integer>(searchComposite.getItemIds());
+				Collections.sort(gidsList);
+
+				request.setEntries(gidsList.stream().map(gid -> {
 					final GermplasmListGeneratorDTO.GermplasmEntryDTO entryDTO = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
 					entryDTO.setGid(gid);
 					return entryDTO;
