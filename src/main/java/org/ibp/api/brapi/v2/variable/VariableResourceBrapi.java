@@ -15,7 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Api(value = "BrAPI V2 Variable Services")
-@Controller
+@Controller(value = "VariableResourceBrapiV2")
 public class VariableResourceBrapi {
 
     @Autowired
