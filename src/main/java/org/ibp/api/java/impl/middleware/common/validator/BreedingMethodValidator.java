@@ -4,11 +4,12 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.MethodGroup;
 import org.generationcp.middleware.pojos.MethodType;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,9 @@ public class BreedingMethodValidator {
 
 	@Autowired
 	private GermplasmService germplasmService;
+
+	@Autowired
+	private DatasetService datasetService;
 
 	public void validateCreation(final BreedingMethodNewRequest breedingMethod) {
 		checkNotNull(breedingMethod, "request.null");
@@ -105,12 +109,24 @@ public class BreedingMethodValidator {
 			throw new ApiRequestValidationException("breeding.methods.not.exists", new Integer[] {breedingMethodDbId});
 		}
 
+		// We avoid count for now as it can be slow
 		Optional<Germplasm> germplasmOptional = this.germplasmService.findOneByMethodId(breedingMethodDbId);
 		if (germplasmOptional.isPresent()) {
 			throw new ApiRequestValidationException("breeding.methods.delete.has.germplasm",
 				new String[] {germplasmOptional.get().getGid().toString()}); }
 
-		// TODO validate study STUDY_BM_CODE, BM_CODE_VTE
+		final BreedingMethodDTO breedingMethodDTO = methodOptional.get();
+		final long projectCount = this.datasetService.countByVariableIdAndValue(TermId.BREEDING_METHOD_CODE.getId(),
+			breedingMethodDTO.getCode());
+		if (projectCount > 0) {
+			throw new ApiRequestValidationException("breeding.methods.delete.has.projects", new Object[] {projectCount});
+		}
+
+		final long observationsCount = this.datasetService.countObservationsByVariableIdAndValue(TermId.BREEDING_METHOD_VARIATE_CODE.getId(),
+			breedingMethodDTO.getCode());
+		if (observationsCount > 0) {
+			throw new ApiRequestValidationException("breeding.methods.delete.has.observations", new Object[] {observationsCount});
+		}
 	}
 
 	private void validateFieldsLength(final BreedingMethodNewRequest breedingMethod) {
