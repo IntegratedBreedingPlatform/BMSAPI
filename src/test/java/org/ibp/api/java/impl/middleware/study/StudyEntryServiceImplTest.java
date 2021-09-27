@@ -28,9 +28,9 @@ import org.hamcrest.collection.IsIn;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
-import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
+import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
@@ -191,7 +191,7 @@ public class StudyEntryServiceImplTest {
 
 		this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 
-		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
+		Mockito.verify(this.germplasmListValidator).validateGermplasmListExists(germplasmListId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
 		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
@@ -352,7 +352,7 @@ public class StudyEntryServiceImplTest {
 		final List<StudyEntryDto> studyEntryDtos = this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 		Assert.assertNotNull("Duplicate gid in list should be accepted. ", studyEntryDtos);
 		org.junit.Assert.assertEquals("Must return same germplasm list data count", listData.size(),studyEntryDtos.size());
-		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
+		Mockito.verify(this.germplasmListValidator).validateGermplasmListExists(germplasmListId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
 		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());

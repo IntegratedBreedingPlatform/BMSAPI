@@ -777,7 +777,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		final List<Integer> listVariableIds = germplasmListService.getListOntologyVariables(listId);
-		if (listVariableIds.containsAll(variableIds)) {
+		if (!listVariableIds.containsAll(variableIds)) {
 			this.errors.reject("germplasm.list.variables.not.associated", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
