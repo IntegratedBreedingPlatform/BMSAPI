@@ -26,6 +26,7 @@ import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -750,6 +751,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public void addVariableToList(final Integer listId,
 		final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListVariableRequestDto.class.getName());
 		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
 		germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		germplasmListValidator.validateListIsUnlocked(germplasmList);
@@ -760,6 +762,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public void removeListVariables(final Integer listId, final Set<Integer> variableIds) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
 		germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		germplasmListValidator.validateListIsUnlocked(germplasmList);
@@ -780,6 +783,21 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		this.germplasmListService.removeListVariables(listId, variableIds);
+	}
+
+	@Override
+	public List<Variable> getGermplasmListVariables(final String cropName, final String programUUID, final Integer listId,
+		final Integer variableTypeId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateProgram(cropName, programUUID);
+		germplasmListValidator.validateGermplasmListExists(listId);
+		if (variableTypeId != null) {
+			if (!VariableType.ids().contains(variableTypeId)) {
+				this.errors.reject("variable.type.does.not.exist", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
+		return germplasmListService.getGermplasmListVariables(programUUID, listId, variableTypeId);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {

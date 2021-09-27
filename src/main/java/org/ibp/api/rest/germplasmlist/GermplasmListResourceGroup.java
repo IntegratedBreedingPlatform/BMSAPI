@@ -18,7 +18,6 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSea
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
@@ -342,13 +341,13 @@ GermplasmListResourceGroup {
 	@ApiOperation(value = "Get the variables associated to the list filtered by variableType", notes = "Get the list variables filtered by variableType")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables", method = RequestMethod.GET)
-	public ResponseEntity<List<MeasurementVariable>> getVariables(
+	public ResponseEntity<List<org.generationcp.middleware.domain.ontology.Variable>> getVariables(
 		@PathVariable final String cropName, @PathVariable final Integer listId, @RequestParam final Integer variableTypeId,
-		@RequestParam(required = true) final String programUUID) {
+		@RequestParam(required = false) final String programUUID) {
 
-		//		final List<MeasurementVariableDto> variables =
-		//			this.studyDatasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.getById(variableTypeId));
-		return new ResponseEntity<>(null, HttpStatus.OK);
+		final List<org.generationcp.middleware.domain.ontology.Variable> variables =
+			this.germplasmListService.getGermplasmListVariables(cropName, programUUID, listId, variableTypeId);
+		return new ResponseEntity<>(variables, HttpStatus.OK);
 	}
 
 }
