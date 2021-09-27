@@ -306,9 +306,9 @@ GermplasmListResourceGroup {
 
 	//TODO: should be ignore in swagger?
 	@ApiOperation(value = "Customize the view of the germplasm list data.")
-	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/view", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/view", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<Void> getGermplasmListDataTableHeader(@PathVariable final String cropName,
+	public ResponseEntity<Void> saveGermplasmListDataView(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final List<GermplasmListDataUpdateViewDTO> view) {
