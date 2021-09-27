@@ -830,9 +830,13 @@ public class DatasetServiceImpl implements DatasetService {
 			public int compare(final MeasurementVariable var1, final MeasurementVariable var2) {
 				final String value1 = var1.getValue();
 				final String value2 = var2.getValue();
-				if (value1 != null && value2 != null)
+				if (value1 != null && value2 != null) {
 					return value1.compareTo(value2);
-				return (value1 == null) ? 1 : -1;
+				} else if (value1 == null && value2 == null) {
+					return 0;
+				} else {
+					return (value1 == null) ? 1 : -1;
+				}
 			}
 		});
 
