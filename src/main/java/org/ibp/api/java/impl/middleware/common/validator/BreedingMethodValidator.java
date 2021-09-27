@@ -48,11 +48,11 @@ public class BreedingMethodValidator {
 		final MethodGroup methodGroup = MethodGroup.getMethodGroup(group);
 		validateMethodGroup(group, methodGroup);
 
-		final Integer methodClass = breedingMethod.getMethodClass();
-		final MethodClass methodClassId = MethodClass.getMethodClass(methodClass);
-		validateMethodClass(methodClass, methodClassId);
+		final Integer methodClassId = breedingMethod.getMethodClass();
+		final MethodClass methodClass = MethodClass.getMethodClass(methodClassId);
+		validateMethodClass(methodClassId, methodClass);
 
-		this.validateClassTypeDuo(methodClassId, methodType);
+		this.validateClassTypeDuo(methodClass, methodType);
 
 		this.validateFieldsLength(breedingMethod);
 	}
@@ -156,10 +156,10 @@ public class BreedingMethodValidator {
 		}
 	}
 
-	private void validateMethodClass(final Integer methodClass, final MethodClass methodClassId) {
-		if (methodClassId == null) {
+	private void validateMethodClass(final Integer methodClassId, final MethodClass methodClass) {
+		if (methodClass == null) {
 			final String validClasses = MethodClass.getAll().stream().map(MethodClass::getId).map(Object::toString).collect(joining(", "));
-			throw new ApiRequestValidationException("breeding.methods.invalid.class", new Object[] {methodClass, validClasses});
+			throw new ApiRequestValidationException("breeding.methods.invalid.class", new Object[] {methodClassId, validClasses});
 		}
 	}
 
