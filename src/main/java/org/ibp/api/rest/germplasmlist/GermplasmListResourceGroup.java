@@ -229,7 +229,7 @@ GermplasmListResourceGroup {
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
 	@ResponseBody
-	public ResponseEntity<List<GermplasmListSearchResponse>> getGermplasmLists(
+	public ResponseEntity<List<GermplasmListSearchResponse>> searchGermplasmLists(
 		@PathVariable final String cropName,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmListSearchRequest request,
@@ -251,7 +251,7 @@ GermplasmListResourceGroup {
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
 	@ResponseBody
-	public ResponseEntity<List<GermplasmListDataSearchResponse>> getGermplasmListData(
+	public ResponseEntity<List<GermplasmListDataSearchResponse>> searchGermplasmListData(
 		@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
