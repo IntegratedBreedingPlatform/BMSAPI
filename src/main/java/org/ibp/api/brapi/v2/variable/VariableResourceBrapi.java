@@ -4,16 +4,15 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.VariableDTO;
+import org.ibp.api.brapi.VariableServiceBrapi;
 import org.ibp.api.brapi.v1.common.*;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
-import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,7 +31,7 @@ import java.util.List;
 public class VariableResourceBrapi {
 
     @Autowired
-    private VariableService variableService;
+    private VariableServiceBrapi variableServiceBrapi;
 
     @Autowired
     private SearchRequestService searchRequestService;
@@ -120,16 +118,14 @@ public class VariableResourceBrapi {
 
                     @Override
                     public long getCount() {
-                        return VariableResourceBrapi.this.variableService.countAllVariables(Collections.unmodifiableList(
-                                Arrays.asList(VariableType.TRAIT.getId())));
+                        return VariableResourceBrapi.this.variableServiceBrapi.countObservationVariables(requestDTO);
                     }
 
                     @Override
                     public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
                         final int pageNumber = pagedResult.getPageNumber() + 1;
-                        return VariableResourceBrapi.this.variableService
-                                .getAllVariables(crop, Collections.unmodifiableList(
-                                        Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
+                        return VariableResourceBrapi.this.variableServiceBrapi
+                                .getObservationVariables(requestDTO, pageRequest);
                     }
                 });
 

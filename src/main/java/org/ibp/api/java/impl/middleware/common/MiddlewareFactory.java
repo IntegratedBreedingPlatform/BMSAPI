@@ -22,6 +22,8 @@ import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapiImpl;
+import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
+import org.generationcp.middleware.api.brapi.VariableServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -749,6 +751,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public TrialServiceBrapi getTrialServiceBrapi() {
 		return new TrialServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public VariableServiceBrapi getVariableServiceBrapi() {
+		return new VariableServiceBrapiImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
