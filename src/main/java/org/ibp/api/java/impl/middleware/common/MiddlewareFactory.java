@@ -18,6 +18,8 @@ import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapiImpl;
+import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
+import org.generationcp.middleware.api.brapi.ObservationServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
@@ -763,6 +765,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyServiceBrapi getStudyServiceBrapi() {
 		return new StudyServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public ObservationServiceBrapi getObservationServiceBrapi() {
+		return new ObservationServiceBrapiImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
