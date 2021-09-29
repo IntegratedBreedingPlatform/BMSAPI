@@ -36,8 +36,9 @@ public class BreedingMethodValidator {
 
 	public void validateCreation(final BreedingMethodNewRequest breedingMethod) {
 		checkNotNull(breedingMethod, "request.null");
-		checkNotNull(breedingMethod.getName(), "field.is.required", new String[] {"name"});
-		checkNotNull(breedingMethod.getCode(), "field.is.required", new String[] {"code"});
+		checkArgument(!isBlank(breedingMethod.getName()), "field.is.required", new String[] {"name"});
+		checkArgument(!isBlank(breedingMethod.getCode()), "field.is.required", new String[] {"code"});
+		checkArgument(!isBlank(breedingMethod.getDescription()), "field.is.required", new String[] {"description"});
 
 		final String type = breedingMethod.getType();
 		final MethodType methodType = MethodType.getMethodType(type);
