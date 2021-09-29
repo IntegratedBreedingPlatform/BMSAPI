@@ -16,7 +16,6 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDataUpdateView
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListVariableRequestDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
@@ -26,15 +25,11 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
-import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
@@ -47,12 +42,10 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmListService;
-import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListValidator;
-import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListVariableRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.UserTreeState;
@@ -72,7 +65,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -163,9 +155,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private GermplasmListValidator germplasmListValidator;
-
-	@Autowired
-	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	private BindingResult errors;
 
@@ -750,58 +739,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		germplasmListValidator.validateGermplasmListExists(listId);
 
 		this.germplasmListService.saveGermplasmListDataView(listId, view);
-	}
-
-	@Override
-	public void addVariableToList(final Integer listId,
-		final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
-		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListVariableRequestDto.class.getName());
-		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
-		germplasmListValidator.validateListIsNotAFolder(germplasmList);
-		germplasmListValidator.validateListIsUnlocked(germplasmList);
-		germplasmListVariableRequestDtoValidator.validate(listId, germplasmListVariableRequestDto);
-		germplasmListService.addVariableToList(listId, germplasmListVariableRequestDto);
-
-	}
-
-	@Override
-	public void removeListVariables(final Integer listId, final Set<Integer> variableIds) {
-		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
-		germplasmListValidator.validateListIsNotAFolder(germplasmList);
-		germplasmListValidator.validateListIsUnlocked(germplasmList);
-		BaseValidator.checkNotEmpty(variableIds, "germplasm.list.variable.ids.can.not.be.empty");
-
-		final VariableFilter variableFilter = new VariableFilter();
-		variableIds.forEach(variableFilter::addVariableId);
-		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-		if (variables.size() != variableIds.size()) {
-			this.errors.reject("germplasm.list.invalid.variables", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-		final List<Integer> listVariableIds = germplasmListService.getListOntologyVariables(listId);
-		if (!listVariableIds.containsAll(variableIds)) {
-			this.errors.reject("germplasm.list.variables.not.associated", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-		this.germplasmListService.removeListVariables(listId, variableIds);
-	}
-
-	@Override
-	public List<Variable> getGermplasmListVariables(final String cropName, final String programUUID, final Integer listId,
-		final Integer variableTypeId) {
-		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.validateProgram(cropName, programUUID);
-		germplasmListValidator.validateGermplasmListExists(listId);
-		if (variableTypeId != null) {
-			if (!VariableType.ids().contains(variableTypeId)) {
-				this.errors.reject("variable.type.does.not.exist", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
-		}
-		return germplasmListService.getGermplasmListVariables(programUUID, listId, variableTypeId);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {

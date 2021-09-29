@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDataUpdateView
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListVariableRequestDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
@@ -15,13 +14,11 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
-import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.ibp.api.rest.common.UserTreeState;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Set;
 
 public interface GermplasmListService {
 
@@ -72,9 +69,4 @@ public interface GermplasmListService {
 
 	void saveGermplasmListDataView(final Integer listId, List<GermplasmListDataUpdateViewDTO> columns);
 
-	void addVariableToList(Integer listId, GermplasmListVariableRequestDto germplasmListVariableRequestDto);
-
-	void removeListVariables(Integer listId, Set<Integer> variableIds);
-
-	List<Variable> getGermplasmListVariables(String cropName, String programUUID, Integer listId, Integer variableTypeId);
 }

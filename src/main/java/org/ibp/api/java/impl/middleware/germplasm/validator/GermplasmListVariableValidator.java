@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Component
-public class GermplasmListVariableRequestDtoValidator {
+public class GermplasmListVariableValidator {
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -31,7 +31,7 @@ public class GermplasmListVariableRequestDtoValidator {
 
 	private static final List<Integer> VALID_TYPES = Lists.newArrayList(VariableType.ENTRY_DETAIL.getId());
 
-	public void validate(final Integer listId, final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
+	public void validateAddVariableToList(final Integer listId, final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListVariableRequestDto.class.getName());
 		BaseValidator.checkNotNull(germplasmListVariableRequestDto, "param.null", new String[] {"request body"});
 		BaseValidator.checkNotNull(germplasmListVariableRequestDto.getVariableId(), "param.null", new String[] {"variableId"});
@@ -56,11 +56,24 @@ public class GermplasmListVariableRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
+		this.validateVariableIsNotAssociatedToList(listId, germplasmListVariableRequestDto.getVariableId());
+	}
+
+	public void validateVariableIsNotAssociatedToList(final Integer listId, final Integer variableId) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		final List<Integer> variableIds = germplasmListService.getListOntologyVariables(listId);
-		if (variableIds.contains(germplasmListVariableRequestDto.getVariableId())) {
+		if (variableIds.contains(variableId)) {
 			this.errors.reject("germplasm.list.variable.already.associated.to.list", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
+	public void validateVariableIsAssociatedToList(final Integer listId, final Integer variableId) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		final List<Integer> variableIds = germplasmListService.getListOntologyVariables(listId);
+		if (variableIds.contains(variableId)) {
+			this.errors.reject("germplasm.list.variable.not.associated", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
 }
