@@ -151,9 +151,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	private GermplasmListDataSearchService germplasmListDataSearchService;
 
 	@Autowired
-	private GermplasmListVariableRequestDtoValidator germplasmListVariableRequestDtoValidator;
-
-	@Autowired
 	private GermplasmListValidator germplasmListValidator;
 
 	private BindingResult errors;
