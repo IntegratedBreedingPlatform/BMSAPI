@@ -61,7 +61,7 @@ public class GermplasmListVariableValidator {
 
 	public void validateVariableIsNotAssociatedToList(final Integer listId, final Integer variableId) {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
-		final List<Integer> variableIds = germplasmListService.getListOntologyVariables(listId);
+		final List<Integer> variableIds = germplasmListService.getListOntologyVariables(listId, null);
 		if (variableIds.contains(variableId)) {
 			this.errors.reject("germplasm.list.variable.already.associated.to.list", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -70,8 +70,8 @@ public class GermplasmListVariableValidator {
 
 	public void validateVariableIsAssociatedToList(final Integer listId, final Integer variableId) {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
-		final List<Integer> variableIds = germplasmListService.getListOntologyVariables(listId);
-		if (variableIds.contains(variableId)) {
+		final List<Integer> variableIds = germplasmListService.getListOntologyVariables(listId, VALID_TYPES);
+		if (!variableIds.contains(variableId)) {
 			this.errors.reject("germplasm.list.variable.not.associated", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}

@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListVariableRequestDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
@@ -28,6 +29,8 @@ import java.util.Set;
 @Service
 @Transactional
 public class GermplasmListVariableServiceImpl implements GermplasmListVariableService {
+
+	private static final List<Integer> VALID_TYPES = Lists.newArrayList(VariableType.ENTRY_DETAIL.getId());
 
 	@Autowired
 	public ProgramValidator programValidator;
@@ -74,7 +77,7 @@ public class GermplasmListVariableServiceImpl implements GermplasmListVariableSe
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final List<Integer> listVariableIds = germplasmListService.getListOntologyVariables(listId);
+		final List<Integer> listVariableIds = germplasmListService.getListOntologyVariables(listId, VALID_TYPES);
 		if (!listVariableIds.containsAll(variableIds)) {
 			this.errors.reject("germplasm.list.variables.not.associated", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
