@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDataDto;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationRequestDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -60,8 +61,11 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		final Variable variable = this.validateVariableIdIsAVariable(germplasmListObservationRequestDto.getVariableId());
 
 		this.germplasmListVariableValidator.validateVariableIsAssociatedToList(listId, germplasmListObservationRequestDto.getVariableId());
+
 		this.validateValue(germplasmListObservationRequestDto.getValue());
 		this.validateVariableDataTypeValue(variable, germplasmListObservationRequestDto.getValue());
+		germplasmListObservationRequestDto
+			.setcValueId(VariableValueUtil.resolveCategoricalValueId(variable, germplasmListObservationRequestDto.getValue()));
 
 		return this.germplasmListService.saveListDataObservation(listId, germplasmListObservationRequestDto);
 	}
@@ -77,9 +81,17 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmListExists(listId);
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
-		//validate the observation belongs to the list
-		//validate anything else but the value is modified
-		//validate value in middleware
+
+		final GermplasmListObservationDto germplasmListObservationDto = this.validateObservationExists(observationId);
+		this.validateObservationBelongsToList(listId, germplasmListObservationDto);
+
+		this.validateValue(value);
+		final Variable variable = this.ontologyVariableDataManager.getVariable(null, germplasmListObservationDto.getVariableId(), false);
+		this.validateVariableDataTypeValue(variable, value);
+
+		final Integer cValueId = VariableValueUtil.resolveCategoricalValueId(variable, value);
+		this.germplasmListService.updateListDataObservation(observationId, value, cValueId);
+
 	}
 
 	@Override
@@ -89,8 +101,21 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmListExists(listId);
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
-		//validate the observation belongs to the list
-		//delete
+
+		final GermplasmListObservationDto germplasmListObservationDto = this.validateObservationExists(observationId);
+		this.validateObservationBelongsToList(listId, germplasmListObservationDto);
+
+		this.germplasmListService.deleteListDataObservation(observationId);
+	}
+
+	private void validateObservationBelongsToList(final Integer listId, final GermplasmListObservationDto germplasmListObservationDto) {
+		final GermplasmListDataDto germplasmListDataDto =
+			this.germplasmListService.getGermplasmListData(germplasmListObservationDto.getListDataId()).get();
+		if (!listId.equals(germplasmListDataDto.getListId())) {
+			this.errors.reject("germplasm.list.data.observation.id.does.not.match.list", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
 	}
 
 	private Variable validateVariableIdIsAVariable(final Integer variableId) {
@@ -125,7 +150,17 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		}
 	}
 
-	void validateValue(final String value) {
+	private GermplasmListObservationDto validateObservationExists(final Integer observationId) {
+		final Optional<GermplasmListObservationDto> germplasmListObservationDto =
+			this.germplasmListService.getGermplasmListObservation(observationId);
+		if (!germplasmListObservationDto.isPresent()) {
+			this.errors.reject("germplasm.list.data.observation.id.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		return germplasmListObservationDto.get();
+	}
+
+	private void validateValue(final String value) {
 		if (value.length() > VALUE_MAX_LENGTH) {
 			this.errors.reject("germplasm.list.data.invalid.length", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
