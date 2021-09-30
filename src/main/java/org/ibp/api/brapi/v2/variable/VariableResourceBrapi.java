@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -98,11 +99,21 @@ public class VariableResourceBrapi {
         @ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
         @RequestParam(value = "pageSize", required = false) final Integer pageSize) {
         final VariableSearchRequestDTO requestDTO = new VariableSearchRequestDTO();
-        requestDTO.setObservationVariableDbIds(Collections.singletonList(observationVariableDbId));
-        requestDTO.setTraitClasses(Collections.singletonList(traitClass));
-        requestDTO.setStudyDbId(Collections.singletonList(studyDbId));
-        requestDTO.setExternalReferenceIDs(Collections.singletonList(externalReferenceID));
-        requestDTO.setExternalReferenceSources(Collections.singletonList(externalReferenceSource));
+        if(!StringUtils.isEmpty(observationVariableDbId)) {
+            requestDTO.setObservationVariableDbIds(Collections.singletonList(observationVariableDbId));
+        }
+        if(!StringUtils.isEmpty(traitClass)) {
+            requestDTO.setTraitClasses(Collections.singletonList(traitClass));
+        }
+        if(!StringUtils.isEmpty(studyDbId)) {
+            requestDTO.setStudyDbId(Collections.singletonList(studyDbId));
+        }
+        if(!StringUtils.isEmpty(externalReferenceID)) {
+            requestDTO.setExternalReferenceIDs(Collections.singletonList(externalReferenceID));
+        }
+        if(!StringUtils.isEmpty(externalReferenceSource)) {
+            requestDTO.setExternalReferenceSources(Collections.singletonList(externalReferenceSource));
+        }
 
         return getSearchResults(crop, requestDTO, currentPage, pageSize);
     }
