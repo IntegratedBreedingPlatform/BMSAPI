@@ -1,9 +1,11 @@
 package org.ibp.api.brapi.v1.variable;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
@@ -39,6 +41,7 @@ public class VariableResourceBrapi {
 
 	@ApiOperation(value = "Call to retrieve a list of observation variables available in the system.")
 	@RequestMapping(value = "/{crop}/brapi/v1/variables", method = RequestMethod.GET)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<VariableDTO>> getAllVariables(final HttpServletResponse response,
 		@PathVariable final String crop,
