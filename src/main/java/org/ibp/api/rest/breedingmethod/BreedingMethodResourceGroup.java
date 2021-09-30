@@ -62,8 +62,9 @@ public class BreedingMethodResourceGroup {
 		return new ResponseEntity<>(this.breedingMethodService.edit(breedingMethodDbId, breedingMethod), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Delete breeding method")
 	@RequestMapping(value = "/crops/{cropName}/breedingmethods/{breedingMethodDbId}", method = RequestMethod.DELETE)
-	public ResponseEntity<Void> edit(
+	public ResponseEntity<Void> delete(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer breedingMethodDbId
