@@ -1,12 +1,12 @@
 package org.ibp.api.java.breedingmethod;
 
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Set;
 
 public interface BreedingMethodService {
 
@@ -14,8 +14,13 @@ public interface BreedingMethodService {
 
 	BreedingMethodDTO getBreedingMethod(Integer breedingMethodDbId);
 
+	BreedingMethodDTO create(BreedingMethodNewRequest breedingMethod);
+
+	BreedingMethodDTO edit(Integer breedingMethodDbId, BreedingMethodNewRequest breedingMethod);
+
+	void delete(Integer breedingMethodDbId);
+
 	List<BreedingMethodDTO> getBreedingMethods(String cropName, BreedingMethodSearchRequest searchRequest, Pageable pageable);
 
 	Long countBreedingMethods(BreedingMethodSearchRequest searchRequest);
-
 }
