@@ -729,7 +729,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.validateGermplasmList(listId);
+		final GermplasmList germplasmList = this.validateGermplasmList(listId);
+		if (germplasmList.isLockedList()) {
+			this.errors.reject("list.locked", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 
 		this.germplasmListService.saveGermplasmListDataView(listId, view);
 	}
