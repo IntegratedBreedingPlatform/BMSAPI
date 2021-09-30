@@ -430,7 +430,6 @@ public class StudyResourceBrapi {
 	@JsonView(BrapiView.BrapiV1_3.class)
 	@ApiOperation(value = "Get observation units by studyDbId")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationunits", method = RequestMethod.GET)
-	@JsonView(BrapiView.BrapiV1_3.class)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<ObservationUnitDto>> listObservationUnitsByStudy(
 		@PathVariable final String crop, @PathVariable final int studyDbId,
