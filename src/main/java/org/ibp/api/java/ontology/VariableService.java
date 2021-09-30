@@ -78,14 +78,5 @@ public interface VariableService {
 
 	List<VariableDetails> getVariablesByFilter(VariableFilter variableFilter);
 
-	long countVariablesByDatasetId(final int studyDbId, final List<Integer> variableTypes);
-
-	List<VariableDTO> getVariablesByDatasetId(final int datasetId, final String cropname,
-		final List<Integer> variableTypes, final int pageSize, final int pageNumber);
-
-	long countAllVariables(final List<Integer> variableTypes);
-
-	List<VariableDTO> getAllVariables(String cropname, final List<Integer> variableTypes, int pageSize, int pageNumber);
-
 	List<Variable> searchAttributeVariables(String query, String programUUID);
 }

@@ -20,7 +20,7 @@ import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.BrapiView;
@@ -33,6 +33,7 @@ import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.StudyServiceBrapi;
 import org.ibp.api.brapi.TrialServiceBrapi;
+import org.ibp.api.brapi.VariableServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -46,7 +47,6 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
-import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -103,9 +103,6 @@ public class StudyResourceBrapi {
 	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
-	private VariableService variableService;
-
-	@Autowired
 	private LocationService locationService;
 
 	@Autowired
@@ -122,6 +119,9 @@ public class StudyResourceBrapi {
 
 	@Autowired
 	private org.generationcp.middleware.service.api.study.StudyInstanceService middlewareStudyInstanceService;
+
+	@Autowired
+	private VariableServiceBrapi variableServiceBrapi;
 
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
@@ -389,21 +389,24 @@ public class StudyResourceBrapi {
 			throw new BrapiNotFoundException("The requested object studyDbId is not found.");
 		}
 
+		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+
+		final PageRequest pageRequest = new PageRequest(finalPageNumber, finalPageSize);
+		final VariableSearchRequestDTO requestDTO = new VariableSearchRequestDTO();
+
 		final PagedResult<VariableDTO> resultPage =
 			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
 
 				@Override
 				public long getCount() {
-					return StudyResourceBrapi.this.variableService.countVariablesByDatasetId(datasetId, Collections.unmodifiableList(
-						Arrays.asList(VariableType.TRAIT.getId())));
+					return StudyResourceBrapi.this.variableServiceBrapi.countObservationVariables(requestDTO);
 				}
 
 				@Override
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
-					final int pageNumber = pagedResult.getPageNumber() + 1;
-					return StudyResourceBrapi.this.variableService
-						.getVariablesByDatasetId(datasetId, crop, Collections.unmodifiableList(
-							Arrays.asList(VariableType.TRAIT.getId())), pagedResult.getPageSize(), pageNumber);
+					return StudyResourceBrapi.this.variableServiceBrapi
+							.getObservationVariables(requestDTO, pageRequest);
 				}
 			});
 
@@ -427,6 +430,7 @@ public class StudyResourceBrapi {
 	@JsonView(BrapiView.BrapiV1_3.class)
 	@ApiOperation(value = "Get observation units by studyDbId")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationunits", method = RequestMethod.GET)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<ObservationUnitDto>> listObservationUnitsByStudy(
 		@PathVariable final String crop, @PathVariable final int studyDbId,
