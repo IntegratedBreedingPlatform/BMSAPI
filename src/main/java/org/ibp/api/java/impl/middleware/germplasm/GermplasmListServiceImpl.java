@@ -19,6 +19,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVar
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchService;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.program.ProgramDTO;
@@ -144,6 +145,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private UserValidator userValidator;
+
+	@Autowired
+	private GermplasmListDataSearchService germplasmListDataSearchService;
 
 	private BindingResult errors;
 
@@ -684,12 +688,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest request,
 		final Pageable pageable) {
-		return this.germplasmListService.searchGermplasmListData(listId, request, pageable);
+		return this.germplasmListDataSearchService.searchGermplasmListData(listId, request, pageable);
 	}
 
 	@Override
 	public long countSearchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest request) {
-		return this.germplasmListService.countSearchGermplasmListData(listId, request);
+		return this.germplasmListDataSearchService.countSearchGermplasmListData(listId, request);
 	}
 
 	@Override

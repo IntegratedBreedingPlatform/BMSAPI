@@ -11,7 +11,6 @@ import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
-import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -70,7 +69,6 @@ import org.springframework.validation.MapBindingResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,7 +77,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -94,6 +91,7 @@ public class DatasetServiceImpl implements DatasetService {
 		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId());
 	public static final String MISSING_VALUE = "missing";
 	public static final String NOT_AVAILABLE_VALUE = "NA";
+	public static final String PARAM_NULL = "param.null";
 
 	@Autowired
 	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
@@ -212,7 +210,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		for (final Integer variableId : variableIds) {
 			if (DatasetServiceImpl.PROTECTED_VARIABLE_IDS.contains(variableId)) {
-				final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+				final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 				errors.reject("dataset.protected.variable.cannot.be.deleted", new Object[] {String.valueOf(variableId)}, "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
@@ -248,7 +246,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds) {
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		final Set<Integer> datasetTypeIdList = new TreeSet<>();
 		this.studyValidator.validate(studyId, false);
 
@@ -407,7 +405,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 
 		// checks input matches validation rules
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<>(), DatasetGeneratorInput.class.getName());
 
 		this.datasetValidator.validateDatasetBelongsToStudy(studyId, parentId);
 		this.instanceValidator.validate(parentId, Sets.newHashSet(datasetGeneratorInput.getInstanceIds()));
@@ -462,7 +460,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void importObservations(final Integer studyId, final Integer datasetId, final ObservationsPutRequestInput input) {
 
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+		BindingResult errors = new MapBindingResult(new HashMap<>(), ObservationsPutRequestInput.class.getName());
 
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
@@ -522,7 +520,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void importObservations(final Integer studyDbId, final List<ObservationDTO> observations) {
 
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+		BindingResult errors = new MapBindingResult(new HashMap<>(), ObservationsPutRequestInput.class.getName());
 
 		final org.generationcp.middleware.domain.dms.DatasetDTO
 			dataset = this.middlewareDatasetService.getDatasetByObsUnitDbId(observations.get(0).getObservationUnitDbId());
@@ -577,10 +575,10 @@ public class DatasetServiceImpl implements DatasetService {
 				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
 		}
 		if (!errors.hasErrors()) {
-			final Table observationDbIdsTable = this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode(), true);
+			final Table<String, Integer, Integer> observationDbIdsTable = this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode(), true);
 			// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
 			observations.stream().forEach(
-				o -> o.setObservationDbId((Integer) observationDbIdsTable.get(o.getObservationUnitDbId(), o.getObservationVariableDbId())));
+				o -> o.setObservationDbId(observationDbIdsTable.get(o.getObservationUnitDbId(), o.getObservationVariableDbId())));
 		} else {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
@@ -594,7 +592,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Map<Integer, MeasurementVariable> varMap =
 			datasetMeasurementVariables.stream().collect(Collectors.toMap(MeasurementVariable::getTermId, Function.identity()));
 		final Set<Integer> variableIds =
-			new TreeSet(observations.stream().map(ObservationDTO::getObservationVariableDbId).collect(Collectors.toSet()));
+			new TreeSet<>(observations.stream().map(ObservationDTO::getObservationVariableDbId).collect(Collectors.toSet()));
 		final List<String> variableNames =
 			variableIds.stream().map(termId -> varMap.get(termId).getAlias()).collect(Collectors.toList());
 
@@ -730,7 +728,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Table<String, String, String> table,
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
 		final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber, final Boolean draftMode) {
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), ObservationsPutRequestInput.class.getName());
 		if (duplicatedFoundNumber > 0) {
 			errors.reject("duplicated.obs.unit.id", null, "");
 		}
@@ -824,14 +822,14 @@ public class DatasetServiceImpl implements DatasetService {
 				VariableType.ENVIRONMENT_CONDITION.getId()));
 		this.addLocationIdVariable(environmentDetailAndConditionVariables);
 		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
-		Collections.sort(environmentDetailAndConditionVariables, new Comparator<MeasurementVariable>() {
-
-			@Override
-			public int compare(final MeasurementVariable var1, final MeasurementVariable var2) {
-				final String value1 = var1.getValue();
-				final String value2 = var2.getValue();
-				if (value1 != null && value2 != null)
-					return value1.compareTo(value2);
+		Collections.sort(environmentDetailAndConditionVariables, (var1, var2) -> {
+			final String value1 = var1.getValue();
+			final String value2 = var2.getValue();
+			if (value1 != null && value2 != null) {
+				return value1.compareTo(value2);
+			} else if (value1 == null && value2 == null) {
+				return 0;
+			} else {
 				return (value1 == null) ? 1 : -1;
 			}
 		});
@@ -886,11 +884,11 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validatePlotDatasetType(datasetId);
 		this.studyValidator.validateStudyHasNoMeansDataset(studyId);
 
-		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
-		BaseValidator.checkNotNull(request.getSearchRequest(), "param.null", new String[] {"searchRequest"});
-		BaseValidator.checkNotNull(request.getEntryId(), "param.null", new String[] {"entryId"});
+		BaseValidator.checkNotNull(request, PARAM_NULL, new String[] {"request"});
+		BaseValidator.checkNotNull(request.getSearchRequest(), PARAM_NULL, new String[] {"searchRequest"});
+		BaseValidator.checkNotNull(request.getEntryId(), PARAM_NULL, new String[] {"entryId"});
 
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(request.getSearchRequest(), errors);
 
 		this.studyEntryValidator.validateStudyContainsEntries(studyId, Collections.singletonList(request.getEntryId()));
@@ -932,9 +930,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> request) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
-		BaseValidator.checkNotNull(request, "param.null", new String[] {"request"});
+		BaseValidator.checkNotNull(request, PARAM_NULL, new String[] {"request"});
 
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), SearchCompositeDto.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), SearchCompositeDto.class.getName());
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(request, errors);
 
 
@@ -945,7 +943,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final ObservationUnitsMetadata observationUnitsMetadata = new ObservationUnitsMetadata();
 		observationUnitsMetadata.setObservationUnitsCount(Long.valueOf(observationUnitRows.size()));
-		observationUnitsMetadata.setInstancesCount(observationUnitRows.stream().map(i -> i.getTrialInstance()).distinct().count());
+		observationUnitsMetadata.setInstancesCount(observationUnitRows.stream().map(ObservationUnitRow::getTrialInstance).distinct().count());
 		return observationUnitsMetadata;
 	}
 
@@ -970,7 +968,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<String> dateVariables = measurementVariables.stream().filter(
 			measurementVariable -> measurementVariable.getDataTypeId() != null
 				&& measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId())
-			.map(measurementVariable -> measurementVariable.getName()).collect(Collectors.toList());
+			.map(MeasurementVariable::getName).collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(dateVariables)) {
 			for (final String colVariable : table.columnKeySet()) {
 				if (dateVariables.contains(colVariable)) {

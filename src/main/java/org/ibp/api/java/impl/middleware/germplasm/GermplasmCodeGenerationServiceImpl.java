@@ -31,7 +31,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -92,11 +92,11 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 			try {
 				// For manual code naming
 				if (germplasmCodeNameBatchRequestDto.getGermplasmCodeNameSetting() != null) {
-					return this.applyGroupNamesForManualNaming(new HashSet<>(germplasmCodeNameBatchRequestDto.getGids()),
+					return this.applyGroupNamesForManualNaming(new LinkedHashSet<>(germplasmCodeNameBatchRequestDto.getGids()),
 						germplasmCodeNameBatchRequestDto.getGermplasmCodeNameSetting(), germplasmNameTypeDTO.get());
 				} else {
 					// For automatic code naming
-					return this.applyGroupNamesForAutomaticNaming(new HashSet<>(germplasmCodeNameBatchRequestDto.getGids()),
+					return this.applyGroupNamesForAutomaticNaming(new LinkedHashSet<>(germplasmCodeNameBatchRequestDto.getGids()),
 						germplasmNameTypeDTO.get());
 				}
 			} catch (final Exception e) {
