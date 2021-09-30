@@ -68,8 +68,11 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 
 	@Override
 	public void update(final Integer listId, final Integer observationId,
-		final GermplasmListObservationRequestDto germplasmListObservationRequestDto) {
+		final String value) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListObservationRequestDto.class.getName());
+		BaseValidator.checkNotNull(listId, "param.null", new String[] {"listId"});
+		BaseValidator.checkNotNull(listId, "param.null", new String[] {"observationId"});
+		BaseValidator.checkNotNull(value, "param.null", new String[] {"request body"});
 
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmListExists(listId);
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);

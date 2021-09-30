@@ -48,9 +48,9 @@ public class GermplasmListObservationResource {
 	public ResponseEntity<Void> modifyGermplasmListObservation(
 		@PathVariable final String cropName, @PathVariable final Integer listId, @PathVariable final Integer observationId,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody final GermplasmListObservationRequestDto germplasmListObservationRequestDto) {
+		@RequestBody final String value) {
 
-		this.germplasmListObservationService.update(listId, observationId, germplasmListObservationRequestDto);
+		this.germplasmListObservationService.update(listId, observationId, value);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
