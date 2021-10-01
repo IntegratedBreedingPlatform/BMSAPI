@@ -234,8 +234,8 @@ GermplasmListResourceGroup {
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmListSearchRequest request,
 		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
-		return new PaginatedSearch().getPagedResult(() -> this.germplasmListService.countSearchGermplasmList(request),
-			() -> this.germplasmListService.searchGermplasmList(request, pageable),
+		return new PaginatedSearch().getPagedResult(() -> this.germplasmListService.countSearchGermplasmList(request, programUUID),
+			() -> this.germplasmListService.searchGermplasmList(request, pageable, programUUID),
 			pageable);
 	}
 
