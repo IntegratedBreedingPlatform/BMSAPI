@@ -733,9 +733,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
-		germplasmListValidator.
-
+		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
+		germplasmListValidator.validateListIsUnlocked(germplasmList);
 		this.germplasmListService.saveGermplasmListDataView(listId, view);
 	}
 
