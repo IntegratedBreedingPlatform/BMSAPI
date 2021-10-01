@@ -20,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -106,6 +107,21 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		this.validateObservationBelongsToList(listId, germplasmListObservationDto);
 
 		this.germplasmListService.deleteListDataObservation(observationId);
+	}
+
+	@Override
+	public long countObservationsByVariables(final Integer listId, final List<Integer> variableIds) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		BaseValidator.checkNotNull(listId, "param.null", new String[] {"listId"});
+		BaseValidator.checkNotNull(listId, "param.null", new String[] {"variableIds"});
+
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmListExists(listId);
+		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
+
+		//validate variableIds
+
+		this.germplasmListVariableValidator.validateAllVariableIdsAreAssociatedToList(listId, variableIds);
+		return this.germplasmListService.countObservationsByVariables(listId, variableIds);
 	}
 
 	private void validateObservationBelongsToList(final Integer listId, final GermplasmListObservationDto germplasmListObservationDto) {

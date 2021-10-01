@@ -76,4 +76,13 @@ public class GermplasmListVariableValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
+
+	public void validateAllVariableIdsAreAssociatedToList(final Integer listId, final List<Integer> variableIds) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		final List<Integer> associatedVariableIds = germplasmListService.getListOntologyVariables(listId, VALID_TYPES);
+		if (!associatedVariableIds.containsAll(variableIds)) {
+			this.errors.reject("germplasm.list.variables.not.associated", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
 }

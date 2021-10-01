@@ -77,12 +77,7 @@ public class GermplasmListVariableServiceImpl implements GermplasmListVariableSe
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final List<Integer> listVariableIds = germplasmListService.getListOntologyVariables(listId, VALID_TYPES);
-		if (!listVariableIds.containsAll(variableIds)) {
-			this.errors.reject("germplasm.list.variables.not.associated", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
+		this.germplasmListVariableValidator.validateAllVariableIdsAreAssociatedToList(listId, Lists.newArrayList(variableIds));
 		this.germplasmListService.removeListVariables(listId, variableIds);
 	}
 

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationRequestDto;
 import org.ibp.api.java.germplasm.GermplasmListObservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Arrays;
 
 @Api(value = "Germplasm List Observation Services")
 @Controller
@@ -53,4 +56,19 @@ public class GermplasmListObservationResource {
 		this.germplasmListObservationService.update(listId, observationId, value);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Count Germplasm List Observations", notes = "Returns count of germplasm list observations given a set of variables")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables/observations", method = RequestMethod.HEAD)
+	public ResponseEntity<String> countObservationsByVariables(
+		@PathVariable final String cropName, @PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID, @RequestParam(value = "variableIds") final Integer[] variableIds) {
+
+		final long count = this.germplasmListObservationService.countObservationsByVariables(listId, Arrays.asList(variableIds));
+		final HttpHeaders respHeaders = new HttpHeaders();
+		respHeaders.add("X-Total-Count", String.valueOf(count));
+
+		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
+	}
+
 }
