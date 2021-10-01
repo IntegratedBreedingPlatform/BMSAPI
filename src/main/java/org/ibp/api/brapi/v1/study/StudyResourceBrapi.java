@@ -406,7 +406,7 @@ public class StudyResourceBrapi {
 				@Override
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					return StudyResourceBrapi.this.variableServiceBrapi
-							.getObservationVariables(requestDTO, pageRequest);
+							.getObservationVariables(crop, requestDTO, pageRequest);
 				}
 			});
 
