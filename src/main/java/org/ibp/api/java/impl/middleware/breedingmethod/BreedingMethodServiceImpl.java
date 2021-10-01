@@ -2,12 +2,14 @@ package org.ibp.api.java.impl.middleware.breedingmethod;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.MethodType;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
+import org.ibp.api.java.impl.middleware.common.validator.BreedingMethodValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +32,9 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	@Autowired
 	private ProgramValidator programValidator;
 
+	@Autowired
+	private BreedingMethodValidator breedingMethodValidator;
+
 	@Override
 	public List<MethodClassDTO> getMethodClasses() {
 		return this.breedingMethodService.getMethodClasses();
@@ -39,11 +44,29 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	public BreedingMethodDTO getBreedingMethod(final Integer breedingMethodDbId) {
 		final Optional<BreedingMethodDTO> breedingMethodDTO =  this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
 		if (!breedingMethodDTO.isPresent()) {
-			final MapBindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			final MapBindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("methoddbid.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		return breedingMethodDTO.get();
+	}
+
+	@Override
+	public BreedingMethodDTO create(final BreedingMethodNewRequest breedingMethod) {
+		this.breedingMethodValidator.validateCreation(breedingMethod);
+		return this.breedingMethodService.create(breedingMethod);
+	}
+
+	@Override
+	public BreedingMethodDTO edit(final Integer breedingMethodDbId, final BreedingMethodNewRequest breedingMethod) {
+		this.breedingMethodValidator.validateEdition(breedingMethodDbId, breedingMethod);
+		return this.breedingMethodService.edit(breedingMethodDbId, breedingMethod);
+	}
+
+	@Override
+	public void delete(final Integer breedingMethodDbId) {
+		this.breedingMethodValidator.validateDeletion(breedingMethodDbId);
+		this.breedingMethodService.delete(breedingMethodDbId);
 	}
 
 	@Override
