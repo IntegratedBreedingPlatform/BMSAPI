@@ -130,7 +130,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		this.addParentsFromPedigreeTable(responseMap, germplasmSearchRequest);
 		this.addHasProgenyAttribute(responseMap, germplasmSearchRequest);
-		this.addUsedInStudyAttribute(responseMap, germplasmSearchRequest);
+		this.addUsedInLockedStudyAttribute(responseMap, germplasmSearchRequest);
 		this.addUsedInLockedListAttribute(responseMap, germplasmSearchRequest);
 
 		return responseList;
@@ -195,18 +195,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	}
 
-	private void addUsedInStudyAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
+	private void addUsedInLockedStudyAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
 		final GermplasmSearchRequest germplasmSearchRequest) {
 		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
 		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
-			|| !addedColumnsPropertyIds.contains(ColumnLabels.USED_IN_STUDY.getName())) {
+			|| !addedColumnsPropertyIds.contains(ColumnLabels.USED_IN_LOCKED_STUDY.getName())) {
 			return;
 		}
 
-		final Set<Integer> gidsOfGermplasmUsedInStudy =
-			this.germplasmService.getGermplasmUsedInStudies(new ArrayList<>(responseMap.keySet()));
+		final Set<Integer> germplasmUsedInLockedStudies =
+			this.germplasmService.getGermplasmUsedInLockedStudies(new ArrayList<>(responseMap.keySet()));
 
-		responseMap.forEach((gid, response) -> response.setUsedInStudy(gidsOfGermplasmUsedInStudy.contains(gid)));
+		responseMap.forEach((gid, response) -> response.setUsedInLockedStudy(germplasmUsedInLockedStudies.contains(gid)));
 	}
 
 	private void addUsedInLockedListAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,

@@ -159,22 +159,22 @@ public class GermplasmServiceImplTest {
 		responseList.add(response1);
 		when(this.germplasmSearchService.searchGermplasm(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseList);
 
-		when(this.middlewareGermplasmService.getGermplasmUsedInStudies(Mockito.anyList())).thenReturn(
+		when(this.middlewareGermplasmService.getGermplasmUsedInLockedStudies(Mockito.anyList())).thenReturn(
 			new HashSet<>());
 		final List<GermplasmSearchResponse> result1 = this.germplasmServiceImpl.searchGermplasm(germplasmSearchRequest, null, null);
-		Assert.assertNull(result1.get(0).getUsedInStudy());
+		Assert.assertNull(result1.get(0).getUsedInLockedStudy());
 
-		germplasmSearchRequest.getAddedColumnsPropertyIds().add(ColumnLabels.USED_IN_STUDY.getName());
+		germplasmSearchRequest.getAddedColumnsPropertyIds().add(ColumnLabels.USED_IN_LOCKED_STUDY.getName());
 
-		when(this.middlewareGermplasmService.getGermplasmUsedInStudies(Mockito.anyList())).thenReturn(
+		when(this.middlewareGermplasmService.getGermplasmUsedInLockedStudies(Mockito.anyList())).thenReturn(
 			new HashSet<>(Arrays.asList(1)));
 		final List<GermplasmSearchResponse> result2 = this.germplasmServiceImpl.searchGermplasm(germplasmSearchRequest, null, null);
-		assertThat(result2.get(0).getUsedInStudy(), is(true));
+		assertThat(result2.get(0).getUsedInLockedStudy(), is(true));
 
 		when(this.middlewareGermplasmService.getGermplasmUsedInStudies(Mockito.anyList())).thenReturn(
 			new HashSet<>());
 		final List<GermplasmSearchResponse> result3 = this.germplasmServiceImpl.searchGermplasm(germplasmSearchRequest, null, null);
-		assertThat(result3.get(0).getUsedInStudy(), is(false));
+		assertThat(result3.get(0).getUsedInLockedStudy(), is(false));
 
 	}
 
