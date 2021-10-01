@@ -369,6 +369,7 @@ public class StudyResourceBrapi {
 
 	}
 
+	@JsonView(BrapiView.BrapiV1_3.class)
 	@ApiOperation(value = "Get studies observation variables by studyDbId", notes = "Get studies observation variables by studyDbId")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationvariables", method = RequestMethod.GET)
 	@ResponseBody
