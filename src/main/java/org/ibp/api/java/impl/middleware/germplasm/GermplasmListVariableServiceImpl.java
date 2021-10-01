@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -68,15 +67,7 @@ public class GermplasmListVariableServiceImpl implements GermplasmListVariableSe
 		germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		germplasmListValidator.validateListIsUnlocked(germplasmList);
 		BaseValidator.checkNotEmpty(variableIds, "germplasm.list.variable.ids.can.not.be.empty");
-
-		final VariableFilter variableFilter = new VariableFilter();
-		variableIds.forEach(variableFilter::addVariableId);
-		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-		if (variables.size() != variableIds.size()) {
-			this.errors.reject("germplasm.list.invalid.variables", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
+		this.germplasmListVariableValidator.validateAllVariableIdsAreVariables(variableIds);
 		this.germplasmListVariableValidator.validateAllVariableIdsAreAssociatedToList(listId, Lists.newArrayList(variableIds));
 		this.germplasmListService.removeListVariables(listId, variableIds);
 	}

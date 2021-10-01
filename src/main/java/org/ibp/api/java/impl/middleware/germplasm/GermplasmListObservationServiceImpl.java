@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDataDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationRequestDto;
@@ -114,12 +115,9 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		BaseValidator.checkNotNull(listId, "param.null", new String[] {"listId"});
 		BaseValidator.checkNotNull(listId, "param.null", new String[] {"variableIds"});
-
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmListExists(listId);
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
-
-		//validate variableIds
-
+		this.germplasmListVariableValidator.validateAllVariableIdsAreVariables(Sets.newHashSet(variableIds));
 		this.germplasmListVariableValidator.validateAllVariableIdsAreAssociatedToList(listId, variableIds);
 		return this.germplasmListService.countObservationsByVariables(listId, variableIds);
 	}

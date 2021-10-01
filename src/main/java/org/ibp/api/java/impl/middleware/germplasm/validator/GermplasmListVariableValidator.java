@@ -17,6 +17,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class GermplasmListVariableValidator {
@@ -85,4 +86,16 @@ public class GermplasmListVariableValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
+
+	public void validateAllVariableIdsAreVariables(final Set<Integer> variableIds) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		final VariableFilter variableFilter = new VariableFilter();
+		variableIds.forEach(variableFilter::addVariableId);
+		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+		if (variables.size() != variableIds.size()) {
+			this.errors.reject("germplasm.list.invalid.variables", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
 }
