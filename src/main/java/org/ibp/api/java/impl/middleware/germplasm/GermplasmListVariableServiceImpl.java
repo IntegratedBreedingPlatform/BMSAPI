@@ -6,7 +6,6 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListVariableReques
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -42,9 +41,6 @@ public class GermplasmListVariableServiceImpl implements GermplasmListVariableSe
 
 	@Autowired
 	private GermplasmListValidator germplasmListValidator;
-
-	@Autowired
-	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	private BindingResult errors;
 
