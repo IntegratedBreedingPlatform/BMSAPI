@@ -60,7 +60,7 @@ public class GermplasmListObservationResource {
 	@ApiOperation(value = "Count Germplasm List Observations", notes = "Returns count of germplasm list observations given a set of variables")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables/observations", method = RequestMethod.HEAD)
-	public ResponseEntity<String> countObservationsByVariables(
+	public ResponseEntity<Void> countObservationsByVariables(
 		@PathVariable final String cropName, @PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID, @RequestParam(value = "variableIds") final Integer[] variableIds) {
 
@@ -68,7 +68,7 @@ public class GermplasmListObservationResource {
 		final HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.add("X-Total-Count", String.valueOf(count));
 
-		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
+		return new ResponseEntity<>(respHeaders, HttpStatus.OK);
 	}
 
 }
