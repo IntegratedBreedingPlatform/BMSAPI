@@ -680,13 +680,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest request,
-		final Pageable pageable) {
-		return this.germplasmListService.searchGermplasmList(request, pageable);
+		final Pageable pageable, final String programUUID) {
+		return this.germplasmListService.searchGermplasmList(request, pageable, programUUID);
 	}
 
 	@Override
-	public long countSearchGermplasmList(final GermplasmListSearchRequest request) {
-		return this.germplasmListService.countSearchGermplasmList(request);
+	public long countSearchGermplasmList(final GermplasmListSearchRequest request, final String programUUID) {
+		return this.germplasmListService.countSearchGermplasmList(request, programUUID);
 	}
 
 	@Override

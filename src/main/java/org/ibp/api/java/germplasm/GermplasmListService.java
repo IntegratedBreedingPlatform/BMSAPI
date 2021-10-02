@@ -53,9 +53,10 @@ public interface GermplasmListService {
 
 	List<GermplasmListDto> getGermplasmLists(Integer gid);
 
-	List<GermplasmListSearchResponse> searchGermplasmList(GermplasmListSearchRequest request, Pageable pageable);
+	List<GermplasmListSearchResponse> searchGermplasmList(GermplasmListSearchRequest request, Pageable pageable,
+		final String programUUID);
 
-	long countSearchGermplasmList(GermplasmListSearchRequest request);
+	long countSearchGermplasmList(GermplasmListSearchRequest request, final String programUUID);
 
 	List<GermplasmListDataSearchResponse> searchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request, Pageable pageable);
 
