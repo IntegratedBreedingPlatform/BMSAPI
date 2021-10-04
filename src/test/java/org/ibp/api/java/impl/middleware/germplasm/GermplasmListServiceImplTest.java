@@ -8,7 +8,8 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListDataUpdateViewDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
@@ -105,6 +106,9 @@ public class GermplasmListServiceImplTest {
 
 	@Mock
 	private GermplasmListService germplasmListServiceMiddleware;
+
+	@Mock
+	private GermplasmListDataService germplasmListDataService;
 
 	@Mock
 	private SearchCompositeDtoValidator searchCompositeDtoValidator;
@@ -1683,12 +1687,12 @@ public class GermplasmListServiceImplTest {
 		final List<GermplasmListDataUpdateViewDTO> view = Mockito.mock(List.class);
 
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(GERMPLASM_LIST_ID)).thenReturn(Optional.of(germplasmList));
-		Mockito.doNothing().when(this.germplasmListServiceMiddleware).saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
+		Mockito.doNothing().when(this.germplasmListDataService).saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
 
 		this.germplasmListService.saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
 
 		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListById(GERMPLASM_LIST_ID);
-		Mockito.verify(this.germplasmListServiceMiddleware).saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
+		Mockito.verify(this.germplasmListDataService).saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
 	}
 
 	@Test

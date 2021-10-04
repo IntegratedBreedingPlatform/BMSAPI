@@ -12,14 +12,14 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListDataUpdateViewDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.program.ProgramDTO;
@@ -147,7 +147,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	private UserValidator userValidator;
 
 	@Autowired
-	private GermplasmListDataSearchService germplasmListDataSearchService;
+	private GermplasmListDataService germplasmListDataService;
 
 	private BindingResult errors;
 
@@ -688,12 +688,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest request,
 		final Pageable pageable) {
-		return this.germplasmListDataSearchService.searchGermplasmListData(listId, request, pageable);
+		return this.germplasmListDataService.searchGermplasmListData(listId, request, pageable);
 	}
 
 	@Override
 	public long countSearchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest request) {
-		return this.germplasmListDataSearchService.countSearchGermplasmListData(listId, request);
+		return this.germplasmListDataService.countSearchGermplasmListData(listId, request);
 	}
 
 	@Override
@@ -715,7 +715,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateGermplasmList(listId);
 
-		return this.germplasmListService.getGermplasmListColumns(listId, programUUID);
+		return this.germplasmListDataService.getGermplasmListColumns(listId, programUUID);
 	}
 
 	@Override
@@ -723,7 +723,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateGermplasmList(listId);
 
-		return this.germplasmListService.getGermplasmListDataTableHeader(listId, programUUID);
+		return this.germplasmListDataService.getGermplasmListDataTableHeader(listId, programUUID);
 	}
 
 	@Override
@@ -735,7 +735,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.germplasmListService.saveGermplasmListDataView(listId, view);
+		this.germplasmListDataService.saveGermplasmListDataView(listId, view);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
