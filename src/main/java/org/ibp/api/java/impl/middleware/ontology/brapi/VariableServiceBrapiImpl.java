@@ -17,11 +17,11 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
     @Autowired
     private org.generationcp.middleware.api.brapi.VariableServiceBrapi middlewareVariableServiceBrapi;
 
-    public List<VariableDTO> getObservationVariables(final String crop, VariableSearchRequestDTO requestDTO, Pageable pageable) {
+    public List<VariableDTO> getObservationVariables(final String crop, final VariableSearchRequestDTO requestDTO, final Pageable pageable) {
         return this.middlewareVariableServiceBrapi.getObservationVariables(crop, requestDTO, pageable);
     }
 
-    public long countObservationVariables(VariableSearchRequestDTO requestDTO){
+    public long countObservationVariables(final VariableSearchRequestDTO requestDTO){
         return this.middlewareVariableServiceBrapi.countObservationVariables(requestDTO);
     }
 }

@@ -6,7 +6,6 @@ import com.google.common.collect.Maps;
 import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -19,10 +18,8 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
-import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
@@ -34,7 +31,6 @@ import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -72,9 +68,6 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
-
-	@Autowired
-	private VariableServiceBrapi variableServiceBrapi;
 
 	@Autowired
 	private VariableValidator variableValidator;

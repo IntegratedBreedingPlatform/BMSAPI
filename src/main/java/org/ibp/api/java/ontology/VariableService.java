@@ -2,7 +2,6 @@
 package org.ibp.api.java.ontology;
 
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
