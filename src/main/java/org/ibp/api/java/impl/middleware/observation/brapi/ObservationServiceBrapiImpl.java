@@ -4,9 +4,11 @@ import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.ibp.api.brapi.ObservationServiceBrapi;
 import org.ibp.api.brapi.v2.observation.ObservationImportResponse;
+import org.ibp.api.java.impl.middleware.study.validator.ObservationImportRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,9 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 
 	@Autowired
 	private org.generationcp.middleware.api.brapi.ObservationServiceBrapi observationServiceBrapi;
+
+	@Autowired
+	private ObservationImportRequestValidator observationImportRequestValidator;
 
 	@Override
 	public List<ObservationDto> searchObservations(final ObservationSearchRequestDto observationSearchRequestDto,
@@ -36,12 +41,11 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		final List<ObservationDto> observationDtos = new ArrayList<>();
 		int noOfCreatedObservations = 0;
 
-		// Remove observation that fails any validation. They will be excluded from creation
-		//		final BindingResult bindingResult =
-		//			this.observationUnitImportRequestValidator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
-		//		if (bindingResult.hasErrors()) {
-		//			response.setErrors(bindingResult.getAllErrors());
-		//		}
+
+		final BindingResult bindingResult = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observations);
+		if (bindingResult.hasErrors()) {
+			response.setErrors(bindingResult.getAllErrors());
+		}
 
 		if (!CollectionUtils.isEmpty(observations)) {
 			final List<Integer> observationDbIds =
