@@ -65,8 +65,8 @@ public class ObservationImportRequestValidator {
                 this.studyServiceBrapi.getStudyInstances(studySearchFilter, null).stream()
                         .collect(Collectors.toMap(StudyInstanceDto::getStudyDbId, Function.identity()));
 
-        final List<String> observationUnitDbIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getObservationDbId()))
-                .map(ObservationDto::getObservationDbId).collect(Collectors.toList());
+        final List<String> observationUnitDbIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getObservationUnitDbId()))
+                .map(ObservationDto::getObservationUnitDbId).collect(Collectors.toList());
         final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = new ObservationUnitSearchRequestDTO();
         observationUnitSearchRequestDTO.setObservationUnitDbIds(observationUnitDbIds);
         final Map<String, ObservationUnitDto> observationUnitDtoMap =
@@ -129,7 +129,7 @@ public class ObservationImportRequestValidator {
             }
             final ObservationUnitDto obsUnit = observationUnitDtoMap.get(dto.getObservationUnitDbId());
             if(!obsUnit.getStudyDbId().equalsIgnoreCase(dto.getStudyDbId())
-                    || obsUnit.getGermplasmDbId().equalsIgnoreCase(dto.getGermplasmDbId()) ) {
+                    || !obsUnit.getGermplasmDbId().equalsIgnoreCase(dto.getGermplasmDbId()) ) {
                 this.errors.reject("observation.import.no.observationUnit", new String[] {index.toString()}, "");
                 iterator.remove();
                 continue;
