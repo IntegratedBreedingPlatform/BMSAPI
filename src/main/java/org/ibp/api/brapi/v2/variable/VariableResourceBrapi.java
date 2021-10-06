@@ -17,6 +17,8 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
+import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
+import org.ibp.api.brapi.v2.BrapiUpdateResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -40,6 +42,9 @@ import java.util.List;
 @Api(value = "BrAPI V2 Variable Services")
 @Controller(value = "VariableResourceBrapiV2")
 public class VariableResourceBrapi {
+
+	@Autowired
+	private BrapiResponseMessageGenerator<VariableDTO> responseMessageGenerator;
 
 	@Autowired
 	private VariableServiceBrapi variableServiceBrapi;
@@ -136,9 +141,10 @@ public class VariableResourceBrapi {
 		@PathVariable final String observationVariableDbId,
 		@RequestBody final VariableDTO variable) {
 
-		this.variableServiceBrapi.updateObservationVariable(variable);
-
-		final SingleEntityResponse<VariableDTO> variableResponse = new SingleEntityResponse<>(variable);
+		final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(variable);
+		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(variableUpdateResponse));
+		final SingleEntityResponse<VariableDTO> variableResponse =
+			new SingleEntityResponse<>(variableUpdateResponse.getEntityObject()).withMetadata(metadata);
 		return new ResponseEntity<>(variableResponse, HttpStatus.OK);
 	}
 

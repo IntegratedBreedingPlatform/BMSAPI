@@ -20,27 +20,48 @@ public class BrapiResponseMessageGenerator<T> {
 
 	public List<Map<String, String>> getMessagesList(final BrapiImportResponse<T> importResponse) {
 		final List<Map<String, String>> messagesList = new ArrayList<>();
-		final Map<String, String> messageInfo = new HashMap<>();
-		final String messageHeader = this.messageSource.getMessage("message.header", null, LocaleContextHolder.getLocale());
 		final String entity = this.messageSource.getMessage(importResponse.getEntity(), null, LocaleContextHolder.getLocale());
-		messageInfo.put(messageHeader, this.messageSource.getMessage("message.created.successfully",
+		final Map<String, String> messageInfo = this.createInfoMessage(this.messageSource.getMessage("message.created.successfully",
 			new Object[] {importResponse.getCreatedSize(), importResponse.getImportListSize(), entity},
 			LocaleContextHolder.getLocale()));
-		final String messageTypeHeader = this.messageSource.getMessage("message.type.header", null, LocaleContextHolder.getLocale());
-		messageInfo.put(messageTypeHeader, this.messageSource.getMessage("message.type.info", null, LocaleContextHolder.getLocale()));
 		messagesList.add(messageInfo);
 		if (!CollectionUtils.isEmpty(importResponse.getErrors())) {
 			int index = 1;
 			for (final ObjectError error : importResponse.getErrors()) {
-				final Map<String, String> messageError = new HashMap<>();
 				final String errorHeader = this.messageSource.getMessage("message.type.error", null, LocaleContextHolder.getLocale());
-				messageError.put(messageHeader, errorHeader + index++ + " " + this.messageSource
-					.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale()));
-				messageError.put(messageTypeHeader, errorHeader);
-				messagesList.add(messageError);
+				messagesList.add(this.createErrorMessage(errorHeader, errorHeader + index++ + " " + this.messageSource
+					.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale())));
 			}
 		}
 		return messagesList;
+	}
+
+	public List<Map<String, String>> getMessagesList(final BrapiUpdateResponse<T> variableUpdateResponse) {
+		final List<Map<String, String>> messagesList = new ArrayList<>();
+		final String entity = this.messageSource.getMessage(variableUpdateResponse.getEntity(), null, LocaleContextHolder.getLocale());
+		final Map<String, String> messageInfo = this.createInfoMessage(this.messageSource.getMessage("message.updated.successfully",
+			new Object[] {variableUpdateResponse.getEntityName(), entity },
+			LocaleContextHolder.getLocale()));
+		messagesList.add(messageInfo);
+		return messagesList;
+	}
+
+	private Map<String, String> createInfoMessage(final String message) {
+		final Map<String, String> messageInfo = new HashMap<>();
+		final String messageHeader = this.messageSource.getMessage("message.header", null, LocaleContextHolder.getLocale());
+		final String messageTypeHeader = this.messageSource.getMessage("message.type.header", null, LocaleContextHolder.getLocale());
+		messageInfo.put(messageHeader, message);
+		messageInfo.put(messageTypeHeader, this.messageSource.getMessage("message.type.info", null, LocaleContextHolder.getLocale()));
+		return messageInfo;
+	}
+
+	private Map<String, String> createErrorMessage(final String errorHeader, final String message) {
+		final Map<String, String> messageError = new HashMap<>();
+		final String messageHeader = this.messageSource.getMessage("message.header", null, LocaleContextHolder.getLocale());
+		final String messageTypeHeader = this.messageSource.getMessage("message.type.header", null, LocaleContextHolder.getLocale());
+		messageError.put(messageHeader, message);
+		messageError.put(messageTypeHeader, errorHeader);
+		return messageError;
 	}
 
 }
