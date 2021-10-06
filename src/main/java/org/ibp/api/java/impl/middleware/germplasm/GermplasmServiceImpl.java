@@ -363,18 +363,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public void mergeGermplasm(final GermplasmMergeRequestDto germplasmMergeRequestDto) {
-		this.validateGermplasmMergeRequestDto(germplasmMergeRequestDto);
+		this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto,
 			this.pedigreeService.getCrossExpansion(germplasmMergeRequestDto.getTargetGermplasmId(), this.crossExpansionProperties));
-	}
-
-	private void validateGermplasmMergeRequestDto(final GermplasmMergeRequestDto germplasmMergeRequestDto) {
-		final List<Integer> gids = germplasmMergeRequestDto.getNonSelectedGermplasm().stream().map(
-			GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(Collectors.toList());
-		gids.add(germplasmMergeRequestDto.getTargetGermplasmId());
-		this.errors = new MapBindingResult(new HashMap<>(), GermplasmMergeRequestDto.class.getName());
-		this.germplasmValidator.validateGids(this.errors, gids);
-		this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
 	}
 
 	@Override
@@ -391,7 +382,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public GermplasmMergeSummaryDto getGermplasmMergeSummary(final GermplasmMergeRequestDto germplasmMergeRequestDto) {
-		this.validateGermplasmMergeRequestDto(germplasmMergeRequestDto);
+		this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
+		// Remove non-selected germplasm for omission
+		germplasmMergeRequestDto.getNonSelectedGermplasm().removeIf(GermplasmMergeRequestDto.NonSelectedGermplasm::isOmit);
+
 		final GermplasmMergeSummaryDto germplasmMergeSummaryDto = new GermplasmMergeSummaryDto();
 		germplasmMergeSummaryDto.setCountGermplasmToDelete(germplasmMergeRequestDto.getNonSelectedGermplasm().size());
 
@@ -401,8 +395,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 		germplasmMergeSummaryDto.setCountStudiesToUpdate(this.studyService.countStudiesByGids(nonSelectedGids));
 		germplasmMergeSummaryDto.setCountPlotsToUpdate(this.studyService.countPlotsByGids(nonSelectedGids));
 
-		final List<Integer> migrateLotsGids = germplasmMergeRequestDto.getNonSelectedGermplasm().stream().filter(o -> !o.isOmit() && o.isMigrateLots())
-			.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
+		final List<Integer> migrateLotsGids =
+			germplasmMergeRequestDto.getNonSelectedGermplasm().stream().filter(GermplasmMergeRequestDto.NonSelectedGermplasm::isMigrateLots)
+				.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
 				Collectors.toList());
 		if (!CollectionUtils.isEmpty(migrateLotsGids)) {
 			final LotsSearchDto migrateLotSearch = new LotsSearchDto();
@@ -410,8 +405,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmMergeSummaryDto.setCountLotsToMigrate(this.lotService.countSearchLots(migrateLotSearch));
 		}
 
-		final List<Integer> closeLotsGids = germplasmMergeRequestDto.getNonSelectedGermplasm().stream().filter(o -> !o.isOmit() && o.isCloseLots())
-			.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
+		final List<Integer> closeLotsGids =
+			germplasmMergeRequestDto.getNonSelectedGermplasm().stream().filter(GermplasmMergeRequestDto.NonSelectedGermplasm::isCloseLots)
+				.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
 				Collectors.toList());
 		if (!CollectionUtils.isEmpty(closeLotsGids)) {
 			final LotsSearchDto closeLotSearch = new LotsSearchDto();
@@ -421,16 +417,5 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return germplasmMergeSummaryDto;
 	}
 
-	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
-		this.germplasmDataManager = germplasmDataManager;
-	}
-
-	void setPedigreeService(final PedigreeService pedigreeService) {
-		this.pedigreeService = pedigreeService;
-	}
-
-	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
-		this.crossExpansionProperties = crossExpansionProperties;
-	}
 
 }
