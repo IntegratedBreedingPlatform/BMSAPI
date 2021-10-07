@@ -226,6 +226,18 @@
     "versions": [
       "2.0"
     ]
+  },
+  {
+    "service": "/observations",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET", "POST"
+    ],
+    "versions": [
+      "2.0"
+    ]
   }
 ]
 }
