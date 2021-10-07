@@ -228,7 +228,7 @@
     ]
   },
   {
-    "service": "/observations",
+    "service": "observations",
     "dataTypes": [
       "application/json"
     ],
