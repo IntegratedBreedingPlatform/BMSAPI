@@ -394,6 +394,7 @@ public class StudyResourceBrapi {
 
 		final PageRequest pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 		final VariableSearchRequestDTO requestDTO = new VariableSearchRequestDTO();
+		requestDTO.setStudyDbId(Lists.newArrayList(String.valueOf(studyDbId)));
 
 		final PagedResult<VariableDTO> resultPage =
 			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<VariableDTO>() {
