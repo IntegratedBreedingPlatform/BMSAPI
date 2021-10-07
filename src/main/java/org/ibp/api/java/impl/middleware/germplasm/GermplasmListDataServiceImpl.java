@@ -24,7 +24,6 @@ import java.util.List;
 @Transactional
 public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
-	public static final String CROP_LISTS = "CROPLISTS";
 	public static final int BATCH_SIZE = 500;
 
 	@Autowired
