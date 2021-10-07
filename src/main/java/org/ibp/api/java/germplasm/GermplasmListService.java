@@ -58,16 +58,6 @@ public interface GermplasmListService {
 
 	long countSearchGermplasmList(GermplasmListSearchRequest request, final String programUUID);
 
-	List<GermplasmListDataSearchResponse> searchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request, Pageable pageable);
-
-	long countSearchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request);
-
 	boolean toggleGermplasmListStatus(Integer listId);
-
-	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, final String programUUID);
-
-	List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(Integer listId, final String programUUID);
-
-	void saveGermplasmListDataView(final Integer listId, List<GermplasmListDataUpdateViewDTO> columns);
 
 }
