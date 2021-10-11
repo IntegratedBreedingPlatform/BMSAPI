@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.germplasm.brapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
+import org.ibp.api.brapi.v2.variable.VariableUpdateResponse;
 import org.ibp.api.java.impl.middleware.ontology.brapi.VariableServiceBrapiImpl;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,5 +45,15 @@ public class VariableServiceBrapiImplTest {
         Mockito.verify(this.middlewareVariableServiceBrapi).getObservationVariables(cropName, requestDTO, null);
         Assert.assertEquals(1, result.size());
         Assert.assertEquals(variableDTO, result.get(0));
+    }
+
+    @Test
+    public void testUpdateObservationVariable() {
+        final VariableDTO variableDTO = new VariableDTO();
+        Mockito.when(this.middlewareVariableServiceBrapi.updateObservationVariable(variableDTO)).thenReturn(variableDTO);
+        final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(variableDTO);
+        Assert.assertEquals(variableDTO, variableUpdateResponse.getEntityObject());
+        Mockito.verify(this.middlewareVariableServiceBrapi).updateObservationVariable(variableDTO);
+
     }
 }

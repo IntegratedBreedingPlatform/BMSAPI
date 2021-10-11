@@ -2,9 +2,12 @@ package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
+import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
@@ -12,10 +15,7 @@ import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRe
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.VariableDTO;
-import org.ibp.api.brapi.GermplasmServiceBrapi;
-import org.ibp.api.brapi.VariableServiceBrapi;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -33,7 +33,7 @@ public class ObservationImportRequestValidator {
     private static final int MAX_VALUE_LENGTH = 255;
 
     @Autowired
-    private GermplasmServiceBrapi germplasmServiceBrapi;
+    private GermplasmServiceBrapi germplasmService;
 
     @Autowired
     private StudyServiceBrapi studyServiceBrapi;
@@ -54,7 +54,7 @@ public class ObservationImportRequestValidator {
                 .map(ObservationDto::getGermplasmDbId).collect(Collectors.toList());
         final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
         germplasmSearchRequest.setGermplasmDbIds(germplasmDbIds);
-        final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmServiceBrapi.searchGermplasmDTO(germplasmSearchRequest, null)
+        final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchGermplasmDTO(germplasmSearchRequest, null)
                 .stream().collect(Collectors.toMap(GermplasmDTO::getGermplasmDbId, Function.identity()));
 
         final List<String> studyDbIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getStudyDbId()))
