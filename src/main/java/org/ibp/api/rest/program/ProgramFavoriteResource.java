@@ -34,7 +34,7 @@ public class ProgramFavoriteResource {
 		@PathVariable final String programUUID, @RequestBody final ProgramFavoriteRequestDto programFavoriteRequestDtos) {
 		this.programFavoriteValidator.validateAddFavorites(programUUID, programFavoriteRequestDtos);
 		this.programFavoriteService.addProgramFavorites(programUUID, programFavoriteRequestDtos.getFavoriteType(),
-			programFavoriteRequestDtos.getEntityId());
+			programFavoriteRequestDtos.getEntityIds());
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
