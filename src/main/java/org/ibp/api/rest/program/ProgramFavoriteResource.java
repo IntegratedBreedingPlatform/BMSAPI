@@ -8,6 +8,7 @@ import org.ibp.api.java.impl.middleware.program.validator.ProgramFavoriteValidat
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,7 @@ public class ProgramFavoriteResource {
 
 	@ApiOperation(value = "Add Favorites", notes = "Add Favorites")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/favorites", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
 	@ResponseBody
 	public ResponseEntity<Void> addFavorite(@PathVariable final String cropName,
 		@PathVariable final String programUUID, @RequestBody final ProgramFavoriteRequestDto programFavoriteRequestDtos) {
@@ -40,6 +42,7 @@ public class ProgramFavoriteResource {
 
 	@ApiOperation(value = "Delete Favorites", notes = "Delete Favorites")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/favorites", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
 	public ResponseEntity<Void> deleteFavorites(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@RequestParam(value = "programFavoriteIds", required = true) final Set<Integer> programFavoriteIds) {
