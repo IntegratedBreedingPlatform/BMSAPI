@@ -9,19 +9,20 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListDataUpdateViewDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.germplasm.GermplasmListTemplateExportService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -55,6 +56,9 @@ GermplasmListResourceGroup {
 
 	@Autowired
 	public GermplasmListService germplasmListService;
+
+	@Autowired
+	public GermplasmListDataService germplasmListDataService;
 
 	@Autowired
 	public GermplasmListTemplateExportService germplasmListTemplateExportService;
@@ -241,8 +245,8 @@ GermplasmListResourceGroup {
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmListSearchRequest request,
 		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
-		return new PaginatedSearch().getPagedResult(() -> this.germplasmListService.countSearchGermplasmList(request),
-			() -> this.germplasmListService.searchGermplasmList(request, pageable),
+		return new PaginatedSearch().getPagedResult(() -> this.germplasmListService.countSearchGermplasmList(request, programUUID),
+			() -> this.germplasmListService.searchGermplasmList(request, pageable, programUUID),
 			pageable);
 	}
 
@@ -264,8 +268,8 @@ GermplasmListResourceGroup {
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmListDataSearchRequest request,
 		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
-		return new PaginatedSearch().getPagedResult(() -> this.germplasmListService.countSearchGermplasmListData(listId, request),
-			() -> this.germplasmListService.searchGermplasmListData(listId, request, pageable),
+		return new PaginatedSearch().getPagedResult(() -> this.germplasmListDataService.countSearchGermplasmListData(listId, request),
+			() -> this.germplasmListDataService.searchGermplasmListData(listId, request, pageable),
 			pageable);
 	}
 
@@ -296,7 +300,7 @@ GermplasmListResourceGroup {
 	public ResponseEntity<List<GermplasmListColumnDTO>> getGermplasmListColumns(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID) {
-		return new ResponseEntity<>(this.germplasmListService.getGermplasmListColumns(listId, programUUID), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmListDataService.getGermplasmListColumns(listId, programUUID), HttpStatus.OK);
 	}
 
 	//TODO: should be ignore in swagger?
@@ -306,7 +310,7 @@ GermplasmListResourceGroup {
 	public ResponseEntity<List<GermplasmListMeasurementVariableDTO>> getGermplasmListDataTableHeader(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID) {
-		return new ResponseEntity<>(this.germplasmListService.getGermplasmListDataTableHeader(listId, programUUID), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmListDataService.getGermplasmListDataTableHeader(listId, programUUID), HttpStatus.OK);
 	}
 
 
@@ -332,7 +336,7 @@ GermplasmListResourceGroup {
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody List<GermplasmListDataUpdateViewDTO> view) {
-		this.germplasmListService.saveGermplasmListDataView(listId, view);
+		this.germplasmListDataService.saveGermplasmListDataView(listId, view);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
