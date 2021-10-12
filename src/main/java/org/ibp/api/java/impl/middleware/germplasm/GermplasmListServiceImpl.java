@@ -39,7 +39,6 @@ import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
-import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.UserTreeState;
@@ -139,9 +138,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private UserValidator userValidator;
-
-	@Autowired
-	private GermplasmListValidator germplasmListValidator;
 
 	@Autowired
 	private GermplasmListValidator germplasmListValidator;

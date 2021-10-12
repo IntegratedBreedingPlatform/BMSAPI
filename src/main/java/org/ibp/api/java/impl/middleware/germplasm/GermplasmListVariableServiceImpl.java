@@ -11,8 +11,8 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmListVariableService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
-import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListVariableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class GermplasmListVariableServiceImpl implements GermplasmListVariableSe
 	public void addVariableToList(final Integer listId,
 		final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListVariableRequestDto.class.getName());
-		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
+		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmList(listId);
 		germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		germplasmListValidator.validateListIsUnlocked(germplasmList);
 		germplasmListVariableValidator.validateAddVariableToList(listId, germplasmListVariableRequestDto);
@@ -59,7 +59,7 @@ public class GermplasmListVariableServiceImpl implements GermplasmListVariableSe
 	@Override
 	public void removeListVariables(final Integer listId, final Set<Integer> variableIds) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmListExists(listId);
+		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmList(listId);
 		germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		germplasmListValidator.validateListIsUnlocked(germplasmList);
 		BaseValidator.checkNotEmpty(variableIds, "germplasm.list.variable.ids.can.not.be.empty");
@@ -73,7 +73,7 @@ public class GermplasmListVariableServiceImpl implements GermplasmListVariableSe
 		final Integer variableTypeId) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateProgram(cropName, programUUID);
-		germplasmListValidator.validateGermplasmListExists(listId);
+		germplasmListValidator.validateGermplasmList(listId);
 		if (variableTypeId != null) {
 			if (!VariableType.ids().contains(variableTypeId)) {
 				this.errors.reject("variable.type.does.not.exist", "");

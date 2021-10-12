@@ -24,9 +24,9 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
-import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
@@ -153,7 +153,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final GermplasmList germplasmList = this.germplasmListService.getGermplasmList(listId);
 		this.studyValidator.validate(studyId, true);
 
-		this.germplasmListValidator.validateGermplasmListExists(listId);
+		this.germplasmListValidator.validateGermplasmList(listId);
 		this.studyEntryValidator.validateStudyAlreadyHasStudyEntries(studyId);
 
 		final ModelMapper mapper = StudyEntryMapper.getInstance();

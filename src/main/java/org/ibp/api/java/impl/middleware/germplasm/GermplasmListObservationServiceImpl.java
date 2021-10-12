@@ -12,7 +12,7 @@ import org.generationcp.middleware.util.VariableValueUtil;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmListObservationService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmListVariableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,7 +53,7 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		BaseValidator.checkNotNull(germplasmListObservationRequestDto.getListDataId(), "param.null", new String[] {"listDataId"});
 		BaseValidator.checkNotNull(germplasmListObservationRequestDto.getValue(), "param.null", new String[] {"value"});
 
-		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmListExists(listId);
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
@@ -80,7 +80,7 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		BaseValidator.checkNotNull(listId, "param.null", new String[] {"observationId"});
 		BaseValidator.checkNotNull(value, "param.null", new String[] {"request body"});
 
-		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmListExists(listId);
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
@@ -100,7 +100,7 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 	public void delete(final Integer listId, final Integer observationId) {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
-		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmListExists(listId);
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
@@ -115,7 +115,7 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		BaseValidator.checkNotNull(listId, "param.null", new String[] {"listId"});
 		BaseValidator.checkNotNull(listId, "param.null", new String[] {"variableIds"});
-		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmListExists(listId);
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListVariableValidator.validateAllVariableIdsAreVariables(Sets.newHashSet(variableIds));
 		this.germplasmListVariableValidator.validateAllVariableIdsAreAssociatedToList(listId, variableIds);
