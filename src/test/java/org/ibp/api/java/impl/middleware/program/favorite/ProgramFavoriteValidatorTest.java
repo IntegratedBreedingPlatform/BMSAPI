@@ -51,7 +51,7 @@ public class ProgramFavoriteValidatorTest {
 	@InjectMocks
 	private ProgramFavoriteValidator programFavoriteValidator;
 
-	ProgramFavoriteRequestDto programFavoriteRequestDtos;
+	private ProgramFavoriteRequestDto programFavoriteRequestDtos;
 
 	@Before
 	public void setup() {
