@@ -456,9 +456,9 @@ public class GermplasmServiceImplTest {
 		final GermplasmMergeRequestDto requestDto = new GermplasmMergeRequestDto();
 		requestDto.setTargetGermplasmId(new Random().nextInt());
 		requestDto.setNonSelectedGermplasm(
-			Lists.newArrayList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, true, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, true, false),
-		new GermplasmMergeRequestDto.NonSelectedGermplasm(4, false, false, true)));
+			Lists.newArrayList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, true, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false),
+		new GermplasmMergeRequestDto.NonSelectedGermplasm(4, false, true)));
 		final long listsToUpdate = new Random().nextInt(100);
 		final long studiesToUpdate = new Random().nextInt(100);
 		final long plotsToUpdate = new Random().nextInt(1000);
@@ -491,8 +491,8 @@ public class GermplasmServiceImplTest {
 		final GermplasmMergeRequestDto requestDto = new GermplasmMergeRequestDto();
 		requestDto.setTargetGermplasmId(new Random().nextInt());
 		requestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false)));
 		final long listsToUpdate = new Random().nextInt(100);
 		final long studiesToUpdate = new Random().nextInt(100);
 		final long plotsToUpdate = new Random().nextInt(1000);

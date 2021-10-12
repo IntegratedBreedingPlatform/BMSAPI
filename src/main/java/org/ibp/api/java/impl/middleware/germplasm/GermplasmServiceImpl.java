@@ -406,7 +406,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		final List<Integer> closeLotsGids =
-			germplasmMergeRequestDto.getNonSelectedGermplasm().stream().filter(GermplasmMergeRequestDto.NonSelectedGermplasm::isCloseLots)
+			germplasmMergeRequestDto.getNonSelectedGermplasm().stream().filter(g -> !g.isMigrateLots())
 				.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
 				Collectors.toList());
 		if (!CollectionUtils.isEmpty(closeLotsGids)) {

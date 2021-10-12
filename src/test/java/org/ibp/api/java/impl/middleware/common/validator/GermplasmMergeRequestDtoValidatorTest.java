@@ -41,11 +41,7 @@ public class GermplasmMergeRequestDtoValidatorTest {
 
 	@Test
 	public void testValidate() {
-		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
-		germplasmMergeRequestDto.setTargetGermplasmId(1);
-		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false, false)));
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = this.getGermplasmMergeRequestDto();
 		this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
 		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(), ArgumentMatchers.eq(Lists.newArrayList(2, 3, 1)));
 		Mockito.verify(this.germplasmServiceMiddleware).getGidsOfGermplasmWithDescendants(Lists.newArrayList(2, 3));
@@ -68,9 +64,39 @@ public class GermplasmMergeRequestDtoValidatorTest {
 	}
 
 	@Test
+	public void testValidate_NullTargetGermplasm() {
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
+		try {
+			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
+			fail("Method should throw an error");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				hasItem("germplasm.merge.target.germplasm.null"));
+			Mockito.verifyZeroInteractions(this.germplasmValidator);
+			Mockito.verifyZeroInteractions(this.germplasmServiceMiddleware);
+		}
+	}
+
+	@Test
+	public void testValidate_NullMergeOptions() {
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
+		germplasmMergeRequestDto.setTargetGermplasmId(100);
+		try {
+			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
+			fail("Method should throw an error");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				hasItem("germplasm.merge.merge.options.null"));
+			Mockito.verifyZeroInteractions(this.germplasmValidator);
+			Mockito.verifyZeroInteractions(this.germplasmServiceMiddleware);
+		}
+	}
+
+	@Test
 	public void testValidate_EmptyNonSelectedGermplasm() {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(1);
+		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 		try {
 			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
 			fail("Method should throw an error");
@@ -84,17 +110,29 @@ public class GermplasmMergeRequestDtoValidatorTest {
 
 	@Test
 	public void testValidate_NonSelectedGermplasmHasNullGid() {
-		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
-		germplasmMergeRequestDto.setTargetGermplasmId(1);
-		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(null, false, false, false)));
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = this.getGermplasmMergeRequestDto();
+		germplasmMergeRequestDto.getNonSelectedGermplasm().add(new GermplasmMergeRequestDto.NonSelectedGermplasm(null, false, false));
 		try {
 			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
 			fail("Method should throw an error");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("germplasm.merge.non.selected.null.gid"));
+			Mockito.verifyZeroInteractions(this.germplasmValidator);
+			Mockito.verifyZeroInteractions(this.germplasmServiceMiddleware);
+		}
+	}
+
+	@Test
+	public void testValidate_NonSelectedGermplasmHasNullMergeLotsAttribute() {
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = this.getGermplasmMergeRequestDto();
+		germplasmMergeRequestDto.getNonSelectedGermplasm().add(new GermplasmMergeRequestDto.NonSelectedGermplasm(4, null, false));
+		try {
+			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
+			fail("Method should throw an error");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				hasItem("germplasm.merge.non.selected.null.migrate.lots"));
 			Mockito.verifyZeroInteractions(this.germplasmValidator);
 			Mockito.verifyZeroInteractions(this.germplasmServiceMiddleware);
 		}
@@ -165,9 +203,10 @@ public class GermplasmMergeRequestDtoValidatorTest {
 	public void testValidate_NoGermplasmToMergeWhenAllNonSelectedOmitted() {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(1);
+		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Lists.newArrayList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false, true),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false, true)));
+			Lists.newArrayList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, true),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, true)));
 
 		try {
 			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
@@ -211,31 +250,13 @@ public class GermplasmMergeRequestDtoValidatorTest {
 		}
 	}
 
-	@Test
-	public void testValidate_InvalidMigrateAndCloseLotsSetting() {
-
-		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
-		germplasmMergeRequestDto.setTargetGermplasmId(1);
-		// Germplasm 2 has closeLots = true and migrateLots = true
-		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Lists.newArrayList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, true, true, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false, false)));
-
-		try {
-			this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
-			fail("Method should throw an error");
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
-				hasItem("germplasm.merge.invalid.lots.spec"));
-		}
-	}
-
 	private GermplasmMergeRequestDto getGermplasmMergeRequestDto() {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(1);
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Lists.newArrayList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, true, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false, false)));
+			Lists.newArrayList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false)));
+		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 		return germplasmMergeRequestDto;
 	}
 

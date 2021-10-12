@@ -34,6 +34,8 @@ public class GermplasmMergeRequestDtoValidator {
 	public void validate(final GermplasmMergeRequestDto germplasmMergeRequestDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmMergeRequestDto.class.getName());
 		BaseValidator.checkNotNull(germplasmMergeRequestDto, "germplasm.merge.request.null");
+		BaseValidator.checkNotNull(germplasmMergeRequestDto.getTargetGermplasmId(), "germplasm.merge.target.germplasm.null");
+		BaseValidator.checkNotNull(germplasmMergeRequestDto.getMergeOptions(), "germplasm.merge.merge.options.null");
 		BaseValidator.checkNotEmpty(germplasmMergeRequestDto.getNonSelectedGermplasm(), "germplasm.import.list.null");
 
 		// Remove non-selected germplasm for omission
@@ -44,6 +46,11 @@ public class GermplasmMergeRequestDtoValidator {
 			final boolean hasNullNonSelectedGermplasmId = germplasmMergeRequestDto.getNonSelectedGermplasm().stream().anyMatch(g -> Objects.isNull(g.getGermplasmId()));
 			if (hasNullNonSelectedGermplasmId) {
 				errors.reject("germplasm.merge.non.selected.null.gid", "");
+			}
+
+			final boolean hasNullMigrateLots = germplasmMergeRequestDto.getNonSelectedGermplasm().stream().anyMatch(g -> Objects.isNull(g.isMigrateLots()));
+			if (hasNullMigrateLots) {
+				errors.reject("germplasm.merge.non.selected.null.migrate.lots", "");
 			}
 
 			final List<GermplasmMergeRequestDto.NonSelectedGermplasm> nonSelectedGermplasm =
@@ -99,13 +106,6 @@ public class GermplasmMergeRequestDtoValidator {
 				"");
 		}
 
-		nonSelectedGermplasm.stream().anyMatch(g -> {
-			if (g.isCloseLots() && g.isMigrateLots()) {
-				errors.reject("germplasm.merge.invalid.lots.spec", new String[] {g.getGermplasmId().toString()}, "");
-				return true;
-			}
-			return false;
-		});
 	}
 
 	protected void setMaximumGermplasmToMerge(final int maximumGermplasmToMerge) {

@@ -71,7 +71,6 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 		germplasmMergeRequestDto.setTargetGermplasmId(1);
 		final GermplasmMergeRequestDto.NonSelectedGermplasm nonSelectedGermplasm = new GermplasmMergeRequestDto.NonSelectedGermplasm();
 		nonSelectedGermplasm.setGermplasmId(2);
-		nonSelectedGermplasm.setCloseLots(false);
 		nonSelectedGermplasm.setOmit(false);
 		nonSelectedGermplasm.setMigrateLots(false);
 		final GermplasmMergeRequestDto.MergeOptions mergeOptions = new GermplasmMergeRequestDto.MergeOptions();
