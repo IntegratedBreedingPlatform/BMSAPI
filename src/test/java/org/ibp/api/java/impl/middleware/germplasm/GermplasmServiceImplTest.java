@@ -486,28 +486,5 @@ public class GermplasmServiceImplTest {
 		assertThat(summary.getCountLotsToClose(), is(lotsToClose));
 	}
 
-	@Test
-	public void testGetGermplasmMergeSummary_NoLotsToCloseOrMerge() {
-		final GermplasmMergeRequestDto requestDto = new GermplasmMergeRequestDto();
-		requestDto.setTargetGermplasmId(new Random().nextInt());
-		requestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(2, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(3, false, false)));
-		final long listsToUpdate = new Random().nextInt(100);
-		final long studiesToUpdate = new Random().nextInt(100);
-		final long plotsToUpdate = new Random().nextInt(1000);
-		when(this.germplasmListService.countGermplasmLists(Mockito.anyList())).thenReturn(listsToUpdate);
-		when(this.studyService.countStudiesByGids(Mockito.anyList())).thenReturn(studiesToUpdate);
-		when(this.studyService.countPlotsByGids(Mockito.anyList())).thenReturn(plotsToUpdate);
-
-		final GermplasmMergeSummaryDto summary = this.germplasmServiceImpl.getGermplasmMergeSummary(requestDto);
-		Mockito.verify(this.germplasmMergeRequestDtoValidator).validate(requestDto);
-		Mockito.verify(this.lotService, Mockito.never()).countSearchLots(ArgumentMatchers.any());
-		assertThat(summary.getCountGermplasmToDelete(), is(2L));
-		assertThat(summary.getCountListsToUpdate(), is(listsToUpdate));
-		assertThat(summary.getCountStudiesToUpdate(), is(studiesToUpdate));
-		assertThat(summary.getCountLotsToMigrate(), is(0L));
-		assertThat(summary.getCountLotsToClose(), is(0L));
-	}
 
 }
