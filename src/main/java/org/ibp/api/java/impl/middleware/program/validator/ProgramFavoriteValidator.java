@@ -47,14 +47,14 @@ public class ProgramFavoriteValidator {
 
 	public void validateAddFavorites(final String programUUID, final ProgramFavoriteRequestDto programFavoriteRequestDtos) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), ProgramFavoriteRequestDto.class.getName());
-		final Set<Integer> entityIds = new HashSet<>(programFavoriteRequestDtos.getEntityIds());
-		final ProgramFavorite.FavoriteType favoriteType = programFavoriteRequestDtos.getFavoriteType();
 
 		if (CollectionUtils.isEmpty(programFavoriteRequestDtos.getEntityIds())) {
 			errors.reject("program.favorite.entity.list.id.required", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
+		final Set<Integer> entityIds = new HashSet<>(programFavoriteRequestDtos.getEntityIds());
+		final ProgramFavorite.FavoriteType favoriteType = programFavoriteRequestDtos.getFavoriteType();
 		final List<ProgramFavorite> favorites = this.programFavoriteService.getProgramFavorites(programUUID, favoriteType, entityIds);
 
 		if (!favorites.isEmpty()) {
