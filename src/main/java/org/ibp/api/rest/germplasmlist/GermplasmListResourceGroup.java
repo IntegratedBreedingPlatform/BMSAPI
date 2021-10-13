@@ -328,7 +328,8 @@ GermplasmListResourceGroup {
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
-	//TODO: should be ignore in swagger?
+
+	@ApiIgnore
 	@ApiOperation(value = "Customize the view of the germplasm list data.")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/view", method = RequestMethod.PUT)
 	@ResponseBody
