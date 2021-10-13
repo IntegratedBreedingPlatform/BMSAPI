@@ -25,24 +25,21 @@ public class BrapiResponseMessageGenerator<T> {
 			new Object[] {importResponse.getCreatedSize(), importResponse.getImportListSize(), entity},
 			LocaleContextHolder.getLocale()));
 		messagesList.add(messageInfo);
-		if (!CollectionUtils.isEmpty(importResponse.getErrors())) {
-			int index = 1;
-			for (final ObjectError error : importResponse.getErrors()) {
-				final String errorHeader = this.messageSource.getMessage("message.type.error", null, LocaleContextHolder.getLocale());
-				messagesList.add(this.createErrorMessage(errorHeader, errorHeader + index++ + " " + this.messageSource
-					.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale())));
-			}
-		}
+		this.addErrorMessageList(messagesList, importResponse.getErrors());
 		return messagesList;
 	}
 
 	public List<Map<String, String>> getMessagesList(final BrapiUpdateResponse<T> variableUpdateResponse) {
 		final List<Map<String, String>> messagesList = new ArrayList<>();
-		final String entity = this.messageSource.getMessage(variableUpdateResponse.getEntity(), null, LocaleContextHolder.getLocale());
-		final Map<String, String> messageInfo = this.createInfoMessage(this.messageSource.getMessage("message.updated.successfully",
-			new Object[] {variableUpdateResponse.getEntityName(), entity },
-			LocaleContextHolder.getLocale()));
-		messagesList.add(messageInfo);
+		if (CollectionUtils.isEmpty(variableUpdateResponse.getErrors())) {
+			final String entity = this.messageSource.getMessage(variableUpdateResponse.getEntity(), null, LocaleContextHolder.getLocale());
+			final Map<String, String> messageInfo = this.createInfoMessage(this.messageSource.getMessage("message.updated.successfully",
+				new Object[] {variableUpdateResponse.getEntityName(), entity},
+				LocaleContextHolder.getLocale()));
+			messagesList.add(messageInfo);
+		} else {
+			this.addErrorMessageList(messagesList, variableUpdateResponse.getErrors());
+		}
 		return messagesList;
 	}
 
@@ -62,6 +59,17 @@ public class BrapiResponseMessageGenerator<T> {
 		messageError.put(messageHeader, message);
 		messageError.put(messageTypeHeader, errorHeader);
 		return messageError;
+	}
+
+	private void addErrorMessageList(final List<Map<String, String>> messagesList, final List<ObjectError> errors) {
+		if (!CollectionUtils.isEmpty(errors)) {
+			int index = 1;
+			for (final ObjectError error : errors) {
+				final String errorHeader = this.messageSource.getMessage("message.type.error", null, LocaleContextHolder.getLocale());
+				messagesList.add(this.createErrorMessage(errorHeader, errorHeader + index++ + " " + this.messageSource
+					.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale())));
+			}
+		}
 	}
 
 }

@@ -137,11 +137,11 @@ public class VariableResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/variables/{observationVariableDbId}", method = RequestMethod.PUT)
 	@JsonView(BrapiView.BrapiV2_1.class)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<VariableDTO>> postObservationVariables(@PathVariable final String crop,
+	public ResponseEntity<SingleEntityResponse<VariableDTO>> putObservationVariables(@PathVariable final String crop,
 		@PathVariable final String observationVariableDbId,
 		@RequestBody final VariableDTO variable) {
 
-		final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(variable);
+		final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(crop, variable);
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(variableUpdateResponse));
 		final SingleEntityResponse<VariableDTO> variableResponse =
 			new SingleEntityResponse<>(variableUpdateResponse.getEntityObject()).withMetadata(metadata);

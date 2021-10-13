@@ -3,8 +3,9 @@ package org.ibp.api.java.impl.middleware.ontology.brapi;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.VariableServiceBrapi;
-import org.ibp.api.brapi.v2.BrapiUpdateResponse;
 import org.ibp.api.brapi.v2.variable.VariableUpdateResponse;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.VariableUpdateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,9 @@ import java.util.List;
 @Service
 @Transactional
 public class VariableServiceBrapiImpl implements VariableServiceBrapi {
+
+	@Autowired
+	private VariableUpdateValidator variableUpdateValidator;
 
 	@Autowired
 	private org.generationcp.middleware.api.brapi.VariableServiceBrapi middlewareVariableServiceBrapi;
@@ -29,9 +33,15 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	@Override
-	public VariableUpdateResponse updateObservationVariable(final VariableDTO variable) {
+	public VariableUpdateResponse updateObservationVariable(final String crop, final VariableDTO variable) {
 		final VariableUpdateResponse variableUpdateResponse = new VariableUpdateResponse();
-		variableUpdateResponse.setEntityObject(this.middlewareVariableServiceBrapi.updateObservationVariable(variable));
+		try {
+			this.variableUpdateValidator.validate(crop, variable);
+			variableUpdateResponse.setEntityObject(this.middlewareVariableServiceBrapi.updateObservationVariable(variable));
+		} catch (final ApiRequestValidationException e) {
+			variableUpdateResponse.setEntityObject(variable);
+			variableUpdateResponse.setErrors(e.getErrors());
+		}
 		return variableUpdateResponse;
 	}
 }
