@@ -254,7 +254,7 @@ public class GermplasmResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get a list of germplasm given a set of germplasmUUIDs and names")
+	@ApiOperation(value = "Get a list of germplasm given a set of germplasmPUIs, germplasmUUIDs, gids and names")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/matches", method = RequestMethod.POST)
 	@ResponseBody

@@ -9,7 +9,6 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,13 +23,8 @@ import java.util.List;
 @Transactional
 public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
-	public static final int BATCH_SIZE = 500;
-
 	@Autowired
 	private org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService germplasmListDataService;
-
-	@Autowired
-	public SecurityService securityService;
 
 	@Autowired
 	public GermplasmListValidator germplasmListValidator;
