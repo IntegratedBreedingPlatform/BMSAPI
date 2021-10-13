@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.common.validator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.api.study.CategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -51,7 +52,7 @@ public class VariableUpdateValidator {
 
 	}
 
-	private void validateVariable(final String crop, final VariableDTO variableDTO, final BindingResult errors) {
+	protected void validateVariable(final String crop, final VariableDTO variableDTO, final BindingResult errors) {
 		if (StringUtils.isEmpty(variableDTO.getObservationVariableDbId())) {
 			errors.reject("observation.variable.update.variable.id.required", new String[] {}, "");
 		}
@@ -86,7 +87,7 @@ public class VariableUpdateValidator {
 
 	}
 
-	private void validateTrait(final VariableDTO variableDTO, final BindingResult errors) {
+	protected void validateTrait(final VariableDTO variableDTO, final BindingResult errors) {
 		if (variableDTO.getTrait() != null) {
 			if (StringUtils.isEmpty(variableDTO.getTrait().getTraitDbId())) {
 				errors.reject("observation.variable.update.trait.id.required", new String[] {}, "");
@@ -112,7 +113,7 @@ public class VariableUpdateValidator {
 		}
 	}
 
-	private void validateMethod(final VariableDTO variableDTO, final BindingResult errors) {
+	protected void validateMethod(final VariableDTO variableDTO, final BindingResult errors) {
 		if (variableDTO.getMethod() != null) {
 			if (StringUtils.isEmpty(variableDTO.getMethod().getMethodDbId())) {
 				errors.reject("observation.variable.update.method.id.required", new String[] {}, "");
@@ -138,7 +139,7 @@ public class VariableUpdateValidator {
 		}
 	}
 
-	private void validateScale(final VariableDTO variableDTO, final BindingResult errors) {
+	protected void validateScale(final VariableDTO variableDTO, final BindingResult errors) {
 		if (variableDTO.getScale() != null) {
 			if (StringUtils.isEmpty(variableDTO.getScale().getScaleDbId())) {
 				errors.reject("observation.variable.update.scale.id.required", new String[] {}, "");
@@ -169,7 +170,19 @@ public class VariableUpdateValidator {
 					.anyMatch(c -> StringUtils.isNotEmpty(c.getValue()) && c.getValue().length() > CATEROGY_LABEL_MAX_LENGTH)) {
 					errors.reject("observation.variable.update.scale.categories.value.length.exceeded", new String[] {}, "");
 				}
+			}
 
+			if (variableDTO.getScale().getValidValues() != null) {
+				final Integer min = variableDTO.getScale().getValidValues().getMin();
+				final Integer max = variableDTO.getScale().getValidValues().getMax();
+				if (min != null && max != null && min > max) {
+					errors.reject("observation.variable.update.scale.min.is.greater.than.max", new String[] {}, "");
+				}
+			}
+			if (StringUtils.isNotEmpty(variableDTO.getScale().getDataType())
+				&& DataType.getByBrapiName(variableDTO.getScale().getDataType()) == null) {
+				errors.reject("observation.variable.update.scale.datatype.not.supported",
+					new String[] {variableDTO.getScale().getDataType()}, "");
 			}
 		}
 	}
