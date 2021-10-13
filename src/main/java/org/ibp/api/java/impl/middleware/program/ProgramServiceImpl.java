@@ -230,7 +230,7 @@ public class ProgramServiceImpl implements ProgramService {
 		final List<Location> locations = this.locationService.getFilteredLocations(locationSearchRequest, null);
 		if (!locations.isEmpty()) {
 			this.programFavoriteService
-				.addProgramFavorite(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, locations.get(0).getLocid());
+				.addProgramFavorites(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, new HashSet<>(locations.get(0).getLocid()));
 		}
 
 		this.installationDirectoryUtil.createWorkspaceDirectoriesForProject(crop, programBasicDetailsDto.getName());
