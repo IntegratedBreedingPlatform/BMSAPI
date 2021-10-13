@@ -82,6 +82,10 @@ public class LocationValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
+		this.validateLocationBelongToProgram(errors, programUUID, location);
+	}
+
+	public void validateLocationBelongToProgram(final BindingResult errors, final String programUUID, final Location location){
 		if (!StringUtils.isEmpty(programUUID) && location.getProgramUUID() != null && !location.getProgramUUID().equals(programUUID)) {
 			errors.reject("location.belongs.to.another.program", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
