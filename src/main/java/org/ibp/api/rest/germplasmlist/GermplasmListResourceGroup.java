@@ -282,8 +282,8 @@ GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmListById(listId), HttpStatus.OK);
 	}
 
-	//TODO: should be ignore in swagger?
 	//TODO: check permission
+	@ApiIgnore
 	@ApiOperation(value = "Locks or unlocks the list depending the current status of it")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/toggle-status", method = RequestMethod.POST)
 	@ResponseBody
@@ -293,7 +293,7 @@ GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.toggleGermplasmListStatus(listId), HttpStatus.OK);
 	}
 
-	//TODO: should be ignore in swagger?
+	@ApiIgnore
 	@ApiOperation(value = "Get a list of static, names and germplasm descriptors columns for a given list")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/columns", method = RequestMethod.GET)
 	@ResponseBody
@@ -303,7 +303,7 @@ GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListDataService.getGermplasmListColumns(listId, programUUID), HttpStatus.OK);
 	}
 
-	//TODO: should be ignore in swagger?
+	@ApiIgnore
 	@ApiOperation(value = "Get the header for list table")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/table/columns", method = RequestMethod.GET)
 	@ResponseBody
