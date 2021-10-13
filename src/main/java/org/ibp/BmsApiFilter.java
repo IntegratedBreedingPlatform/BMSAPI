@@ -33,7 +33,7 @@ public class BmsApiFilter implements Filter {
 		response.setHeader("X-Content-Type-Options", "nosniff");
 		response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
 		response.setHeader("Feature-Policy", "self");
-		response.setHeader("Content-Security-Policy", "default-src 'self' style-src 'self' 'unsafe-inline';");
+		response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline';");
 
 		// Specific Cache control setting. An issue is caused by caching in IE9 and IE10. The GET requests to retrieve the variables,
 		// properties, methods or scales after one has been added are not executed again. IE will only execute the GET request again after
