@@ -243,7 +243,7 @@ public class GermplasmResourceBrapi {
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(germplasmSearchRequestV2, GermplasmSearchRequest.class).toString();
 
-		final SearchDto searchDto = new SearchDto(searchRequestId);
+		final SearchDto searchDto = new SearchDto(searchRequestId, true);
 		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<>(searchDto);
 
 		return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
