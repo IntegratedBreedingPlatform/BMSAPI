@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeSummaryDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
@@ -407,6 +408,15 @@ public class GermplasmResource {
 		@RequestBody final GermplasmMergeRequestDto germplasmMergeRequestDto) {
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get summary of database changes to be done for germplasm merge request")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'MERGE_GERMPLASM')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/merge/summary", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<GermplasmMergeSummaryDto> previewMergeGermplasmSummary(@PathVariable final String cropName,
+		@RequestBody final GermplasmMergeRequestDto germplasmMergeRequestDto) {
+		return new ResponseEntity<>(this.germplasmService.getGermplasmMergeSummary(germplasmMergeRequestDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get the list of duplicate germplasm that were merged into the specified germplasm")
