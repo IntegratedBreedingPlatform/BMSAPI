@@ -84,6 +84,10 @@ public class VariableUpdateValidator {
 				}
 			}
 		}
+		if (variableDTO.getStudyDbIds().stream().anyMatch(s -> !StringUtils.isNumeric(s))) {
+			errors.reject("observation.variable.update.study.id.must.be.numeric",
+				new String[] {}, "");
+		}
 
 	}
 

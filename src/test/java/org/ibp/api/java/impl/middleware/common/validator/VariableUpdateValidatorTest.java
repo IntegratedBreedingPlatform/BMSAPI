@@ -142,6 +142,20 @@ public class VariableUpdateValidatorTest {
 	}
 
 	@Test
+	public void testValidation_ValidateVariable_StudyDbIdsMustBeNumeric() {
+
+		final VariableDTO variableDTO = new VariableDTO();
+		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
+		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH));
+		variableDTO.setStudyDbIds(Arrays.asList("1", "abc"));
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		this.variableUpdateValidator.validateVariable(CROP, variableDTO, errors);
+
+		Assert.assertEquals(1, errors.getAllErrors().size());
+		this.assertError(errors.getAllErrors(), "observation.variable.update.study.id.must.be.numeric");
+	}
+
+	@Test
 	public void testValidation_ValidateTrait_RequiredFields() {
 
 		final VariableDTO variableDTO = new VariableDTO();
