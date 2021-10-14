@@ -4,12 +4,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeSummaryDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -19,12 +21,14 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -38,6 +42,7 @@ import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmBasicDetailsValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.ProgenitorsUpdateRequestDtoValidator;
+import org.ibp.api.java.inventory.manager.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -91,6 +96,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private GermplasmNameTypeService germplasmNameTypeService;
 
 	@Autowired
+	private GermplasmListService germplasmListService;
+
+	@Autowired
+	private LotService lotService;
+
+	@Autowired
+	private StudyService studyService;
+
+	@Autowired
 	private org.generationcp.middleware.api.germplasm.GermplasmService germplasmService;
 
 	@Autowired
@@ -130,7 +144,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		this.addParentsFromPedigreeTable(responseMap, germplasmSearchRequest);
 		this.addHasProgenyAttribute(responseMap, germplasmSearchRequest);
-		this.addUsedInStudyAttribute(responseMap, germplasmSearchRequest);
+		this.addUsedInLockedStudyAttribute(responseMap, germplasmSearchRequest);
 		this.addUsedInLockedListAttribute(responseMap, germplasmSearchRequest);
 
 		return responseList;
@@ -195,18 +209,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	}
 
-	private void addUsedInStudyAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
+	private void addUsedInLockedStudyAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
 		final GermplasmSearchRequest germplasmSearchRequest) {
 		final List<String> addedColumnsPropertyIds = germplasmSearchRequest.getAddedColumnsPropertyIds();
 		if (addedColumnsPropertyIds == null || addedColumnsPropertyIds.isEmpty()
-			|| !addedColumnsPropertyIds.contains(ColumnLabels.USED_IN_STUDY.getName())) {
+			|| !addedColumnsPropertyIds.contains(ColumnLabels.USED_IN_LOCKED_STUDY.getName())) {
 			return;
 		}
 
-		final Set<Integer> gidsOfGermplasmUsedInStudy =
-			this.germplasmService.getGermplasmUsedInStudies(new ArrayList<>(responseMap.keySet()));
+		final Set<Integer> germplasmUsedInLockedStudies =
+			this.germplasmService.getGermplasmUsedInLockedStudies(new ArrayList<>(responseMap.keySet()));
 
-		responseMap.forEach((gid, response) -> response.setUsedInStudy(gidsOfGermplasmUsedInStudy.contains(gid)));
+		responseMap.forEach((gid, response) -> response.setUsedInLockedStudy(germplasmUsedInLockedStudies.contains(gid)));
 	}
 
 	private void addUsedInLockedListAttribute(final Map<Integer, GermplasmSearchResponse> responseMap,
@@ -349,14 +363,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public void mergeGermplasm(final GermplasmMergeRequestDto germplasmMergeRequestDto) {
-
-		final List<Integer> gids = germplasmMergeRequestDto.getNonSelectedGermplasm().stream().map(
-			GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(Collectors.toList());
-		gids.add(germplasmMergeRequestDto.getTargetGermplasmId());
-		this.errors = new MapBindingResult(new HashMap<>(), GermplasmMergeRequestDto.class.getName());
-		this.germplasmValidator.validateGids(this.errors, gids);
 		this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
-
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto,
 			this.pedigreeService.getCrossExpansion(germplasmMergeRequestDto.getTargetGermplasmId(), this.crossExpansionProperties));
 	}
@@ -373,16 +380,42 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.germplasmService.getGermplasmProgenies(gid);
 	}
 
-	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
-		this.germplasmDataManager = germplasmDataManager;
+	@Override
+	public GermplasmMergeSummaryDto getGermplasmMergeSummary(final GermplasmMergeRequestDto germplasmMergeRequestDto) {
+		this.germplasmMergeRequestDtoValidator.validate(germplasmMergeRequestDto);
+		// Remove non-selected germplasm for omission
+		germplasmMergeRequestDto.getNonSelectedGermplasm().removeIf(GermplasmMergeRequestDto.NonSelectedGermplasm::isOmit);
+
+		final GermplasmMergeSummaryDto germplasmMergeSummaryDto = new GermplasmMergeSummaryDto();
+		germplasmMergeSummaryDto.setCountGermplasmToDelete(germplasmMergeRequestDto.getNonSelectedGermplasm().size());
+
+		final List<Integer> nonSelectedGids = germplasmMergeRequestDto.getNonSelectedGermplasm().stream().map(
+			GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(Collectors.toList());
+		germplasmMergeSummaryDto.setCountListsToUpdate(this.germplasmListService.countGermplasmLists(nonSelectedGids));
+		germplasmMergeSummaryDto.setCountStudiesToUpdate(this.studyService.countStudiesByGids(nonSelectedGids));
+		germplasmMergeSummaryDto.setCountPlotsToUpdate(this.studyService.countPlotsByGids(nonSelectedGids));
+
+		final List<Integer> migrateLotsGids =
+			germplasmMergeRequestDto.getNonSelectedGermplasm().stream().filter(GermplasmMergeRequestDto.NonSelectedGermplasm::isMigrateLots)
+				.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
+				Collectors.toList());
+		if (!CollectionUtils.isEmpty(migrateLotsGids)) {
+			final LotsSearchDto migrateLotSearch = new LotsSearchDto();
+			migrateLotSearch.setGids(migrateLotsGids);
+			germplasmMergeSummaryDto.setCountLotsToMigrate(this.lotService.countSearchLots(migrateLotSearch));
+		}
+
+		final List<Integer> closeLotsGids =
+			germplasmMergeRequestDto.getNonSelectedGermplasm().stream().filter(g -> !g.isMigrateLots())
+				.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
+				Collectors.toList());
+		if (!CollectionUtils.isEmpty(closeLotsGids)) {
+			final LotsSearchDto closeLotSearch = new LotsSearchDto();
+			closeLotSearch.setGids(closeLotsGids);
+			germplasmMergeSummaryDto.setCountLotsToClose(this.lotService.countSearchLots(closeLotSearch));
+		}
+		return germplasmMergeSummaryDto;
 	}
 
-	void setPedigreeService(final PedigreeService pedigreeService) {
-		this.pedigreeService = pedigreeService;
-	}
-
-	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
-		this.crossExpansionProperties = crossExpansionProperties;
-	}
 
 }
