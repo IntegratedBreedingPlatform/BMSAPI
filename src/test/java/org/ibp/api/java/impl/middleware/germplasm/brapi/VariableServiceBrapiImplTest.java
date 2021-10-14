@@ -4,6 +4,7 @@ import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.v2.variable.VariableUpdateResponse;
+import org.ibp.api.java.impl.middleware.common.validator.VariableUpdateValidator;
 import org.ibp.api.java.impl.middleware.ontology.brapi.VariableServiceBrapiImpl;
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,6 +22,9 @@ public class VariableServiceBrapiImplTest {
 
     @Mock
     private VariableServiceBrapi middlewareVariableServiceBrapi;
+
+    @Mock
+    private VariableUpdateValidator variableUpdateValidator;
 
     @InjectMocks
     private org.ibp.api.brapi.VariableServiceBrapi variableServiceBrapi = new VariableServiceBrapiImpl();
