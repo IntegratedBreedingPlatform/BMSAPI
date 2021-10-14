@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.api.study.CategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -31,9 +32,6 @@ public class VariableUpdateValidator {
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
-
-	@Autowired
-	protected VariableService variableService;
 
 	@Autowired
 	protected TermValidator termValidator;
@@ -74,11 +72,10 @@ public class VariableUpdateValidator {
 			final boolean isVariableUsedInStudy = this.ontologyVariableDataManager.areVariablesUsedInStudy(
 				Arrays.asList(Integer.valueOf(variableDTO.getObservationVariableDbId())));
 			if (isVariableUsedInStudy) {
-				final VariableDetails variableDetails =
-					this.variableService.getVariableById(crop, null, variableDTO.getObservationVariableDbId());
-				if (!variableDetails.getProperty().getId().equals(variableDTO.getTrait().getTraitDbId())
-					|| !variableDetails.getMethod().getId().equals(variableDTO.getMethod().getMethodDbId())
-					|| !variableDetails.getScale().getId().equals(variableDTO.getScale().getScaleDbId())) {
+				final Variable variableDetails = this.ontologyVariableDataManager.getVariable(StringUtils.EMPTY, Integer.valueOf(variableDTO.getObservationVariableDbId()), true);
+				if (variableDetails.getProperty().getId() != Integer.parseInt(variableDTO.getTrait().getTraitDbId())
+					|| variableDetails.getMethod().getId() != Integer.parseInt(variableDTO.getMethod().getMethodDbId())
+					|| variableDetails.getScale().getId() != Integer.parseInt(variableDTO.getScale().getScaleDbId())) {
 					errors.reject("observation.variable.update.cannot.update.trait.scale.method",
 						new String[] {}, "");
 				}

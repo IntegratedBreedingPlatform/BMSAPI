@@ -1,16 +1,15 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.api.study.CategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
-import org.ibp.api.domain.ontology.MethodDetails;
-import org.ibp.api.domain.ontology.PropertyDetails;
-import org.ibp.api.domain.ontology.ScaleDetails;
-import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
-import org.ibp.api.java.ontology.VariableService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,11 +31,9 @@ import static org.junit.Assert.fail;
 public class VariableUpdateValidatorTest {
 
 	public static final String CROP = "maize";
-	@Mock
-	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Mock
-	protected VariableService variableService;
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Mock
 	protected TermValidator termValidator;
@@ -112,19 +109,19 @@ public class VariableUpdateValidatorTest {
 	@Test
 	public void testValidation_ValidateVariable_PropertyScaleMethodMismatch() {
 
-		final VariableDetails variableDetails = new VariableDetails();
-		final PropertyDetails propertyDetails = new PropertyDetails();
-		propertyDetails.setId("1");
-		final MethodDetails methodDetails = new MethodDetails();
-		methodDetails.setId("2");
-		final ScaleDetails scaleDetails = new ScaleDetails();
-		scaleDetails.setId("3");
-		variableDetails.setProperty(propertyDetails);
-		variableDetails.setMethod(methodDetails);
-		variableDetails.setScale(scaleDetails);
+		final Variable variable = new Variable();
+		final Property property = new Property();
+		property.setId(1);
+		final Method method = new Method();
+		method.setId(2);
+		final Scale scale = new Scale();
+		scale.setId(3);
+		variable.setProperty(property);
+		variable.setMethod(method);
+		variable.setScale(scale);
 
 		Mockito.when(this.ontologyVariableDataManager.areVariablesUsedInStudy(Mockito.anyList())).thenReturn(true);
-		Mockito.when(this.variableService.getVariableById(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(variableDetails);
+		Mockito.when(this.ontologyVariableDataManager.getVariable(Mockito.anyString(), Mockito.anyInt(), Mockito.anyBoolean())).thenReturn(variable);
 
 		final VariableDTO variableDTO = new VariableDTO();
 		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
