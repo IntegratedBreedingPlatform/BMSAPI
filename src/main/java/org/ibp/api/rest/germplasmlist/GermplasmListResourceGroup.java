@@ -228,7 +228,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation("Search germplasm lists")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/search", method = RequestMethod.POST)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -250,7 +250,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Returns a germplasm list data by a given germplasm list id")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/data/search", method = RequestMethod.POST)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -281,8 +281,8 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmListById(listId), HttpStatus.OK);
 	}
 
-	//TODO: should be ignore in swagger?
 	//TODO: check permission
+	@ApiIgnore
 	@ApiOperation(value = "Locks or unlocks the list depending the current status of it")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/toggle-status", method = RequestMethod.POST)
 	@ResponseBody
@@ -292,7 +292,7 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.toggleGermplasmListStatus(listId), HttpStatus.OK);
 	}
 
-	//TODO: should be ignore in swagger?
+	@ApiIgnore
 	@ApiOperation(value = "Get a list of static, names and germplasm descriptors columns for a given list")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/columns", method = RequestMethod.GET)
 	@ResponseBody
@@ -302,7 +302,7 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListDataService.getGermplasmListColumns(listId, programUUID), HttpStatus.OK);
 	}
 
-	//TODO: should be ignore in swagger?
+	@ApiIgnore
 	@ApiOperation(value = "Get the header for list table")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/table/columns", method = RequestMethod.GET)
 	@ResponseBody
@@ -327,7 +327,8 @@ public class GermplasmListResourceGroup {
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
-	//TODO: should be ignore in swagger?
+
+	@ApiIgnore
 	@ApiOperation(value = "Customize the view of the germplasm list data.")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/view", method = RequestMethod.PUT)
 	@ResponseBody
