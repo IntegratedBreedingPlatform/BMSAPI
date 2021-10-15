@@ -54,29 +54,14 @@ public class GermplasmListDataServiceImplTest {
 		final List<GermplasmListDataUpdateViewDTO> view = Mockito.mock(List.class);
 
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		Mockito.doNothing().when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.doNothing().when(this.germplasmListDataServiceMiddleware).saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
 
 		this.germplasmListDataService.saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
+		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verify(this.germplasmListDataServiceMiddleware).saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
-	}
-
-	@Test
-	public void saveGermplasmListDataView_listIsLocked() {
-		final GermplasmList germplasmList = this.createGermplasmListMock(true);
-		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
-
-		try {
-			this.germplasmListDataService.saveGermplasmListDataView(GERMPLASM_LIST_ID, new ArrayList<>());
-			Assert.fail("Should have thrown validation exception but did not.");
-		} catch (final ApiRequestValidationException e) {
-			Assert.assertThat(e.getErrors().get(0).getCode(), is("list.locked"));
-		}
-
-		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
-		Mockito.verifyNoMoreInteractions(this.germplasmListDataServiceMiddleware);
-		Mockito.verifyNoInteractions(this.securityService);
 	}
 
 	private GermplasmList createGermplasmListMock(final boolean isLocked) {

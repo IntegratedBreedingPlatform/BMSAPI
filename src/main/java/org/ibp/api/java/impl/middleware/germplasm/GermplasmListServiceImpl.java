@@ -31,6 +31,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.Util;
+import org.ibp.api.domain.germplasmlist.GermplasmListMapper;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -58,7 +59,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -656,8 +656,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public GermplasmListDto getGermplasmListById(final Integer listId) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
-		final Function<GermplasmList, GermplasmListDto> function = GermplasmListServiceImpl::transformGermplasmList;
-		return function.apply(germplasmList);
+		return GermplasmListMapper.getInstance().map(germplasmList, GermplasmListDto.class);
 	}
 
 	@Override
@@ -746,18 +745,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private Integer getFolderIdAsInteger(final String folderId) {
 		return (CROP_LISTS.equals(folderId) || PROGRAM_LISTS.equals(folderId)) ? null : Integer.valueOf(folderId);
-	}
-
-	private static GermplasmListDto transformGermplasmList(GermplasmList input) {
-		GermplasmListDto output = new GermplasmListDto();
-		output.setListId(input.getId());
-		output.setListName(input.getName());
-		output.setCreationDate(input.parseDate());
-		output.setDescription(input.getDescription());
-		output.setProgramUUID(input.getProgramUUID());
-		output.setLocked(input.isLockedList());
-		output.setOwnerId(input.getUserId());
-		return output;
 	}
 
 	public void setGermplasmListManager(final GermplasmListManager germplasmListManager) {

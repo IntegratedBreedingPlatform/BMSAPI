@@ -65,7 +65,7 @@ public class GermplasmListValidator {
 
 	public void validateListName(final String currentProgram, final String name) {
 		checkNotNull(name, "param.null", new String[] {"name"});
-		checkArgument(name.length() <= 50, "text.field.max.length", new String[] {"name", "50"});
+		checkArgument(name.length() <= NAME_MAX_LENGTH, "text.field.max.length", new String[] {"name", "50"});
 		if (AppConstants.CROP_LISTS.getString().equals(name)) {
 			throw new ApiValidationException("", "error.list.name.invalid", AppConstants.CROP_LISTS.getString());
 		}
@@ -87,6 +87,13 @@ public class GermplasmListValidator {
 				this.errors.reject("list.folder.name.exists", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			});
+	}
+
+	public void validateListIsUnlocked(final GermplasmList germplasmList) {
+		if (germplasmList.isLockedList()) {
+			this.errors.reject("list.locked", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 }

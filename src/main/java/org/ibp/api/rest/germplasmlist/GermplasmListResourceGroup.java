@@ -274,6 +274,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Returns a list by a given list id")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<GermplasmListDto> getGermplasmListById(@PathVariable final String cropName,
@@ -282,9 +283,8 @@ GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmListById(listId), HttpStatus.OK);
 	}
 
-	//TODO: check permission
 	@ApiIgnore
-	@ApiOperation(value = "Locks or unlocks the list depending the current status of it")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/toggle-status", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Boolean> toggleGermplasmListStatus(@PathVariable final String cropName,
@@ -294,7 +294,6 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiIgnore
-	@ApiOperation(value = "Get a list of static, names and germplasm descriptors columns for a given list")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/columns", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmListColumnDTO>> getGermplasmListColumns(@PathVariable final String cropName,
@@ -304,7 +303,6 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiIgnore
-	@ApiOperation(value = "Get the header for list table")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/table/columns", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmListMeasurementVariableDTO>> getGermplasmListDataTableHeader(@PathVariable final String cropName,
@@ -330,7 +328,7 @@ GermplasmListResourceGroup {
 	}
 
 	@ApiIgnore
-	@ApiOperation(value = "Customize the view of the germplasm list data.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/view", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<Void> saveGermplasmListDataView(@PathVariable final String cropName,
