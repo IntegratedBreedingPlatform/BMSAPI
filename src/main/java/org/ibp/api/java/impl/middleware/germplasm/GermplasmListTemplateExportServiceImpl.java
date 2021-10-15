@@ -49,6 +49,7 @@ public class GermplasmListTemplateExportServiceImpl implements GermplasmListTemp
 		IMPORT_HEADERS.put("export.germplasm.list.template.gid.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.guid.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 		IMPORT_HEADERS.put("export.germplasm.list.template.designation.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_HEADERS.put("export.germplasm.list.template.entry.code.column", ExcelCellStyle.HEADING_STYLE_YELLOW);
 	}
 
 	private Map<ExcelCellStyle, CellStyle> sheetStylesMap;
