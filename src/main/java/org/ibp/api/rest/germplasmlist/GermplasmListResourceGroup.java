@@ -331,11 +331,11 @@ GermplasmListResourceGroup {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/view", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<Void> saveGermplasmListDataView(@PathVariable final String cropName,
+	public ResponseEntity<Void> updateGermplasmListDataView(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody List<GermplasmListDataUpdateViewDTO> view) {
-		this.germplasmListDataService.saveGermplasmListDataView(listId, view);
+		this.germplasmListDataService.updateGermplasmListDataView(listId, view);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

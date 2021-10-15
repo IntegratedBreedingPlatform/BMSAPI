@@ -3,10 +3,8 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -14,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -55,13 +52,13 @@ public class GermplasmListDataServiceImplTest {
 
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
 		Mockito.doNothing().when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
-		Mockito.doNothing().when(this.germplasmListDataServiceMiddleware).saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
+		Mockito.doNothing().when(this.germplasmListDataServiceMiddleware).updateGermplasmListDataView(GERMPLASM_LIST_ID, view);
 
-		this.germplasmListDataService.saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
+		this.germplasmListDataService.updateGermplasmListDataView(GERMPLASM_LIST_ID, view);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
-		Mockito.verify(this.germplasmListDataServiceMiddleware).saveGermplasmListDataView(GERMPLASM_LIST_ID, view);
+		Mockito.verify(this.germplasmListDataServiceMiddleware).updateGermplasmListDataView(GERMPLASM_LIST_ID, view);
 	}
 
 	private GermplasmList createGermplasmListMock(final boolean isLocked) {
