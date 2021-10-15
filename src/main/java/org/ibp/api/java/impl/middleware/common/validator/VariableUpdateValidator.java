@@ -130,7 +130,7 @@ public class VariableUpdateValidator {
 				errors.reject("observation.variable.update.method.name.max.length.exceeded", new String[] {}, "");
 			}
 			if (!StringUtils.isEmpty(variableDTO.getMethod().getDescription())
-				&& variableDTO.getMethod().getDescription().length() > TERM_NAME_MAX_LENGTH) {
+				&& variableDTO.getMethod().getDescription().length() > TERM_DEFINITION_MAX_LENGTH) {
 				errors.reject("observation.variable.update.method.description.max.length.exceeded", new String[] {}, "");
 			}
 			if (!StringUtils.isEmpty(variableDTO.getMethod().getMethodDbId())) {
