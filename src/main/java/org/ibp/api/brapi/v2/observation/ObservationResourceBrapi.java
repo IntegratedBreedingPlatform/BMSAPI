@@ -92,7 +92,7 @@ public class ObservationResourceBrapi {
 		observationSearchRequestDto.setObservationUnitDbIds(
 			StringUtils.isNotEmpty(observationUnitDbId) ? Arrays.asList(observationUnitDbId) : new ArrayList<>());
 		observationSearchRequestDto.setGermplasmDbIds(
-			StringUtils.isNotEmpty(germplasmDbId) ? Arrays.asList(Integer.valueOf(germplasmDbId)) : new ArrayList<>());
+			StringUtils.isNotEmpty(germplasmDbId) ? Arrays.asList(germplasmDbId) : new ArrayList<>());
 		observationSearchRequestDto.setObservationVariableDbIds(
 			StringUtils.isNotEmpty(observationVariableDbId) ? Arrays.asList(Integer.valueOf(observationVariableDbId)) : new ArrayList<>());
 		observationSearchRequestDto.setStudyDbIds(
@@ -102,7 +102,7 @@ public class ObservationResourceBrapi {
 		observationSearchRequestDto.setTrialDbIds(
 			StringUtils.isNotEmpty(trialDbId) ? Arrays.asList(Integer.valueOf(trialDbId)) : new ArrayList<>());
 		observationSearchRequestDto.setProgramDbIds(
-			StringUtils.isNotEmpty(programDbId) ? Arrays.asList(Integer.valueOf(programDbId)) : new ArrayList<>());
+			StringUtils.isNotEmpty(programDbId) ? Arrays.asList(programDbId) : new ArrayList<>());
 		observationSearchRequestDto.setSeasonDbId(seasonDbId);
 		observationSearchRequestDto.setObservationUnitLevelName(observationUnitLevelName);
 		observationSearchRequestDto.setObservationUnitLevelCode(observationUnitLevelCode);
