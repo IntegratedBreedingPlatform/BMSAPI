@@ -189,27 +189,9 @@ public class VariableUpdateValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
 		this.variableUpdateValidator.validateTrait(variableDTO, errors);
 
-		Assert.assertEquals(3, errors.getAllErrors().size());
+		Assert.assertEquals(2, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.trait.id.required");
 		this.assertError(errors.getAllErrors(), "observation.variable.update.trait.id.should.be.numeric");
-		this.assertError(errors.getAllErrors(), "observation.variable.update.trait.name.required");
-	}
-
-	@Test
-	public void testValidation_ValidateTrait_MaxLengthExceeded() {
-
-		final VariableDTO variableDTO = new VariableDTO();
-		variableDTO.getTrait().setTraitDbId(RandomStringUtils.randomNumeric(5));
-		variableDTO.getTrait().setTraitName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH + 1));
-		variableDTO.getTrait()
-			.setTraitDescription(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_DEFINITION_MAX_LENGTH + 1));
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateTrait(variableDTO, errors);
-
-		Assert.assertEquals(2, errors.getAllErrors().size());
-		this.assertError(errors.getAllErrors(), "observation.variable.update.trait.name.max.length.exceeded");
-		this.assertError(errors.getAllErrors(), "observation.variable.update.trait.description.max.length.exceeded");
-		Mockito.verify(this.termValidator).validate(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -219,26 +201,9 @@ public class VariableUpdateValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
 		this.variableUpdateValidator.validateMethod(variableDTO, errors);
 
-		Assert.assertEquals(3, errors.getAllErrors().size());
+		Assert.assertEquals(2, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.method.id.required");
 		this.assertError(errors.getAllErrors(), "observation.variable.update.method.id.should.be.numeric");
-		this.assertError(errors.getAllErrors(), "observation.variable.update.method.name.required");
-	}
-
-	@Test
-	public void testValidation_ValidateMethod_MaxLengthExceeded() {
-
-		final VariableDTO variableDTO = new VariableDTO();
-		variableDTO.getMethod().setMethodDbId(RandomStringUtils.randomNumeric(5));
-		variableDTO.getMethod().setMethodName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH + 1));
-		variableDTO.getMethod().setDescription(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_DEFINITION_MAX_LENGTH + 1));
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateMethod(variableDTO, errors);
-
-		Assert.assertEquals(2, errors.getAllErrors().size());
-		this.assertError(errors.getAllErrors(), "observation.variable.update.method.name.max.length.exceeded");
-		this.assertError(errors.getAllErrors(), "observation.variable.update.method.description.max.length.exceeded");
-		Mockito.verify(this.termValidator).validate(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -248,65 +213,9 @@ public class VariableUpdateValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
 		this.variableUpdateValidator.validateScale(variableDTO, errors);
 
-		Assert.assertEquals(3, errors.getAllErrors().size());
+		Assert.assertEquals(2, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.scale.id.required");
 		this.assertError(errors.getAllErrors(), "observation.variable.update.scale.id.should.be.numeric");
-		this.assertError(errors.getAllErrors(), "observation.variable.update.scale.name.required");
-	}
-
-	@Test
-	public void testValidation_ValidateScale_MaxLengthExceeded() {
-
-		final VariableDTO variableDTO = new VariableDTO();
-		variableDTO.getScale().setScaleDbId(RandomStringUtils.randomNumeric(5));
-		variableDTO.getScale().setScaleName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH + 1));
-		final ScaleCategoryDTO validValue1 = new ScaleCategoryDTO();
-		validValue1.setValue(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH));
-		validValue1.setLabel(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.CATEROGY_LABEL_MAX_LENGTH + 1));
-		final ScaleCategoryDTO validValue2 = new ScaleCategoryDTO();
-		validValue2.setValue(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH + 1));
-		validValue2.setLabel(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.CATEROGY_LABEL_MAX_LENGTH));
-
-		variableDTO.getScale().getValidValues().setCategories(Arrays.asList(validValue1, validValue2));
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateScale(variableDTO, errors);
-
-		Assert.assertEquals(2, errors.getAllErrors().size());
-		this.assertError(errors.getAllErrors(), "observation.variable.update.scale.name.max.length.exceeded");
-		this.assertError(errors.getAllErrors(), "observation.variable.update.scale.categories.label.length.exceeded");
-		Mockito.verify(this.termValidator).validate(Mockito.any(), Mockito.any());
-	}
-
-	@Test
-	public void testValidation_ValidateScale_ValidValues_MinIsGreaterThanMax() {
-
-		final VariableDTO variableDTO = new VariableDTO();
-		variableDTO.getScale().setScaleDbId(RandomStringUtils.randomNumeric(5));
-		variableDTO.getScale().setScaleName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH));
-		variableDTO.getScale().getValidValues().setMin(99);
-		variableDTO.getScale().getValidValues().setMax(1);
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateScale(variableDTO, errors);
-
-		Assert.assertEquals(1, errors.getAllErrors().size());
-		this.assertError(errors.getAllErrors(), "observation.variable.update.scale.min.is.greater.than.max");
-		Mockito.verify(this.termValidator).validate(Mockito.any(), Mockito.any());
-	}
-
-	@Test
-	public void testValidation_ValidateScale_DataTypeNotSupported() {
-
-		final VariableDTO variableDTO = new VariableDTO();
-		variableDTO.getScale().setScaleDbId(RandomStringUtils.randomNumeric(5));
-		variableDTO.getScale().setScaleName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH));
-		variableDTO.getScale().setDataType(RandomStringUtils.random(5));
-
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateScale(variableDTO, errors);
-
-		Assert.assertEquals(1, errors.getAllErrors().size());
-		this.assertError(errors.getAllErrors(), "observation.variable.update.scale.datatype.not.supported");
-		Mockito.verify(this.termValidator).validate(Mockito.any(), Mockito.any());
 	}
 
 	private void assertError(final List<ObjectError> objectErrorList, final String errorCode) {
