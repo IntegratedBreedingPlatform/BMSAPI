@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -82,12 +83,25 @@ public class CopResource {
 			header.addAll(results.columnKeySet().stream().map(Object::toString).collect(toList()));
 			rowValues.add(header.toArray(new String[] {}));
 
-			// FIXME
+			int offset = 0;
 			for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : results.rowMap().entrySet()) {
 				final List<String> row = new ArrayList<>();
 				row.add(rowEntrySet.getKey().toString());
+
+				/*
+				 * x x x x x x
+				 *   x x x x x
+				 *     x x x x
+				 *       x x x
+				 *         x x
+				 *           x
+				 * TODO improve
+				 */
+				IntStream.range(0, offset).forEach(i -> row.add(""));
+				offset++;
+
 				row.addAll(rowEntrySet.getValue().values().stream().map(Object::toString).collect(toList()));
-				rowValues.add(row.toArray(new String[]{}));
+				rowValues.add(row.toArray(new String[] {}));
 			}
 
 			csvWriter.writeAll(rowValues);
