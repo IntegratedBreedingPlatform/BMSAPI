@@ -19,6 +19,7 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
@@ -60,7 +61,7 @@ public class ObservationUnitResourceBrapi {
 	@ApiOperation(value = "Post observation units search", notes = "Post observation units search")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchObservationUnits(
+	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchObservationUnits(
 		@PathVariable final String crop,
 		@RequestBody final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto) {
 
@@ -68,8 +69,8 @@ public class ObservationUnitResourceBrapi {
 			this.searchRequestService.saveSearchRequest(observationUnitsSearchRequestDto, ObservationUnitsSearchRequestDto.class)
 				.toString();
 
-		final SearchDto searchDto = new SearchDto(searchRequestId);
-		final SingleEntityResponse<SearchDto> singleObservationUnitsResponse = new SingleEntityResponse<>(searchDto);
+		final BrapiSearchDto searchDto = new BrapiSearchDto(searchRequestId);
+		final SingleEntityResponse<BrapiSearchDto> singleObservationUnitsResponse = new SingleEntityResponse<>(searchDto);
 
 		return new ResponseEntity<>(singleObservationUnitsResponse, HttpStatus.OK);
 
