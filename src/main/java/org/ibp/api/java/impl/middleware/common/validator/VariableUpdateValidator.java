@@ -2,9 +2,11 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.api.study.ScaleCategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -17,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,12 +35,15 @@ public class VariableUpdateValidator {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Autowired
+	private VariableServiceBrapi variableServiceBrapi;
+
+	@Autowired
 	protected TermValidator termValidator;
 
-	public void validate(final String crop, final VariableDTO variableDTO) {
+	public void validate(final VariableDTO variableDTO) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.validateVariable(crop, variableDTO, errors);
+		this.validateVariable(variableDTO, errors);
 		this.validateTrait(variableDTO, errors);
 		this.validateMethod(variableDTO, errors);
 		this.validateScale(variableDTO, errors);
@@ -48,12 +54,18 @@ public class VariableUpdateValidator {
 
 	}
 
-	protected void validateVariable(final String crop, final VariableDTO variableDTO, final BindingResult errors) {
+	protected void validateVariable(final VariableDTO variableDTO, final BindingResult errors) {
 		if (StringUtils.isEmpty(variableDTO.getObservationVariableDbId())) {
 			errors.reject("observation.variable.update.variable.id.required", new String[] {}, "");
 		}
 		if (!StringUtils.isNumeric(variableDTO.getObservationVariableDbId())) {
 			errors.reject("observation.variable.update.variable.id.should.be.numeric", new String[] {}, "");
+		}
+		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
+		variableSearchRequestDTO.setObservationVariableDbIds(Collections.singletonList(variableDTO.getObservationVariableDbId()));
+		final List<VariableDTO> variableDTOS = this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTO, null);
+		if (CollectionUtils.isEmpty(variableDTOS)) {
+			errors.reject("observation.variable.update.variable.id.invalid", new String[] {}, "");
 		}
 		if (StringUtils.isEmpty(variableDTO.getObservationVariableName())) {
 			errors.reject("observation.variable.update.variable.name.required", new String[] {}, "");
@@ -71,9 +83,12 @@ public class VariableUpdateValidator {
 				Arrays.asList(Integer.valueOf(variableDTO.getObservationVariableDbId())));
 			if (isVariableUsedInStudy) {
 				final Variable variableDetails = this.ontologyVariableDataManager.getVariable(StringUtils.EMPTY, Integer.valueOf(variableDTO.getObservationVariableDbId()), true);
-				if (variableDetails.getProperty().getId() != Integer.parseInt(variableDTO.getTrait().getTraitDbId())
+				if (variableDTO.getTrait() != null && StringUtils.isNotEmpty(variableDTO.getTrait().getTraitDbId())
+						&& variableDTO.getScale() != null && StringUtils.isNotEmpty(variableDTO.getScale().getScaleDbId())
+						&& variableDTO.getMethod() != null && StringUtils.isNotEmpty(variableDTO.getMethod().getMethodDbId())
+						&& (variableDetails.getProperty().getId() != Integer.parseInt(variableDTO.getTrait().getTraitDbId())
 					|| variableDetails.getMethod().getId() != Integer.parseInt(variableDTO.getMethod().getMethodDbId())
-					|| variableDetails.getScale().getId() != Integer.parseInt(variableDTO.getScale().getScaleDbId())) {
+					|| variableDetails.getScale().getId() != Integer.parseInt(variableDTO.getScale().getScaleDbId()))) {
 					errors.reject("observation.variable.update.cannot.update.trait.scale.method",
 						new String[] {}, "");
 				}

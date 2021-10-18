@@ -18,9 +18,8 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
-import org.ibp.api.brapi.v2.BrapiUpdateResponse;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,13 +55,13 @@ public class VariableResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/search/variables", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchObservationVariables(
+	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchObservationVariables(
 		@PathVariable final String crop,
 		@RequestBody final VariableSearchRequestDTO variableSearchRequestDTO) {
-		final SearchDto searchDto =
-			new SearchDto(this.searchRequestService.saveSearchRequest(variableSearchRequestDTO, VariableSearchRequestDTO.class)
+		final BrapiSearchDto searchDto =
+			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(variableSearchRequestDTO, VariableSearchRequestDTO.class)
 				.toString());
-		final SingleEntityResponse<SearchDto> singleVariableSearchRequestDTO = new SingleEntityResponse<>(searchDto);
+		final SingleEntityResponse<BrapiSearchDto> singleVariableSearchRequestDTO = new SingleEntityResponse<>(searchDto);
 
 		return new ResponseEntity<>(singleVariableSearchRequestDTO, HttpStatus.OK);
 	}
@@ -91,7 +90,7 @@ public class VariableResourceBrapi {
 				HttpStatus.NOT_FOUND);
 		}
 
-		return getSearchResults(crop, requestDTO, currentPage, pageSize);
+		return this.getSearchResults(crop, requestDTO, currentPage, pageSize);
 	}
 
 	@ApiOperation(value = "Call to retrieve a list of observationVariables available in the system.", notes = "Get the Observation Variables")
@@ -141,15 +140,15 @@ public class VariableResourceBrapi {
 		@PathVariable final String observationVariableDbId,
 		@RequestBody final VariableDTO variable) {
 
-		final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(crop, variable);
+		final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(variable);
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(variableUpdateResponse));
 		final SingleEntityResponse<VariableDTO> variableResponse =
 			new SingleEntityResponse<>(variableUpdateResponse.getEntityObject()).withMetadata(metadata);
 		return new ResponseEntity<>(variableResponse, HttpStatus.OK);
 	}
 
-	private ResponseEntity<EntityListResponse<VariableDTO>> getSearchResults(String crop, VariableSearchRequestDTO requestDTO,
-		Integer currentPage, Integer pageSize) {
+	private ResponseEntity<EntityListResponse<VariableDTO>> getSearchResults(final String crop, final VariableSearchRequestDTO requestDTO,
+																			 final Integer currentPage, final Integer pageSize) {
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 

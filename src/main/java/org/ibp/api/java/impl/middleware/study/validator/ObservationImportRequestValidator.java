@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
@@ -24,6 +25,7 @@ import org.springframework.validation.MapBindingResult;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Component
 public class ObservationImportRequestValidator {
@@ -83,90 +85,113 @@ public class ObservationImportRequestValidator {
 
         final Map<String, List<String>> studyVariableIdsMap = new HashMap<>();
 
-        Integer index = 1;
-        final Iterator<ObservationDto> iterator = observationDtos.iterator();
-        while (iterator.hasNext()) {
-            final ObservationDto dto = iterator.next();
-            if(StringUtils.isEmpty(dto.getGermplasmDbId())) {
-                this.errors.reject("observation.import.germplasmDbId.required", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
+        final Map<ObservationDto, Integer> importRequestByIndexMap = IntStream.range(0, observationDtos.size())
+                .boxed().collect(Collectors.toMap(observationDtos::get, i -> i));
+        observationDtos.removeIf( dto -> {
+            final Integer index = importRequestByIndexMap.get(dto) + 1;
+            if (this.isGermplasmDbIdInvalid(germplasmDTOMap, dto, index) ||
+                    this.isObservationUnitDbIdInvalid(observationUnitDtoMap, dto, index) ||
+                    this.isObservationVariableDbIdInvalid(variableDTOMap, dto, index) ||
+                    this.isStudyDbIdInvalid(studyInstancesMap, dto, index) ||
+                    this.isValueInvalid(dto, index) ||
+                    this.hasNoExistingObservationUnit(observationUnitDtoMap, dto, index) ||
+                    this.isObservationVariableNotInStudy(variableSearchRequestDTO, studyVariableIdsMap, dto, index) ||
+                this.isAnyExternalReferenceInvalid(dto, index)) {
+                return true;
             }
-            if(StringUtils.isEmpty(dto.getObservationUnitDbId())) {
-                this.errors.reject("observation.import.observationUnitDbId.required", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            if(StringUtils.isEmpty(dto.getObservationVariableDbId())) {
-                this.errors.reject("observation.import.observationVariableDbId.required", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            if(StringUtils.isEmpty(dto.getStudyDbId())) {
-                this.errors.reject("observation.import.studyDbId.required", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            if(StringUtils.isEmpty(dto.getValue())) {
-                this.errors.reject("observation.import.value.required", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            if(!germplasmDTOMap.containsKey(dto.getGermplasmDbId())) {
-                this.errors.reject("observation.import.germplasmDbId.invalid", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            if(!studyInstancesMap.containsKey(dto.getStudyDbId())) {
-                this.errors.reject("observation.import.studyDbId.invalid", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            if(!observationUnitDtoMap.containsKey(dto.getObservationUnitDbId())) {
-                this.errors.reject("observation.import.observationUnitDbId.invalid", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            final ObservationUnitDto obsUnit = observationUnitDtoMap.get(dto.getObservationUnitDbId());
-            if(!obsUnit.getStudyDbId().equalsIgnoreCase(dto.getStudyDbId())
-                    || !obsUnit.getGermplasmDbId().equalsIgnoreCase(dto.getGermplasmDbId()) ) {
-                this.errors.reject("observation.import.no.observationUnit", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            if(!variableDTOMap.containsKey(dto.getObservationVariableDbId())) {
-                this.errors.reject("observation.import.observationVariableDbId.invalid", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            if(!studyVariableIdsMap.containsKey(dto.getStudyDbId())) {
-                variableSearchRequestDTO.setStudyDbId(Collections.singletonList(dto.getStudyDbId()));
-                final List<VariableDTO> variableDTOS =  this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTO, null);
-                 List<String> studyVariableIds = new ArrayList<>();
-                 if(!CollectionUtils.isEmpty(variableDTOS)) {
-                     studyVariableIds = variableDTOS.stream().map(VariableDTO::getObservationVariableDbId)
-                             .collect(Collectors.toList());
-                 }
-                studyVariableIdsMap.put(dto.getStudyDbId(), studyVariableIds);
-            }
-            if(!studyVariableIdsMap.get(dto.getStudyDbId()).contains(dto.getObservationVariableDbId())) {
-                this.errors.reject("observation.import.observationVariableDbId.not.in.study", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            if(dto.getValue().length() > MAX_VALUE_LENGTH) {
-                this.errors.reject("observation.import.value.exceeded.length", new String[] {index.toString()}, "");
-                iterator.remove();
-                continue;
-            }
-            if (this.isAnyExternalReferenceInvalid(dto, index)) {
-                iterator.remove();
-                continue;
-            }
-            index++;
+            return false;
+        });
+
+        return this.errors;
+    }
+
+    private boolean isObservationVariableNotInStudy(final VariableSearchRequestDTO variableSearchRequestDTO, final Map<String, List<String>> studyVariableIdsMap, final ObservationDto dto, final Integer index) {
+        if(!studyVariableIdsMap.containsKey(dto.getStudyDbId())) {
+            variableSearchRequestDTO.setStudyDbId(Collections.singletonList(dto.getStudyDbId()));
+            final List<VariableDTO> variableDTOS =  this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTO, null);
+             List<String> studyVariableIds = new ArrayList<>();
+             if(!CollectionUtils.isEmpty(variableDTOS)) {
+                 studyVariableIds = variableDTOS.stream().map(VariableDTO::getObservationVariableDbId)
+                         .collect(Collectors.toList());
+             }
+            studyVariableIdsMap.put(dto.getStudyDbId(), studyVariableIds);
+        }
+        if(!studyVariableIdsMap.get(dto.getStudyDbId()).contains(dto.getObservationVariableDbId())) {
+            this.errors.reject("observation.import.observationVariableDbId.not.in.study", new String[] {index.toString()}, "");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean hasNoExistingObservationUnit(final Map<String, ObservationUnitDto> observationUnitDtoMap, final ObservationDto dto, final Integer index) {
+        final ObservationUnitDto obsUnit = observationUnitDtoMap.get(dto.getObservationUnitDbId());
+        if(!obsUnit.getStudyDbId().equalsIgnoreCase(dto.getStudyDbId())
+                || !obsUnit.getGermplasmDbId().equalsIgnoreCase(dto.getGermplasmDbId()) ) {
+            this.errors.reject("observation.import.no.observationUnit", new String[] {index.toString()}, "");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isValueInvalid(final ObservationDto dto, final Integer index) {
+        if(StringUtils.isEmpty(dto.getValue())) {
+            this.errors.reject("observation.import.value.required", new String[] {index.toString()}, "");
+            return true;
+        }
+        if(dto.getValue().length() > MAX_VALUE_LENGTH) {
+            this.errors.reject("observation.import.value.exceeded.length", new String[] {index.toString()}, "");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isStudyDbIdInvalid(final Map<String, StudyInstanceDto> studyInstancesMap, final ObservationDto dto, final Integer index) {
+        if(StringUtils.isEmpty(dto.getStudyDbId())) {
+            this.errors.reject("observation.import.studyDbId.required", new String[] {index.toString()}, "");
+            return true;
         }
 
-        return errors;
+        if(!studyInstancesMap.containsKey(dto.getStudyDbId())) {
+            this.errors.reject("observation.import.studyDbId.invalid", new String[] {index.toString()}, "");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isObservationVariableDbIdInvalid(final Map<String, VariableDTO> variableDTOMap, final ObservationDto dto, final Integer index) {
+        if(StringUtils.isEmpty(dto.getObservationVariableDbId())) {
+            this.errors.reject("observation.import.observationVariableDbId.required", new String[] {index.toString()}, "");
+            return true;
+        }
+        if(!variableDTOMap.containsKey(dto.getObservationVariableDbId())) {
+            this.errors.reject("observation.import.observationVariableDbId.invalid", new String[] {index.toString()}, "");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isObservationUnitDbIdInvalid(final Map<String, ObservationUnitDto> observationUnitDtoMap, final ObservationDto dto, final Integer index) {
+        if(StringUtils.isEmpty(dto.getObservationUnitDbId())) {
+            this.errors.reject("observation.import.observationUnitDbId.required", new String[] {index.toString()}, "");
+            return true;
+        }
+        if(!observationUnitDtoMap.containsKey(dto.getObservationUnitDbId())) {
+            this.errors.reject("observation.import.observationUnitDbId.invalid", new String[] {index.toString()}, "");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isGermplasmDbIdInvalid(final Map<String, GermplasmDTO> germplasmDTOMap, final ObservationDto dto, final Integer index) {
+        if(StringUtils.isEmpty(dto.getGermplasmDbId())) {
+            this.errors.reject("observation.import.germplasmDbId.required", new String[] {index.toString()}, "");
+            return true;
+        }
+        if(!germplasmDTOMap.containsKey(dto.getGermplasmDbId())) {
+            this.errors.reject("observation.import.germplasmDbId.invalid", new String[] {index.toString()}, "");
+            return true;
+        }
+        return false;
     }
 
     private boolean isAnyExternalReferenceInvalid(final ObservationDto dto, final Integer index) {

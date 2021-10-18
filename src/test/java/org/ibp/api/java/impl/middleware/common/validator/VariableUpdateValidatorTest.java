@@ -61,7 +61,7 @@ public class VariableUpdateValidatorTest {
 		variableDTO.getScale().getValidValues().setCategories(Arrays.asList(scaleCategoryDTO));
 
 		try {
-			this.variableUpdateValidator.validate(CROP, variableDTO);
+			this.variableUpdateValidator.validate(variableDTO);
 		} catch (final ApiRequestValidationException exception) {
 			fail("Should not throw an exception");
 		}
@@ -72,7 +72,7 @@ public class VariableUpdateValidatorTest {
 
 		final VariableDTO variableDTO = new VariableDTO();
 		try {
-			this.variableUpdateValidator.validate(CROP, variableDTO);
+			this.variableUpdateValidator.validate(variableDTO);
 			fail("Should throw an exception");
 		} catch (final ApiRequestValidationException exception) {
 			// Do nothing
@@ -84,7 +84,7 @@ public class VariableUpdateValidatorTest {
 
 		final VariableDTO variableDTO = new VariableDTO();
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateVariable(CROP, variableDTO, errors);
+		this.variableUpdateValidator.validateVariable(variableDTO, errors);
 
 		Assert.assertEquals(3, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.id.required");
@@ -99,7 +99,7 @@ public class VariableUpdateValidatorTest {
 		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH + 1));
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateVariable(CROP, variableDTO, errors);
+		this.variableUpdateValidator.validateVariable(variableDTO, errors);
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.name.max.length.exceeded");
@@ -130,7 +130,7 @@ public class VariableUpdateValidatorTest {
 		variableDTO.getMethod().setMethodDbId("5");
 		variableDTO.getScale().setScaleDbId("6");
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateVariable(CROP, variableDTO, errors);
+		this.variableUpdateValidator.validateVariable(variableDTO, errors);
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.cannot.update.trait.scale.method");
@@ -146,7 +146,7 @@ public class VariableUpdateValidatorTest {
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH));
 		variableDTO.setStudyDbIds(Arrays.asList("1", "abc"));
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateVariable(CROP, variableDTO, errors);
+		this.variableUpdateValidator.validateVariable(variableDTO, errors);
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.study.id.must.be.numeric");
