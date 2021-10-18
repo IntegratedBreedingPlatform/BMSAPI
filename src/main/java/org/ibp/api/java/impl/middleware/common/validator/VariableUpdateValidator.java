@@ -6,13 +6,11 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.service.api.study.CategoryDTO;
+import org.generationcp.middleware.service.api.study.ScaleCategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
-import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
-import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -161,7 +159,7 @@ public class VariableUpdateValidator {
 			}
 			if (variableDTO.getScale().getValidValues() != null && CollectionUtils.isNotEmpty(
 				variableDTO.getScale().getValidValues().getCategories())) {
-				final List<CategoryDTO> categories = variableDTO.getScale().getValidValues().getCategories();
+				final List<ScaleCategoryDTO> categories = variableDTO.getScale().getValidValues().getCategories();
 
 				if (categories.stream()
 					.anyMatch(c -> StringUtils.isNotEmpty(c.getLabel()) && c.getLabel().length() > CATEROGY_LABEL_MAX_LENGTH)) {

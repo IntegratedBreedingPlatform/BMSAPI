@@ -43,10 +43,10 @@ public class VariableServiceBrapiImplTest {
         final String cropName = "MAIZE";
         final VariableDTO variableDTO = new VariableDTO();
         variableDTO.setCommonCropName(cropName);
-        Mockito.when(this.middlewareVariableServiceBrapi.getObservationVariables(cropName, requestDTO, null))
+        Mockito.when(this.middlewareVariableServiceBrapi.getObservationVariables(requestDTO, null))
                 .thenReturn(Collections.singletonList(variableDTO));
         final List<VariableDTO> result = this.variableServiceBrapi.getObservationVariables(cropName, requestDTO, null);
-        Mockito.verify(this.middlewareVariableServiceBrapi).getObservationVariables(cropName, requestDTO, null);
+        Mockito.verify(this.middlewareVariableServiceBrapi).getObservationVariables(requestDTO, null);
         Assert.assertEquals(1, result.size());
         Assert.assertEquals(variableDTO, result.get(0));
     }

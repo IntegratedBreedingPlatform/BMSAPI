@@ -78,7 +78,7 @@ public class ObservationImportRequestValidator {
         final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
         variableSearchRequestDTO.setObservationVariableDbIds(variableIds);
         final Map<String, VariableDTO> variableDTOMap =
-                this.variableServiceBrapi.getObservationVariables(null, variableSearchRequestDTO, null).stream()
+                this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTO, null).stream()
                         .collect(Collectors.toMap(VariableDTO::getObservationVariableDbId, Function.identity()));
 
         final Map<String, List<String>> studyVariableIdsMap = new HashMap<>();
@@ -141,7 +141,7 @@ public class ObservationImportRequestValidator {
             }
             if(!studyVariableIdsMap.containsKey(dto.getStudyDbId())) {
                 variableSearchRequestDTO.setStudyDbId(Collections.singletonList(dto.getStudyDbId()));
-                final List<VariableDTO> variableDTOS =  this.variableServiceBrapi.getObservationVariables(null, variableSearchRequestDTO, null);
+                final List<VariableDTO> variableDTOS =  this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTO, null);
                  List<String> studyVariableIds = new ArrayList<>();
                  if(!CollectionUtils.isEmpty(variableDTOS)) {
                      studyVariableIds = variableDTOS.stream().map(VariableDTO::getObservationVariableDbId)

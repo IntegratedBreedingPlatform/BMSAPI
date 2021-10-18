@@ -25,7 +25,12 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	public List<VariableDTO> getObservationVariables(final String crop, final VariableSearchRequestDTO requestDTO,
 		final Pageable pageable) {
-		return this.middlewareVariableServiceBrapi.getObservationVariables(crop, requestDTO, pageable);
+		final List<VariableDTO> observationVariables = this.middlewareVariableServiceBrapi.getObservationVariables(requestDTO, pageable);
+		observationVariables.forEach(ov -> {
+			ov.setCommonCropName(crop);
+			ov.setCrop(crop);
+		});
+		return observationVariables;
 	}
 
 	public long countObservationVariables(final VariableSearchRequestDTO requestDTO) {

@@ -85,13 +85,13 @@ public class ObservationImportRequestValidatorTest {
         variableDTO.setObservationVariableDbId(VARIABLE_DBID);
         final VariableSearchRequestDTO variableSearchRequestDTOUsingVariableId = new VariableSearchRequestDTO();
         variableSearchRequestDTOUsingVariableId.setObservationVariableDbIds(Collections.singletonList(VARIABLE_DBID));
-        Mockito.when(this.variableServiceBrapi.getObservationVariables(null, variableSearchRequestDTOUsingVariableId, null))
+        Mockito.when(this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTOUsingVariableId, null))
                 .thenReturn(Collections.singletonList(variableDTO));
 
         final VariableSearchRequestDTO variableSearchRequestDTOUsingStudyDbId = new VariableSearchRequestDTO();
         variableSearchRequestDTOUsingStudyDbId.setObservationVariableDbIds(Collections.singletonList(VARIABLE_DBID));
         variableSearchRequestDTOUsingStudyDbId.setStudyDbId(Collections.singletonList(STUDY_DBID));
-        Mockito.when(this.variableServiceBrapi.getObservationVariables(null, variableSearchRequestDTOUsingStudyDbId, null))
+        Mockito.when(this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTOUsingStudyDbId, null))
                 .thenReturn(Collections.singletonList(variableDTO));
     }
 
@@ -161,7 +161,7 @@ public class ObservationImportRequestValidatorTest {
     @Test
     public void testPruneObservationInvalidForImport_VariableDbIdInvalid() {
         final List<ObservationDto> observationDtos = this.createObservationDtoList();
-        Mockito.when(this.variableServiceBrapi.getObservationVariables(ArgumentMatchers.eq(null), ArgumentMatchers.any(VariableSearchRequestDTO.class), ArgumentMatchers.eq(null)))
+        Mockito.when(this.variableServiceBrapi.getObservationVariables(ArgumentMatchers.any(VariableSearchRequestDTO.class), ArgumentMatchers.eq(null)))
                 .thenReturn(new ArrayList<>());
         final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
         Assert.assertTrue(result.hasErrors());
@@ -218,7 +218,7 @@ public class ObservationImportRequestValidatorTest {
         final VariableSearchRequestDTO variableSearchRequestDTOUsingStudyDbId = new VariableSearchRequestDTO();
         variableSearchRequestDTOUsingStudyDbId.setObservationVariableDbIds(Collections.singletonList(VARIABLE_DBID));
         variableSearchRequestDTOUsingStudyDbId.setStudyDbId(Collections.singletonList(STUDY_DBID));
-        Mockito.when(this.variableServiceBrapi.getObservationVariables(null, variableSearchRequestDTOUsingStudyDbId, null))
+        Mockito.when(this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTOUsingStudyDbId, null))
                 .thenReturn(new ArrayList<>());
         final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
         Assert.assertTrue(result.hasErrors());

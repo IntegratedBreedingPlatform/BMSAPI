@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.service.api.study.CategoryDTO;
+import org.generationcp.middleware.service.api.study.ScaleCategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
@@ -55,10 +55,10 @@ public class VariableUpdateValidatorTest {
 		variableDTO.getMethod().setDescription(RandomStringUtils.randomAlphabetic(5));
 		variableDTO.getScale().setScaleDbId(RandomStringUtils.randomNumeric(5));
 		variableDTO.getScale().setScaleName(RandomStringUtils.randomAlphabetic(5));
-		final CategoryDTO categoryDTO = new CategoryDTO();
-		categoryDTO.setLabel(RandomStringUtils.randomAlphabetic(10));
-		categoryDTO.setValue(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getScale().getValidValues().setCategories(Arrays.asList(categoryDTO));
+		final ScaleCategoryDTO scaleCategoryDTO = new ScaleCategoryDTO();
+		scaleCategoryDTO.setLabel(RandomStringUtils.randomAlphabetic(10));
+		scaleCategoryDTO.setValue(RandomStringUtils.randomAlphabetic(10));
+		variableDTO.getScale().getValidValues().setCategories(Arrays.asList(scaleCategoryDTO));
 
 		try {
 			this.variableUpdateValidator.validate(CROP, variableDTO);
@@ -230,10 +230,10 @@ public class VariableUpdateValidatorTest {
 		final VariableDTO variableDTO = new VariableDTO();
 		variableDTO.getScale().setScaleDbId(RandomStringUtils.randomNumeric(5));
 		variableDTO.getScale().setScaleName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH + 1));
-		final CategoryDTO validValue1 = new CategoryDTO();
+		final ScaleCategoryDTO validValue1 = new ScaleCategoryDTO();
 		validValue1.setValue(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH));
 		validValue1.setLabel(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.CATEROGY_LABEL_MAX_LENGTH + 1));
-		final CategoryDTO validValue2 = new CategoryDTO();
+		final ScaleCategoryDTO validValue2 = new ScaleCategoryDTO();
 		validValue2.setValue(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH + 1));
 		validValue2.setLabel(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.CATEROGY_LABEL_MAX_LENGTH));
 

@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.ObservationServiceBrapi;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
@@ -18,6 +19,7 @@ import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -121,9 +123,11 @@ public class ObservationResourceBrapi {
 				@Override
 				public List<ObservationDto> getResults(final PagedResult<ObservationDto> pagedResult) {
 					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
-					final int pageNumber = pagedResult.getPageNumber() + 1;
+					final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page + 1;
+					final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+					final PageRequest pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 					return ObservationResourceBrapi.this.observationServiceBrapi
-						.searchObservations(observationSearchRequestDto, pagedResult.getPageSize(), pageNumber);
+						.searchObservations(observationSearchRequestDto, pageRequest);
 				}
 			});
 
@@ -144,7 +148,7 @@ public class ObservationResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/observations", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<ObservationDto>> createObservationUnits(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<ObservationDto>> createObservations(@PathVariable final String crop,
 		@RequestBody final List<ObservationDto> observations) {
 
 		final ObservationImportResponse observationImportResponse = this.observationServiceBrapi.createObservations(observations);

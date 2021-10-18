@@ -6,6 +6,7 @@ import org.ibp.api.brapi.ObservationServiceBrapi;
 import org.ibp.api.brapi.v2.observation.ObservationImportResponse;
 import org.ibp.api.java.impl.middleware.study.validator.ObservationImportRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
@@ -24,8 +25,8 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 
 	@Override
 	public List<ObservationDto> searchObservations(final ObservationSearchRequestDto observationSearchRequestDto,
-		final Integer pageSize, final Integer pageNumber) {
-		return this.observationServiceBrapi.searchObservations(observationSearchRequestDto, pageSize, pageNumber);
+		final Pageable pageable) {
+		return this.observationServiceBrapi.searchObservations(observationSearchRequestDto, pageable);
 	}
 
 	@Override
@@ -37,10 +38,8 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 	public ObservationImportResponse createObservations(final List<ObservationDto> observations) {
 
 		final ObservationImportResponse response = new ObservationImportResponse();
-		final int originalListSize = observations.size();
-		final List<ObservationDto> observationDtos = new ArrayList<>();
-		int noOfCreatedObservations = 0;
-
+		response.setImportListSize(observations.size());
+		response.setCreatedSize(0);
 
 		final BindingResult bindingResult = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observations);
 		if (bindingResult.hasErrors()) {
@@ -48,21 +47,11 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		}
 
 		if (!CollectionUtils.isEmpty(observations)) {
-			final List<Integer> observationDbIds =
+			final List<ObservationDto> results =
 				this.observationServiceBrapi.createObservations(observations);
-			if (!CollectionUtils.isEmpty(observationDbIds)) {
-				noOfCreatedObservations = observationDbIds.size();
-				final ObservationSearchRequestDto searchRequestDTO = new ObservationSearchRequestDto();
-				searchRequestDTO.setObservationDbIds(observationDbIds);
-				observationDtos.addAll(this.observationServiceBrapi.searchObservations(searchRequestDTO, null, null));
-
-			}
-			response.setEntityList(observationDtos);
+			response.setEntityList(results);
+			response.setCreatedSize(results.size());
 		}
-
-		response.setImportListSize(originalListSize);
-		response.setCreatedSize(noOfCreatedObservations);
-
 		return response;
 
 	}
