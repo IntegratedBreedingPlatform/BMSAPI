@@ -1,18 +1,22 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.api.study.ScaleCategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -22,6 +26,8 @@ import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
 
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,16 +36,23 @@ import static org.junit.Assert.fail;
 @RunWith(MockitoJUnitRunner.class)
 public class VariableUpdateValidatorTest {
 
-	public static final String CROP = "maize";
-
 	@Mock
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Mock
 	protected TermValidator termValidator;
 
+	@Mock
+	private VariableServiceBrapi variableServiceBrapi;
+
 	@InjectMocks
 	private VariableUpdateValidator variableUpdateValidator;
+
+	@Before
+	public void setUp() {
+		Mockito.when(this.variableServiceBrapi.getObservationVariables(ArgumentMatchers.any(VariableSearchRequestDTO.class), ArgumentMatchers.eq(null)))
+				.thenReturn(Collections.singletonList(new VariableDTO()));
+	}
 
 	@Test
 	public void testValidationSuccess() {
@@ -91,6 +104,23 @@ public class VariableUpdateValidatorTest {
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.id.should.be.numeric");
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.name.required");
 	}
+
+	@Test
+	public void testValidation_ValidateVariable_InvalidObservationVariablDbId() {
+		Mockito.when(this.variableServiceBrapi.getObservationVariables(ArgumentMatchers.any(VariableSearchRequestDTO.class), ArgumentMatchers.eq(null)))
+				.thenReturn(new ArrayList<>());
+
+		final VariableDTO variableDTO = new VariableDTO();
+		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
+		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(5));
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		this.variableUpdateValidator.validateVariable(variableDTO, errors);
+
+		Assert.assertEquals(1, errors.getAllErrors().size());
+		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.id.invalid");
+		Mockito.verify(this.termValidator).validate(Mockito.any(), Mockito.any());
+	}
+
 
 	@Test
 	public void testValidation_ValidateVariable_MaxLengthExceeded() {
