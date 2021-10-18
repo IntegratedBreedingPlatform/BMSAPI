@@ -23,6 +23,7 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.germplasm.Germplasm;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -152,13 +153,13 @@ public class GermplasmResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/search/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasm(
+	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchGermplasm(
 		@PathVariable final String crop,
 		@RequestBody final GermplasmSearchRequest germplasmSearchRequest) {
-		final SearchDto searchDto =
-			new SearchDto(this.searchRequestService.saveSearchRequest(germplasmSearchRequest, GermplasmSearchRequest.class)
+		final BrapiSearchDto searchDto =
+			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(germplasmSearchRequest, GermplasmSearchRequest.class)
 				.toString());
-		final SingleEntityResponse<SearchDto> singleGermplasmSearchResponse = new SingleEntityResponse<>(searchDto);
+		final SingleEntityResponse<BrapiSearchDto> singleGermplasmSearchResponse = new SingleEntityResponse<>(searchDto);
 
 		return new ResponseEntity<>(singleGermplasmSearchResponse, HttpStatus.OK);
 	}

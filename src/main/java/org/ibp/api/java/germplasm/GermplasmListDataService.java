@@ -19,6 +19,6 @@ public interface GermplasmListDataService {
 
 	List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(Integer listId, String programUUID);
 
-	void saveGermplasmListDataView(Integer listId, List<GermplasmListDataUpdateViewDTO> columns);
+	void updateGermplasmListDataView(Integer listId, List<GermplasmListDataUpdateViewDTO> columns);
 
 }

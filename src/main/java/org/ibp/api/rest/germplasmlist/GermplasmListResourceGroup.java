@@ -81,7 +81,7 @@ public class GermplasmListResourceGroup {
 	@ApiOperation(value = "Create a new Germplasm list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.POST)
 	// TODO The Permissions will be change after implement IBP-4570 (New list manager)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'IMPORT_GERMPLASM_LISTS')")
 	@ResponseBody
 	public ResponseEntity<GermplasmListGeneratorDTO> create(
 		@ApiParam(required = true) @PathVariable final String crop,
@@ -273,6 +273,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Returns a list by a given list id")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<GermplasmListDto> getGermplasmListById(@PathVariable final String cropName,
@@ -281,9 +282,8 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.getGermplasmListById(listId), HttpStatus.OK);
 	}
 
-	//TODO: check permission
 	@ApiIgnore
-	@ApiOperation(value = "Locks or unlocks the list depending the current status of it")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/toggle-status", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Boolean> toggleGermplasmListStatus(@PathVariable final String cropName,
@@ -293,7 +293,6 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiIgnore
-	@ApiOperation(value = "Get a list of static, names and germplasm descriptors columns for a given list")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/columns", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmListColumnDTO>> getGermplasmListColumns(@PathVariable final String cropName,
@@ -303,7 +302,6 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiIgnore
-	@ApiOperation(value = "Get the header for list table")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/table/columns", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmListMeasurementVariableDTO>> getGermplasmListDataTableHeader(@PathVariable final String cropName,
@@ -329,14 +327,14 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiIgnore
-	@ApiOperation(value = "Customize the view of the germplasm list data.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/view", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<Void> saveGermplasmListDataView(@PathVariable final String cropName,
+	public ResponseEntity<Void> updateGermplasmListDataView(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final List<GermplasmListDataUpdateViewDTO> view) {
-		this.germplasmListDataService.saveGermplasmListDataView(listId, view);
+		this.germplasmListDataService.updateGermplasmListDataView(listId, view);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
