@@ -11,7 +11,6 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.service.api.study.ScaleCategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,9 +37,6 @@ public class VariableUpdateValidatorTest {
 
 	@Mock
 	private OntologyVariableDataManager ontologyVariableDataManager;
-
-	@Mock
-	protected TermValidator termValidator;
 
 	@Mock
 	private VariableServiceBrapi variableServiceBrapi;
@@ -118,7 +114,6 @@ public class VariableUpdateValidatorTest {
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.id.invalid");
-		Mockito.verify(this.termValidator).validate(Mockito.any(), Mockito.any());
 	}
 
 
@@ -133,7 +128,6 @@ public class VariableUpdateValidatorTest {
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.name.max.length.exceeded");
-		Mockito.verify(this.termValidator).validate(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -164,8 +158,6 @@ public class VariableUpdateValidatorTest {
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.cannot.update.trait.scale.method");
-		Mockito.verify(this.termValidator).validate(Mockito.any(), Mockito.any());
-
 	}
 
 	@Test

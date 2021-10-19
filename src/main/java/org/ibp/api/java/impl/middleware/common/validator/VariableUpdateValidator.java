@@ -4,11 +4,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.service.api.study.ScaleCategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
@@ -26,10 +24,7 @@ import java.util.List;
 @Component
 public class VariableUpdateValidator {
 
-	private static final String VARIABLE_NAME = "Variable";
 	public static final int TERM_NAME_MAX_LENGTH = 200;
-	public static final int TERM_DEFINITION_MAX_LENGTH = 1024;
-	public static final int CATEROGY_LABEL_MAX_LENGTH = 255;
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -73,10 +68,6 @@ public class VariableUpdateValidator {
 		if (!StringUtils.isEmpty(variableDTO.getObservationVariableName())
 			&& variableDTO.getObservationVariableName().length() > TERM_NAME_MAX_LENGTH) {
 			errors.reject("observation.variable.update.variable.name.max.length.exceeded", new String[] {}, "");
-		}
-		if (!StringUtils.isEmpty(variableDTO.getObservationVariableDbId())) {
-			final TermRequest term = new TermRequest(variableDTO.getObservationVariableDbId(), VARIABLE_NAME, CvId.VARIABLES.getId());
-			this.termValidator.validate(term, errors);
 		}
 		if (StringUtils.isNumeric(variableDTO.getObservationVariableDbId())) {
 			final boolean isVariableUsedInStudy = this.ontologyVariableDataManager.areVariablesUsedInStudy(
