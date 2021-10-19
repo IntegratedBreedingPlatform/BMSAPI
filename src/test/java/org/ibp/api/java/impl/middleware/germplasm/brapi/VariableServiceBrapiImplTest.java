@@ -55,7 +55,7 @@ public class VariableServiceBrapiImplTest {
     public void testUpdateObservationVariable() {
         final VariableDTO variableDTO = new VariableDTO();
         Mockito.when(this.middlewareVariableServiceBrapi.updateObservationVariable(variableDTO)).thenReturn(variableDTO);
-        final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(variableDTO);
+        final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(null, variableDTO);
         Assert.assertEquals(variableDTO, variableUpdateResponse.getEntityObject());
         Mockito.verify(this.middlewareVariableServiceBrapi).updateObservationVariable(variableDTO);
 

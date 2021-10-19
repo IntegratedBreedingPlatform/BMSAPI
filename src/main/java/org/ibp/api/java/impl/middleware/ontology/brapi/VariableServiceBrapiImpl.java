@@ -38,10 +38,10 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	@Override
-	public VariableUpdateResponse updateObservationVariable(final VariableDTO variable) {
+	public VariableUpdateResponse updateObservationVariable(final String observationVariableDbId, final VariableDTO variable) {
 		final VariableUpdateResponse variableUpdateResponse = new VariableUpdateResponse();
 		try {
-			this.variableUpdateValidator.validate(variable);
+			this.variableUpdateValidator.validate(observationVariableDbId, variable);
 			variableUpdateResponse.setEntityObject(this.middlewareVariableServiceBrapi.updateObservationVariable(variable));
 		} catch (final ApiRequestValidationException e) {
 			variableUpdateResponse.setEntityObject(variable);

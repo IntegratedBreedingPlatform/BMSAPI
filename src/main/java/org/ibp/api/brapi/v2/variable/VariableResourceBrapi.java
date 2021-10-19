@@ -140,7 +140,7 @@ public class VariableResourceBrapi {
 		@PathVariable final String observationVariableDbId,
 		@RequestBody final VariableDTO variable) {
 
-		final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(variable);
+		final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(observationVariableDbId, variable);
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(variableUpdateResponse));
 		final SingleEntityResponse<VariableDTO> variableResponse =
 			new SingleEntityResponse<>(variableUpdateResponse.getEntityObject()).withMetadata(metadata);

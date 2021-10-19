@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
@@ -11,6 +12,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.service.api.study.ScaleCategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +43,12 @@ public class VariableUpdateValidatorTest {
 	@Mock
 	private VariableServiceBrapi variableServiceBrapi;
 
+	@Mock
+	private TermValidator termValidator;
+
+	@Mock
+	private StudyServiceBrapi studyServiceBrapi;
+
 	@InjectMocks
 	private VariableUpdateValidator variableUpdateValidator;
 
@@ -70,7 +78,7 @@ public class VariableUpdateValidatorTest {
 		variableDTO.getScale().getValidValues().setCategories(Arrays.asList(scaleCategoryDTO));
 
 		try {
-			this.variableUpdateValidator.validate(variableDTO);
+			this.variableUpdateValidator.validate(variableDTO.getObservationVariableDbId(), variableDTO);
 		} catch (final ApiRequestValidationException exception) {
 			fail("Should not throw an exception");
 		}
@@ -81,7 +89,7 @@ public class VariableUpdateValidatorTest {
 
 		final VariableDTO variableDTO = new VariableDTO();
 		try {
-			this.variableUpdateValidator.validate(variableDTO);
+			this.variableUpdateValidator.validate(null, variableDTO);
 			fail("Should throw an exception");
 		} catch (final ApiRequestValidationException exception) {
 			// Do nothing
@@ -89,20 +97,56 @@ public class VariableUpdateValidatorTest {
 	}
 
 	@Test
-	public void testValidation_ValidateVariable_RequiredFields() {
+	public void testValidation_ValidateVariable_RequiredVariableDbId() {
 
 		final VariableDTO variableDTO = new VariableDTO();
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateVariable(variableDTO, errors);
+		this.variableUpdateValidator.validateVariable(null, variableDTO, errors);
 
-		Assert.assertEquals(3, errors.getAllErrors().size());
+		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.id.required");
+	}
+
+	@Test
+	public void testValidation_ValidateVariable_VariableDbIdNotEqual() {
+
+		final VariableDTO variableDTO = new VariableDTO();
+		final String observationVariableDbId = RandomStringUtils.randomAlphabetic(5);
+		variableDTO.setObservationVariableDbId(observationVariableDbId);
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		this.variableUpdateValidator.validateVariable(RandomStringUtils.randomAlphabetic(5), variableDTO, errors);
+
+		Assert.assertEquals(1, errors.getAllErrors().size());
+		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.id.and.path.variable.id.not.equal");
+	}
+
+	@Test
+	public void testValidation_ValidateVariable_NonNumericVariableDbId() {
+
+		final VariableDTO variableDTO = new VariableDTO();
+		final String observationVariableDbId = RandomStringUtils.randomAlphabetic(5);
+		variableDTO.setObservationVariableDbId(observationVariableDbId);
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		this.variableUpdateValidator.validateVariable(observationVariableDbId, variableDTO, errors);
+
+		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.id.should.be.numeric");
+	}
+
+	@Test
+	public void testValidation_ValidateVariable_MissingVariableName() {
+
+		final VariableDTO variableDTO = new VariableDTO();
+		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		this.variableUpdateValidator.validateVariable(variableDTO.getObservationVariableDbId(), variableDTO, errors);
+
+		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.name.required");
 	}
 
 	@Test
-	public void testValidation_ValidateVariable_InvalidObservationVariablDbId() {
+	public void testValidation_ValidateVariable_InvalidObservationVariableDbId() {
 		Mockito.when(this.variableServiceBrapi.getObservationVariables(ArgumentMatchers.any(VariableSearchRequestDTO.class), ArgumentMatchers.eq(null)))
 				.thenReturn(new ArrayList<>());
 
@@ -110,7 +154,7 @@ public class VariableUpdateValidatorTest {
 		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(5));
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateVariable(variableDTO, errors);
+		this.variableUpdateValidator.validateVariable(variableDTO.getObservationVariableDbId(), variableDTO, errors);
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.id.invalid");
@@ -124,7 +168,7 @@ public class VariableUpdateValidatorTest {
 		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH + 1));
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateVariable(variableDTO, errors);
+		this.variableUpdateValidator.validateVariable(variableDTO.getObservationVariableDbId(), variableDTO, errors);
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.variable.name.max.length.exceeded");
@@ -154,24 +198,24 @@ public class VariableUpdateValidatorTest {
 		variableDTO.getMethod().setMethodDbId("5");
 		variableDTO.getScale().setScaleDbId("6");
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateVariable(variableDTO, errors);
+		this.variableUpdateValidator.validateVariable(variableDTO.getObservationVariableDbId(), variableDTO, errors);
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.cannot.update.trait.scale.method");
 	}
 
 	@Test
-	public void testValidation_ValidateVariable_StudyDbIdsMustBeNumeric() {
+	public void testValidation_ValidateVariable_InvalidStudyDbId() {
 
 		final VariableDTO variableDTO = new VariableDTO();
 		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(VariableUpdateValidator.TERM_NAME_MAX_LENGTH));
 		variableDTO.setStudyDbIds(Arrays.asList("1", "abc"));
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableUpdateValidator.validateVariable(variableDTO, errors);
+		this.variableUpdateValidator.validateVariable(variableDTO.getObservationVariableDbId(), variableDTO, errors);
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
-		this.assertError(errors.getAllErrors(), "observation.variable.update.study.id.must.be.numeric");
+		this.assertError(errors.getAllErrors(), "observation.variable.update.study.id.invalid");
 	}
 
 	@Test
@@ -181,8 +225,19 @@ public class VariableUpdateValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
 		this.variableUpdateValidator.validateTrait(variableDTO, errors);
 
-		Assert.assertEquals(2, errors.getAllErrors().size());
+		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.trait.id.required");
+	}
+
+	@Test
+	public void testValidation_ValidateTrait_NonNumericTraitDbId() {
+
+		final VariableDTO variableDTO = new VariableDTO();
+		variableDTO.getTrait().setTraitDbId(RandomStringUtils.randomAlphabetic(5));
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		this.variableUpdateValidator.validateTrait(variableDTO, errors);
+
+		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.trait.id.should.be.numeric");
 	}
 
@@ -193,8 +248,19 @@ public class VariableUpdateValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
 		this.variableUpdateValidator.validateMethod(variableDTO, errors);
 
-		Assert.assertEquals(2, errors.getAllErrors().size());
+		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.method.id.required");
+	}
+
+	@Test
+	public void testValidation_ValidateMethod_NonNumericMethodDbId() {
+
+		final VariableDTO variableDTO = new VariableDTO();
+		variableDTO.getMethod().setMethodDbId(RandomStringUtils.randomAlphabetic(5));
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		this.variableUpdateValidator.validateMethod(variableDTO, errors);
+
+		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.method.id.should.be.numeric");
 	}
 
@@ -205,8 +271,19 @@ public class VariableUpdateValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
 		this.variableUpdateValidator.validateScale(variableDTO, errors);
 
-		Assert.assertEquals(2, errors.getAllErrors().size());
+		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.scale.id.required");
+	}
+
+	@Test
+	public void testValidation_ValidateScale_NonNumericScaleDbId() {
+
+		final VariableDTO variableDTO = new VariableDTO();
+		variableDTO.getScale().setScaleDbId(RandomStringUtils.randomAlphabetic(5));
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		this.variableUpdateValidator.validateScale(variableDTO, errors);
+
+		Assert.assertEquals(1, errors.getAllErrors().size());
 		this.assertError(errors.getAllErrors(), "observation.variable.update.scale.id.should.be.numeric");
 	}
 
