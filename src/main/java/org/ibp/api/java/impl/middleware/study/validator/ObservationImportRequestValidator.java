@@ -6,9 +6,9 @@ import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
-import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
@@ -16,6 +16,7 @@ import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRe
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.VariableDTO;
+import org.generationcp.middleware.util.Util;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -93,9 +94,9 @@ public class ObservationImportRequestValidator {
                     this.isObservationUnitDbIdInvalid(observationUnitDtoMap, dto, index) ||
                     this.isObservationVariableDbIdInvalid(variableDTOMap, dto, index) ||
                     this.isStudyDbIdInvalid(studyInstancesMap, dto, index) ||
-                    this.isValueInvalid(dto, index) ||
                     this.hasNoExistingObservationUnit(observationUnitDtoMap, dto, index) ||
                     this.isObservationVariableNotInStudy(variableSearchRequestDTO, studyVariableIdsMap, dto, index) ||
+                    this.isValueInvalid(dto, variableDTOMap, index) ||
                 this.isAnyExternalReferenceInvalid(dto, index)) {
                 return true;
             }
@@ -133,7 +134,7 @@ public class ObservationImportRequestValidator {
         return false;
     }
 
-    private boolean isValueInvalid(final ObservationDto dto, final Integer index) {
+    private boolean isValueInvalid(final ObservationDto dto, final Map<String, VariableDTO> variableDTOMap, final Integer index) {
         if(StringUtils.isEmpty(dto.getValue())) {
             this.errors.reject("observation.import.value.required", new String[] {index.toString()}, "");
             return true;
@@ -141,6 +142,19 @@ public class ObservationImportRequestValidator {
         if(dto.getValue().length() > MAX_VALUE_LENGTH) {
             this.errors.reject("observation.import.value.exceeded.length", new String[] {index.toString()}, "");
             return true;
+        }
+        final VariableDTO.Scale scale = variableDTOMap.get(dto.getObservationVariableDbId()).getScale();
+        if(DataType.NUMERIC_VARIABLE.getBrapiName().equalsIgnoreCase(scale.getDataType())) {
+            if(!StringUtils.isNumeric(dto.getValue())) {
+                this.errors.reject("observation.import.value.non.numeric", new String[] {index.toString()}, "");
+                return true;
+            }
+        }
+        if(DataType.DATE_TIME_VARIABLE.getBrapiName().equalsIgnoreCase(scale.getDataType())) {
+            if(Util.tryParseDate(dto.getValue(), Util.DATE_AS_NUMBER_FORMAT) == null) {
+                this.errors.reject("observation.import.value.invalid.date", new String[] {index.toString()}, "");
+                return true;
+            }
         }
         return false;
     }

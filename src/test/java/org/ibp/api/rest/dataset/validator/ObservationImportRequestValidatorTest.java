@@ -8,6 +8,7 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
@@ -37,7 +38,7 @@ public class ObservationImportRequestValidatorTest {
     private static final String GERMPLASM_DBID = RandomStringUtils.randomAlphabetic(8);
     private static final String STUDY_DBID = "1";
     private static final String VARIABLE_DBID = RandomStringUtils.randomAlphabetic(5);
-    private static final String VALUE = RandomStringUtils.randomAlphabetic(5);
+    private static final String VALUE = RandomStringUtils.randomNumeric(5);
     private static final String OBSERVATION_UNIT_DBID = RandomStringUtils.randomAlphabetic(5);
 
     @Mock
@@ -83,6 +84,7 @@ public class ObservationImportRequestValidatorTest {
 
         final VariableDTO variableDTO = new VariableDTO();
         variableDTO.setObservationVariableDbId(VARIABLE_DBID);
+        variableDTO.getScale().setDataType(DataType.NUMERIC_VARIABLE.getBrapiName());
         final VariableSearchRequestDTO variableSearchRequestDTOUsingVariableId = new VariableSearchRequestDTO();
         variableSearchRequestDTOUsingVariableId.setObservationVariableDbIds(Collections.singletonList(VARIABLE_DBID));
         Mockito.when(this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTOUsingVariableId, null))
@@ -109,6 +111,30 @@ public class ObservationImportRequestValidatorTest {
         final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
         Assert.assertTrue(result.hasErrors());
         Assert.assertEquals("observation.import.germplasmDbId.required", result.getAllErrors().get(0).getCode());
+    }
+
+    @Test
+    public void testPruneObservationInvalidForImport_NonNumericValue() {
+        final List<ObservationDto> observationDtos = this.createObservationDtoList();
+        observationDtos.get(0).setValue(RandomStringUtils.randomAlphabetic(5));
+        final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
+        Assert.assertTrue(result.hasErrors());
+        Assert.assertEquals("observation.import.value.non.numeric", result.getAllErrors().get(0).getCode());
+    }
+
+    @Test
+    public void testPruneObservationInvalidForImport_InvalidDateFormat() {
+        final List<ObservationDto> observationDtos = this.createObservationDtoList();
+        final VariableDTO variableDTO = new VariableDTO();
+        variableDTO.setObservationVariableDbId(VARIABLE_DBID);
+        variableDTO.getScale().setDataType(DataType.DATE_TIME_VARIABLE.getBrapiName());
+        final VariableSearchRequestDTO variableSearchRequestDTOUsingVariableId = new VariableSearchRequestDTO();
+        variableSearchRequestDTOUsingVariableId.setObservationVariableDbIds(Collections.singletonList(VARIABLE_DBID));
+        Mockito.when(this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTOUsingVariableId, null))
+                .thenReturn(Collections.singletonList(variableDTO));
+        final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
+        Assert.assertTrue(result.hasErrors());
+        Assert.assertEquals("observation.import.value.invalid.date", result.getAllErrors().get(0).getCode());
     }
 
     @Test
