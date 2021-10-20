@@ -432,6 +432,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				hasEntryCodeEmpty = true;
 			} else {
 				hasEntryCode = true;
+				if (entry.getEntryCode().length() > 47) {
+					throw new ApiValidationException("", "error.germplasmlist.save.entry.code.exceed.length");
+				}
 			}
 
 			if (isBlank(entry.getSeedSource())) {
