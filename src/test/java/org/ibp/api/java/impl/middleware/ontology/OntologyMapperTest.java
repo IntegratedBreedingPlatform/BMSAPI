@@ -40,8 +40,8 @@ public class OntologyMapperTest {
 		Assert.assertEquals(String.valueOf(method.getId()), methodDetails.getId());
 		Assert.assertEquals(method.getName(), methodDetails.getName());
 		Assert.assertEquals(method.getDefinition(), methodDetails.getDescription());
-		Assert.assertEquals(method.getDateCreated(), ISO8601DateParser.parse(methodDetails.getMetadata().getDateCreated()));
-		Assert.assertEquals(method.getDateLastModified(), ISO8601DateParser.parse(methodDetails.getMetadata().getDateLastModified()));
+		Assert.assertEquals(method.getDateCreated(), ISO8601DateParser.parseToDateTime(methodDetails.getMetadata().getDateCreated()));
+		Assert.assertEquals(method.getDateLastModified(), ISO8601DateParser.parseToDateTime(methodDetails.getMetadata().getDateLastModified()));
 		Assert.assertTrue(methodDetails.getMetadata().getEditableFields().isEmpty());
 		Assert.assertFalse(methodDetails.getMetadata().isDeletable());
 		Assert.assertTrue(methodDetails.getMetadata().getUsage().getVariables().isEmpty());
@@ -59,8 +59,8 @@ public class OntologyMapperTest {
 		Assert.assertEquals(property.getName(), propertyDetails.getName());
 		Assert.assertEquals(property.getDefinition(), propertyDetails.getDescription());
 		Assert.assertEquals(property.getCropOntologyId(), propertyDetails.getCropOntologyId());
-		Assert.assertEquals(property.getDateCreated(), ISO8601DateParser.parse(propertyDetails.getMetadata().getDateCreated()));
-		Assert.assertEquals(property.getDateLastModified(), ISO8601DateParser.parse(propertyDetails.getMetadata().getDateLastModified()));
+		Assert.assertEquals(property.getDateCreated(), ISO8601DateParser.parseToDateTime(propertyDetails.getMetadata().getDateCreated()));
+		Assert.assertEquals(property.getDateLastModified(), ISO8601DateParser.parseToDateTime(propertyDetails.getMetadata().getDateLastModified()));
 		Assert.assertTrue(propertyDetails.getMetadata().getEditableFields().isEmpty());
 		Assert.assertFalse(propertyDetails.getMetadata().isDeletable());
 		Assert.assertTrue(propertyDetails.getMetadata().getUsage().getVariables().isEmpty());
@@ -79,8 +79,8 @@ public class OntologyMapperTest {
 		Assert.assertEquals(scale.getDefinition(), scaleDetails.getDescription());
 		Assert.assertEquals(scale.getMinValue(), String.valueOf(scaleDetails.getValidValues().getMin()));
 		Assert.assertEquals(scale.getMaxValue(), String.valueOf(scaleDetails.getValidValues().getMax()));
-		Assert.assertEquals(scale.getDateCreated(), ISO8601DateParser.parse(scaleDetails.getMetadata().getDateCreated()));
-		Assert.assertEquals(scale.getDateLastModified(), ISO8601DateParser.parse(scaleDetails.getMetadata().getDateLastModified()));
+		Assert.assertEquals(scale.getDateCreated(), ISO8601DateParser.parseToDateTime(scaleDetails.getMetadata().getDateCreated()));
+		Assert.assertEquals(scale.getDateLastModified(), ISO8601DateParser.parseToDateTime(scaleDetails.getMetadata().getDateLastModified()));
 		Assert.assertTrue(scaleDetails.getMetadata().getEditableFields().isEmpty());
 		Assert.assertFalse(scaleDetails.getMetadata().isDeletable());
 		Assert.assertTrue(scaleDetails.getMetadata().getUsage().getVariables().isEmpty());
@@ -110,8 +110,8 @@ public class OntologyMapperTest {
 		Assert.assertEquals(variable.getStudies(), variableDetails.getMetadata().getUsage().getStudies());
 		Assert.assertEquals(variable.getMinValue(), variableDetails.getExpectedRange().getMin());
 		Assert.assertEquals(variable.getMaxValue(), variableDetails.getExpectedRange().getMax());
-		Assert.assertEquals(variable.getDateCreated(), ISO8601DateParser.parse(variableDetails.getMetadata().getDateCreated()));
-		Assert.assertEquals(variable.getDateLastModified(), ISO8601DateParser.parse(variableDetails.getMetadata().getDateLastModified()));
+		Assert.assertEquals(variable.getDateCreated(), ISO8601DateParser.parseToDateTime(variableDetails.getMetadata().getDateCreated()));
+		Assert.assertEquals(variable.getDateLastModified(), ISO8601DateParser.parseToDateTime(variableDetails.getMetadata().getDateLastModified()));
 		Assert.assertTrue(variableDetails.getMetadata().getEditableFields().isEmpty());
 		Assert.assertFalse(variableDetails.getMetadata().isDeletable());
 		Assert.assertTrue(variableDetails.getMetadata().getUsage().getVariables().isEmpty());
