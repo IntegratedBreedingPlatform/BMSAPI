@@ -96,7 +96,7 @@ public class GermplasmListTemplateExportServiceImpl implements GermplasmListTemp
 		entryDetailFilter.setProgramUuid(programUUID);
 		entryDetailFilter.addVariableType(VariableType.ENTRY_DETAIL);
 		final List<Variable> entryDetailVariables = this.ontologyVariableDataManager.getWithFilter(entryDetailFilter);
-		this.ontologyVariableSheetGenerator.writeOntologyVariableSheet(this.wb, "export.germplasm.list.template.sheet.entry.detail",
+		this.ontologyVariableSheetGenerator.writeOntologyVariableSheet(this.wb, "export.germplasm.list.template.sheet.entry.details",
 			entryDetailVariables);
 
 		try (final FileOutputStream fos = new FileOutputStream(file)) {
