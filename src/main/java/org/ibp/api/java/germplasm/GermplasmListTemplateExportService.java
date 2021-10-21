@@ -4,5 +4,5 @@ import java.io.File;
 
 public interface GermplasmListTemplateExportService {
 
-	File export(String cropName, String programUUID);
+	File export(String cropName, String programUUID, boolean isGermplasmUpdateFormat);
 }

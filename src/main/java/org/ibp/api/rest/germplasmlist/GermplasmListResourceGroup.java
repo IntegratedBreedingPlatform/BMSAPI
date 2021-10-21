@@ -311,12 +311,13 @@ public class GermplasmListResourceGroup {
 	}
 
 
-	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/templates/xls", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/templates/xls/{isGermplasmUpdateFormat}", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
+		@PathVariable final boolean isGermplasmUpdateFormat,
 		@RequestParam(required = false) final String programUUID) {
 
 		final File file =
-			this.germplasmListTemplateExportService.export(cropName, programUUID);
+			this.germplasmListTemplateExportService.export(cropName, programUUID, isGermplasmUpdateFormat);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers
