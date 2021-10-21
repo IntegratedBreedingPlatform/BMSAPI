@@ -70,13 +70,13 @@ public class GermplasmListTemplateExportServiceImpl implements GermplasmListTemp
 	protected OntologyVariableSheetGenerator ontologyVariableSheetGenerator;
 
 	@Override
-	public File export(final String cropName, final String programUUID, final boolean isGermplasmUpdateFormat) {
+	public File export(final String cropName, final String programUUID, final boolean isGermplasmListUpdateFormat) {
 		try {
 			final File temporaryFolder = Files.createTempDir();
 
 			final String fileNameFullPath =
 				temporaryFolder.getAbsolutePath() + File.separator + GermplasmListTemplateExportServiceImpl.FILE_NAME;
-			return this.generateTemplateFile(fileNameFullPath, cropName, programUUID, isGermplasmUpdateFormat);
+			return this.generateTemplateFile(fileNameFullPath, cropName, programUUID, isGermplasmListUpdateFormat);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("cannot.export.as.xls.germplasm.template", "");
@@ -84,12 +84,12 @@ public class GermplasmListTemplateExportServiceImpl implements GermplasmListTemp
 		}
 	}
 
-	private File generateTemplateFile(final String fileNamePath, final String cropName, final String programUUID, final boolean isGermplasmUpdateFormat) throws IOException {
+	private File generateTemplateFile(final String fileNamePath, final String cropName, final String programUUID, final boolean isGermplasmListUpdateFormat) throws IOException {
 		this.wb = new HSSFWorkbook();
 
 		final File file = new File(fileNamePath);
 		this.sheetStyles = new ExcelCellStyleBuilder(this.wb);
-		this.writeObservationSheet(isGermplasmUpdateFormat);
+		this.writeObservationSheet(isGermplasmListUpdateFormat);
 
 		final VariableFilter entryDetailFilter = new VariableFilter();
 
@@ -106,21 +106,21 @@ public class GermplasmListTemplateExportServiceImpl implements GermplasmListTemp
 		return file;
 	}
 
-	private void writeObservationSheet(final boolean isGermplasmUpdateFormat) {
+	private void writeObservationSheet(final boolean isGermplasmListUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet observationSheet =
 			this.wb.createSheet(this.getMessageSource().getMessage("export.germplasm.list.template.sheet.observation", null, locale));
 		observationSheet.setDefaultRowHeightInPoints(16);
-		this.writeObservationHeader(observationSheet, isGermplasmUpdateFormat);
+		this.writeObservationHeader(observationSheet, isGermplasmListUpdateFormat);
 
 	}
 
-	private void writeObservationHeader(final HSSFSheet observationSheet, final boolean isGermplasmUpdateFormat) {
+	private void writeObservationHeader(final HSSFSheet observationSheet, final boolean isGermplasmListUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFRow row = observationSheet.createRow(0);
 
 		final Map<String, ExcelCellStyleBuilder.ExcelCellStyle> headers =
-			isGermplasmUpdateFormat ? IMPORT_LIST_UPDATES_HEADERS : IMPORT_LIST_HEADERS;
+			isGermplasmListUpdateFormat ? IMPORT_LIST_UPDATES_HEADERS : IMPORT_LIST_HEADERS;
 		final Iterator<Map.Entry<String, ExcelCellStyleBuilder.ExcelCellStyle>> iterator = headers.entrySet().iterator();
 		int index = 0;
 		while (iterator.hasNext()) {
