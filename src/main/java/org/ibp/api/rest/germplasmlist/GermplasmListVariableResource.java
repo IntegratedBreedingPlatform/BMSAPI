@@ -27,7 +27,7 @@ public class GermplasmListVariableResource {
 	public GermplasmListVariableService germplasmListVariableService;
 
 	@ApiOperation(value = "Add a variable to the list", notes = "Add a variable to the list")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables", method = RequestMethod.PUT)
 	public ResponseEntity<Void> addVariable(
 		@PathVariable final String cropName, @PathVariable final Integer listId, @RequestParam(required = false) final String programUUID,
@@ -37,7 +37,7 @@ public class GermplasmListVariableResource {
 	}
 
 	@ApiOperation(value = "Remove list variables", notes = "Remove a set of variables from a germplasm list")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> removeVariables(
 		@PathVariable final String cropName, @PathVariable final Integer listId,
@@ -49,7 +49,7 @@ public class GermplasmListVariableResource {
 	}
 
 	@ApiOperation(value = "Get the variables associated to the list filtered by variableType", notes = "Get the list variables filtered by variableType")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables", method = RequestMethod.GET)
 	public ResponseEntity<List<Variable>> getVariables(
 		@PathVariable final String cropName, @PathVariable final Integer listId, @RequestParam final Integer variableTypeId,

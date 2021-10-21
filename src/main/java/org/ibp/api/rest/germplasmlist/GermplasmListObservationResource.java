@@ -26,7 +26,7 @@ public class GermplasmListObservationResource {
 	public GermplasmListObservationService germplasmListObservationService;
 
 	@ApiOperation(value = "Add new observation to the germplasm list", notes = "Add new observation to the germplasm list")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/observations", method = RequestMethod.PUT)
 	public ResponseEntity<Integer> createGermplasmListObservation(
 		@PathVariable final String cropName, @PathVariable final Integer listId, @RequestParam(required = false) final String programUUID,
@@ -35,7 +35,7 @@ public class GermplasmListObservationResource {
 	}
 
 	@ApiOperation(value = "Remove observation from the germplasm list", notes = "Remove observation from the germplasm list")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/observations/{observationId}", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> removeGermplasmListObservation(
 		@PathVariable final String cropName, @PathVariable final Integer listId,
@@ -46,7 +46,7 @@ public class GermplasmListObservationResource {
 	}
 
 	@ApiOperation(value = "Get the variables associated to the list filtered by variableType", notes = "Get the list variables filtered by variableType")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/observations/{observationId}", method = RequestMethod.PATCH)
 	public ResponseEntity<Void> modifyGermplasmListObservation(
 		@PathVariable final String cropName, @PathVariable final Integer listId, @PathVariable final Integer observationId,
@@ -58,7 +58,7 @@ public class GermplasmListObservationResource {
 	}
 
 	@ApiOperation(value = "Count Germplasm List Observations", notes = "Returns count of germplasm list observations given a set of variables")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/variables/observations", method = RequestMethod.HEAD)
 	public ResponseEntity<Void> countObservationsByVariables(
 		@PathVariable final String cropName, @PathVariable final Integer listId,
