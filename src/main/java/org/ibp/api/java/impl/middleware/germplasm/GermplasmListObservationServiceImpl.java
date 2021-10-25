@@ -166,7 +166,7 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 
 	private GermplasmListObservationDto validateObservationExists(final Integer observationId) {
 		final Optional<GermplasmListObservationDto> germplasmListObservationDto =
-			this.germplasmListService.getGermplasmListObservation(observationId);
+			this.germplasmListService.getListDataObservation(observationId);
 		if (!germplasmListObservationDto.isPresent()) {
 			this.errors.reject("germplasm.list.data.observation.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
