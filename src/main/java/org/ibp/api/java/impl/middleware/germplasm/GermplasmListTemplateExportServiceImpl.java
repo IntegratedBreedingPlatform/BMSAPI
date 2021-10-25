@@ -52,8 +52,7 @@ public class GermplasmListTemplateExportServiceImpl implements GermplasmListTemp
 
 	static {
 		IMPORT_LIST_UPDATES_HEADERS = new LinkedHashMap<>();
-		IMPORT_LIST_UPDATES_HEADERS.put("export.germplasm.list.template.gid.column", ExcelCellStyleBuilder.ExcelCellStyle.HEADING_STYLE_YELLOW);
-		IMPORT_LIST_UPDATES_HEADERS.put("export.germplasm.list.template.entry.code.column", ExcelCellStyleBuilder.ExcelCellStyle.HEADING_STYLE_YELLOW);
+		IMPORT_LIST_UPDATES_HEADERS.put("export.germplasm.list.template.entry.no.column", ExcelCellStyleBuilder.ExcelCellStyle.HEADING_STYLE_YELLOW);
 	}
 
 	private ExcelCellStyleBuilder sheetStyles;
