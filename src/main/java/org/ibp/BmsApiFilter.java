@@ -1,7 +1,8 @@
 
 package org.ibp;
 
-import java.io.IOException;
+import org.generationcp.commons.hibernate.HTTPRequestAwareServletFilter;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -10,8 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.stereotype.Component;
+import java.io.IOException;
 
 /**
  * Filter to enable <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing" >Cross-origin resource sharing</a>. This is also
@@ -33,7 +33,7 @@ public class BmsApiFilter implements Filter {
 		response.setHeader("X-Content-Type-Options", "nosniff");
 		response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
 		response.setHeader("Feature-Policy", "self");
-		response.setHeader("Content-Security-Policy", "default-src 'self' 'unsafe-inline';");
+		response.setHeader("Content-Security-Policy", HTTPRequestAwareServletFilter.CSP_CONFIG);
 
 		// Specific Cache control setting. An issue is caused by caching in IE9 and IE10. The GET requests to retrieve the variables,
 		// properties, methods or scales after one has been added are not executed again. IE will only execute the GET request again after
