@@ -60,6 +60,7 @@ public class Germplasm {
 
 	private String countryOfOriginCode;
 
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private List<String> typeOfGermplasmStorageCode = new ArrayList<>();
 
 	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV2.class})
@@ -118,7 +119,7 @@ public class Germplasm {
 	private List<ExternalReferenceDTO> externalReferences;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private List<String> storageTypes;
+	private List<String> storageTypes = new ArrayList<>();
 
 	public Germplasm() {
 	}

@@ -1,15 +1,22 @@
 package org.ibp.api.java.germplasm;
 
 import org.generationcp.commons.pojo.treeview.TreeNode;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.springframework.data.domain.Pageable;
 import org.ibp.api.rest.common.UserTreeState;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -42,6 +49,14 @@ public interface GermplasmListService {
 
 	void deleteGermplasmListFolder(String cropName, String programUUID, String folderId);
 
+	GermplasmListDto getGermplasmListById(Integer listId);
+
 	List<GermplasmListDto> getGermplasmLists(Integer gid);
+
+	List<GermplasmListSearchResponse> searchGermplasmList(GermplasmListSearchRequest request, Pageable pageable, String programUUID);
+
+	long countSearchGermplasmList(GermplasmListSearchRequest request, String programUUID);
+
+	boolean toggleGermplasmListStatus(Integer listId);
 
 }

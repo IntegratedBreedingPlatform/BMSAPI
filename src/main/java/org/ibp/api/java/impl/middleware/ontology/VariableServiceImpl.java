@@ -18,7 +18,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
@@ -112,6 +111,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			if (property != null) {
 				middlewareVariableFilter.addPropertyId(property);
 			}
+
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
 			final List<VariableDetails> variableDetailsList = new ArrayList<>();
 
@@ -547,36 +547,6 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			variableDetailsList.add(variableSummary);
 		}
 		return variableDetailsList;
-	}
-
-	@Override
-	public long countVariablesByDatasetId(final int datasetId, final List<Integer> variableTypes) {
-		return this.ontologyVariableDataManager.countVariablesByDatasetId(datasetId, variableTypes);
-	}
-
-	@Override
-	public List<VariableDTO> getVariablesByDatasetId(final int datasetId, final String cropname, final List<Integer> variableTypes,
-		final int pageSize, final int pageNumber) {
-		final List<VariableDTO> variableDTOs = this.ontologyVariableDataManager.getVariablesByDatasetId(datasetId, variableTypes, pageSize, pageNumber);
-		for (final VariableDTO variableDTO : variableDTOs) {
-			variableDTO.setCrop(cropname);
-		}
-		return variableDTOs;
-	}
-
-	@Override
-	public long countAllVariables(final List<Integer> variableTypes) {
-		return this.ontologyVariableDataManager.countAllVariables(variableTypes);
-	}
-
-	@Override
-	public List<VariableDTO> getAllVariables(final String cropname, final List<Integer> variableTypes, final int pageSize,
-		final int pageNumber) {
-		final List<VariableDTO> variableDTOs = this.ontologyVariableDataManager.getAllVariables(variableTypes, cropname, pageSize, pageNumber);
-		for (final VariableDTO variableDTO : variableDTOs) {
-			variableDTO.setCrop(cropname);
-		}
-		return variableDTOs;
 	}
 
 	@Override

@@ -18,10 +18,14 @@ import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapiImpl;
+import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
+import org.generationcp.middleware.api.brapi.ObservationServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapiImpl;
+import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
+import org.generationcp.middleware.api.brapi.VariableServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -40,6 +44,8 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListServiceImpl;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataServiceImpl;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsService;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsServiceImpl;
 import org.generationcp.middleware.api.location.LocationService;
@@ -753,14 +759,32 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public VariableServiceBrapi getVariableServiceBrapi() {
+		return new VariableServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyServiceBrapi getStudyServiceBrapi() {
 		return new StudyServiceBrapiImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public ObservationServiceBrapi getObservationServiceBrapi() {
+		return new ObservationServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public ProgramFavoriteService getProgramFavoriteService() {
 		return new ProgramFavoriteServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmListDataService getGermplasmListDataSearchService() {
+		return new GermplasmListDataServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
