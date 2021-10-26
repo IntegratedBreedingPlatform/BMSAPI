@@ -31,7 +31,8 @@ public class GermplasmListObservationResource {
 	public ResponseEntity<Integer> createGermplasmListObservation(
 		@PathVariable final String cropName, @PathVariable final Integer listId, @RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmListObservationRequestDto germplasmListObservationRequestDto) {
-		return new ResponseEntity<>(this.germplasmListObservationService.create(listId, germplasmListObservationRequestDto), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmListObservationService.create(programUUID, listId, germplasmListObservationRequestDto),
+			HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Remove observation from the germplasm list", notes = "Remove observation from the germplasm list")
@@ -53,7 +54,7 @@ public class GermplasmListObservationResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final String value) {
 
-		this.germplasmListObservationService.update(listId, observationId, value);
+		this.germplasmListObservationService.update(programUUID, listId, observationId, value);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

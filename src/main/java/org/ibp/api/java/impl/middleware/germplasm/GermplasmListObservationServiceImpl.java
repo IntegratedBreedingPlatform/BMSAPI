@@ -45,7 +45,8 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Override
-	public Integer create(final Integer listId, final GermplasmListObservationRequestDto germplasmListObservationRequestDto) {
+	public Integer create(final String programUUID, final Integer listId,
+		final GermplasmListObservationRequestDto germplasmListObservationRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListObservationRequestDto.class.getName());
 		BaseValidator.checkNotNull(listId, "param.null", new String[] {"listId"});
 		BaseValidator.checkNotNull(germplasmListObservationRequestDto, "param.null", new String[] {"request body"});
@@ -60,7 +61,7 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		final GermplasmListDataDto germplasmListDataDto = this.validateListDataExists(germplasmListObservationRequestDto.getListDataId());
 		this.validateListDataBelongsToTheList(listId, germplasmListDataDto);
 
-		final Variable variable = this.validateVariableIdIsAVariable(germplasmListObservationRequestDto.getVariableId());
+		final Variable variable = this.validateVariableIdIsAVariable(programUUID, germplasmListObservationRequestDto.getVariableId());
 
 		this.germplasmListVariableValidator.validateVariableIsAssociatedToList(listId, germplasmListObservationRequestDto.getVariableId());
 
@@ -73,7 +74,7 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 	}
 
 	@Override
-	public void update(final Integer listId, final Integer observationId,
+	public void update(final String programUUID, final Integer listId, final Integer observationId,
 		final String value) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListObservationRequestDto.class.getName());
 		BaseValidator.checkNotNull(listId, "param.null", new String[] {"listId"});
@@ -88,7 +89,8 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 		this.validateObservationBelongsToList(listId, germplasmListObservationDto);
 
 		this.validateValue(value);
-		final Variable variable = this.ontologyVariableDataManager.getVariable(null, germplasmListObservationDto.getVariableId(), false);
+		final Variable variable =
+			this.ontologyVariableDataManager.getVariable(programUUID, germplasmListObservationDto.getVariableId(), false);
 		this.validateVariableDataTypeValue(variable, value);
 
 		final Integer cValueId = VariableValueUtil.resolveCategoricalValueId(variable, value);
@@ -132,8 +134,8 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 
 	}
 
-	private Variable validateVariableIdIsAVariable(final Integer variableId) {
-		final Variable variable = this.ontologyVariableDataManager.getVariable(null, variableId, false);
+	private Variable validateVariableIdIsAVariable(final String programUUID, final Integer variableId) {
+		final Variable variable = this.ontologyVariableDataManager.getVariable(programUUID, variableId, false);
 		if (variable == null) {
 			this.errors.reject("germplasm.list.variable.does.not.exist", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
