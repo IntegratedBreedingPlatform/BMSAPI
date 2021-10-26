@@ -55,13 +55,13 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
-	private List<Field> defaultPedigreeDetailsFields;
-	private List<Field> defaultGermplasmDetailsFields;
+	List<Field> defaultPedigreeDetailsFields;
+	List<Field> defaultGermplasmDetailsFields;
 
-	private List<Integer> pedigreeFieldIds;
-	private List<Integer> germplasmFieldIds;
+	List<Integer> pedigreeFieldIds;
+	List<Integer> germplasmFieldIds;
 
-	protected List<SortableFieldDto> sortedByFields;
+	List<SortableFieldDto> sortedByFields;
 
 	public static final String GERMPLASM_DATE = "GERMPLASM DATE";
 	public static final String METHOD_ABBREV = "METHOD ABBREV";
@@ -85,25 +85,25 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	public static final String ORIG_FINAL_NAME = "germplasm-labels";
 
 	@Autowired
-	private ResourceBundleMessageSource messageSource;
+	ResourceBundleMessageSource messageSource;
 
 	@Autowired
-	private GermplasmAttributeService germplasmAttributeService;
+	GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
 	private SearchRequestService searchRequestService;
 
 	@Autowired
-	private GermplasmSearchService germplasmSearchService;
+	GermplasmSearchService germplasmSearchService;
 
 	@Autowired
-	private GermplasmNameTypeService germplasmNameTypeService;
+	GermplasmNameTypeService germplasmNameTypeService;
 
 	@Autowired
-	private GermplasmService germplasmService;
+	GermplasmService germplasmService;
 
 	@Autowired
-	private GermplasmNameService germplasmNameService;
+	GermplasmNameService germplasmNameService;
 
 	@Value("${export.germplasm.max.total.results}")
 	public int maxTotalResults;
@@ -166,32 +166,36 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	public List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final List<LabelType> labelTypes = new LinkedList<>();
-		final String germplasmPropValue = this.getMessage("label.printing.germplasm.details");
-		final String pedigreePropValue = this.getMessage("label.printing.pedigree.details");
-		final String namesPropValue = this.getMessage("label.printing.names.details");
-		final String attributesPropValue = this.getMessage("label.printing.attributes.details");
-
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
-
 		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 
 		// Germplasm Details labels
+		final String germplasmPropValue = this.getMessage("label.printing.germplasm.details");
 		final LabelType germplasmType = new LabelType(germplasmPropValue, germplasmPropValue);
 		germplasmType.setFields(this.defaultGermplasmDetailsFields);
 		labelTypes.add(germplasmType);
 
 		// Pedigree labels
+		final String pedigreePropValue = this.getMessage("label.printing.pedigree.details");
 		final LabelType pedigreeType = new LabelType(pedigreePropValue, pedigreePropValue);
 		pedigreeType.setFields(this.defaultPedigreeDetailsFields);
 		labelTypes.add(pedigreeType);
 
+		this.populateNamesAndAttributesLabelType(programUUID, labelTypes, germplasmSearchResponses);
+		return labelTypes;
+	}
+
+	void populateNamesAndAttributesLabelType(
+		final String programUUID, final List<LabelType> labelTypes, final List<GermplasmSearchResponse> germplasmSearchResponses) {
 		// Names labels
+		final String namesPropValue = this.getMessage("label.printing.names.details");
 		final LabelType namesType = new LabelType(namesPropValue, namesPropValue);
 		namesType.setFields(new ArrayList<>());
 		labelTypes.add(namesType);
 
 		// Attributes labels
+		final String attributesPropValue = this.getMessage("label.printing.attributes.details");
 		final LabelType attributesType = new LabelType(attributesPropValue, attributesPropValue);
 		attributesType.setFields(new ArrayList<>());
 		labelTypes.add(attributesType);
@@ -210,56 +214,65 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 				.collect(Collectors.toList()));
 		}
-		return labelTypes;
 	}
 
 	@Override
 	public LabelsData getLabelsData(
 		final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
-		// Get raw data
+		// Get Germplasm data
 		final Integer searchRequestId = labelsGeneratorInput.getSearchRequestId();
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(searchRequestId, GermplasmSearchRequest.class);
-
 		this.setAddedColumnsToSearchRequest(labelsGeneratorInput, germplasmSearchRequest);
-
-		final List<Integer> listOfGermplasmDetailsAndPedrigreeIds = new ArrayList<>();
-		listOfGermplasmDetailsAndPedrigreeIds.addAll(this.germplasmFieldIds);
-		listOfGermplasmDetailsAndPedrigreeIds.addAll(this.pedigreeFieldIds);
-
-		final List<Integer> selectedFieldIds =
-			labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toList());
-
-		final boolean fieldsContainsNamesOrAttributes =
-			selectedFieldIds.stream().anyMatch(fieldId -> !listOfGermplasmDetailsAndPedrigreeIds.contains(fieldId));
-
 		PageRequest pageRequest = null;
 		if (!StringUtils.isBlank(labelsGeneratorInput.getSortBy())) {
 			pageRequest = new PageRequest(0, this.maxTotalResults, new Sort(Sort.Direction.ASC, labelsGeneratorInput.getSortBy()));
 		}
-
 		final List<GermplasmSearchResponse> responseList =
 			this.germplasmService.searchGermplasm(germplasmSearchRequest, pageRequest, programUUID);
+
+		//Get Germplasm names and attributes data
+		final List<Integer> nonNameAndAttributeIds = new ArrayList<>();
+		nonNameAndAttributeIds.addAll(this.germplasmFieldIds);
+		nonNameAndAttributeIds.addAll(this.pedigreeFieldIds);
+		final Set<Integer> keys = this.getSelectedFieldIds(labelsGeneratorInput);
+		final boolean fieldsContainsNamesOrAttributes =
+			keys.stream().anyMatch(fieldId -> !nonNameAndAttributeIds.contains(fieldId));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
-
 		if (fieldsContainsNamesOrAttributes) {
 			final List<Integer> gids = responseList.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
-			final Map<Integer, List<AttributeDTO>> attributesByGIDsMap = this.germplasmAttributeService.getAttributesByGIDsMap(gids);
-			for (final Map.Entry<Integer, List<AttributeDTO>> gidAttributes : attributesByGIDsMap.entrySet()) {
-				final Map<Integer, String> attributesMap = new HashMap<>();
-				gidAttributes.getValue().forEach(attributeDTO -> attributesMap.put(attributeDTO.getAttributeDbId(), attributeDTO.getValue()));
-				attributeValues.put(gidAttributes.getKey(), attributesMap);
-			}
-			final List<GermplasmNameDto> germplasmNames = this.germplasmNameService.getGermplasmNamesByGids(gids);
-			germplasmNames.forEach(name -> {
-				nameValues.putIfAbsent(name.getGid(), new HashMap<>());
-				nameValues.get(name.getGid()).put(name.getNameTypeId(), name.getName());
-			});
+			this.getAttributeValuesMap(attributeValues, gids);
+			this.getNameValuesMap(nameValues, gids);
 		}
 
 		// Data to be exported
 		final List<Map<Integer, String>> data = new ArrayList<>();
+		for (final GermplasmSearchResponse germplasmSearchResponse : responseList) {
+			data.add(this.getDataRow(keys, germplasmSearchResponse, attributeValues, nameValues));
+		}
+
+		return new LabelsData(LabelPrintingStaticField.GUID.getFieldId(), data);
+	}
+
+	void getNameValuesMap(final Map<Integer, Map<Integer, String>> nameValues, final List<Integer> gids) {
+		final List<GermplasmNameDto> germplasmNames = this.germplasmNameService.getGermplasmNamesByGids(gids);
+		germplasmNames.forEach(name -> {
+			nameValues.putIfAbsent(name.getGid(), new HashMap<>());
+			nameValues.get(name.getGid()).put(name.getNameTypeId(), name.getName());
+		});
+	}
+
+	void getAttributeValuesMap(final Map<Integer, Map<Integer, String>> attributeValues, final List<Integer> gids) {
+		final Map<Integer, List<AttributeDTO>> attributesByGIDsMap = this.germplasmAttributeService.getAttributesByGIDsMap(gids);
+		for (final Map.Entry<Integer, List<AttributeDTO>> gidAttributes : attributesByGIDsMap.entrySet()) {
+			final Map<Integer, String> attributesMap = new HashMap<>();
+			gidAttributes.getValue().forEach(attributeDTO -> attributesMap.put(attributeDTO.getAttributeDbId(), attributeDTO.getValue()));
+			attributeValues.put(gidAttributes.getKey(), attributesMap);
+		}
+	}
+
+	Set<Integer> getSelectedFieldIds(final LabelsGeneratorInput labelsGeneratorInput) {
 		final Set<Integer> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toSet());
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
@@ -269,15 +282,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 				keys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
 		}
-
-		for (final GermplasmSearchResponse germplasmSearchResponse : responseList) {
-			data.add(this.getDataRow(keys, germplasmSearchResponse, attributeValues, nameValues));
-		}
-
-		return new LabelsData(LabelPrintingStaticField.GUID.getFieldId(), data);
+		return keys;
 	}
 
-	private void setAddedColumnsToSearchRequest(final LabelsGeneratorInput labelsGeneratorInput,
+	void setAddedColumnsToSearchRequest(final LabelsGeneratorInput labelsGeneratorInput,
 		final GermplasmSearchRequest germplasmSearchRequest) {
 		final Set<String> addedColumnsPropertyIds = new HashSet<>();
 
@@ -298,157 +306,146 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final Map<Integer, String> columns = new HashMap<>();
 		for (final Integer key : keys) {
 			final int id = toId(key);
-
 			if (this.germplasmFieldIds.contains(id)) {
-				if (TermId.GID.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getGid(), ""));
-					continue;
-				}
-
-				if (LabelPrintingStaticField.GUID.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmUUID(), ""));
-					continue;
-				}
-
-				if (TermId.GROUP_ID.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getGroupId(), ""));
-					continue;
-				}
-
-				if (TermId.GERMPLASM_LOCATION.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getLocationName(), ""));
-					continue;
-				}
-
-				if (TermId.LOCATION_ABBR.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getLocationAbbr(), ""));
-					continue;
-				}
-
-				if (TermId.BREEDING_METHOD.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getMethodName(), ""));
-					continue;
-				}
-
-				if (TermId.PREFERRED_ID.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredId(), ""));
-					continue;
-				}
-
-				if (TermId.PREFERRED_NAME.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredName(), ""));
-					continue;
-				}
-
-				if (LabelPrintingStaticField.REFERENCE.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getReference(), ""));
-					continue;
-				}
-
-				if (TermId.GERMPLASM_DATE.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmDate(), ""));
-					continue;
-				}
-
-				if (LabelPrintingStaticField.METHOD_CODE.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getMethodCode(), ""));
-					continue;
-				}
-
-				if (LabelPrintingStaticField.METHOD_NUMBER.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getMethodNumber(), ""));
-					continue;
-				}
-
-				if (LabelPrintingStaticField.METHOD_GROUP.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getMethodGroup(), ""));
-					continue;
-				}
-
-				if (LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getGroupSourceGID(), ""));
-					continue;
-				}
-
-				if (LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getGroupSourcePreferredName(), ""));
-					continue;
-				}
-
-				if (TermId.AVAILABLE_INVENTORY.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getAvailableBalance(), ""));
-					continue;
-				}
-
-				if (TermId.UNITS_INVENTORY.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getUnit(), ""));
-					continue;
-				}
-
-				if (LabelPrintingStaticField.LOTS.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getLotCount(), ""));
-				}
-
+				this.getGermplasmFieldDataRowValue(germplasmSearchResponse, columns, key, id);
 			} else if (this.pedigreeFieldIds.contains(id)) {
-				if (LabelPrintingStaticField.CROSS.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getPedigreeString(), ""));
-					continue;
-				}
-
-				if (TermId.CROSS_FEMALE_GID.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getFemaleParentGID(), ""));
-					continue;
-				}
-
-				if (TermId.CROSS_MALE_GID.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentGID(), ""));
-					continue;
-				}
-
-				if (TermId.CROSS_MALE_PREFERRED_NAME.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentPreferredName(), ""));
-					continue;
-				}
-
-				if (TermId.CROSS_FEMALE_PREFERRED_NAME.getId() == id) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getFemaleParentPreferredName(), ""));
-					continue;
-				}
-
-				if (LabelPrintingStaticField.INMEDIATE_SOURCE_GID.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourceGID(), ""));
-					continue;
-				}
-
-				if (LabelPrintingStaticField.INMEDIATE_SOURCE_PREFERRED_NAME.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourcePreferredName(), ""));
-				}
+				this.getPedigreeFieldDataRowValue(germplasmSearchResponse, columns, key, id);
 			} else {
-				// Not part of the fixed columns
-				// Attributes
-				final Map<Integer, String> attributesByType = attributeValues.get(germplasmSearchResponse.getGid());
-				if (attributesByType != null) {
-					final String attributeValue = attributesByType.get(id);
-					if (attributeValue != null) {
-						columns.put(key, attributeValue);
-					}
-				}
-
-				// Not part of the fixed columns
-				// Name
-				final Map<Integer, String> namesByType = nameValues.get(germplasmSearchResponse.getGid());
-				if (namesByType != null) {
-					final String nameValue = namesByType.get(id);
-					if (nameValue != null) {
-						columns.put(key, nameValue);
-					}
-				}
+				this.getAttributeOrNameDataRowValue(germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
 			}
 		}
 		return columns;
 	}
 
-	private void addingColumnToGermplasmSearchRequest(final List<Integer> listOfSelectedFields,
+	void getAttributeOrNameDataRowValue(
+		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
+		final Map<Integer, Map<Integer, String>> nameValues, final Map<Integer, String> columns, final Integer key, final int id) {
+		// Not part of the fixed columns
+		// Attributes
+		final Map<Integer, String> attributesByType = attributeValues.get(germplasmSearchResponse.getGid());
+		if (attributesByType != null) {
+			final String attributeValue = attributesByType.get(id);
+			if (attributeValue != null) {
+				columns.put(key, attributeValue);
+			}
+		}
+
+		// Not part of the fixed columns
+		// Name
+		final Map<Integer, String> namesByType = nameValues.get(germplasmSearchResponse.getGid());
+		if (namesByType != null) {
+			final String nameValue = namesByType.get(id);
+			if (nameValue != null) {
+				columns.put(key, nameValue);
+			}
+		}
+	}
+
+	void getPedigreeFieldDataRowValue(
+		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, String> columns, final Integer key, final int id) {
+		final TermId term = TermId.getById(id);
+		switch (term) {
+			case CROSS_FEMALE_GID:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getFemaleParentGID(), ""));
+				return;
+			case CROSS_MALE_GID:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentGID(), ""));
+				return;
+			case CROSS_MALE_PREFERRED_NAME:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentPreferredName(), ""));
+				return;
+			case CROSS_FEMALE_PREFERRED_NAME:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getFemaleParentPreferredName(), ""));
+				return;
+			default:
+				//do nothing
+		}
+		final LabelPrintingStaticField staticField = LabelPrintingStaticField.getByFieldId(id);
+		switch (staticField) {
+			case CROSS:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getPedigreeString(), ""));
+				return;
+			case INMEDIATE_SOURCE_GID:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourceGID(), ""));
+				return;
+			case INMEDIATE_SOURCE_PREFERRED_NAME:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourcePreferredName(), ""));
+				return;
+			default:
+				//do nothing
+		}
+	}
+
+	void getGermplasmFieldDataRowValue(
+		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, String> columns, final Integer key, final int id) {
+		final TermId term = TermId.getById(id);
+		switch (term) {
+			case GID:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getGid(), ""));
+				return;
+			case GROUP_ID:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getGroupId(), ""));
+				return;
+			case GERMPLASM_LOCATION:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getLocationName(), ""));
+				return;
+			case LOCATION_ABBR:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getLocationAbbr(), ""));
+				return;
+			case BREEDING_METHOD:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getMethodName(), ""));
+				return;
+			case PREFERRED_ID:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredId(), ""));
+				return;
+			case PREFERRED_NAME:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredName(), ""));
+				return;
+			case GERMPLASM_DATE:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmDate(), ""));
+				return;
+			case AVAILABLE_INVENTORY:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getAvailableBalance(), ""));
+				return;
+			case UNITS_INVENTORY:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getUnit(), ""));
+				return;
+			default:
+				//do nothing
+		}
+		
+		final LabelPrintingStaticField staticField = LabelPrintingStaticField.getByFieldId(id);
+		switch (staticField) {
+			case GUID:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmUUID(), ""));
+				return;
+			case REFERENCE:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getReference(), ""));
+				return;
+			case METHOD_CODE:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getMethodCode(), ""));
+				return;
+			case METHOD_NUMBER:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getMethodNumber(), ""));
+				return;
+			case METHOD_GROUP:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getMethodGroup(), ""));
+				return;
+			case GROUP_SOURCE_GID:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getGroupSourceGID(), ""));
+				return;
+			case GROUP_SOURCE_PREFERRED_NAME:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getGroupSourcePreferredName(), ""));
+				return;
+			case LOTS:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getLotCount(), ""));
+				return;
+			default:
+				//do nothing
+		}
+	}
+
+	void addingColumnToGermplasmSearchRequest(final List<Integer> listOfSelectedFields,
 		final Set<String> addedColumnsPropertyIds) {
 		if (listOfSelectedFields.contains(TermId.GERMPLASM_DATE.getId())) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.GERMPLASM_DATE);
@@ -589,11 +586,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	 */
 	private static final Integer MAX_FIXED_TYPE_INDEX = 10000;
 
-	private static int toKey(final int id) {
+	static int toKey(final int id) {
 		return id + MAX_FIXED_TYPE_INDEX;
 	}
 
-	private static int toId(final int key) {
+	static int toId(final int key) {
 		if (key > MAX_FIXED_TYPE_INDEX) {
 			return key - MAX_FIXED_TYPE_INDEX;
 		}
