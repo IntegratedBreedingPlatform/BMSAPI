@@ -9,19 +9,22 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
-import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.germplasm.GermplasmListTemplateExportService;
@@ -65,6 +68,9 @@ GermplasmListResourceGroup {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private SearchRequestService searchRequestService;
 
 	@ApiOperation(value = "Get germplasm lists given a tree parent node folder", notes = "Get germplasm lists given a tree parent node folder")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
@@ -250,9 +256,27 @@ GermplasmListResourceGroup {
 			pageable);
 	}
 
+	@ApiOperation(value = "Post germplasm list data search", notes = "Post germplasm list data search")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/search", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasmListData(
+		@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListDataSearchRequest request) {
+
+		final String searchRequestId =
+			this.searchRequestService.saveSearchRequest(request, GermplasmListDataSearchRequest.class).toString();
+		final SearchDto searchDto = new SearchDto(searchRequestId);
+		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse<>(searchDto);
+
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Returns a germplasm list data by a given germplasm list id")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
-	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/data/search", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/search", method = RequestMethod.GET)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
 			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
@@ -266,8 +290,12 @@ GermplasmListResourceGroup {
 		@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
-		@RequestBody final GermplasmListDataSearchRequest request,
+		@RequestParam final Integer searchRequestId,
 		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+
+		final GermplasmListDataSearchRequest request = (GermplasmListDataSearchRequest) this.searchRequestService
+			.getSearchRequest(searchRequestId, GermplasmListDataSearchRequest.class);
+
 		return new PaginatedSearch().getPagedResult(() -> this.germplasmListDataService.countSearchGermplasmListData(listId, request),
 			() -> this.germplasmListDataService.searchGermplasmListData(listId, request, pageable),
 			pageable);
