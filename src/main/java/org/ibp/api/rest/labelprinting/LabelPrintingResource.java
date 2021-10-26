@@ -102,7 +102,7 @@ public class LabelPrintingResource {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
 		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput, programUUID);
-		final OriginResourceMetadata originResourceMetadata = labelPrintingStrategy.getOriginResourceMetadata(labelsInfoInput);
+		final OriginResourceMetadata originResourceMetadata = labelPrintingStrategy.getOriginResourceMetadata(labelsInfoInput, programUUID);
 
 		return new ResponseEntity<>(originResourceMetadata, HttpStatus.OK);
 	}

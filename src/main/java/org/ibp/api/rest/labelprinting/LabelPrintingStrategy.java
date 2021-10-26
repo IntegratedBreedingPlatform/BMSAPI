@@ -66,7 +66,7 @@ public abstract class LabelPrintingStrategy {
 	 * @param labelsInfoInput
 	 * @return OriginResourceMetadata
 	 */
-	abstract OriginResourceMetadata getOriginResourceMetadata (final LabelsInfoInput labelsInfoInput);
+	abstract OriginResourceMetadata getOriginResourceMetadata (final LabelsInfoInput labelsInfoInput, String programUUID);
 
 	/**
 	 * Given labelInfoInput, it will get the available LabelTypes (fields organized in lists), so that the user can

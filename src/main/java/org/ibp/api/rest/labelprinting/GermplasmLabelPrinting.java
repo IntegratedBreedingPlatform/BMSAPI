@@ -158,7 +158,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	public OriginResourceMetadata getOriginResourceMetadata(
-		final LabelsInfoInput labelsInfoInput) {
+		final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final String fileName = FileNameGenerator.generateFileName(GermplasmLabelPrinting.ORIG_FINAL_NAME);
 		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
 	}
@@ -191,10 +191,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		namesType.setFields(new ArrayList<>());
 		labelTypes.add(namesType);
 
-		// Attribiutes labels
-		final LabelType attirbutesType = new LabelType(attributesPropValue, attributesPropValue);
-		attirbutesType.setFields(new ArrayList<>());
-		labelTypes.add(attirbutesType);
+		// Attributes labels
+		final LabelType attributesType = new LabelType(attributesPropValue, attributesPropValue);
+		attributesType.setFields(new ArrayList<>());
+		labelTypes.add(attributesType);
 
 		if (!germplasmSearchResponses.isEmpty()) {
 			final List<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
@@ -205,7 +205,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 				.map(nameType -> new Field(toKey(nameType.getId()), nameType.getCode()))
 				.collect(Collectors.toList()));
 
-			attirbutesType.getFields().addAll(attributeVariables.stream()
+			attributesType.getFields().addAll(attributeVariables.stream()
 				.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
 					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 				.collect(Collectors.toList()));

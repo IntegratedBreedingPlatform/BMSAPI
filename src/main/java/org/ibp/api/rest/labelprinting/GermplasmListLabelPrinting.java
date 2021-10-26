@@ -147,13 +147,13 @@ public class GermplasmListLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	public OriginResourceMetadata getOriginResourceMetadata(
-		final LabelsInfoInput labelsInfoInput) {
+		final LabelsInfoInput labelsInfoInput, final String programUUID) {
 
 		final GermplasmListDto germplasmListDto = this.germplasmListService.getGermplasmListById(labelsInfoInput.getListId());
 		final WorkbenchUser user = this.userService.getUserById(germplasmListDto.getOwnerId());
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		germplasmSearchRequest.setGermplasmListIds(Collections.singletonList(labelsInfoInput.getListId()));
-		final long germplasmCount = this.germplasmService.countSearchGermplasm(germplasmSearchRequest, null);
+		final long germplasmCount = this.germplasmService.countSearchGermplasm(germplasmSearchRequest, programUUID);
 		final String tempFileName = "Labels-for-".concat(germplasmListDto.getListName());
 		final String defaultFileName = FileNameGenerator.generateFileName(FileUtils.cleanFileName(tempFileName));
 
@@ -170,9 +170,9 @@ public class GermplasmListLabelPrinting extends LabelPrintingStrategy {
 	public List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final List<LabelType> labelTypes = new LinkedList<>();
 		final String germplasmPropValue = this.getMessage("label.printing.germplasm.details");
-		final String pedigreePropValue = this.getMessage("label.printing.pedigree.details");
 		final String namesPropValue = this.getMessage("label.printing.names.details");
 		final String attributesPropValue = this.getMessage("label.printing.attributes.details");
+		final String entryDetailsPropValue = this.getMessage("label.printing.entry.details");
 
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		germplasmSearchRequest.setGermplasmListIds(Collections.singletonList(labelsInfoInput.getListId()));
@@ -183,22 +183,23 @@ public class GermplasmListLabelPrinting extends LabelPrintingStrategy {
 		// Germplasm Details labels
 		final LabelType germplasmType = new LabelType(germplasmPropValue, germplasmPropValue);
 		germplasmType.setFields(this.defaultGermplasmDetailsFields);
+		germplasmType.getFields().addAll(this.defaultPedigreeDetailsFields);
 		labelTypes.add(germplasmType);
-
-		// Pedigree labels
-		final LabelType pedigreeType = new LabelType(pedigreePropValue, pedigreePropValue);
-		pedigreeType.setFields(this.defaultPedigreeDetailsFields);
-		labelTypes.add(pedigreeType);
 
 		// Names labels
 		final LabelType namesType = new LabelType(namesPropValue, namesPropValue);
 		namesType.setFields(new ArrayList<>());
 		labelTypes.add(namesType);
 
-		// Attribiutes labels
-		final LabelType attirbutesType = new LabelType(attributesPropValue, attributesPropValue);
-		attirbutesType.setFields(new ArrayList<>());
-		labelTypes.add(attirbutesType);
+		// Attributes labels
+		final LabelType attributesType = new LabelType(attributesPropValue, attributesPropValue);
+		attributesType.setFields(new ArrayList<>());
+		labelTypes.add(attributesType);
+
+		// Entry Details labels
+		final LabelType entryDetailsType = new LabelType(entryDetailsPropValue, entryDetailsPropValue);
+		entryDetailsType.setFields(new ArrayList<>());
+		labelTypes.add(entryDetailsType);
 
 		if (!germplasmSearchResponses.isEmpty()) {
 			final List<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
