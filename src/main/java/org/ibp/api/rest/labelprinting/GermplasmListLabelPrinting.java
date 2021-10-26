@@ -210,7 +210,7 @@ public class GermplasmListLabelPrinting extends LabelPrintingStrategy {
 				.map(nameType -> new Field(toKey(nameType.getId()), nameType.getCode()))
 				.collect(Collectors.toList()));
 
-			attirbutesType.getFields().addAll(attributeVariables.stream()
+			attributesType.getFields().addAll(attributeVariables.stream()
 				.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
 					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 				.collect(Collectors.toList()));
