@@ -9,6 +9,7 @@ public class LabelsInfoInput {
 	private Integer studyId;
 	private Integer datasetId;
 	private Integer searchRequestId;
+	private Integer listId;
 	private String  sortBy;
 
 	public Integer getStudyId() {
@@ -33,6 +34,14 @@ public class LabelsInfoInput {
 
 	public void setSearchRequestId(final Integer searchRequestId) {
 		this.searchRequestId = searchRequestId;
+	}
+
+	public Integer getListId() {
+		return this.listId;
+	}
+
+	public void setListId(final Integer listId) {
+		this.listId = listId;
 	}
 
 	public String getSortBy() {
