@@ -109,7 +109,8 @@ public class GermplasmListVariableValidatorTest {
 		try {
 			final Integer listId = 1;
 			final Integer variableId = 1;
-			Mockito.doReturn(Arrays.asList(variableId)).when(germplasmListService).getListOntologyVariables(listId, null);
+			Mockito.doReturn(Arrays.asList(variableId)).when(germplasmListService)
+				.getListOntologyVariables(listId, GermplasmListVariableValidator.VALID_TYPES);
 			germplasmListVariableValidator.validateVariableIsNotAssociatedToList(listId, variableId);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.list.variable.already.associated.to.list"));
