@@ -231,7 +231,7 @@ public class LabelPrintingResource {
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.GERMPLASM.name())
 					|| this.request.isUserInRole(PermissionsEnum.MANAGE_GERMPLASM.name())
-					|| this.request.isUserInRole(PermissionsEnum.EXPORT_GERMPLASM_LISTS.name());
+					|| this.request.isUserInRole(PermissionsEnum.GERMPLASM_LIST_LABEL_PRINTING.name());
 			default:
 				return false;
 		}

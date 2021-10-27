@@ -30,7 +30,8 @@ import java.util.List;
 	+ "'LOT_LABEL_PRINTING',"
 	+ "'GERMPLASM',"
 	+ "'MANAGE_GERMPLASM',"
-	+ "'GERMPLASM_LABEL_PRINTING'"
+	+ "'GERMPLASM_LABEL_PRINTING',"
+	+ "'GERMPLASM_LIST_LABEL_PRINTING'"
 	+ ")")
 @RestController
 public class PresetResource {
