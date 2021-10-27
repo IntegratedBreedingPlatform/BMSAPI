@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearc
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -64,6 +66,11 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
 		this.germplasmListDataService.updateGermplasmListDataView(listId, view);
+	}
+
+	@Override
+	public List<GermplasmListDataDetail> getGermplasmListDataList(Integer listId) {
+		return this.germplasmListDataService.getGermplasmListDataList(listId);
 	}
 
 }

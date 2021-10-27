@@ -10,6 +10,9 @@ import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearc
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
@@ -49,7 +52,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 	private List<Field> defaultEntryDetailsFields;
-	private List<Integer> entryDetailsFieldIds;
+	private List<Integer> defaultEntryDetailsFieldIds;
 
 	@Autowired
 	private GermplasmListService germplasmListService;
@@ -71,7 +74,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		this.pedigreeFieldIds = this.defaultPedigreeDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
 
 		this.defaultEntryDetailsFields = this.buildEntryDetailsFields();
-		this.entryDetailsFieldIds = this.defaultEntryDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
+		this.defaultEntryDetailsFieldIds = this.defaultEntryDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
 	}
 
 	@Override
@@ -128,7 +131,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		// Entry Details labels
 		final String entryDetailsPropValue = this.getMessage("label.printing.entry.details");
 		final LabelType entryDetailsType = new LabelType(entryDetailsPropValue, entryDetailsPropValue);
-		entryDetailsType.setFields(new ArrayList<>(this.defaultEntryDetailsFields));
+		entryDetailsType.setFields(this.getEntryDetailsFields(programUUID, labelsInfoInput.getListId()));
 		labelTypes.add(entryDetailsType);
 
 		return labelTypes;
@@ -144,20 +147,22 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final List<GermplasmSearchResponse> responseList =
 			this.germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 
-		//Get Germplasm names and attributes data
-		final List<Integer> nonNameAndAttributeIds = new ArrayList<>();
-		nonNameAndAttributeIds.addAll(this.germplasmFieldIds);
-		nonNameAndAttributeIds.addAll(this.pedigreeFieldIds);
-		nonNameAndAttributeIds.addAll(this.entryDetailsFieldIds);
+		//Get Germplasm names, attributes, entry details data
+		final List<Integer> germplasmFieldIds = new ArrayList<>();
+		germplasmFieldIds.addAll(this.germplasmFieldIds);
+		germplasmFieldIds.addAll(this.pedigreeFieldIds);
+		germplasmFieldIds.addAll(this.defaultEntryDetailsFieldIds);
 		final Set<Integer> keys = this.getSelectedFieldIds(labelsGeneratorInput);
-		final boolean fieldsContainsNamesOrAttributes =
-			keys.stream().anyMatch(fieldId -> !nonNameAndAttributeIds.contains(fieldId));
+		final boolean fieldsContainsNonGermplasmFields =
+			keys.stream().anyMatch(fieldId -> !germplasmFieldIds.contains(fieldId));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
-		if (fieldsContainsNamesOrAttributes) {
+		final Map<Integer, Map<Integer, String>> entryDetailValues = new HashMap<>();
+		if (fieldsContainsNonGermplasmFields) {
 			final List<Integer> gids = responseList.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
 			this.getAttributeValuesMap(attributeValues, gids);
 			this.getNameValuesMap(nameValues, gids);
+			this.getEntryDetailValues(entryDetailValues, labelsGeneratorInput.getListId());
 		}
 
 		//Get Germplasm List Data
@@ -172,10 +177,19 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final List<Map<Integer, String>> data = new ArrayList<>();
 		for (final GermplasmListDataSearchResponse listData : listDataSearchResponseList) {
 			final Integer gid = (Integer)listData.getData().get(GermplasmListStaticColumns.GID.getName());
-			data.add(this.getDataRow(keys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues));
+			data.add(this.getDataRow(keys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues, entryDetailValues));
 		}
 
 		return new LabelsData(LabelPrintingStaticField.GUID.getFieldId(), data);
+	}
+
+	private void getEntryDetailValues(final Map<Integer, Map<Integer, String>> entryDetailValues, final Integer listId) {
+		final List<GermplasmListDataDetail> germplasmListDataDetails = this.germplasmListDataService.getGermplasmListDataList(listId);
+		germplasmListDataDetails.forEach(listDataDetail -> {
+			final Integer listDataId = listDataDetail.getListData().getListDataId();
+			entryDetailValues.putIfAbsent(listDataId, new HashMap<>());
+			entryDetailValues.get(listDataId).put(listDataDetail.getVariableId(), listDataDetail.getValue());
+		});
 	}
 
 	private List<Field> buildEntryDetailsFields() {
@@ -187,9 +201,21 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 			.build();
 	}
 
+	private List<Field> getEntryDetailsFields(final String programUUID, final Integer listId) {
+		final List<Field> entryDetailFields = new ArrayList<>(this.defaultEntryDetailsFields);
+		final List<Variable> germplasmEntryDetailVariables = this.germplasmListService
+			.getGermplasmListVariables(programUUID, listId, VariableType.ENTRY_DETAIL.getId());
+
+		entryDetailFields.addAll(germplasmEntryDetailVariables.stream()
+			.map(variable -> new Field(toKey(variable.getId()), variable.getName()))
+			.collect(Collectors.toList()));
+
+		return entryDetailFields;
+	}
+
 	private Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmListDataSearchResponse listData,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
-		final Map<Integer, Map<Integer, String>> nameValues) {
+		final Map<Integer, Map<Integer, String>> nameValues, final Map<Integer, Map<Integer, String>> entryDetailValues) {
 
 		final Map<Integer, String> columns = new HashMap<>();
 		for (final Integer key : keys) {
@@ -198,13 +224,27 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 				this.getGermplasmFieldDataRowValue(germplasmSearchResponse, columns, key, id);
 			} else if (this.pedigreeFieldIds.contains(id)) {
 				this.getPedigreeFieldDataRowValue(germplasmSearchResponse, columns, key, id);
-			} else if (this.entryDetailsFieldIds.contains(id)){
+			} else if (this.defaultEntryDetailsFieldIds.contains(id)){
 				this.getEntryDetailFieldDataRowValue(listData, columns, key, id);
 			} else {
 				this.getAttributeOrNameDataRowValue(germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
+				this.getEntryDetailDataRowValue(listData, entryDetailValues, columns, key, id);
 			}
 		}
 		return columns;
+	}
+
+	public void getEntryDetailDataRowValue(final GermplasmListDataSearchResponse listData,
+		final Map<Integer, Map<Integer, String>> entryDetailValues, final Map<Integer, String> columns, final Integer key, final int id) {
+		// Not part of the fixed columns
+		// Entry Details
+		final Map<Integer, String> entryDetails = entryDetailValues.get(listData.getListDataId());
+		if (entryDetails != null) {
+			final String entryDetailValue = entryDetails.get(id);
+			if (entryDetailValue != null) {
+				columns.put(key, entryDetailValue);
+			}
+		}
 	}
 
 	private void getEntryDetailFieldDataRowValue(
