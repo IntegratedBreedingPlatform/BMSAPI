@@ -85,7 +85,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final long germplasmCount = this.germplasmListDataService.countSearchGermplasmListData(labelsInfoInput.getListId(), new GermplasmListDataSearchRequest());
 		if (germplasmCount > this.maxTotalResults) {
 			throw new ApiRequestValidationException(Arrays.asList(
-				new ObjectError("", new String[] {"exceed.germplasm.export.labels.threshold"}, new Object[]{this.maxTotalResults}, null))
+				new ObjectError("", new String[] {"exceed.germplasm.list.export.labels.threshold"}, new Object[]{this.maxTotalResults}, null))
 			);
 		}
 	}
