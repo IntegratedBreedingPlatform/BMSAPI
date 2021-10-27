@@ -8,11 +8,11 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.TermSummary;
-import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
@@ -22,7 +22,7 @@ import org.modelmapper.spi.MappingContext;
 
 public class OntologyMapper {
 
-	private static ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
+	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
 
 	/**
 	 * We do not want public constructor of this class as all methods are static
@@ -59,7 +59,7 @@ public class OntologyMapper {
 	/**
 	 * Get ModelMapper instance and add Method related mapping to it
 	 */
-	private static void addMethodMappers(ModelMapper mapper) {
+	private static void addMethodMappers(final ModelMapper mapper) {
 
 		mapper.addMappings(new PropertyMap<Method, MethodDetails>() {
 
@@ -78,7 +78,7 @@ public class OntologyMapper {
 	/**
 	 * Get ModelMapper instance and add Property related mapping to it
 	 */
-	private static void addPropertyMappers(ModelMapper mapper) {
+	private static void addPropertyMappers(final ModelMapper mapper) {
 
 		mapper.addMappings(new PropertyMap<Property, PropertyDetails>() {
 
@@ -99,7 +99,7 @@ public class OntologyMapper {
 	/**
 	 * Get ModelMapper instance and add Scale related mapping to it
 	 */
-	private static void addScaleMappers(ModelMapper mapper) {
+	private static void addScaleMappers(final ModelMapper mapper) {
 
 		mapper.addMappings(new PropertyMap<Scale, ScaleDetails>() {
 
@@ -120,7 +120,7 @@ public class OntologyMapper {
 	/**
 	 * Get ModelMapper instance and add Variable related mapping to it
 	 */
-	private static void addVariableMappers(ModelMapper mapper) {
+	private static void addVariableMappers(final ModelMapper mapper) {
 
 		mapper.addMappings(new PropertyMap<Variable, VariableDetails>() {
 
@@ -144,6 +144,8 @@ public class OntologyMapper {
 				this.map().getMetadata().setDatasets(this.source.getDatasets());
 				this.map().getMetadata().setGermplasm(this.source.getGermplasm());
 				this.map().getMetadata().setBreedingMethods(this.source.getBreedingMethods());
+				this.map().getMetadata().setLists(this.source.getLists());
+
 			}
 		});
 	}
@@ -153,7 +155,7 @@ public class OntologyMapper {
 	 *
 	 * @param mapper ModelMapper instance
 	 */
-	private static void addTermRelationShipMapper(ModelMapper mapper) {
+	private static void addTermRelationShipMapper(final ModelMapper mapper) {
 
 		mapper.addMappings(new PropertyMap<TermRelationship, TermSummary>() {
 
@@ -166,19 +168,19 @@ public class OntologyMapper {
 		});
 	}
 
-	public static void addVariableTypeMapper(ModelMapper mapper) {
+	public static void addVariableTypeMapper(final ModelMapper mapper) {
 		// Note: This will type map middleware VariableType which is enum to BMSAPI VariableType (Both are collections element)
 		mapper.createTypeMap(VariableType.class, org.ibp.api.domain.ontology.VariableType.class).setConverter(
 				new Converter<VariableType, org.ibp.api.domain.ontology.VariableType>() {
 
 					@Override public org.ibp.api.domain.ontology.VariableType convert(
-							MappingContext<VariableType, org.ibp.api.domain.ontology.VariableType> context) {
+						final MappingContext<VariableType, org.ibp.api.domain.ontology.VariableType> context) {
 						if (context.getSource() == null) {
 							return null;
 						}
-						VariableType variableEnum = context.getSource();
+						final VariableType variableEnum = context.getSource();
 
-						org.ibp.api.domain.ontology.VariableType variableType = new org.ibp.api.domain.ontology.VariableType();
+						final org.ibp.api.domain.ontology.VariableType variableType = new org.ibp.api.domain.ontology.VariableType();
 						variableType.setId(String.valueOf(variableEnum.getId()));
 						variableType.setName(variableEnum.getName());
 						variableType.setDescription(variableEnum.getDescription());
@@ -187,20 +189,21 @@ public class OntologyMapper {
 				});
 	}
 
-	public static void addTermSummaryMapper(ModelMapper mapper) {
+	public static void addTermSummaryMapper(final ModelMapper mapper) {
 		// Note: This will type map middleware TermSummary to BMSAPI TermSummary for scale categorical values.
 		mapper.createTypeMap(org.generationcp.middleware.domain.oms.TermSummary.class, TermSummary.class).setConverter(
 				new Converter<org.generationcp.middleware.domain.oms.TermSummary, TermSummary>() {
 
 					@Override
-					public TermSummary convert(MappingContext<org.generationcp.middleware.domain.oms.TermSummary, TermSummary> context) {
+					public TermSummary convert(
+						final MappingContext<org.generationcp.middleware.domain.oms.TermSummary, TermSummary> context) {
 						if (context.getSource() == null) {
 							return null;
 						}
 
-						org.generationcp.middleware.domain.oms.TermSummary termSummary = context.getSource();
+						final org.generationcp.middleware.domain.oms.TermSummary termSummary = context.getSource();
 
-						TermSummary term  = new TermSummary();
+						final TermSummary term = new TermSummary();
 						term.setId(String.valueOf(termSummary.getId()));
 						term.setName(termSummary.getName());
 						term.setDescription(termSummary.getDefinition());
@@ -209,20 +212,20 @@ public class OntologyMapper {
 				});
 	}
 
-	public static void addDataTypeMapper(ModelMapper mapper) {
+	public static void addDataTypeMapper(final ModelMapper mapper) {
 		// Note: This will type map middleware DataType which is enum to BMSAPI DataType (Both are collections element)
 		mapper.createTypeMap(DataType.class, org.ibp.api.domain.ontology.DataType.class).setConverter(
 				new Converter<DataType, org.ibp.api.domain.ontology.DataType>() {
 
 					@Override
 					public org.ibp.api.domain.ontology.DataType convert(
-							MappingContext<DataType, org.ibp.api.domain.ontology.DataType> context) {
+						final MappingContext<DataType, org.ibp.api.domain.ontology.DataType> context) {
 						if (context.getSource() == null) {
 							return null;
 						}
-						DataType dataTypeEnum = context.getSource();
+						final DataType dataTypeEnum = context.getSource();
 
-						org.ibp.api.domain.ontology.DataType dataType = new org.ibp.api.domain.ontology.DataType();
+						final org.ibp.api.domain.ontology.DataType dataType = new org.ibp.api.domain.ontology.DataType();
 						dataType.setId(String.valueOf(dataTypeEnum.getId()));
 						dataType.setName(dataTypeEnum.getName());
 						return dataType;
@@ -230,20 +233,21 @@ public class OntologyMapper {
 				});
 	}
 
-	public static void addCategoryMapper(ModelMapper mapper) {
+	public static void addCategoryMapper(final ModelMapper mapper) {
 		// Note: This will type map middleware TermSummary to BMSAPI Category for scale categorical values.
 		mapper.createTypeMap(org.generationcp.middleware.domain.oms.TermSummary.class, Category.class)
 				.setConverter(new Converter<org.generationcp.middleware.domain.oms.TermSummary, Category>() {
 
 							@Override
-							public Category convert(MappingContext<org.generationcp.middleware.domain.oms.TermSummary, Category> context) {
+							public Category convert(
+								final MappingContext<org.generationcp.middleware.domain.oms.TermSummary, Category> context) {
 								if (context.getSource() == null) {
 									return null;
 								}
 
-								org.generationcp.middleware.domain.oms.TermSummary termSummary = context.getSource();
+								final org.generationcp.middleware.domain.oms.TermSummary termSummary = context.getSource();
 
-								Category category = new Category();
+								final Category category = new Category();
 								category.setId(String.valueOf(termSummary.getId()));
 								category.setName(termSummary.getName());
 								category.setDescription(termSummary.getDefinition());

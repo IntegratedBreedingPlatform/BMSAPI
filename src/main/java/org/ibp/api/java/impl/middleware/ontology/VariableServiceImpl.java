@@ -55,13 +55,14 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	private static final String ERROR_MESSAGE = "Error!";
 	private static final List<VariableType> EDITABLE_VARIABLES_TYPES = Arrays
 		.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.ENVIRONMENT_CONDITION, VariableType.GERMPLASM_ATTRIBUTE,
-			VariableType.GERMPLASM_PASSPORT);
+			VariableType.GERMPLASM_PASSPORT, VariableType.ENTRY_DETAIL);
 	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId(), //
 		VariableType.ENVIRONMENT_CONDITION.getId(), //
 		VariableType.GERMPLASM_ATTRIBUTE.getId(), //
-		VariableType.GERMPLASM_PASSPORT.getId());
+		VariableType.GERMPLASM_PASSPORT.getId(),
+		VariableType.ENTRY_DETAIL.getId());
 
 	private static final List<String> NOT_EDITABLE_AND_DELETABLE_VARIABLES =
 		Arrays.asList("PLOT_NUMBER_AP_text", "INSTANCE_NUMBER_AP_text", "REP_NUMBER_AP_text", "PLANT_NUMBER_AP_text", "PLOT_CODE_AP_text");

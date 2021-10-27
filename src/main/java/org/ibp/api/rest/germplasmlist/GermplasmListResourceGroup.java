@@ -54,8 +54,7 @@ import java.util.List;
 
 @Api(value = "Germplasm List Services")
 @Controller
-public class
-GermplasmListResourceGroup {
+public class GermplasmListResourceGroup {
 
 	@Autowired
 	public GermplasmListService germplasmListService;
@@ -362,7 +361,7 @@ GermplasmListResourceGroup {
 	public ResponseEntity<Void> updateGermplasmListDataView(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody List<GermplasmListDataUpdateViewDTO> view) {
+		@RequestBody final List<GermplasmListDataUpdateViewDTO> view) {
 		this.germplasmListDataService.updateGermplasmListDataView(listId, view);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
