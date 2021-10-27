@@ -115,6 +115,27 @@ public class GermplasmListDataServiceImplTest {
 	}
 
 	@Test
+	public void reOrderEntries_numberOfEntriesEqualsToSelectedEntries_OK() {
+		final List<Integer> selectedEntries = Arrays.asList(1, 2);
+		final GermplasmListReorderEntriesRequest request =
+			this.createDummyGermplasmListReorderEntriesRequest(selectedEntries, null, true);
+		final GermplasmList germplasmList = this.createGermplasmListMock(false);
+
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		Mockito.doNothing().when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
+		Mockito.when(this.germplasmListDataServiceMiddleware.countByListId(GERMPLASM_LIST_ID)).thenReturn(new Long(selectedEntries.size()));
+
+		this.germplasmListDataService.reOrderEntries(GERMPLASM_LIST_ID, request);
+
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
+		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
+		Mockito.verify(this.germplasmListDataServiceMiddleware).countByListId(GERMPLASM_LIST_ID);
+
+		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
+		Mockito.verifyNoMoreInteractions(this.germplasmListDataServiceMiddleware);
+	}
+
+	@Test
 	public void reOrderEntries_invalidNullRequest() {
 
 		try {

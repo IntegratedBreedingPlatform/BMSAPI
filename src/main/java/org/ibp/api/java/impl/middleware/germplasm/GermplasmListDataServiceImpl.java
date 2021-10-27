@@ -84,6 +84,11 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		final int position;
 		final List<Integer> selectedEntries = request.getSelectedEntries();
 		final Long totalEntries = this.germplasmListDataService.countByListId(listId);
+
+		if (totalEntries == selectedEntries.size()) {
+			return;
+		}
+
 		if (request.getAtTheEndPosition() != null && request.getAtTheEndPosition()) {
 			position = totalEntries.intValue() - selectedEntries.size() + 1;
 		} else {
