@@ -376,6 +376,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.germplasmListService.create(request, status, programUUID, loggedInUser);
 	}
 
+	@Override
+	public void importUpdates(final GermplasmListGeneratorDTO request) {
+		this.processEntriesForUpdate(request);
+		this.germplasmListService.importUpdates(request);
+	}
+
 	private void processEntries(final GermplasmListGeneratorDTO request, final String currentProgram) {
 
 		// resolve/validate composite and entries
@@ -413,16 +419,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			this.pedigreeService.getCrossExpansionsBulk(new HashSet<>(gids), null, this.crossExpansionProperties);
 		final Map<Integer, String> plotCodeValuesByGIDs = this.germplasmService.getPlotCodeValues(new HashSet<>(gids));
 
-		final List<Integer> entryDetailVariableIds = request.getEntries().stream()
-			.flatMap(germplasmEntryDTO -> germplasmEntryDTO.getData().keySet().stream())
-			.collect(Collectors.toList());
-
-		final VariableFilter filter = new VariableFilter();
-		entryDetailVariableIds.forEach(filter::addVariableId);
-		final Map<Integer, Variable> entryDetailVariablesById = !isEmpty(entryDetailVariableIds)
-			? this.ontologyVariableService.getVariablesWithFilterById(filter)
-			.entrySet().stream().collect(toMap(entry -> entry.getValue().getId(), Map.Entry::getValue))
-			: Collections.emptyMap();
+		final Map<Integer, Variable> entryDetailVariablesById = this.extractVariableIds(request);
 
 		int entryNo = 1;
 		boolean hasEntryNo = false;
@@ -486,6 +483,34 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiValidationException("", "error.germplasmlist.save.gaps", GROUP_NAME);
 		}
 
+	}
+
+	private void processEntriesForUpdate(final GermplasmListGeneratorDTO request) {
+
+		BaseValidator.checkNotNull(request.getId(), "error.germplasmlist.importupdates.listid.mandatory");
+
+		final Map<Integer, Variable> entryDetailVariablesById = this.extractVariableIds(request);
+
+		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
+			if (entry.getEntryNo() == null) {
+				throw new ApiValidationException("", "error.germplasmlist.importupdates.entryno.mandatory");
+			}
+
+			this.processEntryDetails(entry.getData(), entryDetailVariablesById);
+		}
+	}
+
+	private Map<Integer, Variable> extractVariableIds(final GermplasmListGeneratorDTO request) {
+		final List<Integer> entryDetailVariableIds = request.getEntries().stream()
+			.flatMap(germplasmEntryDTO -> germplasmEntryDTO.getData().keySet().stream())
+			.collect(Collectors.toList());
+
+		final VariableFilter filter = new VariableFilter();
+		entryDetailVariableIds.forEach(filter::addVariableId);
+		return !isEmpty(entryDetailVariableIds)
+			? this.ontologyVariableService.getVariablesWithFilterById(filter)
+			.entrySet().stream().collect(toMap(entry -> entry.getValue().getId(), Map.Entry::getValue))
+			: Collections.emptyMap();
 	}
 
 	private void processEntryDetails(

@@ -91,6 +91,20 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListService.create(request), HttpStatus.CREATED);
 	}
 
+	@ApiOperation(value = "Import Germplasm list updates")
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.PATCH)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'IMPORT_GERMPLASM_LIST_UPDATES')")
+	@ResponseBody
+	public ResponseEntity<Void> importUpdates(
+		@ApiParam(required = true) @PathVariable final String crop,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListGeneratorDTO request
+	) {
+		// TODO see if we can use a subset of the fields of GermplasmListGeneratorDTO
+		this.germplasmListService.importUpdates(request);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
 	@ApiOperation(value = "Get germplasm lists types", notes = "Get germplasm lists types")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-types", method = RequestMethod.GET)
 	@ResponseBody
