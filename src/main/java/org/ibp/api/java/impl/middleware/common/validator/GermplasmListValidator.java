@@ -89,6 +89,16 @@ public class GermplasmListValidator {
 			});
 	}
 
+	public void validateListIsNotAFolder(final GermplasmList germplasmList) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
+		if (germplasmList.isFolder()) {
+			this.errors.reject("list.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+	}
+
 	public void validateListIsUnlocked(final GermplasmList germplasmList) {
 		if (germplasmList.isLockedList()) {
 			this.errors.reject("list.locked", "");
