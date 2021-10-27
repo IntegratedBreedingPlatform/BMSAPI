@@ -241,7 +241,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setFileConfiguration(this.filePresetConfigurationDTO);
 		presetDTO.setBarcodeSetting(this.barcodeSetting);
 
-		final List<List<Integer>> selectedFields = Arrays.asList(Arrays.asList(-1));
+		final List<List<Integer>> selectedFields = Arrays.asList(Arrays.asList(-2));
 		presetDTO.setSelectedFields(selectedFields);
 
 		Mockito.doReturn(null).when(this.variableService).getVariableById(CROP_NAME, presetDTO.getProgramUUID(), "-1");
@@ -330,7 +330,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(true, false, Arrays.asList(-1));
+			new LabelPrintingPresetDTO.BarcodeSetting(true, false, Arrays.asList(-2));
 		Mockito.doReturn(null).when(this.variableService).getVariableById(CROP_NAME, presetDTO.getProgramUUID(), "-1");
 
 		presetDTO.setBarcodeSetting(barcodeSetting);
