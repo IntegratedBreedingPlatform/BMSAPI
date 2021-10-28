@@ -412,7 +412,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one
 		// item
-		// If not trait then it should not have formulas asociated
+		// If not trait then it should not have formulas associated
 		boolean isTrait = false;
 
 		for (final VariableType variableType : variable.getVariableTypes()) {
@@ -448,7 +448,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		if (this.isEntryDetailVariable(variable) && variable.getVariableTypes().size() > 1) {
 			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ENTRY_DETAIL_SHOULD_BE_USED_SINGLE,
-				new Object[] {"Variable Type"});
+				null);
 		}
 
 		return errors.getErrorCount() == initialCount;

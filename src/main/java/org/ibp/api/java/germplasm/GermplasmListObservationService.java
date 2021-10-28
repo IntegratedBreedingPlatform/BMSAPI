@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface GermplasmListObservationService {
 
-	Integer create(Integer listId, GermplasmListObservationRequestDto germplasmListObservationRequestDto);
+	Integer create(String programUUID, Integer listId, GermplasmListObservationRequestDto germplasmListObservationRequestDto);
 
-	void update(Integer listId, Integer observationId, String value);
+	void update(String programUUID, Integer listId, Integer observationId, String value);
 
 	void delete(Integer listId, Integer observationId);
 
