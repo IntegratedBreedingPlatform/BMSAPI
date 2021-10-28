@@ -213,7 +213,8 @@ public class PresetDTOValidator {
 
 	private boolean isValidateFieldId(final LabelPrintingPresetDTO labelPrintingPresetDTO) {
 		return !ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection())
-			&& !ToolSection.GERMPLASM_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection());
+			&& !ToolSection.GERMPLASM_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection())
+			&& !ToolSection.GERMPLASM_LIST_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection());
 	}
 
 }
