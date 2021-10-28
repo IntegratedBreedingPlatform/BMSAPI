@@ -371,7 +371,8 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiIgnore
+	@ApiOperation(value = "Reorder the selected entries to a given position or at the end of list.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/entries/reorder", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<Void> reorderEntries(@PathVariable final String cropName,
