@@ -104,7 +104,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
 		resultsMap.put(this.getMessage("label.printing.list.name"), germplasmListDto.getListName());
-		resultsMap.put(this.getMessage("label.printing.title"), germplasmListDto.getDescription());
+		resultsMap.put(this.getMessage("label.printing.description"), germplasmListDto.getDescription());
 		resultsMap.put(this.getMessage("label.printing.owner"), user.getPerson().getDisplayName());
 		resultsMap.put(this.getMessage("label.printing.date"), Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).format(germplasmListDto.getCreationDate()));
 		resultsMap.put(this.getMessage("label.printing.noOfEntries"), String.valueOf(germplasmCount));
