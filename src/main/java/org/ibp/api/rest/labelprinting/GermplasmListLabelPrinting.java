@@ -207,7 +207,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 			.getGermplasmListVariables(programUUID, listId, VariableType.ENTRY_DETAIL.getId());
 
 		entryDetailFields.addAll(germplasmEntryDetailVariables.stream()
-			.map(variable -> new Field(variable.getId(), variable.getName()))
+			.map(variable -> new Field(toKey(variable.getId()), variable.getName()))
 			.collect(Collectors.toList()));
 
 		return entryDetailFields;
@@ -228,19 +228,19 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 				this.getEntryDetailFieldDataRowValue(listData, columns, key, id);
 			} else {
 				this.getAttributeOrNameDataRowValue(germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
-				this.getEntryDetailDataRowValue(listData, entryDetailValues, columns, key);
+				this.getEntryDetailDataRowValue(listData, entryDetailValues, columns, key, id);
 			}
 		}
 		return columns;
 	}
 
 	public void getEntryDetailDataRowValue(final GermplasmListDataSearchResponse listData,
-		final Map<Integer, Map<Integer, String>> entryDetailValues, final Map<Integer, String> columns, final Integer key) {
+		final Map<Integer, Map<Integer, String>> entryDetailValues, final Map<Integer, String> columns, final Integer key, final int id) {
 		// Not part of the fixed columns
 		// Entry Details
 		final Map<Integer, String> entryDetails = entryDetailValues.get(listData.getListDataId());
 		if (entryDetails != null) {
-			final String entryDetailValue = entryDetails.get(key);
+			final String entryDetailValue = entryDetails.get(id);
 			if (entryDetailValue != null) {
 				columns.put(key, entryDetailValue);
 			}
