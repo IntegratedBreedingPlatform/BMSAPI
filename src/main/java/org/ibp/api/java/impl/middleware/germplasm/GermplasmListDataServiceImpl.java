@@ -112,10 +112,10 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			}
 		}
 
-		final List<Integer> lrecidsByListId = this.germplasmListDataService.getLrecidsByListId(listId);
+		final List<Integer> listDataIdsByListId = this.germplasmListDataService.getListDataIdsByListId(listId);
 		final Set<Integer> entriesNotInList = request.getSelectedEntries()
 			.stream()
-			.filter(selectedEntry -> !lrecidsByListId.contains(selectedEntry))
+			.filter(selectedEntry -> !listDataIdsByListId.contains(selectedEntry))
 			.collect(Collectors.toSet());
 		if (!CollectionUtils.isEmpty(entriesNotInList)) {
 			final String entriesIds = entriesNotInList.stream().map(lrecid -> String.valueOf(lrecid)).collect(Collectors.joining(","));
