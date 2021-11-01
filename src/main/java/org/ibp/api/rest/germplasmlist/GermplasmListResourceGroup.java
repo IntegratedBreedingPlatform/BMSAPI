@@ -16,6 +16,7 @@ import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListReorderEntriesRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
@@ -28,6 +29,7 @@ import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.germplasm.GermplasmListTemplateExportService;
+import org.ibp.api.java.impl.middleware.germplasm.ReorderEntriesLock;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -70,6 +72,9 @@ public class GermplasmListResourceGroup {
 
 	@Autowired
 	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private ReorderEntriesLock reorderEntriesLock;
 
 	@ApiOperation(value = "Get germplasm lists given a tree parent node folder", notes = "Get germplasm lists given a tree parent node folder")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
@@ -363,6 +368,25 @@ public class GermplasmListResourceGroup {
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final List<GermplasmListDataUpdateViewDTO> view) {
 		this.germplasmListDataService.updateGermplasmListDataView(listId, view);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Reorder the selected entries to a given position or at the end of list.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'REORDER_ENTRIES_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/entries/reorder", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<Void> reorderEntries(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody GermplasmListReorderEntriesRequest request) {
+
+		try {
+			this.reorderEntriesLock.lockWrite();
+			this.germplasmListDataService.reOrderEntries(listId, request);
+		} finally {
+			this.reorderEntriesLock.unlockWrite();
+		}
+
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
