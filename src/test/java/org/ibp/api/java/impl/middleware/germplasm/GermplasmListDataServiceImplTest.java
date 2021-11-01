@@ -92,7 +92,7 @@ public class GermplasmListDataServiceImplTest {
 	}
 
 	@Test
-	public void reOrderEntries_atTheEndPosition_OK() {
+	public void reOrderEntries_endOfList_OK() {
 		final List<Integer> selectedEntries = Arrays.asList(1, 2);
 		final GermplasmListReorderEntriesRequest request =
 			this.createDummyGermplasmListReorderEntriesRequest(selectedEntries, null, true);
@@ -277,11 +277,11 @@ public class GermplasmListDataServiceImplTest {
 	}
 
 	private GermplasmListReorderEntriesRequest createDummyGermplasmListReorderEntriesRequest(final List<Integer> selectedEntries,
-		final Integer entryNumberPosition, final Boolean atTheEndPosition) {
+		final Integer entryNumberPosition, final Boolean endOfList) {
 		final GermplasmListReorderEntriesRequest request = new GermplasmListReorderEntriesRequest();
 		request.setSelectedEntries(selectedEntries);
 		request.setEntryNumberPosition(entryNumberPosition);
-		request.setAtTheEndPosition(atTheEndPosition);
+		request.setEndOfList(endOfList);
 		return request;
 	}
 

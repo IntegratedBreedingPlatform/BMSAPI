@@ -89,7 +89,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			return;
 		}
 
-		if (request.getAtTheEndPosition() != null && request.getAtTheEndPosition()) {
+		if (request.getEndOfList() != null && request.getEndOfList()) {
 			position = totalEntries.intValue() - selectedEntries.size() + 1;
 		} else {
 			final Integer entryNumberPosition = request.getEntryNumberPosition();
