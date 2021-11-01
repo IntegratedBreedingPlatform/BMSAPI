@@ -77,6 +77,7 @@ public class GermplasmListDataServiceImplTest {
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
 		Mockito.doNothing().when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.when(this.germplasmListDataServiceMiddleware.countByListId(GERMPLASM_LIST_ID)).thenReturn(5L);
+		Mockito.when(this.germplasmListDataServiceMiddleware.getLrecidsByListId(GERMPLASM_LIST_ID)).thenReturn(selectedEntries);
 		Mockito.doNothing().when(this.germplasmListDataServiceMiddleware)
 			.reOrderEntries(GERMPLASM_LIST_ID, selectedEntries, entryNumberPosition);
 
@@ -85,6 +86,7 @@ public class GermplasmListDataServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verify(this.germplasmListDataServiceMiddleware).countByListId(GERMPLASM_LIST_ID);
+		Mockito.verify(this.germplasmListDataServiceMiddleware).getLrecidsByListId(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListDataServiceMiddleware).reOrderEntries(GERMPLASM_LIST_ID, selectedEntries, entryNumberPosition);
 
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
@@ -101,6 +103,7 @@ public class GermplasmListDataServiceImplTest {
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
 		Mockito.doNothing().when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.when(this.germplasmListDataServiceMiddleware.countByListId(GERMPLASM_LIST_ID)).thenReturn(5L);
+		Mockito.when(this.germplasmListDataServiceMiddleware.getLrecidsByListId(GERMPLASM_LIST_ID)).thenReturn(selectedEntries);
 		Mockito.doNothing().when(this.germplasmListDataServiceMiddleware).reOrderEntries(GERMPLASM_LIST_ID, selectedEntries, 4);
 
 		this.germplasmListDataService.reOrderEntries(GERMPLASM_LIST_ID, request);
@@ -108,6 +111,7 @@ public class GermplasmListDataServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verify(this.germplasmListDataServiceMiddleware).countByListId(GERMPLASM_LIST_ID);
+		Mockito.verify(this.germplasmListDataServiceMiddleware).getLrecidsByListId(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListDataServiceMiddleware).reOrderEntries(GERMPLASM_LIST_ID, selectedEntries, 4);
 
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
@@ -259,6 +263,39 @@ public class GermplasmListDataServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verify(this.germplasmListDataServiceMiddleware).countByListId(GERMPLASM_LIST_ID);
+
+		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
+		Mockito.verifyNoMoreInteractions(this.germplasmListDataServiceMiddleware);
+	}
+
+	@Test
+	public void reOrderEntries_selectedEntriesNotInList() {
+		final List<Integer> entriesInList = Arrays.asList(4, 5, 6);
+		final List<Integer> selectedEntries = Arrays.asList(1, 2, 3);
+		final int entryNumberPosition = 1;
+		final long totalEntries = 5L;
+		final GermplasmListReorderEntriesRequest request =
+			this.createDummyGermplasmListReorderEntriesRequest(selectedEntries, entryNumberPosition, null);
+		final GermplasmList germplasmList = this.createGermplasmListMock(false);
+
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		Mockito.doNothing().when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
+		Mockito.when(this.germplasmListDataServiceMiddleware.countByListId(GERMPLASM_LIST_ID)).thenReturn(totalEntries);
+		Mockito.when(this.germplasmListDataServiceMiddleware.getLrecidsByListId(GERMPLASM_LIST_ID)).thenReturn(entriesInList);
+
+		try {
+			this.germplasmListDataService.reOrderEntries(GERMPLASM_LIST_ID, request);
+			Assert.fail("should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("list.entries.not.in.list"));
+			assertThat(e.getErrors().get(0).getArguments().length, is(1));
+			assertThat(e.getErrors().get(0).getArguments()[0], is(String.valueOf("1,2,3")));
+		}
+
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
+		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
+		Mockito.verify(this.germplasmListDataServiceMiddleware).countByListId(GERMPLASM_LIST_ID);
+		Mockito.verify(this.germplasmListDataServiceMiddleware).getLrecidsByListId(GERMPLASM_LIST_ID);
 
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
 		Mockito.verifyNoMoreInteractions(this.germplasmListDataServiceMiddleware);

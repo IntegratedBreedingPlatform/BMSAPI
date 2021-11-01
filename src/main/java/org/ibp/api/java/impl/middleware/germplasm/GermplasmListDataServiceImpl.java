@@ -21,6 +21,8 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -69,7 +71,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
 	@Override
 	public void reOrderEntries(final Integer listId, final GermplasmListReorderEntriesRequest request) {
-		BaseValidator.checkNotNull(request,"list.reorder.input.null");
+		BaseValidator.checkNotNull(request, "list.reorder.input.null");
 
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 
@@ -108,6 +110,17 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 					String.valueOf(totalEntries), String.valueOf(maxSelectionPosition)  }, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
+		}
+
+		final List<Integer> lrecidsByListId = this.germplasmListDataService.getLrecidsByListId(listId);
+		final Set<Integer> entriesNotInList = request.getSelectedEntries()
+			.stream()
+			.filter(selectedEntry -> !lrecidsByListId.contains(selectedEntry))
+			.collect(Collectors.toSet());
+		if (!CollectionUtils.isEmpty(entriesNotInList)) {
+			final String entriesIds = entriesNotInList.stream().map(lrecid -> String.valueOf(lrecid)).collect(Collectors.joining(","));
+			this.errors.reject("list.entries.not.in.list", new String[] { entriesIds }, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		this.germplasmListDataService.reOrderEntries(listId, selectedEntries, position);
