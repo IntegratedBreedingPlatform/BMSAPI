@@ -82,7 +82,9 @@ public class LocationResource {
 		@RequestParam(required = false) final String name,
 		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
 
-		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest(programUUID, locationTypes, name, favoritesOnly);
+		final String favoriteProgramUUID = (favoritesOnly) ? programUUID : null;
+
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest(favoriteProgramUUID, locationTypes, name);
 		final PagedResult<LocationDto> pageResult =
 			new PaginatedSearch().execute(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<LocationDto>() {
 

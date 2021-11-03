@@ -184,7 +184,7 @@ public class LotInputValidatorTest {
 		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
 		lotUpdateRequestDto.setSingleInput(this.getLotSingleUpdateRequestDto());
 		Mockito.when(this.transactionService.searchTransactions(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(this.getMockedTransactionsSearchDTO(extendedLotDto));
-		this.lotInputValidator.validate(null, Arrays.asList(extendedLotDto), lotUpdateRequestDto);
+		this.lotInputValidator.validate(Arrays.asList(extendedLotDto), lotUpdateRequestDto);
 	}
 
 	@Test
@@ -195,7 +195,7 @@ public class LotInputValidatorTest {
 		lotUpdateRequestDto.setSingleInput(this.getLotSingleUpdateRequestDto());
 		Mockito.when(this.transactionService.searchTransactions(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(this.getMockedTransactionsSearchDTO(extendedLotDto));
 		try {
-			this.lotInputValidator.validate(null, Arrays.asList(extendedLotDto), lotUpdateRequestDto);
+			this.lotInputValidator.validate(Arrays.asList(extendedLotDto), lotUpdateRequestDto);
 		} catch (final Exception e) {
 			pass = false;
 		}
@@ -217,7 +217,7 @@ public class LotInputValidatorTest {
 		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
 		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
 
-		this.lotInputValidator.validate(null, lotDtos, lotUpdateRequestDto);
+		this.lotInputValidator.validate(lotDtos, lotUpdateRequestDto);
 
 		this.verifySearchLots(newLotUID);
 
@@ -247,7 +247,7 @@ public class LotInputValidatorTest {
 		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
 
 		try {
-			this.lotInputValidator.validate(null, lotDtos, lotUpdateRequestDto);
+			this.lotInputValidator.validate(lotDtos, lotUpdateRequestDto);
 			Assert.fail("Should has failed");
 		} catch (Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
@@ -286,7 +286,7 @@ public class LotInputValidatorTest {
 		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
 
 		try {
-			this.lotInputValidator.validate(null, lotDtos, lotUpdateRequestDto);
+			this.lotInputValidator.validate(lotDtos, lotUpdateRequestDto);
 			Assert.fail("Should has failed");
 		} catch (Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
@@ -328,7 +328,7 @@ public class LotInputValidatorTest {
 		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
 
 		try {
-			this.lotInputValidator.validate(null, lotDtos, lotUpdateRequestDto);
+			this.lotInputValidator.validate(lotDtos, lotUpdateRequestDto);
 			Assert.fail("Should has failed");
 		} catch (Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));

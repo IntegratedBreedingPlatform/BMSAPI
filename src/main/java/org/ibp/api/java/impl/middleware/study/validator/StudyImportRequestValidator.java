@@ -66,8 +66,6 @@ public class StudyImportRequestValidator {
 			if (StringUtils.isNotEmpty(s.getLocationDbId())) {
 				final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 				locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(s.getLocationDbId())));
-				//Get the programUUID from the Study where the environment will be added
-				locationSearchRequest.setProgramUUID(trialsMap.get(s.getTrialDbId()).getProgramDbId());
 
 				if (CollectionUtils.isEmpty(this.locationService.getFilteredLocations(locationSearchRequest, null))) {
 					this.errors.reject("study.import.locationDbId.invalid", new String[] {index.toString()}, "");

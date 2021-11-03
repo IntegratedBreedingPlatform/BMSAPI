@@ -219,13 +219,13 @@ public class LotServiceImpl implements LotService {
 		// save to db
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		final CropType cropType = this.contextUtil.getProjectInContext().getCropType();
-		return this.lotService.saveLots(cropType, programUUID, loggedInUser.getUserid(), lotList);
+		return this.lotService.saveLots(cropType, loggedInUser.getUserid(), lotList);
 	}
 
 	@Override
-	public void updateLots(final String programUUID, final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
-		this.lotInputValidator.validate(programUUID, lotDtos, lotRequest);
-		this.lotService.updateLots(programUUID, lotDtos, lotRequest);
+	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
+		this.lotInputValidator.validate(lotDtos, lotRequest);
+		this.lotService.updateLots(lotDtos, lotRequest);
 	}
 
 	@Override
@@ -245,7 +245,7 @@ public class LotServiceImpl implements LotService {
 				lotItemDto.setStockId(nextStockIDPrefix + ++i);
 			}
 		}
-		this.lotService.saveLots(cropType, programUUID, loggedInUser.getUserid(), lotImportRequestDto.getLotList());
+		this.lotService.saveLots(cropType, loggedInUser.getUserid(), lotImportRequestDto.getLotList());
 	}
 
 	@Override

@@ -95,7 +95,7 @@ public class LotInputValidator {
 		}
 	}
 
-	public void validate(final String programUUID, final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
+	public void validate(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
@@ -127,7 +127,7 @@ public class LotInputValidator {
 				lotUpdateRequestDto.getMultiInput().getLotList().stream().map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
 
 			if (filteredLocationAbbrs.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
-				this.locationValidator.validateSeedLocationAbbr(this.errors, programUUID, filteredLocationAbbrs);
+				this.locationValidator.validateSeedLocationAbbr(this.errors, filteredLocationAbbrs);
 			}
 
 			final List<String> unitNames =

@@ -47,7 +47,7 @@ public class LocationValidator {
 		}
 	}
 
-	public void validateSeedLocationAbbr(final BindingResult errors, final String programUUID, final List<String> locationAbbreviations) {
+	public void validateSeedLocationAbbr(final BindingResult errors, final List<String> locationAbbreviations) {
 		if (locationAbbreviations.stream().anyMatch(s -> StringUtils.isBlank(s))) {
 			errors.reject("lot.input.list.location.null.or.empty", "");
 			return;
@@ -55,7 +55,7 @@ public class LocationValidator {
 
 		final List<Location> existingLocations =
 			this.locationService.getFilteredLocations(
-				new LocationSearchRequest(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null, false), null);
+				new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null), null);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 
 			final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());

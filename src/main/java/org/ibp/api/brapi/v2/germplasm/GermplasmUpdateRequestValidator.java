@@ -141,8 +141,7 @@ public class GermplasmUpdateRequestValidator {
 			this.locationService
 				.countFilteredLocations(
 					new LocationSearchRequest(null, null, null, Collections.singletonList(germplasmUpdateRequest.getCountryOfOriginCode()),
-						null,
-						false)) > 0;
+						null)) > 0;
 
 	}
 

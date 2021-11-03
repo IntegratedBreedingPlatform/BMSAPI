@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
@@ -155,9 +154,9 @@ public class LocationValidatorTest {
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");
 
 		Mockito.when(this.locationService
-			.getFilteredLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, null, false), null))
+			.getFilteredLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, null), null))
 			.thenReturn(locationList);
-		this.locationValidator.validateSeedLocationAbbr(this.errors, null, locationAbbrList);
+		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
 	}
@@ -170,9 +169,9 @@ public class LocationValidatorTest {
 		;
 
 		Mockito.when(this.locationService
-			.getFilteredLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, null, false), null))
+			.getFilteredLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, null), null))
 			.thenReturn(locationList);
-		this.locationValidator.validateSeedLocationAbbr(this.errors, null, locationAbbrList);
+		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
@@ -187,7 +186,7 @@ public class LocationValidatorTest {
 		location.setLabbr("DSS");
 		final List<String> locationAbbrList = Lists.newArrayList("");
 
-		this.locationValidator.validateSeedLocationAbbr(this.errors, null, locationAbbrList);
+		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
