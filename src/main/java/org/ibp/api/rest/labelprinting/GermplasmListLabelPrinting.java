@@ -51,6 +51,8 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
+
+	static final String LABELS_FOR = "Labels-for-";
 	private List<Field> defaultEntryDetailsFields;
 	private List<Integer> defaultEntryDetailsFieldIds;
 
@@ -79,9 +81,6 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 	@Override
 	public void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput, final String programUUID) {
-		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
-		germplasmSearchRequest.setGermplasmListIds(Collections.singletonList(labelsInfoInput.getListId()));
-
 		final long germplasmCount = this.germplasmListDataService.countSearchGermplasmListData(labelsInfoInput.getListId(), new GermplasmListDataSearchRequest());
 		if (germplasmCount > this.maxTotalResults) {
 			throw new ApiRequestValidationException(Arrays.asList(
@@ -91,15 +90,14 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 	}
 
 	@Override
-	public OriginResourceMetadata getOriginResourceMetadata(
-		final LabelsInfoInput labelsInfoInput, final String programUUID) {
+	public OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 
 		final GermplasmListDto germplasmListDto = this.germplasmListService.getGermplasmListById(labelsInfoInput.getListId());
 		final WorkbenchUser user = this.userService.getUserById(germplasmListDto.getOwnerId());
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		germplasmSearchRequest.setGermplasmListIds(Collections.singletonList(labelsInfoInput.getListId()));
 		final long germplasmCount = this.germplasmListDataService.countSearchGermplasmListData(labelsInfoInput.getListId(), new GermplasmListDataSearchRequest());
-		final String tempFileName = "Labels-for-".concat(germplasmListDto.getListName());
+		final String tempFileName = LABELS_FOR.concat(germplasmListDto.getListName());
 		final String defaultFileName = FileNameGenerator.generateFileName(FileUtils.cleanFileName(tempFileName));
 
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
@@ -183,7 +181,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		return new LabelsData(LabelPrintingStaticField.GUID.getFieldId(), data);
 	}
 
-	private void getEntryDetailValues(final Map<Integer, Map<Integer, String>> entryDetailValues, final Integer listId) {
+	void getEntryDetailValues(final Map<Integer, Map<Integer, String>> entryDetailValues, final Integer listId) {
 		final List<GermplasmListDataDetail> germplasmListDataDetails = this.germplasmListDataService.getGermplasmListDataList(listId);
 		germplasmListDataDetails.forEach(listDataDetail -> {
 			final Integer listDataId = listDataDetail.getListData().getListDataId();
@@ -213,7 +211,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		return entryDetailFields;
 	}
 
-	private Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmListDataSearchResponse listData,
+	Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmListDataSearchResponse listData,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
 		final Map<Integer, Map<Integer, String>> nameValues, final Map<Integer, Map<Integer, String>> entryDetailValues) {
 
@@ -252,10 +250,10 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final TermId term = TermId.getById(id);
 		switch (term) {
 			case ENTRY_NO:
-				columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.ENTRY_NO.getName()), ""));
+				columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.ENTRY_NO.name()), ""));
 				return;
 			case ENTRY_CODE:
-				columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.ENTRY_CODE.getName()), ""));
+				columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.ENTRY_CODE.name()), ""));
 				return;
 			default:
 				//do nothing
@@ -267,4 +265,11 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		return Collections.emptyList();
 	}
 
+	public List<Field> getDefaultEntryDetailsFields() {
+		return defaultEntryDetailsFields;
+	}
+
+	void setMaxTotalResults(final int maxTotalResults) {
+		this.maxTotalResults = maxTotalResults;
+	}
 }

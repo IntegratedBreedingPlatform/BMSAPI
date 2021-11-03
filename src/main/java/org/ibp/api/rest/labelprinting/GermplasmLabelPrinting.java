@@ -300,7 +300,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		germplasmSearchRequest.setAddedColumnsPropertyIds(new ArrayList<>(addedColumnsPropertyIds));
 	}
 
-	private Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse,
+	Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse,
 		final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues) {
 
 		final Map<Integer, String> columns = new HashMap<>();
@@ -599,6 +599,14 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	public String getMessage(final String code) {
 		return this.messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
+	}
+
+	List<Field> getDefaultPedigreeDetailsFields() {
+		return defaultPedigreeDetailsFields;
+	}
+
+	List<Field> getDefaultGermplasmDetailsFields() {
+		return defaultGermplasmDetailsFields;
 	}
 
 }

@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.is;
-
 public class GermplasmListDataServiceImplTest {
 
 	private static final int GERMPLASM_LIST_ID = new Random().nextInt(Integer.MAX_VALUE);
@@ -59,6 +57,13 @@ public class GermplasmListDataServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verify(this.germplasmListDataServiceMiddleware).updateGermplasmListDataView(GERMPLASM_LIST_ID, view);
+	}
+
+	@Test
+	public void testGetGermplasmListDataList_OK() {
+		final int listId = 1;
+		this.germplasmListDataService.getGermplasmListDataList(1);
+		Mockito.verify(this.germplasmListDataServiceMiddleware).getGermplasmListDataList(listId);
 	}
 
 	private GermplasmList createGermplasmListMock(final boolean isLocked) {
