@@ -81,10 +81,12 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 	@Override
 	public void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput, final String programUUID) {
-		final long germplasmCount = this.germplasmListDataService.countSearchGermplasmListData(labelsInfoInput.getListId(), new GermplasmListDataSearchRequest());
+		final long germplasmCount =
+			this.germplasmListDataService.countSearchGermplasmListData(labelsInfoInput.getListId(), new GermplasmListDataSearchRequest());
 		if (germplasmCount > this.maxTotalResults) {
 			throw new ApiRequestValidationException(Arrays.asList(
-				new ObjectError("", new String[] {"exceed.germplasm.list.export.labels.threshold"}, new Object[]{this.maxTotalResults}, null))
+				new ObjectError(
+					"", new String[] {"exceed.germplasm.list.export.labels.threshold"}, new Object[] {this.maxTotalResults}, null))
 			);
 		}
 	}
@@ -96,7 +98,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final WorkbenchUser user = this.userService.getUserById(germplasmListDto.getOwnerId());
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		germplasmSearchRequest.setGermplasmListIds(Collections.singletonList(labelsInfoInput.getListId()));
-		final long germplasmCount = this.germplasmListDataService.countSearchGermplasmListData(labelsInfoInput.getListId(), new GermplasmListDataSearchRequest());
+		final long germplasmCount =
+			this.germplasmListDataService.countSearchGermplasmListData(labelsInfoInput.getListId(), new GermplasmListDataSearchRequest());
 		final String tempFileName = LABELS_FOR.concat(germplasmListDto.getListName());
 		final String defaultFileName = FileNameGenerator.generateFileName(FileUtils.cleanFileName(tempFileName));
 
@@ -104,7 +107,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		resultsMap.put(this.getMessage("label.printing.list.name"), germplasmListDto.getListName());
 		resultsMap.put(this.getMessage("label.printing.description"), germplasmListDto.getDescription());
 		resultsMap.put(this.getMessage("label.printing.owner"), user.getPerson().getDisplayName());
-		resultsMap.put(this.getMessage("label.printing.date"), Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).format(germplasmListDto.getCreationDate()));
+		resultsMap.put(this.getMessage("label.printing.date"),
+			Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).format(germplasmListDto.getCreationDate()));
 		resultsMap.put(this.getMessage("label.printing.noOfEntries"), String.valueOf(germplasmCount));
 		return new OriginResourceMetadata(defaultFileName, resultsMap);
 	}
@@ -174,7 +178,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		// Data to be exported
 		final List<Map<Integer, String>> data = new ArrayList<>();
 		for (final GermplasmListDataSearchResponse listData : listDataSearchResponseList) {
-			final Integer gid = (Integer)listData.getData().get(GermplasmListStaticColumns.GID.getName());
+			final Integer gid = (Integer) listData.getData().get(GermplasmListStaticColumns.GID.getName());
 			data.add(this.getDataRow(keys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues, entryDetailValues));
 		}
 
@@ -211,7 +215,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		return entryDetailFields;
 	}
 
-	Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmListDataSearchResponse listData,
+	Map<Integer, String> getDataRow(
+		final Set<Integer> keys, final GermplasmListDataSearchResponse listData,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
 		final Map<Integer, Map<Integer, String>> nameValues, final Map<Integer, Map<Integer, String>> entryDetailValues) {
 
@@ -222,7 +227,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 				this.getGermplasmFieldDataRowValue(germplasmSearchResponse, columns, key, id);
 			} else if (this.pedigreeFieldIds.contains(id)) {
 				this.getPedigreeFieldDataRowValue(germplasmSearchResponse, columns, key, id);
-			} else if (this.defaultEntryDetailsFieldIds.contains(id)){
+			} else if (this.defaultEntryDetailsFieldIds.contains(id)) {
 				this.getEntryDetailFieldDataRowValue(listData, columns, key, id);
 			} else {
 				this.getAttributeOrNameDataRowValue(germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
@@ -232,7 +237,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		return columns;
 	}
 
-	public void getEntryDetailDataRowValue(final GermplasmListDataSearchResponse listData,
+	public void getEntryDetailDataRowValue(
+		final GermplasmListDataSearchResponse listData,
 		final Map<Integer, Map<Integer, String>> entryDetailValues, final Map<Integer, String> columns, final Integer key, final int id) {
 		// Not part of the fixed columns
 		// Entry Details
@@ -266,7 +272,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 	}
 
 	public List<Field> getDefaultEntryDetailsFields() {
-		return defaultEntryDetailsFields;
+		return this.defaultEntryDetailsFields;
 	}
 
 	void setMaxTotalResults(final int maxTotalResults) {

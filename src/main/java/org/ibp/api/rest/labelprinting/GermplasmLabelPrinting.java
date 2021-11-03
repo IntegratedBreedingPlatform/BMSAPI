@@ -55,6 +55,7 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
+
 	List<Field> defaultPedigreeDetailsFields;
 	List<Field> defaultGermplasmDetailsFields;
 
@@ -139,7 +140,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final long germplasmCount = this.germplasmService.countSearchGermplasm(germplasmSearchRequest, programUUID);
 		if (germplasmCount > this.maxTotalResults) {
 			throw new ApiRequestValidationException(Arrays.asList(
-				new ObjectError("", new String[] {"exceed.germplasm.export.labels.threshold"}, new Object[]{this.maxTotalResults}, null))
+				new ObjectError("", new String[] {"exceed.germplasm.export.labels.threshold"}, new Object[] {this.maxTotalResults}, null))
 			);
 		}
 	}
@@ -168,7 +169,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final List<LabelType> labelTypes = new LinkedList<>();
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
-		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
+		final List<GermplasmSearchResponse> germplasmSearchResponses =
+			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 
 		// Germplasm Details labels
 		final String germplasmPropValue = this.getMessage("label.printing.germplasm.details");
@@ -210,7 +212,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 				.collect(Collectors.toList()));
 
 			attributesType.getFields().addAll(attributeVariables.stream()
-				.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
+				.map(attributeVariable -> new Field(
+					toKey(attributeVariable.getId()),
 					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 				.collect(Collectors.toList()));
 		}
@@ -285,7 +288,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		return keys;
 	}
 
-	void setAddedColumnsToSearchRequest(final LabelsGeneratorInput labelsGeneratorInput,
+	void setAddedColumnsToSearchRequest(
+		final LabelsGeneratorInput labelsGeneratorInput,
 		final GermplasmSearchRequest germplasmSearchRequest) {
 		final Set<String> addedColumnsPropertyIds = new HashSet<>();
 
@@ -300,7 +304,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		germplasmSearchRequest.setAddedColumnsPropertyIds(new ArrayList<>(addedColumnsPropertyIds));
 	}
 
-	Map<Integer, String> getDataRow(final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse,
+	Map<Integer, String> getDataRow(
+		final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse,
 		final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues) {
 
 		final Map<Integer, String> columns = new HashMap<>();
@@ -413,7 +418,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			default:
 				//do nothing
 		}
-		
+
 		final LabelPrintingStaticField staticField = LabelPrintingStaticField.getByFieldId(id);
 		switch (staticField) {
 			case GUID:
@@ -445,7 +450,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		}
 	}
 
-	void addingColumnToGermplasmSearchRequest(final List<Integer> listOfSelectedFields,
+	void addingColumnToGermplasmSearchRequest(
+		final List<Integer> listOfSelectedFields,
 		final Set<String> addedColumnsPropertyIds) {
 		if (listOfSelectedFields.contains(TermId.GERMPLASM_DATE.getId())) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.GERMPLASM_DATE);
@@ -602,11 +608,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	List<Field> getDefaultPedigreeDetailsFields() {
-		return defaultPedigreeDetailsFields;
+		return this.defaultPedigreeDetailsFields;
 	}
 
 	List<Field> getDefaultGermplasmDetailsFields() {
-		return defaultGermplasmDetailsFields;
+		return this.defaultGermplasmDetailsFields;
 	}
 
 }

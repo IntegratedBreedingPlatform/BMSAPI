@@ -13,7 +13,8 @@ import java.util.List;
 
 public interface GermplasmListDataService {
 
-	List<GermplasmListDataSearchResponse> searchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request, Pageable pageable);
+	List<GermplasmListDataSearchResponse> searchGermplasmListData(
+		Integer listId, GermplasmListDataSearchRequest request, Pageable pageable);
 
 	long countSearchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request);
 

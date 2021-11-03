@@ -129,7 +129,7 @@ public class GermplasmLabelPrintingTest {
 
 		final List<LabelType> labelTypes = this.germplasmLabelPrinting.getAvailableLabelTypes(this.labelsInfoInput, PROGRAM_UUID);
 
-		Map<String, LabelType> labelTypeMap = labelTypes.stream().collect(Collectors.toMap(LabelType::getKey, Function.identity()));
+		final Map<String, LabelType> labelTypeMap = labelTypes.stream().collect(Collectors.toMap(LabelType::getKey, Function.identity()));
 		Assert.assertEquals(4, labelTypes.size());
 		Assert
 			.assertEquals(this.germplasmLabelPrinting.getDefaultGermplasmDetailsFields(), labelTypeMap.get(GERMPLASM_DETAILS).getFields());
@@ -158,7 +158,7 @@ public class GermplasmLabelPrintingTest {
 
 		this.germplasmLabelPrinting.populateNamesAndAttributesLabelType(PROGRAM_UUID, labelTypes, Collections.singletonList(response));
 		Assert.assertEquals(2, labelTypes.size());
-		Map<String, LabelType> labelTypeMap = labelTypes.stream().collect(Collectors.toMap(LabelType::getKey, Function.identity()));
+		final Map<String, LabelType> labelTypeMap = labelTypes.stream().collect(Collectors.toMap(LabelType::getKey, Function.identity()));
 		Assert.assertEquals(1, labelTypeMap.get(NAMES).getFields().size());
 		Assert
 			.assertEquals(GermplasmLabelPrinting.toKey(nameTypeDTO.getId()), labelTypeMap.get(NAMES).getFields().get(0).getId().intValue());
@@ -179,7 +179,8 @@ public class GermplasmLabelPrintingTest {
 		final LabelsData labelsData = this.germplasmLabelPrinting.getLabelsData(labelsGeneratorInput, PROGRAM_UUID);
 		Mockito.verify(this.searchRequestService).getSearchRequest(SEARCH_REQUEST_ID, GermplasmSearchRequest.class);
 		Mockito.verify(this.germplasmService).searchGermplasm(this.germplasmSearchRequest, null, PROGRAM_UUID);
-		Mockito.verify(this.germplasmAttributeService, Mockito.never()).getGermplasmAttributeVariables(ArgumentMatchers.anyList(), ArgumentMatchers.anyString());
+		Mockito.verify(this.germplasmAttributeService, Mockito.never())
+			.getGermplasmAttributeVariables(ArgumentMatchers.anyList(), ArgumentMatchers.anyString());
 		Mockito.verify(this.germplasmNameTypeService, Mockito.never()).getNameTypesByGIDList(ArgumentMatchers.anyList());
 		Assert.assertEquals(LabelPrintingStaticField.GUID.getFieldId(), labelsData.getDefaultBarcodeKey());
 		Assert.assertTrue(CollectionUtils.isEmpty(labelsData.getData()));
@@ -208,7 +209,8 @@ public class GermplasmLabelPrintingTest {
 		germplasmNameDto.setNameTypeId(nameTypeId);
 		germplasmNameDto.setName(RandomStringUtils.randomAlphabetic(10));
 		germplasmNameDto.setGid(GID);
-		Mockito.when(this.germplasmNameService.getGermplasmNamesByGids(Collections.singletonList(GID))).thenReturn(Collections.singletonList(germplasmNameDto));
+		Mockito.when(this.germplasmNameService.getGermplasmNamesByGids(Collections.singletonList(GID)))
+			.thenReturn(Collections.singletonList(germplasmNameDto));
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 
 		this.germplasmLabelPrinting.getNameValuesMap(nameValues, Collections.singletonList(GID));
@@ -230,7 +232,8 @@ public class GermplasmLabelPrintingTest {
 	@Test
 	public void testGetDataRow_For_PedigreeFields() {
 		this.germplasmLabelPrinting.initStaticFields();
-		final Set<Integer> keys = new HashSet<>(Arrays.asList(TermId.CROSS_FEMALE_GID.getId(), LabelPrintingStaticField.CROSS.getFieldId()));
+		final Set<Integer> keys =
+			new HashSet<>(Arrays.asList(TermId.CROSS_FEMALE_GID.getId(), LabelPrintingStaticField.CROSS.getFieldId()));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, String> dataRow = this.germplasmLabelPrinting.getDataRow(keys, response, new HashMap<>(), new HashMap<>());
 		Assert.assertEquals(2, dataRow.keySet().size());

@@ -38,7 +38,8 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	private BindingResult errors;
 
 	@Override
-	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest request,
+	public List<GermplasmListDataSearchResponse> searchGermplasmListData(
+		final Integer listId, final GermplasmListDataSearchRequest request,
 		final Pageable pageable) {
 		return this.germplasmListDataService.searchGermplasmListData(listId, request, pageable);
 	}
@@ -71,7 +72,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	@Override
-	public List<GermplasmListDataDetail> getGermplasmListDataList(Integer listId) {
+	public List<GermplasmListDataDetail> getGermplasmListDataList(final Integer listId) {
 		return this.germplasmListDataService.getGermplasmListDataList(listId);
 	}
 
@@ -104,7 +105,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			final long maxSelectionPosition = totalEntries - selectedEntries.size() + 1;
 			if (entryNumberPosition == null || entryNumberPosition <= 0) {
 				this.errors.reject("list.reorder.invalid.selected.position.number",
-					new String[] { String.valueOf(maxSelectionPosition) }, "");
+					new String[] {String.valueOf(maxSelectionPosition)}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 
@@ -112,8 +113,9 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
 			final long maxPositionNumber = entryNumberPosition + selectedEntries.size() - 1;
 			if (maxPositionNumber > totalEntries) {
-				this.errors.reject("list.reorder.invalid.selected.position", new String[] { String.valueOf(entryNumberPosition),
-					String.valueOf(totalEntries), String.valueOf(maxSelectionPosition)  }, "");
+				this.errors.reject("list.reorder.invalid.selected.position", new String[] {
+					String.valueOf(entryNumberPosition),
+					String.valueOf(totalEntries), String.valueOf(maxSelectionPosition)}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
@@ -125,7 +127,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.collect(Collectors.toSet());
 		if (!CollectionUtils.isEmpty(entriesNotInList)) {
 			final String entriesIds = entriesNotInList.stream().map(lrecid -> String.valueOf(lrecid)).collect(Collectors.joining(","));
-			this.errors.reject("list.entries.not.in.list", new String[] { entriesIds }, "");
+			this.errors.reject("list.entries.not.in.list", new String[] {entriesIds}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 

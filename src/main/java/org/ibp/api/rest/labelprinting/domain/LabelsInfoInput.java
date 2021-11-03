@@ -10,10 +10,10 @@ public class LabelsInfoInput {
 	private Integer datasetId;
 	private Integer searchRequestId;
 	private Integer listId;
-	private String  sortBy;
+	private String sortBy;
 
 	public Integer getStudyId() {
-		return studyId;
+		return this.studyId;
 	}
 
 	public void setStudyId(final Integer studyId) {
@@ -21,7 +21,7 @@ public class LabelsInfoInput {
 	}
 
 	public Integer getDatasetId() {
-		return datasetId;
+		return this.datasetId;
 	}
 
 	public void setDatasetId(final Integer datasetId) {

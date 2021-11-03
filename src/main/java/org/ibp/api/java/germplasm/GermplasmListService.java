@@ -18,7 +18,8 @@ import java.util.List;
 
 public interface GermplasmListService {
 
-	List<TreeNode> getGermplasmListChildrenNodes(final String crop, final String programUUID, final String parentId, final Boolean folderOnly);
+	List<TreeNode> getGermplasmListChildrenNodes(
+		final String crop, final String programUUID, final String parentId, final Boolean folderOnly);
 
 	List<TreeNode> getUserTreeState(final String crop, final String programUUID, final String userId);
 
@@ -34,7 +35,8 @@ public interface GermplasmListService {
 
 	List<GermplasmListTypeDTO> getGermplasmListTypes();
 
-	void addGermplasmEntriesToList(Integer germplasmListId,	SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite,
+	void addGermplasmEntriesToList(
+		Integer germplasmListId, SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite,
 		String programUUID);
 
 	Integer createGermplasmListFolder(String cropName, String programUUID, String folderName, String parentId);

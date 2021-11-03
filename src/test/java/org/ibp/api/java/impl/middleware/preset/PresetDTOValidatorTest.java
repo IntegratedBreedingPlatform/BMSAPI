@@ -78,7 +78,6 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		this.filePresetConfigurationDTO.setOutputType("csv");
 		this.presetId = RandomUtils.nextInt();
 
-
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -473,7 +472,6 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setBarcodeSetting(this.barcodeSetting);
 		presetDTO.setSelectedFields(this.selectedField);
 
-
 		this.selectedField.forEach(list -> {
 			list.forEach(id -> Mockito.doReturn(new VariableDetails()).when(this.variableService)
 				.getVariableById(CROP_NAME, presetDTO.getProgramUUID(), String.valueOf(id)));
@@ -519,7 +517,6 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 				presetDTO.getToolSection());
 
-
 		Mockito.doReturn(programPreset).when(this.presetService).getProgramPresetById(presetDTO.getId());
 		this.presetDTOValidator.validate(CROP_NAME, 1, presetDTO);
 	}
@@ -555,7 +552,6 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 				presetDTO.getToolSection());
 
-
 		Mockito.doReturn(programPreset).when(this.presetService).getProgramPresetById(presetDTO.getId());
 		this.presetDTOValidator.validate(CROP_NAME, 1, presetDTO);
 	}
@@ -590,7 +586,6 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
 			.getProgramPresetFromProgramAndToolByName(presetDTO.getName(), presetDTO.getProgramUUID(), presetDTO.getToolId(),
 				presetDTO.getToolSection());
-
 
 		Mockito.doReturn(programPreset).when(this.presetService).getProgramPresetById(presetDTO.getId());
 		this.presetDTOValidator.validate(CROP_NAME, 1, presetDTO);

@@ -36,12 +36,15 @@ public class LabelPrintingResourceTest {
 
 	@Test
 	public void testGetLabelsFileGenerator() {
-		Mockito.when(this.subObservationDatasetLabelPrinting.getSupportedFileTypes()).thenReturn(SubObservationDatasetLabelPrinting.SUPPORTED_FILE_TYPES);
+		Mockito.when(this.subObservationDatasetLabelPrinting.getSupportedFileTypes())
+			.thenReturn(SubObservationDatasetLabelPrinting.SUPPORTED_FILE_TYPES);
 
-		LabelsFileGenerator fileGenerator = this.labelPrintingResource.getLabelsFileGenerator(FileType.CSV.getExtension(), this.subObservationDatasetLabelPrinting);
+		LabelsFileGenerator fileGenerator =
+			this.labelPrintingResource.getLabelsFileGenerator(FileType.CSV.getExtension(), this.subObservationDatasetLabelPrinting);
 		Assert.assertEquals(this.csvLabelsFileGenerator, fileGenerator);
 
-		fileGenerator = this.labelPrintingResource.getLabelsFileGenerator(FileType.PDF.getExtension(), this.subObservationDatasetLabelPrinting);
+		fileGenerator =
+			this.labelPrintingResource.getLabelsFileGenerator(FileType.PDF.getExtension(), this.subObservationDatasetLabelPrinting);
 		Assert.assertEquals(this.pdfLabelsFileGenerator, fileGenerator);
 
 	}
@@ -65,7 +68,7 @@ public class LabelPrintingResourceTest {
 		Exception e = null;
 		try {
 			this.labelPrintingResource.getLabelPrintingStrategy("Lot");
-		}catch (final AccessDeniedException ex) {
+		} catch (final AccessDeniedException ex) {
 			e = ex;
 		}
 		Assert.assertNull(e);

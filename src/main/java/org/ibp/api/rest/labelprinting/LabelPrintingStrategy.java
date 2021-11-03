@@ -46,14 +46,16 @@ public abstract class LabelPrintingStrategy {
 
 	/**
 	 * Given a labelInfoInput, it retrieves a summarized info of the labels needed in a more readable object
+	 *
 	 * @param labelsInfoInput
 	 * @return LabelsNeededSummary
 	 */
-	abstract LabelsNeededSummary getSummaryOfLabelsNeeded (final LabelsInfoInput labelsInfoInput);
+	abstract LabelsNeededSummary getSummaryOfLabelsNeeded(final LabelsInfoInput labelsInfoInput);
 
 	/**
 	 * Given LabelsNeededSummary, it transforms the object in a response that allows to build a more flexible response
 	 * to the frontend
+	 *
 	 * @param labelsNeededSummary
 	 * @return LabelsNeededSummaryResponse
 	 */
@@ -63,14 +65,16 @@ public abstract class LabelPrintingStrategy {
 	 * Given labelsInfoInput, it will get the metadata of the resource which can be a dataset, a study, fieldmap, inventory,
 	 * depending on the LabelPrintingType that is being implemented.
 	 * Built to provide more flexibility to the frontend
+	 *
 	 * @param labelsInfoInput
 	 * @return OriginResourceMetadata
 	 */
-	abstract OriginResourceMetadata getOriginResourceMetadata (final LabelsInfoInput labelsInfoInput, String programUUID);
+	abstract OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput, String programUUID);
 
 	/**
 	 * Given labelInfoInput, it will get the available LabelTypes (fields organized in lists), so that the user can
 	 * select from them the ones he would like to include in her labels
+	 *
 	 * @param labelsInfoInput
 	 * @param programUUID
 	 * @return List<LabelType>
@@ -81,21 +85,24 @@ public abstract class LabelPrintingStrategy {
 	 * Given labelsGeneratorInput (user selection for labels creation), it will get all the data from the database to be able
 	 * to build the labels.
 	 * It will also include data for the barcode generation
+	 *
 	 * @param labelsGeneratorInput
 	 * @param programUUID
 	 * @return LabelsData
 	 */
-	abstract LabelsData getLabelsData (final LabelsGeneratorInput labelsGeneratorInput, final String programUUID);
+	abstract LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID);
 
 	/**
 	 * List all the supported file types for a particular strategy.
 	 * Once all datatypes are implemented for all the strategies, this function can be removed
+	 *
 	 * @return
 	 */
 	abstract List<FileType> getSupportedFileTypes();
 
 	/**
 	 * List of Sortable field labels for a particular strategy.
+	 *
 	 * @return Sortable
 	 */
 	abstract List<SortableFieldDto> getSortableFields();
@@ -103,6 +110,7 @@ public abstract class LabelPrintingStrategy {
 	/**
 	 * Validate LabelsGeneratorInput
 	 * Throws an exception when a validation problem is found
+	 *
 	 * @param labelsGeneratorInput
 	 * @param programUUID
 	 */
@@ -178,7 +186,6 @@ public abstract class LabelPrintingStrategy {
 		return availableFields;
 	}
 
-
 	String getPedigree(final String gid, final Map<String, String> gidPedigreeMap) {
 		final String pedigree;
 		if (gidPedigreeMap.containsKey(gid)) {
@@ -192,15 +199,15 @@ public abstract class LabelPrintingStrategy {
 
 	void validateBarcode(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
-		if(!labelsGeneratorInput.isAutomaticBarcode()){
-			for (final Map<Integer, String> data:labelsData.getData()){
+		if (!labelsGeneratorInput.isAutomaticBarcode()) {
+			for (final Map<Integer, String> data : labelsData.getData()) {
 				final List<Integer> barcodeIds =
 					labelsGeneratorInput.getBarcodeFields().stream().filter(labelId -> StringUtils.isEmpty(data.get(labelId))).collect(
 						Collectors.toList());
-					if(!barcodeIds.isEmpty()){
-						errors.reject("label.fields.barcodes.selected.empty.value","");
-						throw new ApiRequestValidationException(errors.getAllErrors());
-					}
+				if (!barcodeIds.isEmpty()) {
+					errors.reject("label.fields.barcodes.selected.empty.value", "");
+					throw new ApiRequestValidationException(errors.getAllErrors());
+				}
 			}
 		}
 	}

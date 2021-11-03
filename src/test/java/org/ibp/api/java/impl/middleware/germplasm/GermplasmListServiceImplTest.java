@@ -385,7 +385,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.parent.id.invalid"));
 		}
 
@@ -409,7 +410,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.parent.id.not.exist"));
 		}
 
@@ -472,7 +474,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.folder.id.invalid"));
 		}
 
@@ -491,7 +494,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.folder.id.invalid"));
 		}
 
@@ -515,7 +519,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.folder.id.not.exist"));
 		}
 
@@ -546,7 +551,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.folder.id.not.exist"));
 		}
 
@@ -658,7 +664,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.folder.id.invalid"));
 		}
 
@@ -676,7 +683,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.parent.id.invalid"));
 		}
 
@@ -694,7 +702,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.move.id.same.values"));
 		}
 
@@ -713,7 +722,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.parent.id.invalid"));
 		}
 
@@ -738,7 +748,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.folder.id.not.exist"));
 		}
 
@@ -772,7 +783,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.move.folder.has.child"));
 		}
 
@@ -811,7 +823,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.move.list.another.list.not.allowed"));
 		}
 
@@ -857,7 +870,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.folder.name.exists"));
 		}
 
@@ -917,7 +931,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.folder.id.invalid"));
 		}
 
@@ -935,7 +950,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.folder.id.invalid"));
 		}
 
@@ -953,7 +969,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.folder.id.invalid"));
 		}
 
@@ -983,7 +1000,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.delete.not.folder"));
 		}
 
@@ -1021,7 +1039,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.delete.folder.has.child"));
 		}
 
@@ -1063,7 +1082,8 @@ public class GermplasmListServiceImplTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 				hasItem("list.delete.not.owner"));
 		}
 

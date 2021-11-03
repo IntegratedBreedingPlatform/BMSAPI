@@ -193,10 +193,12 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
 		resultsMap.put(this.getMessage("label.printing.name"), study.getStudyName());
 		resultsMap.put(this.getMessage("label.printing.title"), study.getDescription());
-		resultsMap.put(this.getMessage("label.printing.objective"), //
+		resultsMap.put(
+			this.getMessage("label.printing.objective"), //
 			(study.getObjective() == null) ? StringUtils.EMPTY : study.getObjective());
 		resultsMap.put(this.getMessage("label.printing.selected.dataset"), datasetDTO.getName());
-		resultsMap.put(this.getMessage("label.printing.number.of.environments.in.dataset"), //
+		resultsMap.put(
+			this.getMessage("label.printing.number.of.environments.in.dataset"), //
 			String.valueOf(datasetDTO.getInstances().size()));
 
 		return new OriginResourceMetadata(defaultFileName, resultsMap);
@@ -222,18 +224,21 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final List<MeasurementVariable> studyDetailsVariables = this.middlewareDatasetService
 			.getObservationSetVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 
-		final List<MeasurementVariable> environmentVariables = this.middlewareDatasetService.getObservationSetVariables(environmentDatasetId,
+		final List<MeasurementVariable> environmentVariables = this.middlewareDatasetService.getObservationSetVariables(
+			environmentDatasetId,
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 				VariableType.ENVIRONMENT_CONDITION.getId()));
 
 		final List<MeasurementVariable> treatmentFactors =
 			this.middlewareDatasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
 
-		final List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getObservationSetVariables(plotDatasetId,
+		final List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getObservationSetVariables(
+			plotDatasetId,
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
 		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
-			.getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId(), VariableType.SELECTION_METHOD
+			.getObservationSetVariables(
+				labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId(), VariableType.SELECTION_METHOD
 					.getId(), VariableType.TRAIT.getId()));
 
 		final LabelType studyDetailsLabelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
@@ -334,7 +339,9 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 					if (TermId.getById(termId).equals(TermId.SEASON_VAR)) {
 						final ObservationUnitData observationUnitData =
 							observationUnitRow.getEnvironmentVariables().get("Crop_season_Code");
-						row.put(requiredField, ObservationLabelPrintingHelper.getSeason(observationUnitData != null ? observationUnitData.getValue() : null));
+						row.put(
+							requiredField,
+							ObservationLabelPrintingHelper.getSeason(observationUnitData != null ? observationUnitData.getValue() : null));
 						continue;
 					}
 

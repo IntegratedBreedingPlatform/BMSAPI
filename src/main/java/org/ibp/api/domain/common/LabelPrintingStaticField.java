@@ -12,7 +12,7 @@ import java.util.Map;
 public enum LabelPrintingStaticField {
 	NONEXISTENT(-1),
 
-	YEAR (4),
+	YEAR(4),
 	STUDY_NAME(6),
 	PARENTAGE(13),
 	SUB_OBSERVATION_DATASET_OBS_UNIT_ID(25),
