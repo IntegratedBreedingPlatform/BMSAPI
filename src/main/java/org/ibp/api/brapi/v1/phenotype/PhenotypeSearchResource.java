@@ -50,10 +50,8 @@ public class PhenotypeSearchResource {
 
 				@Override
 				public List<ObservationUnitDto> getResults(final PagedResult<ObservationUnitDto> pagedResult) {
-					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
-					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return PhenotypeSearchResource.this.observationUnitService
-						.searchObservationUnits(pagedResult.getPageSize(), pageNumber, requestDTO);
+						.searchObservationUnits(pagedResult.getPageSize(), pagedResult.getPageNumber(), requestDTO);
 				}
 			});
 
