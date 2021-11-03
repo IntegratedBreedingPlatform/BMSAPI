@@ -123,8 +123,7 @@ public class LotSplitValidatorTest {
 			BindingResult.class));
 		Mockito.doNothing().when(this.inventoryCommonValidator).validateTransactionNotes(ArgumentMatchers.eq(dummyInitialLotDepositDto.getNotes()), ArgumentMatchers.any(
 			BindingResult.class));
-		Mockito.doNothing().when(this.locationValidator).validateSeedLocationId(ArgumentMatchers.any(BindingResult.class),
-			ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.eq(dummyNewLotSplitDto.getLocationId()));
+		Mockito.doNothing().when(this.locationValidator).validateSeedLocationId(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(dummyNewLotSplitDto.getLocationId()));
 
 		this.lotSplitValidator.validateSplitLot(PROGRAM_UUID, lotDto, dummyNewLotSplitDto, dummyInitialLotDepositDto);
 
@@ -133,7 +132,7 @@ public class LotSplitValidatorTest {
 		Mockito.verify(this.inventoryCommonValidator).validateTransactionNotes(ArgumentMatchers.eq(dummyInitialLotDepositDto.getNotes()), ArgumentMatchers.any(
 			BindingResult.class));
 		Mockito.verify(this.locationValidator).validateSeedLocationId(ArgumentMatchers.any(BindingResult.class),
-			ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.eq(dummyNewLotSplitDto.getLocationId()));
+			ArgumentMatchers.eq(dummyNewLotSplitDto.getLocationId()));
 	}
 
 	@Test

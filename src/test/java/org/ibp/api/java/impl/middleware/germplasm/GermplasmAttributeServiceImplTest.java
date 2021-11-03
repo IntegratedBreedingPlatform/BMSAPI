@@ -61,7 +61,7 @@ public class GermplasmAttributeServiceImplTest {
 		Mockito.verify(this.attributeValidator).validateAttribute(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(GID),
 			ArgumentMatchers.eq(dto), Mockito.any());
 		Mockito.verify(this.locationValidator).validateLocation(ArgumentMatchers.any(BindingResult.class),
-			ArgumentMatchers.eq(dto.getLocationId()), Mockito.any());
+			ArgumentMatchers.eq(dto.getLocationId()));
 		Mockito.verify(this.germplasmAttributeService).createGermplasmAttribute(ArgumentMatchers.eq(GID),
 			ArgumentMatchers.eq(dto));
 	}
@@ -73,7 +73,7 @@ public class GermplasmAttributeServiceImplTest {
 		Mockito.verify(this.attributeValidator).validateAttribute(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(GID),
 			ArgumentMatchers.eq(dto), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
 		Mockito.verify(this.locationValidator).validateLocation(ArgumentMatchers.any(BindingResult.class),
-			ArgumentMatchers.eq(dto.getLocationId()), Mockito.any());
+			ArgumentMatchers.eq(dto.getLocationId()));
 		Mockito.verify(this.germplasmAttributeService).updateGermplasmAttribute(ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID),
 			ArgumentMatchers.eq(dto));
 	}

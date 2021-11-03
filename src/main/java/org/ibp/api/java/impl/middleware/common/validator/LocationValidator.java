@@ -30,7 +30,7 @@ public class LocationValidator {
 	@Autowired
 	private LocationService locationService;
 
-	public void validateSeedLocationId(final BindingResult errors, final String programUUID, final Integer locationId) {
+	public void validateSeedLocationId(final BindingResult errors, final Integer locationId) {
 		if (locationId == null) {
 			errors.reject("location.required", "");
 			return;
@@ -38,10 +38,6 @@ public class LocationValidator {
 		final Location location = this.locationDataManager.getLocationByID(locationId);
 		if (location == null) {
 			errors.reject("location.invalid", "");
-			return;
-		}
-		if (!StringUtils.isEmpty(programUUID) && location.getProgramUUID() != null && !location.getProgramUUID().equals(programUUID)) {
-			errors.reject("location.belongs.to.another.program", "");
 			return;
 		}
 		final List<Location> locationList = this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(locationId));
@@ -69,7 +65,7 @@ public class LocationValidator {
 		}
 	}
 
-	public void validateLocation(final BindingResult errors, final Integer locationId, final String programUUID) {
+	public void validateLocation(final BindingResult errors, final Integer locationId) {
 		if (locationId == null) {
 			errors.reject("location.required", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -79,15 +75,6 @@ public class LocationValidator {
 
 		if (location == null) {
 			errors.reject("location.invalid", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
-		this.validateLocationBelongToProgram(errors, programUUID, location);
-	}
-
-	public void validateLocationBelongToProgram(final BindingResult errors, final String programUUID, final Location location){
-		if (!StringUtils.isEmpty(programUUID) && location.getProgramUUID() != null && !location.getProgramUUID().equals(programUUID)) {
-			errors.reject("location.belongs.to.another.program", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}

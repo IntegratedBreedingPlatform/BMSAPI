@@ -132,10 +132,9 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public String saveLot(final String programUUID,
-		final LotGeneratorInputDto lotGeneratorInputDto) {
+	public String saveLot(final LotGeneratorInputDto lotGeneratorInputDto) {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		this.lotInputValidator.validate(programUUID, lotGeneratorInputDto);
+		this.lotInputValidator.validate(lotGeneratorInputDto);
 		if (lotGeneratorInputDto.getGenerateStock()) {
 			final String nextStockIDPrefix = this.resolveStockIdPrefix(lotGeneratorInputDto.getStockPrefix());
 			lotGeneratorInputDto.setStockId(nextStockIDPrefix + "1");
@@ -292,7 +291,7 @@ public class LotServiceImpl implements LotService {
 		//Creates the new lot
 		final LotSplitRequestDto.NewLotSplitDto newLot = lotSplitRequestDto.getNewLot();
 		final LotGeneratorInputDto lotGeneratorInputDto = new LotGeneratorInputDto(splitLotDto.getGid(), splitLotDto.getUnitId(), newLot);
-		this.lotInputValidator.validate(programUUID, lotGeneratorInputDto);
+		this.lotInputValidator.validate(lotGeneratorInputDto);
 		if (lotGeneratorInputDto.getGenerateStock()) {
 			final String nextStockIDPrefix = this.resolveStockIdPrefix(lotGeneratorInputDto.getStockPrefix());
 			lotGeneratorInputDto.setStockId(nextStockIDPrefix + "1");

@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
@@ -77,7 +76,7 @@ public class LocationValidatorTest {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 
-		this.locationValidator.validateSeedLocationId(this.errors, null, locationId);
+		this.locationValidator.validateSeedLocationId(this.errors, locationId);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
@@ -97,7 +96,7 @@ public class LocationValidatorTest {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(null);
-		this.locationValidator.validateSeedLocationId(this.errors, null, LOCATION_ID);
+		this.locationValidator.validateSeedLocationId(this.errors, LOCATION_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
@@ -119,7 +118,7 @@ public class LocationValidatorTest {
 		final Location location = new Location();
 		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(location);
 		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(LOCATION_ID))).thenReturn(Lists.newArrayList());
-		this.locationValidator.validateSeedLocationId(this.errors, null, LOCATION_ID);
+		this.locationValidator.validateSeedLocationId(this.errors, LOCATION_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
@@ -142,7 +141,7 @@ public class LocationValidatorTest {
 		final List<Location> locationList = Collections.singletonList(location);
 		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(location);
 		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(LOCATION_ID))).thenReturn(locationList);
-		this.locationValidator.validateSeedLocationId(this.errors, null, LOCATION_ID);
+		this.locationValidator.validateSeedLocationId(this.errors, LOCATION_ID);
 
 		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
 	}
@@ -200,7 +199,7 @@ public class LocationValidatorTest {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
 
 		try {
-			this.locationValidator.validateLocation(errors, null, null);
+			this.locationValidator.validateLocation(errors, null);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.required"));
 			throw e;
@@ -212,27 +211,11 @@ public class LocationValidatorTest {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
 
 		try {
-			this.locationValidator.validateLocation(errors, LOCATION_ID, null);
+			this.locationValidator.validateLocation(errors, LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.invalid"));
 			throw e;
 		}
 	}
 
-	@Test(expected = ApiRequestValidationException.class)
-	public void testvalidateInvalidProgramLocation() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
-
-		final Location location = new Location();
-		location.setProgramUUID(RandomStringUtils.randomAlphabetic(256));
-		final List<Location> locationList = Collections.singletonList(location);
-		Mockito.when(this.locationDataManager.getLocationByID(LOCATION_ID)).thenReturn(location);
-
-		try {
-			this.locationValidator.validateLocation(errors, LOCATION_ID, RandomStringUtils.randomAlphabetic(256));
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.belongs.to.another.program"));
-			throw e;
-		}
-	}
 }

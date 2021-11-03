@@ -67,7 +67,7 @@ public class ProgramFavoriteValidator {
 
 		switch (favoriteType) {
 			case LOCATION:
-				this.validateLocationId(errors, programUUID, entityIds);
+				this.validateLocationId(errors, entityIds);
 				break;
 			case METHOD:
 				this.validateMethodId(errors, programUUID, entityIds);
@@ -112,7 +112,7 @@ public class ProgramFavoriteValidator {
 		}
 	}
 
-	private void validateLocationId(final BindingResult errors, final String programUUID, final Set<Integer> locationsIds) {
+	private void validateLocationId(final BindingResult errors, final Set<Integer> locationsIds) {
 		final List<Location> locations = locationDataManager.getLocationsByIDs(Lists.newArrayList(locationsIds));
 		final List<Integer> locIds = locations.stream().map(Location::getLocid).collect(Collectors.toList());
 
@@ -121,11 +121,6 @@ public class ProgramFavoriteValidator {
 			errors.reject("program.favorite.location.not.identified", new String[] {String.join(",", Arrays.toString(locationsIds.toArray()))}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-
-		locations.forEach((location) -> {
-			this.locationValidator.validateLocationBelongToProgram(errors, programUUID, location);
-		});
-
 	}
 
 }
