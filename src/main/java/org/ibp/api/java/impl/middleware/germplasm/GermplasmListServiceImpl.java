@@ -537,6 +537,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				"variable: " + variable.getName() + ", value: " + value
 			});
 		}
+		checkArgument(value.length() <= 255, "text.field.max.length", new String[] {"entry detail value", "255"});
 	}
 
 	@Override
