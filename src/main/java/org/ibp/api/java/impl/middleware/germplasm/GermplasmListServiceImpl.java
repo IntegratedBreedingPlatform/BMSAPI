@@ -411,8 +411,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		// process entries
 
-		final List<Integer> gids = request.getEntries()
-			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
+		final List<Integer> gids = request.getEntries().stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+		checkArgument(!gids.isEmpty(), "error.germplasmlist.save.gid");
 		final Map<Integer, Germplasm> germplasmMap = this.germplasmDataManager.getGermplasms(gids)
 			.stream().collect(toMap(Germplasm::getGid, identity()));
 		final Map<Integer, String> crossExpansions =
