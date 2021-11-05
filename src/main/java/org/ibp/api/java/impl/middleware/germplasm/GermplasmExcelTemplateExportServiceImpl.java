@@ -189,7 +189,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 
 		this.writeOntologyVariableSheet("export.germplasm.list.template.sheet.attributes", attributeVariables);
 
-		this.writeOtherCodesSheet(cropName, programUUID, isGermplasmUpdateFormat);
+		this.writeOtherCodesSheet(cropName, isGermplasmUpdateFormat);
 
 		try (final FileOutputStream fos = new FileOutputStream(file)) {
 			this.wb.write(fos);
@@ -330,7 +330,7 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		}
 	}
 
-	private void writeOtherCodesSheet(final String cropName, final String programUUID, final boolean isGermplasmUpdateFormat) {
+	private void writeOtherCodesSheet(final String cropName, final boolean isGermplasmUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet otherCodesSheet =
 			this.wb.createSheet(this.getMessageSource().getMessage("export.germplasm.list.template.sheet.other.codes", null, locale));
@@ -346,13 +346,12 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final List<LocationDto> storageLocations =
 			this.locationService
 				.getLocations(cropName,
-					new LocationSearchRequest(programUUID, GermplasmExcelTemplateExportServiceImpl.STORAGE_LOCATION_TYPE, null, null, null,
-						false), null);
+					new LocationSearchRequest(null, GermplasmExcelTemplateExportServiceImpl.STORAGE_LOCATION_TYPE, null, null, null), null);
 
 		final List<LocationDto> locations =
 			this.locationService
 				.getLocations(cropName,
-					new LocationSearchRequest(programUUID, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, null, false),
+					new LocationSearchRequest(null, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, null),
 					null);
 
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, false);

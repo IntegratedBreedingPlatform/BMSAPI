@@ -29,23 +29,9 @@ public class LocationSearchRequestValidatorTest {
 	private LocationSearchRequestValidator validator = new LocationSearchRequestValidator();
 
 	@Test
-	public void testValidate_MissingProgramUUIDWhenFavoritesAreRequired() {
-		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setFavoritesOnly(true);
-		try {
-			this.validator.validate("maize", locationSearchRequest);
-		} catch (Exception e) {
-			assertThat(e, instanceOf(ApiRequestValidationException.class));
-			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
-				hasItem("locations.favorite.requires.program"));
-		}
-	}
-
-	@Test
 	public void testValidate_InvalidProgram() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setProgramUUID(UUID.randomUUID().toString());
-		locationSearchRequest.setFavoritesOnly(false);
+		locationSearchRequest.setFavoriteProgramUUID(UUID.randomUUID().toString());
 		try {
 			Mockito.doAnswer(invocation -> {
 				Object[] args = invocation.getArguments();

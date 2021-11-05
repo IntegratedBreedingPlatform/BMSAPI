@@ -9,7 +9,6 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -60,7 +59,7 @@ public class GermplasmUpdateDtoValidator {
 		this.validateEmptyList(errors, germplasmUpdateDTOList);
 		this.validateAttributeAndNameCodes(errors, programUUID, germplasmUpdateDTOList);
 		this.validateGermplasmIdAndGermplasmUUID(errors, germplasmUpdateDTOList);
-		this.validateLocationAbbreviation(errors, programUUID, germplasmUpdateDTOList);
+		this.validateLocationAbbreviation(errors, germplasmUpdateDTOList);
 		this.validateBreedingMethod(errors, germplasmUpdateDTOList);
 		this.validateCreationDate(errors, germplasmUpdateDTOList);
 		this.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateDTOList);
@@ -179,8 +178,7 @@ public class GermplasmUpdateDtoValidator {
 
 	}
 
-	protected void validateLocationAbbreviation(final BindingResult errors, final String programUUID,
-		final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateLocationAbbreviation(final BindingResult errors,	final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> locationAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getLocationAbbreviation()))
@@ -188,7 +186,7 @@ public class GermplasmUpdateDtoValidator {
 
 		final List<String> abbreviations =
 			this.locationService
-				.getFilteredLocations(new LocationSearchRequest(programUUID, null, null, new ArrayList<>(locationAbbrs), null, false), null)
+				.getFilteredLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null), null)
 				.stream()
 				.map(Location::getLabbr).collect(
 				Collectors.toList());

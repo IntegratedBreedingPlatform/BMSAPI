@@ -200,7 +200,7 @@ public class LotResource {
 		@ApiParam("Lot to be created")
 		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
 		final SingleEntityResponse<String> singleEntityResponse =
-			new SingleEntityResponse<>(this.lotService.saveLot(programUUID, lotGeneratorInputDto));
+			new SingleEntityResponse<>(this.lotService.saveLot(lotGeneratorInputDto));
 		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
 	}
 
@@ -258,7 +258,7 @@ public class LotResource {
 
 		try {
 			this.inventoryLock.lockWrite();
-			this.lotService.updateLots(programUUID, extendedLotDtos, lotRequest);
+			this.lotService.updateLots(extendedLotDtos, lotRequest);
 		} finally {
 			this.inventoryLock.unlockWrite();
 		}
@@ -290,7 +290,7 @@ public class LotResource {
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
 		final List<LocationDto> locations =
 			this.locationService
-				.getLocations(cropName, new LocationSearchRequest(programUUID, LotResource.STORAGE_LOCATION_TYPE, null, null, null, false),
+				.getLocations(cropName, new LocationSearchRequest(null, LotResource.STORAGE_LOCATION_TYPE, null, null, null),
 					null);
 
 		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
