@@ -1,17 +1,17 @@
 package org.ibp.api.domain.common;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This enum is needed for hardcoded labels in printing label module (those that are not variable in the ontology)
  * Please refer to appconstants.properties for new static fields, so we keep simple old preset migration
  */
 public enum LabelPrintingStaticField {
-	NONEXISTENT(-1),
-
 	YEAR(4),
 	STUDY_NAME(6),
 	PARENTAGE(13),
@@ -44,7 +44,12 @@ public enum LabelPrintingStaticField {
 	INMEDIATE_SOURCE_PREFERRED_NAME(63);
 
 	private Integer fieldId;
-	private static final Map<Integer, LabelPrintingStaticField> STATIC_FIELD_MAP = new HashMap<>();
+	private static final Map<Integer, LabelPrintingStaticField> STATIC_FIELD_MAP_LOOKUP = new HashMap<>();
+	static {
+		for (final LabelPrintingStaticField sf : EnumSet.allOf(LabelPrintingStaticField.class)) {
+			STATIC_FIELD_MAP_LOOKUP.put(sf.getFieldId(), sf);
+		}
+	}
 
 	LabelPrintingStaticField(final Integer fieldId) {
 		this.fieldId = fieldId;
@@ -66,24 +71,14 @@ public enum LabelPrintingStaticField {
 		return availableStaticFieldIds;
 	}
 
-	public static LabelPrintingStaticField getByFieldId(final Integer id) {
+	public static Optional<LabelPrintingStaticField> getByFieldId(final Integer id) {
 		if (id == null) {
-			return NONEXISTENT;
+			return Optional.empty();
 		}
-
-		if (!LabelPrintingStaticField.STATIC_FIELD_MAP.containsKey(id)) {
-			for (final LabelPrintingStaticField staticField : LabelPrintingStaticField.values()) {
-				if (staticField.getFieldId() == id) {
-					STATIC_FIELD_MAP.put(id, staticField);
-					return staticField;
-				}
-			}
-
-			return NONEXISTENT;
-		} else {
-			return STATIC_FIELD_MAP.get(id);
+		if (LabelPrintingStaticField.STATIC_FIELD_MAP_LOOKUP.containsKey(id)) {
+			return Optional.of(STATIC_FIELD_MAP_LOOKUP.get(id));
 		}
-
+		return Optional.empty();
 	}
 
 }

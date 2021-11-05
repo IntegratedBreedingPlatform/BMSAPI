@@ -49,6 +49,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -365,8 +366,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			default:
 				//do nothing
 		}
-		final LabelPrintingStaticField staticField = LabelPrintingStaticField.getByFieldId(id);
-		switch (staticField) {
+
+		final Optional<LabelPrintingStaticField> staticField = LabelPrintingStaticField.getByFieldId(id);
+		if(!staticField.isPresent()) return;
+		switch (staticField.get()) {
 			case CROSS:
 				columns.put(key, Objects.toString(germplasmSearchResponse.getPedigreeString(), ""));
 				return;
@@ -419,8 +422,9 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 				//do nothing
 		}
 
-		final LabelPrintingStaticField staticField = LabelPrintingStaticField.getByFieldId(id);
-		switch (staticField) {
+		final Optional<LabelPrintingStaticField> staticField = LabelPrintingStaticField.getByFieldId(id);
+		if(!staticField.isPresent()) return;
+		switch (staticField.get()) {
 			case GUID:
 				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmUUID(), ""));
 				return;
