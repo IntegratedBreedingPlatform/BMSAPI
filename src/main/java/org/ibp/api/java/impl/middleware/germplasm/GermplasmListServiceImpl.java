@@ -19,6 +19,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
@@ -692,6 +693,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		return this.germplasmListService.toggleGermplasmListStatus(listId);
+	}
+
+	@Override
+	public List<Variable> getGermplasmListVariables(final String programUUID, final Integer listId, final Integer variableTypeId) {
+		return this.germplasmListService.getGermplasmListVariables(programUUID, listId, variableTypeId);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
