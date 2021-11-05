@@ -70,7 +70,7 @@ public class ProgramFavoriteValidator {
 				this.validateLocationId(errors, entityIds);
 				break;
 			case METHOD:
-				this.validateMethodId(errors, programUUID, entityIds);
+				this.validateMethodId(errors, entityIds);
 				break;
 			case VARIABLE:
 				this.validateVariableId(errors, programUUID, entityIds);
@@ -98,7 +98,7 @@ public class ProgramFavoriteValidator {
 
 	}
 
-	private void validateMethodId(final BindingResult errors, final String programUUID, final Set<Integer> methodsIs) {
+	private void validateMethodId(final BindingResult errors, final Set<Integer> methodsIs) {
 		final BreedingMethodSearchRequest methodSearchRequest = new BreedingMethodSearchRequest();
 		methodSearchRequest.setMethodIds(methodsIs.stream().collect(Collectors.toList()));
 
