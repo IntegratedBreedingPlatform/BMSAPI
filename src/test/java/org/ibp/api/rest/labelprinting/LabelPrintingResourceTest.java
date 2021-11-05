@@ -1,7 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
-import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.filegenerator.CSVLabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.LabelsFileGenerator;
@@ -13,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,12 +36,15 @@ public class LabelPrintingResourceTest {
 
 	@Test
 	public void testGetLabelsFileGenerator() {
-		Mockito.when(this.subObservationDatasetLabelPrinting.getSupportedFileTypes()).thenReturn(SubObservationDatasetLabelPrinting.SUPPORTED_FILE_TYPES);
+		Mockito.when(this.subObservationDatasetLabelPrinting.getSupportedFileTypes())
+			.thenReturn(SubObservationDatasetLabelPrinting.SUPPORTED_FILE_TYPES);
 
-		LabelsFileGenerator fileGenerator = this.labelPrintingResource.getLabelsFileGenerator(FileType.CSV.getExtension(), this.subObservationDatasetLabelPrinting);
+		LabelsFileGenerator fileGenerator =
+			this.labelPrintingResource.getLabelsFileGenerator(FileType.CSV.getExtension(), this.subObservationDatasetLabelPrinting);
 		Assert.assertEquals(this.csvLabelsFileGenerator, fileGenerator);
 
-		fileGenerator = this.labelPrintingResource.getLabelsFileGenerator(FileType.PDF.getExtension(), this.subObservationDatasetLabelPrinting);
+		fileGenerator =
+			this.labelPrintingResource.getLabelsFileGenerator(FileType.PDF.getExtension(), this.subObservationDatasetLabelPrinting);
 		Assert.assertEquals(this.pdfLabelsFileGenerator, fileGenerator);
 
 	}
@@ -56,7 +57,7 @@ public class LabelPrintingResourceTest {
 		Mockito.when(this.request.isUserInRole(PermissionsEnum.MANAGE_INVENTORY.name())).thenReturn(false);
 		Mockito.when(this.request.isUserInRole(PermissionsEnum.MANAGE_LOTS.name())).thenReturn(false);
 		Mockito.when(this.request.isUserInRole(PermissionsEnum.LOT_LABEL_PRINTING.name())).thenReturn(false);
-		final LabelPrintingStrategy labelPrintingStrategy = this.labelPrintingResource.getLabelPrintingStrategy("Lot");
+		this.labelPrintingResource.getLabelPrintingStrategy("Lot");
 	}
 
 	@Test
@@ -66,8 +67,8 @@ public class LabelPrintingResourceTest {
 		Mockito.when(this.request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())).thenReturn(true);
 		Exception e = null;
 		try {
-			final LabelPrintingStrategy labelPrintingStrategy = this.labelPrintingResource.getLabelPrintingStrategy("Lot");
-		}catch (final AccessDeniedException ex) {
+			this.labelPrintingResource.getLabelPrintingStrategy("Lot");
+		} catch (final AccessDeniedException ex) {
 			e = ex;
 		}
 		Assert.assertNull(e);

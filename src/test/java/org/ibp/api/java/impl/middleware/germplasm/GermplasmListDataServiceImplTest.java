@@ -289,7 +289,7 @@ public class GermplasmListDataServiceImplTest {
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("list.entries.not.in.list"));
 			assertThat(e.getErrors().get(0).getArguments().length, is(1));
-			assertThat(e.getErrors().get(0).getArguments()[0], is(String.valueOf("1,2,3")));
+			assertThat(e.getErrors().get(0).getArguments()[0], is("1,2,3"));
 		}
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
@@ -299,6 +299,13 @@ public class GermplasmListDataServiceImplTest {
 
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
 		Mockito.verifyNoMoreInteractions(this.germplasmListDataServiceMiddleware);
+	}
+
+	@Test
+	public void testGetGermplasmListDataDetailList_OK() {
+		final int listId = 1;
+		this.germplasmListDataService.getGermplasmListDataDetailList(1);
+		Mockito.verify(this.germplasmListDataServiceMiddleware).getGermplasmListDataDetailList(listId);
 	}
 
 	private GermplasmList createGermplasmListMock(final boolean isLocked) {

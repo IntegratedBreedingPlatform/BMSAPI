@@ -58,6 +58,9 @@ public class LabelPrintingResource {
 	private LabelPrintingStrategy germplasmLabelPrinting;
 
 	@Autowired
+	private LabelPrintingStrategy germplasmListLabelPrinting;
+
+	@Autowired
 	private CSVLabelsFileGenerator csvLabelsFileGenerator;
 
 	@Autowired
@@ -99,7 +102,7 @@ public class LabelPrintingResource {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
 		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput, programUUID);
-		final OriginResourceMetadata originResourceMetadata = labelPrintingStrategy.getOriginResourceMetadata(labelsInfoInput);
+		final OriginResourceMetadata originResourceMetadata = labelPrintingStrategy.getOriginResourceMetadata(labelsInfoInput, programUUID);
 
 		return new ResponseEntity<>(originResourceMetadata, HttpStatus.OK);
 	}
@@ -196,6 +199,9 @@ public class LabelPrintingResource {
 			case GERMPLASM:
 				labelPrintingStrategy = this.germplasmLabelPrinting;
 				break;
+			case GERMPLASM_LIST:
+				labelPrintingStrategy = this.germplasmListLabelPrinting;
+				break;
 			default:
 				labelPrintingStrategy = null;
 		}
@@ -221,6 +227,11 @@ public class LabelPrintingResource {
 					|| this.request.isUserInRole(PermissionsEnum.GERMPLASM.name())
 					|| this.request.isUserInRole(PermissionsEnum.MANAGE_GERMPLASM.name())
 					|| this.request.isUserInRole(PermissionsEnum.GERMPLASM_LABEL_PRINTING.name());
+			case GERMPLASM_LIST:
+				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
+					|| this.request.isUserInRole(PermissionsEnum.GERMPLASM.name())
+					|| this.request.isUserInRole(PermissionsEnum.MANAGE_GERMPLASM.name())
+					|| this.request.isUserInRole(PermissionsEnum.GERMPLASM_LIST_LABEL_PRINTING.name());
 			default:
 				return false;
 		}
