@@ -201,7 +201,7 @@ public class GermplasmListLabelPrintingTest {
 		Mockito.verify(this.germplasmAttributeService, Mockito.never())
 			.getGermplasmAttributeVariables(ArgumentMatchers.anyList(), ArgumentMatchers.anyString());
 		Mockito.verify(this.germplasmNameService, Mockito.never()).getGermplasmNamesByGids(ArgumentMatchers.anyList());
-		Mockito.verify(this.germplasmListDataService, Mockito.never()).getGermplasmListDataList(LIST_ID);
+		Mockito.verify(this.germplasmListDataService, Mockito.never()).getGermplasmListDataDetailList(LIST_ID);
 		Mockito.verify(this.germplasmListDataService)
 			.searchGermplasmListData(ArgumentMatchers.eq(LIST_ID), ArgumentMatchers.any(GermplasmListDataSearchRequest.class),
 				ArgumentMatchers.any(PageRequest.class));
@@ -220,7 +220,7 @@ public class GermplasmListLabelPrintingTest {
 		detail.getListData().setId(listDataId);
 		detail.setVariableId(variableId);
 		detail.setValue(RandomStringUtils.randomAlphanumeric(10));
-		Mockito.when(this.germplasmListDataService.getGermplasmListDataList(LIST_ID)).thenReturn(Collections.singletonList(detail));
+		Mockito.when(this.germplasmListDataService.getGermplasmListDataDetailList(LIST_ID)).thenReturn(Collections.singletonList(detail));
 
 		final Map<Integer, Map<Integer, String>> entryDetailValues = new HashMap<>();
 		this.labelPrinting.getEntryDetailValues(entryDetailValues, LIST_ID);

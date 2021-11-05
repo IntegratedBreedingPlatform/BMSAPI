@@ -302,10 +302,10 @@ public class GermplasmListDataServiceImplTest {
 	}
 
 	@Test
-	public void testGetGermplasmListDataList_OK() {
+	public void testGetGermplasmListDataDetailList_OK() {
 		final int listId = 1;
-		this.germplasmListDataService.getGermplasmListDataList(1);
-		Mockito.verify(this.germplasmListDataServiceMiddleware).getGermplasmListDataList(listId);
+		this.germplasmListDataService.getGermplasmListDataDetailList(1);
+		Mockito.verify(this.germplasmListDataServiceMiddleware).getGermplasmListDataDetailList(listId);
 	}
 
 	private GermplasmList createGermplasmListMock(final boolean isLocked) {

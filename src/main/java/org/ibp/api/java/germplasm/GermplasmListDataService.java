@@ -24,7 +24,7 @@ public interface GermplasmListDataService {
 
 	void updateGermplasmListDataView(Integer listId, List<GermplasmListDataUpdateViewDTO> columns);
 
-	List<GermplasmListDataDetail> getGermplasmListDataList(Integer listId);
+	List<GermplasmListDataDetail> getGermplasmListDataDetailList(Integer listId);
 
 	void reOrderEntries(Integer listId, GermplasmListReorderEntriesRequest request);
 }

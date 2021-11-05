@@ -186,7 +186,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 	}
 
 	void getEntryDetailValues(final Map<Integer, Map<Integer, String>> entryDetailValues, final Integer listId) {
-		final List<GermplasmListDataDetail> germplasmListDataDetails = this.germplasmListDataService.getGermplasmListDataList(listId);
+		final List<GermplasmListDataDetail> germplasmListDataDetails = this.germplasmListDataService.getGermplasmListDataDetailList(listId);
 		germplasmListDataDetails.forEach(listDataDetail -> {
 			final Integer listDataId = listDataDetail.getListData().getListDataId();
 			entryDetailValues.putIfAbsent(listDataId, new HashMap<>());

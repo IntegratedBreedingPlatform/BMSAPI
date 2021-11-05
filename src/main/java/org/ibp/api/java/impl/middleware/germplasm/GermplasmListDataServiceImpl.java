@@ -72,8 +72,8 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	@Override
-	public List<GermplasmListDataDetail> getGermplasmListDataList(final Integer listId) {
-		return this.germplasmListDataService.getGermplasmListDataList(listId);
+	public List<GermplasmListDataDetail> getGermplasmListDataDetailList(final Integer listId) {
+		return this.germplasmListDataService.getGermplasmListDataDetailList(listId);
 	}
 
 	@Override
