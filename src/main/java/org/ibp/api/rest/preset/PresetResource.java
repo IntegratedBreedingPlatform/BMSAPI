@@ -30,7 +30,8 @@ import java.util.List;
 	+ "'LOT_LABEL_PRINTING',"
 	+ "'GERMPLASM',"
 	+ "'MANAGE_GERMPLASM',"
-	+ "'GERMPLASM_LABEL_PRINTING'"
+	+ "'GERMPLASM_LABEL_PRINTING',"
+	+ "'GERMPLASM_LIST_LABEL_PRINTING'"
 	+ ")")
 @RestController
 public class PresetResource {
@@ -67,10 +68,8 @@ public class PresetResource {
 	@ResponseBody
 	@JsonView(PresetDTO.View.Qualified.class)
 	public ResponseEntity<List<PresetDTO>> getPresets(
-		@PathVariable
-			final String cropname,
-		@PathVariable
-			final String programUUID,
+		@PathVariable final String cropname,
+		@PathVariable final String programUUID,
 		@RequestParam final
 		Integer toolId,
 		@RequestParam final
@@ -84,10 +83,8 @@ public class PresetResource {
 		notes = "Delete preset.")
 	@ResponseBody
 	public ResponseEntity<Void> deletePreset(
-		@PathVariable
-			final String cropname,
-		@PathVariable
-			final String programUUID,
+		@PathVariable final String cropname,
+		@PathVariable final String programUUID,
 		@PathVariable final
 		Integer presetId) {
 		this.presetService.deletePreset(cropname, presetId);

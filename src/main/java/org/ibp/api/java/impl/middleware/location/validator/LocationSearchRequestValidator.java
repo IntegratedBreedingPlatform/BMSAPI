@@ -21,13 +21,8 @@ public class LocationSearchRequestValidator {
 	public void validate(final String crop, final LocationSearchRequest locationSearchRequest) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
-		if (locationSearchRequest.getFavoritesOnly() && StringUtils.isEmpty(locationSearchRequest.getProgramUUID())) {
-			errors.reject("locations.favorite.requires.program", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
-		if (locationSearchRequest.getProgramUUID() != null) {
-			this.programValidator.validate(new ProgramDTO(crop, locationSearchRequest.getProgramUUID()), errors);
+		if (locationSearchRequest.getFavoriteProgramUUID() != null) {
+			this.programValidator.validate(new ProgramDTO(crop, locationSearchRequest.getFavoriteProgramUUID()), errors);
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}

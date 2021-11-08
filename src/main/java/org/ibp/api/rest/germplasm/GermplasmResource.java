@@ -378,7 +378,7 @@ public class GermplasmResource {
 		@PathVariable final Integer gid,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
-		final boolean updateExecuted = this.germplasmService.updateGermplasmBasicDetails(programUUID, gid, germplasmBasicDetailsDto);
+		final boolean updateExecuted = this.germplasmService.updateGermplasmBasicDetails(gid, germplasmBasicDetailsDto);
 		return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
 	}
 

@@ -770,6 +770,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.germplasmListService.toggleGermplasmListStatus(listId);
 	}
 
+	@Override
+	public List<Variable> getGermplasmListVariables(final String programUUID, final Integer listId, final Integer variableTypeId) {
+		return this.germplasmListService.getGermplasmListVariables(programUUID, listId, variableTypeId);
+	}
+
 	private void validateProgram(final String cropName, final String programUUID) {
 		if (!StringUtils.isEmpty(programUUID)) {
 			this.programValidator.validate(new ProgramDTO(cropName, programUUID), this.errors);

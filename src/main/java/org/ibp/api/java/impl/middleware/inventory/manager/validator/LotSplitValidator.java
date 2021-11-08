@@ -70,7 +70,7 @@ public class LotSplitValidator {
 
 		this.inventoryCommonValidator.validateLotNotes(newLotSplitDto.getNotes(), errors);
 		this.inventoryCommonValidator.validateTransactionNotes(initialLotDepositDto.getNotes(), errors);
-		this.locationValidator.validateSeedLocationId(errors, programUUID, newLotSplitDto.getLocationId());
+		this.locationValidator.validateSeedLocationId(errors, newLotSplitDto.getLocationId());
 	}
 
 }

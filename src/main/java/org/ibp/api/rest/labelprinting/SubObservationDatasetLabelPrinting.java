@@ -128,8 +128,8 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 		this.fieldIds = Stream.of(this.lotFieldIds, this.transactionFieldIds,
 			Arrays.asList(LabelPrintingStaticField.STUDY_NAME.getFieldId(), LabelPrintingStaticField.YEAR.getFieldId(),
-				LabelPrintingStaticField.PARENTAGE.getFieldId(),LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId())).flatMap(Collection::stream).collect(Collectors.toList());
-
+				LabelPrintingStaticField.PARENTAGE.getFieldId(), LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()))
+			.flatMap(Collection::stream).collect(Collectors.toList());
 
 	}
 
@@ -182,7 +182,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	public OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput) {
+	public OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
 		final DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
 		final String tempFileName = "Labels-for-".concat(study.getStudyName()).concat("-").concat(datasetDTO.getName());
@@ -220,14 +220,16 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			.getObservationSetVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 
 		final List<MeasurementVariable> environmentVariables =
-			this.middlewareDatasetService.getObservationSetVariables(environmentDatasetId,
+			this.middlewareDatasetService.getObservationSetVariables(
+				environmentDatasetId,
 				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-						VariableType.ENVIRONMENT_CONDITION.getId()));
+					VariableType.ENVIRONMENT_CONDITION.getId()));
 
 		final List<MeasurementVariable> treatmentFactors =
 			this.middlewareDatasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
 
-		final List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getObservationSetVariables(plotDatasetId,
+		final List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getObservationSetVariables(
+			plotDatasetId,
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
 		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
@@ -334,20 +336,25 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 						continue;
 					}
 					if (TermId.getById(termId).equals(TermId.SEASON_VAR)) {
-						final ObservationUnitData observationUnitData = observationUnitRow.getEnvironmentVariables().get("Crop_season_Code");
-						row.put(requiredField, ObservationLabelPrintingHelper.getSeason(observationUnitData != null ? observationUnitData.getValue() : null));
+						final ObservationUnitData observationUnitData =
+							observationUnitRow.getEnvironmentVariables().get("Crop_season_Code");
+						row.put(
+							requiredField,
+							ObservationLabelPrintingHelper.getSeason(observationUnitData != null ? observationUnitData.getValue() : null));
 						continue;
 					}
 
 					final Optional<ObservationUnitData>
-						observationVariables = ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(),field);
+						observationVariables =
+						ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(), field);
 					if (observationVariables.isPresent()) {
 						row.put(requiredField, observationVariables.get().getValue());
 						continue;
 					}
 
 					final Optional<ObservationUnitData>
-						environmentVariables = ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getEnvironmentVariables(),field);
+						environmentVariables =
+						ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getEnvironmentVariables(), field);
 					if (environmentVariables.isPresent()) {
 						row.put(requiredField, environmentVariables.get().getValue());
 						continue;
