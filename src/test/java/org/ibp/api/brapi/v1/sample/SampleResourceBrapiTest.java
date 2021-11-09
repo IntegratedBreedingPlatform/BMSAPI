@@ -22,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
@@ -57,7 +58,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 
 		final SampleObservationDto sampleObservationDto = this.createRandomSampleObservationDto();
 		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
-		requestDTO.setSampleDbId(sampleId);
+		requestDTO.setSampleDbIds(Collections.singletonList(sampleId));
 		Mockito.when(this.sampleService.getSampleObservations(requestDTO, null)).thenReturn(Lists.newArrayList(sampleObservationDto));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
@@ -90,7 +91,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/samples/" + sampleId).build().encode();
 
 		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
-		requestDTO.setSampleDbId(sampleId);
+		requestDTO.setSampleDbIds(Collections.singletonList(sampleId));
 		Mockito.when(this.sampleService.getSampleObservations(requestDTO, null)).thenReturn(new ArrayList<>());
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))

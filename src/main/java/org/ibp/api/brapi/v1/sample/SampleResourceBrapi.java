@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Collections;
 import java.util.List;
 
 @Api(value = "BrAPI Sample Services")
@@ -33,7 +34,7 @@ public class SampleResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SampleObservationDto>> getSampleBySampleId(@PathVariable final String crop, final @PathVariable String sampleDbId) {
 		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
-		requestDTO.setSampleDbId(sampleDbId);
+		requestDTO.setSampleDbIds(Collections.singletonList(sampleDbId));
 		final List<SampleObservationDto> sampleObservationDtos = this.sampleService.getSampleObservations(requestDTO, null);
 
 		if (!CollectionUtils.isEmpty(sampleObservationDtos)) {
