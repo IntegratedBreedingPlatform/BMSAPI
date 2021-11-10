@@ -10,8 +10,8 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.brapi.SampleServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
-import org.ibp.api.java.impl.middleware.sample.SampleService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,7 +35,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 	private static final SimpleDateFormat DATE_FORMAT = DateUtil.getSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
 	@Autowired
-	private SampleService sampleService;
+	private SampleServiceBrapi sampleService;
 
 	@Autowired
 	private SearchRequestService searchRequestService;

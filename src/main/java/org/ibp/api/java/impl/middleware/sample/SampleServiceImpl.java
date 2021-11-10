@@ -41,14 +41,4 @@ public class SampleServiceImpl implements SampleService {
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		return this.sampleService.getByGid(gid);
 	}
-
-	@Override
-	public List<SampleObservationDto> getSampleObservations(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
-		return this.sampleService.getSampleObservations(requestDTO, pageable);
-	}
-
-	@Override
-	public long countSampleObservations(final SampleSearchRequestDTO sampleSearchRequestDTO) {
-		return this.sampleService.countSampleObservations(sampleSearchRequestDTO);
-	}
 }

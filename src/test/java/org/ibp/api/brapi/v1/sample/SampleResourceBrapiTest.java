@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRe
 import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.impl.middleware.sample.SampleService;
+import org.ibp.api.brapi.SampleServiceBrapi;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +35,8 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public SampleService sampleService() {
-			return Mockito.mock(SampleService.class);
+		public SampleServiceBrapi sampleServiceBrapi() {
+			return Mockito.mock(SampleServiceBrapi.class);
 		}
 	}
 
@@ -44,7 +44,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 	private static final SimpleDateFormat DATE_FORMAT = DateUtil.getSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
 	@Autowired
-	private SampleService sampleService;
+	private SampleServiceBrapi sampleServiceBrapi;
 
 	/**
 	 * Should respond with 200 and a Sample. * *
@@ -59,7 +59,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 		final SampleObservationDto sampleObservationDto = this.createRandomSampleObservationDto();
 		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
 		requestDTO.setSampleDbIds(Collections.singletonList(sampleId));
-		Mockito.when(this.sampleService.getSampleObservations(requestDTO, null)).thenReturn(Lists.newArrayList(sampleObservationDto));
+		Mockito.when(this.sampleServiceBrapi.getSampleObservations(requestDTO, null)).thenReturn(Lists.newArrayList(sampleObservationDto));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
@@ -92,7 +92,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 
 		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
 		requestDTO.setSampleDbIds(Collections.singletonList(sampleId));
-		Mockito.when(this.sampleService.getSampleObservations(requestDTO, null)).thenReturn(new ArrayList<>());
+		Mockito.when(this.sampleServiceBrapi.getSampleObservations(requestDTO, null)).thenReturn(new ArrayList<>());
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isNotFound())

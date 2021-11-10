@@ -17,8 +17,4 @@ public interface SampleService {
 	long countFilter(final String obsUnitId, final Integer listId);
 
 	List<SampleDTO> getGermplasmSamples(Integer gid);
-
-	List<SampleObservationDto> getSampleObservations(SampleSearchRequestDTO sampleSearchRequestDTO, Pageable pageable);
-
-	long countSampleObservations(SampleSearchRequestDTO sampleSearchRequestDTO);
 }

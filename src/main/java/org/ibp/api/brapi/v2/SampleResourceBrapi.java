@@ -17,7 +17,7 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
-import org.ibp.api.java.impl.middleware.sample.SampleService;
+import org.ibp.api.brapi.SampleServiceBrapi;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ import java.util.List;
 public class SampleResourceBrapi {
 
 	@Autowired
-	private SampleService sampleService;
+	private SampleServiceBrapi sampleServiceBrapi;
 
 	@Autowired
 	private SearchRequestService searchRequestService;
@@ -80,12 +80,12 @@ public class SampleResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return SampleResourceBrapi.this.sampleService.countSampleObservations(requestDTO);
+					return SampleResourceBrapi.this.sampleServiceBrapi.countSampleObservations(requestDTO);
 				}
 
 				@Override
 				public List<SampleObservationDto> getResults(final PagedResult<SampleObservationDto> pagedResult) {
-					return SampleResourceBrapi.this.sampleService.getSampleObservations(requestDTO, pageRequest);
+					return SampleResourceBrapi.this.sampleServiceBrapi.getSampleObservations(requestDTO, pageRequest);
 				}
 			});
 
@@ -163,12 +163,12 @@ public class SampleResourceBrapi {
 
 					@Override
 					public long getCount() {
-						return SampleResourceBrapi.this.sampleService.countSampleObservations(sampleSearchDTO);
+						return SampleResourceBrapi.this.sampleServiceBrapi.countSampleObservations(sampleSearchDTO);
 					}
 
 					@Override
 					public List<SampleObservationDto> getResults(final PagedResult<SampleObservationDto> pagedResult) {
-						return SampleResourceBrapi.this.sampleService
+						return SampleResourceBrapi.this.sampleServiceBrapi
 							.getSampleObservations(sampleSearchDTO, new PageRequest(finalPageNumber, finalPageSize));
 					}
 				});
