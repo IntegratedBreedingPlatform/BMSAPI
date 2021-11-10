@@ -2,18 +2,25 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.service.api.inventory.LotService;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +36,23 @@ public class LocationValidator {
 
 	@Autowired
 	private LocationService locationService;
+
+	@Autowired
+	private GermplasmNameService germplasmNameService;
+
+	@Autowired
+	private GermplasmService germplasmService;
+
+	@Autowired
+	private GermplasmAttributeService germplasmAttributeService;
+
+	@Autowired
+	private StudyService studyService;
+
+	@Autowired
+	private LotService lotService;
+
+	private BindingResult errors;
 
 	public void validateSeedLocationId(final BindingResult errors, final Integer locationId) {
 		if (locationId == null) {
@@ -77,6 +101,60 @@ public class LocationValidator {
 			errors.reject("location.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+	}
+
+	public void validateCanBeDeleted(final Integer locationId) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		this.validateExistingLocationId(locationId);
+		this.validateLocationBelongsToGermplasms(locationId);
+		this.validateLocationBelongsToLots(locationId);
+		this.validateLocationBelongsToAttributes(locationId);
+		this.validateLocationBelongsToNames(locationId);
+		this.validateLocationBelongsToStudies(locationId);
+	}
+
+	private void validateLocationBelongsToLots(final Integer locationId) {
+		boolean isLocationUsedInLots = this.lotService.isLocationIdUsedInLots(locationId);
+		if (isLocationUsedInLots) {
+			this.errors.reject("location.is.used.in.lots", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateLocationBelongsToNames(final Integer locationId) {
+		boolean isLocationUsedInNames = this.germplasmNameService.isLocationIdUsedInGermplasmNames(locationId);
+		if (isLocationUsedInNames) {
+			this.errors.reject("location.is.used.in.names", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateLocationBelongsToAttributes(final Integer locationId) {
+		boolean isLocationUsedInAttributes = this.germplasmAttributeService.isLocationIdUsedInAttributes(locationId);
+		if (isLocationUsedInAttributes) {
+			this.errors.reject("location.is.used.in.attributes", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateLocationBelongsToGermplasms(final Integer locationId) {
+		final boolean isLocationUsedInGermplasm = this.germplasmService.isLocationIdUsedInGermplasms(locationId);
+		if (isLocationUsedInGermplasm) {
+			this.errors.reject("location.is.used.in.germplasms", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateLocationBelongsToStudies(final Integer locationId) {
+		final boolean isLocationUsedInStudies = this.studyService.isLocationIdUsedInStudies(locationId);
+		if (isLocationUsedInStudies) {
+			this.errors.reject("location.is.used.in.studies", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateExistingLocationId(final Integer locationId) {
+		this.validateLocation(this.errors, locationId);
 	}
 
 }
