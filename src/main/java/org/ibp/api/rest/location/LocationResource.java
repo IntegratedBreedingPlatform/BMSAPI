@@ -121,4 +121,15 @@ public class LocationResource {
 		return new ResponseEntity<List<LocationDto>>(pageResult.getPageResults(), headers, HttpStatus.OK);
 
 	}
+
+	@ApiOperation(value = "Delete location", notes = "Delete location")
+	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity<Void> deleteLocation(@PathVariable final String cropName,
+		@PathVariable final Integer locationId,
+		@RequestParam(required = false) final String programUUID) {
+		this.locationService.deleteLocation(locationId);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
 }
