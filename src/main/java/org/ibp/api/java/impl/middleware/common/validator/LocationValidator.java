@@ -95,7 +95,7 @@ public class LocationValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final Location location = locationDataManager.getLocationByID(locationId);
+		final Location location = this.locationDataManager.getLocationByID(locationId);
 
 		if (location == null) {
 			errors.reject("location.invalid", "");
@@ -114,7 +114,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationBelongsToLots(final Integer locationId) {
-		boolean isLocationUsedInLots = this.lotService.isLocationIdUsedInLots(locationId);
+		final boolean isLocationUsedInLots = this.lotService.isLocationIdUsedInLots(locationId);
 		if (isLocationUsedInLots) {
 			this.errors.reject("location.is.used.in.lots", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -122,7 +122,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationBelongsToNames(final Integer locationId) {
-		boolean isLocationUsedInNames = this.germplasmNameService.isLocationIdUsedInGermplasmNames(locationId);
+		final boolean isLocationUsedInNames = this.germplasmNameService.isLocationIdUsedInGermplasmNames(locationId);
 		if (isLocationUsedInNames) {
 			this.errors.reject("location.is.used.in.names", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -130,7 +130,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationBelongsToAttributes(final Integer locationId) {
-		boolean isLocationUsedInAttributes = this.germplasmAttributeService.isLocationIdUsedInAttributes(locationId);
+		final boolean isLocationUsedInAttributes = this.germplasmAttributeService.isLocationIdUsedInAttributes(locationId);
 		if (isLocationUsedInAttributes) {
 			this.errors.reject("location.is.used.in.attributes", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
