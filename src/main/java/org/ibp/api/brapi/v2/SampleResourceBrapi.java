@@ -51,26 +51,26 @@ public class SampleResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<SampleObservationDto>> getSamples(@PathVariable final String crop,
 		@ApiParam(value = "the internal DB id for a sample")
-		@RequestParam(value = "sampleDbId", required = false) final String sampleDbIds,
+		@RequestParam(value = "sampleDbId", required = false) final String sampleDbId,
 		@ApiParam(value = "the internal DB id for an observation unit where a sample was taken from")
 		@RequestParam(value = "observationUnitDbId", required = false) final String observationUnitDbIds,
 		@ApiParam(value = "the internal DB id for a plate of samples")
-		@RequestParam(value = "plateDbId", required = false) final String plateDbIds,
+		@RequestParam(value = "plateDbId", required = false) final String plateDbId,
 		@ApiParam(value = "the internal DB id for a germplasm")
-		@RequestParam(value = "germplasmDbId", required = false) final String germplasmDbIds,
+		@RequestParam(value = "germplasmDbId", required = false) final String germplasmDbId,
 		@ApiParam(value = "Filter by study DbId")
-		@RequestParam(value = "studyDbId", required = false) final String studyDbIds,
+		@RequestParam(value = "studyDbId", required = false) final String studyDbId,
 		@ApiParam(value = "An external reference ID. Could be a simple string or a URI. (use with externalReferenceSource parameter)")
-		@RequestParam(value = "externalReferenceID", required = false) final String externalReferenceIDs,
+		@RequestParam(value = "externalReferenceID", required = false) final String externalReferenceID,
 		@ApiParam(value = "An identifier for the source system or database of an external reference (use with externalReferenceID parameter)")
-		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSources,
+		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page", required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
-		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO(sampleDbIds, observationUnitDbIds, plateDbIds,
-			germplasmDbIds, studyDbIds, externalReferenceIDs, externalReferenceSources, null, null);
+		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO(sampleDbId, observationUnitDbIds, plateDbId,
+			germplasmDbId, studyDbId, externalReferenceID, externalReferenceSource);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
