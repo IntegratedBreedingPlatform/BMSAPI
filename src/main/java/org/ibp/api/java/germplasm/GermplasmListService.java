@@ -33,6 +33,8 @@ public interface GermplasmListService {
 
 	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request);
 
+	void importUpdates(GermplasmListGeneratorDTO request);
+
 	List<GermplasmListTypeDTO> getGermplasmListTypes();
 
 	void addGermplasmEntriesToList(
@@ -58,5 +60,4 @@ public interface GermplasmListService {
 	long countSearchGermplasmList(GermplasmListSearchRequest request, String programUUID);
 
 	boolean toggleGermplasmListStatus(Integer listId);
-
 }

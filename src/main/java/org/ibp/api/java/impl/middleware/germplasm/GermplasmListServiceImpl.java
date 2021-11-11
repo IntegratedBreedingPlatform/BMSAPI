@@ -13,9 +13,11 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -24,6 +26,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
@@ -31,12 +34,14 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.generationcp.middleware.util.VariableValueUtil;
 import org.ibp.api.Util;
 import org.ibp.api.domain.germplasmlist.GermplasmListMapper;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmListService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
@@ -48,7 +53,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -67,6 +71,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 @Transactional
@@ -142,6 +147,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private GermplasmListValidator germplasmListValidator;
+
+	@Autowired
+	private OntologyVariableService ontologyVariableService;
 
 	private BindingResult errors;
 
@@ -225,7 +233,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		// Retrieve the list of expanded nodes
 		final List<String> treeFolders = this.userProgramStateDataManager
 			.getUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name());
-		if (!CollectionUtils.isEmpty(treeFolders)) {
+		if (!isEmpty(treeFolders)) {
 			final Map<String, TreeNode> folderParentNodeMap = new HashMap<>();
 			final TreeNode programRootNode = treeNodesList.get(1);
 			programRootNode.setChildren(this.getChildrenNodes(programUUID, programRootNode.getKey(), false));
@@ -273,7 +281,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	private void validateFolders(final List<String> folders, final String programUUID) {
-		if (CollectionUtils.isEmpty(folders)) {
+		if (isEmpty(folders)) {
 			this.errors.reject("list.folders.empty", "");
 		}
 		folders.forEach(nodeId -> this.validateNodeId(nodeId.toUpperCase(), programUUID, ListNodeType.PARENT, true));
@@ -368,16 +376,22 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.germplasmListService.create(request, status, programUUID, loggedInUser);
 	}
 
+	@Override
+	public void importUpdates(final GermplasmListGeneratorDTO request) {
+		this.processEntriesForUpdate(request);
+		this.germplasmListService.importUpdates(request);
+	}
+
 	private void processEntries(final GermplasmListGeneratorDTO request, final String currentProgram) {
 
 		// resolve/validate composite and entries
 
 		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite = request.getSearchComposite();
-		checkArgument(!CollectionUtils.isEmpty(request.getEntries()) || searchComposite != null && searchComposite.isValid(),
+		checkArgument(!isEmpty(request.getEntries()) || searchComposite != null && searchComposite.isValid(),
 			"error.germplasmlist.save.entries.or.composite");
 
-		if (CollectionUtils.isEmpty(request.getEntries())) {
-			if (!CollectionUtils.isEmpty(searchComposite.getItemIds())) {
+		if (isEmpty(request.getEntries())) {
+			if (!isEmpty(searchComposite.getItemIds())) {
 				request.setEntries(searchComposite.getItemIds().stream().map(gid -> {
 					final GermplasmListGeneratorDTO.GermplasmEntryDTO entryDTO = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
 					entryDTO.setGid(gid);
@@ -397,13 +411,17 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		// process entries
 
-		final List<Integer> gids = request.getEntries()
-			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
+		final List<Integer> gids = request.getEntries().stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+		checkArgument(!gids.isEmpty(), "error.germplasmlist.save.gid");
 		final Map<Integer, Germplasm> germplasmMap = this.germplasmDataManager.getGermplasms(gids)
 			.stream().collect(toMap(Germplasm::getGid, identity()));
 		final Map<Integer, String> crossExpansions =
 			this.pedigreeService.getCrossExpansionsBulk(new HashSet<>(gids), null, this.crossExpansionProperties);
 		final Map<Integer, String> plotCodeValuesByGIDs = this.germplasmService.getPlotCodeValues(new HashSet<>(gids));
+
+		final Map<Integer, Variable> entryDetailVariablesById = this.extractVariableIds(request);
 
 		int entryNo = 1;
 		boolean hasEntryNo = false;
@@ -451,6 +469,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			} else {
 				hasGroupName = true;
 			}
+
+			this.processEntryDetails(entry.getData(), entryDetailVariablesById);
 		}
 		if (hasEntryNo && entryNo > 1) {
 			throw new ApiValidationException("", "error.germplasmlist.save.entryno.gaps");
@@ -465,6 +485,61 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiValidationException("", "error.germplasmlist.save.gaps", GROUP_NAME);
 		}
 
+	}
+
+	private void processEntriesForUpdate(final GermplasmListGeneratorDTO request) {
+
+		BaseValidator.checkNotNull(request.getId(), "error.germplasmlist.importupdates.listid.mandatory");
+
+		final Map<Integer, Variable> entryDetailVariablesById = this.extractVariableIds(request);
+
+		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
+			if (entry.getEntryNo() == null) {
+				throw new ApiValidationException("", "error.germplasmlist.importupdates.entryno.mandatory");
+			}
+
+			this.processEntryDetails(entry.getData(), entryDetailVariablesById);
+		}
+	}
+
+	private Map<Integer, Variable> extractVariableIds(final GermplasmListGeneratorDTO request) {
+		final List<Integer> entryDetailVariableIds = request.getEntries().stream()
+			.flatMap(germplasmEntryDTO -> germplasmEntryDTO.getData().keySet().stream())
+			.collect(Collectors.toList());
+
+		final VariableFilter filter = new VariableFilter();
+		entryDetailVariableIds.forEach(filter::addVariableId);
+		return !isEmpty(entryDetailVariableIds)
+			? this.ontologyVariableService.getVariablesWithFilterById(filter)
+			.entrySet().stream().collect(toMap(entry -> entry.getValue().getId(), Map.Entry::getValue))
+			: Collections.emptyMap();
+	}
+
+	private void processEntryDetails(
+		final Map<Integer, GermplasmListObservationDto> data,
+		final Map<Integer, Variable> entryDetailVariablesById
+	) {
+		// complete variable info based on request
+		for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : data.entrySet()) {
+
+			final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
+			final Variable variable = entryDetailVariablesById.get(entryDetailSet.getKey());
+			BaseValidator.checkNotNull(variable, "germplasm.list.variable.does.not.exist");
+			final String value = entryDetail.getValue();
+			this.validateVariableDataTypeValue(variable, value);
+
+			entryDetail.setVariableId(variable.getId());
+			entryDetail.setcValueId(VariableValueUtil.resolveCategoricalValueId(variable, value));
+		}
+	}
+
+	private void validateVariableDataTypeValue(final Variable variable, final String value) {
+		if (!VariableValueUtil.isValidAttributeValue(variable, value)) {
+			throw new ApiRequestValidationException("invalid.variable.value.with.param", new String[] {
+				"variable: " + variable.getName() + ", value: " + value
+			});
+		}
+		checkArgument(value.length() <= 255, "text.field.max.length", new String[] {"entry detail value", "255"});
 	}
 
 	@Override
@@ -500,7 +575,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (!CollectionUtils.isEmpty(searchComposite.getItemIds())) {
+		if (!isEmpty(searchComposite.getItemIds())) {
 			this.germplasmValidator.validateGids(this.errors, new ArrayList<>(searchComposite.getItemIds()));
 		}
 
