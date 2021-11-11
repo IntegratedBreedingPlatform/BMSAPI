@@ -138,47 +138,47 @@ public class LocationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
 		this.validateExistingLocationId(locationId);
-		this.validateLocationBelongsToGermplasms(locationId);
-		this.validateLocationBelongsToLots(locationId);
-		this.validateLocationBelongsToAttributes(locationId);
-		this.validateLocationBelongsToNames(locationId);
-		this.validateLocationBelongsToStudies(locationId);
+		this.validateLocationBelongsToGermplasm(locationId);
+		this.validateLocationBelongsToLot(locationId);
+		this.validateLocationBelongsToAttribute(locationId);
+		this.validateLocationBelongsToName(locationId);
+		this.validateLocationBelongsToStudy(locationId);
 	}
 
-	private void validateLocationBelongsToLots(final Integer locationId) {
-		final boolean isLocationUsedInLots = this.lotService.isLocationIdUsedInLots(locationId);
+	private void validateLocationBelongsToLot(final Integer locationId) {
+		final boolean isLocationUsedInLots = this.lotService.isLocationIdUsedInLot(locationId);
 		if (isLocationUsedInLots) {
 			this.errors.reject("location.is.used.in.lots", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateLocationBelongsToNames(final Integer locationId) {
-		final boolean isLocationUsedInNames = this.germplasmNameService.isLocationIdUsedInGermplasmNames(locationId);
+	private void validateLocationBelongsToName(final Integer locationId) {
+		final boolean isLocationUsedInNames = this.germplasmNameService.isLocationIdUsedInGermplasmName(locationId);
 		if (isLocationUsedInNames) {
 			this.errors.reject("location.is.used.in.names", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateLocationBelongsToAttributes(final Integer locationId) {
-		final boolean isLocationUsedInAttributes = this.germplasmAttributeService.isLocationIdUsedInAttributes(locationId);
+	private void validateLocationBelongsToAttribute(final Integer locationId) {
+		final boolean isLocationUsedInAttributes = this.germplasmAttributeService.isLocationIdUsedInAttribute(locationId);
 		if (isLocationUsedInAttributes) {
 			this.errors.reject("location.is.used.in.attributes", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateLocationBelongsToGermplasms(final Integer locationId) {
-		final boolean isLocationUsedInGermplasm = this.germplasmService.isLocationIdUsedInGermplasms(locationId);
+	private void validateLocationBelongsToGermplasm(final Integer locationId) {
+		final boolean isLocationUsedInGermplasm = this.germplasmService.isLocationIdUsedInGermplasm(locationId);
 		if (isLocationUsedInGermplasm) {
 			this.errors.reject("location.is.used.in.germplasms", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateLocationBelongsToStudies(final Integer locationId) {
-		final boolean isLocationUsedInStudies = this.studyService.isLocationIdUsedInStudies(locationId);
+	private void validateLocationBelongsToStudy(final Integer locationId) {
+		final boolean isLocationUsedInStudies = this.studyService.isLocationIdUsedInStudy(locationId);
 		if (isLocationUsedInStudies) {
 			this.errors.reject("location.is.used.in.studies", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
