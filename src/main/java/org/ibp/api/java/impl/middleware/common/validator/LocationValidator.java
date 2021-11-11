@@ -2,10 +2,14 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
@@ -103,8 +107,36 @@ public class LocationValidator {
 		}
 	}
 
+	public void validate(final Integer locationId, final LocationRequestDto locationRequestDto) {
+		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
+
+		if (locationId != null) {
+			this.validateExistingLocationId(locationId);
+		}
+
+		this.validateLocationType(locationId, locationRequestDto.getType());
+		this.validateLocationAbbr(locationId, locationRequestDto.getAbbreviation());
+
+		if (locationRequestDto.getCountryId() != null) {
+			final LocationDTO province = this.locationService.getLocation(locationRequestDto.getCountryId());
+			if (province == null) {
+				this.errors.reject("location.province.invalid", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
+
+		if (locationRequestDto.getProvinceId() != null) {
+			final LocationDTO country = this.locationService.getLocation(locationRequestDto.getProvinceId());
+			if (country == null) {
+				this.errors.reject("location.country.invalid", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
+	}
+
 	public void validateCanBeDeleted(final Integer locationId) {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
 		this.validateExistingLocationId(locationId);
 		this.validateLocationBelongsToGermplasms(locationId);
 		this.validateLocationBelongsToLots(locationId);
@@ -157,4 +189,41 @@ public class LocationValidator {
 		this.validateLocation(this.errors, locationId);
 	}
 
+	private void validateLocationAbbr(final Integer locationId, final String locationAbbr) {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationAbbreviations(Arrays.asList(locationAbbr));
+		final List<org.generationcp.middleware.api.location.Location> locationList =
+			this.locationService.getLocations(locationSearchRequest, null);
+
+		if (locationId != null && !locationList.isEmpty()) {
+			final List<String> locationAbbrIds = locationList.stream() //
+				.map(org.generationcp.middleware.api.location.Location::getLocationDbId) //
+				.collect(Collectors.toList());
+			locationAbbrIds.removeAll(Arrays.asList(locationId.toString()));
+			if (!locationAbbrIds.isEmpty()) {
+				this.errors.reject("location.abbr.is.in.used", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+
+		} else if (!locationList.isEmpty()) {
+			this.errors.reject("location.abbr.is.in.used", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateLocationType(final Integer locationId, final Integer locationTypeId) {
+		if (locationId == null) {
+			if (locationTypeId == null) {
+				this.errors.reject("location.type.is.required", "");
+			}
+
+			final List<LocationTypeDTO> locationTypeDTOS = this.locationService.getLocationTypes();
+			final List<LocationTypeDTO> locationTypeDTO =
+				locationTypeDTOS.stream().filter(locType -> locType.getId().equals(locationTypeId)).collect(Collectors.toList());
+			if (Collections.isEmpty(locationTypeDTO)) {
+				this.errors.reject("location.type.invalid", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
+	}
 }

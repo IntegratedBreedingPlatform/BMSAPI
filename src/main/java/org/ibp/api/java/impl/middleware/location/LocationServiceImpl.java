@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.location;
 
 import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.ibp.api.domain.location.LocationDto;
@@ -65,6 +66,19 @@ public class LocationServiceImpl implements LocationService {
 	public void deleteLocation(final Integer locationId) {
 		this.locationValidator.validateCanBeDeleted(locationId);
 		this.locationMiddlewareService.deleteLocation(locationId);
+	}
+
+	@Override
+	public Integer createLocation(final LocationRequestDto locationRequestDto) {
+		this.locationValidator.validate(null, locationRequestDto);
+		return this.locationMiddlewareService.createLocation(locationRequestDto);
+	}
+
+	@Override
+	public boolean updateLocation(final Integer locationId, final LocationRequestDto locationRequestDto) {
+		this.locationValidator.validate(locationId, locationRequestDto);
+		this.locationMiddlewareService.updateLocation(locationId, locationRequestDto);
+		return true;
 	}
 
 }
