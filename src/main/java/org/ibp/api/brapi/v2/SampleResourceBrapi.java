@@ -53,7 +53,7 @@ public class SampleResourceBrapi {
 		@ApiParam(value = "the internal DB id for a sample")
 		@RequestParam(value = "sampleDbId", required = false) final String sampleDbId,
 		@ApiParam(value = "the internal DB id for an observation unit where a sample was taken from")
-		@RequestParam(value = "observationUnitDbId", required = false) final String observationUnitDbIds,
+		@RequestParam(value = "observationUnitDbId", required = false) final String observationUnitDbId,
 		@ApiParam(value = "the internal DB id for a plate of samples")
 		@RequestParam(value = "plateDbId", required = false) final String plateDbId,
 		@ApiParam(value = "the internal DB id for a germplasm")
@@ -69,7 +69,7 @@ public class SampleResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
-		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO(sampleDbId, observationUnitDbIds, plateDbId,
+		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO(sampleDbId, observationUnitDbId, plateDbId,
 			germplasmDbId, studyDbId, externalReferenceID, externalReferenceSource);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
