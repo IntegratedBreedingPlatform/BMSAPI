@@ -85,15 +85,14 @@ public class LocationValidatorTest {
 	@Before
 	public void setup() {
 		this.lotGeneratorInputDto = new LotGeneratorInputDto();
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 	}
 
 	@Test
 	public void testValidateNullLocationId() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
-		final Integer locationId = null;
 		this.lotGeneratorInputDto.setGid(GID);
-		this.lotGeneratorInputDto.setLocationId(locationId);
+		this.lotGeneratorInputDto.setLocationId(null);
 		this.lotGeneratorInputDto.setGenerateStock(false);
 
 		this.lotGeneratorInputDto.setUnitId(UNIT_ID);
@@ -102,9 +101,9 @@ public class LocationValidatorTest {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 
-		this.locationValidator.validateSeedLocationId(this.errors, locationId);
+		this.locationValidator.validateSeedLocationId(this.errors, null);
 
-		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
+		Assert.assertEquals(1, this.errors.getAllErrors().size());
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("location.required"));
 	}
@@ -124,7 +123,7 @@ public class LocationValidatorTest {
 		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(null);
 		this.locationValidator.validateSeedLocationId(this.errors, LocationValidatorTest.LOCATION_ID);
 
-		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
+		Assert.assertEquals(1, this.errors.getAllErrors().size());
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("location.invalid"));
 	}
@@ -147,7 +146,7 @@ public class LocationValidatorTest {
 			.thenReturn(Lists.newArrayList());
 		this.locationValidator.validateSeedLocationId(this.errors, LocationValidatorTest.LOCATION_ID);
 
-		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
+		Assert.assertEquals(1, this.errors.getAllErrors().size());
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("seed.location.invalid"));
 	}
@@ -171,7 +170,7 @@ public class LocationValidatorTest {
 			.thenReturn(locationList);
 		this.locationValidator.validateSeedLocationId(this.errors, LocationValidatorTest.LOCATION_ID);
 
-		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
+		Assert.assertEquals(0, this.errors.getAllErrors().size());
 	}
 
 	@Test
@@ -187,7 +186,7 @@ public class LocationValidatorTest {
 			.thenReturn(locationList);
 		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
 
-		Assert.assertEquals(this.errors.getAllErrors().size(), 0);
+		Assert.assertEquals(0, this.errors.getAllErrors().size());
 	}
 
 	@Test
@@ -201,7 +200,7 @@ public class LocationValidatorTest {
 			.thenReturn(locationList);
 		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
 
-		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
+		Assert.assertEquals(1, this.errors.getAllErrors().size());
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("lot.input.invalid.abbreviations"));
 
@@ -216,7 +215,7 @@ public class LocationValidatorTest {
 
 		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
 
-		Assert.assertEquals(this.errors.getAllErrors().size(), 1);
+		Assert.assertEquals(1, this.errors.getAllErrors().size());
 		final ObjectError objectError = this.errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("lot.input.list.location.null.or.empty"));
 	}
