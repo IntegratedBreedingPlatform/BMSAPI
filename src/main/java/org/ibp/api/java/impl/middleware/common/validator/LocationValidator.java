@@ -146,7 +146,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationBelongsToLot(final Integer locationId) {
-		final boolean isLocationUsedInLots = this.lotService.isLocationIdUsedInLot(locationId);
+		final boolean isLocationUsedInLots = this.lotService.isLocationUsedInLot(locationId);
 		if (isLocationUsedInLots) {
 			this.errors.reject("location.is.used.in.lots", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -154,7 +154,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationBelongsToName(final Integer locationId) {
-		final boolean isLocationUsedInNames = this.germplasmNameService.isLocationIdUsedInGermplasmName(locationId);
+		final boolean isLocationUsedInNames = this.germplasmNameService.isLocationUsedInGermplasmName(locationId);
 		if (isLocationUsedInNames) {
 			this.errors.reject("location.is.used.in.names", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -162,7 +162,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationBelongsToAttribute(final Integer locationId) {
-		final boolean isLocationUsedInAttributes = this.germplasmAttributeService.isLocationIdUsedInAttribute(locationId);
+		final boolean isLocationUsedInAttributes = this.germplasmAttributeService.isLocationUsedInAttribute(locationId);
 		if (isLocationUsedInAttributes) {
 			this.errors.reject("location.is.used.in.attributes", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -170,7 +170,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationBelongsToGermplasm(final Integer locationId) {
-		final boolean isLocationUsedInGermplasm = this.germplasmService.isLocationIdUsedInGermplasm(locationId);
+		final boolean isLocationUsedInGermplasm = this.germplasmService.isLocationUsedInGermplasm(locationId);
 		if (isLocationUsedInGermplasm) {
 			this.errors.reject("location.is.used.in.germplasms", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -178,7 +178,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationBelongsToStudy(final Integer locationId) {
-		final boolean isLocationUsedInStudies = this.studyService.isLocationIdUsedInStudy(locationId);
+		final boolean isLocationUsedInStudies = this.studyService.isLocationUsedInStudy(locationId);
 		if (isLocationUsedInStudies) {
 			this.errors.reject("location.is.used.in.studies", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());

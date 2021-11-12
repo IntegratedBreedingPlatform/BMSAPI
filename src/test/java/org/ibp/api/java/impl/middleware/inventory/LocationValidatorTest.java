@@ -269,7 +269,7 @@ public class LocationValidatorTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateCanBeDeleted_ThrowsException_WhenLocationBelongsToGermplasm() {
 		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
-		Mockito.when(this.germplasmService.isLocationIdUsedInGermplasm(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
+		Mockito.when(this.germplasmService.isLocationUsedInGermplasm(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
 
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
@@ -282,7 +282,7 @@ public class LocationValidatorTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateCanBeDeleted_ThrowsException_WhenLocationBelongsToLot() {
 		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
-		Mockito.when(this.lotService.isLocationIdUsedInLot(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
+		Mockito.when(this.lotService.isLocationUsedInLot(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
 
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
@@ -295,7 +295,7 @@ public class LocationValidatorTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateCanBeDeleted_ThrowsException_WhenLocationBelongsToAttribute() {
 		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
-		Mockito.when(this.germplasmAttributeService.isLocationIdUsedInAttribute(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
+		Mockito.when(this.germplasmAttributeService.isLocationUsedInAttribute(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
 
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
@@ -308,7 +308,7 @@ public class LocationValidatorTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateCanBeDeleted_ThrowsException_WhenLocationBelongsToName() {
 		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
-		Mockito.when(this.germplasmNameService.isLocationIdUsedInGermplasmName(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
+		Mockito.when(this.germplasmNameService.isLocationUsedInGermplasmName(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
 
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
@@ -321,7 +321,7 @@ public class LocationValidatorTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateCanBeDeleted_ThrowsException_WhenLocationBelongsToStudy() {
 		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
-		Mockito.when(this.studyService.isLocationIdUsedInStudy(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
+		Mockito.when(this.studyService.isLocationUsedInStudy(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
 
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
