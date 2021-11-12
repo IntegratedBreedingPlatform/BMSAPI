@@ -257,7 +257,7 @@ public class GermplasmImportRequestValidator {
 
 		return
 			this.locationService
-				.getFilteredLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null, false),
+				.getFilteredLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null),
 					null)
 				.stream().map(
 				Location::getLabbr).collect(

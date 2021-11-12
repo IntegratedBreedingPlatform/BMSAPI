@@ -6,7 +6,6 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.LocationService;
-import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.hamcrest.CoreMatchers;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Assert;
@@ -17,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.Optional;

@@ -139,7 +139,8 @@ public class PresetDTOValidator {
 	private static boolean isValidToolSection(final String toolSection) {
 		return ToolSection.DATASET_LABEL_PRINTING_PRESET.name().equals(toolSection)
 			|| ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(toolSection)
-			|| ToolSection.GERMPLASM_LABEL_PRINTING_PRESET.name().equals(toolSection);
+			|| ToolSection.GERMPLASM_LABEL_PRINTING_PRESET.name().equals(toolSection)
+			|| ToolSection.GERMPLASM_LIST_LABEL_PRINTING_PRESET.name().equals(toolSection);
 	}
 
 	private void validateLabelPrintingPreset(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO) {
@@ -212,7 +213,8 @@ public class PresetDTOValidator {
 
 	private boolean isValidateFieldId(final LabelPrintingPresetDTO labelPrintingPresetDTO) {
 		return !ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection())
-			&& !ToolSection.GERMPLASM_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection());
+			&& !ToolSection.GERMPLASM_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection())
+			&& !ToolSection.GERMPLASM_LIST_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection());
 	}
 
 }

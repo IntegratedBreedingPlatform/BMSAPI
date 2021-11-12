@@ -1,31 +1,107 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.constant.AppConstants;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ApiValidationException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
+import java.util.List;
+
+import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
+import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
 
 @Component
 public class GermplasmListValidator {
 
+	public static final int NAME_MAX_LENGTH = 50;
+
 	private BindingResult errors;
+
+	@Autowired
+	private GermplasmListService germplasmListService;
 
 	@Autowired
 	private GermplasmListManager germplasmListManager;
 
-	public void validateGermplasmList(final Integer germplasmListId) {
+	public GermplasmList validateGermplasmList(final Integer germplasmListId) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmListValidator.class.getName());
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-
-		if (germplasmListId != null && this.germplasmListManager.getGermplasmListById(germplasmListId) == null) {
-			errors.reject("list.germplasm.does.not.exist", "");
+		if (!Util.isPositiveInteger(String.valueOf(germplasmListId))) {
+			this.errors.reject("list.id.invalid", new String[] {String.valueOf(germplasmListId)}, "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 
-		if (this.errors.hasErrors()) {
+		return this.germplasmListService.getGermplasmListById(germplasmListId)
+			.orElseThrow(() -> {
+				this.errors.reject("list.id.invalid", new String[] {germplasmListId.toString()}, "");
+				return new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+			});
+	}
+
+	public void validateFolderName(final String folderName) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmListValidator.class.getName());
+
+		if (StringUtils.isEmpty(folderName)) {
+			this.errors.reject("list.folder.empty", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (folderName.length() > NAME_MAX_LENGTH) {
+			this.errors.reject("list.folder.name.too.long", new Object[] { NAME_MAX_LENGTH }, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validateListName(final String currentProgram, final String name) {
+		checkNotNull(name, "param.null", new String[] {"name"});
+		checkArgument(name.length() <= NAME_MAX_LENGTH, "text.field.max.length", new String[] {"name", "50"});
+		if (AppConstants.CROP_LISTS.getString().equals(name)) {
+			throw new ApiValidationException("", "error.list.name.invalid", AppConstants.CROP_LISTS.getString());
+		}
+		if (AppConstants.PROGRAM_LISTS.getString().equals(name)) {
+			throw new ApiValidationException("", "error.list.name.invalid", AppConstants.PROGRAM_LISTS.getString());
+		}
+		final List<GermplasmList>
+			germplasmListByName = this.germplasmListManager.getGermplasmListByName(name, currentProgram, 0, 1, Operation.EQUAL);
+		if (!germplasmListByName.isEmpty()) {
+			throw new ApiValidationException("", "error.list.name.exists");
+		}
+	}
+
+	public void validateNotSameFolderNameInParent(final String folderName, final Integer parent, final String programUUID) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmListValidator.class.getName());
+
+		this.germplasmListService.getGermplasmListByParentAndName(folderName, parent, programUUID)
+			.ifPresent(germplasmList -> {
+				this.errors.reject("list.folder.name.exists", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			});
+	}
+
+	public void validateListIsNotAFolder(final GermplasmList germplasmList) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
+		if (germplasmList.isFolder()) {
+			this.errors.reject("list.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+	}
+
+	public void validateListIsUnlocked(final GermplasmList germplasmList) {
+		if (germplasmList.isLockedList()) {
+			this.errors.reject("list.locked", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

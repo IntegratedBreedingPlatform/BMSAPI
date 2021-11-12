@@ -242,7 +242,6 @@ public class ProgramServiceImpl implements ProgramService {
 	public void deleteProgram(final String programUUID) {
 		this.studyService.deleteProgramStudies(programUUID);
 		this.programFavoriteService.deleteAllProgramFavorites(programUUID);
-		this.locationService.deleteProgramLocations(programUUID);
 		this.germplasmListService.deleteProgramGermplasmLists(programUUID);
 		this.programService.deleteProgramAndDependencies(programUUID);
 	}

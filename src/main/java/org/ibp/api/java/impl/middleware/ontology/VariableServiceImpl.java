@@ -18,7 +18,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
@@ -56,13 +55,14 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	private static final String ERROR_MESSAGE = "Error!";
 	private static final List<VariableType> EDITABLE_VARIABLES_TYPES = Arrays
 		.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.ENVIRONMENT_CONDITION, VariableType.GERMPLASM_ATTRIBUTE,
-			VariableType.GERMPLASM_PASSPORT);
+			VariableType.GERMPLASM_PASSPORT, VariableType.ENTRY_DETAIL);
 	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
 		VariableType.TRAIT.getId(), //
 		VariableType.SELECTION_METHOD.getId(), //
 		VariableType.ENVIRONMENT_CONDITION.getId(), //
 		VariableType.GERMPLASM_ATTRIBUTE.getId(), //
-		VariableType.GERMPLASM_PASSPORT.getId());
+		VariableType.GERMPLASM_PASSPORT.getId(),
+		VariableType.ENTRY_DETAIL.getId());
 
 	private static final List<String> NOT_EDITABLE_AND_DELETABLE_VARIABLES =
 		Arrays.asList("PLOT_NUMBER_AP_text", "INSTANCE_NUMBER_AP_text", "REP_NUMBER_AP_text", "PLANT_NUMBER_AP_text", "PLOT_CODE_AP_text");
@@ -112,6 +112,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			if (property != null) {
 				middlewareVariableFilter.addPropertyId(property);
 			}
+
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
 			final List<VariableDetails> variableDetailsList = new ArrayList<>();
 
@@ -547,36 +548,6 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			variableDetailsList.add(variableSummary);
 		}
 		return variableDetailsList;
-	}
-
-	@Override
-	public long countVariablesByDatasetId(final int datasetId, final List<Integer> variableTypes) {
-		return this.ontologyVariableDataManager.countVariablesByDatasetId(datasetId, variableTypes);
-	}
-
-	@Override
-	public List<VariableDTO> getVariablesByDatasetId(final int datasetId, final String cropname, final List<Integer> variableTypes,
-		final int pageSize, final int pageNumber) {
-		final List<VariableDTO> variableDTOs = this.ontologyVariableDataManager.getVariablesByDatasetId(datasetId, variableTypes, pageSize, pageNumber);
-		for (final VariableDTO variableDTO : variableDTOs) {
-			variableDTO.setCrop(cropname);
-		}
-		return variableDTOs;
-	}
-
-	@Override
-	public long countAllVariables(final List<Integer> variableTypes) {
-		return this.ontologyVariableDataManager.countAllVariables(variableTypes);
-	}
-
-	@Override
-	public List<VariableDTO> getAllVariables(final String cropname, final List<Integer> variableTypes, final int pageSize,
-		final int pageNumber) {
-		final List<VariableDTO> variableDTOs = this.ontologyVariableDataManager.getAllVariables(variableTypes, cropname, pageSize, pageNumber);
-		for (final VariableDTO variableDTO : variableDTOs) {
-			variableDTO.setCrop(cropname);
-		}
-		return variableDTOs;
 	}
 
 	@Override

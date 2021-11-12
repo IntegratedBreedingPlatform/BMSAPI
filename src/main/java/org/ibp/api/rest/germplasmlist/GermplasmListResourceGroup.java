@@ -6,19 +6,36 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListReorderEntriesRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.SearchDto;
+import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.germplasm.GermplasmListService;
+import org.ibp.api.java.germplasm.GermplasmListTemplateExportService;
+import org.ibp.api.java.impl.middleware.germplasm.ReorderEntriesLock;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.ibp.api.rest.common.UserTreeState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
@@ -34,18 +51,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.io.File;
 import java.util.List;
 
 @Api(value = "Germplasm List Services")
 @Controller
-public class
-GermplasmListResourceGroup {
+public class GermplasmListResourceGroup {
 
 	@Autowired
 	public GermplasmListService germplasmListService;
 
 	@Autowired
+	public GermplasmListDataService germplasmListDataService;
+
+	@Autowired
+	public GermplasmListTemplateExportService germplasmListTemplateExportService;
+
+	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private ReorderEntriesLock reorderEntriesLock;
 
 	@ApiOperation(value = "Get germplasm lists given a tree parent node folder", notes = "Get germplasm lists given a tree parent node folder")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + PermissionsEnum.HAS_INVENTORY_VIEW)
@@ -63,7 +92,7 @@ GermplasmListResourceGroup {
 	@ApiOperation(value = "Create a new Germplasm list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.POST)
 	// TODO The Permissions will be change after implement IBP-4570 (New list manager)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'LISTS', 'GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'IMPORT_GERMPLASM_LISTS')")
 	@ResponseBody
 	public ResponseEntity<GermplasmListGeneratorDTO> create(
 		@ApiParam(required = true) @PathVariable final String crop,
@@ -71,6 +100,20 @@ GermplasmListResourceGroup {
 		@RequestBody final GermplasmListGeneratorDTO request
 	) {
 		return new ResponseEntity<>(this.germplasmListService.create(request), HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Import Germplasm list updates")
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.PATCH)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'IMPORT_GERMPLASM_LIST_UPDATES')")
+	@ResponseBody
+	public ResponseEntity<Void> importUpdates(
+		@ApiParam(required = true) @PathVariable final String crop,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListGeneratorDTO request
+	) {
+		// TODO see if we can use a subset of the fields of GermplasmListGeneratorDTO
+		this.germplasmListService.importUpdates(request);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@ApiOperation(value = "Get germplasm lists types", notes = "Get germplasm lists types")
@@ -206,6 +249,159 @@ GermplasmListResourceGroup {
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@RequestBody final UserTreeState treeState) {
 		this.germplasmListService.saveGermplasmListTreeState(crop, programUUID, treeState);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation("Search germplasm lists")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/search", method = RequestMethod.POST)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. ")
+	})
+	@ResponseBody
+	public ResponseEntity<List<GermplasmListSearchResponse>> searchGermplasmLists(
+		@PathVariable final String cropName,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListSearchRequest request,
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+		return new PaginatedSearch().getPagedResult(() -> this.germplasmListService.countSearchGermplasmList(request, programUUID),
+			() -> this.germplasmListService.searchGermplasmList(request, pageable, programUUID),
+			pageable);
+	}
+
+	@ApiOperation(value = "Post germplasm list data search", notes = "Post germplasm list data search")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/search", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasmListData(
+		@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListDataSearchRequest request) {
+
+		final String searchRequestId =
+			this.searchRequestService.saveSearchRequest(request, GermplasmListDataSearchRequest.class).toString();
+		final SearchDto searchDto = new SearchDto(searchRequestId);
+		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse<>(searchDto);
+
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Returns a germplasm list data by a given germplasm list id")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/search", method = RequestMethod.GET)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. ")
+	})
+	@ResponseBody
+	public ResponseEntity<List<GermplasmListDataSearchResponse>> searchGermplasmListData(
+		@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@RequestParam final Integer searchRequestId,
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+
+		final GermplasmListDataSearchRequest request = (GermplasmListDataSearchRequest) this.searchRequestService
+			.getSearchRequest(searchRequestId, GermplasmListDataSearchRequest.class);
+
+		return new PaginatedSearch().getPagedResult(() -> this.germplasmListDataService.countSearchGermplasmListData(listId, request),
+			() -> this.germplasmListDataService.searchGermplasmListData(listId, request, pageable),
+			pageable);
+	}
+
+	@ApiOperation(value = "Returns a list by a given list id")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<GermplasmListDto> getGermplasmListById(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmListService.getGermplasmListById(listId), HttpStatus.OK);
+	}
+
+	@ApiIgnore
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/toggle-status", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Boolean> toggleGermplasmListStatus(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmListService.toggleGermplasmListStatus(listId), HttpStatus.OK);
+	}
+
+	@ApiIgnore
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/columns", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmListColumnDTO>> getGermplasmListColumns(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmListDataService.getGermplasmListColumns(listId, programUUID), HttpStatus.OK);
+	}
+
+	@ApiIgnore
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/table/columns", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmListMeasurementVariableDTO>> getGermplasmListDataTableHeader(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmListDataService.getGermplasmListDataTableHeader(listId, programUUID), HttpStatus.OK);
+	}
+
+
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/templates/xls/{isGermplasmListUpdateFormat}", method = RequestMethod.GET)
+	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
+		@PathVariable final boolean isGermplasmListUpdateFormat,
+		@RequestParam(required = false) final String programUUID) {
+
+		final File file =
+			this.germplasmListTemplateExportService.export(cropName, programUUID, isGermplasmListUpdateFormat);
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(file.getName())));
+		final FileSystemResource fileSystemResource = new FileSystemResource(file);
+		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+	}
+
+	@ApiIgnore
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/view", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<Void> updateGermplasmListDataView(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final List<GermplasmListDataUpdateViewDTO> view) {
+		this.germplasmListDataService.updateGermplasmListDataView(listId, view);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Reorder the selected entries to a given position or at the end of list.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'REORDER_ENTRIES_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/entries/reorder", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<Void> reorderEntries(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody GermplasmListReorderEntriesRequest request) {
+
+		try {
+			this.reorderEntriesLock.lockWrite();
+			this.germplasmListDataService.reOrderEntries(listId, request);
+		} finally {
+			this.reorderEntriesLock.unlockWrite();
+		}
+
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

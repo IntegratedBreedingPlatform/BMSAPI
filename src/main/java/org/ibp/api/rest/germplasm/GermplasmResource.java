@@ -255,8 +255,8 @@ public class GermplasmResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get a list of germplasm given a set of germplasmUUIDs and names")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM')")
+	@ApiOperation(value = "Get a list of germplasm given a set of germplasmPUIs, germplasmUUIDs, gids and names")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'LISTS', 'MANAGE_GERMPLASM_LISTS', 'IMPORT_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/matches", method = RequestMethod.POST)
 	@ResponseBody
 	@ApiImplicitParams({
@@ -378,7 +378,7 @@ public class GermplasmResource {
 		@PathVariable final Integer gid,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
-		final boolean updateExecuted = this.germplasmService.updateGermplasmBasicDetails(programUUID, gid, germplasmBasicDetailsDto);
+		final boolean updateExecuted = this.germplasmService.updateGermplasmBasicDetails(gid, germplasmBasicDetailsDto);
 		return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
 	}
 

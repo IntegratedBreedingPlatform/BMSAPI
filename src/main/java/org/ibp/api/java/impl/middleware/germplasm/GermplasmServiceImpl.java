@@ -336,11 +336,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public boolean updateGermplasmBasicDetails(final String programUUID, final Integer gid,
-		final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
+	public boolean updateGermplasmBasicDetails(final Integer gid, final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(this.errors, Collections.singletonList(gid));
-		this.germplasmBasicDetailsValidator.validate(programUUID, germplasmBasicDetailsDto);
+		this.germplasmBasicDetailsValidator.validate(germplasmBasicDetailsDto);
 		if (germplasmBasicDetailsDto.allAttributesNull()) {
 			return false;
 		}

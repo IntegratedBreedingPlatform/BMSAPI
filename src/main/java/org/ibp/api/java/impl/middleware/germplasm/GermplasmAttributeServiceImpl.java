@@ -53,7 +53,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.attributeValidator.validateAttribute(errors, gid, dto, null);
-		this.locationValidator.validateLocation(errors, dto.getLocationId(), programUUID);
+		this.locationValidator.validateLocation(errors, dto.getLocationId());
 		this.germplasmAttributeService.createGermplasmAttribute(gid, dto);
 		return dto;
 	}
@@ -63,7 +63,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.attributeValidator.validateAttribute(errors, gid, dto, attributeId);
-		this.locationValidator.validateLocation(errors, dto.getLocationId(), programUUID);
+		this.locationValidator.validateLocation(errors, dto.getLocationId());
 		this.germplasmAttributeService.updateGermplasmAttribute(attributeId, dto);
 		return dto;
 	}

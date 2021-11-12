@@ -101,31 +101,6 @@ public class ProgramFavoriteValidatorTest {
 	}
 
 	@Test
-	public void testValidateAddFavorites_ThrowsException_WhenLocationIdDoNotBelongToProgram(){
-		final Location location = new Location();
-		location.setProgramUUID(RandomStringUtils.randomAlphabetic(20));
-		location.setLocid(this.LOCATION_ID);
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), ProgramFavoriteRequestDto.class.getName());
-		errors.reject("location.belongs.to.another.program", "");
-		this.programFavoriteRequestDtos.setEntityIds(new HashSet<>(Arrays.asList(this.LOCATION_ID)));
-		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.LOCATION);
-
-		Mockito.when(this.locationDataManager.getLocationsByIDs(Mockito.any())).thenReturn(Arrays.asList(location));
-
-
-		Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors()))
-			.when(this.locationValidator).validateLocationBelongToProgram(
-				ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(this.PROGRAM_UUID), ArgumentMatchers.eq(location));
-
-		try {
-			this.programFavoriteValidator.validateAddFavorites(this.PROGRAM_UUID, this.programFavoriteRequestDtos);
-			Assert.fail("Should have thrown validation exception for location id not belong to the program but did not.");
-		} catch (final ApiRequestValidationException e) {
-			Assert.assertEquals("location.belongs.to.another.program", e.getErrors().get(0).getCode());
-		}
-	}
-
-	@Test
 	public void testValidateAddFavorites_ThrowsException_WhenVariableIdNotExists(){
 		this.programFavoriteRequestDtos.setEntityIds(new HashSet<>(Arrays.asList(RandomUtils.nextInt())));
 		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.VARIABLE);
