@@ -77,6 +77,11 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public boolean updateLocation(final Integer locationId, final LocationRequestDto locationRequestDto) {
 		this.locationValidator.validate(locationId, locationRequestDto);
+
+		if (locationRequestDto.allAttributesNull()) {
+			return false;
+		}
+
 		this.locationMiddlewareService.updateLocation(locationId, locationRequestDto);
 		return true;
 	}
