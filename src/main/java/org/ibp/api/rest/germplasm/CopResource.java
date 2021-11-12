@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -44,7 +45,7 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<Map<Integer, Map<Integer, Double>>> getCopMatrix(
 		@PathVariable final String cropName,
-		@RequestParam final List<Integer> gids
+		@RequestParam final Set<Integer> gids
 	) {
 		final Map<Integer, Map<Integer, Double>> results = this.copService.coefficientOfParentage(gids).rowMap();
 		return new ResponseEntity<>(results, HttpStatus.OK);
@@ -55,7 +56,7 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<FileSystemResource> getCopMatrixAsCsv(
 		@PathVariable final String cropName,
-		@RequestParam final List<Integer> gids
+		@RequestParam final Set<Integer> gids
 	) throws IOException {
 		final Table<Integer, Integer, Double> results = this.copService.coefficientOfParentage(gids);
 
