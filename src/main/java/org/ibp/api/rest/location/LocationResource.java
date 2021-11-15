@@ -134,7 +134,7 @@ public class LocationResource {
 		return new ResponseEntity<>(this.locationService.createLocation(locationRequestDto), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "update Location", notes = "update Location")
+	@ApiOperation(value = "Update Location", notes = "Update Location")
 	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.PATCH)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
 	@ResponseBody
@@ -145,7 +145,7 @@ public class LocationResource {
 		return new ResponseEntity<>((updateExecuted) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
 	}
 
-	@ApiOperation(value = "Delete location", notes = "Delete location")
+	@ApiOperation(value = "Delete Location", notes = "Delete Location")
 	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
 	@ResponseBody
