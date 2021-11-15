@@ -138,14 +138,14 @@ public class LocationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
 		this.validateExistingLocationId(locationId);
-		this.validateLocationBelongsToGermplasm(locationId);
-		this.validateLocationBelongsToLot(locationId);
-		this.validateLocationBelongsToAttribute(locationId);
-		this.validateLocationBelongsToName(locationId);
-		this.validateLocationBelongsToStudy(locationId);
+		this.validateLocationNotUsedInGermplasm(locationId);
+		this.validateLocationNotUsedInLot(locationId);
+		this.validateLocationNotUsedInAttribute(locationId);
+		this.validateLocationNotUsedInName(locationId);
+		this.validateLocationNotUsedInStudy(locationId);
 	}
 
-	private void validateLocationBelongsToLot(final Integer locationId) {
+	private void validateLocationNotUsedInLot(final Integer locationId) {
 		final boolean isLocationUsedInLots = this.lotService.isLocationUsedInLot(locationId);
 		if (isLocationUsedInLots) {
 			this.errors.reject("location.is.used.in.lots", new String[] {locationId.toString()}, "");
@@ -153,7 +153,7 @@ public class LocationValidator {
 		}
 	}
 
-	private void validateLocationBelongsToName(final Integer locationId) {
+	private void validateLocationNotUsedInName(final Integer locationId) {
 		final boolean isLocationUsedInNames = this.germplasmNameService.isLocationUsedInGermplasmName(locationId);
 		if (isLocationUsedInNames) {
 			this.errors.reject("location.is.used.in.names", "");
@@ -161,7 +161,7 @@ public class LocationValidator {
 		}
 	}
 
-	private void validateLocationBelongsToAttribute(final Integer locationId) {
+	private void validateLocationNotUsedInAttribute(final Integer locationId) {
 		final boolean isLocationUsedInAttributes = this.germplasmAttributeService.isLocationUsedInAttribute(locationId);
 		if (isLocationUsedInAttributes) {
 			this.errors.reject("location.is.used.in.attributes", "");
@@ -169,7 +169,7 @@ public class LocationValidator {
 		}
 	}
 
-	private void validateLocationBelongsToGermplasm(final Integer locationId) {
+	private void validateLocationNotUsedInGermplasm(final Integer locationId) {
 		final boolean isLocationUsedInGermplasm = this.germplasmService.isLocationUsedInGermplasm(locationId);
 		if (isLocationUsedInGermplasm) {
 			this.errors.reject("location.is.used.in.germplasms", "");
@@ -177,7 +177,7 @@ public class LocationValidator {
 		}
 	}
 
-	private void validateLocationBelongsToStudy(final Integer locationId) {
+	private void validateLocationNotUsedInStudy(final Integer locationId) {
 		final boolean isLocationUsedInStudies = this.studyService.isLocationUsedInStudy(locationId);
 		if (isLocationUsedInStudies) {
 			this.errors.reject("location.is.used.in.studies", "");
