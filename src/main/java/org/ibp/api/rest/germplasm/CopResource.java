@@ -51,6 +51,18 @@ public class CopResource {
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
+	@ApiOperation("Get coefficient of parentage as 2d array")
+	@RequestMapping(value = "/cop/array", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<String[]>> getCopMatrixAs2DArray(
+		@PathVariable final String cropName,
+		@RequestParam final Set<Integer> gids
+	) {
+		final Table<Integer, Integer, Double> results = this.copService.coefficientOfParentage(gids);
+		final List<String[]> array = this.convertTableToCsv(results);
+		return new ResponseEntity<>(array, HttpStatus.OK);
+	}
+
 	@ApiOperation("Get coefficient of parentage as csv")
 	@RequestMapping(value = "/cop/csv", method = RequestMethod.GET)
 	@ResponseBody
@@ -77,38 +89,41 @@ public class CopResource {
 			new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')
 		) {
 			final File newFile = new File(fileNameFullPath);
-			final List<String[]> rowValues = new ArrayList<>();
-
-			final List<String> header = new ArrayList<>();
-			header.add("");
-			header.addAll(results.columnKeySet().stream().map(Object::toString).collect(toList()));
-			rowValues.add(header.toArray(new String[] {}));
-
-			int offset = 0;
-			for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : results.rowMap().entrySet()) {
-				final List<String> row = new ArrayList<>();
-				row.add(rowEntrySet.getKey().toString());
-
-				/*
-				 * x x x x x x
-				 *   x x x x x
-				 *     x x x x
-				 *       x x x
-				 *         x x
-				 *           x
-				 * TODO improve
-				 */
-				IntStream.range(0, offset).forEach(i -> row.add(""));
-				offset++;
-
-				row.addAll(rowEntrySet.getValue().values().stream().map(Object::toString).collect(toList()));
-				rowValues.add(row.toArray(new String[] {}));
-			}
-
+			final List<String[]> rowValues = this.convertTableToCsv(results);
 			csvWriter.writeAll(rowValues);
 			return newFile;
 		}
 
+	}
+
+	private List<String[]> convertTableToCsv(final Table<Integer, Integer, Double> results) {
+		final List<String[]> rowValues = new ArrayList<>();
+
+		final List<String> header = new ArrayList<>();
+		header.add("");
+		header.addAll(results.columnKeySet().stream().map(Object::toString).collect(toList()));
+		rowValues.add(header.toArray(new String[] {}));
+
+		int offset = 0;
+		for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : results.rowMap().entrySet()) {
+			final List<String> row = new ArrayList<>();
+			row.add(rowEntrySet.getKey().toString());
+
+			/*
+			 * x x x x x x
+			 *   x x x x x
+			 *     x x x x
+			 *       x x x
+			 *         x x
+			 *           x
+			 */
+			IntStream.range(0, offset).forEach(i -> row.add(""));
+			offset++;
+
+			row.addAll(rowEntrySet.getValue().values().stream().map(Object::toString).collect(toList()));
+			rowValues.add(row.toArray(new String[] {}));
+		}
+		return rowValues;
 	}
 
 }
