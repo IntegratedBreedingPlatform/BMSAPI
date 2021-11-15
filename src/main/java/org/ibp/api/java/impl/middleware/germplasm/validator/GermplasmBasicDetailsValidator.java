@@ -25,15 +25,15 @@ public class GermplasmBasicDetailsValidator {
 	@Autowired
 	private LocationService locationService;
 
-	public void validate(final String programUUID, final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
+	public void validate(final GermplasmBasicDetailsDto germplasmBasicDetailsDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmBasicDetailsDto.class.getName());
 		BaseValidator.checkNotNull(germplasmBasicDetailsDto, "germplasm.import.request.null");
 		if (germplasmBasicDetailsDto.getBreedingLocationId() != null) {
 			if (this.locationService
 				.getFilteredLocations(
-					new LocationSearchRequest(programUUID, null,
+					new LocationSearchRequest(null, null,
 						Collections.singletonList(germplasmBasicDetailsDto.getBreedingLocationId()), null,
-						null, false),
+						null),
 					null).isEmpty()) {
 				this.errors.reject("germplasm.update.breeding.location.invalid", "");
 			}

@@ -55,7 +55,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmNameRequestDto.class.getName());
 		this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, gid, nameId);
 		if (germplasmNameRequestDto.getLocationId() != null) {
-			this.locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
+			this.locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId());
 		}
 		this.germplasmNameService.updateName(germplasmNameRequestDto, gid, nameId);
 	}
@@ -64,7 +64,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	public Integer createName(final String programUUID, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmNameRequestDto.class.getName());
 		this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, gid, null);
-		this.locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId(), programUUID);
+		this.locationValidator.validateLocation(errors, germplasmNameRequestDto.getLocationId());
 		return this.germplasmNameService.createName(germplasmNameRequestDto, gid);
 	}
 

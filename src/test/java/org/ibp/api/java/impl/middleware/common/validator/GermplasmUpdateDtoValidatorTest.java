@@ -96,8 +96,8 @@ public class GermplasmUpdateDtoValidatorTest {
 			.thenReturn(Arrays.asList(new Germplasm(3), new Germplasm(4)));
 
 		when(this.locationService
-			.getFilteredLocations(new LocationSearchRequest(programUUID, null, null,
-				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null, false), null))
+			.getFilteredLocations(new LocationSearchRequest(null, null, null,
+				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null), null))
 			.thenReturn(Arrays.asList(location));
 
 		try {
@@ -170,24 +170,22 @@ public class GermplasmUpdateDtoValidatorTest {
 	@Test
 	public void testValidate_LocationAbbr() {
 
-		final String programUUID = RandomStringUtils.random(10);
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setLocationAbbreviation("AFG");
 
 		when(this.locationService
-			.getFilteredLocations(new LocationSearchRequest(programUUID, null, null,
-				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null, false), null))
+			.getFilteredLocations(new LocationSearchRequest(null, null, null,
+				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null), null))
 			.thenReturn(Arrays.asList(new Location()));
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);
-		this.germplasmUpdateDtoValidator.validateLocationAbbreviation(errors, programUUID, germplasmUpdateList);
+		this.germplasmUpdateDtoValidator.validateLocationAbbreviation(errors, germplasmUpdateList);
 		Mockito.verify(errors).reject("germplasm.update.invalid.location.abbreviation", new String[] {"AFG"}, "");
 	}
 
 	@Test
 	public void testValidate_BreedingMethod() {
-		final String programUUID = RandomStringUtils.random(10);
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setBreedingMethodAbbr("UAC");
 

@@ -54,6 +54,8 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.LocationServiceImpl;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
+import org.generationcp.middleware.api.ontology.OntologyVariableServiceImpl;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl;
 import org.generationcp.middleware.api.program.ProgramService;
@@ -279,6 +281,13 @@ public class MiddlewareFactory {
 	public TermDataManager getTermDataManager() {
 		return new TermDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyVariableService getOntologyVariableService() {
+		return new OntologyVariableServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)

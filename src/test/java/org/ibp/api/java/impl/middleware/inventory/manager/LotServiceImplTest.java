@@ -169,8 +169,7 @@ public class LotServiceImplTest {
             ArgumentMatchers.anySet());
         Mockito.doNothing().when(this.lotSplitValidator).validateSplitLot(PROGRAM_UUID, splitExtendedLotDto, newLotSplitDto, initialDeposit);
 
-        Mockito.doNothing().when(this.lotInputValidator).validate(ArgumentMatchers.eq(PROGRAM_UUID),
-            ArgumentMatchers.any(LotGeneratorInputDto.class));
+        Mockito.doNothing().when(this.lotInputValidator).validate(ArgumentMatchers.any(LotGeneratorInputDto.class));
 
         Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(new WorkbenchUser(USER_ID));
 

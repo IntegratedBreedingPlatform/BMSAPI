@@ -50,7 +50,7 @@ public interface GermplasmService {
 
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 
-	boolean updateGermplasmBasicDetails(String programUUID, Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
+	boolean updateGermplasmBasicDetails(Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
 
 	boolean updateGermplasmPedigree(final String programUUID, final Integer gid,
 		final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto);
