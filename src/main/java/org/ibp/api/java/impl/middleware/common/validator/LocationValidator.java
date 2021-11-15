@@ -148,7 +148,7 @@ public class LocationValidator {
 	private void validateLocationBelongsToLot(final Integer locationId) {
 		final boolean isLocationUsedInLots = this.lotService.isLocationUsedInLot(locationId);
 		if (isLocationUsedInLots) {
-			this.errors.reject("location.is.used.in.lots", "");
+			this.errors.reject("location.is.used.in.lots", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
