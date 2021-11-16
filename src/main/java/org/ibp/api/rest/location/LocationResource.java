@@ -129,7 +129,7 @@ public class LocationResource {
 	@RequestMapping(value = "/crops/{cropName}/locations", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
 	@ResponseBody
-	public ResponseEntity<Integer> createLocation(@PathVariable final String cropName,
+	public ResponseEntity<LocationDTO> createLocation(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID, @RequestBody final LocationRequestDto locationRequestDto) {
 		return new ResponseEntity<>(this.locationService.createLocation(locationRequestDto), HttpStatus.OK);
 	}
