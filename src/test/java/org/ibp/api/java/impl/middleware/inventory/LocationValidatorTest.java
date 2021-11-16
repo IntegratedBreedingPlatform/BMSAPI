@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
@@ -334,7 +335,7 @@ public class LocationValidatorTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidate_update_ThrowsException_WhenLocationIdIsInvalid() {
 		try {
-			this.locationValidator.validate(LocationValidatorTest.LOCATION_ID, new LocationRequestDto());
+			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, new LocationRequestDto());
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.invalid"));
 			throw e;
@@ -348,7 +349,7 @@ public class LocationValidatorTest {
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, 0);
 
 		try {
-			this.locationValidator.validate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
+			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.type.invalid"));
 			throw e;
@@ -366,7 +367,7 @@ public class LocationValidatorTest {
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, null);
 
 		try {
-			this.locationValidator.validate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
+			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.abbr.is.in.used"));
 			throw e;
@@ -374,12 +375,42 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
+	public void testValidate_update_ThrowsException_WhenProvinceIdIsInvalid() {
+		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
+
+		final LocationRequestDto locationRequestDto =
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, null);
+		locationRequestDto.setProvinceId(0);
+		try {
+			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.province.invalid"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidate_update_ThrowsException_WhenCountryIdIsInvalid() {
+		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
+
+		final LocationRequestDto locationRequestDto =
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, null);
+		locationRequestDto.setCountryId(0);
+
+		try {
+			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.country.invalid"));
+			throw e;
+		}
+	}
+	@Test(expected = ApiRequestValidationException.class)
 	public void testValidate_create_ThrowsException_WhenLocationTypeIsRequired() {
 		final LocationRequestDto locationRequestDto =
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, null);
 
 		try {
-			this.locationValidator.validate(null, locationRequestDto);
+			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.type.is.required"));
 			throw e;
@@ -392,7 +423,7 @@ public class LocationValidatorTest {
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, 0);
 
 		try {
-			this.locationValidator.validate(null, locationRequestDto);
+			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.type.invalid"));
 			throw e;
@@ -415,9 +446,53 @@ public class LocationValidatorTest {
 		Mockito.when(this.locationService.getLocations(Mockito.any(), Mockito.any())).thenReturn(listLocations);
 
 		try {
-			this.locationValidator.validate(null, locationRequestDto);
+			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.abbr.is.in.used"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidate_create_ThrowsException_WhenProvinceIdIsInvalid() {
+		final LocationRequestDto locationRequestDto =
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR,
+				LocationValidatorTest.LOCATION_TYPE);
+		locationRequestDto.setProvinceId(0);
+		final LocationTypeDTO locationTypeDTO = new LocationTypeDTO();
+		locationTypeDTO.setId(LocationValidatorTest.LOCATION_TYPE);
+
+		final List<LocationTypeDTO> locationTypeDTOS = Arrays.asList(new LocationTypeDTO());
+
+
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(Arrays.asList(locationTypeDTO));
+
+		try {
+			this.locationValidator.validateCreation(locationRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.province.invalid"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidate_create_ThrowsException_WhenCountryIdIsInvalid() {
+		final LocationRequestDto locationRequestDto =
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR,
+				LocationValidatorTest.LOCATION_TYPE);
+		locationRequestDto.setCountryId(0);
+		final LocationTypeDTO locationTypeDTO = new LocationTypeDTO();
+		locationTypeDTO.setId(LocationValidatorTest.LOCATION_TYPE);
+
+		final List<LocationTypeDTO> locationTypeDTOS = Arrays.asList(new LocationTypeDTO());
+
+
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(Arrays.asList(locationTypeDTO));
+
+		try {
+			this.locationValidator.validateCreation(locationRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.country.invalid"));
 			throw e;
 		}
 	}
@@ -435,7 +510,7 @@ public class LocationValidatorTest {
 		locationRequestDto.setCountryId(0);
 
 		try {
-			this.locationValidator.validate(null, locationRequestDto);
+			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.country.invalid"));
 			throw e;
@@ -455,7 +530,7 @@ public class LocationValidatorTest {
 		locationRequestDto.setProvinceId(0);
 
 		try {
-			this.locationValidator.validate(null, locationRequestDto);
+			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.province.invalid"));
 			throw e;
