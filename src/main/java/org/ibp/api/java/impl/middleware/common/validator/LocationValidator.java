@@ -107,13 +107,33 @@ public class LocationValidator {
 		}
 	}
 
-	public void validate(final Integer locationId, final LocationRequestDto locationRequestDto) {
+	public void validateCreation(final LocationRequestDto locationRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
 
-		if (locationId != null) {
-			this.validateExistingLocationId(locationId);
+		this.validateLocationType(locationRequestDto.getType());
+		this.validateLocationAbbr(locationRequestDto.getAbbreviation());
+
+		if (locationRequestDto.getProvinceId() != null) {
+			final LocationDTO province = this.locationService.getLocation(locationRequestDto.getProvinceId());
+			if (province == null) {
+				this.errors.reject("location.province.invalid", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
 		}
 
+		if (locationRequestDto.getCountryId() != null) {
+			final LocationDTO country = this.locationService.getLocation(locationRequestDto.getCountryId());
+			if (country == null) {
+				this.errors.reject("location.country.invalid", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
+	}
+
+	public void validateUpdate(final Integer locationId, final LocationRequestDto locationRequestDto) {
+		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
+
+		this.validateExistingLocationId(locationId);
 		this.validateLocationType(locationId, locationRequestDto.getType());
 		this.validateLocationAbbr(locationId, locationRequestDto.getAbbreviation());
 
@@ -196,28 +216,46 @@ public class LocationValidator {
 			this.locationService.getLocations(locationSearchRequest, null);
 
 		if (!locationList.isEmpty()) {
-			if (locationId != null) {
-				final List<String> locationAbbrIds = locationList.stream() //
-					.map(org.generationcp.middleware.api.location.Location::getLocationDbId) //
-					.collect(Collectors.toList());
-				locationAbbrIds.removeAll(Arrays.asList(locationId.toString()));
-				if (!locationAbbrIds.isEmpty()) {
-					this.errors.reject("location.abbr.is.in.used", "");
-					throw new ApiRequestValidationException(this.errors.getAllErrors());
-				}
-			} else {
+			final List<String> locationAbbrIds = locationList.stream() //
+				.map(org.generationcp.middleware.api.location.Location::getLocationDbId) //
+				.collect(Collectors.toList());
+			locationAbbrIds.removeAll(Arrays.asList(locationId.toString()));
+			if (!locationAbbrIds.isEmpty()) {
 				this.errors.reject("location.abbr.is.in.used", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
+	}
 
+	private void validateLocationAbbr(final String locationAbbr) {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationAbbreviations(Arrays.asList(locationAbbr));
+		final List<org.generationcp.middleware.api.location.Location> locationList =
+			this.locationService.getLocations(locationSearchRequest, null);
+
+		if (!locationList.isEmpty()) {
+			this.errors.reject("location.abbr.is.in.used", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateLocationType(final Integer locationTypeId) {
+		if (locationTypeId == null) {
+			this.errors.reject("location.type.is.required", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		final List<LocationTypeDTO> locationTypeDTOS = this.locationService.getLocationTypes();
+		final List<LocationTypeDTO> locationTypeDTO =
+			locationTypeDTOS.stream().filter(locType -> locType.getId().equals(locationTypeId)).collect(Collectors.toList());
+		if (Collections.isEmpty(locationTypeDTO)) {
+			this.errors.reject("location.type.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	private void validateLocationType(final Integer locationId, final Integer locationTypeId) {
-		if (locationId == null && locationTypeId == null) {
-			this.errors.reject("location.type.is.required", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		} else if (locationTypeId != null) {
+		if (locationTypeId != null) {
 			final List<LocationTypeDTO> locationTypeDTOS = this.locationService.getLocationTypes();
 			final List<LocationTypeDTO> locationTypeDTO =
 				locationTypeDTOS.stream().filter(locType -> locType.getId().equals(locationTypeId)).collect(Collectors.toList());
