@@ -90,7 +90,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test
-	public void testValidateNullLocationId() {
+	public void testValidateSeedLocationId_ThrowsException_WhenLocationIdIsRequired() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(null);
@@ -110,7 +110,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test
-	public void testValidateInvalidLocationId() {
+	public void testValidateSeedLocationId_ThrowsException_WhenLocationIdIsInvalid() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(LocationValidatorTest.LOCATION_ID);
@@ -130,7 +130,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test
-	public void testValidateInvalidSeedLocation() {
+	public void testValidateSeedLocationId_ThrowsException_WhenSeedLocationIdIsInvalid() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(LocationValidatorTest.LOCATION_ID);
@@ -153,7 +153,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test
-	public void testValidateValidSeedLocation() {
+	public void testValidateSeedLocationId_Success() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
 		this.lotGeneratorInputDto.setGid(GID);
 		this.lotGeneratorInputDto.setLocationId(LocationValidatorTest.LOCATION_ID);
@@ -175,7 +175,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test
-	public void testValidateValidSeedLocationAbbr() {
+	public void testValidateSeedLocationAbbr_Success() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
 		final Location location = new Location();
 		location.setLabbr("DSS");
@@ -191,7 +191,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test
-	public void testValidateInvalidSeedLocationAbbr() {
+	public void testValidateSeedLocationAbbr_ThrowsException_WhenLocationAbbrListHaveInvalidAbbreviations() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
 		final List<Location> locationList = Collections.emptyList();
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");
@@ -208,7 +208,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test
-	public void testValidateEmptySeedLocationAbbr() {
+	public void testValidateSeedLocationAbbr_ThrowsException_WhenLocationAbbrListIsNullorEmpty() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
 		final Location location = new Location();
 		location.setLabbr("DSS");
@@ -222,7 +222,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testvalidateRequiredLocation() {
+	public void testValidateLocation_ThrowsException_WhenLocationIdIsRequired() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
 
 		try {
@@ -234,7 +234,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testvalidateInvalidLocation() {
+	public void testValidateLocation_ThrowsException_WhenLocationIdIsInvalid() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
 
 		try {
