@@ -1,4 +1,4 @@
-package org.ibp.api.brapi.v2;
+package org.ibp.api.brapi.v2.sample;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
@@ -9,6 +9,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.sample.SampleObservationDto;
+import org.ibp.api.brapi.SampleServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -17,7 +18,6 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
-import org.ibp.api.brapi.SampleServiceBrapi;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,29 +72,7 @@ public class SampleResourceBrapi {
 		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO(sampleDbId, observationUnitDbId, plateDbId,
 			germplasmDbId, studyDbId, externalReferenceID, externalReferenceSource);
 
-		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
-		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
-		final PageRequest pageRequest = new PageRequest(finalPageNumber, finalPageSize);
-		final PagedResult<SampleObservationDto> resultPage =
-			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<SampleObservationDto>() {
-
-				@Override
-				public long getCount() {
-					return SampleResourceBrapi.this.sampleServiceBrapi.countSampleObservations(requestDTO);
-				}
-
-				@Override
-				public List<SampleObservationDto> getResults(final PagedResult<SampleObservationDto> pagedResult) {
-					return SampleResourceBrapi.this.sampleServiceBrapi.getSampleObservations(requestDTO, pageRequest);
-				}
-			});
-
-		final Result<SampleObservationDto> results = new Result<SampleObservationDto>().withData(resultPage.getPageResults());
-		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
-
-		final Metadata metadata = new Metadata().withPagination(pagination);
-		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
+		return new ResponseEntity<>(this.getSampleObservationDtoEntityListResponse(requestDTO, currentPage, pageSize), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Search samples", notes = "Submit a search request for samples")
@@ -136,8 +114,16 @@ public class SampleResourceBrapi {
 				HttpStatus.NOT_FOUND);
 		}
 
+		return new ResponseEntity<>(this.getSampleObservationDtoEntityListResponse(samplesSearchRequest,
+			currentPage, pageSize), HttpStatus.OK);
+
+	}
+
+	private EntityListResponse<SampleObservationDto> getSampleObservationDtoEntityListResponse(
+		final SampleSearchRequestDTO sampleSearchDTO,
+		final Integer currentPage, final Integer pageSize) {
 		final PagedResult<SampleObservationDto> resultPage =
-			this.getSamplesDtoPagedResult(samplesSearchRequest, currentPage,
+			this.getSamplesDtoPagedResult(sampleSearchDTO, currentPage,
 				pageSize);
 
 		final Result<SampleObservationDto> results = new Result<SampleObservationDto>().withData(resultPage.getPageResults());
@@ -147,9 +133,7 @@ public class SampleResourceBrapi {
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
 		final EntityListResponse<SampleObservationDto> entityListResponse = new EntityListResponse<>(metadata, results);
-
-		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
-
+		return entityListResponse;
 	}
 
 	private PagedResult<SampleObservationDto> getSamplesDtoPagedResult(
