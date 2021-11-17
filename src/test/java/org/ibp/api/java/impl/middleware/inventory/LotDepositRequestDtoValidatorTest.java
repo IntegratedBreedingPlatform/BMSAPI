@@ -68,7 +68,7 @@ public class LotDepositRequestDtoValidatorTest {
 			final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 			final SearchCompositeDto<Integer, String> searchCompositeDto = new SearchCompositeDto();
 			searchCompositeDto.setSearchRequest(1);
-			searchCompositeDto.setItemIds(new HashSet<>(Collections.singleton(RandomStringUtils.randomAlphabetic(38))));
+			searchCompositeDto.setItemIds(Collections.singletonList(RandomStringUtils.randomAlphabetic(38)));
 			lotDepositRequestDto.setSelectedLots(searchCompositeDto);
 			this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
 		} catch (final ApiRequestValidationException e) {

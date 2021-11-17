@@ -1103,7 +1103,7 @@ public class GermplasmListServiceImplTest {
 	public void testAddGermplasmEntriesToList_WithSelectedItems_OK() {
 		final Integer germplasmListId = new Random().nextInt(Integer.MAX_VALUE);
 		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite = Mockito.mock(SearchCompositeDto.class);
-		Mockito.when(searchComposite.getItemIds()).thenReturn(new HashSet<>(Collections.singletonList(new Random().nextInt())));
+		Mockito.when(searchComposite.getItemIds()).thenReturn(Collections.singletonList(new Random().nextInt()));
 
 		Mockito.doNothing().when(this.searchCompositeDtoValidator).validateSearchCompositeDto(
 			ArgumentMatchers.eq(searchComposite),

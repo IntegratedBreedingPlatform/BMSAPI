@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
@@ -121,7 +122,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotWithdrawalInputDto.getSelectedLots());
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotWithdrawalInputDto.getSelectedLots().getItemIds());
+		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, Sets.newHashSet(lotWithdrawalInputDto.getSelectedLots().getItemIds()));
 		this.extendedLotListValidator.validateEmptyList(lotDtos);
 		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
@@ -146,7 +147,7 @@ public class TransactionServiceImpl implements TransactionService {
 			Collectors.toSet());
 
 		this.transactionInputValidator.validateEmptyList(transactionDtos);
-		this.transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, searchCompositeDto.getItemIds());
+		this.transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, Sets.newHashSet(searchCompositeDto.getItemIds()));
 		this.transactionInputValidator.validatePendingStatus(transactionDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
 
@@ -182,7 +183,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotDepositRequestDto.getSelectedLots());
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
+		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, Sets.newHashSet(lotDepositRequestDto.getSelectedLots().getItemIds()));
 		this.extendedLotListValidator.validateEmptyList(lotDtos);
 		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
@@ -203,12 +204,12 @@ public class TransactionServiceImpl implements TransactionService {
 		this.lotDepositDtoValidator.validate(lotDepositDtos);
 
 		final SearchCompositeDto<Integer, String> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(lotDepositDtos.stream().map(LotDepositDto::getLotUID).collect(Collectors.toSet()));
+		searchCompositeDto.setItemIds(lotDepositDtos.stream().map(LotDepositDto::getLotUID).collect(Collectors.toList()));
 
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchCompositeDto);
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, searchCompositeDto.getItemIds());
+		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, Sets.newHashSet(searchCompositeDto.getItemIds()));
 		this.extendedLotListValidator.validateEmptyList(lotDtos);
 		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
@@ -233,7 +234,7 @@ public class TransactionServiceImpl implements TransactionService {
 			Collectors.toSet());
 
 		this.transactionInputValidator.validateEmptyList(transactionDtos);
-		this.transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, searchCompositeDto.getItemIds());
+		this.transactionInputValidator.validateAllProvidedTransactionsExists(transactionDtos, Sets.newHashSet(searchCompositeDto.getItemIds()));
 		this.transactionInputValidator.validatePendingStatus(transactionDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos.stream().collect(Collectors.toList()));
 
@@ -264,7 +265,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotAdjustmentRequestDto.getSelectedLots());
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotAdjustmentRequestDto.getSelectedLots().getItemIds());
+		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, Sets.newHashSet(lotAdjustmentRequestDto.getSelectedLots().getItemIds()));
 		this.extendedLotListValidator.validateEmptyList(lotDtos);
 		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos);

@@ -243,7 +243,7 @@ public class LotResource {
 			extendedLotDtos = this.lotService.searchLots(searchDTO, null);
 			if (lotRequest.getSingleInput().getSearchComposite().getSearchRequest() == null) {
 				this.extendedLotListValidator
-					.validateAllProvidedLotUUIDsExist(extendedLotDtos, lotRequest.getSingleInput().getSearchComposite().getItemIds());
+					.validateAllProvidedLotUUIDsExist(extendedLotDtos, Sets.newHashSet(lotRequest.getSingleInput().getSearchComposite().getItemIds()));
 			}
 		} else {
 			final List<String> lotUIDs =
@@ -318,7 +318,7 @@ public class LotResource {
 
 		if (searchCompositeDto.getSearchRequest() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchCompositeDto.getItemIds());
+			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, Sets.newHashSet(searchCompositeDto.getItemIds()));
 		}
 		try {
 			this.inventoryLock.lockRead();
@@ -343,7 +343,7 @@ public class LotResource {
 
 		if (searchCompositeDto.getSearchRequest() == null) {
 			final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchCompositeDto.getItemIds());
+			this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, Sets.newHashSet(searchCompositeDto.getItemIds()));
 		}
 		try {
 			this.inventoryLock.lockWrite();
@@ -401,7 +401,7 @@ public class LotResource {
 			final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(searchComposite);
 			if (searchComposite.getSearchRequest() == null) {
 				final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDTO, null);
-				this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, searchComposite.getItemIds());
+				this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(extendedLotDtos, Sets.newHashSet(searchComposite.getItemIds()));
 			}
 
 			this.lotService.mergeLots(lotMergeRequestDto.getLotUUIDToKeep(), searchDTO);

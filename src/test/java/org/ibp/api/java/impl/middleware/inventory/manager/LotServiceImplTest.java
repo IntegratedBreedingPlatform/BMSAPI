@@ -46,6 +46,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -280,9 +281,8 @@ public class LotServiceImplTest {
 
 	@Test
 	public void testCreateLots_ThrowsException_WhenSearchRequestIsNullAndItemsAreInvalid() {
-		final Set items = Sets.newSet(new Random().nextInt());
 		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
-		lotGeneratorBatchRequestDto.getSearchComposite().setItemIds(items);
+		lotGeneratorBatchRequestDto.getSearchComposite().setItemIds(Collections.singletonList(new Random().nextInt()));
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
 		errors.reject("gids.invalid", new String[] {}, "");

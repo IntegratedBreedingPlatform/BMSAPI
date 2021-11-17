@@ -63,7 +63,7 @@ public class LotWithdrawalInputDtoValidatorTest {
 			final LotWithdrawalInputDto lotWithdrawalInputDto = new LotWithdrawalInputDto();
 			final SearchCompositeDto<Integer, String> searchCompositeDto = new SearchCompositeDto();
 			searchCompositeDto.setSearchRequest(1);
-			searchCompositeDto.setItemIds(Collections.singleton(RandomStringUtils.randomAlphabetic(38)));
+			searchCompositeDto.setItemIds(Collections.singletonList(RandomStringUtils.randomAlphabetic(38)));
 			lotWithdrawalInputDto.setSelectedLots(searchCompositeDto);
 			this.lotWithdrawalInputDtoValidator.validate(lotWithdrawalInputDto);
 		} catch (final ApiRequestValidationException e) {

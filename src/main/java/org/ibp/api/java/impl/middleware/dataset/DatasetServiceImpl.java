@@ -957,7 +957,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (searchDTO.getItemIds() != null && !searchDTO.getItemIds().isEmpty()) {
 			final ObservationUnitsSearchDTO searchRequest = new ObservationUnitsSearchDTO();
 			final ObservationUnitsSearchDTO.Filter filter = searchRequest.new Filter();
-			filter.setFilteredNdExperimentIds(searchDTO.getItemIds());
+			filter.setFilteredNdExperimentIds(Sets.newHashSet(searchDTO.getItemIds()));
 			searchRequest.setFilter(filter);
 			searchDTO.setSearchRequest(searchRequest);
 		}

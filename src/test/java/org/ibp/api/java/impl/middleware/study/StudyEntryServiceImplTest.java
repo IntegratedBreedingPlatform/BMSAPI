@@ -137,7 +137,7 @@ public class StudyEntryServiceImplTest {
 		final StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto = new StudyEntryGeneratorRequestDto();
 		studyEntryGeneratorRequestDto.setEntryTypeId(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-		searchCompositeDto.setItemIds(new HashSet(gids));
+		searchCompositeDto.setItemIds(gids);
 		studyEntryGeneratorRequestDto.setSearchComposite(searchCompositeDto);
 
 		Mockito.when(this.searchRequestDtoResolver.resolveGidSearchDto(searchCompositeDto)).thenReturn(gids);
@@ -267,7 +267,7 @@ public class StudyEntryServiceImplTest {
 		final Integer entryId = this.random.nextInt();
 		final Integer variableId = this.random.nextInt();
 		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
-		searchCompositeDto.setItemIds(new HashSet(Collections.singletonList(entryId)));
+		searchCompositeDto.setItemIds(Collections.singletonList(entryId));
 		final StudyEntryPropertyBatchUpdateRequest requestDto = new StudyEntryPropertyBatchUpdateRequest( searchCompositeDto,
 			variableId, String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		this.studyEntryService.updateStudyEntriesProperty(studyId, requestDto);

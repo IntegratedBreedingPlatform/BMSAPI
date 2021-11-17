@@ -956,9 +956,8 @@ public class DatasetServiceImplTest {
 
 		final List<ObservationUnitRow> selectedRows =
 			Lists.newArrayList(observationUnitRow1, observationUnitRow2, observationUnitRow3, observationUnitRow4);
-		final Set<Integer> itemIds = Sets.newHashSet(obsUnitId1, obsUnitId2, obsUnitId3, obsUnitId4);
 		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(itemIds);
+		searchCompositeDto.setItemIds(Lists.newArrayList(obsUnitId1, obsUnitId2, obsUnitId3, obsUnitId4));
 
 		Mockito.when(this.middlewareDatasetService.getObservationUnitRows(eq(studyId), eq(datasetId), Mockito.any(), Mockito.any()))
 			.thenReturn(selectedRows);
@@ -975,9 +974,8 @@ public class DatasetServiceImplTest {
 		final int studyId = random.nextInt();
 		final int datasetId = random.nextInt();
 
-		final Set<Integer> itemIds = Sets.newHashSet(random.nextInt(), random.nextInt(), random.nextInt(), random.nextInt());
 		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(itemIds);
+		searchCompositeDto.setItemIds(Lists.newArrayList(random.nextInt(), random.nextInt(), random.nextInt(), random.nextInt()));
 
 		final ObservationUnitEntryReplaceRequest observationUnitEntryReplaceRequest = new ObservationUnitEntryReplaceRequest();
 		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
@@ -1008,9 +1006,8 @@ public class DatasetServiceImplTest {
 		observationUnitRow1.setEnvironmentVariables(new HashMap<>());
 		observationUnitRow1.setSamplesCount("6");
 
-		final Set<Integer> itemIds = Sets.newHashSet(obsUnitId1);
 		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(itemIds);
+		searchCompositeDto.setItemIds(Collections.singletonList(obsUnitId1));
 
 		final ObservationUnitEntryReplaceRequest observationUnitEntryReplaceRequest = new ObservationUnitEntryReplaceRequest();
 		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
@@ -1042,9 +1039,8 @@ public class DatasetServiceImplTest {
 		observationUnitRow1.setEnvironmentVariables(new HashMap<>());
 		observationUnitRow1.setSamplesCount("-");
 
-		final Set<Integer> itemIds = Sets.newHashSet(obsUnitId1);
 		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(itemIds);
+		searchCompositeDto.setItemIds(Collections.singletonList(obsUnitId1));
 
 		final ObservationUnitEntryReplaceRequest observationUnitEntryReplaceRequest = new ObservationUnitEntryReplaceRequest();
 		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);
@@ -1079,7 +1075,7 @@ public class DatasetServiceImplTest {
 
 		final List<Integer> itemIds = Lists.newArrayList(obsUnitId1);
 		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(Sets.newHashSet(itemIds));
+		searchCompositeDto.setItemIds(itemIds);
 
 		final ObservationUnitEntryReplaceRequest observationUnitEntryReplaceRequest = new ObservationUnitEntryReplaceRequest();
 		observationUnitEntryReplaceRequest.setSearchRequest(searchCompositeDto);

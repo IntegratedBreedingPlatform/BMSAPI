@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
@@ -115,7 +116,7 @@ public class TransactionServiceImplTest {
 		Mockito.verify(this.studyValidator, Mockito.times(0)).validate(ArgumentMatchers.anyInt(), ArgumentMatchers.anyBoolean());
 		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
 		Mockito.verify(this.extendedLotListValidator)
-			.validateAllProvidedLotUUIDsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
+			.validateAllProvidedLotUUIDsExist(lotDtos, Sets.newHashSet(lotDepositRequestDto.getSelectedLots().getItemIds()));
 		Mockito.verify(this.extendedLotListValidator).validateEmptyList(lotDtos);
 		Mockito.verify(this.extendedLotListValidator).validateEmptyUnits(lotDtos);
 		Mockito.verify(this.extendedLotListValidator).validateClosedLots(lotDtos);
@@ -146,7 +147,7 @@ public class TransactionServiceImplTest {
 		Mockito.verify(this.studyValidator).validate(lotDepositRequestDto.getSourceStudyId(), true);
 		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
 		Mockito.verify(this.extendedLotListValidator)
-			.validateAllProvidedLotUUIDsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
+			.validateAllProvidedLotUUIDsExist(lotDtos, Sets.newHashSet(lotDepositRequestDto.getSelectedLots().getItemIds()));
 		Mockito.verify(this.extendedLotListValidator).validateEmptyList(lotDtos);
 		Mockito.verify(this.extendedLotListValidator).validateEmptyUnits(lotDtos);
 		Mockito.verify(this.extendedLotListValidator).validateClosedLots(lotDtos);
