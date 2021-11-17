@@ -41,6 +41,8 @@ import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeService;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeServiceImpl;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopService;
+import org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceAsync;
+import org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceAsyncImpl;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceImpl;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
@@ -383,6 +385,19 @@ public class MiddlewareFactory {
 		return new HibernateSessionPerRequestProvider(this.getSessionFactory());
 	}
 
+	/**
+	 * Not bound to request, can be used in thread context (e.g async)
+	 */
+	@Bean
+	@Scope(value = "prototype")
+	public HibernateSessionPerRequestProvider getCropDatabaseSessionPrototypeProvider() {
+		/*
+		 * There is no much difference with HibernateSessionPerThreadProvider, perhaps it's not even needed anymore
+		 * TODO review HibernateSessionProvider classes
+		 */
+		return new HibernateSessionPerRequestProvider(this.getSessionFactory());
+	}
+
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public SampleService getSampleService() {
@@ -666,6 +681,11 @@ public class MiddlewareFactory {
 		return new CopServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public CopServiceAsync getCopServiceAsync() {
+		return new CopServiceAsyncImpl(this.getCropDatabaseSessionPrototypeProvider());
+	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
