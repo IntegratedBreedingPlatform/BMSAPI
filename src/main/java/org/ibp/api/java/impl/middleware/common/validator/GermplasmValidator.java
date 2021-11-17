@@ -40,8 +40,10 @@ public class GermplasmValidator {
 				existingGermplasms.stream().filter(g -> !g.getDeleted()).map(Germplasm::getGid).collect(Collectors.toList());
 			final List<Integer> invalidGids = new ArrayList<>(gids);
 			invalidGids.removeAll(existingGids);
-			errors.reject("gids.invalid", new String[] {Util.buildErrorMessageFromList(invalidGids, 3)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			if(!CollectionUtils.isEmpty(invalidGids)) {
+				errors.reject("gids.invalid", new String[] {Util.buildErrorMessageFromList(invalidGids, 3)}, "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
 		}
 	}
 	public void validateGermplasmUUID(final BindingResult errors, final String germplasmUUID) {
