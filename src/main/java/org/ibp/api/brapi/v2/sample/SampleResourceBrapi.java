@@ -132,8 +132,7 @@ public class SampleResourceBrapi {
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
-		final EntityListResponse<SampleObservationDto> entityListResponse = new EntityListResponse<>(metadata, results);
-		return entityListResponse;
+		return new EntityListResponse<>(metadata, results);
 	}
 
 	private PagedResult<SampleObservationDto> getSamplesDtoPagedResult(
