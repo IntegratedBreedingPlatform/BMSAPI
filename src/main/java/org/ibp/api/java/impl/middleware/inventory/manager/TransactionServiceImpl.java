@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -183,7 +184,9 @@ public class TransactionServiceImpl implements TransactionService {
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotDepositRequestDto.getSelectedLots());
 		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
 
-		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, Sets.newHashSet(lotDepositRequestDto.getSelectedLots().getItemIds()));
+		final Set<String> providedLotUUIDs = CollectionUtils.isEmpty(lotDepositRequestDto.getSelectedLots().getItemIds()) ? null :
+			Sets.newHashSet(lotDepositRequestDto.getSelectedLots().getItemIds());
+		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, providedLotUUIDs);
 		this.extendedLotListValidator.validateEmptyList(lotDtos);
 		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
