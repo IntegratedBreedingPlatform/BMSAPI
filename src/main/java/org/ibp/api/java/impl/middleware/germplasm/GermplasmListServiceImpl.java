@@ -580,7 +580,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		this.germplasmListService.addGermplasmEntriesToList(germplasmListId, searchComposite, programUUID);
-}
+	}
 
 	@Override
 	public Integer createGermplasmListFolder(final String cropName, final String programUUID, final String folderName,
@@ -729,6 +729,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		this.germplasmListService.deleteGermplasmListFolder(Integer.parseInt(folderId));
+	}
+
+	@Override
+	public void deleteGermplasmList(final String cropName, String programUUID, final Integer listId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateProgram(cropName, programUUID);
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+		this.germplasmListService.deleteGermplasmList(listId);
 	}
 
 	@Override

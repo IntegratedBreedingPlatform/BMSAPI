@@ -274,6 +274,19 @@ public class GermplasmListResourceGroup {
 			pageable);
 	}
 
+
+	@ApiOperation(value = "Delete germplasm list", notes = "Delete germplasm list.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'DELETE_GERMPLASM_LIST')")
+	@RequestMapping(value = "/crops/{crop}/germplasm-list/{listId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity deleteGermplasmList(
+		@PathVariable final String crop,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID) {
+		this.germplasmListService.deleteGermplasmList(crop, programUUID, listId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Post germplasm list data search", notes = "Post germplasm list data search")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/search", method = RequestMethod.POST)

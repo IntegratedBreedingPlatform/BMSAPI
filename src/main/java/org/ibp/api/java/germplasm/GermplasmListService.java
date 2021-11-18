@@ -49,6 +49,8 @@ public interface GermplasmListService {
 
 	void deleteGermplasmListFolder(String cropName, String programUUID, String folderId);
 
+	void deleteGermplasmList(String cropName, String programUUID, Integer listId);
+
 	GermplasmListDto getGermplasmListById(Integer listId);
 
 	List<GermplasmListDto> getGermplasmLists(Integer gid);
