@@ -115,8 +115,7 @@ public class TransactionServiceImplTest {
 
 		Mockito.verify(this.studyValidator, Mockito.times(0)).validate(ArgumentMatchers.anyInt(), ArgumentMatchers.anyBoolean());
 		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
-		Mockito.verify(this.extendedLotListValidator)
-			.validateAllProvidedLotUUIDsExist(lotDtos, Sets.newHashSet(lotDepositRequestDto.getSelectedLots().getItemIds()));
+		Mockito.verify(this.extendedLotListValidator).validateAllProvidedLotUUIDsExist(lotDtos, null);
 		Mockito.verify(this.extendedLotListValidator).validateEmptyList(lotDtos);
 		Mockito.verify(this.extendedLotListValidator).validateEmptyUnits(lotDtos);
 		Mockito.verify(this.extendedLotListValidator).validateClosedLots(lotDtos);
@@ -146,8 +145,7 @@ public class TransactionServiceImplTest {
 
 		Mockito.verify(this.studyValidator).validate(lotDepositRequestDto.getSourceStudyId(), true);
 		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
-		Mockito.verify(this.extendedLotListValidator)
-			.validateAllProvidedLotUUIDsExist(lotDtos, Sets.newHashSet(lotDepositRequestDto.getSelectedLots().getItemIds()));
+		Mockito.verify(this.extendedLotListValidator).validateAllProvidedLotUUIDsExist(lotDtos, null);
 		Mockito.verify(this.extendedLotListValidator).validateEmptyList(lotDtos);
 		Mockito.verify(this.extendedLotListValidator).validateEmptyUnits(lotDtos);
 		Mockito.verify(this.extendedLotListValidator).validateClosedLots(lotDtos);
