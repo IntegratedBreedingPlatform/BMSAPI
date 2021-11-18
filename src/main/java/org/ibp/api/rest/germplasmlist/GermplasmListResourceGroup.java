@@ -277,7 +277,7 @@ public class GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Delete germplasm list", notes = "Delete germplasm list.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'DELETE_GERMPLASM_LIST')")
-	@RequestMapping(value = "/crops/{crop}/germplasm-list/{listId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{listId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteGermplasmList(
 		@PathVariable final String crop,
