@@ -644,7 +644,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (StringUtils.isEmpty(newParentFolderId) || newParentFolderId.equals(CROP_LISTS)) {
+		if (StringUtils.isEmpty(newParentFolderId)) {
 			this.errors.reject("list.parent.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -657,7 +657,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.validateProgram(cropName, programUUID);
 
 		this.validateNodeId(newParentFolderId, programUUID, ListNodeType.PARENT, false);
-		this.validateNodeId(folderId, programUUID, ListNodeType.FOLDER, false);
+		this.validateNodeId(folderId,
+				(PROGRAM_LISTS.equals(newParentFolderId)) ? null : programUUID,
+				ListNodeType.FOLDER,
+				false);
 
 		final GermplasmList germplasmListToMove = this.germplasmListService.getGermplasmListById(Integer.parseInt(folderId))
 			.orElseThrow(() -> {
@@ -797,18 +800,23 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if ((PROGRAM_LISTS.equals(nodeId) && StringUtils.isEmpty(programUUID))) {
+		if (validateRequiredProgramUUID && PROGRAM_LISTS.equals(nodeId) && StringUtils.isEmpty(programUUID)) {
 			this.errors.reject("list.project.mandatory", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (Util.isPositiveInteger(nodeId)) {
-			final GermplasmList germplasmList =
-				this.germplasmListService.getGermplasmListByIdAndProgramUUID(Integer.parseInt(nodeId), programUUID)
-					.orElseThrow(() -> {
-						this.errors.reject("list." + nodeType.getValue() + ".id.not.exist", "");
-						return new ApiRequestValidationException(this.errors.getAllErrors());
-					});
+			final GermplasmList germplasmList;
+			if (programUUID == null) {
+				germplasmList = this.germplasmListValidator.validateGermplasmList(Integer.parseInt(nodeId));
+			} else {
+				germplasmList =
+						this.germplasmListService.getGermplasmListByIdAndProgramUUID(Integer.parseInt(nodeId), programUUID)
+								.orElseThrow(() -> {
+									this.errors.reject("list." + nodeType.getValue() + ".id.not.exist", "");
+									return new ApiRequestValidationException(this.errors.getAllErrors());
+								});
+			}
 
 			if (validateRequiredProgramUUID && !StringUtils.isEmpty(programUUID) && StringUtils.isEmpty(germplasmList.getProgramUUID())) {
 				this.errors.reject("list.project.mandatory", "");

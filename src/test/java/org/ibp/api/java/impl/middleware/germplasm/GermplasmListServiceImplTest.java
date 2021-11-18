@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -625,8 +626,6 @@ public class GermplasmListServiceImplTest {
 		Mockito.when(actualFolder.getName()).thenReturn(folderName);
 
 		Mockito.doNothing().when(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
-		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByIdAndProgramUUID(folderId, PROGRAM_UUID))
-			.thenReturn(Optional.of(actualFolder));
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(folderId))
 			.thenReturn(Optional.of(actualFolder));
 
@@ -644,7 +643,6 @@ public class GermplasmListServiceImplTest {
 		assertThat(germplasmListFolderId, is(folderId));
 
 		Mockito.verify(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
-		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListByIdAndProgramUUID(folderId, PROGRAM_UUID);
 		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListById(folderId);
 		Mockito.verify(this.germplasmListManager).getGermplasmListByParentFolderId(folderId, PROGRAM_UUID);
 		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListByParentAndName(folderName, null, PROGRAM_UUID);
@@ -713,23 +711,71 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test
-	public void shouldFailMoveGermplasmToListToCropList() {
+	public void shouldMoveGermplasmToListToCropList() {
+		final String folderName = "folderName";
 		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
 
-		try {
-			this.germplasmListService
-				.moveGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId), GermplasmListServiceImpl.CROP_LISTS);
-			fail("Should have failed");
-		} catch (final Exception e) {
-			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(
-				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
-				hasItem("list.parent.id.invalid"));
-		}
+		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.getParentId()).thenReturn(null);
+		Mockito.when(actualFolder.getName()).thenReturn(folderName);
+
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByIdAndProgramUUID(folderId, null))
+				.thenReturn(Optional.of(actualFolder));
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(folderId))
+				.thenReturn(Optional.of(actualFolder));
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByParentAndName(folderName, null, null))
+				.thenReturn(Optional.empty());
+		Mockito.when(this.germplasmListServiceMiddleware.moveGermplasmListFolder(folderId, null, null))
+				.thenReturn(folderId);
+
+		final Integer actualFolderId = this.germplasmListService
+				.moveGermplasmListFolder(CROP, null, String.valueOf(folderId), GermplasmListServiceImpl.CROP_LISTS);
+		assertThat(actualFolderId, is(folderId));
 
 		Mockito.verifyNoInteractions(this.programValidator);
-		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
-		Mockito.verifyNoInteractions(this.germplasmListManager);
+
+		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListById(folderId);
+		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListByParentAndName(folderName, null, null);
+		Mockito.verify(this.germplasmListServiceMiddleware).moveGermplasmListFolder(folderId, null, null);
+		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
+
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(folderId);
+		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
+	}
+
+	@Test
+	public void shouldMoveGermplasmToListFromCropListToProgramList() {
+		final String folderName = "folderName";
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.getParentId()).thenReturn(null);
+		Mockito.when(actualFolder.getName()).thenReturn(folderName);
+
+		Mockito.doNothing().when(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByIdAndProgramUUID(folderId, null))
+				.thenReturn(Optional.of(actualFolder));
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(folderId))
+				.thenReturn(Optional.of(actualFolder));
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByParentAndName(folderName, null, null))
+				.thenReturn(Optional.empty());
+		Mockito.when(this.germplasmListServiceMiddleware.moveGermplasmListFolder(folderId, null, PROGRAM_UUID))
+				.thenReturn(folderId);
+
+		final Integer actualFolderId = this.germplasmListService
+				.moveGermplasmListFolder(CROP, PROGRAM_UUID, String.valueOf(folderId), GermplasmListServiceImpl.PROGRAM_LISTS);
+		assertThat(actualFolderId, is(folderId));
+
+		Mockito.verify(this.programValidator).validate(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.verifyNoMoreInteractions(this.programValidator);
+
+		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListById(folderId);
+		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListByParentAndName(folderName, null, PROGRAM_UUID);
+		Mockito.verify(this.germplasmListServiceMiddleware).moveGermplasmListFolder(folderId, null, PROGRAM_UUID);
+		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
+
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(folderId);
+		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
 	}
 
 	@Test
