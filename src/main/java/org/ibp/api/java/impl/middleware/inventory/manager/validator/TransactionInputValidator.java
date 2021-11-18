@@ -1,10 +1,12 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -34,9 +36,9 @@ public class TransactionInputValidator {
 		}
 	}
 
-	public void validateAllProvidedTransactionsExists(final List<TransactionDto> transactionDtos, final Set<Integer> transactionIds) {
+	public void validateAllProvidedTransactionsExists(final List<TransactionDto> transactionDtos, final List<Integer> transactionIds) {
 		errors = new MapBindingResult(new HashMap<String, String>(), TransactionDto.class.getName());
-		if (transactionIds != null && !transactionIds.isEmpty() && transactionDtos.size() != transactionIds.size()) {
+		if (!CollectionUtils.isEmpty(transactionIds) && transactionDtos.size() != Sets.newHashSet(transactionIds).size()) {
 			final List<Integer> existentTransactionIds =
 				transactionDtos.stream().map(TransactionDto::getTransactionId).collect(Collectors.toList());
 			final List<Integer> invalidTransactionIds = new ArrayList<>(transactionIds);

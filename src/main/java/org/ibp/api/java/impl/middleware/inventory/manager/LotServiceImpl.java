@@ -282,7 +282,7 @@ public class LotServiceImpl implements LotService {
 		final LotsSearchDto splitLotSearchDto = new LotsSearchDto();
 		splitLotSearchDto.setLotUUIDs(lotUUIDs);
 		final List<ExtendedLotDto> splitLotDtosSearchResult = this.searchLots(splitLotSearchDto, null);
-		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(splitLotDtosSearchResult, new HashSet<>(lotUUIDs));
+		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(splitLotDtosSearchResult, lotUUIDs);
 
 		final ExtendedLotDto splitLotDto = splitLotDtosSearchResult.get(0);
 		final LotSplitRequestDto.InitialLotDepositDto initialDeposit = lotSplitRequestDto.getInitialDeposit();

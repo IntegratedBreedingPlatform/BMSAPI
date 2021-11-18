@@ -167,7 +167,7 @@ public class LotServiceImplTest {
 
         final ExtendedLotDto splitExtendedLotDto = ExtendedLotDtoDummyFactory.create(lotActualBalance);
         Mockito.doNothing().when(this.extendedLotListValidator).validateAllProvidedLotUUIDsExist(ArgumentMatchers.anyList(),
-            ArgumentMatchers.anySet());
+            ArgumentMatchers.anyList());
         Mockito.doNothing().when(this.lotSplitValidator).validateSplitLot(PROGRAM_UUID, splitExtendedLotDto, newLotSplitDto, initialDeposit);
 
         Mockito.doNothing().when(this.lotInputValidator).validate(ArgumentMatchers.any(LotGeneratorInputDto.class));

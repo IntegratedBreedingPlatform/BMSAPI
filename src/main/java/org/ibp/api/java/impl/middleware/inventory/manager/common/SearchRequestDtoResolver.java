@@ -31,7 +31,7 @@ public class SearchRequestDtoResolver {
 				(LotsSearchDto) this.searchRequestService.getSearchRequest(searchCompositeDto.getSearchRequest(), LotsSearchDto.class);
 		} else {
 			searchDTO = new LotsSearchDto();
-			searchDTO.setLotUUIDs(new ArrayList<>(searchCompositeDto.getItemIds()));
+			searchDTO.setLotUUIDs(searchCompositeDto.getItemIds());
 		}
 		return searchDTO;
 	}
@@ -44,7 +44,7 @@ public class SearchRequestDtoResolver {
 					.getSearchRequest(searchCompositeDto.getSearchRequest(), TransactionsSearchDto.class);
 		} else {
 			transactionsSearchDto = new TransactionsSearchDto();
-			transactionsSearchDto.setTransactionIds(new ArrayList<>(searchCompositeDto.getItemIds()));
+			transactionsSearchDto.setTransactionIds(searchCompositeDto.getItemIds());
 		}
 		return transactionsSearchDto;
 	}
@@ -55,7 +55,7 @@ public class SearchRequestDtoResolver {
 				(GidSearchDto) this.searchRequestService.getSearchRequest(searchCompositeDto.getSearchRequest(), GidSearchDto.class);
 			return searchRequest.getGids();
 		} else if (!Util.isNullOrEmpty(searchCompositeDto.getItemIds())) {
-			return new ArrayList<>(searchCompositeDto.getItemIds());
+			return searchCompositeDto.getItemIds();
 		}
 		return Collections.EMPTY_LIST;
 	}

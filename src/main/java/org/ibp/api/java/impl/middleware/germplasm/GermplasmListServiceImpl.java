@@ -576,7 +576,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		if (!isEmpty(searchComposite.getItemIds())) {
-			this.germplasmValidator.validateGids(this.errors, new ArrayList<>(searchComposite.getItemIds()));
+			this.germplasmValidator.validateGids(this.errors, searchComposite.getItemIds());
 		}
 
 		this.germplasmListService.addGermplasmEntriesToList(germplasmListId, searchComposite, programUUID);

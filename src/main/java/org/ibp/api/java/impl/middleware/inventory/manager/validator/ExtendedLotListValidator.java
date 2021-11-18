@@ -1,9 +1,11 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -48,9 +50,9 @@ public class ExtendedLotListValidator {
 		}
 	}
 
-	public void validateAllProvidedLotUUIDsExist(final List<ExtendedLotDto> extendedLotDtos, final Set<String> lotUUIDs) {
+	public void validateAllProvidedLotUUIDsExist(final List<ExtendedLotDto> extendedLotDtos, final List<String> lotUUIDs) {
 		errors = new MapBindingResult(new HashMap<String, String>(), ExtendedLotDto.class.getName());
-		if (lotUUIDs != null && !lotUUIDs.isEmpty() && lotUUIDs.size() != extendedLotDtos.size()) {
+		if (!CollectionUtils.isEmpty(lotUUIDs) && Sets.newHashSet(lotUUIDs).size() != extendedLotDtos.size()) {
 			errors.reject("lots.does.not.exist", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}

@@ -273,8 +273,8 @@ public class StudyEntryServiceImplTest {
 		this.studyEntryService.updateStudyEntriesProperty(studyId, requestDto);
 
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.studyEntryValidator).validateStudyContainsEntries(studyId, new ArrayList<>(searchCompositeDto.getItemIds()));
-		Mockito.verify(this.studyEntryValidator).validateStudyContainsEntries(studyId, new ArrayList<>(searchCompositeDto.getItemIds()));
+		Mockito.verify(this.studyEntryValidator).validateStudyContainsEntries(studyId, searchCompositeDto.getItemIds());
+		Mockito.verify(this.studyEntryValidator).validateStudyContainsEntries(studyId, searchCompositeDto.getItemIds());
 		Mockito.verify(this.termValidator).validate(variableId);
 		Mockito.verify(this.middlewareStudyEntryService).updateStudyEntriesProperty(requestDto);
 	}

@@ -185,7 +185,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final StudyEntryPropertyBatchUpdateRequest batchUpdateRequest) {
 		this.studyValidator.validate(studyId, true);
 		this.studyValidator.validateStudyShouldNotHaveObservation(studyId);
-		this.studyEntryValidator.validateStudyContainsEntries(studyId, new ArrayList<>(batchUpdateRequest.getSearchComposite().getItemIds()));
+		this.studyEntryValidator.validateStudyContainsEntries(studyId, batchUpdateRequest.getSearchComposite().getItemIds());
 		this.termValidator.validate(batchUpdateRequest.getVariableId());
 		this.middlewareStudyEntryService.updateStudyEntriesProperty(batchUpdateRequest);
 	}
