@@ -779,7 +779,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void deleteGermplasmList(final String cropName, String programUUID, final Integer listId) {
+	public void deleteGermplasmList(final String cropName, final String programUUID, final Integer listId) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateProgram(cropName, programUUID);
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);

@@ -174,12 +174,12 @@ public class GermplasmListResourceGroup {
 
 				@Override
 				public long getCount() {
-					return germplasmListService.countMyLists(programUUID, userId);
+					return GermplasmListResourceGroup.this.germplasmListService.countMyLists(programUUID, userId);
 				}
 
 				@Override
 				public List<MyListsDTO> getResults(final PagedResult<MyListsDTO> pagedResult) {
-					return germplasmListService.getMyLists(programUUID, pageable, userId);
+					return GermplasmListResourceGroup.this.germplasmListService.getMyLists(programUUID, pageable, userId);
 				}
 			});
 		final List<MyListsDTO> pageResults = result.getPageResults();
@@ -406,7 +406,7 @@ public class GermplasmListResourceGroup {
 	public ResponseEntity<Void> reorderEntries(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody GermplasmListReorderEntriesRequest request) {
+		@RequestBody final GermplasmListReorderEntriesRequest request) {
 
 		try {
 			this.reorderEntriesLock.lockWrite();
