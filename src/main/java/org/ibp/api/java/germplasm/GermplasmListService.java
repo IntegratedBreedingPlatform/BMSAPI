@@ -60,4 +60,6 @@ public interface GermplasmListService {
 	long countSearchGermplasmList(GermplasmListSearchRequest request, String programUUID);
 
 	boolean toggleGermplasmListStatus(Integer listId);
+
+	void deleteGermplasmList(String cropName, String programUUID, Integer listId);
 }

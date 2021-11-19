@@ -405,4 +405,15 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Delete germplasm list", notes = "Delete germplasm list.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'DELETE_GERMPLASM_LIST')")
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{listId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity deleteGermplasmList(
+		@PathVariable final String crop,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID) {
+		this.germplasmListService.deleteGermplasmList(crop, programUUID, listId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }
