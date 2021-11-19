@@ -1,11 +1,17 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.constant.AppConstants;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hamcrest.MatcherAssert;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,6 +22,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -29,6 +37,7 @@ public class GermplasmListValidatorTest {
 
 	private static final int LIST_ID = new Random().nextInt(Integer.MAX_VALUE);
 	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
+	private static final String GERMPLASM_LIST_TYPE = "LST";
 
 	@InjectMocks
 	private GermplasmListValidator germplasmListValidator;
@@ -42,6 +51,13 @@ public class GermplasmListValidatorTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.openMocks(this);
+
+		final UserDefinedField userDefinedField = new UserDefinedField();
+		userDefinedField.setFcode(GERMPLASM_LIST_TYPE);
+		userDefinedField.setFldno(new Random().nextInt());
+		userDefinedField.setFname("GERMPLASM LISTS");
+
+		Mockito.when(this.germplasmListManager.getGermplasmListTypes()).thenReturn(Collections.singletonList(userDefinedField));
 	}
 
 	@Test
@@ -167,9 +183,8 @@ public class GermplasmListValidatorTest {
 		try {
 			this.germplasmListValidator.validateNotSameFolderNameInParent(folderName, parentId, PROGRAM_UUID);
 			fail("Should have failed");
-		} catch (final Exception e) {
-			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+		} catch (final ApiRequestValidationException e) {
+			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("list.folder.name.exists"));
 		}
 
@@ -177,4 +192,260 @@ public class GermplasmListValidatorTest {
 		Mockito.verifyNoMoreInteractions(this.germplasmListService);
 	}
 
+	@Test
+	public void validateListMetadata_EmptyMetadataRequest() {
+		try {
+			this.germplasmListValidator.validateListMetadata(null, RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiRequestValidationException e) {
+			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("param.null"));
+			Assert.assertEquals(new String[] {"request"}, e.getErrors().get(0).getArguments());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_EmptyDate() {
+		try {
+			this.germplasmListValidator
+				.validateListMetadata(new GermplasmListMetadataRequest(), RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiRequestValidationException e) {
+			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("param.null"));
+			Assert.assertEquals(new String[] {"date"}, e.getErrors().get(0).getArguments());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_EmptyDescription() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			this.germplasmListValidator.validateListMetadata(request, RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiRequestValidationException e) {
+			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("param.null"));
+			Assert.assertEquals(new String[] {"description"}, e.getErrors().get(0).getArguments());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_DescriptionExceedsMaxLength() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			request.setDescription(RandomStringUtils.randomAlphabetic(260));
+			this.germplasmListValidator.validateListMetadata(request, RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiRequestValidationException e) {
+			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("text.field.max.length"));
+			Assert.assertEquals(new String[] {"description", "255"}, e.getErrors().get(0).getArguments());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_NotesExceedsMaxLength() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			request.setDescription(RandomStringUtils.randomAlphabetic(200));
+			request.setNotes(RandomStringUtils.randomAlphabetic(65536));
+			this.germplasmListValidator.validateListMetadata(request, RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiRequestValidationException e) {
+			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("text.field.max.length"));
+			Assert.assertEquals(new String[] {"notes", "65535"}, e.getErrors().get(0).getArguments());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_EmptyListType() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			request.setDescription(RandomStringUtils.randomAlphabetic(200));
+			this.germplasmListValidator.validateListMetadata(request, RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiRequestValidationException e) {
+			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("param.null"));
+			Assert.assertEquals(new String[] {"type"}, e.getErrors().get(0).getArguments());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_InvalidListType() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			request.setDescription(RandomStringUtils.randomAlphabetic(200));
+			request.setType(RandomStringUtils.random(12));
+
+			this.germplasmListValidator.validateListMetadata(request, RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiValidationException e) {
+			Assert.assertEquals("error.germplasmlist.save.type.not.exists", e.getErrorCode());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_EmptyName() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			request.setDescription(RandomStringUtils.randomAlphabetic(200));
+			request.setType(GERMPLASM_LIST_TYPE);
+			this.germplasmListValidator.validateListMetadata(request, RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiRequestValidationException e) {
+			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("param.null"));
+			Assert.assertEquals(new String[] {"name"}, e.getErrors().get(0).getArguments());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_NameExceedsLength() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			request.setDescription(RandomStringUtils.randomAlphabetic(200));
+			request.setType(GERMPLASM_LIST_TYPE);
+			request.setName(RandomStringUtils.randomAlphabetic(55));
+			this.germplasmListValidator.validateListMetadata(request, RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiRequestValidationException e) {
+			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("text.field.max.length"));
+			Assert.assertEquals(new String[] {"name", "50"}, e.getErrors().get(0).getArguments());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_NameEqualsCropLists() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			request.setDescription(RandomStringUtils.randomAlphabetic(200));
+			request.setType(GERMPLASM_LIST_TYPE);
+			request.setName(AppConstants.CROP_LISTS.getString());
+
+			this.germplasmListValidator.validateListMetadata(request, RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiValidationException e) {
+			Assert.assertEquals("error.list.name.invalid", e.getErrorCode());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_NameEqualsProgramLists() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			request.setDescription(RandomStringUtils.randomAlphabetic(200));
+			request.setType(GERMPLASM_LIST_TYPE);
+			request.setName(AppConstants.PROGRAM_LISTS.getString());
+
+			this.germplasmListValidator.validateListMetadata(request, RandomStringUtils.randomAlphabetic(20), null);
+			fail("Should have failed");
+		} catch (final ApiValidationException e) {
+			Assert.assertEquals("error.list.name.invalid", e.getErrorCode());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_ListCreation_NameAlreadyExists() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			request.setDescription(RandomStringUtils.randomAlphabetic(200));
+			request.setType(GERMPLASM_LIST_TYPE);
+			final String listName = RandomStringUtils.randomAlphabetic(45);
+			request.setName(listName);
+
+			final String currentProgram = RandomStringUtils.randomAlphabetic(20);
+			Mockito.doReturn(Collections.singletonList(new GermplasmList(1))).when(this.germplasmListManager).getGermplasmListByName(listName, currentProgram, 0, 1,
+				Operation.EQUAL);
+			this.germplasmListValidator.validateListMetadata(request, currentProgram, null);
+			fail("Should have failed");
+		} catch (final ApiValidationException e) {
+			Assert.assertEquals("error.list.name.exists", e.getErrorCode());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_ListCreation_Successful() {
+		final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+		request.setDate(new Date());
+		request.setDescription(RandomStringUtils.randomAlphabetic(200));
+		request.setType(GERMPLASM_LIST_TYPE);
+		final String listName = RandomStringUtils.randomAlphabetic(45);
+		request.setName(listName);
+
+		final String currentProgram = RandomStringUtils.randomAlphabetic(20);
+		Mockito.doReturn(Collections.emptyList()).when(this.germplasmListManager).getGermplasmListByName(listName, currentProgram, 0, 1,
+			Operation.EQUAL);
+		this.germplasmListValidator.validateListMetadata(request, currentProgram, null);
+	}
+
+	@Test
+	public void validateListMetadata_ExistingList_NameTakenByAnotherList() {
+		try {
+			final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+			request.setDate(new Date());
+			request.setDescription(RandomStringUtils.randomAlphabetic(200));
+			request.setType(GERMPLASM_LIST_TYPE);
+			final String listName = RandomStringUtils.randomAlphabetic(45);
+			request.setName(listName);
+
+			final String currentProgram = RandomStringUtils.randomAlphabetic(20);
+			final Integer existingListId = 2;
+			Mockito.doReturn(Collections.singletonList(new GermplasmList(1))).when(this.germplasmListManager)
+				.getGermplasmListByName(listName, currentProgram, 0, 1,
+					Operation.EQUAL);
+			this.germplasmListValidator.validateListMetadata(request, currentProgram, existingListId);
+			fail("Should have failed");
+		} catch (final ApiValidationException e) {
+			Assert.assertEquals("error.list.name.exists", e.getErrorCode());
+		}
+	}
+
+	@Test
+	public void validateListMetadata_ExistingList_RetainSameName() {
+		final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+		request.setDate(new Date());
+		request.setDescription(RandomStringUtils.randomAlphabetic(200));
+		request.setType(GERMPLASM_LIST_TYPE);
+		final String listName = RandomStringUtils.randomAlphabetic(45);
+		request.setName(listName);
+
+		final String currentProgram = RandomStringUtils.randomAlphabetic(20);
+		final Integer existingListId = 2;
+		Mockito.doReturn(Collections.singletonList(new GermplasmList(existingListId))).when(this.germplasmListManager)
+			.getGermplasmListByName(listName, currentProgram, 0, 1,
+				Operation.EQUAL);
+		this.germplasmListValidator.validateListMetadata(request, currentProgram, existingListId);
+	}
+
+
+	@Test
+	public void validateListMetadata_ExistingList_Successful() {
+		final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+		request.setDate(new Date());
+		request.setDescription(RandomStringUtils.randomAlphabetic(200));
+		request.setType(GERMPLASM_LIST_TYPE);
+		final String listName = RandomStringUtils.randomAlphabetic(45);
+		request.setName(listName);
+
+		final String currentProgram = RandomStringUtils.randomAlphabetic(20);
+		final Integer existingListId = 2;
+		Mockito.doReturn(Collections.emptyList()).when(this.germplasmListManager)
+			.getGermplasmListByName(listName, currentProgram, 0, 1,
+				Operation.EQUAL);
+		this.germplasmListValidator.validateListMetadata(request, currentProgram, existingListId);
+	}
 }

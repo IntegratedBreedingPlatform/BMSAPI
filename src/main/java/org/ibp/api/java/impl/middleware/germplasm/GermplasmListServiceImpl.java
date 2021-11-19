@@ -13,6 +13,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
@@ -324,28 +325,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request) {
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
-
-		// validations
-
-		checkNotNull(request, "param.null", new String[] {"request"});
-		checkNotNull(request.getDate(), "param.null", new String[] {"date"});
-
-		if (!StringUtils.isBlank(request.getDescription())) {
-			checkArgument(request.getDescription().length() <= 255, "text.field.max.length", new String[] {"description", "255"});
-		}
-
-		if (!StringUtils.isBlank(request.getNotes())) {
-			checkArgument(request.getNotes().length() <= 65535, "text.field.max.length", new String[] {"notes", "65535"});
-		}
-
-		final String type = request.getType();
-		checkNotNull(type, "param.null", new String[] {"type"});
-		if (this.getGermplasmListTypes().stream().noneMatch(typeDTO -> typeDTO.getCode().equals(type))) {
-			throw new ApiValidationException("", "error.germplasmlist.save.type.not.exists", type);
-		}
-
-		final String name = request.getName();
-		this.germplasmListValidator.validateListName(currentProgram, name);
+		this.germplasmListValidator.validateListMetadata(
+			new GermplasmListMetadataRequest(request.getName(), request.getDescription(), request.getType(), request.getDate(),
+				request.getNotes()), currentProgram, null);
 
 		final String parentFolderId = request.getParentFolderId();
 		checkNotNull(parentFolderId, "param.null", new String[] {"parentFolderId"});
