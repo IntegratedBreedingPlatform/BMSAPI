@@ -787,6 +787,16 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListService.deleteGermplasmList(listId);
 	}
 
+	@Override
+	public void addGermplasmListToAnotherList(final String cropName, final String programUUID, final Integer destinationListId, final Integer sourceListId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateProgram(cropName, programUUID);
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(destinationListId);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+		this.germplasmListValidator.validateGermplasmList(sourceListId);
+		this.germplasmListService.addGermplasmListToAnotherList(destinationListId, sourceListId, programUUID);
+	}
+
 	private void validateProgram(final String cropName, final String programUUID) {
 		if (!StringUtils.isEmpty(programUUID)) {
 			this.programValidator.validate(new ProgramDTO(cropName, programUUID), this.errors);

@@ -62,4 +62,6 @@ public interface GermplasmListService {
 	boolean toggleGermplasmListStatus(Integer listId);
 
 	void deleteGermplasmList(String cropName, String programUUID, Integer listId);
+
+	void addGermplasmListToAnotherList(String cropName, String programUUID, Integer destinationListId, Integer sourceListId);
 }

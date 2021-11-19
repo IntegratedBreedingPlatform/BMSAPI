@@ -139,6 +139,19 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Add germplasm list entries to an existing list")
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries/{sourceGermplasmListId}", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> addGermplasmListEntriesToAnotherList(
+		@ApiParam(required = true) @PathVariable final String crop,
+		@PathVariable final Integer germplasmListId,
+		@PathVariable final Integer sourceGermplasmListId,
+		@RequestParam(required = false) final String programUUID
+	) {
+		this.germplasmListService.addGermplasmListToAnotherList(crop, programUUID, germplasmListId, sourceGermplasmListId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@ApiOperation("Get my lists")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/my-lists", method = RequestMethod.GET)
 	@ApiImplicitParams({
