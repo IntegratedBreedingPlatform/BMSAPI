@@ -113,12 +113,16 @@ public class LocationValidator {
 		this.validateLocationType(locationRequestDto.getType());
 		this.validateLocationAbbrNotExists(locationRequestDto.getAbbreviation());
 
+		if (locationRequestDto.getCountryId() != null) {
+			this.validateLocationId(locationRequestDto.getCountryId(), "location.country.invalid");
+		}
+
 		if (locationRequestDto.getProvinceId() != null) {
 			this.validateLocationId(locationRequestDto.getProvinceId(), "location.province.invalid");
 		}
 
-		if (locationRequestDto.getCountryId() != null) {
-			this.validateLocationId(locationRequestDto.getCountryId(), "location.country.invalid");
+		if (locationRequestDto.getCountryId() != null && locationRequestDto.getProvinceId() != null) {
+			this.validateIfProvinceBelongToCountry(locationRequestDto.getCountryId(), locationRequestDto.getProvinceId());
 		}
 	}
 
@@ -130,23 +134,40 @@ public class LocationValidator {
 		}
 	}
 
+	private void validateIfProvinceBelongToCountry(final Integer countryId, final Integer provinceId) {
+		final LocationDTO locationDTO = this.locationService.getLocation(provinceId);
+		if (locationDTO.getCountryId().equals(countryId)) {
+			this.errors.reject("location.province.not.belong.to.contry", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
 	public void validateUpdate(final Integer locationId, final LocationRequestDto locationRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
 
 		this.validateLocation(this.errors, locationId);
+		final LocationDTO locationDTO = this.locationService.getLocation(locationId);
+		final Integer countryId = locationRequestDto.getCountryId() != null ? locationRequestDto.getCountryId() : locationDTO.getCountryId();
+		final Integer provinceId = locationRequestDto.getProvinceId() != null ? locationRequestDto.getProvinceId() : locationDTO.getProvinceId();
+
 		if (locationRequestDto.getType() != null) {
 			this.validateLocationType(locationRequestDto.getType());
-
 		}
+
 		this.validateLocationAbbrNotExists(locationId, locationRequestDto.getAbbreviation());
 
-		if (locationRequestDto.getProvinceId() != null) {
+		if (countryId != null) {
+			this.validateLocationId(locationRequestDto.getCountryId(), "location.country.invalid");
+		}
+
+		if (provinceId != null) {
 			this.validateLocationId(locationRequestDto.getProvinceId(), "location.province.invalid");
 		}
 
-		if (locationRequestDto.getCountryId() != null) {
-			this.validateLocationId(locationRequestDto.getCountryId(), "location.country.invalid");
+		if (countryId != null && provinceId != null) {
+			this.validateIfProvinceBelongToCountry(countryId, provinceId);
 		}
+
 	}
 
 	public void validateCanBeDeleted(final Integer locationId) {
