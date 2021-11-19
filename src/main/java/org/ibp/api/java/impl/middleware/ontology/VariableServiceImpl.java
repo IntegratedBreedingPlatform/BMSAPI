@@ -218,6 +218,13 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			final ModelMapper mapper = OntologyMapper.getInstance();
 			final VariableDetails response = mapper.map(ontologyVariable, VariableDetails.class);
 
+			if(ontologyVariable.getIsSystem()){
+				response.getMetadata().setEditable(false);
+				response.getMetadata().setDeletable(false);
+				response.getMetadata().getUsage().setVariableSystem(true);
+				return response;
+			}
+
 			if (NOT_EDITABLE_AND_DELETABLE_VARIABLES.contains(ontologyVariable.getName())) {
 				response.getMetadata().setDeletable(false);
 				return response;
