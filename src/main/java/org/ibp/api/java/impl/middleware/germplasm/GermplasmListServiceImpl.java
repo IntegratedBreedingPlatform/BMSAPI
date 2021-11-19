@@ -547,15 +547,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, this.errors);
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(germplasmListId);
 
-		if (germplasmList.isFolder()) {
-			this.errors.reject("list.invalid", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-		if (germplasmList.isLockedList()) {
-			this.errors.reject("list.locked", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
+		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
 		if (!isEmpty(searchComposite.getItemIds())) {
 			this.germplasmValidator.validateGids(this.errors, new ArrayList<>(searchComposite.getItemIds()));

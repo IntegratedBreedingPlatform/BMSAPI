@@ -48,6 +48,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1109,9 +1110,7 @@ public class GermplasmListServiceImplTest {
 			ArgumentMatchers.eq(searchComposite),
 			ArgumentMatchers.any(MapBindingResult.class));
 
-		final GermplasmList germplasmList = Mockito.mock(GermplasmList.class);
-		Mockito.when(germplasmList.isFolder()).thenReturn(false);
-		Mockito.when(germplasmList.isLockedList()).thenReturn(false);
+		final GermplasmList germplasmList = new GermplasmList(germplasmListId);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(germplasmListId)).thenReturn(germplasmList);
 
 		Mockito.doNothing().when(this.germplasmValidator)
@@ -1125,6 +1124,8 @@ public class GermplasmListServiceImplTest {
 		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
+		Mockito.verify(this.germplasmListValidator).validateListIsNotAFolder(germplasmList);
+		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
 
 		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(MapBindingResult.class), ArgumentMatchers.anyList());
@@ -1143,9 +1144,7 @@ public class GermplasmListServiceImplTest {
 			ArgumentMatchers.eq(searchComposite),
 			ArgumentMatchers.any(MapBindingResult.class));
 
-		final GermplasmList germplasmList = Mockito.mock(GermplasmList.class);
-		Mockito.when(germplasmList.isFolder()).thenReturn(false);
-		Mockito.when(germplasmList.isLockedList()).thenReturn(false);
+		final GermplasmList germplasmList = new GermplasmList(germplasmListId);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(germplasmListId)).thenReturn(germplasmList);
 
 		this.germplasmListService.addGermplasmEntriesToList(germplasmListId, searchComposite, PROGRAM_UUID);
@@ -1156,6 +1155,8 @@ public class GermplasmListServiceImplTest {
 		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
+		Mockito.verify(this.germplasmListValidator).validateListIsNotAFolder(germplasmList);
+		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
 
 		Mockito.verifyNoInteractions(this.germplasmValidator);
@@ -1174,24 +1175,24 @@ public class GermplasmListServiceImplTest {
 			ArgumentMatchers.eq(searchComposite),
 			ArgumentMatchers.any(MapBindingResult.class));
 
-		final GermplasmList germplasmList = Mockito.mock(GermplasmList.class);
-		Mockito.when(germplasmList.isFolder()).thenReturn(true);
-		Mockito.when(germplasmList.isLockedList()).thenReturn(false);
+		final GermplasmList germplasmList = new GermplasmList(germplasmListId);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(germplasmListId)).thenReturn(germplasmList);
-
+		final String errorCode = RandomStringUtils.randomAlphabetic(10);
+		Mockito.doThrow(new ApiRequestValidationException(errorCode, null))
+			.when(this.germplasmListValidator).validateListIsNotAFolder(germplasmList);
 		try {
 			this.germplasmListService.addGermplasmEntriesToList(germplasmListId, searchComposite, PROGRAM_UUID);
 			Assert.fail("Should have failed");
-		} catch (final Exception e) {
-			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert
-				.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.invalid"));
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertEquals(errorCode, e.getErrors().get(0).getCode());
 		}
 
 		Mockito.verify(this.searchCompositeDtoValidator).validateSearchCompositeDto(
 			ArgumentMatchers.eq(searchComposite),
 			ArgumentMatchers.any(MapBindingResult.class));
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
+		Mockito.verify(this.germplasmListValidator).validateListIsNotAFolder(germplasmList);
+		Mockito.verify(this.germplasmListValidator, Mockito.never()).validateListIsUnlocked(germplasmList);
 
 		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
 		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
@@ -1207,18 +1208,17 @@ public class GermplasmListServiceImplTest {
 			ArgumentMatchers.eq(searchComposite),
 			ArgumentMatchers.any(MapBindingResult.class));
 
-		final GermplasmList germplasmList = Mockito.mock(GermplasmList.class);
-		Mockito.when(germplasmList.isFolder()).thenReturn(false);
-		Mockito.when(germplasmList.isLockedList()).thenReturn(true);
+		final GermplasmList germplasmList = new GermplasmList(germplasmListId);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(germplasmListId)).thenReturn(germplasmList);
+		final String errorCode = RandomStringUtils.randomAlphabetic(10);
+		Mockito.doThrow(new ApiRequestValidationException(errorCode, null))
+			.when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 
 		try {
 			this.germplasmListService.addGermplasmEntriesToList(germplasmListId, searchComposite, PROGRAM_UUID);
 			Assert.fail("Should have failed");
-		} catch (final Exception e) {
-			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-			MatcherAssert
-				.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("list.locked"));
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertEquals(errorCode, e.getErrors().get(0).getCode());
 		}
 
 		Mockito.verify(this.searchCompositeDtoValidator).validateSearchCompositeDto(
@@ -1227,6 +1227,8 @@ public class GermplasmListServiceImplTest {
 		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
+		Mockito.verify(this.germplasmListValidator).validateListIsNotAFolder(germplasmList);
+		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verifyNoMoreInteractions(this.germplasmValidator);
 	}
 
