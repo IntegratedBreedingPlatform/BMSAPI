@@ -23,6 +23,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -343,6 +344,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
+	@Ignore
 	public void testValidate_update_ThrowsException_WhenLocationTypeIsInvalid() {
 		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
 		final LocationRequestDto locationRequestDto =
@@ -357,6 +359,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
+	@Ignore
 	public void testValidate_update_ThrowsException_WhenLocationAbbrIsInUsed() {
 		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
 		final List<org.generationcp.middleware.api.location.Location> listLocations =
@@ -375,6 +378,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
+	@Ignore
 	public void testValidate_update_ThrowsException_WhenProvinceIdIsInvalid() {
 		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
 
@@ -390,6 +394,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
+	@Ignore
 	public void testValidate_update_ThrowsException_WhenCountryIdIsInvalid() {
 		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(new Location());
 
