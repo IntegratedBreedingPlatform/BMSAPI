@@ -6,6 +6,7 @@ import com.google.common.io.Files;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +34,7 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 
+// TODO move package
 @Api("Coefficient Of Parentage services")
 @RequestMapping(value = "/crops/{cropName}")
 @RestController
@@ -41,26 +44,25 @@ public class CopResource {
 	private CopService copService;
 
 	@ApiOperation("Get coefficient of parentage")
-	@RequestMapping(value = "/cop", method = RequestMethod.GET)
+	@RequestMapping(value = "/cop/calculation", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Map<Integer, Map<Integer, Double>>> getCopMatrix(
+	public ResponseEntity<CopResponse> calculateCopMatrix(
 		@PathVariable final String cropName,
-		@RequestParam final Set<Integer> gids
+		@RequestBody final Set<Integer> gids
 	) {
-		final Map<Integer, Map<Integer, Double>> results = this.copService.coefficientOfParentage(gids).rowMap();
+		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
-	@ApiOperation("Get coefficient of parentage as 2d array")
-	@RequestMapping(value = "/cop/array", method = RequestMethod.GET)
+	@ApiOperation("Get coefficient of parentage")
+	@RequestMapping(value = "/cop", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<String[]>> getCopMatrixAs2DArray(
+	public ResponseEntity<CopResponse> getCopMatrix(
 		@PathVariable final String cropName,
 		@RequestParam final Set<Integer> gids
 	) {
-		final Table<Integer, Integer, Double> results = this.copService.coefficientOfParentage(gids);
-		final List<String[]> array = this.convertTableToCsv(results);
-		return new ResponseEntity<>(array, HttpStatus.OK);
+		final CopResponse results = this.copService.coefficientOfParentage(gids);
+		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
 	@ApiOperation("Get coefficient of parentage as csv")
@@ -70,7 +72,7 @@ public class CopResource {
 		@PathVariable final String cropName,
 		@RequestParam final Set<Integer> gids
 	) throws IOException {
-		final Table<Integer, Integer, Double> results = this.copService.coefficientOfParentage(gids);
+		final CopResponse results = this.copService.coefficientOfParentage(gids);
 
 		final File file = this.generateFile(results);
 
@@ -81,7 +83,7 @@ public class CopResource {
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
 
-	private File generateFile(final Table<Integer, Integer, Double> results) throws IOException {
+	private File generateFile(final CopResponse results) throws IOException {
 		final File temporaryFolder = Files.createTempDir();
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + "COP.csv";
 
@@ -89,41 +91,10 @@ public class CopResource {
 			new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')
 		) {
 			final File newFile = new File(fileNameFullPath);
-			final List<String[]> rowValues = this.convertTableToCsv(results);
-			csvWriter.writeAll(rowValues);
+			csvWriter.writeAll(results.getArray());
 			return newFile;
 		}
 
-	}
-
-	private List<String[]> convertTableToCsv(final Table<Integer, Integer, Double> results) {
-		final List<String[]> rowValues = new ArrayList<>();
-
-		final List<String> header = new ArrayList<>();
-		header.add("");
-		header.addAll(results.columnKeySet().stream().map(Object::toString).collect(toList()));
-		rowValues.add(header.toArray(new String[] {}));
-
-		int offset = 0;
-		for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : results.rowMap().entrySet()) {
-			final List<String> row = new ArrayList<>();
-			row.add(rowEntrySet.getKey().toString());
-
-			/*
-			 * x x x x x x
-			 *   x x x x x
-			 *     x x x x
-			 *       x x x
-			 *         x x
-			 *           x
-			 */
-			IntStream.range(0, offset).forEach(i -> row.add(""));
-			offset++;
-
-			row.addAll(rowEntrySet.getValue().values().stream().map(Object::toString).collect(toList()));
-			rowValues.add(row.toArray(new String[] {}));
-		}
-		return rowValues;
 	}
 
 }
