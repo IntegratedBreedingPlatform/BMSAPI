@@ -753,6 +753,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public void editListMetadata(final Integer listId, final GermplasmListMetadataRequest request) {
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
+		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+
+		final String currentProgram = ContextHolder.getCurrentProgram();
+		this.germplasmListValidator.validateListMetadata(
+			new GermplasmListMetadataRequest(request.getName(), request.getDescription(), request.getType(), request.getDate(),
+				request.getNotes()), currentProgram, listId);
+	}
+
+	@Override
 	public List<Variable> getGermplasmListVariables(final String programUUID, final Integer listId, final Integer variableTypeId) {
 		return this.germplasmListService.getGermplasmListVariables(programUUID, listId, variableTypeId);
 	}

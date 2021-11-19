@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
@@ -403,6 +404,19 @@ public class GermplasmListResourceGroup {
 		}
 
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Edit List metatadata")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/metadata", method = RequestMethod.PATCH)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'EDIT_LIST_METADATA')")
+	@ResponseBody
+	public ResponseEntity<Void> editListMetadata(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListMetadataRequest request
+	) {
+		this.germplasmListService.editListMetadata(listId, request);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 }

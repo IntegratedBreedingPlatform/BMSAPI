@@ -4,6 +4,7 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
@@ -60,4 +61,7 @@ public interface GermplasmListService {
 	long countSearchGermplasmList(GermplasmListSearchRequest request, String programUUID);
 
 	boolean toggleGermplasmListStatus(Integer listId);
+
+	void editListMetadata(Integer listId, GermplasmListMetadataRequest request);
+
 }
