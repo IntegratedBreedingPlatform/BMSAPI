@@ -111,53 +111,48 @@ public class LocationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
 
 		this.validateLocationType(locationRequestDto.getType());
-		this.validateLocationAbbr(locationRequestDto.getAbbreviation());
+		this.validateLocationAbbrNotExists(locationRequestDto.getAbbreviation());
 
 		if (locationRequestDto.getProvinceId() != null) {
-			final LocationDTO province = this.locationService.getLocation(locationRequestDto.getProvinceId());
-			if (province == null) {
-				this.errors.reject("location.province.invalid", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
+			this.validateLocationId(locationRequestDto.getProvinceId(), "location.province.invalid");
 		}
 
 		if (locationRequestDto.getCountryId() != null) {
-			final LocationDTO country = this.locationService.getLocation(locationRequestDto.getCountryId());
-			if (country == null) {
-				this.errors.reject("location.country.invalid", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
+			this.validateLocationId(locationRequestDto.getCountryId(), "location.country.invalid");
+		}
+	}
+
+	private void validateLocationId(final Integer provinceId, final String errorCode) {
+		final LocationDTO locationDTO = this.locationService.getLocation(provinceId);
+		if (locationDTO == null) {
+			this.errors.reject(errorCode, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
 	public void validateUpdate(final Integer locationId, final LocationRequestDto locationRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
 
-		this.validateExistingLocationId(locationId);
-		this.validateLocationType(locationId, locationRequestDto.getType());
-		this.validateLocationAbbr(locationId, locationRequestDto.getAbbreviation());
+		this.validateLocation(this.errors, locationId);
+		if (locationRequestDto.getType() != null) {
+			this.validateLocationType(locationRequestDto.getType());
+
+		}
+		this.validateLocationAbbrNotExists(locationId, locationRequestDto.getAbbreviation());
 
 		if (locationRequestDto.getProvinceId() != null) {
-			final LocationDTO province = this.locationService.getLocation(locationRequestDto.getProvinceId());
-			if (province == null) {
-				this.errors.reject("location.province.invalid", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
+			this.validateLocationId(locationRequestDto.getProvinceId(), "location.province.invalid");
 		}
 
 		if (locationRequestDto.getCountryId() != null) {
-			final LocationDTO country = this.locationService.getLocation(locationRequestDto.getCountryId());
-			if (country == null) {
-				this.errors.reject("location.country.invalid", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
+			this.validateLocationId(locationRequestDto.getCountryId(), "location.country.invalid");
 		}
 	}
 
 	public void validateCanBeDeleted(final Integer locationId) {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
-		this.validateExistingLocationId(locationId);
+		this.validateLocation(this.errors, locationId);
 		this.validateLocationNotUsedInGermplasm(locationId);
 		this.validateLocationNotUsedInLot(locationId);
 		this.validateLocationNotUsedInAttribute(locationId);
@@ -205,11 +200,7 @@ public class LocationValidator {
 		}
 	}
 
-	private void validateExistingLocationId(final Integer locationId) {
-		this.validateLocation(this.errors, locationId);
-	}
-
-	private void validateLocationAbbr(final Integer locationId, final String locationAbbr) {
+	private void validateLocationAbbrNotExists(final Integer locationId, final String locationAbbr) {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationAbbreviations(Arrays.asList(locationAbbr));
 		final List<org.generationcp.middleware.api.location.Location> locationList =
@@ -227,7 +218,7 @@ public class LocationValidator {
 		}
 	}
 
-	private void validateLocationAbbr(final String locationAbbr) {
+	private void validateLocationAbbrNotExists(final String locationAbbr) {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationAbbreviations(Arrays.asList(locationAbbr));
 		final List<org.generationcp.middleware.api.location.Location> locationList =
@@ -251,18 +242,6 @@ public class LocationValidator {
 		if (Collections.isEmpty(locationTypeDTO)) {
 			this.errors.reject("location.type.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-	}
-
-	private void validateLocationType(final Integer locationId, final Integer locationTypeId) {
-		if (locationTypeId != null) {
-			final List<LocationTypeDTO> locationTypeDTOS = this.locationService.getLocationTypes();
-			final List<LocationTypeDTO> locationTypeDTO =
-				locationTypeDTOS.stream().filter(locType -> locType.getId().equals(locationTypeId)).collect(Collectors.toList());
-			if (Collections.isEmpty(locationTypeDTO)) {
-				this.errors.reject("location.type.invalid", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
 		}
 	}
 
