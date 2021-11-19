@@ -171,7 +171,7 @@ public class LocationValidator {
 	private void validateLocationNotUsedInName(final Integer locationId) {
 		final boolean isLocationUsedInNames = this.germplasmNameService.isLocationUsedInGermplasmName(locationId);
 		if (isLocationUsedInNames) {
-			this.errors.reject("location.is.used.in.names", "");
+			this.errors.reject("location.is.used.in.names", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -179,7 +179,7 @@ public class LocationValidator {
 	private void validateLocationNotUsedInAttribute(final Integer locationId) {
 		final boolean isLocationUsedInAttributes = this.germplasmAttributeService.isLocationUsedInAttribute(locationId);
 		if (isLocationUsedInAttributes) {
-			this.errors.reject("location.is.used.in.attributes", "");
+			this.errors.reject("location.is.used.in.attributes", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -187,7 +187,7 @@ public class LocationValidator {
 	private void validateLocationNotUsedInGermplasm(final Integer locationId) {
 		final boolean isLocationUsedInGermplasm = this.germplasmService.isLocationUsedInGermplasm(locationId);
 		if (isLocationUsedInGermplasm) {
-			this.errors.reject("location.is.used.in.germplasms", "");
+			this.errors.reject("location.is.used.in.germplasms", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -195,7 +195,7 @@ public class LocationValidator {
 	private void validateLocationNotUsedInStudy(final Integer locationId) {
 		final boolean isLocationUsedInStudies = this.studyService.isLocationUsedInStudy(locationId);
 		if (isLocationUsedInStudies) {
-			this.errors.reject("location.is.used.in.studies", "");
+			this.errors.reject("location.is.used.in.studies", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
