@@ -755,9 +755,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
-		this.germplasmListValidator.validateListMetadata(
-			new GermplasmListMetadataRequest(request.getName(), request.getDescription(), request.getType(), request.getDate(),
-				request.getNotes()), currentProgram, listId);
+		this.germplasmListValidator.validateListMetadata(request, currentProgram, listId);
+		this.germplasmListService.editListMetadata(listId, request);
 	}
 
 	@Override

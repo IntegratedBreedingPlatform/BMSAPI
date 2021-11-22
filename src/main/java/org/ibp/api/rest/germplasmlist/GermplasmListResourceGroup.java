@@ -416,7 +416,7 @@ public class GermplasmListResourceGroup {
 		@RequestBody final GermplasmListMetadataRequest request
 	) {
 		this.germplasmListService.editListMetadata(listId, request);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }
