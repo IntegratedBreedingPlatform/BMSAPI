@@ -360,6 +360,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public void importUpdates(final GermplasmListGeneratorDTO request) {
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(request.getId());
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+
 		this.processEntriesForUpdate(request);
 		this.germplasmListService.importUpdates(request);
 	}
