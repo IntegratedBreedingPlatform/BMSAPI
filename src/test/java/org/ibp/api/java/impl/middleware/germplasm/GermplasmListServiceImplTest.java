@@ -1559,13 +1559,22 @@ public class GermplasmListServiceImplTest {
 		final int sourceGermplasmListId = new Random().nextInt(Integer.MAX_VALUE);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(sourceGermplasmListId)).thenReturn(sourceGermplasmList);
 
-		this.germplasmListService.addGermplasmListToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId, null);
+		Mockito.doNothing().when(this.searchCompositeDtoValidator).validateSearchCompositeDto(
+			ArgumentMatchers.any(SearchCompositeDto.class),
+			ArgumentMatchers.any(MapBindingResult.class));
+
+		this.germplasmListService.addGermplasmListToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId, new SearchCompositeDto<>());
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(sourceGermplasmListId);
+		Mockito.verify(this.searchCompositeDtoValidator).validateSearchCompositeDto(
+			ArgumentMatchers.any(SearchCompositeDto.class),
+			ArgumentMatchers.any(MapBindingResult.class));
+		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
+		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
-		Mockito.verify(this.germplasmListServiceMiddleware).addGermplasmListToAnotherList(GERMPLASM_LIST_ID, sourceGermplasmListId, PROGRAM_UUID, null);
+		Mockito.verify(this.germplasmListServiceMiddleware).addGermplasmListToAnotherList(GERMPLASM_LIST_ID, sourceGermplasmListId, PROGRAM_UUID, new SearchCompositeDto<>());
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -1575,11 +1584,12 @@ public class GermplasmListServiceImplTest {
 		Mockito.doThrow(ApiRequestValidationException.class).when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		final int sourceGermplasmListId = new Random().nextInt(Integer.MAX_VALUE);
 
-		this.germplasmListService.addGermplasmListToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId, null);
+		this.germplasmListService.addGermplasmListToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId, new SearchCompositeDto<>());
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
+		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
 		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
 	}
 
