@@ -774,6 +774,25 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public void removeGermplasmEntriesFromList(final Integer germplasmListId, final List<Integer> selectedEntries, final String programUUID) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(germplasmListId);
+
+		if (germplasmList.isFolder()) {
+			this.errors.reject("list.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (germplasmList.isLockedList()) {
+			this.errors.reject("list.locked", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, selectedEntries);
+	}
+
+	@Override
 	public List<Variable> getGermplasmListVariables(final String programUUID, final Integer listId, final Integer variableTypeId) {
 		return this.germplasmListService.getGermplasmListVariables(programUUID, listId, variableTypeId);
 	}

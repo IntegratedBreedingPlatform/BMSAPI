@@ -139,6 +139,19 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Remove germplasm entries from an existing list")
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'REMOVE_ENTRIES_GERMPLASM_LISTS')")
+	public ResponseEntity<Void> removeGermplasmEntriesFromList(
+		@ApiParam(required = true) @PathVariable final String crop,
+		@PathVariable final Integer germplasmListId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = true) final List<Integer> selectedEntries
+	) {
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, selectedEntries, programUUID);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@ApiOperation("Get my lists")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/my-lists", method = RequestMethod.GET)
 	@ApiImplicitParams({
