@@ -1559,13 +1559,13 @@ public class GermplasmListServiceImplTest {
 		final int sourceGermplasmListId = new Random().nextInt(Integer.MAX_VALUE);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(sourceGermplasmListId)).thenReturn(sourceGermplasmList);
 
-		this.germplasmListService.addGermplasmListToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId);
+		this.germplasmListService.addGermplasmListToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId, null);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(sourceGermplasmListId);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
-		Mockito.verify(this.germplasmListServiceMiddleware).addGermplasmListToAnotherList(GERMPLASM_LIST_ID, sourceGermplasmListId, PROGRAM_UUID);
+		Mockito.verify(this.germplasmListServiceMiddleware).addGermplasmListToAnotherList(GERMPLASM_LIST_ID, sourceGermplasmListId, PROGRAM_UUID, null);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -1575,7 +1575,7 @@ public class GermplasmListServiceImplTest {
 		Mockito.doThrow(ApiRequestValidationException.class).when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		final int sourceGermplasmListId = new Random().nextInt(Integer.MAX_VALUE);
 
-		this.germplasmListService.addGermplasmListToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId);
+		this.germplasmListService.addGermplasmListToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId, null);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);

@@ -15,6 +15,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
@@ -788,13 +789,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void addGermplasmListToAnotherList(final String cropName, final String programUUID, final Integer destinationListId, final Integer sourceListId) {
+	public void addGermplasmListToAnotherList(final String cropName, final String programUUID, final Integer destinationListId,
+		final Integer sourceListId, final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateProgram(cropName, programUUID);
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(destinationListId);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 		this.germplasmListValidator.validateGermplasmList(sourceListId);
-		this.germplasmListService.addGermplasmListToAnotherList(destinationListId, sourceListId, programUUID);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, this.errors);
+		this.germplasmListService.addGermplasmListToAnotherList(destinationListId, sourceListId, programUUID, searchComposite);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {

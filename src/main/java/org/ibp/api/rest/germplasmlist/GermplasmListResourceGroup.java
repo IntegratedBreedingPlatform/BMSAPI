@@ -146,9 +146,10 @@ public class GermplasmListResourceGroup {
 		@ApiParam(required = true) @PathVariable final String crop,
 		@PathVariable final Integer germplasmListId,
 		@PathVariable final Integer sourceGermplasmListId,
+		@RequestBody final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite,
 		@RequestParam(required = false) final String programUUID
 	) {
-		this.germplasmListService.addGermplasmListToAnotherList(crop, programUUID, germplasmListId, sourceGermplasmListId);
+		this.germplasmListService.addGermplasmListToAnotherList(crop, programUUID, germplasmListId, sourceGermplasmListId, searchComposite);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

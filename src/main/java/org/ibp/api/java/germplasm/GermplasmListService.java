@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
@@ -63,5 +64,6 @@ public interface GermplasmListService {
 
 	void deleteGermplasmList(String cropName, String programUUID, Integer listId);
 
-	void addGermplasmListToAnotherList(String cropName, String programUUID, Integer destinationListId, Integer sourceListId);
+	void addGermplasmListToAnotherList(String cropName, String programUUID, Integer destinationListId, Integer sourceListId,
+		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 }
