@@ -63,7 +63,7 @@ public class LocationValidator {
 			errors.reject("location.required", "");
 			return;
 		}
-		final Location location = this.locationDataManager.getLocationByID(locationId);
+		final LocationDTO location = this.locationService.getLocation(locationId);
 		if (location == null) {
 			errors.reject("location.invalid", "");
 			return;
@@ -99,7 +99,7 @@ public class LocationValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final Location location = this.locationDataManager.getLocationByID(locationId);
+		final LocationDTO location = this.locationService.getLocation(locationId);
 
 		if (location == null) {
 			errors.reject("location.invalid", "");
