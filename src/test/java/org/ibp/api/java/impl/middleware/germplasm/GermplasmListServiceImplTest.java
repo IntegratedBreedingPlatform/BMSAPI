@@ -30,6 +30,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmListDataValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
@@ -127,6 +128,9 @@ public class GermplasmListServiceImplTest {
 
 	@Mock
 	private GermplasmListValidator germplasmListValidator;
+
+	@Mock
+	private GermplasmListDataValidator germplasmListDataValidator;
 
 	@Before
 	public void init() {
@@ -1563,7 +1567,8 @@ public class GermplasmListServiceImplTest {
 			ArgumentMatchers.any(SearchCompositeDto.class),
 			ArgumentMatchers.any(MapBindingResult.class));
 
-		this.germplasmListService.addGermplasmListEntriesToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId, new SearchCompositeDto<>());
+		this.germplasmListService.addGermplasmListEntriesToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId,
+			new SearchCompositeDto<>());
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
@@ -1574,7 +1579,8 @@ public class GermplasmListServiceImplTest {
 		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
 		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
-		Mockito.verify(this.germplasmListServiceMiddleware).addGermplasmListEntriesToAnotherList(GERMPLASM_LIST_ID, sourceGermplasmListId, PROGRAM_UUID, new SearchCompositeDto<>());
+		Mockito.verify(this.germplasmListServiceMiddleware)
+			.addGermplasmListEntriesToAnotherList(GERMPLASM_LIST_ID, sourceGermplasmListId, PROGRAM_UUID, new SearchCompositeDto<>());
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -1584,13 +1590,29 @@ public class GermplasmListServiceImplTest {
 		Mockito.doThrow(ApiRequestValidationException.class).when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		final int sourceGermplasmListId = new Random().nextInt(Integer.MAX_VALUE);
 
-		this.germplasmListService.addGermplasmListEntriesToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId, new SearchCompositeDto<>());
+		this.germplasmListService.addGermplasmListEntriesToAnotherList(CROP, PROGRAM_UUID, GERMPLASM_LIST_ID, sourceGermplasmListId,
+			new SearchCompositeDto<>());
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
 		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
 		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
+	}
+
+	@Test
+	public void testRemoveEntriesFromList_OK() {
+		final GermplasmList germplasmList = this.createGermplasmListMock(false);
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+
+		final List<Integer> selectedEntries = Arrays.asList(1);
+		this.germplasmListService.removeGermplasmEntriesFromList(GERMPLASM_LIST_ID, selectedEntries);
+
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
+		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
+		Mockito.verify(this.germplasmListValidator).validateListIsNotAFolder(germplasmList);
+		Mockito.verify(this.germplasmListDataValidator).verifyListDataIdsExist(GERMPLASM_LIST_ID, selectedEntries);
+		Mockito.verify(this.germplasmListServiceMiddleware).removeGermplasmEntriesFromList(GERMPLASM_LIST_ID, selectedEntries);
 	}
 
 	private GermplasmListGeneratorDTO createGermplasmList() {

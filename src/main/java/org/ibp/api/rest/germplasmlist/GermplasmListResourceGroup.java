@@ -159,10 +159,9 @@ public class GermplasmListResourceGroup {
 	public ResponseEntity<Void> removeGermplasmEntriesFromList(
 		@ApiParam(required = true) @PathVariable final String crop,
 		@PathVariable final Integer germplasmListId,
-		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = true) final List<Integer> selectedEntries
 	) {
-		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, selectedEntries, programUUID);
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, selectedEntries);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
