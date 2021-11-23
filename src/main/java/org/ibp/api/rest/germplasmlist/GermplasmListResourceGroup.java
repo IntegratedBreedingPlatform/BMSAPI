@@ -139,6 +139,20 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Add germplasm list entries to an existing list")
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries/{sourceGermplasmListId}", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> addGermplasmListEntriesToAnotherList(
+		@ApiParam(required = true) @PathVariable final String crop,
+		@PathVariable final Integer germplasmListId,
+		@PathVariable final Integer sourceGermplasmListId,
+		@RequestBody final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite,
+		@RequestParam(required = false) final String programUUID
+	) {
+		this.germplasmListService.addGermplasmListEntriesToAnotherList(crop, programUUID, germplasmListId, sourceGermplasmListId, searchComposite);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Remove germplasm entries from an existing list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'REMOVE_ENTRIES_GERMPLASM_LISTS')")
@@ -174,12 +188,12 @@ public class GermplasmListResourceGroup {
 
 				@Override
 				public long getCount() {
-					return germplasmListService.countMyLists(programUUID, userId);
+					return GermplasmListResourceGroup.this.germplasmListService.countMyLists(programUUID, userId);
 				}
 
 				@Override
 				public List<MyListsDTO> getResults(final PagedResult<MyListsDTO> pagedResult) {
-					return germplasmListService.getMyLists(programUUID, pageable, userId);
+					return GermplasmListResourceGroup.this.germplasmListService.getMyLists(programUUID, pageable, userId);
 				}
 			});
 		final List<MyListsDTO> pageResults = result.getPageResults();
@@ -406,7 +420,7 @@ public class GermplasmListResourceGroup {
 	public ResponseEntity<Void> reorderEntries(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody GermplasmListReorderEntriesRequest request) {
+		@RequestBody final GermplasmListReorderEntriesRequest request) {
 
 		try {
 			this.reorderEntriesLock.lockWrite();
@@ -418,4 +432,15 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Delete germplasm list", notes = "Delete germplasm list.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'DELETE_GERMPLASM_LIST')")
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{listId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity deleteGermplasmList(
+		@PathVariable final String crop,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID) {
+		this.germplasmListService.deleteGermplasmList(crop, programUUID, listId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }
