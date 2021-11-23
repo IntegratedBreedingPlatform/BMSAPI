@@ -64,6 +64,6 @@ public interface GermplasmListService {
 
 	void deleteGermplasmList(String cropName, String programUUID, Integer listId);
 
-	void addGermplasmListToAnotherList(String cropName, String programUUID, Integer destinationListId, Integer sourceListId,
+	void addGermplasmListEntriesToAnotherList(String cropName, String programUUID, Integer destinationListId, Integer sourceListId,
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 }

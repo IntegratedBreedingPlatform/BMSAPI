@@ -149,7 +149,7 @@ public class GermplasmListResourceGroup {
 		@RequestBody final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite,
 		@RequestParam(required = false) final String programUUID
 	) {
-		this.germplasmListService.addGermplasmListToAnotherList(crop, programUUID, germplasmListId, sourceGermplasmListId, searchComposite);
+		this.germplasmListService.addGermplasmListEntriesToAnotherList(crop, programUUID, germplasmListId, sourceGermplasmListId, searchComposite);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

@@ -789,7 +789,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void addGermplasmListToAnotherList(final String cropName, final String programUUID, final Integer destinationListId,
+	public void addGermplasmListEntriesToAnotherList(final String cropName, final String programUUID, final Integer destinationListId,
 		final Integer sourceListId, final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateProgram(cropName, programUUID);
@@ -797,7 +797,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 		this.germplasmListValidator.validateGermplasmList(sourceListId);
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, this.errors);
-		this.germplasmListService.addGermplasmListToAnotherList(destinationListId, sourceListId, programUUID, searchComposite);
+		this.germplasmListService.addGermplasmListEntriesToAnotherList(destinationListId, sourceListId, programUUID, searchComposite);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
