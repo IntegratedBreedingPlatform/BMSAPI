@@ -1,7 +1,6 @@
 package org.ibp.api.rest.germplasm;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import com.google.common.collect.Table;
 import com.google.common.io.Files;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,13 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.IntStream;
-
-import static java.util.stream.Collectors.toList;
 
 // TODO move package
 @Api("Coefficient Of Parentage services")
@@ -43,7 +36,7 @@ public class CopResource {
 	@Autowired
 	private CopService copService;
 
-	@ApiOperation("Get coefficient of parentage")
+	@ApiOperation("Calculate coefficient of parentage")
 	@RequestMapping(value = "/cop/calculation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<CopResponse> calculateCopMatrix(
@@ -52,6 +45,17 @@ public class CopResource {
 	) {
 		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids);
 		return new ResponseEntity<>(results, HttpStatus.OK);
+	}
+
+	@ApiOperation("Cancel coefficient of parentage calculation jobs")
+	@RequestMapping(value = "/cop/calculation", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity<Void> cancelJobs(
+		@PathVariable final String cropName,
+		@RequestParam final Set<Integer> gids
+	) {
+		this.copService.cancelJobs(gids);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation("Get coefficient of parentage")
