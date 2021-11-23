@@ -34,8 +34,8 @@ import java.util.stream.Collectors;
 public class LocationValidator {
 
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
-	private static final Integer LOCACION_NAME_MAX_LENGTH = 60;
-	private static final Integer LOCACION_ABBR_MAX_LENGTH = 12;
+	private static final Integer LOCATION_NAME_MAX_LENGTH = 60;
+	private static final Integer LOCATION_ABBR_MAX_LENGTH = 12;
 
 	@Autowired
 	private LocationDataManager locationDataManager;
@@ -95,9 +95,24 @@ public class LocationValidator {
 		}
 	}
 
-	private void validateMaxLength(final String field, final Integer maxLength, final String errorCode) {
-		if (field.length() > maxLength) {
-			this.errors.reject(errorCode, new String[] {LocationValidator.LOCACION_NAME_MAX_LENGTH.toString()}, "");
+	private void validateLocationName(final String locationName) {
+		if(StringUtils.isBlank(locationName)) {
+			this.errors.reject("location.name.is.required", null, "");
+		}
+
+		if (locationName.length() > LocationValidator.LOCATION_NAME_MAX_LENGTH) {
+			this.errors.reject("location.name.max.length", new String[] {LocationValidator.LOCATION_NAME_MAX_LENGTH.toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateLocationAbbr(final String locationAbbr) {
+		if(StringUtils.isBlank(locationAbbr)) {
+			this.errors.reject("location.abbr.is.required", null, "");
+		}
+
+		if (locationAbbr.length() > LocationValidator.LOCATION_ABBR_MAX_LENGTH) {
+			this.errors.reject("location.abbr.max.length", new String[] {LocationValidator.LOCATION_ABBR_MAX_LENGTH.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -119,9 +134,9 @@ public class LocationValidator {
 	public void validateCreation(final LocationRequestDto locationRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
 
-		this.validateMaxLength(locationRequestDto.getName(), LocationValidator.LOCACION_NAME_MAX_LENGTH, "location.name.max.length");
+		this.validateLocationName(locationRequestDto.getName());
 		this.validateLocationType(locationRequestDto.getType());
-		this.validateMaxLength(locationRequestDto.getAbbreviation(), LocationValidator.LOCACION_ABBR_MAX_LENGTH, "location.abbr.max.length");
+		this.validateLocationAbbr(locationRequestDto.getAbbreviation());
 		this.validateLocationAbbrNotExists(locationRequestDto.getAbbreviation());
 
 		if (locationRequestDto.getCountryId() != null) {
@@ -151,7 +166,7 @@ public class LocationValidator {
 	private void validateIfProvinceBelongToCountry(final Integer countryId, final Integer provinceId) {
 		final LocationDTO locationDTO = this.locationService.getLocation(provinceId);
 		if (!locationDTO.getCountryId().equals(countryId)) {
-			this.errors.reject("location.province.not.belong.to.contry", "");
+			this.errors.reject("location.province.not.belong.to.country", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -161,7 +176,7 @@ public class LocationValidator {
 
 		this.validateLocation(this.errors, locationId);
 		if (locationRequestDto.getName() != null) {
-			this.validateMaxLength(locationRequestDto.getName(), LocationValidator.LOCACION_NAME_MAX_LENGTH, "location.name.max.length");
+			this.validateLocationName(locationRequestDto.getName());
 		}
 
 		final LocationDTO locationDTO = this.locationService.getLocation(locationId);
@@ -173,7 +188,7 @@ public class LocationValidator {
 		}
 
 		if (locationRequestDto.getAbbreviation() != null) {
-			this.validateMaxLength(locationRequestDto.getAbbreviation(), LocationValidator.LOCACION_ABBR_MAX_LENGTH, "location.abbr.max.length");
+			this.validateLocationAbbr(locationRequestDto.getAbbreviation());
 			this.validateLocationAbbrNotExists(locationId, locationRequestDto.getAbbreviation());
 		}
 
