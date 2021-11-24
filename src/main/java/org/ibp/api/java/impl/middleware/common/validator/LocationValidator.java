@@ -151,7 +151,7 @@ public class LocationValidator {
 			this.validateLocationId(locationRequestDto.getProvinceId(), "location.province.invalid");
 		}
 
-		if (locationRequestDto.getCountryId() != null && locationRequestDto.getProvinceId() != null) {
+		if (locationRequestDto.getCountryId() != null && locationRequestDto.getProvinceId() != null && !locationRequestDto.getProvinceId().equals(0)) {
 			this.validateIfProvinceBelongToCountry(locationRequestDto.getCountryId(), locationRequestDto.getProvinceId());
 		}
 	}
@@ -205,7 +205,7 @@ public class LocationValidator {
 			this.validateLocationId(provinceId, "location.province.invalid");
 		}
 
-		if (countryId != null && provinceId != null) {
+		if (countryId != null && provinceId != null && !provinceId.equals(0)) {
 			this.validateIfProvinceBelongToCountry(countryId, provinceId);
 		}
 
