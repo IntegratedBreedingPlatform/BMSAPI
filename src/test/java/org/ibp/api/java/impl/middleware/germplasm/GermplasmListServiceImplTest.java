@@ -1593,6 +1593,19 @@ public class GermplasmListServiceImplTest {
 		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
 	}
 
+	@Test
+	public void testCloneGermplasmList_OK() {
+		final GermplasmList germplasmList = this.createGermplasmListMock(false);
+		final GermplasmListGeneratorDTO germplasmListGen = this.createGermplasmList();
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		this.germplasmListService.clone(GERMPLASM_LIST_ID, germplasmListGen);
+
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
+		Mockito.verify(this.germplasmListValidator).validateListName(PROGRAM_UUID, germplasmListGen.getName());
+		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
+		Mockito.verify(this.germplasmListServiceMiddleware).cloneGermplasmListEntries(GERMPLASM_LIST_ID, germplasmListGen);
+	}
+
 	private GermplasmListGeneratorDTO createGermplasmList() {
 		final GermplasmListGeneratorDTO list = new GermplasmListGeneratorDTO();
 		list.setName(RandomStringUtils.random(50));

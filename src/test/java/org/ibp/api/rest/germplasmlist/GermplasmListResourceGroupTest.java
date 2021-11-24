@@ -5,6 +5,8 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -12,6 +14,7 @@ import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.germplasm.GermplasmListServiceImpl;
 import org.ibp.api.rest.common.UserTreeState;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -20,7 +23,9 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.mockito.Mockito.doReturn;
 
 public class GermplasmListResourceGroupTest extends ApiUnitTestBase {
@@ -85,6 +90,35 @@ public class GermplasmListResourceGroupTest extends ApiUnitTestBase {
 			.contentType(this.contentType))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print());
+
+	}
+
+	@Test
+	public void testCloneGermplasmList() throws Exception {
+		final String crop = CropType.CropEnum.MAIZE.name().toLowerCase();
+		final Integer listId = new Random().nextInt(100);
+
+		final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
+		request.setName(randomAlphanumeric(10));
+
+		final GermplasmListGeneratorDTO resultList = new GermplasmListGeneratorDTO();
+		resultList.setName(request.getName());
+		resultList.setEntries(Collections.singletonList(new GermplasmListGeneratorDTO.GermplasmEntryDTO(
+			1, 1, randomAlphanumeric(10), randomAlphanumeric(10), randomAlphanumeric(10)
+		)));
+
+		doReturn(resultList).when(this.germplasmListService).clone(Mockito.anyInt(), Mockito.any(GermplasmListGeneratorDTO.class));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/crops/{cropName}/germplasm-lists/{listId}/clone",
+					crop, listId).param("programUUID", GermplasmListResourceGroupTest.PROGRAM_UUID)
+				.content(this.convertObjectToByte(request))
+				.contentType(this.contentType))
+			.andExpect(MockMvcResultMatchers.status().isCreated())
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.name",
+				Matchers.is(request.getName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.entries",
+				IsCollectionWithSize.hasSize(resultList.getEntries().size())));
 
 	}
 
