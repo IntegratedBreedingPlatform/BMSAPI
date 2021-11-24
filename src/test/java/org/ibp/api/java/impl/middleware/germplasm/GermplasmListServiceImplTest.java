@@ -1605,14 +1605,14 @@ public class GermplasmListServiceImplTest {
 		final GermplasmList germplasmList = this.createGermplasmListMock(false);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
 
-		final List<Integer> selectedEntries = Arrays.asList(1);
-		this.germplasmListService.removeGermplasmEntriesFromList(GERMPLASM_LIST_ID, selectedEntries);
+		final List<Integer> listDataIds = Arrays.asList(1);
+		this.germplasmListService.removeGermplasmEntriesFromList(GERMPLASM_LIST_ID, listDataIds);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.verify(this.germplasmListValidator).validateListIsNotAFolder(germplasmList);
-		Mockito.verify(this.germplasmListDataValidator).verifyListDataIdsExist(GERMPLASM_LIST_ID, selectedEntries);
-		Mockito.verify(this.germplasmListServiceMiddleware).removeGermplasmEntriesFromList(GERMPLASM_LIST_ID, selectedEntries);
+		Mockito.verify(this.germplasmListDataValidator).verifyListDataIdsExist(GERMPLASM_LIST_ID, listDataIds);
+		Mockito.verify(this.germplasmListServiceMiddleware).removeGermplasmEntriesFromList(GERMPLASM_LIST_ID, listDataIds);
 	}
 
 	private GermplasmListGeneratorDTO createGermplasmList() {

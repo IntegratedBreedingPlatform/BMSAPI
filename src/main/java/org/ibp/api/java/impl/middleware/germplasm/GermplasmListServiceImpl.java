@@ -785,13 +785,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void removeGermplasmEntriesFromList(final Integer germplasmListId, final List<Integer> selectedEntries) {
+	public void removeGermplasmEntriesFromList(final Integer germplasmListId, final List<Integer> listDataIds) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(germplasmListId);
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
-		this.germplasmListDataValidator.verifyListDataIdsExist(germplasmListId, selectedEntries);
-		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, selectedEntries);
+		this.germplasmListDataValidator.verifyListDataIdsExist(germplasmListId, listDataIds);
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, listDataIds);
 	}
 
 	@Override
