@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
@@ -426,9 +427,9 @@ public class GermplasmListResourceGroup {
 	public ResponseEntity<GermplasmListGeneratorDTO> cloneList(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody final GermplasmListGeneratorDTO request) {
+		@RequestBody final GermplasmListMetadataRequest request) {
 
-		return new ResponseEntity<>(this.germplasmListService.clone(listId, request), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.germplasmListService.clone(listId, new GermplasmListGeneratorDTO(request)), HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Delete germplasm list", notes = "Delete germplasm list.")
