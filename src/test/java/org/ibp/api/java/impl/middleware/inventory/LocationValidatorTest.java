@@ -491,6 +491,26 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
+	public void testValidate_update_ThrowsException_WhenCountryIsRequiredBecauseProvinceIsDefined() {
+		final LocationRequestDto locationRequestDto =
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR,
+				LocationValidatorTest.LOCATION_TYPE);
+		locationRequestDto.setProvinceId(100);
+		final LocationTypeDTO locationTypeDTO = new LocationTypeDTO();
+		locationTypeDTO.setId(LocationValidatorTest.LOCATION_TYPE);
+
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(Arrays.asList(locationTypeDTO));
+
+		try {
+			this.locationValidator.validateCreation(locationRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.country.required.when.province.is.defined"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
 	public void testValidate_create_ThrowsException_WhenLocationNamExceedsMaxLength() {
 		final LocationRequestDto locationRequestDto =
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, null);
@@ -621,6 +641,26 @@ public class LocationValidatorTest {
 		} catch (final ApiRequestValidationException e) {
 			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.country.invalid"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidate_create_ThrowsException_WhenCountryIsRequiredBecauseProvinceIsDefined() {
+		final LocationRequestDto locationRequestDto =
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR,
+				LocationValidatorTest.LOCATION_TYPE);
+		locationRequestDto.setProvinceId(100);
+		final LocationTypeDTO locationTypeDTO = new LocationTypeDTO();
+		locationTypeDTO.setId(LocationValidatorTest.LOCATION_TYPE);
+
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(Arrays.asList(locationTypeDTO));
+
+		try {
+			this.locationValidator.validateCreation(locationRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.country.required.when.province.is.defined"));
 			throw e;
 		}
 	}
