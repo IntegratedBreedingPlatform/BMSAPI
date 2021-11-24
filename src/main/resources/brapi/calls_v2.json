@@ -192,6 +192,30 @@
     ]
   },
   {
+    "service": "search/samples",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "search/samples/{searchResultsDbId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
     "service": "variables",
     "dataTypes": [
       "application/json"

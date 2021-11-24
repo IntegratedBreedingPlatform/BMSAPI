@@ -15,6 +15,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
@@ -378,6 +379,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public void importUpdates(final GermplasmListGeneratorDTO request) {
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(request.getId());
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+
 		this.processEntriesForUpdate(request);
 		this.germplasmListService.importUpdates(request);
 	}
@@ -641,7 +645,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (StringUtils.isEmpty(newParentFolderId) || newParentFolderId.equals(CROP_LISTS)) {
+		if (StringUtils.isEmpty(newParentFolderId)) {
 			this.errors.reject("list.parent.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -654,7 +658,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.validateProgram(cropName, programUUID);
 
 		this.validateNodeId(newParentFolderId, programUUID, ListNodeType.PARENT, false);
-		this.validateNodeId(folderId, programUUID, ListNodeType.FOLDER, false);
+		this.validateNodeId(folderId, ListNodeType.FOLDER);
+
+		if (Util.isPositiveInteger(folderId)) {
+			final GermplasmListDto germplasmListById = this.getGermplasmListById(Integer.parseInt(folderId));
+			this.getGermplasmListByIdAndProgramUUID(folderId, germplasmListById.getProgramUUID(), ListNodeType.FOLDER);
+		}
 
 		final GermplasmList germplasmListToMove = this.germplasmListService.getGermplasmListById(Integer.parseInt(folderId))
 			.orElseThrow(() -> {
@@ -775,6 +784,27 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.germplasmListService.getGermplasmListVariables(programUUID, listId, variableTypeId);
 	}
 
+	@Override
+	public void deleteGermplasmList(final String cropName, final String programUUID, final Integer listId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateProgram(cropName, programUUID);
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+		this.germplasmListService.deleteGermplasmList(listId);
+	}
+
+	@Override
+	public void addGermplasmListEntriesToAnotherList(final String cropName, final String programUUID, final Integer destinationListId,
+		final Integer sourceListId, final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateProgram(cropName, programUUID);
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(destinationListId);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+		this.germplasmListValidator.validateGermplasmList(sourceListId);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, this.errors);
+		this.germplasmListService.addGermplasmListEntriesToAnotherList(destinationListId, sourceListId, programUUID, searchComposite);
+	}
+
 	private void validateProgram(final String cropName, final String programUUID) {
 		if (!StringUtils.isEmpty(programUUID)) {
 			this.programValidator.validate(new ProgramDTO(cropName, programUUID), this.errors);
@@ -789,28 +819,27 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	private void validateNodeId(final String nodeId, final String programUUID, final ListNodeType nodeType, final boolean validateRequiredProgramUUID) {
-		if (!Objects.isNull(nodeId) && !PROGRAM_LISTS.equals(nodeId) && !CROP_LISTS.equals(nodeId) && !Util.isPositiveInteger(nodeId)) {
-			this.errors.reject("list." + nodeType.getValue() + ".id.invalid", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
+		this.validateNodeId(nodeId, nodeType);
 
-		if ((PROGRAM_LISTS.equals(nodeId) && StringUtils.isEmpty(programUUID))) {
+		if (validateRequiredProgramUUID && PROGRAM_LISTS.equals(nodeId) && StringUtils.isEmpty(programUUID)) {
 			this.errors.reject("list.project.mandatory", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (Util.isPositiveInteger(nodeId)) {
-			final GermplasmList germplasmList =
-				this.germplasmListService.getGermplasmListByIdAndProgramUUID(Integer.parseInt(nodeId), programUUID)
-					.orElseThrow(() -> {
-						this.errors.reject("list." + nodeType.getValue() + ".id.not.exist", "");
-						return new ApiRequestValidationException(this.errors.getAllErrors());
-					});
+			final GermplasmList germplasmList = this.getGermplasmListByIdAndProgramUUID(nodeId, programUUID, nodeType);
 
 			if (validateRequiredProgramUUID && !StringUtils.isEmpty(programUUID) && StringUtils.isEmpty(germplasmList.getProgramUUID())) {
 				this.errors.reject("list.project.mandatory", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
+		}
+	}
+
+	private void validateNodeId(final String nodeId, final ListNodeType nodeType) {
+		if (!Objects.isNull(nodeId) && !PROGRAM_LISTS.equals(nodeId) && !CROP_LISTS.equals(nodeId) && !Util.isPositiveInteger(nodeId)) {
+			this.errors.reject("list." + nodeType.getValue() + ".id.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
@@ -829,6 +858,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private Integer getFolderIdAsInteger(final String folderId) {
 		return (CROP_LISTS.equals(folderId) || PROGRAM_LISTS.equals(folderId)) ? null : Integer.valueOf(folderId);
+	}
+
+	private GermplasmList getGermplasmListByIdAndProgramUUID(final String nodeId, final String programUUID, final ListNodeType nodeType) {
+		return this.germplasmListService.getGermplasmListByIdAndProgramUUID(Integer.parseInt(nodeId), programUUID)
+				.orElseThrow(() -> {
+					this.errors.reject("list." + nodeType.getValue() + ".id.not.exist", "");
+					return new ApiRequestValidationException(this.errors.getAllErrors());
+				});
 	}
 
 	public void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
