@@ -419,6 +419,18 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Clone germplasm list")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'CLONE_GERMPLASM_LIST')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/clone", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<GermplasmListGeneratorDTO> cloneList(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListGeneratorDTO request) {
+
+		return new ResponseEntity<>(this.germplasmListService.clone(listId, request), HttpStatus.CREATED);
+	}
+
 	@ApiOperation(value = "Delete germplasm list", notes = "Delete germplasm list.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'DELETE_GERMPLASM_LIST')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{listId}", method = RequestMethod.DELETE)

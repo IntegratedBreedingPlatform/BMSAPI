@@ -322,6 +322,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public GermplasmListGeneratorDTO clone(final Integer germplasmListId, final GermplasmListGeneratorDTO request) {
+		this.germplasmListService.cloneGermplasmListEntries(germplasmListId, request);
+		return this.create(request);
+	}
+
+	@Override
 	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request) {
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
