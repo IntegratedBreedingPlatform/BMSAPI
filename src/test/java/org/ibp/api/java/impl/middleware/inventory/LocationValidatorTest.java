@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 public class LocationValidatorTest {
@@ -227,6 +228,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateLocation(errors, null);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.required"));
 			throw e;
 		}
@@ -239,6 +241,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateLocation(errors, LocationValidatorTest.LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.invalid"));
 			throw e;
 		}
@@ -250,6 +253,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.invalid"));
 			throw e;
 		}
@@ -261,6 +265,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCanBeDeleted(null);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.required"));
 			throw e;
 		}
@@ -274,6 +279,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.is.used.in.germplasms"));
 			throw e;
 		}
@@ -287,6 +293,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.is.used.in.lots"));
 			throw e;
 		}
@@ -300,6 +307,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.is.used.in.attributes"));
 			throw e;
 		}
@@ -313,6 +321,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.is.used.in.names"));
 			throw e;
 		}
@@ -326,6 +335,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.is.used.in.studies"));
 			throw e;
 		}
@@ -336,6 +346,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, new LocationRequestDto());
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.invalid"));
 			throw e;
 		}
@@ -352,6 +363,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.type.invalid"));
 			throw e;
 		}
@@ -367,6 +379,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.name.max.length"));
 			throw e;
 		}
@@ -388,6 +401,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.abbr.is.in.used"));
 			throw e;
 		}
@@ -405,6 +419,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.abbr.max.length"));
 			throw e;
 		}
@@ -414,7 +429,9 @@ public class LocationValidatorTest {
 	public void testValidate_update_ThrowsException_WhenProvinceIdIsInvalid() {
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(new LocationDTO());
 		final LocationDTO locationDTO = new LocationDTO();
+		locationDTO.setCountryId(10);
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(locationDTO);
+		Mockito.when(this.locationService.getLocation(locationDTO.getCountryId())).thenReturn(new LocationDTO());
 
 		final LocationRequestDto locationRequestDto =
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, null);
@@ -422,6 +439,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.province.invalid"));
 			throw e;
 		}
@@ -440,6 +458,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.country.invalid"));
 			throw e;
 		}
@@ -465,7 +484,8 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.province.not.belong.to.contry"));
+			assertThat(e.getErrors(), hasSize(1));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.province.not.belong.to.country"));
 			throw e;
 		}
 	}
@@ -478,6 +498,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.type.is.required"));
 			throw e;
 		}
@@ -491,6 +512,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.type.is.required"));
 			throw e;
 		}
@@ -504,6 +526,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.type.invalid"));
 			throw e;
 		}
@@ -524,6 +547,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.abbr.max.length"));
 			throw e;
 		}
@@ -548,6 +572,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.abbr.is.in.used"));
 			throw e;
 		}
@@ -559,17 +584,19 @@ public class LocationValidatorTest {
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR,
 				LocationValidatorTest.LOCATION_TYPE);
 		locationRequestDto.setProvinceId(0);
+		locationRequestDto.setCountryId(10);
 		final LocationTypeDTO locationTypeDTO = new LocationTypeDTO();
 		locationTypeDTO.setId(LocationValidatorTest.LOCATION_TYPE);
 
 		final List<LocationTypeDTO> locationTypeDTOS = Arrays.asList(new LocationTypeDTO());
 
-
+		Mockito.when(this.locationService.getLocation(locationRequestDto.getCountryId())).thenReturn(new LocationDTO());
 		Mockito.when(this.locationService.getLocationTypes()).thenReturn(Arrays.asList(locationTypeDTO));
 
 		try {
 			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.province.invalid"));
 			throw e;
 		}
@@ -592,6 +619,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.country.invalid"));
 			throw e;
 		}
@@ -612,6 +640,7 @@ public class LocationValidatorTest {
 		try {
 			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.country.invalid"));
 			throw e;
 		}
@@ -628,10 +657,13 @@ public class LocationValidatorTest {
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR,
 				LocationValidatorTest.LOCATION_TYPE);
 		locationRequestDto.setProvinceId(0);
+		locationRequestDto.setCountryId(10);
+		Mockito.when(this.locationService.getLocation(locationRequestDto.getCountryId())).thenReturn(new LocationDTO());
 
 		try {
 			this.locationValidator.validateCreation(locationRequestDto);
 		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.province.invalid"));
 			throw e;
 		}
