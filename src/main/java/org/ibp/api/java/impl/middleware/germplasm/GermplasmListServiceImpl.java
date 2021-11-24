@@ -323,6 +323,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public GermplasmListGeneratorDTO clone(final Integer germplasmListId, final GermplasmListGeneratorDTO request) {
+		this.germplasmListValidator.validateGermplasmList(germplasmListId);
 		this.germplasmListService.cloneGermplasmListEntries(germplasmListId, request);
 		return this.create(request);
 	}
