@@ -139,7 +139,7 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Add germplasm list entries to an existing list")
+	@ApiOperation(value = "Import germplasm list entries to an existing list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries/import", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> addGermplasmListEntriesToAnotherList(
