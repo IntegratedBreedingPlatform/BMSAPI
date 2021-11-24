@@ -144,8 +144,9 @@ public class LocationValidator {
 		}
 
 		if (locationRequestDto.getProvinceId() != null) {
-			if (locationRequestDto.getCountryId() != null) {
+			if (locationRequestDto.getCountryId() == null) {
 				this.errors.reject("location.country.required.when.province.is.defined", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 			this.validateLocationId(locationRequestDto.getProvinceId(), "location.province.invalid");
 		}
@@ -197,6 +198,10 @@ public class LocationValidator {
 		}
 
 		if (provinceId != null) {
+			if (countryId == null) {
+				this.errors.reject("location.country.required.when.province.is.defined", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
 			this.validateLocationId(provinceId, "location.province.invalid");
 		}
 
