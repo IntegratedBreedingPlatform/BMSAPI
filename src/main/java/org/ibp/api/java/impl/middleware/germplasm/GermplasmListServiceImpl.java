@@ -330,7 +330,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.assignFolderDependentProperties(request, currentProgram);
 
 		return this.germplasmListService.cloneGermplasmList(germplasmListId, request,
-			this.securityService.getCurrentlyLoggedInUser());
+			this.securityService.getCurrentlyLoggedInUser().getUserid());
 	}
 
 	@Override
@@ -346,7 +346,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 
 		// finally save
-		return this.germplasmListService.create(request, loggedInUser);
+		return this.germplasmListService.create(request, loggedInUser.getUserid());
 	}
 
 	private void assignFolderDependentProperties (final GermplasmListGeneratorDTO request, final String currentProgram) {

@@ -1747,8 +1747,7 @@ public class GermplasmListServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListName(PROGRAM_UUID, germplasmListGen.getName());
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
-		Mockito.verify(this.germplasmListServiceMiddleware).cloneGermplasmList(GERMPLASM_LIST_ID, germplasmListGen,
-			new WorkbenchUser(USER_ID));
+		Mockito.verify(this.germplasmListServiceMiddleware).cloneGermplasmList(GERMPLASM_LIST_ID, germplasmListGen, USER_ID);
 	}
 
 	private GermplasmListGeneratorDTO createGermplasmList() {
