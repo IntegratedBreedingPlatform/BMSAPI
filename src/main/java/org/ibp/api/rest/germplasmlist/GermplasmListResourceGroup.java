@@ -12,7 +12,6 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
@@ -421,15 +420,16 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Edit List metatadata")
-	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/metadata", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}", method = RequestMethod.PATCH)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'EDIT_LIST_METADATA')")
 	@ResponseBody
 	public ResponseEntity<Void> editListMetadata(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
-		@RequestBody final GermplasmListMetadataRequest request
+		@RequestBody final GermplasmListDto request
 	) {
-		this.germplasmListService.editListMetadata(listId, request);
+		request.setListId(listId);
+		this.germplasmListService.editListMetadata(request);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

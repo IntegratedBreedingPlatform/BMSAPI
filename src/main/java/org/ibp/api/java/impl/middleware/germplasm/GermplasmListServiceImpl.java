@@ -13,7 +13,6 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
@@ -326,9 +325,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request) {
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
-		this.germplasmListValidator.validateListMetadata(
-			new GermplasmListMetadataRequest(request.getName(), request.getDescription(), request.getType(), request.getDate(),
-				request.getNotes()), currentProgram, null);
+		final GermplasmListDto germplasmListDto = new GermplasmListDto();
+		germplasmListDto.setListName(request.getName());
+		germplasmListDto.setDescription(request.getDescription());
+		germplasmListDto.setListType(request.getType());
+		germplasmListDto.setCreationDate(request.getDate());
+		germplasmListDto.setNotes(request.getNotes());
+		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
 
 		final String parentFolderId = request.getParentFolderId();
 		checkNotNull(parentFolderId, "param.null", new String[] {"parentFolderId"});
@@ -750,14 +753,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void editListMetadata(final Integer listId, final GermplasmListMetadataRequest request) {
-		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
+	public void editListMetadata(final GermplasmListDto germplasmListDto) {
+		BaseValidator.checkNotNull(germplasmListDto.getListId(), "list.id.required");
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(germplasmListDto.getListId());
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
-		this.germplasmListValidator.validateListMetadata(request, currentProgram, listId);
-		this.germplasmListService.editListMetadata(listId, request);
+		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
+		this.germplasmListService.editListMetadata(germplasmListDto);
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -67,25 +67,24 @@ public class GermplasmListValidator {
 		}
 	}
 
-	public void validateListMetadata(final GermplasmListMetadataRequest request, final String currentProgram,
-		final Integer listId) {
-		checkNotNull(request, PARAM_NULL, new String[] {"request"});
-		checkNotNull(request.getDate(), PARAM_NULL, new String[] {"date"});
+	public void validateListMetadata(final GermplasmListDto germplasmListDto, final String currentProgram) {
+		checkNotNull(germplasmListDto, PARAM_NULL, new String[] {"request"});
+		checkNotNull(germplasmListDto.getCreationDate(), PARAM_NULL, new String[] {"date"});
 
-		final String description = request.getDescription();
+		final String description = germplasmListDto.getDescription();
 		checkNotEmpty(description, PARAM_NULL, new String[] {"description"});
 		checkArgument(description.length() <= 255, TEXT_FIELD_MAX_LENGTH, new String[] {"description", "255"});
 
-		if (!StringUtils.isBlank(request.getNotes())) {
-			checkArgument(request.getNotes().length() <= 65535, TEXT_FIELD_MAX_LENGTH, new String[] {"notes", "65535"});
+		if (!StringUtils.isBlank(germplasmListDto.getNotes())) {
+			checkArgument(germplasmListDto.getNotes().length() <= 65535, TEXT_FIELD_MAX_LENGTH, new String[] {"notes", "65535"});
 		}
 
-		final String type = request.getType();
+		final String type = germplasmListDto.getListType();
 		checkNotEmpty(type, PARAM_NULL, new String[] {"type"});
 		if (this.germplasmListManager.getGermplasmListTypes().stream().noneMatch(listType -> listType.getFcode().equals(type))) {
 			throw new ApiValidationException("", "error.germplasmlist.save.type.not.exists", type);
 		}
-		this.validateListName(currentProgram, request.getName(), listId);
+		this.validateListName(currentProgram, germplasmListDto.getListName(), germplasmListDto.getListId());
 	}
 
 	private void validateListName(final String currentProgram, final String name, final Integer listId) {

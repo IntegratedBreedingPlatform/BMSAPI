@@ -10,7 +10,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.program.ProgramDTO;
@@ -49,7 +48,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -318,14 +316,14 @@ public class GermplasmListServiceImplTest {
 	public void testCreate_OK() {
 		final GermplasmListGeneratorDTO request = this.createGermplasmList();
 		this.germplasmListService.create(request);
-		final ArgumentCaptor<GermplasmListMetadataRequest> metadataRequestCaptor = ArgumentCaptor.forClass(GermplasmListMetadataRequest.class);
-		Mockito.verify(this.germplasmListValidator).validateListMetadata(metadataRequestCaptor.capture(), ArgumentMatchers.eq(PROGRAM_UUID), ArgumentMatchers.isNull());
-		final GermplasmListMetadataRequest metadata = metadataRequestCaptor.getValue();
-		Assert.assertEquals(request.getDate(), metadata.getDate());
-		Assert.assertEquals(request.getName(), metadata.getName());
+		final ArgumentCaptor<GermplasmListDto> metadataRequestCaptor = ArgumentCaptor.forClass(GermplasmListDto.class);
+		Mockito.verify(this.germplasmListValidator).validateListMetadata(metadataRequestCaptor.capture(), ArgumentMatchers.eq(PROGRAM_UUID));
+		final GermplasmListDto metadata = metadataRequestCaptor.getValue();
+		Assert.assertEquals(request.getDate(), metadata.getCreationDate());
+		Assert.assertEquals(request.getName(), metadata.getListName());
 		Assert.assertEquals(request.getDescription(), metadata.getDescription());
 		Assert.assertEquals(request.getNotes(), metadata.getNotes());
-		Assert.assertEquals(request.getType(), metadata.getType());
+		Assert.assertEquals(request.getType(), metadata.getListType());
 		Mockito.verify(this.germplasmListServiceMiddleware)
 			.create(request, GermplasmList.Status.LIST.getCode(), PROGRAM_UUID, this.loggedInUser);
 	}
@@ -1547,19 +1545,36 @@ public class GermplasmListServiceImplTest {
 		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
 	}
 
+	@Test(expected = ApiRequestValidationException.class)
+	public void testEditListMetadata_NoListId() {
+		final GermplasmListDto request = new GermplasmListDto();
+		request.setListName(RandomStringUtils.randomAlphabetic(20));
+		request.setDescription(RandomStringUtils.randomAlphabetic(20));
+		request.setNotes(RandomStringUtils.randomAlphabetic(20));
+		request.setCreationDate(new Date());
+		request.setListType(GERMPLASM_LIST_TYPE);
+		this.germplasmListService.editListMetadata(request);
+		Mockito.verifyNoInteractions(this.germplasmListValidator);
+		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
+	}
+
 	@Test
 	public void testEditListMetadata_OK() {
-		final GermplasmList germplasmList = this.createGermplasmListMock(true);
+		final GermplasmList germplasmList = new GermplasmList(GERMPLASM_LIST_ID);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
-		final GermplasmListMetadataRequest request =
-			new GermplasmListMetadataRequest(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
-				GERMPLASM_LIST_TYPE, new Date(), RandomStringUtils.randomAlphabetic(20));
-		this.germplasmListService.editListMetadata(GERMPLASM_LIST_ID, request);
+		final GermplasmListDto request = new GermplasmListDto();
+		request.setListId(GERMPLASM_LIST_ID);
+		request.setListName(RandomStringUtils.randomAlphabetic(20));
+		request.setDescription(RandomStringUtils.randomAlphabetic(20));
+		request.setNotes(RandomStringUtils.randomAlphabetic(20));
+		request.setCreationDate(new Date());
+		request.setListType(GERMPLASM_LIST_TYPE);
+		this.germplasmListService.editListMetadata(request);
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsNotAFolder(germplasmList);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
-		Mockito.verify(this.germplasmListValidator).validateListMetadata(request, PROGRAM_UUID, GERMPLASM_LIST_ID);
-		Mockito.verify(this.germplasmListServiceMiddleware).editListMetadata(GERMPLASM_LIST_ID, request);
+		Mockito.verify(this.germplasmListValidator).validateListMetadata(request, PROGRAM_UUID);
+		Mockito.verify(this.germplasmListServiceMiddleware).editListMetadata(request);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
