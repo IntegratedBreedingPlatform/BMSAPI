@@ -61,6 +61,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE = "variable.type.germplasm.passport.can.not.club.with.other";
 	private static final String VARIABLE_TYPE_ENTRY_DETAIL_SHOULD_BE_USED_SINGLE = "variable.type.entry.detail.can.not.club.with.other";
 
+	private static final String VARIABLE_NOT_DELETABLE_AND_EDITABLE = "variable.not.editable.and.deletable";
+
 	private static final Integer NAME_TEXT_LIMIT = 32;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
 
@@ -87,6 +89,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	public void validate(final Object target, final Errors errors) {
 
 		final VariableDetails variable = (VariableDetails) target;
+
+		//validar que la variable es del system
 
 		final boolean nameValidationResult = this.nameValidationProcessor(variable, errors);
 
@@ -498,6 +502,11 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				return;
 			}
 
+			// should not be a System variable
+			if(oldVariable.getIsSystem()){
+				this.addCustomError(errors, VariableValidator.VARIABLE_NOT_DELETABLE_AND_EDITABLE, new Object[] {variable.getName()});
+				return;
+			}
 
 			final boolean isEditable = !oldVariable.getHasUsage();
 			if (isEditable) {
