@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.constant.ListTreeState;
@@ -790,13 +791,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void removeGermplasmEntriesFromList(final Integer germplasmListId, final List<Integer> listDataIds) {
+	public void removeGermplasmEntriesFromList(final Integer germplasmListId,
+		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(germplasmListId);
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
-		this.germplasmListDataValidator.verifyListDataIdsExist(germplasmListId, listDataIds);
-		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, listDataIds);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite,
+			new MapBindingResult(new HashMap<>(), String.class.getName()));
+		if (CollectionUtils.isNotEmpty(searchComposite.getItemIds()) && searchComposite.getSearchRequest() == null) {
+			this.germplasmListDataValidator.verifyListDataIdsExist(germplasmListId, new ArrayList<>(searchComposite.getItemIds()));
+		}
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, searchComposite);
 	}
 
 	@Override
@@ -883,10 +889,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private GermplasmList getGermplasmListByIdAndProgramUUID(final String nodeId, final String programUUID, final ListNodeType nodeType) {
 		return this.germplasmListService.getGermplasmListByIdAndProgramUUID(Integer.parseInt(nodeId), programUUID)
-				.orElseThrow(() -> {
-					this.errors.reject("list." + nodeType.getValue() + ".id.not.exist", "");
-					return new ApiRequestValidationException(this.errors.getAllErrors());
-				});
+			.orElseThrow(() -> {
+				this.errors.reject("list." + nodeType.getValue() + ".id.not.exist", "");
+				return new ApiRequestValidationException(this.errors.getAllErrors());
+			});
 	}
 
 	public void setGermplasmListManager(final GermplasmListManager germplasmListManager) {

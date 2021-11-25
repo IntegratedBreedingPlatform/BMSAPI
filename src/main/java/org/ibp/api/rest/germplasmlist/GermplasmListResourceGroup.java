@@ -53,6 +53,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 @Api(value = "Germplasm List Services")
 @Controller
@@ -161,9 +162,11 @@ public class GermplasmListResourceGroup {
 	public ResponseEntity<Void> removeGermplasmEntriesFromList(
 		@ApiParam(required = true) @PathVariable final String crop,
 		@PathVariable final Integer germplasmListId,
-		@RequestParam(required = true) final List<Integer> selectedEntries
+		@RequestParam(required = true) final Set<Integer> selectedEntries
 	) {
-		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, selectedEntries);
+		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite = new SearchCompositeDto<>();
+		searchComposite.setItemIds(selectedEntries);
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, searchComposite);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
