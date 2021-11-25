@@ -323,9 +323,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public GermplasmListGeneratorDTO clone(final Integer germplasmListId, final GermplasmListGeneratorDTO request) {
+		final String currentProgram = ContextHolder.getCurrentProgram();
+
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
-		this.germplasmListService.cloneGermplasmListEntries(germplasmListId, request);
-		return this.create(request);
+		this.validateNewList(request, currentProgram);
+		this.assignFolderDependentProperties(request, currentProgram);
+
+		return this.germplasmListService.cloneGermplasmList(germplasmListId, request,
+			this.securityService.getCurrentlyLoggedInUser());
 	}
 
 	@Override
@@ -333,8 +338,37 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
 
-		// validations
+		this.validateNewList(request, currentProgram);
+		// process and assign defaults + more validations
+		this.processEntries(request, currentProgram);
+		this.assignFolderDependentProperties(request, currentProgram);
 
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+
+		// finally save
+		return this.germplasmListService.create(request, loggedInUser);
+	}
+
+	private void assignFolderDependentProperties (final GermplasmListGeneratorDTO request, final String currentProgram) {
+		// properties that depend on CROP/PROGRAM folder
+		int status = GermplasmList.Status.LIST.getCode();
+		final String parentFolderId = request.getParentFolderId();
+		// If the germplasm list is saved in 'Crop lists' folder, the programUUID should be null
+		// so that the germplasm list will be accessible to all programs of the same crop.
+		if (CROP_LISTS.equals(parentFolderId)) {
+			// list should be locked by default if it is saved in 'Crop lists' folder.
+			status = GermplasmList.Status.LOCKED_LIST.getCode();
+		} else {
+			request.setProgramUUID(currentProgram);
+		}
+		request.setStatus(status);
+
+		if (CROP_LISTS.equals(parentFolderId) || PROGRAM_LISTS.equals(parentFolderId)) {
+			request.setParentFolderId(null);
+		}
+	}
+
+	private void validateNewList (final GermplasmListGeneratorDTO request, final String currentProgram) {
 		checkNotNull(request, "param.null", new String[] {"request"});
 		checkNotNull(request.getDate(), "param.null", new String[] {"date"});
 
@@ -358,30 +392,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final String parentFolderId = request.getParentFolderId();
 		checkNotNull(parentFolderId, "param.null", new String[] {"parentFolderId"});
 		this.validateNodeId(parentFolderId, currentProgram, ListNodeType.PARENT);
-
-		// process and assign defaults + more validations
-		this.processEntries(request, currentProgram);
-
-		// properties that depend on CROP/PROGRAM folder
-		int status = GermplasmList.Status.LIST.getCode();
-		String programUUID = null;
-		// If the germplasm list is saved in 'Crop lists' folder, the programUUID should be null
-		// so that the germplasm list will be accessible to all programs of the same crop.
-		if (CROP_LISTS.equals(parentFolderId)) {
-			// list should be locked by default if it is saved in 'Crop lists' folder.
-			status = GermplasmList.Status.LOCKED_LIST.getCode();
-		} else {
-			programUUID = currentProgram;
-		}
-
-		if (CROP_LISTS.equals(parentFolderId) || PROGRAM_LISTS.equals(parentFolderId)) {
-			request.setParentFolderId(null);
-		}
-
-		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-
-		// finally save
-		return this.germplasmListService.create(request, status, programUUID, loggedInUser);
 	}
 
 	@Override
