@@ -67,6 +67,7 @@ public interface GermplasmListService {
 	void addGermplasmListEntriesToAnotherList(String cropName, String programUUID, Integer destinationListId, Integer sourceListId,
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 
-	void editListMetadata(GermplasmListDto germplasmListDto);
+	void removeGermplasmEntriesFromList(Integer germplasmListId, SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 
+	void editListMetadata(GermplasmListDto germplasmListDto);
 }
