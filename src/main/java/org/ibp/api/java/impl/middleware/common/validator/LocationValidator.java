@@ -249,7 +249,7 @@ public class LocationValidator {
 	private void validateLocationNotUsedInGermplasm(final Integer locationId) {
 		final boolean isLocationUsedInGermplasm = this.germplasmService.isLocationUsedInGermplasm(locationId);
 		if (isLocationUsedInGermplasm) {
-			this.errors.reject("location.is.used.in.germplasms", new String[] {locationId.toString()}, "");
+			this.errors.reject("location.is.used.in.germplasm", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

@@ -280,7 +280,7 @@ public class LocationValidatorTest {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(e.getErrors(), hasSize(1));
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.is.used.in.germplasms"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.is.used.in.germplasm"));
 			throw e;
 		}
 	}
