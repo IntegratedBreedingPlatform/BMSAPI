@@ -130,4 +130,9 @@ public class GermplasmListValidator {
 		}
 	}
 
+	public void validateParentFolder(final GermplasmListDto request) {
+		final String parentFolderId = request.getParentFolderId();
+		checkNotNull(parentFolderId, PARAM_NULL, new String[] {"parentFolderId"});
+	}
+
 }

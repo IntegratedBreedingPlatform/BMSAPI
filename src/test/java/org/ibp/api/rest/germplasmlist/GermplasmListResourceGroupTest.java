@@ -5,6 +5,7 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMetadataRequest;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -98,16 +99,16 @@ public class GermplasmListResourceGroupTest extends ApiUnitTestBase {
 		final String crop = CropType.CropEnum.MAIZE.name().toLowerCase();
 		final Integer listId = new Random().nextInt(100);
 
-		final GermplasmListMetadataRequest request = new GermplasmListMetadataRequest();
-		request.setName(randomAlphanumeric(10));
+		final GermplasmListDto request = new GermplasmListDto();
+		request.setListName(randomAlphanumeric(10));
 
 		final GermplasmListGeneratorDTO resultList = new GermplasmListGeneratorDTO();
-		resultList.setName(request.getName());
+		resultList.setName(request.getListName());
 		resultList.setEntries(Collections.singletonList(new GermplasmListGeneratorDTO.GermplasmEntryDTO(
 			1, 1, randomAlphanumeric(10), randomAlphanumeric(10), randomAlphanumeric(10)
 		)));
 
-		doReturn(resultList).when(this.germplasmListService).clone(Mockito.anyInt(), Mockito.any(GermplasmListGeneratorDTO.class));
+		doReturn(resultList).when(this.germplasmListService).clone(Mockito.anyInt(), Mockito.any(GermplasmListDto.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/crops/{cropName}/germplasm-lists/{listId}/clone",
 					crop, listId).param("programUUID", GermplasmListResourceGroupTest.PROGRAM_UUID)
@@ -116,7 +117,7 @@ public class GermplasmListResourceGroupTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isCreated())
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.name",
-				Matchers.is(request.getName())))
+				Matchers.is(request.getListName())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.entries",
 				IsCollectionWithSize.hasSize(resultList.getEntries().size())));
 

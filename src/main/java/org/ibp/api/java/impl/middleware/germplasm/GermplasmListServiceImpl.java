@@ -332,14 +332,21 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public GermplasmListGeneratorDTO clone(final Integer germplasmListId, final GermplasmListGeneratorDTO request) {
+	public GermplasmListGeneratorDTO clone(final Integer germplasmListId, final GermplasmListDto request) {
 		final String currentProgram = ContextHolder.getCurrentProgram();
 
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
-		this.validateNewList(request, currentProgram);
-		this.assignFolderDependentProperties(request, currentProgram);
+		this.germplasmListValidator.validateListMetadata(request, currentProgram);
+		this.germplasmListValidator.validateParentFolder(request);
+		this.validateNodeId(request.getParentFolderId(), currentProgram, ListNodeType.PARENT);
 
-		return this.germplasmListService.cloneGermplasmList(germplasmListId, request,
+		// create new GermplasmListGeneratorDTO object from request to reuse create list method
+		final GermplasmListGeneratorDTO listGeneratorDTO = new GermplasmListGeneratorDTO(request);
+		this.assignFolderDependentProperties(listGeneratorDTO, currentProgram);
+
+		// returns a new GermplasmListGeneratorDTO (different from param) since
+		// entries are inserted and then retrieved from db
+		return this.germplasmListService.cloneGermplasmList(germplasmListId, listGeneratorDTO,
 			this.securityService.getCurrentlyLoggedInUser().getUserid());
 	}
 
@@ -356,7 +363,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		germplasmListDto.setNotes(request.getNotes());
 		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
 
-		this.validateNewList(request, currentProgram);
+		this.germplasmListValidator.validateParentFolder(germplasmListDto);
+		this.validateNodeId(germplasmListDto.getParentFolderId(), currentProgram, ListNodeType.PARENT);
 
 		// process and assign defaults + more validations
 		this.processEntries(request, currentProgram);
@@ -385,12 +393,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		if (CROP_LISTS.equals(parentFolderId) || PROGRAM_LISTS.equals(parentFolderId)) {
 			request.setParentFolderId(null);
 		}
-	}
-
-	private void validateNewList (final GermplasmListGeneratorDTO request, final String currentProgram) {
-		final String parentFolderId = request.getParentFolderId();
-		checkNotNull(parentFolderId, "param.null", new String[] {"parentFolderId"});
-		this.validateNodeId(parentFolderId, currentProgram, ListNodeType.PARENT);
 	}
 
 	@Override

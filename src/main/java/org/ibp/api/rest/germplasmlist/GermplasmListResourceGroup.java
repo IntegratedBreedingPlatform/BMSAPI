@@ -446,7 +446,7 @@ public class GermplasmListResourceGroup {
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmListDto request) {
 
-		return new ResponseEntity<>(this.germplasmListService.clone(listId, new GermplasmListGeneratorDTO(request)), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.germplasmListService.clone(listId, request), HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Edit List metatadata")
