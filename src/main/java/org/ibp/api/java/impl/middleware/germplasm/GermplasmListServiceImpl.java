@@ -90,6 +90,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	static final String ENTRY_CODE = "entryCode";
 	static final String SEED_SOURCE = "seedSource";
 	static final String GROUP_NAME = "groupName";
+	public static final String LIST_FIELD_UPDATE_NOT_SUPPORTED = "list.field.update.not.supported";
+	public static final String LIST_FOLDER_ID_INVALID = "list.folder.id.invalid";
+	public static final String ERROR_GERMPLASMLIST_SAVE_GAPS = "error.germplasmlist.save.gaps";
 
 
 	private enum ListNodeType {
@@ -475,13 +478,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiValidationException("", "error.germplasmlist.save.entryno.gaps");
 		}
 		if (hasEntryCode && hasEntryCodeEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", ENTRY_CODE);
+			throw new ApiValidationException("", ERROR_GERMPLASMLIST_SAVE_GAPS, ENTRY_CODE);
 		}
 		if (hasSeedSource && hasSeedSourceEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", SEED_SOURCE);
+			throw new ApiValidationException("", ERROR_GERMPLASMLIST_SAVE_GAPS, SEED_SOURCE);
 		}
 		if (hasGroupName && hasGroupNameEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", GROUP_NAME);
+			throw new ApiValidationException("", ERROR_GERMPLASMLIST_SAVE_GAPS, GROUP_NAME);
 		}
 
 	}
@@ -630,7 +633,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 
 		if (StringUtils.isEmpty(folderId)) {
-			this.errors.reject("list.folder.id.invalid", "");
+			this.errors.reject(LIST_FOLDER_ID_INVALID, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
@@ -696,7 +699,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 
 		if (StringUtils.isEmpty(folderId)) {
-			this.errors.reject("list.folder.id.invalid", "");
+			this.errors.reject(LIST_FOLDER_ID_INVALID, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
@@ -777,6 +780,21 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
 		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
+
+		// Throw exception for fields not supported for updating
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		if (germplasmListDto.getOwnerId() != null && !germplasmListDto.getOwnerId().equals(germplasmList.getUserId())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"ownerId"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		if (germplasmListDto.isLocked() != null && !germplasmListDto.isLocked().equals(germplasmList.isLockedList())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"locked"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		if (StringUtils.isNotBlank(germplasmListDto.getProgramUUID()) && !germplasmListDto.getProgramUUID().equals(germplasmList.getProgramUUID())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"programUUID"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 		this.germplasmListService.editListMetadata(germplasmListDto);
 	}
 
@@ -868,7 +886,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private void validateFolderNotCropNorProgramList(final String folderId) {
 		if (folderId.equals(CROP_LISTS) || folderId.equals(PROGRAM_LISTS)) {
-			this.errors.reject("list.folder.id.invalid", "");
+			this.errors.reject(LIST_FOLDER_ID_INVALID, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

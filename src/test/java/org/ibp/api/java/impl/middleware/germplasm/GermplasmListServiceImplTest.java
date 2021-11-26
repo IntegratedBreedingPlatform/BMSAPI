@@ -1696,7 +1696,7 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testEditListMetadata_NoListId() {
+	public void testEditListMetadata_NoListId_Fail() {
 		final GermplasmListDto request = new GermplasmListDto();
 		request.setListName(RandomStringUtils.randomAlphabetic(20));
 		request.setDescription(RandomStringUtils.randomAlphabetic(20));
@@ -1705,6 +1705,53 @@ public class GermplasmListServiceImplTest {
 		request.setListType(GERMPLASM_LIST_TYPE);
 		this.germplasmListService.editListMetadata(request);
 		Mockito.verifyNoInteractions(this.germplasmListValidator);
+		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testEditListMetadata_TryingToUpdateListOwner_Fail() {
+		final GermplasmList germplasmList = new GermplasmList(GERMPLASM_LIST_ID);
+		germplasmList.setUserId(1);
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		final GermplasmListDto request = new GermplasmListDto();
+		request.setListId(GERMPLASM_LIST_ID);
+		request.setOwnerId(2);
+		this.germplasmListService.editListMetadata(request);
+		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testEditListMetadata_TryingToLockList_Fail() {
+		final GermplasmList germplasmList = new GermplasmList(GERMPLASM_LIST_ID);
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		final GermplasmListDto request = new GermplasmListDto();
+		request.setListId(GERMPLASM_LIST_ID);
+		request.setLocked(true);
+		this.germplasmListService.editListMetadata(request);
+		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testEditListMetadata_TryingToUnlockList_Fail() {
+		final GermplasmList germplasmList = new GermplasmList(GERMPLASM_LIST_ID);
+		germplasmList.lockList();
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		final GermplasmListDto request = new GermplasmListDto();
+		request.setListId(GERMPLASM_LIST_ID);
+		request.setLocked(false);
+		this.germplasmListService.editListMetadata(request);
+		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testEditListMetadata_TryingToUpdateListProgram_Fail() {
+		final GermplasmList germplasmList = new GermplasmList(GERMPLASM_LIST_ID);
+		germplasmList.setProgramUUID(RandomStringUtils.randomAlphabetic(30));
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		final GermplasmListDto request = new GermplasmListDto();
+		request.setListId(GERMPLASM_LIST_ID);
+		request.setProgramUUID(RandomStringUtils.randomAlphabetic(30));
+		this.germplasmListService.editListMetadata(request);
 		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
 	}
 
