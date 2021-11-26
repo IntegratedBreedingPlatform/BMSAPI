@@ -23,7 +23,6 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
@@ -55,6 +54,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 @Api(value = "Germplasm List Services")
 @Controller
@@ -87,7 +87,8 @@ public class GermplasmListResourceGroup {
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId,
 		@ApiParam(value = "Only folders") @RequestParam(required = true) final Boolean onlyFolders) {
-		final List<TreeNode> children = this.germplasmListService.getGermplasmListChildrenNodes(crop, programUUID, parentFolderId, onlyFolders);
+		final List<TreeNode> children =
+			this.germplasmListService.getGermplasmListChildrenNodes(crop, programUUID, parentFolderId, onlyFolders);
 		return new ResponseEntity<>(children, HttpStatus.OK);
 	}
 
@@ -151,7 +152,22 @@ public class GermplasmListResourceGroup {
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite
 	) {
-		this.germplasmListService.addGermplasmListEntriesToAnotherList(crop, programUUID, germplasmListId, sourceGermplasmListId, searchComposite);
+		this.germplasmListService.addGermplasmListEntriesToAnotherList(crop, programUUID, germplasmListId, sourceGermplasmListId,
+			searchComposite);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Remove germplasm entries from an existing list")
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'REMOVE_ENTRIES_GERMPLASM_LISTS')")
+	public ResponseEntity<Void> removeGermplasmEntriesFromList(
+		@ApiParam(required = true) @PathVariable final String crop,
+		@PathVariable final Integer germplasmListId,
+		@RequestParam(required = true) final Set<Integer> selectedEntries
+	) {
+		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite = new SearchCompositeDto<>();
+		searchComposite.setItemIds(selectedEntries);
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, searchComposite);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -192,7 +208,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Create germplasm list folder", notes = "Create sample list folder.")
- 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createGermplasmListFolder(
@@ -253,7 +269,7 @@ public class GermplasmListResourceGroup {
 		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "The User ID") @RequestParam(required = true) final String userId) {
-		return new ResponseEntity<>( this.germplasmListService.getUserTreeState(crop, programUUID, userId), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmListService.getUserTreeState(crop, programUUID, userId), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Save hierarchy of germplasm list folders last used by user", notes = "Save hierarchy of germplasm list folders last used by user")
@@ -373,7 +389,6 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(this.germplasmListDataService.getGermplasmListDataTableHeader(listId, programUUID), HttpStatus.OK);
 	}
 
-
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/templates/xls/{isGermplasmListUpdateFormat}", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> getImportGermplasmExcelTemplate(@PathVariable final String cropName,
 		@PathVariable final boolean isGermplasmListUpdateFormat,
@@ -431,6 +446,20 @@ public class GermplasmListResourceGroup {
 		@RequestBody final GermplasmListMetadataRequest request) {
 
 		return new ResponseEntity<>(this.germplasmListService.clone(listId, new GermplasmListGeneratorDTO(request)), HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Edit List metatadata")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}", method = RequestMethod.PATCH)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'EDIT_LIST_METADATA')")
+	@ResponseBody
+	public ResponseEntity<Void> editListMetadata(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListDto request
+	) {
+		request.setListId(listId);
+		this.germplasmListService.editListMetadata(request);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Delete germplasm list", notes = "Delete germplasm list.")
