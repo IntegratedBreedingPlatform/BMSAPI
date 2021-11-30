@@ -459,7 +459,7 @@ public class GermplasmListResourceGroup {
 		@RequestBody final GermplasmListDto request
 	) {
 		request.setListId(listId);
-		this.germplasmListService.editListMetadata(request);
+		this.germplasmListService.editListMetadata(request, programUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
