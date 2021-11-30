@@ -1859,7 +1859,7 @@ public class GermplasmListServiceImplTest {
 		final GermplasmListDto list = new GermplasmListDto();
 		list.setListName(RandomStringUtils.random(50));
 		list.setDescription(RandomStringUtils.random(255));
-		list.setListDate(new Date());
+		list.setCreationDate(new Date());
 		list.setListType(GERMPLASM_LIST_TYPE);
 		list.setParentFolderId(GermplasmListServiceImpl.PROGRAM_LISTS);
 		return list;
