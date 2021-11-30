@@ -361,6 +361,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		germplasmListDto.setListType(request.getType());
 		germplasmListDto.setCreationDate(request.getDate());
 		germplasmListDto.setNotes(request.getNotes());
+		germplasmListDto.setParentFolderId(request.getParentFolderId());
 		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
 
 		this.germplasmListValidator.validateParentFolder(germplasmListDto);
