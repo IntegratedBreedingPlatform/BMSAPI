@@ -1703,7 +1703,7 @@ public class GermplasmListServiceImplTest {
 		request.setNotes(RandomStringUtils.randomAlphabetic(20));
 		request.setCreationDate(new Date());
 		request.setListType(GERMPLASM_LIST_TYPE);
-		this.germplasmListService.editListMetadata(request);
+		this.germplasmListService.editListMetadata(request, PROGRAM_UUID);
 		Mockito.verifyNoInteractions(this.germplasmListValidator);
 		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
 	}
@@ -1716,7 +1716,7 @@ public class GermplasmListServiceImplTest {
 		final GermplasmListDto request = new GermplasmListDto();
 		request.setListId(GERMPLASM_LIST_ID);
 		request.setOwnerId(2);
-		this.germplasmListService.editListMetadata(request);
+		this.germplasmListService.editListMetadata(request, PROGRAM_UUID);
 		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
 	}
 
@@ -1727,7 +1727,7 @@ public class GermplasmListServiceImplTest {
 		final GermplasmListDto request = new GermplasmListDto();
 		request.setListId(GERMPLASM_LIST_ID);
 		request.setLocked(true);
-		this.germplasmListService.editListMetadata(request);
+		this.germplasmListService.editListMetadata(request, PROGRAM_UUID);
 		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
 	}
 
@@ -1739,7 +1739,7 @@ public class GermplasmListServiceImplTest {
 		final GermplasmListDto request = new GermplasmListDto();
 		request.setListId(GERMPLASM_LIST_ID);
 		request.setLocked(false);
-		this.germplasmListService.editListMetadata(request);
+		this.germplasmListService.editListMetadata(request, PROGRAM_UUID);
 		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
 	}
 
@@ -1750,8 +1750,8 @@ public class GermplasmListServiceImplTest {
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
 		final GermplasmListDto request = new GermplasmListDto();
 		request.setListId(GERMPLASM_LIST_ID);
-		request.setProgramUUID(RandomStringUtils.randomAlphabetic(30));
-		this.germplasmListService.editListMetadata(request);
+		request.setProgramUUID(PROGRAM_UUID);
+		this.germplasmListService.editListMetadata(request, PROGRAM_UUID);
 		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
 	}
 
@@ -1766,7 +1766,7 @@ public class GermplasmListServiceImplTest {
 		request.setNotes(RandomStringUtils.randomAlphabetic(20));
 		request.setCreationDate(new Date());
 		request.setListType(GERMPLASM_LIST_TYPE);
-		this.germplasmListService.editListMetadata(request);
+		this.germplasmListService.editListMetadata(request, PROGRAM_UUID);
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsNotAFolder(germplasmList);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);

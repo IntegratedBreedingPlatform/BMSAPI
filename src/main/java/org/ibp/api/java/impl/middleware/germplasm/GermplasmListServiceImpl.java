@@ -772,14 +772,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void editListMetadata(final GermplasmListDto germplasmListDto) {
+	public void editListMetadata(final GermplasmListDto germplasmListDto, final String programUUID) {
 		BaseValidator.checkNotNull(germplasmListDto.getListId(), "list.id.required");
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(germplasmListDto.getListId());
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
-		final String currentProgram = ContextHolder.getCurrentProgram();
-		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
+		this.germplasmListValidator.validateListMetadata(germplasmListDto, programUUID);
 
 		// Throw exception for fields not supported for updating
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
