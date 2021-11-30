@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -19,12 +20,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
+import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotEmpty;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
 
 @Component
 public class GermplasmListValidator {
 
 	public static final int NAME_MAX_LENGTH = 50;
+	public static final String PARAM_NULL = "param.null";
+	public static final String TEXT_FIELD_MAX_LENGTH = "text.field.max.length";
 
 	private BindingResult errors;
 
@@ -35,7 +39,7 @@ public class GermplasmListValidator {
 	private GermplasmListManager germplasmListManager;
 
 	public GermplasmList validateGermplasmList(final Integer germplasmListId) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmListValidator.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListValidator.class.getName());
 
 		if (!Util.isPositiveInteger(String.valueOf(germplasmListId))) {
 			this.errors.reject("list.id.invalid", new String[] {String.valueOf(germplasmListId)}, "");
@@ -50,7 +54,7 @@ public class GermplasmListValidator {
 	}
 
 	public void validateFolderName(final String folderName) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmListValidator.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListValidator.class.getName());
 
 		if (StringUtils.isEmpty(folderName)) {
 			this.errors.reject("list.folder.empty", "");
@@ -63,9 +67,29 @@ public class GermplasmListValidator {
 		}
 	}
 
-	public void validateListName(final String currentProgram, final String name) {
-		checkNotNull(name, "param.null", new String[] {"name"});
-		checkArgument(name.length() <= NAME_MAX_LENGTH, "text.field.max.length", new String[] {"name", "50"});
+	public void validateListMetadata(final GermplasmListDto germplasmListDto, final String currentProgram) {
+		checkNotNull(germplasmListDto, PARAM_NULL, new String[] {"request"});
+		checkNotNull(germplasmListDto.getCreationDate(), PARAM_NULL, new String[] {"date"});
+
+		final String description = germplasmListDto.getDescription();
+		checkNotEmpty(description, PARAM_NULL, new String[] {"description"});
+		checkArgument(description.length() <= 255, TEXT_FIELD_MAX_LENGTH, new String[] {"description", "255"});
+
+		if (!StringUtils.isBlank(germplasmListDto.getNotes())) {
+			checkArgument(germplasmListDto.getNotes().length() <= 65535, TEXT_FIELD_MAX_LENGTH, new String[] {"notes", "65535"});
+		}
+
+		final String type = germplasmListDto.getListType();
+		checkNotEmpty(type, PARAM_NULL, new String[] {"type"});
+		if (this.germplasmListManager.getGermplasmListTypes().stream().noneMatch(listType -> listType.getFcode().equals(type))) {
+			throw new ApiValidationException("", "error.germplasmlist.save.type.not.exists", type);
+		}
+		this.validateListName(currentProgram, germplasmListDto.getListName(), germplasmListDto.getListId());
+	}
+
+	private void validateListName(final String currentProgram, final String name, final Integer listId) {
+		checkNotEmpty(name, "param.null", new String[] {"name"});
+		checkArgument(name.length() <= NAME_MAX_LENGTH, TEXT_FIELD_MAX_LENGTH, new String[] {"name", "50"});
 		if (AppConstants.CROP_LISTS.getString().equals(name)) {
 			throw new ApiValidationException("", "error.list.name.invalid", AppConstants.CROP_LISTS.getString());
 		}
@@ -74,13 +98,13 @@ public class GermplasmListValidator {
 		}
 		final List<GermplasmList>
 			germplasmListByName = this.germplasmListManager.getGermplasmListByName(name, currentProgram, 0, 1, Operation.EQUAL);
-		if (!germplasmListByName.isEmpty()) {
+		if (!germplasmListByName.isEmpty() && (listId == null || !listId.equals(germplasmListByName.get(0).getId()))) {
 			throw new ApiValidationException("", "error.list.name.exists");
 		}
 	}
 
 	public void validateNotSameFolderNameInParent(final String folderName, final Integer parent, final String programUUID) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), GermplasmListValidator.class.getName());
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListValidator.class.getName());
 
 		this.germplasmListService.getGermplasmListByParentAndName(folderName, parent, programUUID)
 			.ifPresent(germplasmList -> {
