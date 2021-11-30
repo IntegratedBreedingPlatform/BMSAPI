@@ -435,6 +435,20 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Edit List metatadata")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}", method = RequestMethod.PATCH)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'EDIT_LIST_METADATA')")
+	@ResponseBody
+	public ResponseEntity<Void> editListMetadata(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListDto request
+	) {
+		request.setListId(listId);
+		this.germplasmListService.editListMetadata(request, programUUID);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Delete germplasm list", notes = "Delete germplasm list.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'DELETE_GERMPLASM_LIST')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{listId}", method = RequestMethod.DELETE)
