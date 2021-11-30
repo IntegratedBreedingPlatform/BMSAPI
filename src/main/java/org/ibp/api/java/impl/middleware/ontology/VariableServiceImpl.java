@@ -218,7 +218,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			if(ontologyVariable.getIsSystem()){
 				response.getMetadata().setEditable(false);
 				response.getMetadata().setDeletable(false);
-				response.getMetadata().getUsage().setVariableSystem(true);
+				response.getMetadata().getUsage().setSystemVariable(true);
 				return response;
 			}
 
