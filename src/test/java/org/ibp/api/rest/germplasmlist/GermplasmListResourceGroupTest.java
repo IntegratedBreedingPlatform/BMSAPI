@@ -6,8 +6,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
-import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -15,6 +13,7 @@ import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.germplasm.GermplasmListServiceImpl;
 import org.ibp.api.rest.common.UserTreeState;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -101,6 +100,12 @@ public class GermplasmListResourceGroupTest extends ApiUnitTestBase {
 		final GermplasmListDto request = new GermplasmListDto();
 		request.setListName(randomAlphanumeric(10));
 
+		final GermplasmListDto resultList = new GermplasmListDto();
+		resultList.setListName(request.getListName());
+		resultList.setListId(1);
+
+		doReturn(resultList).when(this.germplasmListService).clone(Mockito.anyInt(), Mockito.any(GermplasmListDto.class));
+
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/crops/{cropName}/germplasm-lists/{listId}/clone",
 					crop, listId).param("programUUID", GermplasmListResourceGroupTest.PROGRAM_UUID)
 				.content(this.convertObjectToByte(request))
@@ -108,7 +113,9 @@ public class GermplasmListResourceGroupTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isCreated())
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.listName",
-				Matchers.is(request.getListName())));
+				Matchers.is(request.getListName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.listId",
+				Matchers.is(resultList.getListId())));
 
 	}
 
