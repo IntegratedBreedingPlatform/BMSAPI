@@ -1861,7 +1861,7 @@ public class GermplasmListServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateParentFolder(request);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
 
-		Mockito.verify(this.germplasmListServiceMiddleware).cloneGermplasmList(anyInt(), any(GermplasmListGeneratorDTO.class), anyInt());
+		Mockito.verify(this.germplasmListServiceMiddleware).cloneGermplasmList(anyInt(), any(GermplasmListDto.class), anyInt());
 	}
 
 	@Test

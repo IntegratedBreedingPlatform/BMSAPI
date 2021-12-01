@@ -7,6 +7,7 @@ import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -14,7 +15,6 @@ import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.germplasm.GermplasmListServiceImpl;
 import org.ibp.api.rest.common.UserTreeState;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -101,24 +101,14 @@ public class GermplasmListResourceGroupTest extends ApiUnitTestBase {
 		final GermplasmListDto request = new GermplasmListDto();
 		request.setListName(randomAlphanumeric(10));
 
-		final GermplasmListGeneratorDTO resultList = new GermplasmListGeneratorDTO();
-		resultList.setName(request.getListName());
-		resultList.setEntries(Collections.singletonList(new GermplasmListGeneratorDTO.GermplasmEntryDTO(
-			1, 1, randomAlphanumeric(10), randomAlphanumeric(10), randomAlphanumeric(10)
-		)));
-
-		doReturn(resultList).when(this.germplasmListService).clone(Mockito.anyInt(), Mockito.any(GermplasmListDto.class));
-
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/crops/{cropName}/germplasm-lists/{listId}/clone",
 					crop, listId).param("programUUID", GermplasmListResourceGroupTest.PROGRAM_UUID)
 				.content(this.convertObjectToByte(request))
 				.contentType(this.contentType))
 			.andExpect(MockMvcResultMatchers.status().isCreated())
 			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.name",
-				Matchers.is(request.getListName())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.entries",
-				IsCollectionWithSize.hasSize(resultList.getEntries().size())));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.listName",
+				Matchers.is(request.getListName())));
 
 	}
 

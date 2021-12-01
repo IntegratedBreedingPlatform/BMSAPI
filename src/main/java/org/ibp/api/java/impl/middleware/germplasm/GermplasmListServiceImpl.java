@@ -335,7 +335,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public GermplasmListGeneratorDTO clone(final Integer germplasmListId, final GermplasmListDto request) {
+	public GermplasmListDto clone(final Integer germplasmListId, final GermplasmListDto request) {
 		final String currentProgram = ContextHolder.getCurrentProgram();
 
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
@@ -343,13 +343,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListValidator.validateParentFolder(request);
 		this.validateNodeId(request.getParentFolderId(), currentProgram, ListNodeType.PARENT);
 
-		// create new GermplasmListGeneratorDTO object from request to reuse create list method
-		final GermplasmListGeneratorDTO listGeneratorDTO = new GermplasmListGeneratorDTO(request);
-		this.assignFolderDependentProperties(listGeneratorDTO, currentProgram);
+		this.assignFolderDependentProperties(request, currentProgram);
 
-		// returns a new GermplasmListGeneratorDTO (different from param) since
-		// entries are inserted and then retrieved from db
-		return this.germplasmListService.cloneGermplasmList(germplasmListId, listGeneratorDTO,
+		return this.germplasmListService.cloneGermplasmList(germplasmListId, request,
 			this.securityService.getCurrentlyLoggedInUser().getUserid());
 	}
 
@@ -358,13 +354,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
 
-		final GermplasmListDto germplasmListDto = new GermplasmListDto();
-		germplasmListDto.setListName(request.getName());
-		germplasmListDto.setDescription(request.getDescription());
-		germplasmListDto.setListType(request.getType());
-		germplasmListDto.setCreationDate(request.getDate());
-		germplasmListDto.setNotes(request.getNotes());
-		germplasmListDto.setParentFolderId(request.getParentFolderId());
+		final GermplasmListDto germplasmListDto = new GermplasmListDto(request);
 		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
 
 		this.germplasmListValidator.validateParentFolder(germplasmListDto);
@@ -372,15 +362,20 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		// process and assign defaults + more validations
 		this.processEntries(request, currentProgram);
-		this.assignFolderDependentProperties(request, currentProgram);
 
-		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+		this.assignFolderDependentProperties(germplasmListDto, currentProgram);
+		// set updated listdto fields to request for now, listdto and generatorlistdto to merge in the future
+		request.setStatus(germplasmListDto.getStatus());
+		request.setProgramUUID(germplasmListDto.getProgramUUID());
+		request.setParentFolderId(germplasmListDto.getParentFolderId());
+
+		final Integer loggedInUser = this.securityService.getCurrentlyLoggedInUser().getUserid();
 
 		// finally save
-		return this.germplasmListService.create(request, loggedInUser.getUserid());
+		return this.germplasmListService.create(request, loggedInUser);
 	}
 
-	private void assignFolderDependentProperties (final GermplasmListGeneratorDTO request, final String currentProgram) {
+	private void assignFolderDependentProperties (final GermplasmListDto request, final String currentProgram) {
 		// properties that depend on CROP/PROGRAM folder
 		int status = GermplasmList.Status.LIST.getCode();
 		final String parentFolderId = request.getParentFolderId();

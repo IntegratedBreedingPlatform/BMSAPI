@@ -32,7 +32,7 @@ public interface GermplasmListService {
 
 	List<MyListsDTO> getMyLists(String programUUID, Pageable pageable, Integer userId);
 
-	GermplasmListGeneratorDTO clone(Integer germplasmListId, GermplasmListDto request);
+	GermplasmListDto clone(Integer germplasmListId, GermplasmListDto request);
 
 	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request);
 

@@ -439,7 +439,7 @@ public class GermplasmListResourceGroup {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'CLONE_GERMPLASM_LIST')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/clone", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GermplasmListGeneratorDTO> cloneList(@PathVariable final String cropName,
+	public ResponseEntity<GermplasmListDto> cloneList(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmListDto request) {
