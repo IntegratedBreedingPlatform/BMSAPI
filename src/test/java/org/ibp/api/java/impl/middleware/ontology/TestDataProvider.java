@@ -215,7 +215,7 @@ public class TestDataProvider {
 		variable.setFormula(getTestFormula());
 		variable.setAllowsFormula(true);
 	  	variable.setHasUsage(false);
-
+		variable.setIsSystem(false);
 		return variable;
 	}
 
