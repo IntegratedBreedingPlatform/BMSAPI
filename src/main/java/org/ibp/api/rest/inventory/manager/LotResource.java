@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -28,7 +29,6 @@ import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.Util;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.search.SearchDto;
@@ -288,7 +288,7 @@ public class LotResource {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
-		final List<LocationDto> locations =
+		final List<LocationDTO> locations =
 			this.locationService
 				.getLocations(cropName, new LocationSearchRequest(null, LotResource.STORAGE_LOCATION_TYPE, null, null, null),
 					null);

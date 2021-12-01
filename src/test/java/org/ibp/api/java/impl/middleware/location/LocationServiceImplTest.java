@@ -1,10 +1,10 @@
 package org.ibp.api.java.impl.middleware.location;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.pojos.Location;
-import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.java.impl.middleware.location.validator.LocationSearchRequestValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +48,6 @@ public class LocationServiceImplTest {
 
 	@Test
 	public void testGetLocations() {
-		final String programUUID = "myprogram";
 		org.generationcp.middleware.pojos.Location locationMw = new Location();
 		final String locationName = RandomStringUtils.randomAlphabetic(10);
 		final String locationAbbreviation = RandomStringUtils.randomAlphabetic(3);
@@ -59,7 +58,7 @@ public class LocationServiceImplTest {
 			.thenReturn(
 				Collections.singletonList(locationMw));
 
-		final List<LocationDto> locationList =
+		final List<LocationDTO> locationList =
 			this.locationService.getLocations(CROP, new LocationSearchRequest(), null);
 
 		Mockito.verify(this.locationSearchRequestValidator).validate(Mockito.any(), Mockito.any());

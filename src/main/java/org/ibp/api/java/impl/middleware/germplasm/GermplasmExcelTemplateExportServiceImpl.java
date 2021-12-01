@@ -9,13 +9,13 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -213,12 +213,12 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final List<Variable> units = this.ontologyVariableDataManager.getWithFilter(inventoryPropertyFilter);
 
 
-		final List<LocationDto> storageLocations =
+		final List<LocationDTO> storageLocations =
 			this.locationService
 				.getLocations(cropName,
 					new LocationSearchRequest(null, GermplasmExcelTemplateExportServiceImpl.STORAGE_LOCATION_TYPE, null, null, null), null);
 
-		final List<LocationDto> locations =
+		final List<LocationDTO> locations =
 			this.locationService
 				.getLocations(cropName,
 					new LocationSearchRequest(null, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, null),
@@ -297,10 +297,10 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		return rowNumIndex;
 	}
 
-	private int writeLocationAbbrSection(final HSSFSheet codesSheet, final int currentRowNum, final List<LocationDto> storageLocations) {
+	private int writeLocationAbbrSection(final HSSFSheet codesSheet, final int currentRowNum, final List<LocationDTO> storageLocations) {
 		int rowNumIndex = currentRowNum;
 		int count = storageLocations.size();
-		for (final LocationDto locationDto : storageLocations) {
+		for (final LocationDTO locationDto : storageLocations) {
 			final HSSFRow row = codesSheet.createRow(rowNumIndex++);
 
 			HSSFCell cell = row.createCell(GermplasmExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, CellType.STRING);

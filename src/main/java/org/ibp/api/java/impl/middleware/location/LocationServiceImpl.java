@@ -4,12 +4,10 @@ import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.ibp.api.domain.location.LocationDto;
-import org.ibp.api.domain.location.LocationMapper;
+import org.generationcp.middleware.pojos.Location;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.location.validator.LocationSearchRequestValidator;
 import org.ibp.api.java.location.LocationService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -49,17 +47,13 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public List<LocationDto> getLocations(final String crop, final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
+	public List<LocationDTO> getLocations(final String crop, final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
 
 		this.locationSearchRequestValidator.validate(crop, locationSearchRequest);
 
-		final List<org.generationcp.middleware.pojos.Location> locations =
-			this.locationMiddlewareService
-				.getFilteredLocations(locationSearchRequest,
-					pageable);
-
-		final ModelMapper mapper = LocationMapper.getInstance();
-		return locations.stream().map(o -> mapper.map(o, LocationDto.class)).collect(Collectors.toList());
+		final List<Location> locations = this.locationMiddlewareService.getFilteredLocations(locationSearchRequest,
+				pageable);
+		return locations.stream().map(LocationDTO::new).collect(Collectors.toList());
 	}
 
 	@Override
