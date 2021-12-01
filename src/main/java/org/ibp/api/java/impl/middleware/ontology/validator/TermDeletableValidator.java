@@ -47,12 +47,16 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 				return;
 			}
 			final Integer variableId = Integer.valueOf(request.getId());
-			final Variable oldVariable = this.ontologyVariableDataManager.getVariable(null, variableId, true);
 
-			// validate if it's a System variable
-			if(oldVariable.getIsSystem()){
-				this.addCustomError(errors, VariableValidator.VARIABLE_NOT_DELETABLE_AND_EDITABLE, new Object[] {oldVariable.getName()});
-				return;
+			if (request.getCvId() == CvId.VARIABLES.getId()) {
+				final Variable oldVariable = this.ontologyVariableDataManager.getVariable(null, variableId, true);
+
+				// validate if it's a System variable
+				if (oldVariable.getIsSystem()) {
+					this.addCustomError(errors, VariableValidator.VARIABLE_NOT_DELETABLE_AND_EDITABLE,
+						new Object[] {oldVariable.getName()});
+					return;
+				}
 			}
 
 			boolean hasUsage = false,
