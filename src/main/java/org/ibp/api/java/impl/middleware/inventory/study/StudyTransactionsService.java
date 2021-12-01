@@ -15,4 +15,6 @@ public interface StudyTransactionsService {
 
 	void cancelPendingTransactions(Integer studyId, SearchCompositeDto<Integer, Integer> searchCompositeDto);
 
+	StudyTransactionsDto getStudyTransactionByTransactionId(Integer transactionId);
+
 }

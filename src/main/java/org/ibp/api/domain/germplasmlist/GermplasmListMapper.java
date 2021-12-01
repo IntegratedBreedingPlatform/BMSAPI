@@ -37,6 +37,8 @@ public class GermplasmListMapper {
 				this.map().setProgramUUID(this.source.getProgramUUID());
 				this.map().setLocked(this.source.isLockedList());
 				this.map().setOwnerId(this.source.getUserId());
+				this.map().setListType(this.source.getType());
+				this.map().setNotes(this.source.getNotes());
 			}
 
 		});
