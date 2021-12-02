@@ -801,6 +801,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		// Throw exception for fields not supported for updating
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateListNonEditableFields(germplasmListDto, germplasmList);
+		this.germplasmListService.editListMetadata(germplasmListDto);
+	}
+
+	private void validateListNonEditableFields(final GermplasmListDto germplasmListDto, final GermplasmList germplasmList) {
 		if (germplasmListDto.getOwnerId() != null && !germplasmListDto.getOwnerId().equals(germplasmList.getUserId())) {
 			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"ownerId"}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -813,7 +818,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"programUUID"}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		this.germplasmListService.editListMetadata(germplasmListDto);
+		if (germplasmListDto.getParentFolderId() != null && !Integer.valueOf(germplasmListDto.getParentFolderId()).equals(germplasmList.getParentId())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"parentFolderId"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		if (germplasmListDto.getStatus() != null && !germplasmListDto.getStatus().equals(germplasmList.getStatus())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"status"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	@Override
