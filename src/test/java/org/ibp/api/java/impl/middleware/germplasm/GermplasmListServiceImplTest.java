@@ -71,6 +71,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 
@@ -322,6 +323,9 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void testCreate_OK() {
 		final GermplasmListGeneratorDTO request = this.createGermplasmList();
+		request.setProgramUUID(PROGRAM_UUID);
+		request.setStatus(GermplasmList.Status.LIST.getCode());
+
 		this.germplasmListService.create(request);
 		final ArgumentCaptor<GermplasmListDto> metadataRequestCaptor = ArgumentCaptor.forClass(GermplasmListDto.class);
 		Mockito.verify(this.germplasmListValidator).validateListMetadata(metadataRequestCaptor.capture(), ArgumentMatchers.eq(PROGRAM_UUID));
@@ -332,7 +336,7 @@ public class GermplasmListServiceImplTest {
 		Assert.assertEquals(request.getNotes(), metadata.getNotes());
 		Assert.assertEquals(request.getType(), metadata.getListType());
 		Mockito.verify(this.germplasmListServiceMiddleware)
-			.create(request, GermplasmList.Status.LIST.getCode(), PROGRAM_UUID, this.loggedInUser);
+			.create(request,  this.loggedInUser.getUserid());
 	}
 
 	@Test
@@ -1845,6 +1849,22 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test
+	public void testCloneGermplasmList_OK() {
+		final GermplasmList germplasmList = this.createGermplasmListMock(false);
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+
+		final GermplasmListDto request = this.createGermplasmListRequest();
+		this.germplasmListService.clone(GERMPLASM_LIST_ID, request);
+
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
+		Mockito.verify(this.germplasmListValidator).validateListMetadata(request, PROGRAM_UUID);
+		Mockito.verify(this.germplasmListValidator).validateParentFolder(request);
+		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
+
+		Mockito.verify(this.germplasmListServiceMiddleware).cloneGermplasmList(anyInt(), any(GermplasmListDto.class), anyInt());
+	}
+
+	@Test
 	public void testRemoveEntriesFromList_OK() {
 		final GermplasmList germplasmList = this.createGermplasmListMock(false);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
@@ -1879,6 +1899,16 @@ public class GermplasmListServiceImplTest {
 		entry2.setSeedSource(RandomStringUtils.random(255));
 		entries.add(entry2);
 		list.setEntries(entries);
+		return list;
+	}
+
+	private GermplasmListDto createGermplasmListRequest() {
+		final GermplasmListDto list = new GermplasmListDto();
+		list.setListName(RandomStringUtils.random(50));
+		list.setDescription(RandomStringUtils.random(255));
+		list.setCreationDate(new Date());
+		list.setListType(GERMPLASM_LIST_TYPE);
+		list.setParentFolderId(GermplasmListServiceImpl.PROGRAM_LISTS);
 		return list;
 	}
 

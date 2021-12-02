@@ -452,4 +452,26 @@ public class GermplasmListValidatorTest {
 				Operation.EQUAL);
 		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
 	}
+
+	@Test
+	public void validateParentFolderId_invalidNullParentFolder() {
+		try {
+			final GermplasmListDto emptyListDto = new GermplasmListDto();
+			this.germplasmListValidator.validateParentFolder(emptyListDto);
+			Assert.fail("Should have thrown validation exception but did not.");
+		} catch (final Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert
+				.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+					hasItem("param.null"));
+		}
+	}
+
+	@Test
+	public void validateParentFolderId_OK() {
+		final GermplasmListDto listDto = new GermplasmListDto();
+		listDto.setParentFolderId("parentFolder");
+		this.germplasmListValidator.validateParentFolder(listDto);
+	}
+
 }
