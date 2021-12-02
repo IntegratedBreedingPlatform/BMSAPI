@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.util.StringUtil;
@@ -45,11 +46,22 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 			if (errors.hasErrors()) {
 				return;
 			}
+			final Integer variableId = Integer.valueOf(request.getId());
+
+			if (request.getCvId() == CvId.VARIABLES.getId()) {
+				final Variable oldVariable = this.ontologyVariableDataManager.getVariable(null, variableId, true);
+
+				// validate if it's a System variable
+				if (oldVariable.getIsSystem()) {
+					this.addCustomError(errors, VariableValidator.VARIABLE_NOT_DELETABLE_AND_EDITABLE,
+						new Object[] {request.getId()});
+					return;
+				}
+			}
 
 			boolean hasUsage = false,
 					isReferred = false,
 					germplasmDeleted = false;
-			final Integer variableId = Integer.valueOf(request.getId());
 			if (Objects.equals(request.getCvId(), CvId.VARIABLES.getId())) {
 				hasUsage = this.ontologyVariableDataManager.hasUsage(variableId);
 			} else {

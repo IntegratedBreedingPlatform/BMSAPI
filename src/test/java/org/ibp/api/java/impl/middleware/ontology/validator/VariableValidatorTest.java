@@ -183,7 +183,7 @@ public class VariableValidatorTest {
 
 		final Variable dbVariable = TestDataProvider.getTestVariable(org.generationcp.middleware.domain.ontology.VariableType.ANALYSIS);
 		dbVariable.setHasUsage(true);
-
+		dbVariable.setIsSystem(false);
 		dbVariable.setAlias("TEST");
 
 		final Term methodTerm = TestDataProvider.getMethodTerm();
