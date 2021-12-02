@@ -72,8 +72,9 @@ public class GermplasmListValidator {
 		checkNotNull(germplasmListDto.getCreationDate(), PARAM_NULL, new String[] {"date"});
 
 		final String description = germplasmListDto.getDescription();
-		checkNotEmpty(description, PARAM_NULL, new String[] {"description"});
-		checkArgument(description.length() <= 255, TEXT_FIELD_MAX_LENGTH, new String[] {"description", "255"});
+		if (!StringUtils.isBlank(description)) {
+			checkArgument(description.length() <= 255, TEXT_FIELD_MAX_LENGTH, new String[] {"description", "255"});
+		}
 
 		if (!StringUtils.isBlank(germplasmListDto.getNotes())) {
 			checkArgument(germplasmListDto.getNotes().length() <= 65535, TEXT_FIELD_MAX_LENGTH, new String[] {"notes", "65535"});
@@ -128,6 +129,11 @@ public class GermplasmListValidator {
 			this.errors.reject("list.locked", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+	}
+
+	public void validateParentFolder(final GermplasmListDto request) {
+		final String parentFolderId = request.getParentFolderId();
+		checkNotNull(parentFolderId, PARAM_NULL, new String[] {"parentFolderId"});
 	}
 
 }

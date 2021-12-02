@@ -335,44 +335,63 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public GermplasmListDto clone(final Integer germplasmListId, final GermplasmListDto request) {
+		final String currentProgram = ContextHolder.getCurrentProgram();
+
+		this.germplasmListValidator.validateGermplasmList(germplasmListId);
+		this.germplasmListValidator.validateListMetadata(request, currentProgram);
+		this.germplasmListValidator.validateParentFolder(request);
+		this.validateNodeId(request.getParentFolderId(), currentProgram, ListNodeType.PARENT);
+
+		this.assignFolderDependentProperties(request, currentProgram);
+
+		return this.germplasmListService.cloneGermplasmList(germplasmListId, request,
+			this.securityService.getCurrentlyLoggedInUser().getUserid());
+	}
+
+	@Override
 	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request) {
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
-		final GermplasmListDto germplasmListDto = new GermplasmListDto();
-		germplasmListDto.setListName(request.getName());
-		germplasmListDto.setDescription(request.getDescription());
-		germplasmListDto.setListType(request.getType());
-		germplasmListDto.setCreationDate(request.getDate());
-		germplasmListDto.setNotes(request.getNotes());
+
+		final GermplasmListDto germplasmListDto = new GermplasmListDto(request);
 		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
 
-		final String parentFolderId = request.getParentFolderId();
-		checkNotNull(parentFolderId, "param.null", new String[] {"parentFolderId"});
-		this.validateNodeId(parentFolderId, currentProgram, ListNodeType.PARENT);
+		this.germplasmListValidator.validateParentFolder(germplasmListDto);
+		this.validateNodeId(germplasmListDto.getParentFolderId(), currentProgram, ListNodeType.PARENT);
 
 		// process and assign defaults + more validations
 		this.processEntries(request, currentProgram);
 
+		this.assignFolderDependentProperties(germplasmListDto, currentProgram);
+		// set updated listdto fields to request for now, listdto and generatorlistdto to merge in the future
+		request.setStatus(germplasmListDto.getStatus());
+		request.setProgramUUID(germplasmListDto.getProgramUUID());
+		request.setParentFolderId(germplasmListDto.getParentFolderId());
+
+		final Integer loggedInUser = this.securityService.getCurrentlyLoggedInUser().getUserid();
+
+		// finally save
+		return this.germplasmListService.create(request, loggedInUser);
+	}
+
+	private void assignFolderDependentProperties (final GermplasmListDto request, final String currentProgram) {
 		// properties that depend on CROP/PROGRAM folder
 		int status = GermplasmList.Status.LIST.getCode();
-		String programUUID = null;
+		final String parentFolderId = request.getParentFolderId();
 		// If the germplasm list is saved in 'Crop lists' folder, the programUUID should be null
 		// so that the germplasm list will be accessible to all programs of the same crop.
 		if (CROP_LISTS.equals(parentFolderId)) {
 			// list should be locked by default if it is saved in 'Crop lists' folder.
 			status = GermplasmList.Status.LOCKED_LIST.getCode();
 		} else {
-			programUUID = currentProgram;
+			request.setProgramUUID(currentProgram);
 		}
+		request.setStatus(status);
 
 		if (CROP_LISTS.equals(parentFolderId) || PROGRAM_LISTS.equals(parentFolderId)) {
 			request.setParentFolderId(null);
 		}
-
-		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-
-		// finally save
-		return this.germplasmListService.create(request, status, programUUID, loggedInUser);
 	}
 
 	@Override
@@ -782,6 +801,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		// Throw exception for fields not supported for updating
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateListNonEditableFields(germplasmListDto, germplasmList);
+		this.germplasmListService.editListMetadata(germplasmListDto);
+	}
+
+	private void validateListNonEditableFields(final GermplasmListDto germplasmListDto, final GermplasmList germplasmList) {
 		if (germplasmListDto.getOwnerId() != null && !germplasmListDto.getOwnerId().equals(germplasmList.getUserId())) {
 			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"ownerId"}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -794,7 +818,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"programUUID"}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		this.germplasmListService.editListMetadata(germplasmListDto);
+		if (germplasmListDto.getParentFolderId() != null && !Integer.valueOf(germplasmListDto.getParentFolderId()).equals(germplasmList.getParentId())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"parentFolderId"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		if (germplasmListDto.getStatus() != null && !germplasmListDto.getStatus().equals(germplasmList.getStatus())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"status"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	@Override

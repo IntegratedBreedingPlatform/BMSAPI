@@ -218,20 +218,6 @@ public class GermplasmListValidatorTest {
 	}
 
 	@Test
-	public void validateListMetadata_EmptyDescription() {
-		try {
-			final GermplasmListDto germplasmListDto = new GermplasmListDto();
-			germplasmListDto.setCreationDate(new Date());
-			this.germplasmListValidator.validateListMetadata(germplasmListDto, RandomStringUtils.randomAlphabetic(20));
-			fail("Should have failed");
-		} catch (final ApiRequestValidationException e) {
-			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("param.null"));
-			Assert.assertEquals(new String[] {"description"}, e.getErrors().get(0).getArguments());
-		}
-	}
-
-	@Test
 	public void validateListMetadata_DescriptionExceedsMaxLength() {
 		try {
 			final GermplasmListDto germplasmListDto = new GermplasmListDto();
@@ -393,6 +379,20 @@ public class GermplasmListValidatorTest {
 	}
 
 	@Test
+	public void validateListMetadata_EmptyDescription_Successful() {
+		final GermplasmListDto germplasmListDto = new GermplasmListDto();
+		germplasmListDto.setCreationDate(new Date());
+		germplasmListDto.setListType(GERMPLASM_LIST_TYPE);
+		final String listName = RandomStringUtils.randomAlphabetic(45);
+		germplasmListDto.setListName(listName);
+
+		final String currentProgram = RandomStringUtils.randomAlphabetic(20);
+		Mockito.doReturn(Collections.emptyList()).when(this.germplasmListManager).getGermplasmListByName(listName, currentProgram, 0, 1,
+			Operation.EQUAL);
+		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
+	}
+
+	@Test
 	public void validateListMetadata_ExistingList_NameTakenByAnotherList() {
 		try {
 			final GermplasmListDto germplasmListDto = new GermplasmListDto();
@@ -452,4 +452,26 @@ public class GermplasmListValidatorTest {
 				Operation.EQUAL);
 		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
 	}
+
+	@Test
+	public void validateParentFolderId_invalidNullParentFolder() {
+		try {
+			final GermplasmListDto emptyListDto = new GermplasmListDto();
+			this.germplasmListValidator.validateParentFolder(emptyListDto);
+			Assert.fail("Should have thrown validation exception but did not.");
+		} catch (final Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert
+				.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+					hasItem("param.null"));
+		}
+	}
+
+	@Test
+	public void validateParentFolderId_OK() {
+		final GermplasmListDto listDto = new GermplasmListDto();
+		listDto.setParentFolderId("parentFolder");
+		this.germplasmListValidator.validateParentFolder(listDto);
+	}
+
 }

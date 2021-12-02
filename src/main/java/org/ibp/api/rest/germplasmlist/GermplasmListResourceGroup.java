@@ -435,6 +435,18 @@ public class GermplasmListResourceGroup {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Clone germplasm list")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'CLONE_GERMPLASM_LIST')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/clone", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<GermplasmListDto> cloneList(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final GermplasmListDto request) {
+
+		return new ResponseEntity<>(this.germplasmListService.clone(listId, request), HttpStatus.CREATED);
+	}
+
 	@ApiOperation(value = "Edit List metatadata")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}", method = RequestMethod.PATCH)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'EDIT_LIST_METADATA')")
