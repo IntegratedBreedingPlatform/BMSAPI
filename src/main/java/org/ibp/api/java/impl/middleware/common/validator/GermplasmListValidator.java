@@ -72,7 +72,6 @@ public class GermplasmListValidator {
 		checkNotNull(germplasmListDto.getCreationDate(), PARAM_NULL, new String[] {"date"});
 
 		final String description = germplasmListDto.getDescription();
-		checkNotEmpty(description, PARAM_NULL, new String[] {"description"});
 		checkArgument(description.length() <= 255, TEXT_FIELD_MAX_LENGTH, new String[] {"description", "255"});
 
 		if (!StringUtils.isBlank(germplasmListDto.getNotes())) {

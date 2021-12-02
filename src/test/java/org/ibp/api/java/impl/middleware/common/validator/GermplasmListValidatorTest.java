@@ -218,20 +218,6 @@ public class GermplasmListValidatorTest {
 	}
 
 	@Test
-	public void validateListMetadata_EmptyDescription() {
-		try {
-			final GermplasmListDto germplasmListDto = new GermplasmListDto();
-			germplasmListDto.setCreationDate(new Date());
-			this.germplasmListValidator.validateListMetadata(germplasmListDto, RandomStringUtils.randomAlphabetic(20));
-			fail("Should have failed");
-		} catch (final ApiRequestValidationException e) {
-			MatcherAssert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("param.null"));
-			Assert.assertEquals(new String[] {"description"}, e.getErrors().get(0).getArguments());
-		}
-	}
-
-	@Test
 	public void validateListMetadata_DescriptionExceedsMaxLength() {
 		try {
 			final GermplasmListDto germplasmListDto = new GermplasmListDto();
