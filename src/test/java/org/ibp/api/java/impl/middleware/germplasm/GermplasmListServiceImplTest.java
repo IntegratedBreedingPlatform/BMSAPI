@@ -1759,6 +1759,30 @@ public class GermplasmListServiceImplTest {
 		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
 	}
 
+	@Test(expected = ApiRequestValidationException.class)
+	public void testEditListMetadata_TryingToUpdateParentFolder_Fail() {
+		final GermplasmList germplasmList = new GermplasmList(GERMPLASM_LIST_ID);
+		germplasmList.setParent(new GermplasmList(1));
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		final GermplasmListDto request = new GermplasmListDto();
+		request.setListId(GERMPLASM_LIST_ID);
+		request.setParentFolderId("2");
+		this.germplasmListService.editListMetadata(request, PROGRAM_UUID);
+		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testEditListMetadata_TryingToUpdateStatus_Fail() {
+		final GermplasmList germplasmList = new GermplasmList(GERMPLASM_LIST_ID);
+		germplasmList.setStatus(0);
+		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
+		final GermplasmListDto request = new GermplasmListDto();
+		request.setListId(GERMPLASM_LIST_ID);
+		request.setStatus(9);
+		this.germplasmListService.editListMetadata(request, PROGRAM_UUID);
+		Mockito.verifyNoInteractions(this.germplasmListServiceMiddleware);
+	}
+
 	@Test
 	public void testEditListMetadata_OK() {
 		final GermplasmList germplasmList = new GermplasmList(GERMPLASM_LIST_ID);
