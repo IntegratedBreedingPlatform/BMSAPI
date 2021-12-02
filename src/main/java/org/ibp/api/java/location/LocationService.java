@@ -1,6 +1,7 @@
 package org.ibp.api.java.location;
 
 import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.ibp.api.domain.location.LocationDto;
@@ -17,4 +18,10 @@ public interface LocationService {
 	long countLocations(String crop, LocationSearchRequest locationSearchRequest);
 
 	List<LocationDto> getLocations(String crop, LocationSearchRequest locationSearchRequest, Pageable pageable);
+
+	void deleteLocation(Integer locationId);
+
+	LocationDTO createLocation(LocationRequestDto locationRequestDto);
+
+	boolean updateLocation(Integer locationId, LocationRequestDto locationRequestDto);
 }

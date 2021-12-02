@@ -32,6 +32,8 @@ public interface GermplasmListService {
 
 	List<MyListsDTO> getMyLists(String programUUID, Pageable pageable, Integer userId);
 
+	GermplasmListDto clone(Integer germplasmListId, GermplasmListDto request);
+
 	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request);
 
 	void importUpdates(GermplasmListGeneratorDTO request);
@@ -66,4 +68,8 @@ public interface GermplasmListService {
 
 	void addGermplasmListEntriesToAnotherList(String cropName, String programUUID, Integer destinationListId, Integer sourceListId,
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
+
+	void removeGermplasmEntriesFromList(Integer germplasmListId, SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
+
+	void editListMetadata(GermplasmListDto germplasmListDto, String programUUID);
 }
