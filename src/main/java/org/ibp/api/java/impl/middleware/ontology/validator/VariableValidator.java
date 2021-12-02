@@ -502,7 +502,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			// should not be a System variable
 			if(oldVariable.getIsSystem()){
-				this.addCustomError(errors, VariableValidator.VARIABLE_NOT_DELETABLE_AND_EDITABLE, new Object[] {variable.getName()});
+				this.addCustomError(errors, VariableValidator.VARIABLE_NOT_DELETABLE_AND_EDITABLE, new Object[] {variable.getId()});
 				return;
 			}
 
