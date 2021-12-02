@@ -64,9 +64,6 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		VariableType.GERMPLASM_PASSPORT.getId(),
 		VariableType.ENTRY_DETAIL.getId());
 
-	private static final List<String> NOT_EDITABLE_AND_DELETABLE_VARIABLES =
-		Arrays.asList("PLOT_NUMBER_AP_text", "INSTANCE_NUMBER_AP_text", "REP_NUMBER_AP_text", "PLANT_NUMBER_AP_text", "PLOT_CODE_AP_text");
-
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
@@ -218,8 +215,10 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			final ModelMapper mapper = OntologyMapper.getInstance();
 			final VariableDetails response = mapper.map(ontologyVariable, VariableDetails.class);
 
-			if (NOT_EDITABLE_AND_DELETABLE_VARIABLES.contains(ontologyVariable.getName())) {
+			if(ontologyVariable.getIsSystem()){
+				response.getMetadata().setEditable(false);
 				response.getMetadata().setDeletable(false);
+				response.getMetadata().getUsage().setSystemVariable(true);
 				return response;
 			}
 
