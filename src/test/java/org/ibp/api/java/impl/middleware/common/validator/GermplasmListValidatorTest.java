@@ -379,6 +379,20 @@ public class GermplasmListValidatorTest {
 	}
 
 	@Test
+	public void validateListMetadata_EmptyDescription_Successful() {
+		final GermplasmListDto germplasmListDto = new GermplasmListDto();
+		germplasmListDto.setCreationDate(new Date());
+		germplasmListDto.setListType(GERMPLASM_LIST_TYPE);
+		final String listName = RandomStringUtils.randomAlphabetic(45);
+		germplasmListDto.setListName(listName);
+
+		final String currentProgram = RandomStringUtils.randomAlphabetic(20);
+		Mockito.doReturn(Collections.emptyList()).when(this.germplasmListManager).getGermplasmListByName(listName, currentProgram, 0, 1,
+			Operation.EQUAL);
+		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
+	}
+
+	@Test
 	public void validateListMetadata_ExistingList_NameTakenByAnotherList() {
 		try {
 			final GermplasmListDto germplasmListDto = new GermplasmListDto();
