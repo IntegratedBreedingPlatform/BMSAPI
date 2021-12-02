@@ -54,7 +54,7 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 				// validate if it's a System variable
 				if (oldVariable.getIsSystem()) {
 					this.addCustomError(errors, VariableValidator.VARIABLE_NOT_DELETABLE_AND_EDITABLE,
-						new Object[] {oldVariable.getName()});
+						new Object[] {request.getId()});
 					return;
 				}
 			}
