@@ -158,7 +158,7 @@ public class ObservationUnitResourceBrapi {
 					@Override
 					public List<ObservationUnitDto> getResults(final PagedResult<ObservationUnitDto> pagedResult) {
 						return ObservationUnitResourceBrapi.this.observationUnitService
-							.searchObservationUnits(finalPageSize, finalPageNumber, phenotypeSearchDTO);
+							.searchObservationUnits(finalPageSize, finalPageNumber, phenotypeSearchDTO, true);
 					}
 				});
 	}
