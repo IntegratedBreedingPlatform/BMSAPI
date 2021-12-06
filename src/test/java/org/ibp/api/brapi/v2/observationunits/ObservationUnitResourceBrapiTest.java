@@ -105,7 +105,7 @@ public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 			.getSearchRequest(searchResultsDbId, ObservationUnitsSearchRequestDto.class);
 		when(this.observationUnitService
 			.searchObservationUnits(Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE), Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER), any(
-				ObservationUnitSearchRequestDTO.class))).thenReturn(Arrays.asList(observationUnitDto));
+				ObservationUnitSearchRequestDTO.class), Mockito.eq(true))).thenReturn(Arrays.asList(observationUnitDto));
 		this.mockMvc.perform(
 			MockMvcRequestBuilders.get("/{crop}/brapi/v2/search/observationunits/{searchResultsDbId}", this.cropName, searchResultsDbId)
 				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk())
