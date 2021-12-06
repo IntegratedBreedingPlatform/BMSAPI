@@ -1659,7 +1659,7 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test
-	public void toggleGermplasmListStatus_notOwner_userIsAdmin() {
+	public void toggleGermplasmListStatus_notOwner_userHasAdminPermission() {
 
 		final Authentication authentication = Mockito.mock(Authentication.class);
 		Mockito.when(this.securityContext.getAuthentication()).thenReturn(authentication);
