@@ -17,8 +17,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.servlet.http.HttpServletRequest;
-
 public class SecurityServiceImplTest {
 
 	@Mock
@@ -57,6 +55,8 @@ public class SecurityServiceImplTest {
 
 		Mockito.when(this.userService.getUserByUsername(this.me.getName())).thenReturn(this.me);
 		Mockito.when(this.userService.getUserByUsername(this.otherBreeder.getName())).thenReturn(this.otherBreeder);
+		Mockito.when(this.securityServiceImpl.getCurrentlyLoggedInUser()).thenReturn(this.me);
+
 	}
 
 	@After
