@@ -57,12 +57,6 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	@Override
 	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
-		final ObservationUnitSearchRequestDTO requestDTO, final boolean retrieveObservationDetails) {
-		return this.middlewareObservationUnitService.searchObservationUnits(pageSize, pageNumber, requestDTO, retrieveObservationDetails);
-	}
-
-	@Override
-	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
 		final ObservationUnitSearchRequestDTO requestDTO) {
 		return this.middlewareObservationUnitService.searchObservationUnits(pageSize, pageNumber, requestDTO);
 	}

@@ -14,9 +14,6 @@ public interface ObservationUnitService {
 
 	List<ObservationUnitDto> searchObservationUnits(Integer pageSize, Integer pageNumber, ObservationUnitSearchRequestDTO requestDTO);
 
-	List<ObservationUnitDto> searchObservationUnits(Integer pageSize, Integer pageNumber, ObservationUnitSearchRequestDTO requestDTO,
-		boolean retrieveObservationDetails);
-
 	long countObservationUnits(ObservationUnitSearchRequestDTO requestDTO);
 
 }
