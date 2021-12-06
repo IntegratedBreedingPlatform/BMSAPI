@@ -523,6 +523,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				throw new ApiValidationException("", "error.germplasmlist.importupdates.entryno.mandatory");
 			}
 
+			// Temporary workaround to allow users to edit ENTRY_CODE
+			if (!isBlank(entry.getEntryCode())) {
+				if (entry.getEntryCode().length() > 47) {
+					throw new ApiValidationException("", "error.germplasmlist.save.entry.code.exceed.length");
+				}
+			}
+
 			this.processEntryDetails(entry.getData(), entryDetailVariablesById);
 		}
 	}
