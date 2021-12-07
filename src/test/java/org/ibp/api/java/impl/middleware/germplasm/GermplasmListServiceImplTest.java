@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.ListTreeState;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
@@ -46,12 +47,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -141,9 +140,6 @@ public class GermplasmListServiceImplTest {
 
 	@Mock
 	private GermplasmListDataValidator germplasmListDataValidator;
-
-	@Mock
-	private SecurityContext securityContext;
 
 	@Before
 	public void init() {
@@ -1661,23 +1657,23 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void toggleGermplasmListStatus_notOwner_userHasAdminPermission() {
 
-		final Authentication authentication = Mockito.mock(Authentication.class);
-		Mockito.when(this.securityContext.getAuthentication()).thenReturn(authentication);
 		final Collection authorities = Collections.singletonList(new SimpleGrantedAuthority("ADMIN"));
-		Mockito.when(authentication.getAuthorities()).thenReturn(authorities);
-		SecurityContextHolder.setContext(this.securityContext);
 
 		final GermplasmList germplasmList = this.createGermplasmListMock(false);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
 		Mockito.when(this.germplasmListServiceMiddleware.toggleGermplasmListStatus(GERMPLASM_LIST_ID)).thenReturn(true);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(new WorkbenchUser(new Random().nextInt()));
 
-		final boolean status = this.germplasmListService.toggleGermplasmListStatus(GERMPLASM_LIST_ID);
-		assertTrue(status);
+		try (final MockedStatic<SecurityUtil> utilMockedStatic = Mockito.mockStatic(SecurityUtil.class)) {
+			utilMockedStatic.when(SecurityUtil::getLoggedInUserAuthorities).thenReturn(authorities);
+			final boolean status = this.germplasmListService.toggleGermplasmListStatus(GERMPLASM_LIST_ID);
+			assertTrue(status);
 
-		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
-		Mockito.verify(this.germplasmListServiceMiddleware).toggleGermplasmListStatus(GERMPLASM_LIST_ID);
-		Mockito.verify(this.securityService).getCurrentlyLoggedInUser();
+			Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
+			Mockito.verify(this.germplasmListServiceMiddleware).toggleGermplasmListStatus(GERMPLASM_LIST_ID);
+			Mockito.verify(this.securityService).getCurrentlyLoggedInUser();
+		}
+
 	}
 
 	@Test
