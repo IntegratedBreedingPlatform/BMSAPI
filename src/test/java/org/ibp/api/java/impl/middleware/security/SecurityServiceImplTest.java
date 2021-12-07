@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityServiceImplTest {
@@ -35,6 +36,10 @@ public class SecurityServiceImplTest {
 	private final String programUUID = "fb0783d2-dc82-4db6-a36e-7554d3740092";
 	private final String cropname = "maize";
 
+	@Mock
+	private SecurityContext mockSecurityContext;
+
+
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
@@ -48,15 +53,16 @@ public class SecurityServiceImplTest {
 		this.otherBreeder.setUserid(2);
 
 		this.loggedInUser = new UsernamePasswordAuthenticationToken(this.me.getName(), this.me.getPassword());
-		SecurityContextHolder.getContext().setAuthentication(this.loggedInUser);
+
+		SecurityContextHolder.setContext(this.mockSecurityContext);
+		Mockito.when(mockSecurityContext.getAuthentication()).thenReturn(this.loggedInUser);
+
 
 		Mockito.when(this.userService.getUserById(this.me.getUserid())).thenReturn(this.me);
 		Mockito.when(this.userService.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder);
 
 		Mockito.when(this.userService.getUserByUsername(this.me.getName())).thenReturn(this.me);
 		Mockito.when(this.userService.getUserByUsername(this.otherBreeder.getName())).thenReturn(this.otherBreeder);
-		Mockito.when(this.securityServiceImpl.getCurrentlyLoggedInUser()).thenReturn(this.me);
-
 	}
 
 	@After
@@ -75,7 +81,7 @@ public class SecurityServiceImplTest {
 	public void testGetCurrentlyLoggedInUserErrorCase() {
 		// We setup authentication context in setup method.
 		// We want that cleared for this test case.
-		SecurityContextHolder.getContext().setAuthentication(null);
+		Mockito.when(mockSecurityContext.getAuthentication()).thenReturn(null);
 		this.securityServiceImpl.getCurrentlyLoggedInUser();
 	}
 
