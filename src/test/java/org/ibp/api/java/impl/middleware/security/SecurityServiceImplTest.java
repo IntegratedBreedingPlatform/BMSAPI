@@ -55,8 +55,6 @@ public class SecurityServiceImplTest {
 
 		Mockito.when(this.userService.getUserByUsername(this.me.getName())).thenReturn(this.me);
 		Mockito.when(this.userService.getUserByUsername(this.otherBreeder.getName())).thenReturn(this.otherBreeder);
-		Mockito.when(this.securityServiceImpl.getCurrentlyLoggedInUser()).thenReturn(this.me);
-
 	}
 
 	@After
