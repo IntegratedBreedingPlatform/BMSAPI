@@ -129,6 +129,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Add germplasm entries to an existing list")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'LISTS', 'MANAGE_GERMPLASM_LISTS', 'ADD_ENTRIES_TO_LIST', 'MG_ADD_ENTRIES_TO_LIST', 'ADD_GERMPLASM_LIST_ENTRIES')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> addGermplasmEntriesToList(
@@ -142,6 +143,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Import germplasm list entries from an existing list")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS', 'ADD_ENTRIES_TO_LIST')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries/import", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> addGermplasmListEntriesToAnotherList(
