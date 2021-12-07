@@ -160,7 +160,7 @@ public class GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Remove germplasm entries from an existing list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'REMOVE_ENTRIES_GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM_LISTS', 'LISTS', 'MANAGE_GERMPLASM_LISTS', 'REMOVE_ENTRIES_GERMPLASM_LISTS')")
 	public ResponseEntity<Void> removeGermplasmEntriesFromList(
 		@ApiParam(required = true) @PathVariable final String crop,
 		@PathVariable final Integer germplasmListId,
