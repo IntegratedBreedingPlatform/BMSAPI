@@ -76,7 +76,6 @@ public class StudyResource {
 
 	@ApiOperation(value = "Get the study tree")
 	@RequestMapping(value = "/{cropName}/studies/tree", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')" + PermissionsEnum.HAS_INVENTORY_VIEW)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getStudyTree(final @PathVariable String cropName,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
