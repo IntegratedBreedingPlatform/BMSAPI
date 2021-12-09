@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
@@ -117,7 +118,7 @@ public class GermplasmLabelPrintingTest {
 			this.germplasmLabelPrinting.getOriginResourceMetadata(this.labelsInfoInput, PROGRAM_UUID);
 		Assert.assertTrue(MapUtils.isEmpty(originResourceMetadata.getMetadata()));
 		Assert.assertEquals(
-			FileNameGenerator.generateFileName(GermplasmLabelPrinting.ORIG_FINAL_NAME),
+			FileUtils.cleanFileName(FileNameGenerator.generateFileName(GermplasmLabelPrinting.ORIG_FINAL_NAME)),
 			originResourceMetadata.getDefaultFileName());
 	}
 
