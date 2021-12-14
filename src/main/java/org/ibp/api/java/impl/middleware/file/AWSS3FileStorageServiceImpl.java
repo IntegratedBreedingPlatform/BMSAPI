@@ -143,4 +143,8 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 			.credentialsProvider(StaticCredentialsProvider.create(credentials))
 			.build();
 	}
+
+	void setBucketName(final String bucketName) {
+		this.bucketName = bucketName;
+	}
 }
