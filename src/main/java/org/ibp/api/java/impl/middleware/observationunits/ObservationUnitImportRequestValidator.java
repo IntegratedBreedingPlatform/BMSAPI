@@ -31,6 +31,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.lang.Integer.parseInt;
+import static org.apache.commons.lang3.math.NumberUtils.isNumber;
+
 @Component
 public class ObservationUnitImportRequestValidator {
 
@@ -164,6 +167,18 @@ public class ObservationUnitImportRequestValidator {
 			}
 
 			if (this.isAnyExternalReferenceInvalid(dto, index)) {
+				iterator.remove();
+				continue;
+			}
+
+			final boolean isPlotLevelCodeInValid = position.getObservationLevelRelationships().stream().anyMatch(
+				levelRelationship -> {
+					final String levelCode = levelRelationship.getLevelCode();
+					return levelRelationship.getLevelName().equalsIgnoreCase(PLOT) && (!isNumber(levelCode) || parseInt(levelCode) < 1);
+				}
+			);
+			if (isPlotLevelCodeInValid) {
+				this.errors.reject("observation.unit.import.plot.levelCode.invalid", new String[] {index.toString()}, "");
 				iterator.remove();
 				continue;
 			}
