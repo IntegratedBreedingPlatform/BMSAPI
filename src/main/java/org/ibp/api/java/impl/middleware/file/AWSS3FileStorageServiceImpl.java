@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.file;
 
+import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
 import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.java.file.FileStorageService;
 import org.slf4j.Logger;
@@ -29,12 +30,14 @@ import java.io.IOException;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
+import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class AWSS3FileStorageServiceImpl implements FileStorageService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AWSS3FileStorageServiceImpl.class);
 
+	static final String FOLDER_SEPARATOR = FileMetadataServiceImpl.FILE_PATH_SLASH;
 
 	@Value("${aws.bucketName}")
 	private String bucketName;
@@ -54,8 +57,8 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 			final S3Client s3Client = this.buildS3Client();
 
 			final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-				.bucket(this.bucketName)
-				.key(path)
+				.bucket(resolveBucketName())
+				.key(resolvePath(path))
 				.build();
 			final PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
 		} catch (final SdkClientException e) {
@@ -71,8 +74,8 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 			final S3Client s3Client = this.buildS3Client();
 
 			final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-				.bucket(this.bucketName)
-				.key(path)
+				.bucket(resolveBucketName())
+				.key(resolvePath(path))
 				.build();
 			final ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest);
 
@@ -96,8 +99,8 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 			final S3Client s3Client = this.buildS3Client();
 
 			final DeleteObjectRequest deleteObjectResponse = DeleteObjectRequest.builder()
-				.bucket(this.bucketName)
-				.key(path)
+				.bucket(resolveBucketName())
+				.key(resolvePath(path))
 				.build();
 			s3Client.deleteObject(deleteObjectResponse);
 		} catch (final SdkClientException e) {
@@ -110,9 +113,10 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 		try {
 			final S3Client s3Client = this.buildS3Client();
 
-			final List<ObjectIdentifier> objIds = paths.stream().map(s -> ObjectIdentifier.builder().key(s).build()).collect(toList());
+			final List<ObjectIdentifier> objIds = paths.stream().map(s -> ObjectIdentifier.builder().key(resolvePath(s)).build())
+				.collect(toList());
 			final DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
-				.bucket(this.bucketName)
+				.bucket(resolveBucketName())
 				.delete(Delete.builder().objects(objIds).build())
 				.build();
 			final DeleteObjectsResponse response = s3Client.deleteObjects(deleteObjectsRequest);
@@ -142,6 +146,23 @@ public class AWSS3FileStorageServiceImpl implements FileStorageService {
 			.httpClient(UrlConnectionHttpClient.builder().build())
 			.credentialsProvider(StaticCredentialsProvider.create(credentials))
 			.build();
+	}
+
+	private String resolveBucketName() {
+		return resolveSubfolder()[0];
+	}
+
+	private String resolvePath(final String path) {
+		final String[] subfolder = resolveSubfolder();
+		return subfolder.length == 2
+			? subfolder[1] + FOLDER_SEPARATOR + path
+			: path;
+	}
+
+	private String[] resolveSubfolder() {
+		final String[] parts = this.bucketName.split("\\" + FOLDER_SEPARATOR);
+		checkArgument(parts.length <= 2, "file.storage.aws.error.subfolder.multi");
+		return parts;
 	}
 
 	void setBucketName(final String bucketName) {
