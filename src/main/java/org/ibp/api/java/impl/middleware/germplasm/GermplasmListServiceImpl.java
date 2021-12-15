@@ -18,6 +18,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
@@ -165,6 +166,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private OntologyVariableService ontologyVariableService;
+
+	@Autowired
+	private GermplasmListDataService germplasmListDataService;
 
 	private BindingResult errors;
 
@@ -518,9 +522,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final Map<Integer, Variable> entryDetailVariablesById = this.extractVariableIds(request);
 
+		final int numberOfEntries = (int) this.germplasmListDataService.countSearchGermplasmListData(request.getId(), new GermplasmListDataSearchRequest());
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			if (entry.getEntryNo() == null) {
 				throw new ApiValidationException("", "error.germplasmlist.importupdates.entryno.mandatory");
+			}
+
+			if (entry.getEntryNo() > numberOfEntries || entry.getEntryNo() < 1) {
+				throw new ApiRequestValidationException("invalid.entry.no.value", new String[] {entry.getEntryNo().toString()});
 			}
 
 			// Temporary workaround to allow users to edit ENTRY_CODE

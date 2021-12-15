@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,7 +119,6 @@ public class ObservationUnitResourceBrapi {
 
 	}
 
-	@ApiIgnore
 	@ApiOperation(value = "Add new Observation Units", notes = "Add new Observation Units")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationunits", method = RequestMethod.POST)
 	@ResponseBody
