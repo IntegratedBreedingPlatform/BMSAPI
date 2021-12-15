@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.constant.ListTreeState;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
 import org.generationcp.middleware.ContextHolder;
@@ -17,6 +18,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
@@ -54,12 +56,14 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.UserTreeState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,6 +97,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public static final String LIST_FIELD_UPDATE_NOT_SUPPORTED = "list.field.update.not.supported";
 	public static final String LIST_FOLDER_ID_INVALID = "list.folder.id.invalid";
 	public static final String ERROR_GERMPLASMLIST_SAVE_GAPS = "error.germplasmlist.save.gaps";
+	public static final String ADMIN = "ADMIN";
 
 
 	private enum ListNodeType {
@@ -161,6 +166,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private OntologyVariableService ontologyVariableService;
+
+	@Autowired
+	private GermplasmListDataService germplasmListDataService;
 
 	private BindingResult errors;
 
@@ -514,9 +522,21 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final Map<Integer, Variable> entryDetailVariablesById = this.extractVariableIds(request);
 
+		final int numberOfEntries = (int) this.germplasmListDataService.countSearchGermplasmListData(request.getId(), new GermplasmListDataSearchRequest());
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			if (entry.getEntryNo() == null) {
 				throw new ApiValidationException("", "error.germplasmlist.importupdates.entryno.mandatory");
+			}
+
+			if (entry.getEntryNo() > numberOfEntries || entry.getEntryNo() < 1) {
+				throw new ApiRequestValidationException("invalid.entry.no.value", new String[] {entry.getEntryNo().toString()});
+			}
+
+			// Temporary workaround to allow users to edit ENTRY_CODE
+			if (!isBlank(entry.getEntryCode())) {
+				if (entry.getEntryCode().length() > 47) {
+					throw new ApiValidationException("", "error.germplasmlist.save.entry.code.exceed.length");
+				}
 			}
 
 			this.processEntryDetails(entry.getData(), entryDetailVariablesById);
@@ -782,7 +802,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
 
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
-		if (!germplasmList.getUserId().equals(createdBy.getUserid())) {
+		final Collection<? extends GrantedAuthority> authorities = SecurityUtil.getLoggedInUserAuthorities();
+		// Allow updating of status if user has Full permission or user owns the list
+		if (authorities.stream().noneMatch(o -> o.getAuthority().equals(ADMIN)) && !germplasmList.getUserId()
+			.equals(createdBy.getUserid())) {
 			this.errors.reject("list.toggle.status.not.owner", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
