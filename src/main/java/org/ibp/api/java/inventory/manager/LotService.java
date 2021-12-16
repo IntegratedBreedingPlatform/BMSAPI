@@ -23,11 +23,11 @@ public interface LotService {
 
 	Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(LotsSearchDto searchDto);
 
-	String saveLot(String programUUID, LotGeneratorInputDto lotGeneratorInputDto);
+	String saveLot(LotGeneratorInputDto lotGeneratorInputDto);
 
 	List<String> createLots(final String programUUID, LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto);
 
-	void updateLots(String programUUID, List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest);
+	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest);
 
 	void importLotsWithInitialTransaction(String programUUID, LotImportRequestDto lotImportRequestDto);
 

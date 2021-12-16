@@ -230,7 +230,7 @@ public class ProgramServiceImpl implements ProgramService {
 		final List<Location> locations = this.locationService.getFilteredLocations(locationSearchRequest, null);
 		if (!locations.isEmpty()) {
 			this.programFavoriteService
-				.addProgramFavorite(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, locations.get(0).getLocid());
+				.addProgramFavorites(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, new HashSet<>(locations.get(0).getLocid()));
 		}
 
 		this.installationDirectoryUtil.createWorkspaceDirectoriesForProject(crop, programBasicDetailsDto.getName());
@@ -242,7 +242,6 @@ public class ProgramServiceImpl implements ProgramService {
 	public void deleteProgram(final String programUUID) {
 		this.studyService.deleteProgramStudies(programUUID);
 		this.programFavoriteService.deleteAllProgramFavorites(programUUID);
-		this.locationService.deleteProgramLocations(programUUID);
 		this.germplasmListService.deleteProgramGermplasmLists(programUUID);
 		this.programService.deleteProgramAndDependencies(programUUID);
 	}

@@ -1,10 +1,10 @@
 
 package org.ibp.api.domain.ontology;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * List of variables that used in Method, Property and Scale Variable Observations and Studies List of variable usage and variable
@@ -30,7 +30,12 @@ public class Usage {
 	// breeding methods of variable
 	private Integer breedingMethods;
 
-	public void addUsage(TermSummary variable) {
+	// lists of variable
+	private Integer lists;
+
+	private boolean isSystemVariable;
+
+	public void addUsage(final TermSummary variable) {
 		// Note: Do not add null value of variable
 		if (variable != null) {
 			this.variables.add(variable);
@@ -79,5 +84,21 @@ public class Usage {
 
 	public void setBreedingMethods(final Integer breedingMethods) {
 		this.breedingMethods = breedingMethods;
+	}
+
+	public Integer getLists() {
+		return lists;
+	}
+
+	public void setLists(final Integer lists) {
+		this.lists = lists;
+	}
+
+	public boolean isSystemVariable() {
+		return this.isSystemVariable;
+	}
+
+	public void setSystemVariable(final boolean systemVariable) {
+		this.isSystemVariable = systemVariable;
 	}
 }

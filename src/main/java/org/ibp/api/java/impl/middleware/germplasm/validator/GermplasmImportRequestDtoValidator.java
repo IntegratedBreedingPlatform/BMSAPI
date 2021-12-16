@@ -209,7 +209,7 @@ public class GermplasmImportRequestDtoValidator {
 		}
 		this.validateNotDuplicatedPUI(germplasmImportDTOList);
 		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmImportDTOList);
-		this.validateAllLocationAbbreviationsExists(programUUID, germplasmImportDTOList);
+		this.validateAllLocationAbbreviationsExists(germplasmImportDTOList);
 		this.validateAllNameTypesExists(germplasmImportDTOList);
 		this.validateAllAttributesExists(programUUID, germplasmImportDTOList);
 
@@ -305,8 +305,8 @@ public class GermplasmImportRequestDtoValidator {
 
 		this.validateNotDuplicatedPUI(germplasmInventoryImportDTOList);
 		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmInventoryImportDTOList);
-		this.validateAllLocationAbbreviationsExists(programUUID, germplasmInventoryImportDTOList);
-		this.validateAllStorageLocationAbbreviationsExists(programUUID, germplasmInventoryImportDTOList);
+		this.validateAllLocationAbbreviationsExists(germplasmInventoryImportDTOList);
+		this.validateAllStorageLocationAbbreviationsExists(germplasmInventoryImportDTOList);
 		this.validateAllNameTypesExists(germplasmInventoryImportDTOList);
 		this.validateAllAttributesExists(programUUID, germplasmInventoryImportDTOList);
 		this.validateStockIds(germplasmInventoryImportDTOList);
@@ -366,14 +366,13 @@ public class GermplasmImportRequestDtoValidator {
 		}
 	}
 
-	private void validateAllLocationAbbreviationsExists(final String programUUID,
-		final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
+	private void validateAllLocationAbbreviationsExists(final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
 		final Set<String> locationAbbrs = germplasmImportDTOList.stream().filter(g -> StringUtils.isNotEmpty(g.getLocationAbbr()))
 			.map(g -> g.getLocationAbbr().toUpperCase()).collect(Collectors.toSet());
 		if (!locationAbbrs.isEmpty()) {
 			final List<String> existingLocations =
 				this.locationService
-					.getFilteredLocations(new LocationSearchRequest(programUUID, null, null, new ArrayList<>(locationAbbrs), null, false),
+					.getFilteredLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null),
 						null)
 					.stream().map(
 					Location::getLabbr).collect(
@@ -387,16 +386,14 @@ public class GermplasmImportRequestDtoValidator {
 		}
 	}
 
-	private void validateAllStorageLocationAbbreviationsExists(final String programUUID,
-		final List<GermplasmInventoryImportDTO> germplasmInventoryImportDTOList) {
+	private void validateAllStorageLocationAbbreviationsExists(final List<GermplasmInventoryImportDTO> germplasmInventoryImportDTOList) {
 		final List<String> locationAbbreviations =
 			germplasmInventoryImportDTOList.stream().filter(g -> StringUtils.isNotEmpty(g.getStorageLocationAbbr()))
 				.map(g -> g.getStorageLocationAbbr().toUpperCase()).distinct().collect(Collectors.toList());
 		if (!locationAbbreviations.isEmpty()) {
 			final List<Location> existingLocations =
 				this.locationService.getFilteredLocations(
-					new LocationSearchRequest(programUUID, STORAGE_LOCATION_TYPE, null, new ArrayList<>(locationAbbreviations), null,
-						false), null);
+					new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, new ArrayList<>(locationAbbreviations), null), null);
 			if (existingLocations.size() != locationAbbreviations.size()) {
 				final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
 				final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);

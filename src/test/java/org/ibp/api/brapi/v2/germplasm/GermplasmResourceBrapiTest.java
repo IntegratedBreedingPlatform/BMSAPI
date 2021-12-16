@@ -360,7 +360,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 				.locale(Locale.getDefault()))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.searchResultDbId", Matchers.is(String.valueOf(searchResultsDbId))));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.searchResultsDbId", Matchers.is(String.valueOf(searchResultsDbId))));
 
 	}
 

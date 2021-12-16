@@ -198,7 +198,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput) {
+	OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final String fileName = FileNameGenerator.generateFileName("lot-labels");
 		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
 	}

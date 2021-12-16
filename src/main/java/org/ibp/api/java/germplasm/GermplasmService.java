@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeSummaryDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
@@ -49,7 +50,7 @@ public interface GermplasmService {
 
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
 
-	boolean updateGermplasmBasicDetails(String programUUID, Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
+	boolean updateGermplasmBasicDetails(Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
 
 	boolean updateGermplasmPedigree(final String programUUID, final Integer gid,
 		final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto);
@@ -59,4 +60,6 @@ public interface GermplasmService {
 	List<GermplasmMergedDto> getGermplasmMerged(Integer gid);
 
 	List<GermplasmProgenyDto> getGermplasmProgenies(Integer gid);
+
+	GermplasmMergeSummaryDto getGermplasmMergeSummary(GermplasmMergeRequestDto germplasmMergeRequestDto);
 }

@@ -59,6 +59,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	private static final String VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE = "variable.type.germplasm.attribute.can.not.club.with.other";
 	private static final String VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE = "variable.type.germplasm.passport.can.not.club.with.other";
+	private static final String VARIABLE_TYPE_ENTRY_DETAIL_SHOULD_BE_USED_SINGLE = "variable.type.entry.detail.can.not.club.with.other";
+
+	protected static final String VARIABLE_NOT_DELETABLE_AND_EDITABLE = "variable.not.editable.and.deletable";
 
 	private static final Integer NAME_TEXT_LIMIT = 32;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
@@ -338,9 +341,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				BigDecimal variableExpectedMin = null;
 				BigDecimal variableExpectedMax = null;
 
-				final String variableMin = variable.getExpectedRange().getMin() == null ? null : variable.getExpectedRange().getMin();
+				final String variableMin = variable.getExpectedRange().getMin();
 
-				if (!this.isNullOrEmpty(variableMin)) {
+				if (!isNullOrEmpty(variableMin)) {
 					variableExpectedMin = StringUtil.parseBigDecimal(variableMin, null);
 					if (variableExpectedMin == null) {
 						this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME + ".min", BaseValidator.FIELD_SHOULD_BE_NUMERIC,
@@ -348,9 +351,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 					}
 				}
 
-				final String variableMax = variable.getExpectedRange().getMax() == null ? null : variable.getExpectedRange().getMax();
+				final String variableMax = variable.getExpectedRange().getMax();
 
-				if (!this.isNullOrEmpty(variableMax)) {
+				if (!isNullOrEmpty(variableMax)) {
 					variableExpectedMax = StringUtil.parseBigDecimal(variableMax, null);
 					if (variableExpectedMax == null) {
 						this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME + ".max", BaseValidator.FIELD_SHOULD_BE_NUMERIC,
@@ -411,7 +414,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one
 		// item
-		// If not trait then it should not have formulas asociated
+		// If not trait then it should not have formulas associated
 		boolean isTrait = false;
 
 		for (final VariableType variableType : variable.getVariableTypes()) {
@@ -445,12 +448,17 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
 		}
 
+		if (this.isEntryDetailVariable(variable) && variable.getVariableTypes().size() > 1) {
+			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ENTRY_DETAIL_SHOULD_BE_USED_SINGLE,
+				null);
+		}
+
 		return errors.getErrorCount() == initialCount;
 	}
 
 	private void aliasValidation(final VariableDetails variable, final Errors errors) {
 
-		if (!this.isNullOrEmpty(variable.getAlias())) {
+		if (!isNullOrEmpty(variable.getAlias())) {
 			// Trim alias
 			variable.setAlias(variable.getAlias().trim());
 
@@ -492,6 +500,11 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				return;
 			}
 
+			// should not be a System variable
+			if(oldVariable.getIsSystem()){
+				this.addCustomError(errors, VariableValidator.VARIABLE_NOT_DELETABLE_AND_EDITABLE, new Object[] {variable.getId()});
+				return;
+			}
 
 			final boolean isEditable = !oldVariable.getHasUsage();
 			if (isEditable) {
@@ -501,7 +514,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			}
 
 			boolean editableVariable = false;
-			for (VariableType variableType : variable.getVariableTypes()) {
+			for (final VariableType variableType : variable.getVariableTypes()) {
 				if (VariableValidator.EDITABLE_VARIABLES_TYPE_IDS.contains(Integer.valueOf(variableType.getId()))) {
 					editableVariable = true;
 				}
@@ -515,9 +528,11 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			final boolean propertyEqual = Objects.equals(propertyId, oldVariable.getProperty().getId());
 			final boolean methodEqual = Objects.equals(methodId, oldVariable.getMethod().getId());
 			final boolean scaleEqual = Objects.equals(scaleId, oldVariable.getScale().getId());
-			final boolean minValuesEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
-			final boolean maxValuesEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
-			final boolean aliasEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getAlias(), oldVariable.getAlias());
+			final boolean minValuesEqual =
+				editableVariable || StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
+			final boolean maxValuesEqual =
+				editableVariable || StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
+			final boolean aliasEqual = editableVariable || StringUtil.areBothEmptyOrEqual(variable.getAlias(), oldVariable.getAlias());
 
 			if (!nameEqual) {
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
@@ -621,11 +636,16 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getName());
 	}
 
-    private boolean areAllPreviousVariableTypesPresent(Set<org.generationcp.middleware.domain.ontology.VariableType> previousTypeList, List<VariableType> currentTypeList){
-        for (org.generationcp.middleware.domain.ontology.VariableType variableType : previousTypeList) {
+	private boolean isEntryDetailVariable(final VariableDetails variable) {
+		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.ENTRY_DETAIL.getName());
+	}
+
+	private boolean areAllPreviousVariableTypesPresent(final Set<org.generationcp.middleware.domain.ontology.VariableType> previousTypeList,
+		final List<VariableType> currentTypeList) {
+		for (final org.generationcp.middleware.domain.ontology.VariableType variableType : previousTypeList) {
             boolean found = false;
 
-			for (VariableType type : currentTypeList) {
+			for (final VariableType type : currentTypeList) {
 				if (type.getName().equals(variableType.getName())) {
                     found = true;
                 }
@@ -639,14 +659,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
         return true;
     }
 
-	public void checkVariableExist(final String Name, final Integer variableId, Integer cvId, Errors errors) {
+	public void checkVariableExist(final String Name, final Integer variableId, final Integer cvId, final Errors errors) {
 		this.checkTermExist(Name, String.valueOf(variableId), cvId, errors);
 	}
 
 	protected void checkVariableUniqueness(final String fieldName, final String fieldUsedAs, final Integer id, final String nameOrAlias,
 		final Integer cvId, final Errors errors) {
 
-		Term term = this.termDataManager.getTermByNameAndCvId(nameOrAlias, cvId);
+		final Term term = this.termDataManager.getTermByNameAndCvId(nameOrAlias, cvId);
 		if (term == null) {
 			return;
 		}

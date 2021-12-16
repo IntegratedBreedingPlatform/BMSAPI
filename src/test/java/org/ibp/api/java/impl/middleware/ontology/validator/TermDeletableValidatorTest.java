@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
@@ -77,10 +78,12 @@ public class TermDeletableValidatorTest {
 	public void testWithTermNotReferred() throws MiddlewareException {
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
+		final Variable ontologyVariable = TestDataProvider.getTestVariable();
 
 		doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		doReturn(false).when(this.termDataManager).isTermReferred(methodTerm.getId());
-
+		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(null, methodTerm.getId(),
+			true);
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(methodTerm.getId()), "method", CvId.METHODS.getId()),
 				bindingResult);
@@ -90,8 +93,12 @@ public class TermDeletableValidatorTest {
 	@Test
 	public void testWithVariableTermHasNoUsage() throws MiddlewareException {
 		Term variableTerm = TestDataProvider.getVariableTerm();
+		final Variable ontologyVariable = TestDataProvider.getTestVariable();
+
 		doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());
 		doReturn(false).when(this.ontologyVariableDataManager).isVariableUsedInStudy(variableTerm.getId());
+		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(null, ontologyVariable.getId(),
+			true);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(variableTerm.getId()), "variableName", CvId.VARIABLES.getId()),
@@ -102,8 +109,12 @@ public class TermDeletableValidatorTest {
 	@Test
 	public void testWithVariableTermHasUsage() throws MiddlewareException {
 		Term variableTerm = TestDataProvider.getVariableTerm();
+		final Variable ontologyVariable = TestDataProvider.getTestVariable();
+
 		doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());
 		doReturn(true).when(this.ontologyVariableDataManager).hasUsage(variableTerm.getId());
+		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(null, ontologyVariable.getId(),
+			true);
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(variableTerm.getId()), "variableName", CvId.VARIABLES.getId()),
 				bindingResult);
