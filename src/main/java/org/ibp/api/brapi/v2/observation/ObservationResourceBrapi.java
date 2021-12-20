@@ -59,7 +59,7 @@ public class ObservationResourceBrapi {
 		@RequestParam(required = false) final String observationVariableDbId,
 		@ApiParam(value = "The unique ID of a study to filter on")
 		@RequestParam(required = false) final String studyDbId,
-		@ApiParam(value = "Common name for the crop associated with this study.")
+		@ApiParam(value = "The unique ID of a location where these observations were collected")
 		@RequestParam(required = false) final String locationDbId,
 		@ApiParam(value = "The unique ID of a trial to filter on")
 		@RequestParam(required = false) final String trialDbId,

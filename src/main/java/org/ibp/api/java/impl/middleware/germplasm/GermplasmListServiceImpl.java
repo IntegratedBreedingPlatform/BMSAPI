@@ -383,7 +383,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.germplasmListService.create(request, loggedInUser);
 	}
 
-	private void assignFolderDependentProperties (final GermplasmListDto request, final String currentProgram) {
+	private void assignFolderDependentProperties(final GermplasmListDto request, final String currentProgram) {
 		// properties that depend on CROP/PROGRAM folder
 		int status = GermplasmList.Status.LIST.getCode();
 		final String parentFolderId = request.getParentFolderId();
@@ -421,7 +421,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		if (isEmpty(request.getEntries())) {
 			if (!isEmpty(searchComposite.getItemIds())) {
-				request.setEntries(searchComposite.getItemIds().stream().map(gid -> {
+				final List<Integer> gidsList = new ArrayList<Integer>(searchComposite.getItemIds());
+				Collections.sort(gidsList);
+
+				request.setEntries(gidsList.stream().map(gid -> {
 					final GermplasmListGeneratorDTO.GermplasmEntryDTO entryDTO = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
 					entryDTO.setGid(gid);
 					return entryDTO;
@@ -522,7 +525,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final Map<Integer, Variable> entryDetailVariablesById = this.extractVariableIds(request);
 
-		final int numberOfEntries = (int) this.germplasmListDataService.countSearchGermplasmListData(request.getId(), new GermplasmListDataSearchRequest());
+		final int numberOfEntries =
+			(int) this.germplasmListDataService.countSearchGermplasmListData(request.getId(), new GermplasmListDataSearchRequest());
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			if (entry.getEntryNo() == null) {
 				throw new ApiValidationException("", "error.germplasmlist.importupdates.entryno.mandatory");
@@ -837,11 +841,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"locked"}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		if (StringUtils.isNotBlank(germplasmListDto.getProgramUUID()) && !germplasmListDto.getProgramUUID().equals(germplasmList.getProgramUUID())) {
+		if (StringUtils.isNotBlank(germplasmListDto.getProgramUUID()) && !germplasmListDto.getProgramUUID()
+			.equals(germplasmList.getProgramUUID())) {
 			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"programUUID"}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		if (germplasmListDto.getParentFolderId() != null && !Integer.valueOf(germplasmListDto.getParentFolderId()).equals(germplasmList.getParentId())) {
+		if (germplasmListDto.getParentFolderId() != null && !Integer.valueOf(germplasmListDto.getParentFolderId())
+			.equals(germplasmList.getParentId())) {
 			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"parentFolderId"}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
