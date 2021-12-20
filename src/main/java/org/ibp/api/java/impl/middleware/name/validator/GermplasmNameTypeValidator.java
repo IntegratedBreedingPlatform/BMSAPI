@@ -39,6 +39,7 @@ public class GermplasmNameTypeValidator {
 		this.validateIfCodeAlreadyExists(germplasmNameTypeRequestDTO.getCode(), null);
 		this.validateNameTypeName(germplasmNameTypeRequestDTO);
 		this.validateIfNameAlreadyExists(germplasmNameTypeRequestDTO.getName(), null);
+		this.validateNameTypeDescription(germplasmNameTypeRequestDTO);
 	}
 
 	public void validateNameTypeDeletion(final Integer nameTypeId) {
