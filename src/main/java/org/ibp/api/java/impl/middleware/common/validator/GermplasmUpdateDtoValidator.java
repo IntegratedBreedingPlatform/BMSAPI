@@ -29,10 +29,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator.ATTRIBUTE_MAX_LENGTH;
+import static org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator.NAME_MAX_LENGTH;
 
 @Component
 public class GermplasmUpdateDtoValidator {
@@ -58,6 +62,7 @@ public class GermplasmUpdateDtoValidator {
 
 		this.validateEmptyList(errors, germplasmUpdateDTOList);
 		this.validateAttributeAndNameCodes(errors, programUUID, germplasmUpdateDTOList);
+		this.validateAttributeAndNameValues(errors, germplasmUpdateDTOList);
 		this.validateGermplasmIdAndGermplasmUUID(errors, germplasmUpdateDTOList);
 		this.validateLocationAbbreviation(errors, germplasmUpdateDTOList);
 		this.validateBreedingMethod(errors, germplasmUpdateDTOList);
@@ -69,6 +74,51 @@ public class GermplasmUpdateDtoValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
+	}
+
+	/**
+	 * TODO IBP-5324 Review and consolidate approach with GermplasmImportRequestDtoValidator#validateBeforeSaving
+	 */
+	boolean validateAttributeAndNameValues(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+		return germplasmUpdateDTOList.stream().anyMatch(g -> {
+			if (this.areNameValuesInvalid(g.getNames().values(), errors)) {
+				return true;
+			}
+
+			if (this.areAttributesInvalid(g.getAttributes(), errors)) {
+				return true;
+			}
+			return false;
+		});
+	}
+
+	private boolean areAttributesInvalid(final Map<String, String> attributes, final BindingResult errors) {
+		if (attributes != null) {
+			return attributes.values().stream().anyMatch(n -> {
+				if (StringUtils.isNotEmpty(n) && n.length() > ATTRIBUTE_MAX_LENGTH) {
+					errors.reject("germplasm.import.attribute.value.invalid.length", "");
+					return true;
+				}
+				return false;
+			});
+		}
+		return false;
+	}
+
+	private boolean areNameValuesInvalid(final Collection<String> values, final BindingResult errors) {
+		return values.stream().anyMatch(n -> {
+			/* FIXME germplasm import updates receives empty name columns and filter them out
+			if (StringUtils.isEmpty(n)) {
+				errors.reject("germplasm.import.name.type.value.null.empty", "");
+				return true;
+			}
+			 */
+			if (n.length() > NAME_MAX_LENGTH) {
+				errors.reject("germplasm.import.name.type.value.invalid.length", "");
+				return true;
+			}
+			return false;
+		});
 	}
 
 	protected void validateEmptyList(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {

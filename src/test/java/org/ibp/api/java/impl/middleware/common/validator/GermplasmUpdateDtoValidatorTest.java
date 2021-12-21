@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -69,10 +70,10 @@ public class GermplasmUpdateDtoValidatorTest {
 		germplasmUpdateDTO.setLocationAbbreviation(location.getLabbr());
 		germplasmUpdateDTO.setCreationDate("20200101");
 		germplasmUpdateDTO.setBreedingMethodAbbr(null);
-		germplasmUpdateDTO.getNames().put("DRVNM", "");
-		germplasmUpdateDTO.getNames().put("LNAME", "");
-		germplasmUpdateDTO.getAttributes().put("NOTE", "");
-		germplasmUpdateDTO.getAttributes().put("ACQ_DATE", "");
+		germplasmUpdateDTO.getNames().put("DRVNM", randomAlphanumeric(10));
+		germplasmUpdateDTO.getNames().put("LNAME", randomAlphanumeric(10));
+		germplasmUpdateDTO.getAttributes().put("NOTE", randomAlphanumeric(10));
+		germplasmUpdateDTO.getAttributes().put("ACQ_DATE", randomAlphanumeric(10));
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 3);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 4);
 
@@ -138,6 +139,19 @@ public class GermplasmUpdateDtoValidatorTest {
 		this.germplasmUpdateDtoValidator.validateAttributeAndNameCodes(errors, programUUID, germplasmUpdateList);
 		Mockito.verify(errors).reject("germplasm.update.invalid.name.code", new String[] {"LNAME"}, "");
 		Mockito.verify(errors).reject("germplasm.update.invalid.attribute.code", new String[] {"ACQ_DATE"}, "");
+	}
+
+	@Test
+	public void testValidate_InvalidAttributeAndNameValues() {
+		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
+		germplasmUpdateDTO.getNames().put("DRVNM", randomAlphanumeric(300));
+		germplasmUpdateDTO.getNames().put("LNAME", "");
+
+		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
+
+		final BindingResult errors = Mockito.mock(BindingResult.class);
+		this.germplasmUpdateDtoValidator.validateAttributeAndNameValues(errors, germplasmUpdateList);
+		Mockito.verify(errors).reject("germplasm.import.name.type.value.invalid.length", "");
 	}
 
 	@Test

@@ -1,12 +1,12 @@
 package org.ibp.api.java.impl.middleware.name;
 
+import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.SystemNameTypes;
-import org.generationcp.middleware.pojos.Name;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.junit.Test;
@@ -18,10 +18,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.Assert.assertThat;
@@ -42,126 +40,164 @@ public class GermplasmNameTypeValidatorTest {
 	private GermplasmNameTypeValidator germplasmNameTypeValidator;
 
 	@Test
-	public void testValidate_ThrowsException_WhenCodeIsNull() {
+	public void testValidateNameTypeCreation_ThrowsException_WhenCodeIsNull() {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
 		germplasmNameTypeRequestDTO.setCode(null);
 		try {
-			this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
+			this.germplasmNameTypeValidator.validateNameTypeCreation(germplasmNameTypeRequestDTO);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.code.empty"));
 		}
 	}
 
 	@Test
-	public void testValidate_ThrowsException_WhenCodeIsBlank() {
+	public void testValidateNameTypeCreation_ThrowsException_WhenCodeIsBlank() {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
 		germplasmNameTypeRequestDTO.setCode("");
 		try {
-			this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
+			this.germplasmNameTypeValidator.validateNameTypeCreation(germplasmNameTypeRequestDTO);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.code.empty"));
 		}
 	}
 
 	@Test
-	public void testValidate_ThrowsException_WhenCodeIsInvalid() {
+	public void testValidateNameTypeCreation_ThrowsException_WhenCodeIsInvalid() {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
 		germplasmNameTypeRequestDTO.setCode(RandomStringUtils.randomAlphabetic(GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH + 1));
 		try {
-			this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
+			this.germplasmNameTypeValidator.validateNameTypeCreation(germplasmNameTypeRequestDTO);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.code.length.invalid"));
 		}
 	}
 
 	@Test
-	public void testValidate_ThrowsException_WhenCodeAlreadyExists() {
+	public void testValidateNameTypeCreation_ThrowsException_WhenCodeAlreadyExists() {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
-		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameTypeRequestDTO.getCode()));
 		final GermplasmNameTypeDTO nameTypes = new GermplasmNameTypeDTO();
 		nameTypes.setCode(germplasmNameTypeRequestDTO.getCode());
 		when(this.germplasmNameTypeService.filterGermplasmNameTypes(Mockito.any())).thenReturn(Collections.singletonList(nameTypes));
 		try {
-			this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
+			this.germplasmNameTypeValidator.validateNameTypeCreation(germplasmNameTypeRequestDTO);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.code.invalid"));
 		}
 	}
 
 	@Test
-	public void testValidate_ThrowsException_WhenNameIsNull() {
+	public void testValidateNameTypeCreation_ThrowsException_WhenNameIsNull() {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
 		germplasmNameTypeRequestDTO.setName(null);
 
 		try {
-			this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
+			this.germplasmNameTypeValidator.validateNameTypeCreation(germplasmNameTypeRequestDTO);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.name.empty"));
 		}
 	}
 
 	@Test
-	public void testValidate_ThrowsException_WhenNameIsBlank() {
+	public void testValidateNameTypeCreation_ThrowsException_WhenNameIsBlank() {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
 		germplasmNameTypeRequestDTO.setName("");
 
 		try {
-			this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
+			this.germplasmNameTypeValidator.validateNameTypeCreation(germplasmNameTypeRequestDTO);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.name.empty"));
 		}
 	}
 
 	@Test
-	public void testValidate_ThrowsException_WhenNameIsInvalid() {
+	public void testValidateNameTypeCreation_ThrowsException_WhenNameIsInvalid() {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
 		germplasmNameTypeRequestDTO.setName(RandomStringUtils.randomAlphabetic(GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH + 1));
 
 		try {
-			this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
+			this.germplasmNameTypeValidator.validateNameTypeCreation(germplasmNameTypeRequestDTO);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.name.length.invalid"));
 		}
 	}
 
 	@Test
-	public void testValidate_ThrowsException_WhenNameAlreadyExists() {
+	public void testValidateNameTypeCreation_ThrowsException_WhenNameAlreadyExists() {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
 		Mockito.when(this.germplasmNameTypeService.filterGermplasmNameTypesByName(germplasmNameTypeRequestDTO.getName()))
 			.thenReturn(Arrays.asList(new GermplasmNameTypeDTO()));
 		try {
-			this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
+			this.germplasmNameTypeValidator.validateNameTypeCreation(germplasmNameTypeRequestDTO);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.name.invalid"));
 		}
 	}
 
 	@Test
-	public void testValidate_ThrowsException_WhenDescriptionIsInvalid() {
+	public void testValidateNameTypeCreation_ThrowsException_WhenDescriptionIsInvalid() {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
 		germplasmNameTypeRequestDTO
 			.setDescription(RandomStringUtils.randomAlphabetic(GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH + 1));
 
 		try {
-			this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
+			this.germplasmNameTypeValidator.validateNameTypeCreation(germplasmNameTypeRequestDTO);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.description.length.invalid"));
 		}
 	}
 
 	@Test
-	public void testValidate_Deletable_ThrowsException_WhenNameTypeIdIsInvalid() {
+	public void testValidateNameTypeModification_ThrowsException_WhenCodeIsModifiedAndNameIsInUse() {
+		final Integer nameTypeId = RandomUtils.nextInt();
+		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
+
+		final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
+		germplasmNameTypeDTO.setId(nameTypeId);
+		germplasmNameTypeDTO.setCode(RandomStringUtils.randomAlphabetic(GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH));
+
+		Mockito.when(germplasmNameTypeService.getNameTypeById(Mockito.eq(nameTypeId))).thenReturn(Optional.of(germplasmNameTypeDTO));
+		Mockito.when(germplasmNameService.isNameTypeUsedAsGermplasmName(nameTypeId)).thenReturn(Boolean.TRUE);
+
+		try {
+			this.germplasmNameTypeValidator.validateNameTypeModification(nameTypeId, germplasmNameTypeRequestDTO);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.code.can.not.be.modified"));
+		}
+	}
+
+	@Test
+	public void testValidateNameTypeModification_ThrowsException_WhenNameIsModifiedAndNameIsInUse() {
+		final Integer nameTypeId = RandomUtils.nextInt();
+		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
+
+		final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
+		germplasmNameTypeDTO.setId(nameTypeId);
+		germplasmNameTypeDTO.setCode(germplasmNameTypeRequestDTO.getCode());
+		germplasmNameTypeDTO.setName(RandomStringUtils.randomAlphabetic(GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH));
+
+		Mockito.when(germplasmNameTypeService.getNameTypeById(Mockito.eq(nameTypeId))).thenReturn(Optional.of(germplasmNameTypeDTO));
+		Mockito.when(germplasmNameService.isNameTypeUsedAsGermplasmName(nameTypeId)).thenReturn(Boolean.TRUE);
+
+		try {
+			this.germplasmNameTypeValidator.validateNameTypeModification(nameTypeId, germplasmNameTypeRequestDTO);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.name.can.not.be.modified"));
+		}
+	}
+
+	@Test
+	public void testValidateNameTypeDeletion_ThrowsException_WhenNameTypeIdIsInvalid() {
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
 			.thenReturn(Optional.empty());
 		try {
-			this.germplasmNameTypeValidator.validateCanBeDeleted(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
+			this.germplasmNameTypeValidator.validateNameTypeDeletion(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.invalid"));
 		}
 	}
 
 	@Test
-	public void testValidate_Deletable_ThrowsException_WhenNameTypeIsUsedInGermplasm() {
+	public void testValidateNameTypeDeletion_ThrowsException_WhenNameTypeIsUsedInGermplasm() {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
 
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
@@ -171,14 +207,14 @@ public class GermplasmNameTypeValidatorTest {
 			.thenReturn(false);
 
 		try {
-			this.germplasmNameTypeValidator.validateCanBeDeleted(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
+			this.germplasmNameTypeValidator.validateNameTypeDeletion(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.is.in.used"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.is.in.use"));
 		}
 	}
 
 	@Test
-	public void testValidate_Deletable_ThrowsException_WhenNameTypeIsUsedInList() {
+	public void testValidateNameTypeDeletion_ThrowsException_WhenNameTypeIsUsedInList() {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
 
 		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
@@ -187,14 +223,14 @@ public class GermplasmNameTypeValidatorTest {
 		Mockito.when(this.germplasmNameTypeService.isNameTypeUsedInListDataProp(Mockito.any()))
 			.thenReturn(true);
 		try {
-			this.germplasmNameTypeValidator.validateCanBeDeleted(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
+			this.germplasmNameTypeValidator.validateNameTypeDeletion(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.asociated.to.list"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.associated.to.list"));
 		}
 	}
 
 	@Test
-	public void testValidate_Deletable_ThrowsException_WhenNameTypeIdIsUsedBySystem() {
+	public void testValidateNameTypeDeletion_ThrowsException_WhenNameTypeIdIsUsedBySystem() {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
 		germplasmNameTypeDTO.setCode(SystemNameTypes.LNAME.getType());
 
@@ -202,7 +238,7 @@ public class GermplasmNameTypeValidatorTest {
 			.thenReturn(Optional.of(germplasmNameTypeDTO));
 
 		try {
-			this.germplasmNameTypeValidator.validateCanBeDeleted(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
+			this.germplasmNameTypeValidator.validateNameTypeDeletion(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.used.for.the.system"));
 		}
