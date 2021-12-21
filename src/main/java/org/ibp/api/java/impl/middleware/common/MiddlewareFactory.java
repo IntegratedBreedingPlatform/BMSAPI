@@ -20,6 +20,8 @@ import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
 import org.generationcp.middleware.api.brapi.ObservationServiceBrapiImpl;
+import org.generationcp.middleware.api.brapi.SampleServiceBrapi;
+import org.generationcp.middleware.api.brapi.SampleServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
@@ -387,6 +389,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public SampleService getSampleService() {
 		return new SampleServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public SampleServiceBrapi getSampleServiceBrapi() {
+		return new SampleServiceBrapiImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

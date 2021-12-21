@@ -33,6 +33,8 @@ public class Usage {
 	// lists of variable
 	private Integer lists;
 
+	private boolean isSystemVariable;
+
 	public void addUsage(final TermSummary variable) {
 		// Note: Do not add null value of variable
 		if (variable != null) {
@@ -90,5 +92,13 @@ public class Usage {
 
 	public void setLists(final Integer lists) {
 		this.lists = lists;
+	}
+
+	public boolean isSystemVariable() {
+		return this.isSystemVariable;
+	}
+
+	public void setSystemVariable(final boolean systemVariable) {
+		this.isSystemVariable = systemVariable;
 	}
 }

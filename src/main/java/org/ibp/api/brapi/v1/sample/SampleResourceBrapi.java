@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRe
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
-import org.ibp.api.java.impl.middleware.sample.SampleService;
+import org.ibp.api.brapi.SampleServiceBrapi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Collections;
 import java.util.List;
 
 @Api(value = "BrAPI Sample Services")
@@ -25,7 +26,7 @@ import java.util.List;
 public class SampleResourceBrapi {
 
 	@Autowired
-	private SampleService sampleService;
+	private SampleServiceBrapi sampleServiceBrapi;
 
 	@ApiOperation(value = "Get a sample by sampleDbId", notes = "Get a sample by sampleDbId")
 	@RequestMapping(value = "/{crop}/brapi/v1/samples/{sampleDbId}", method = RequestMethod.GET)
@@ -33,8 +34,8 @@ public class SampleResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SampleObservationDto>> getSampleBySampleId(@PathVariable final String crop, final @PathVariable String sampleDbId) {
 		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
-		requestDTO.setSampleDbId(sampleDbId);
-		final List<SampleObservationDto> sampleObservationDtos = this.sampleService.getSampleObservations(requestDTO, null);
+		requestDTO.setSampleDbIds(Collections.singletonList(sampleDbId));
+		final List<SampleObservationDto> sampleObservationDtos = this.sampleServiceBrapi.getSampleObservations(requestDTO, null);
 
 		if (!CollectionUtils.isEmpty(sampleObservationDtos)) {
 			return new ResponseEntity<>(new SingleEntityResponse<>(sampleObservationDtos.get(0)), HttpStatus.OK);

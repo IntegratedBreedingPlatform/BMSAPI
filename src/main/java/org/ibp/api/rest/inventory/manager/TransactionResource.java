@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
 import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
@@ -29,6 +29,7 @@ import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
+import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.java.inventory.manager.TransactionExportService;
 import org.ibp.api.java.inventory.manager.TransactionService;
@@ -81,6 +82,9 @@ public class TransactionResource {
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
+
+	@Autowired
+	private StudyTransactionsService studyTransactionsService;
 
 	@ApiOperation(value = "Get Transaction types")
 	@RequestMapping(value = "/crops/{cropName}/transaction-types", method = RequestMethod.GET)
@@ -468,6 +472,17 @@ public class TransactionResource {
 
 		return new ResponseEntity<>(transactionDtos, headers, HttpStatus.OK);
 
+	}
+
+	@ApiOperation(value = "It returns a transaction by a given id", notes = "It returns a transaction by a given id")
+	@RequestMapping(value = "/crops/{cropName}/transactions/{transactionId}", method = RequestMethod.GET)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')")
+	@ResponseBody
+	@JsonView(InventoryView.LotView.class)
+	public ResponseEntity<StudyTransactionsDto> getLot(@PathVariable final String cropName,
+			@RequestParam(required = false) final String programUUID,
+			@PathVariable final Integer transactionId) {
+		return new ResponseEntity<>(this.studyTransactionsService.getStudyTransactionByTransactionId(transactionId), HttpStatus.OK);
 	}
 
 }

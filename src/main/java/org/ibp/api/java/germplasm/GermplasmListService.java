@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
@@ -30,6 +31,8 @@ public interface GermplasmListService {
 	long countMyLists(String programUUID, Integer userId);
 
 	List<MyListsDTO> getMyLists(String programUUID, Pageable pageable, Integer userId);
+
+	GermplasmListDto clone(Integer germplasmListId, GermplasmListDto request);
 
 	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request);
 
@@ -60,4 +63,13 @@ public interface GermplasmListService {
 	long countSearchGermplasmList(GermplasmListSearchRequest request, String programUUID);
 
 	boolean toggleGermplasmListStatus(Integer listId);
+
+	void deleteGermplasmList(String cropName, String programUUID, Integer listId);
+
+	void addGermplasmListEntriesToAnotherList(String cropName, String programUUID, Integer destinationListId, Integer sourceListId,
+		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
+
+	void removeGermplasmEntriesFromList(Integer germplasmListId, SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
+
+	void editListMetadata(GermplasmListDto germplasmListDto, String programUUID);
 }

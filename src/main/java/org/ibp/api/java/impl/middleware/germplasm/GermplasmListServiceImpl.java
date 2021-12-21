@@ -1,9 +1,11 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.constant.ListTreeState;
 import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
 import org.generationcp.middleware.ContextHolder;
@@ -15,6 +17,8 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
@@ -42,6 +46,7 @@ import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmListDataValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
@@ -51,12 +56,14 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.UserTreeState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -87,6 +94,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	static final String ENTRY_CODE = "entryCode";
 	static final String SEED_SOURCE = "seedSource";
 	static final String GROUP_NAME = "groupName";
+	public static final String LIST_FIELD_UPDATE_NOT_SUPPORTED = "list.field.update.not.supported";
+	public static final String LIST_FOLDER_ID_INVALID = "list.folder.id.invalid";
+	public static final String ERROR_GERMPLASMLIST_SAVE_GAPS = "error.germplasmlist.save.gaps";
+	public static final String ADMIN = "ADMIN";
+
 
 	private enum ListNodeType {
 		PARENT("parent"),
@@ -102,6 +114,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			return this.value;
 		}
 	}
+
 
 	@Autowired
 	private GermplasmListManager germplasmListManager;
@@ -149,7 +162,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	private GermplasmListValidator germplasmListValidator;
 
 	@Autowired
+	private GermplasmListDataValidator germplasmListDataValidator;
+
+	@Autowired
 	private OntologyVariableService ontologyVariableService;
+
+	@Autowired
+	private GermplasmListDataService germplasmListDataService;
 
 	private BindingResult errors;
 
@@ -169,7 +188,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final List<TreeNode> treeNodes = new ArrayList<>();
 		if (parentId == null) {
-			final TreeNode cropFolderNode = new TreeNode(GermplasmListServiceImpl.CROP_LISTS, AppConstants.CROP_LISTS.getString(), true, LEAD_CLASS,
+			final TreeNode cropFolderNode =
+				new TreeNode(GermplasmListServiceImpl.CROP_LISTS, AppConstants.CROP_LISTS.getString(), true, LEAD_CLASS,
 					AppConstants.FOLDER_ICON_PNG.getString(), null);
 			cropFolderNode.setNumOfChildren(this.germplasmListManager.getAllTopLevelLists(null).size());
 			treeNodes.add(cropFolderNode);
@@ -185,13 +205,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			} else if (GermplasmListServiceImpl.CROP_LISTS.equals(parentId)) {
 				rootLists = this.germplasmListManager.getAllTopLevelLists(null);
 			} else {
-				rootLists = this.germplasmListManager.getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID, GermplasmListServiceImpl.BATCH_SIZE);
+				rootLists = this.germplasmListManager.getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID,
+					GermplasmListServiceImpl.BATCH_SIZE);
 			}
 
 			this.germplasmListManager.populateGermplasmListCreatedByName(rootLists);
 
 			final List<UserDefinedField> listTypes = this.germplasmDataManager
-					.getUserDefinedFieldByFieldTableNameAndType(RowColumnType.LIST_TYPE.getFtable(), RowColumnType.LIST_TYPE.getFtype());
+				.getUserDefinedFieldByFieldTableNameAndType(RowColumnType.LIST_TYPE.getFtable(), RowColumnType.LIST_TYPE.getFtype());
 
 			final List<TreeNode> childNodes = TreeViewUtil.convertGermplasmListToTreeView(rootLists, folderOnly, listTypes);
 
@@ -217,7 +238,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private TreeNode getProgramFolderTreeNode(final String programUUID) {
 		return new TreeNode(GermplasmListServiceImpl.PROGRAM_LISTS, AppConstants.PROGRAM_LISTS.getString(), true, LEAD_CLASS,
-							AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
+			AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
 	}
 
 	@Override
@@ -238,7 +259,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			final TreeNode programRootNode = treeNodesList.get(1);
 			programRootNode.setChildren(this.getChildrenNodes(programUUID, programRootNode.getKey(), false));
 			programRootNode.getChildren().forEach(c -> folderParentNodeMap.put(c.getKey(), programRootNode));
-			for (int i=1; i<treeFolders.size(); i++) {
+			for (int i = 1; i < treeFolders.size(); i++) {
 				final String finalKey = StringUtils.stripStart(treeFolders.get(i), " ");
 				final Optional<Map.Entry<String, TreeNode>> parentNodeOpt =
 					folderParentNodeMap.entrySet().stream().filter(entry -> entry.getKey().equals(finalKey)).findFirst();
@@ -248,8 +269,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 					final Optional<TreeNode> nodeToExpand =
 						parentNode.getChildren().stream().filter(child -> child.getKey().equals(finalKey)).findFirst();
 					nodeToExpand.ifPresent(node -> {
-						 node.setChildren(this.getChildrenNodes(programUUID, finalKey, false));
-						 node.getChildren().forEach(c -> folderParentNodeMap.put(c.getKey(), node));
+							node.setChildren(this.getChildrenNodes(programUUID, finalKey, false));
+							node.getChildren().forEach(c -> folderParentNodeMap.put(c.getKey(), node));
 						}
 					);
 				}
@@ -276,7 +297,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		// Persist the tree state for user
-		this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name(),
+		this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), programUUID,
+			ListTreeState.GERMPLASM_LIST.name(),
 			folders);
 	}
 
@@ -321,63 +343,70 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public GermplasmListDto clone(final Integer germplasmListId, final GermplasmListDto request) {
+		final String currentProgram = ContextHolder.getCurrentProgram();
+
+		this.germplasmListValidator.validateGermplasmList(germplasmListId);
+		this.germplasmListValidator.validateListMetadata(request, currentProgram);
+		this.germplasmListValidator.validateParentFolder(request);
+		this.validateNodeId(request.getParentFolderId(), currentProgram, ListNodeType.PARENT);
+
+		this.assignFolderDependentProperties(request, currentProgram);
+
+		return this.germplasmListService.cloneGermplasmList(germplasmListId, request,
+			this.securityService.getCurrentlyLoggedInUser().getUserid());
+	}
+
+	@Override
 	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request) {
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
 
-		// validations
+		final GermplasmListDto germplasmListDto = new GermplasmListDto(request);
+		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
 
-		checkNotNull(request, "param.null", new String[] {"request"});
-		checkNotNull(request.getDate(), "param.null", new String[] {"date"});
-
-		if (!StringUtils.isBlank(request.getDescription())) {
-			checkArgument(request.getDescription().length() <= 255, "text.field.max.length", new String[] {"description", "255"});
-		}
-
-		if (!StringUtils.isBlank(request.getNotes())) {
-			checkArgument(request.getNotes().length() <= 65535, "text.field.max.length", new String[] {"notes", "65535"});
-		}
-
-		final String type = request.getType();
-		checkNotNull(type, "param.null", new String[] {"type"});
-		if (this.getGermplasmListTypes().stream().noneMatch(typeDTO -> typeDTO.getCode().equals(type))) {
-			throw new ApiValidationException("", "error.germplasmlist.save.type.not.exists", type);
-		}
-
-		final String name = request.getName();
-		this.germplasmListValidator.validateListName(currentProgram, name);
-
-		final String parentFolderId = request.getParentFolderId();
-		checkNotNull(parentFolderId, "param.null", new String[] {"parentFolderId"});
-		this.validateNodeId(parentFolderId, currentProgram, ListNodeType.PARENT);
+		this.germplasmListValidator.validateParentFolder(germplasmListDto);
+		this.validateNodeId(germplasmListDto.getParentFolderId(), currentProgram, ListNodeType.PARENT);
 
 		// process and assign defaults + more validations
 		this.processEntries(request, currentProgram);
 
+		this.assignFolderDependentProperties(germplasmListDto, currentProgram);
+		// set updated listdto fields to request for now, listdto and generatorlistdto to merge in the future
+		request.setStatus(germplasmListDto.getStatus());
+		request.setProgramUUID(germplasmListDto.getProgramUUID());
+		request.setParentFolderId(germplasmListDto.getParentFolderId());
+
+		final Integer loggedInUser = this.securityService.getCurrentlyLoggedInUser().getUserid();
+
+		// finally save
+		return this.germplasmListService.create(request, loggedInUser);
+	}
+
+	private void assignFolderDependentProperties(final GermplasmListDto request, final String currentProgram) {
 		// properties that depend on CROP/PROGRAM folder
 		int status = GermplasmList.Status.LIST.getCode();
-		String programUUID = null;
+		final String parentFolderId = request.getParentFolderId();
 		// If the germplasm list is saved in 'Crop lists' folder, the programUUID should be null
 		// so that the germplasm list will be accessible to all programs of the same crop.
 		if (CROP_LISTS.equals(parentFolderId)) {
 			// list should be locked by default if it is saved in 'Crop lists' folder.
 			status = GermplasmList.Status.LOCKED_LIST.getCode();
 		} else {
-			programUUID = currentProgram;
+			request.setProgramUUID(currentProgram);
 		}
+		request.setStatus(status);
 
 		if (CROP_LISTS.equals(parentFolderId) || PROGRAM_LISTS.equals(parentFolderId)) {
 			request.setParentFolderId(null);
 		}
-
-		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-
-		// finally save
-		return this.germplasmListService.create(request, status, programUUID, loggedInUser);
 	}
 
 	@Override
 	public void importUpdates(final GermplasmListGeneratorDTO request) {
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(request.getId());
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+
 		this.processEntriesForUpdate(request);
 		this.germplasmListService.importUpdates(request);
 	}
@@ -392,7 +421,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		if (isEmpty(request.getEntries())) {
 			if (!isEmpty(searchComposite.getItemIds())) {
-				request.setEntries(searchComposite.getItemIds().stream().map(gid -> {
+				final List<Integer> gidsList = new ArrayList<Integer>(searchComposite.getItemIds());
+				Collections.sort(gidsList);
+
+				request.setEntries(gidsList.stream().map(gid -> {
 					final GermplasmListGeneratorDTO.GermplasmEntryDTO entryDTO = new GermplasmListGeneratorDTO.GermplasmEntryDTO();
 					entryDTO.setGid(gid);
 					return entryDTO;
@@ -476,13 +508,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiValidationException("", "error.germplasmlist.save.entryno.gaps");
 		}
 		if (hasEntryCode && hasEntryCodeEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", ENTRY_CODE);
+			throw new ApiValidationException("", ERROR_GERMPLASMLIST_SAVE_GAPS, ENTRY_CODE);
 		}
 		if (hasSeedSource && hasSeedSourceEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", SEED_SOURCE);
+			throw new ApiValidationException("", ERROR_GERMPLASMLIST_SAVE_GAPS, SEED_SOURCE);
 		}
 		if (hasGroupName && hasGroupNameEmpty) {
-			throw new ApiValidationException("", "error.germplasmlist.save.gaps", GROUP_NAME);
+			throw new ApiValidationException("", ERROR_GERMPLASMLIST_SAVE_GAPS, GROUP_NAME);
 		}
 
 	}
@@ -493,9 +525,22 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final Map<Integer, Variable> entryDetailVariablesById = this.extractVariableIds(request);
 
+		final int numberOfEntries =
+			(int) this.germplasmListDataService.countSearchGermplasmListData(request.getId(), new GermplasmListDataSearchRequest());
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			if (entry.getEntryNo() == null) {
 				throw new ApiValidationException("", "error.germplasmlist.importupdates.entryno.mandatory");
+			}
+
+			if (entry.getEntryNo() > numberOfEntries || entry.getEntryNo() < 1) {
+				throw new ApiRequestValidationException("invalid.entry.no.value", new String[] {entry.getEntryNo().toString()});
+			}
+
+			// Temporary workaround to allow users to edit ENTRY_CODE
+			if (!isBlank(entry.getEntryCode())) {
+				if (entry.getEntryCode().length() > 47) {
+					throw new ApiValidationException("", "error.germplasmlist.save.entry.code.exceed.length");
+				}
 			}
 
 			this.processEntryDetails(entry.getData(), entryDetailVariablesById);
@@ -565,22 +610,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, this.errors);
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(germplasmListId);
 
-		if (germplasmList.isFolder()) {
-			this.errors.reject("list.invalid", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-		if (germplasmList.isLockedList()) {
-			this.errors.reject("list.locked", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
+		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
 		if (!isEmpty(searchComposite.getItemIds())) {
 			this.germplasmValidator.validateGids(this.errors, new ArrayList<>(searchComposite.getItemIds()));
 		}
 
 		this.germplasmListService.addGermplasmEntriesToList(germplasmListId, searchComposite, programUUID);
-}
+	}
 
 	@Override
 	public Integer createGermplasmListFolder(final String cropName, final String programUUID, final String folderName,
@@ -627,7 +665,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListValidator.validateNotSameFolderNameInParent(newFolderName, germplasmList.getParentId(), programUUID);
 
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
-		return this.germplasmListService.updateGermplasmListFolder(createdBy.getUserid(), newFolderName, Integer.valueOf(folderId), programUUID);
+		return this.germplasmListService.updateGermplasmListFolder(createdBy.getUserid(), newFolderName, Integer.valueOf(folderId),
+			programUUID);
 	}
 
 	@Override
@@ -636,12 +675,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 
-		if (StringUtils.isEmpty(folderId) ) {
-			this.errors.reject("list.folder.id.invalid", "");
+		if (StringUtils.isEmpty(folderId)) {
+			this.errors.reject(LIST_FOLDER_ID_INVALID, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (StringUtils.isEmpty(newParentFolderId) || newParentFolderId.equals(CROP_LISTS)) {
+		if (StringUtils.isEmpty(newParentFolderId)) {
 			this.errors.reject("list.parent.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -654,7 +693,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.validateProgram(cropName, programUUID);
 
 		this.validateNodeId(newParentFolderId, programUUID, ListNodeType.PARENT, false);
-		this.validateNodeId(folderId, programUUID, ListNodeType.FOLDER, false);
+		this.validateNodeId(folderId, ListNodeType.FOLDER);
+
+		if (Util.isPositiveInteger(folderId)) {
+			final GermplasmListDto germplasmListById = this.getGermplasmListById(Integer.parseInt(folderId));
+			this.getGermplasmListByIdAndProgramUUID(folderId, germplasmListById.getProgramUUID(), ListNodeType.FOLDER);
+		}
 
 		final GermplasmList germplasmListToMove = this.germplasmListService.getGermplasmListById(Integer.parseInt(folderId))
 			.orElseThrow(() -> {
@@ -662,7 +706,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				return new ApiRequestValidationException(this.errors.getAllErrors());
 			});
 
-		if(this.isSourceItemHasChildren(Integer.parseInt(folderId), programUUID)) {
+		if (this.isSourceItemHasChildren(Integer.parseInt(folderId), programUUID)) {
 			this.errors.reject("list.move.folder.has.child", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -698,7 +742,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 
 		if (StringUtils.isEmpty(folderId)) {
-			this.errors.reject("list.folder.id.invalid", "");
+			this.errors.reject(LIST_FOLDER_ID_INVALID, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
@@ -717,7 +761,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if(this.isSourceItemHasChildren(Integer.parseInt(folderId), programUUID)) {
+		if (this.isSourceItemHasChildren(Integer.parseInt(folderId), programUUID)) {
 			this.errors.reject("list.delete.folder.has.child", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -762,7 +806,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
 
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
-		if (!germplasmList.getUserId().equals(createdBy.getUserid())) {
+		final Collection<? extends GrantedAuthority> authorities = SecurityUtil.getLoggedInUserAuthorities();
+		// Allow updating of status if user has Full permission or user owns the list
+		if (authorities.stream().noneMatch(o -> o.getAuthority().equals(ADMIN)) && !germplasmList.getUserId()
+			.equals(createdBy.getUserid())) {
 			this.errors.reject("list.toggle.status.not.owner", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -771,8 +818,84 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public void editListMetadata(final GermplasmListDto germplasmListDto, final String programUUID) {
+		BaseValidator.checkNotNull(germplasmListDto.getListId(), "list.id.required");
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(germplasmListDto.getListId());
+		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+
+		this.germplasmListValidator.validateListMetadata(germplasmListDto, programUUID);
+
+		// Throw exception for fields not supported for updating
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateListNonEditableFields(germplasmListDto, germplasmList);
+		this.germplasmListService.editListMetadata(germplasmListDto);
+	}
+
+	private void validateListNonEditableFields(final GermplasmListDto germplasmListDto, final GermplasmList germplasmList) {
+		if (germplasmListDto.getOwnerId() != null && !germplasmListDto.getOwnerId().equals(germplasmList.getUserId())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"ownerId"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		if (germplasmListDto.isLocked() != null && !germplasmListDto.isLocked().equals(germplasmList.isLockedList())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"locked"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		if (StringUtils.isNotBlank(germplasmListDto.getProgramUUID()) && !germplasmListDto.getProgramUUID()
+			.equals(germplasmList.getProgramUUID())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"programUUID"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		if (germplasmListDto.getParentFolderId() != null && !Integer.valueOf(germplasmListDto.getParentFolderId())
+			.equals(germplasmList.getParentId())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"parentFolderId"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		if (germplasmListDto.getStatus() != null && !germplasmListDto.getStatus().equals(germplasmList.getStatus())) {
+			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"status"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	@Override
+	public void removeGermplasmEntriesFromList(final Integer germplasmListId,
+		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(germplasmListId);
+		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite,
+			new MapBindingResult(new HashMap<>(), String.class.getName()));
+		if (CollectionUtils.isNotEmpty(searchComposite.getItemIds()) && searchComposite.getSearchRequest() == null) {
+			this.germplasmListDataValidator.verifyListDataIdsExist(germplasmListId, new ArrayList<>(searchComposite.getItemIds()));
+		}
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmListId, searchComposite);
+	}
+
+	@Override
 	public List<Variable> getGermplasmListVariables(final String programUUID, final Integer listId, final Integer variableTypeId) {
 		return this.germplasmListService.getGermplasmListVariables(programUUID, listId, variableTypeId);
+	}
+
+	@Override
+	public void deleteGermplasmList(final String cropName, final String programUUID, final Integer listId) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateProgram(cropName, programUUID);
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+		this.germplasmListService.deleteGermplasmList(listId);
+	}
+
+	@Override
+	public void addGermplasmListEntriesToAnotherList(final String cropName, final String programUUID, final Integer destinationListId,
+		final Integer sourceListId, final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.validateProgram(cropName, programUUID);
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(destinationListId);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+		this.germplasmListValidator.validateGermplasmList(sourceListId);
+		this.searchCompositeDtoValidator.validateSearchCompositeDto(searchComposite, this.errors);
+		this.germplasmListService.addGermplasmListEntriesToAnotherList(destinationListId, sourceListId, programUUID, searchComposite);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
@@ -788,29 +911,29 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.validateNodeId(nodeId, programUUID, nodeType, true);
 	}
 
-	private void validateNodeId(final String nodeId, final String programUUID, final ListNodeType nodeType, final boolean validateRequiredProgramUUID) {
-		if (!Objects.isNull(nodeId) && !PROGRAM_LISTS.equals(nodeId) && !CROP_LISTS.equals(nodeId) && !Util.isPositiveInteger(nodeId)) {
-			this.errors.reject("list." + nodeType.getValue() + ".id.invalid", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
+	private void validateNodeId(final String nodeId, final String programUUID, final ListNodeType nodeType,
+		final boolean validateRequiredProgramUUID) {
+		this.validateNodeId(nodeId, nodeType);
 
-		if ((PROGRAM_LISTS.equals(nodeId) && StringUtils.isEmpty(programUUID))) {
+		if (validateRequiredProgramUUID && PROGRAM_LISTS.equals(nodeId) && StringUtils.isEmpty(programUUID)) {
 			this.errors.reject("list.project.mandatory", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (Util.isPositiveInteger(nodeId)) {
-			final GermplasmList germplasmList =
-				this.germplasmListService.getGermplasmListByIdAndProgramUUID(Integer.parseInt(nodeId), programUUID)
-					.orElseThrow(() -> {
-						this.errors.reject("list." + nodeType.getValue() + ".id.not.exist", "");
-						return new ApiRequestValidationException(this.errors.getAllErrors());
-					});
+			final GermplasmList germplasmList = this.getGermplasmListByIdAndProgramUUID(nodeId, programUUID, nodeType);
 
 			if (validateRequiredProgramUUID && !StringUtils.isEmpty(programUUID) && StringUtils.isEmpty(germplasmList.getProgramUUID())) {
 				this.errors.reject("list.project.mandatory", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
+		}
+	}
+
+	private void validateNodeId(final String nodeId, final ListNodeType nodeType) {
+		if (!Objects.isNull(nodeId) && !PROGRAM_LISTS.equals(nodeId) && !CROP_LISTS.equals(nodeId) && !Util.isPositiveInteger(nodeId)) {
+			this.errors.reject("list." + nodeType.getValue() + ".id.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
@@ -822,13 +945,21 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private void validateFolderNotCropNorProgramList(final String folderId) {
 		if (folderId.equals(CROP_LISTS) || folderId.equals(PROGRAM_LISTS)) {
-			this.errors.reject("list.folder.id.invalid", "");
+			this.errors.reject(LIST_FOLDER_ID_INVALID, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
 	private Integer getFolderIdAsInteger(final String folderId) {
 		return (CROP_LISTS.equals(folderId) || PROGRAM_LISTS.equals(folderId)) ? null : Integer.valueOf(folderId);
+	}
+
+	private GermplasmList getGermplasmListByIdAndProgramUUID(final String nodeId, final String programUUID, final ListNodeType nodeType) {
+		return this.germplasmListService.getGermplasmListByIdAndProgramUUID(Integer.parseInt(nodeId), programUUID)
+			.orElseThrow(() -> {
+				this.errors.reject("list." + nodeType.getValue() + ".id.not.exist", "");
+				return new ApiRequestValidationException(this.errors.getAllErrors());
+			});
 	}
 
 	public void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
