@@ -27,19 +27,19 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public long countSearchNameTypes(NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest) {
+	public long countSearchNameTypes(final NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest) {
 		return this.germplasmNameTypeService.countSearchNameTypes(nameTypeMetadataFilterRequest);
 	}
 
 	@Override
 	public Integer createNameType(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
-		this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, null);
+		this.germplasmNameTypeValidator.validateNameTypeCreation(germplasmNameTypeRequestDTO);
 		return this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
 	}
 
 	@Override
 	public boolean updateNameType(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
-		this.germplasmNameTypeValidator.validate(germplasmNameTypeRequestDTO, nameTypeId);
+		this.germplasmNameTypeValidator.validateNameTypeModification(nameTypeId, germplasmNameTypeRequestDTO);
 		if (germplasmNameTypeRequestDTO.allAttributesNull()) {
 			return false;
 		}
@@ -49,7 +49,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	@Override
 	public void deleteNameType(final Integer nameTypeId) {
-		this.germplasmNameTypeValidator.validateCanBeDeleted(nameTypeId);
+		this.germplasmNameTypeValidator.validateNameTypeDeletion(nameTypeId);
 		this.germplasmNameTypeService.deleteNameType(nameTypeId);
 	}
 }
