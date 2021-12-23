@@ -229,8 +229,8 @@ public class LabelPrintingResource {
 					|| this.request.isUserInRole(PermissionsEnum.GERMPLASM_LABEL_PRINTING.name());
 			case GERMPLASM_LIST:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
-					|| this.request.isUserInRole(PermissionsEnum.GERMPLASM.name())
-					|| this.request.isUserInRole(PermissionsEnum.MANAGE_GERMPLASM.name())
+					|| this.request.isUserInRole(PermissionsEnum.LISTS.name())
+					|| this.request.isUserInRole(PermissionsEnum.MANAGE_GERMPLASM_LISTS.name())
 					|| this.request.isUserInRole(PermissionsEnum.GERMPLASM_LIST_LABEL_PRINTING.name());
 			default:
 				return false;
