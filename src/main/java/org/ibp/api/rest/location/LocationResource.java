@@ -10,6 +10,7 @@ import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.location.validator.LocationSearchRequestValidator;
 import org.ibp.api.java.location.LocationService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ public class LocationResource {
 
 	@Autowired
 	private LocationService locationService;
+
+	@Autowired
+	private LocationSearchRequestValidator locationSearchRequestValidator;
 
 	@ApiOperation(value = "Get location")
 	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.GET)
@@ -73,8 +77,10 @@ public class LocationResource {
 		@RequestBody final LocationSearchRequest request,
 		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
 
-		return new PaginatedSearch().getPagedResult(() -> this.locationService.countLocations(cropname, request),
-				() -> this.locationService.getLocations(cropname, request, pageable),
+		this.locationSearchRequestValidator.validate(cropname, request);
+
+		return new PaginatedSearch().getPagedResult(() -> this.locationService.countLocations(cropname, request, programUUID),
+				() -> this.locationService.searchLocations(cropname, request, pageable, programUUID),
 				pageable);
 	}
 

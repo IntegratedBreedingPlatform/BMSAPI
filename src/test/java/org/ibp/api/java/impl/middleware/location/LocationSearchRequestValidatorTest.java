@@ -45,4 +45,17 @@ public class LocationSearchRequestValidatorTest {
 		}
 	}
 
+	@Test
+	public void testValidate_ProgramFavoriteNotPresent() {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setFilterFavoriteProgramUUID(true);
+		locationSearchRequest.setFavoriteProgramUUID(null);
+		try {
+			this.validator.validate("maize", locationSearchRequest);
+		} catch (Exception e) {
+			assertThat(e, instanceOf(ApiRequestValidationException.class));
+			assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()), hasItem("locations.favorite.requires.program"));
+		}
+	}
+
 }
