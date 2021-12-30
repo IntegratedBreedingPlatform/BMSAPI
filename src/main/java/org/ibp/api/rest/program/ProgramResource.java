@@ -98,6 +98,14 @@ public class ProgramResource {
         return new ResponseEntity<>(programs, headers, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Get program by programUUID", notes = "Get program by programUUID")
+    @RequestMapping(value = "/crops/{cropName}/programs/{programUUID}", method = RequestMethod.GET)
+    public ResponseEntity<ProgramDTO> getProgramByProgramUUID(@PathVariable final String cropName,
+        @PathVariable final String programUUID) {
+        final ProgramDTO programDTO = this.programService.getByUUIDAndCrop(cropName, programUUID);
+        return new ResponseEntity<>(programDTO, HttpStatus.OK);
+    }
+
     @ApiOperation(value = "Create program", notes = "Create program")
     @RequestMapping(value = "/crops/{cropName}/programs", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'ADD_PROGRAM')")
