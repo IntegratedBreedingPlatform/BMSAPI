@@ -134,9 +134,9 @@ public class ProgramResource {
     }
 
     private boolean hasAdmin() {
-        return request.isUserInRole(PermissionsEnum.ADMIN.name())
-            || request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())
-            || request.isUserInRole(PermissionsEnum.ADMINISTRATION.name())
-            || request.isUserInRole(PermissionsEnum.SITE_ADMIN.name());
+        return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
+            || this.request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())
+            || this.request.isUserInRole(PermissionsEnum.ADMINISTRATION.name())
+            || this.request.isUserInRole(PermissionsEnum.SITE_ADMIN.name());
     }
 }
