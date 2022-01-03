@@ -96,12 +96,14 @@ public class ObservationImportRequestValidator {
 		final List<ObservationDto> existingObservations =
 			this.observationServiceBrapi.searchObservations(observationSearchRequestDto, null);
 		final Map<String, Map<String, ObservationDto>> existingObservationsMap = new HashMap<>();
-		for (final ObservationDto existingObservation: existingObservations) {
-			final String observationUnitDbId = existingObservation.getObservationUnitDbId();
-			if(!existingObservationsMap.containsKey(observationUnitDbId)) {
-				existingObservationsMap.put(observationUnitDbId, new HashMap<>());
+		if(CollectionUtils.isNotEmpty(existingObservations)) {
+			for (final ObservationDto existingObservation : existingObservations) {
+				final String observationUnitDbId = existingObservation.getObservationUnitDbId();
+				if (!existingObservationsMap.containsKey(observationUnitDbId)) {
+					existingObservationsMap.put(observationUnitDbId, new HashMap<>());
+				}
+				existingObservationsMap.get(observationUnitDbId).put(existingObservation.getObservationVariableDbId(), existingObservation);
 			}
-			existingObservationsMap.get(observationUnitDbId).put(existingObservation.getObservationVariableDbId(), existingObservation);
 		}
 
 		final Map<String, List<String>> studyVariableIdsMap = new HashMap<>();
