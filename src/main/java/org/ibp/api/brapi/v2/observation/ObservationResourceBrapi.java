@@ -94,7 +94,7 @@ public class ObservationResourceBrapi {
 		observationSearchRequestDto.setGermplasmDbIds(
 			StringUtils.isNotEmpty(germplasmDbId) ? Arrays.asList(germplasmDbId) : new ArrayList<>());
 		observationSearchRequestDto.setObservationVariableDbIds(
-			StringUtils.isNotEmpty(observationVariableDbId) ? Arrays.asList(Integer.valueOf(observationVariableDbId)) : new ArrayList<>());
+			StringUtils.isNotEmpty(observationVariableDbId) ? Arrays.asList(observationVariableDbId) : new ArrayList<>());
 		observationSearchRequestDto.setStudyDbIds(
 			StringUtils.isNotEmpty(studyDbId) ? Arrays.asList(Integer.valueOf(studyDbId)) : new ArrayList<>());
 		observationSearchRequestDto.setLocationDbIds(
