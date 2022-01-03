@@ -99,9 +99,7 @@ public class ObservationImportRequestValidator {
 		if(CollectionUtils.isNotEmpty(existingObservations)) {
 			for (final ObservationDto existingObservation : existingObservations) {
 				final String observationUnitDbId = existingObservation.getObservationUnitDbId();
-				if (!existingObservationsMap.containsKey(observationUnitDbId)) {
-					existingObservationsMap.put(observationUnitDbId, new HashMap<>());
-				}
+				existingObservationsMap.putIfAbsent(observationUnitDbId, new HashMap<>());
 				existingObservationsMap.get(observationUnitDbId).put(existingObservation.getObservationVariableDbId(), existingObservation);
 			}
 		}
