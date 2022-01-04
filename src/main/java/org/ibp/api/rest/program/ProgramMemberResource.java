@@ -48,7 +48,7 @@ public class ProgramMemberResource {
 	})
 	@ApiOperation(value = "List program members", notes = "Get the list or program members")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	public ResponseEntity<List<ProgramMemberDto>> getProgramMembers(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@ApiIgnore
@@ -71,7 +71,7 @@ public class ProgramMemberResource {
 	})
 	@ApiOperation(value = "List users eligible to be program members", notes = "List users eligible to be program members")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members/eligible-users", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	public ResponseEntity<List<UserDetailDto>> getMembersEligibleUsers(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@ApiIgnore
@@ -84,7 +84,7 @@ public class ProgramMemberResource {
 
 	@ApiOperation(value = "Add a set of users as program members with an specific program role", notes = "Add a set of users as program members with an specific program role")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	public ResponseEntity<Void> addProgramRoleToUsers(@PathVariable final String cropName,
 		@PathVariable final String programUUID, @RequestBody final AddProgramMemberRequestDto requestDto) {
 		this.programService.addNewProgramMembers(programUUID, requestDto);
@@ -93,7 +93,7 @@ public class ProgramMemberResource {
 
 	@ApiOperation(value = "Delete a set of program members from a given program", notes = "Delete a set of program members from a given program")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	public ResponseEntity<Void> removeProgramMembers(@PathVariable final String cropName,
 		@PathVariable final String programUUID, @RequestParam final Set<Integer> userIds) {
 		this.programService.removeProgramMembers(programUUID, userIds);
