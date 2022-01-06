@@ -80,7 +80,7 @@ public class RemoveProgramMembersValidatorTest {
 			final Set<Integer> set = Sets.newHashSet(userId);
 			final WorkbenchUser user = new WorkbenchUser(userId);
 			Mockito.when(this.userService.getUsersByIds(Mockito.anyList())).thenReturn(Collections.singletonList(user));
-			Mockito.when(this.userService.getProgramMembers(this.programUUID, null)).thenReturn(Collections.emptyList());
+			Mockito.when(this.userService.getProgramMembers(this.programUUID, null, null)).thenReturn(Collections.emptyList());
 			removeProgramMembersValidator.validate(programUUID, set);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.member.not.removable.user.ids"));

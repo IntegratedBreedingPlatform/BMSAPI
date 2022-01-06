@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
+import org.generationcp.middleware.domain.workbench.UserSearchRequest;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.program.ProgramService;
@@ -47,15 +48,17 @@ public class ProgramMemberResource {
 				"Multiple sort criteria are supported.")
 	})
 	@ApiOperation(value = "List program members", notes = "Get the list or program members")
-	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members/search", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	public ResponseEntity<List<ProgramMemberDto>> getProgramMembers(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@ApiIgnore
-		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable,
+		@RequestBody UserSearchRequest userSearchRequest
+	) {
 
-		return new PaginatedSearch().getPagedResult(() -> this.programService.countAllProgramMembers(programUUID),
-			() -> this.programService.getProgramMembers(programUUID, pageable),
+		return new PaginatedSearch().getPagedResult(() -> this.programService.countAllProgramMembers(programUUID, userSearchRequest),
+			() -> this.programService.getProgramMembers(programUUID, userSearchRequest, pageable),
 			pageable);
 	}
 
@@ -70,21 +73,23 @@ public class ProgramMemberResource {
 				"Multiple sort criteria are supported.")
 	})
 	@ApiOperation(value = "List users eligible to be program members", notes = "List users eligible to be program members")
-	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members/eligible-users", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members/eligible-users/search", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	public ResponseEntity<List<UserDetailDto>> getMembersEligibleUsers(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@ApiIgnore
-		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable,
+		@RequestBody UserSearchRequest userSearchRequest
+	) {
 
-		return new PaginatedSearch().getPagedResult(() -> this.userService.countAllMembersEligibleUsers(programUUID),
-			() -> this.userService.getMembersEligibleUsers(programUUID, pageable),
+		return new PaginatedSearch().getPagedResult(() -> this.userService.countAllMembersEligibleUsers(programUUID, userSearchRequest),
+			() -> this.userService.getMembersEligibleUsers(programUUID, userSearchRequest, pageable),
 			pageable);
 	}
 
 	@ApiOperation(value = "Add a set of users as program members with an specific program role", notes = "Add a set of users as program members with an specific program role")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	public ResponseEntity<Void> addProgramRoleToUsers(@PathVariable final String cropName,
 		@PathVariable final String programUUID, @RequestBody final AddProgramMemberRequestDto requestDto) {
 		this.programService.addNewProgramMembers(programUUID, requestDto);
@@ -93,7 +98,7 @@ public class ProgramMemberResource {
 
 	@ApiOperation(value = "Delete a set of program members from a given program", notes = "Delete a set of program members from a given program")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	public ResponseEntity<Void> removeProgramMembers(@PathVariable final String cropName,
 		@PathVariable final String programUUID, @RequestParam final Set<Integer> userIds) {
 		this.programService.removeProgramMembers(programUUID, userIds);
