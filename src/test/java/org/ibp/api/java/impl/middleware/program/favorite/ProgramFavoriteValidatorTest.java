@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.program.favorite;
 
 import org.apache.commons.lang.math.RandomUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.program.ProgramFavoriteRequestDto;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
@@ -14,6 +13,7 @@ import org.ibp.api.java.impl.middleware.program.validator.ProgramFavoriteValidat
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -25,9 +25,6 @@ import java.util.List;
 
 public class ProgramFavoriteValidatorTest {
 
-	private final String PROGRAM_UUID = RandomStringUtils.randomAlphabetic(20);
-
-	private final Integer LOCATION_ID = RandomUtils.nextInt();
 	@Mock
 	private LocationDataManager locationDataManager;
 
@@ -113,7 +110,7 @@ public class ProgramFavoriteValidatorTest {
 	public void testValidateAddFavorites_ThrowsException_WhenMethodIdNotExists(){
 		this.programFavoriteRequestDtos.setEntityIds(new HashSet<>(Arrays.asList(RandomUtils.nextInt())));
 		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.METHODS);
-		Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(),Mockito.any())).thenReturn(Arrays.asList());
+		Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.isNull())).thenReturn(Arrays.asList());
 
 		try {
 			this.programFavoriteValidator.validateAddFavorites(null, this.programFavoriteRequestDtos);
