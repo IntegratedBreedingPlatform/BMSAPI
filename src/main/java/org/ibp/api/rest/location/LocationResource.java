@@ -86,7 +86,7 @@ public class LocationResource {
 
 	@ApiOperation(value = "Create a new Location", notes = "Create a new Location")
 	@RequestMapping(value = "/crops/{cropName}/locations", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@ResponseBody
 	public ResponseEntity<LocationDTO> createLocation(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID, @RequestBody final LocationRequestDto locationRequestDto) {
@@ -95,7 +95,7 @@ public class LocationResource {
 
 	@ApiOperation(value = "Update Location", notes = "Update Location")
 	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.PATCH)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@ResponseBody
 	public ResponseEntity<Void> updateLocation(@PathVariable final String cropName,
 		@PathVariable final Integer locationId,
@@ -106,7 +106,7 @@ public class LocationResource {
 
 	@ApiOperation(value = "Delete Location", notes = "Delete Location")
 	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@ResponseBody
 	public ResponseEntity<Void> deleteLocation(@PathVariable final String cropName,
 		@PathVariable final Integer locationId,
