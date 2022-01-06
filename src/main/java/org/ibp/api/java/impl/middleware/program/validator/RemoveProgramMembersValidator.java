@@ -52,7 +52,7 @@ public class RemoveProgramMembersValidator {
 		}
 
 		final List<Integer> usersWithProgramAccess =
-			this.userService.getProgramMembers(programUUID, null).stream()
+			this.userService.getProgramMembers(programUUID, null, null).stream()
 				.filter(p -> p.getRole().getType().equals(
 					RoleType.PROGRAM.name())).map(ProgramMemberDto::getUserId).collect(Collectors.toList());
 		if (!usersWithProgramAccess.containsAll(userIds)) {

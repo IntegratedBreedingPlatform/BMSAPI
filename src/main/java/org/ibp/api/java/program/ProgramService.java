@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
+import org.generationcp.middleware.domain.workbench.UserSearchRequest;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,9 +31,9 @@ public interface ProgramService {
 
 	void saveOrUpdateProjectUserInfo(Integer userId, String  programUUID);
 
-	List<ProgramMemberDto> getProgramMembers(String programUUID, Pageable pageable);
+	List<ProgramMemberDto> getProgramMembers(String programUUID, UserSearchRequest userSearchRequest, Pageable pageable);
 
-	long countAllProgramMembers(String programUUID);
+	long countAllProgramMembers(String programUUID, UserSearchRequest userSearchRequest);
 
 	void addNewProgramMembers(String programUUID, AddProgramMemberRequestDto requestDto);
 

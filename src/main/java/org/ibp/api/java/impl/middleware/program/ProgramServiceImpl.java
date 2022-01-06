@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
+import org.generationcp.middleware.domain.workbench.UserSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -199,13 +200,15 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable) {
-		return this.userService.getProgramMembers(programUUID, pageable);
+	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final UserSearchRequest userSearchRequest,
+		final Pageable pageable) {
+
+		return this.userService.getProgramMembers(programUUID, userSearchRequest, pageable);
 	}
 
 	@Override
-	public long countAllProgramMembers(final String programUUID) {
-		return this.userService.countAllProgramMembers(programUUID);
+	public long countAllProgramMembers(final String programUUID, final UserSearchRequest userSearchRequest) {
+		return this.userService.countAllProgramMembers(programUUID, userSearchRequest);
 	}
 
 	@Override

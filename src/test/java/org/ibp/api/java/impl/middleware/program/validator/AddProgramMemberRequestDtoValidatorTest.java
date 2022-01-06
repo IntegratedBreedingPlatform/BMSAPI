@@ -129,7 +129,7 @@ public class AddProgramMemberRequestDtoValidatorTest {
 			final Role role = this.buildRole(roleId, org.generationcp.middleware.domain.workbench.RoleType.PROGRAM);
 			Mockito.when(this.userService.getUsersByIds(Mockito.anyList())).thenReturn(Collections.singletonList(user));
 			Mockito.when(this.workbenchDataManager.getRoleById(Mockito.eq(roleId))).thenReturn(role);
-			Mockito.when(this.userService.getProgramMembersEligibleUsers(programUUID, null)).thenReturn(Collections.emptyList());
+			Mockito.when(this.userService.getProgramMembersEligibleUsers(programUUID, null, null)).thenReturn(Collections.emptyList());
 			addProgramMemberRequestDtoValidator.validate(programUUID, addProgramMemberRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.member.not.eligible.users"));
