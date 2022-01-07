@@ -180,22 +180,15 @@ public class LocationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
 
 		this.validateLocation(this.errors, locationId);
-		if (locationRequestDto.getName() != null) {
-			this.validateLocationName(locationRequestDto.getName());
-		}
-
-		if (locationRequestDto.getType() != null) {
-			this.validateLocationType(locationRequestDto.getType());
-		}
-
-		if (locationRequestDto.getAbbreviation() != null) {
-			this.validateLocationAbbr(locationRequestDto.getAbbreviation());
-			this.validateLocationAbbrNotExists(locationId, locationRequestDto.getAbbreviation());
-		}
+		this.validateLocationName(locationRequestDto.getName());
+		this.validateLocationType(locationRequestDto.getType());
+		this.validateLocationAbbr(locationRequestDto.getAbbreviation());
+		this.validateLocationAbbrNotExists(locationId, locationRequestDto.getAbbreviation());
 
 		final LocationDTO locationDTO = this.locationService.getLocation(locationId);
-		final Integer countryId = locationRequestDto.getCountryId() != null ? locationRequestDto.getCountryId() : locationDTO.getCountryId();
-		final Integer provinceId = locationRequestDto.getProvinceId() != null ? locationRequestDto.getProvinceId() : locationDTO.getProvinceId();
+
+		final Integer countryId = locationRequestDto.getCountryId();
+		final Integer provinceId = locationRequestDto.getProvinceId();
 		this.validateCountryAndProvince(countryId, provinceId);
 	}
 

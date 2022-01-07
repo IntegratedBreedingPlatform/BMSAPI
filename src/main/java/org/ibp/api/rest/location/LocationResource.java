@@ -94,7 +94,7 @@ public class LocationResource {
 	}
 
 	@ApiOperation(value = "Update Location", notes = "Update Location")
-	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.PUT)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@ResponseBody
 	public ResponseEntity<Void> updateLocation(@PathVariable final String cropName,
