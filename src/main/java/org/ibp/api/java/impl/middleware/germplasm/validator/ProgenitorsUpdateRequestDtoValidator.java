@@ -54,7 +54,7 @@ public class ProgenitorsUpdateRequestDtoValidator {
 			final BreedingMethodSearchRequest searchRequest =
 				new BreedingMethodSearchRequest();
 			searchRequest.setMethodIds(Collections.singletonList(progenitorsUpdateRequestDto.getBreedingMethodId()));
-			final List<BreedingMethodDTO> methodDTOS = this.breedingMethodService.getBreedingMethods(searchRequest, null);
+			final List<BreedingMethodDTO> methodDTOS = this.breedingMethodService.searchBreedingMethods(searchRequest, null, null);
 			if (methodDTOS.isEmpty()) {
 				this.errors.reject("germplasm.update.breeding.method.invalid", "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
@@ -119,7 +119,7 @@ public class ProgenitorsUpdateRequestDtoValidator {
 			final BreedingMethodSearchRequest searchRequest =
 				new BreedingMethodSearchRequest();
 			searchRequest.setMethodIds(Collections.singletonList(germplasm.getBreedingMethodId()));
-			final List<BreedingMethodDTO> methodDTOS = this.breedingMethodService.getBreedingMethods(searchRequest, null);
+			final List<BreedingMethodDTO> methodDTOS = this.breedingMethodService.searchBreedingMethods(searchRequest, null, null);
 			method = methodDTOS.get(0);
 		}
 		return method;

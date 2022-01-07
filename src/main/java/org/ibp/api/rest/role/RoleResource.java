@@ -20,7 +20,6 @@ import java.util.List;
 
 @RestController
 @Controller
-@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
 public class RoleResource {
 
 	@Autowired
@@ -35,6 +34,7 @@ public class RoleResource {
 
 	@ApiOperation(value = "Save role", notes = "Save role. ")
 	@RequestMapping(value = "/roles", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
 	@ResponseBody
 	public ResponseEntity<Integer> createRole(@RequestBody final RoleGeneratorInput dto) {
 		final Integer roleId = this.roleService.createRole(dto);
@@ -43,6 +43,7 @@ public class RoleResource {
 
 	@ApiOperation(value = "Get a role", notes = "Get role")
 	@RequestMapping(value = "/roles/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
 	@ResponseBody
 	public ResponseEntity<RoleDto> getRole(final @PathVariable Integer id) {
 		return new ResponseEntity<>(roleService.getRole(id), HttpStatus.OK);
@@ -50,6 +51,7 @@ public class RoleResource {
 
 	@ApiOperation(value = "Update role", notes = "Update role. ")
 	@RequestMapping(value = "/roles", method = RequestMethod.PUT)
+	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
 	@ResponseBody
 	public ResponseEntity updateRole(@RequestBody final RoleGeneratorInput roleGeneratorInput) {
 		this.roleService.updateRole(roleGeneratorInput);

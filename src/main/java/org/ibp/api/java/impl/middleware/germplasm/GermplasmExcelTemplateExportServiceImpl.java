@@ -216,16 +216,16 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 		final List<LocationDTO> storageLocations =
 			this.locationService
 				.searchLocations(cropName,
-					new LocationSearchRequest(null, GermplasmExcelTemplateExportServiceImpl.STORAGE_LOCATION_TYPE, null, null, null), null, null);
+					new LocationSearchRequest(GermplasmExcelTemplateExportServiceImpl.STORAGE_LOCATION_TYPE, null, null, null), null, null);
 
 		final List<LocationDTO> locations =
 			this.locationService
 				.searchLocations(cropName,
-					new LocationSearchRequest(null, GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, null),
+					new LocationSearchRequest(GermplasmExcelTemplateExportServiceImpl.LOCATION_TYPE, null, null, null),
 					null, null);
 
-		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, false);
-		final List<BreedingMethodDTO> breedingMethodDTOs = this.breedingMethodService.getBreedingMethods(searchRequest, null);
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
+		final List<BreedingMethodDTO> breedingMethodDTOs = this.breedingMethodService.searchBreedingMethods(searchRequest, null, null);
 
 		final List<GermplasmNameTypeDTO> germplasmNames = this.germplasmService.filterGermplasmNameTypes(null);
 

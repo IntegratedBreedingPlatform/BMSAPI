@@ -140,7 +140,7 @@ public class GermplasmUpdateRequestValidator {
 		return
 			this.locationService
 				.countFilteredLocations(
-					new LocationSearchRequest(null, null, null, Collections.singletonList(germplasmUpdateRequest.getCountryOfOriginCode()),
+					new LocationSearchRequest(null, null, Collections.singletonList(germplasmUpdateRequest.getCountryOfOriginCode()),
 						null), null) > 0;
 
 	}

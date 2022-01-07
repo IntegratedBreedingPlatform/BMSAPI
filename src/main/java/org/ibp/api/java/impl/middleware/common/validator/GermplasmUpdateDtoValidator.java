@@ -236,7 +236,7 @@ public class GermplasmUpdateDtoValidator {
 
 		final List<String> abbreviations =
 			this.locationService
-				.searchLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null), null, null)
+				.searchLocations(new LocationSearchRequest(null, null, new ArrayList<>(locationAbbrs), null), null, null)
 				.stream()
 				.map(LocationDTO::getAbbreviation).collect(
 				Collectors.toList());
@@ -255,8 +255,10 @@ public class GermplasmUpdateDtoValidator {
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
 				.map(GermplasmUpdateDTO::getBreedingMethodAbbr).collect(Collectors.toList());
 
+		final BreedingMethodSearchRequest breedingMethodSearchRequest = new BreedingMethodSearchRequest();
+		breedingMethodSearchRequest.setMethodAbbreviations(breedingMethodsAbbrs);
 		final List<String> abbreviations =
-			this.breedingMethodService.getBreedingMethods(new BreedingMethodSearchRequest(null, breedingMethodsAbbrs, false), null)
+			this.breedingMethodService.searchBreedingMethods(breedingMethodSearchRequest, null, null)
 				.stream()
 				.map(BreedingMethodDTO::getCode).collect(
 				Collectors.toList());

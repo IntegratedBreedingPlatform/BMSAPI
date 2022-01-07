@@ -290,7 +290,7 @@ public class LotResource {
 		final List<VariableDetails> units = this.variableService.getVariablesByFilter(variableFilter);
 		final List<LocationDTO> locations =
 			this.locationService
-				.searchLocations(cropName, new LocationSearchRequest(null, LotResource.STORAGE_LOCATION_TYPE, null, null, null),
+				.searchLocations(cropName, new LocationSearchRequest(LotResource.STORAGE_LOCATION_TYPE, null, null, null),
 					null, null);
 
 		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
