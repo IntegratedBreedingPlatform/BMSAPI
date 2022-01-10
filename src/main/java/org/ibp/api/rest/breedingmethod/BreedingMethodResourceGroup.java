@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +52,7 @@ public class BreedingMethodResourceGroup {
 
 	@ApiOperation(value = "Create breeding method")
 	@RequestMapping(value = "/crops/{cropName}/breedingmethods", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	public ResponseEntity<BreedingMethodDTO> create(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
@@ -61,6 +63,7 @@ public class BreedingMethodResourceGroup {
 
 	@ApiOperation(value = "Edit breeding method")
 	@RequestMapping(value = "/crops/{cropName}/breedingmethods/{breedingMethodDbId}", method = RequestMethod.PATCH)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	public ResponseEntity<BreedingMethodDTO> edit(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
@@ -72,6 +75,7 @@ public class BreedingMethodResourceGroup {
 
 	@ApiOperation(value = "Delete breeding method")
 	@RequestMapping(value = "/crops/{cropName}/breedingmethods/{breedingMethodDbId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	public ResponseEntity<Void> delete(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
