@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,10 +27,10 @@ public class ReleaseNoteResource {
 	}
 
 	@RequestMapping(
-		value = "/show-again/{showAgain}",
+		value = "/toggle",
 		method = RequestMethod.PUT
 	)
-	public ResponseEntity<Void> showAgain(@PathVariable final boolean showAgain) {
+	public ResponseEntity<Void> showAgain(@RequestParam final boolean showAgain) {
 		this.releaseNoteService.showAgain(showAgain);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
