@@ -62,7 +62,7 @@ public class BreedingMethodResourceGroup {
 	}
 
 	@ApiOperation(value = "Edit breeding method")
-	@RequestMapping(value = "/crops/{cropName}/breedingmethods/{breedingMethodDbId}", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/crops/{cropName}/breedingmethods/{breedingMethodDbId}", method = RequestMethod.PUT)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	public ResponseEntity<BreedingMethodDTO> edit(
 		@PathVariable final String cropName,
