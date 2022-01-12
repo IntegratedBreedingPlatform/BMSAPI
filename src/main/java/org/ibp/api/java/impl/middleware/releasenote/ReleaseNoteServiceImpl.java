@@ -27,9 +27,9 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	}
 
 	@Override
-	public void dontShowAgain() {
+	public void showAgain(final boolean showAgain) {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		this.releaseNoteService.dontShowAgain(loggedInUser.getUserid());
+		this.releaseNoteService.showAgain(loggedInUser.getUserid(), showAgain);
 	}
 
 }

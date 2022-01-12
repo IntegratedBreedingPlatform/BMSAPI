@@ -39,17 +39,16 @@
 
 		// Setup required for BMS authentication.
 		function addApiKeyAuthorization() {
+			const loginPath = "/ibpworkbench/controller/auth/login";
+
 			var authToken = localStorage.getItem("bms.xAuthToken");
 			if (authToken) {
 				var authTokenJSON = JSON.parse(authToken);
 				if (!authTokenJSON.expires || authTokenJSON.expires <= new Date().getTime()) {
-					alert("Authentication has expired. Please login to Workbench again, then refresh this page.");
+					alert(`Authentication has expired. Please login to BMS again (${loginPath}), then refresh this page.`);
 				}
 			} else {
-				// Swagger front-end is not part of product so we as such do not expect users to see this screen.
-				// This should happen only in cases where BMSAPI swagger front-end is loaded directly
-				//  which should only happen for demo/development environments hence is fair enough to require being logged in to Workbench first.
-				alert("You don't seem to have logged in. Please login to Workbench first, then refresh this page.");
+				alert(`You don't seem to have logged in. Please login to BMS first (${loginPath}), then refresh this page.`);
 			}
 		}
 
