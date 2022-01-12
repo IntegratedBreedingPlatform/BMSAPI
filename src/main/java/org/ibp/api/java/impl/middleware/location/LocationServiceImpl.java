@@ -42,7 +42,7 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public List<LocationDTO> searchLocations(final String crop, final LocationSearchRequest locationSearchRequest,
 			final Pageable pageable, final String programUUID) {
-		return this.locationMiddlewareService.searchLocations(locationSearchRequest,	pageable, programUUID);
+		return this.locationMiddlewareService.searchLocations(locationSearchRequest, pageable, programUUID);
 	}
 
 	@Override
