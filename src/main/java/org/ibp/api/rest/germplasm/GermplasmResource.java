@@ -280,9 +280,12 @@ public class GermplasmResource {
 
 				@Override
 				public long getFilteredCount() {
-					//					return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
-					// Not counting filtered germplasms for performance reasons
-					return 0;
+					/*
+					 * Warning: previously filtered count was not available for matches due to some perf issues.
+					 * This issues can no longer be replicated, hence we enable this again
+					 * to be able to consider the exact count when retrieving all results.
+					 */
+					return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
 				}
 
 				@Override
