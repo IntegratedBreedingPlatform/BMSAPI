@@ -92,7 +92,6 @@ public class GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Create a new Germplasm list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.POST)
-	// TODO The Permissions will be change after implement IBP-4570 (New list manager)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'IMPORT_GERMPLASM_LISTS')")
 	@ResponseBody
 	public ResponseEntity<GermplasmListGeneratorDTO> create(
@@ -128,6 +127,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Add germplasm entries to an existing list")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'LISTS', 'MANAGE_GERMPLASM_LISTS', 'MG_ADD_ENTRIES_TO_LIST', 'ADD_GERMPLASM_LIST_ENTRIES')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> addGermplasmEntriesToList(
@@ -141,6 +141,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Import germplasm list entries from an existing list")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS', 'ADD_ENTRIES_TO_LIST')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries/import", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> addGermplasmListEntriesToAnotherList(
@@ -157,7 +158,7 @@ public class GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Remove germplasm entries from an existing list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'REMOVE_ENTRIES_GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM_LISTS', 'LISTS', 'MANAGE_GERMPLASM_LISTS', 'REMOVE_ENTRIES_GERMPLASM_LISTS')")
 	public ResponseEntity<Void> removeGermplasmEntriesFromList(
 		@ApiParam(required = true) @PathVariable final String crop,
 		@PathVariable final Integer germplasmListId,
