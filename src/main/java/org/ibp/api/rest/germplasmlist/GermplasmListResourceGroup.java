@@ -22,7 +22,6 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
@@ -59,6 +58,9 @@ import java.util.Set;
 @Controller
 public class GermplasmListResourceGroup {
 
+	private static final String MANAGE_GERMPLASM_LISTS_PERMISSIONS = "'LISTS', 'MANAGE_GERMPLASM_LISTS'";
+	private static final String MANAGE_GERMPLASM_PERMISSIONS = "'GERMPLASM', 'MANAGE_GERMPLASM'";
+
 	@Autowired
 	public GermplasmListService germplasmListService;
 
@@ -92,7 +94,9 @@ public class GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Create a new Germplasm list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'IMPORT_GERMPLASM_LISTS')")
+	// TODO add specific permission to create list from germplasm manager? IBP-5387
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS
+		+ ", 'IMPORT_GERMPLASM_LISTS')")
 	@ResponseBody
 	public ResponseEntity<GermplasmListGeneratorDTO> create(
 		@ApiParam(required = true) @PathVariable final String crop,
@@ -104,7 +108,7 @@ public class GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Import Germplasm list updates")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.PATCH)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'IMPORT_GERMPLASM_LIST_UPDATES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'IMPORT_GERMPLASM_LIST_UPDATES')")
 	@ResponseBody
 	public ResponseEntity<Void> importUpdates(
 		@ApiParam(required = true) @PathVariable final String crop,
@@ -127,7 +131,8 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Add germplasm entries to an existing list")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'LISTS', 'MANAGE_GERMPLASM_LISTS', 'MG_ADD_ENTRIES_TO_LIST', 'ADD_GERMPLASM_LIST_ENTRIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'MG_ADD_ENTRIES_TO_LIST', "
+		+ MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'ADD_GERMPLASM_LIST_ENTRIES')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> addGermplasmEntriesToList(
@@ -141,7 +146,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Import germplasm list entries from an existing list")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS', 'ADD_ENTRIES_TO_LIST')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'ADD_ENTRIES_TO_LIST')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries/import", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> addGermplasmListEntriesToAnotherList(
@@ -158,7 +163,7 @@ public class GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Remove germplasm entries from an existing list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{germplasmListId}/entries", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM_LISTS', 'LISTS', 'MANAGE_GERMPLASM_LISTS', 'REMOVE_ENTRIES_GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'REMOVE_ENTRIES_GERMPLASM_LISTS')")
 	public ResponseEntity<Void> removeGermplasmEntriesFromList(
 		@ApiParam(required = true) @PathVariable final String crop,
 		@PathVariable final Integer germplasmListId,
@@ -282,7 +287,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation("Search germplasm lists")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/search", method = RequestMethod.POST)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -304,7 +309,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Post germplasm list data search", notes = "Post germplasm list data search")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/search", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasmListData(
@@ -322,7 +327,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Returns a germplasm list data by a given germplasm list id")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/search", method = RequestMethod.GET)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -349,7 +354,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Returns a list by a given list id")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<GermplasmListDto> getGermplasmListById(@PathVariable final String cropName,
@@ -359,7 +364,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiIgnore
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/toggle-status", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Boolean> toggleGermplasmListStatus(@PathVariable final String cropName,
@@ -403,7 +408,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiIgnore
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/view", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<Void> updateGermplasmListDataView(@PathVariable final String cropName,
@@ -415,7 +420,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Reorder the selected entries to a given position or at the end of list.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'REORDER_ENTRIES_GERMPLASM_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'REORDER_ENTRIES_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/entries/reorder", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<Void> reorderEntries(@PathVariable final String cropName,
@@ -434,7 +439,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Clone germplasm list")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'CLONE_GERMPLASM_LIST')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'CLONE_GERMPLASM_LIST')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/clone", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GermplasmListDto> cloneList(@PathVariable final String cropName,
@@ -447,7 +452,7 @@ public class GermplasmListResourceGroup {
 
 	@ApiOperation(value = "Edit List metatadata")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}", method = RequestMethod.PATCH)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'EDIT_LIST_METADATA')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'EDIT_LIST_METADATA')")
 	@ResponseBody
 	public ResponseEntity<Void> editListMetadata(@PathVariable final String cropName,
 		@PathVariable final Integer listId,
@@ -460,7 +465,7 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Delete germplasm list", notes = "Delete germplasm list.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'DELETE_GERMPLASM_LIST')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'DELETE_GERMPLASM_LIST')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{listId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteGermplasmList(
