@@ -40,6 +40,7 @@ import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
+import org.ibp.api.security.WorkbenchUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
@@ -66,10 +67,18 @@ import java.util.Set;
 @Controller
 public class GermplasmResource {
 
+	/**
+	 * TODO germplasm search (specifically germplasm selector component) is increasingly being needed in more places.
+	 *  See if it makes sense to remove all granular permissions for these APIs and components
+	 *  (leaving only checks for crop authorization in {@link WorkbenchUserDetailsService}).
+	 */
 	private static final String HAS_GERMPLASM_SEARCH = " or hasAnyAuthority('STUDIES'"
 		+ ", 'MANAGE_STUDIES'"
 		+ ", 'QUERIES'"
 		+ ", 'GRAPHICAL_QUERIES'"
+		+ ", 'LISTS'"
+		+ ", 'MANAGE_GERMPLASM_LISTS'"
+		+ ", 'SEARCH_GERMPLASM_LISTS'"
 		+ ")";
 
 	@Autowired
