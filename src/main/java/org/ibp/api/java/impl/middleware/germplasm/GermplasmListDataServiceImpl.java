@@ -72,6 +72,14 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	@Override
+	public void fillWithCrossExpansion(final Integer listId, final Integer level) {
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
+		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+
+		this.germplasmListDataService.fillWithCrossExpansion(listId, level);
+	}
+
+	@Override
 	public List<GermplasmListDataDetail> getGermplasmListDataDetailList(final Integer listId) {
 		return this.germplasmListDataService.getGermplasmListDataDetailList(listId);
 	}
