@@ -3,10 +3,12 @@ package org.ibp.api.java.impl.middleware.study.validator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
+import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
+import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
@@ -43,6 +45,9 @@ public class ObservationImportRequestValidator {
 
 	@Autowired
 	private ObservationUnitService observationUnitService;
+
+	@Autowired
+	private ObservationServiceBrapi observationServiceBrapi;
 
 	@Autowired
 	private VariableServiceBrapi variableServiceBrapi;
@@ -84,6 +89,21 @@ public class ObservationImportRequestValidator {
 			this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTO, null).stream()
 				.collect(Collectors.toMap(VariableDTO::getObservationVariableDbId, Function.identity()));
 
+		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
+		observationSearchRequestDto.setObservationUnitDbIds(observationUnitDbIds);
+		observationSearchRequestDto.setObservationVariableDbIds(variableIds);
+
+		final List<ObservationDto> existingObservations =
+			this.observationServiceBrapi.searchObservations(observationSearchRequestDto, null);
+		final Map<String, Map<String, ObservationDto>> existingObservationsMap = new HashMap<>();
+		if(CollectionUtils.isNotEmpty(existingObservations)) {
+			for (final ObservationDto existingObservation : existingObservations) {
+				final String observationUnitDbId = existingObservation.getObservationUnitDbId();
+				existingObservationsMap.putIfAbsent(observationUnitDbId, new HashMap<>());
+				existingObservationsMap.get(observationUnitDbId).put(existingObservation.getObservationVariableDbId(), existingObservation);
+			}
+		}
+
 		final Map<String, List<String>> studyVariableIdsMap = new HashMap<>();
 
 		final Map<ObservationDto, Integer> importRequestByIndexMap = IntStream.range(0, observationDtos.size())
@@ -97,10 +117,22 @@ public class ObservationImportRequestValidator {
 				this.hasNoExistingObservationUnit(observationUnitDtoMap, dto, index) ||
 				this.isObservationVariableNotInStudy(variableSearchRequestDTO, studyVariableIdsMap, dto, index) ||
 				this.isValueInvalid(dto, variableDTOMap, index) ||
+				this.isObservationAlreadyExisting(dto, existingObservationsMap, index) ||
 				this.isAnyExternalReferenceInvalid(dto, index);
 		});
 
 		return this.errors;
+	}
+
+	private boolean isObservationAlreadyExisting(final ObservationDto dto,
+		final Map<String, Map<String, ObservationDto>> existingObservationsMap, final Integer index) {
+		if(existingObservationsMap.containsKey(dto.getObservationUnitDbId())
+			&& existingObservationsMap.get(dto.getObservationUnitDbId()).containsKey(dto.getObservationVariableDbId())) {
+			this.errors.reject("observation.import.already.existing",
+				new String[] {index.toString(), dto.getObservationUnitDbId(), dto.getObservationVariableDbId()}, "");
+			return true;
+		}
+		return false;
 	}
 
 	private boolean isObservationVariableNotInStudy(
