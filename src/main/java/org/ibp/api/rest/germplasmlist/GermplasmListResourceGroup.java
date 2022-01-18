@@ -436,7 +436,9 @@ public class GermplasmListResourceGroup {
 		@RequestBody @ApiParam("a positive number, without quotation marks. E.g level: 2") final String level
 	) {
 		BaseValidator.checkArgument(isNumber(level), "error.germplasmlist.generationlevel.invalid");
-		this.germplasmListDataService.fillWithCrossExpansion(listId, Integer.parseInt(level));
+		final int levelInt = Integer.parseInt(level);
+		BaseValidator.checkArgument(levelInt > 0 && levelInt <= 10 , "error.germplasmlist.max.generationlevel");
+		this.germplasmListDataService.fillWithCrossExpansion(listId, levelInt);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
