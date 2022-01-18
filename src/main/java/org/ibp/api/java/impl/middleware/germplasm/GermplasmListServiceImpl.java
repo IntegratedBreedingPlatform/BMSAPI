@@ -183,7 +183,30 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	private List<TreeNode> getChildrenNodes(final String programUUID, final String parentId, final Boolean folderOnly) {
-		this.validateNodeId(parentId, programUUID, ListNodeType.PARENT);
+
+		/**
+		 * Warning: Adding custom validation to show crop folders and list below those folders
+		 * It will need to be revisited when implementing full crop folder management
+		 */
+		this.validateNodeId(parentId, ListNodeType.PARENT);
+
+		if (Util.isPositiveInteger(parentId)) {
+
+			final GermplasmList germplasmList = this.germplasmListService.getGermplasmListById(Integer.parseInt(parentId))
+				.orElseThrow(() -> {
+					this.errors.reject("list.folder.id.not.exist", "");
+					return new ApiRequestValidationException(this.errors.getAllErrors());
+				});
+
+			//verify that folder belongs to the program when it is not a crop folder
+			if (!StringUtils.isEmpty(germplasmList.getProgramUUID())) {
+				if (StringUtils.isEmpty(programUUID) || !programUUID.equals(germplasmList.getProgramUUID())) {
+					this.errors.reject("list.project.mandatory", "");
+					throw new ApiRequestValidationException(this.errors.getAllErrors());
+				}
+			}
+		}
+
 		checkNotNull(folderOnly, "list.folder.only");
 
 		final List<TreeNode> treeNodes = new ArrayList<>();
