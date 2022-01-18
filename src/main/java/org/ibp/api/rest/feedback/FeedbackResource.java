@@ -23,7 +23,7 @@ public class FeedbackResource {
 		return new ResponseEntity<>(shouldShowFeedback, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/{feature}/dont-show-again",	method = RequestMethod.PUT)
+	@RequestMapping(value = "/{feature}/dont-show-again", method = RequestMethod.PUT)
 	public ResponseEntity<Void> dontShowAgain(@PathVariable final FeedbackFeature feature) {
 		this.feedbackService.dontShowAgain(feature);
 		return new ResponseEntity<>(HttpStatus.OK);
