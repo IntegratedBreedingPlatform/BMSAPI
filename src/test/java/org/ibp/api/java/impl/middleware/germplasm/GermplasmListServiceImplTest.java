@@ -181,12 +181,6 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testGetGermplasmListChildrenNodes_ProgramNotSpecified_ThrowsException() throws ApiRequestValidationException {
-		this.germplasmListService.getGermplasmListChildrenNodes(CROP, null, GermplasmListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
-
-	}
-
-	@Test(expected = ApiRequestValidationException.class)
 	public void testGetGermplasmListChildrenNodes_InvalidFolderId_ThrowsException() throws ApiRequestValidationException {
 		final String parentId = "1";
 		final GermplasmList germplasmList = new GermplasmList();
@@ -234,8 +228,9 @@ public class GermplasmListServiceImplTest {
 		final String parentId = "1";
 
 		final GermplasmList germplasmList = this.getGermplasmList(new Random().nextInt());
+		germplasmList.setProgramUUID(program);
 
-		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByIdAndProgramUUID(Integer.parseInt(parentId), program))
+		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListById(Integer.parseInt(parentId)))
 			.thenReturn(Optional.of(germplasmList));
 
 		this.germplasmListService.getGermplasmListChildrenNodes(CROP, program, parentId, Boolean.FALSE);
@@ -1489,7 +1484,7 @@ public class GermplasmListServiceImplTest {
 		Mockito.doReturn(Collections.singletonList(this.getGermplasmList(8))).when(this.germplasmListManager)
 			.getGermplasmListByParentFolderIdBatched(5, GermplasmListServiceImplTest.PROGRAM_UUID, GermplasmListServiceImpl.BATCH_SIZE);
 		Mockito.doReturn(Optional.of(this.getGermplasmList(new Random().nextInt()))).when(this.germplasmListServiceMiddleware)
-			.getGermplasmListByIdAndProgramUUID(any(), eq(GermplasmListServiceImplTest.PROGRAM_UUID));
+			.getGermplasmListById(any());
 
 		final List<TreeNode> treeNodes = this.germplasmListService
 			.getUserTreeState(GermplasmListServiceImplTest.CROP, GermplasmListServiceImplTest.PROGRAM_UUID, userId);
