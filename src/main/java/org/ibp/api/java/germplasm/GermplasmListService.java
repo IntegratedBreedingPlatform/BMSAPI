@@ -20,11 +20,11 @@ import java.util.List;
 public interface GermplasmListService {
 
 	List<TreeNode> getGermplasmListChildrenNodes(
-		final String crop, final String programUUID, final String parentId, final Boolean folderOnly);
+		String crop, String programUUID, String parentId, Boolean folderOnly);
 
-	List<TreeNode> getUserTreeState(final String crop, final String programUUID, final String userId);
+	List<TreeNode> getUserTreeState(String crop, String programUUID, String userId);
 
-	void saveGermplasmListTreeState(final String crop, final String programUUID, final UserTreeState userTreeState);
+	void saveGermplasmListTreeState(String crop, String programUUID, UserTreeState userTreeState);
 
 	GermplasmList getGermplasmList(Integer germplasmListId);
 
