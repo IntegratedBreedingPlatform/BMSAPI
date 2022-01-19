@@ -630,7 +630,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		this.germplasmListValidator.validateFolderName(folderName);
 		this.validateProgram(cropName, programUUID);
-		this.validateNodeId(parentId, programUUID, ListNodeType.PARENT);
+		this.validateNodeIdAcceptingCropFolders(parentId, programUUID, ListNodeType.PARENT);
 
 		//Validate if there is a folder with same name in parent folder
 		final Integer parent = this.getFolderIdAsInteger(parentId);
@@ -649,9 +649,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.validateFolderNotCropNorProgramList(folderId);
 		this.germplasmListValidator.validateFolderName(newFolderName);
 		this.validateProgram(cropName, programUUID);
-		this.validateNodeIdAcceptingCropFolders(folderId, programUUID, ListNodeType.FOLDER);
+		final GermplasmList germplasmList = this.validateNodeIdAcceptingCropFolders(folderId, programUUID, ListNodeType.FOLDER).get();
 
-		final GermplasmList germplasmList = this.germplasmListService.getGermplasmListById(Integer.parseInt(folderId)).get();
 		if (!germplasmList.isFolder()) {
 			this.errors.reject("list.folder.id.not.exist", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -688,19 +687,17 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		this.validateProgram(cropName, programUUID);
 
-		this.validateNodeId(newParentFolderId, programUUID, ListNodeType.PARENT, false);
+		final Optional<GermplasmList> parentFolderOptional = this.validateNodeIdAcceptingCropFolders(newParentFolderId, programUUID, ListNodeType.PARENT);
 		this.validateNodeId(folderId, ListNodeType.FOLDER);
-
-		if (Util.isPositiveInteger(folderId)) {
-			final GermplasmListDto germplasmListById = this.getGermplasmListById(Integer.parseInt(folderId));
-			this.getGermplasmListByIdAndProgramUUID(folderId, germplasmListById.getProgramUUID(), ListNodeType.FOLDER);
-		}
+		this.validateFolderNotCropNorProgramList(folderId);
 
 		final GermplasmList germplasmListToMove = this.germplasmListService.getGermplasmListById(Integer.parseInt(folderId))
 			.orElseThrow(() -> {
 				this.errors.reject("list.folder.id.not.exist", "");
 				return new ApiRequestValidationException(this.errors.getAllErrors());
 			});
+
+		this.getGermplasmListByIdAndProgramUUID(folderId, germplasmListToMove.getProgramUUID(), ListNodeType.FOLDER);
 
 		if (this.isSourceItemHasChildren(Integer.parseInt(folderId), programUUID)) {
 			this.errors.reject("list.move.folder.has.child", "");
@@ -709,11 +706,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final Integer parent = this.getFolderIdAsInteger(newParentFolderId);
 		if (!Objects.isNull(parent)) {
-			final GermplasmList parentFolder = this.germplasmListService.getGermplasmListById(parent)
-				.orElseThrow(() -> {
-					this.errors.reject("list.parent.id.not.exist", "");
-					return new ApiRequestValidationException(this.errors.getAllErrors());
-				});
+			final GermplasmList parentFolder = parentFolderOptional.get();
 
 			if (!parentFolder.isFolder()) {
 				this.errors.reject("list.move.list.another.list.not.allowed", "");
@@ -744,9 +737,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		this.validateFolderNotCropNorProgramList(folderId);
 		this.validateProgram(cropName, programUUID);
-		this.validateNodeIdAcceptingCropFolders(folderId, programUUID, ListNodeType.FOLDER);
-
-		final GermplasmList folder = this.germplasmListService.getGermplasmListById(Integer.parseInt(folderId)).get();
+		final Optional<GermplasmList> germplasmList = this.validateNodeIdAcceptingCropFolders(folderId, programUUID, ListNodeType.FOLDER);
+		final GermplasmList folder = germplasmList.get();
 
 		if (!folder.isFolder()) {
 			this.errors.reject("list.delete.not.folder", "");
@@ -899,7 +891,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 	}
 
-	private void validateNodeIdAcceptingCropFolders(final String nodeId, final String programUUID, final ListNodeType nodeType) {
+	private Optional<GermplasmList> validateNodeIdAcceptingCropFolders(final String nodeId, final String programUUID, final ListNodeType nodeType) {
 		/**
 		 * Warning: Adding custom validation to show crop folders and list below those folders
 		 * It will need to be revisited when implementing full crop folder management
@@ -921,30 +913,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 					throw new ApiRequestValidationException(this.errors.getAllErrors());
 				}
 			}
-		}
-	}
 
-	private void validateNodeId(final String nodeId, final String programUUID, final ListNodeType nodeType) {
-		this.validateNodeId(nodeId, programUUID, nodeType, true);
-	}
-
-	private void validateNodeId(final String nodeId, final String programUUID, final ListNodeType nodeType,
-		final boolean validateRequiredProgramUUID) {
-		this.validateNodeId(nodeId, nodeType);
-
-		if (validateRequiredProgramUUID && PROGRAM_LISTS.equals(nodeId) && StringUtils.isEmpty(programUUID)) {
-			this.errors.reject("list.project.mandatory", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+			return Optional.of(germplasmList);
 		}
 
-		if (Util.isPositiveInteger(nodeId)) {
-			final GermplasmList germplasmList = this.getGermplasmListByIdAndProgramUUID(nodeId, programUUID, nodeType);
-
-			if (validateRequiredProgramUUID && !StringUtils.isEmpty(programUUID) && StringUtils.isEmpty(germplasmList.getProgramUUID())) {
-				this.errors.reject("list.project.mandatory", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
-		}
+		return Optional.empty();
 	}
 
 	private void validateNodeId(final String nodeId, final ListNodeType nodeType) {
