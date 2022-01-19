@@ -34,7 +34,8 @@ import java.util.Locale;
 @Service
 public class LotExcelTemplateExportServiceImpl implements LotTemplateExportService {
 
-	private static final String FILE_NAME = "basic_template_import_lots.xls";
+	private static final String FILE_NAME = "basic_template_import_lots_";
+	private static final String FILE_EXTENSION = ".xls";
 
 	private static final int LOTS_SHEET_GID_COLUMN_INDEX = 0;
 	private static final int LOTS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX = 1;
@@ -50,12 +51,12 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 	ResourceBundleMessageSource messageSource;
 
 	@Override
-	public File export(final List<LocationDto> locations, final List<VariableDetails> units) {
+	public File export(final String cropName, final List<LocationDto> locations, final List<VariableDetails> units) {
 		try {
 			final File temporaryFolder = Files.createTempDir();
 
-			final String fileNameFullPath =
-				temporaryFolder.getAbsolutePath() + File.separator + LotExcelTemplateExportServiceImpl.FILE_NAME;
+			final String fileNameFullPath =	temporaryFolder.getAbsolutePath() + File.separator
+				+ LotExcelTemplateExportServiceImpl.FILE_NAME + cropName.toLowerCase() + LotExcelTemplateExportServiceImpl.FILE_EXTENSION;
 			return this.generateTemplateFile(fileNameFullPath, locations, units);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());

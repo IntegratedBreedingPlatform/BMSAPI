@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface LotTemplateExportService {
 
-	File export(final List<LocationDto> locations, final List<VariableDetails> scales);
+	File export(final String cropName, final List<LocationDto> locations, final List<VariableDetails> scales);
 }
