@@ -88,6 +88,7 @@ public class DatasetServiceImplTest {
 	private static final String ENVFACTOR1 = "ENVFACTOR1";
 	public static final String DATASET_NAME = "ABC";
 	public static final int PARENT_ID = 123;
+	public static final String ALIAS = "ALIAS";
 
 	@Mock
 	private DatasetService middlewareDatasetService;
@@ -340,7 +341,7 @@ public class DatasetServiceImplTest {
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();
-		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", ALIAS);
 		final List<String> row = Arrays.asList("1", "1");
 		data.add(header);
 		data.add(row);
@@ -363,15 +364,12 @@ public class DatasetServiceImplTest {
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();
-		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", ALIAS);
 		final List<String> row = Arrays.asList("1", "1");
 		data.add(header);
 		data.add(row);
 		observationsPutRequestInput.setData(data);
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariables.add(measurementVariable);
+		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
 		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
 		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
@@ -392,23 +390,19 @@ public class DatasetServiceImplTest {
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();
-		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
-		final List<String> row = Arrays.asList("1", "A");
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", ALIAS);
+		final List<String> row = Arrays.asList("1", ALIAS);
 		data.add(header);
 		data.add(row);
 		observationsPutRequestInput.setData(data);
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariable.setDataType("Numeric");
-		measurementVariables.add(measurementVariable);
+		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
-		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData("1"));
+		observationUnitDataMap.put(ALIAS, new org.generationcp.middleware.service.api.dataset.ObservationUnitData("1"));
 		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setVariables(observationUnitDataMap);
-		storedData.put("A", observationUnitRow);
+		storedData.put(ALIAS, observationUnitRow);
 		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
 		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
@@ -428,7 +422,7 @@ public class DatasetServiceImplTest {
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();
-		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", ALIAS);
 		final List<String> row1 = Arrays.asList("1", "1");
 
 		data.add(header);
@@ -437,14 +431,10 @@ public class DatasetServiceImplTest {
 		observationsPutRequestInput.setData(data);
 		observationsPutRequestInput.setProcessWarnings(true);
 		observationsPutRequestInput.setDraftMode(false);
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariable.setDataType("Numeric");
-		measurementVariables.add(measurementVariable);
+		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
-		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData("2"));
+		observationUnitDataMap.put(ALIAS, new org.generationcp.middleware.service.api.dataset.ObservationUnitData("2"));
 		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setVariables(observationUnitDataMap);
@@ -468,7 +458,7 @@ public class DatasetServiceImplTest {
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();
-		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", ALIAS);
 		final List<String> row1 = Arrays.asList("1", "1");
 		final List<String> row2 = Arrays.asList("1", "1");
 
@@ -478,14 +468,10 @@ public class DatasetServiceImplTest {
 
 		observationsPutRequestInput.setData(data);
 		observationsPutRequestInput.setProcessWarnings(true);
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariable.setDataType("Numeric");
-		measurementVariables.add(measurementVariable);
+		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
-		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		observationUnitDataMap.put(ALIAS, new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
 		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setVariables(observationUnitDataMap);
@@ -503,13 +489,28 @@ public class DatasetServiceImplTest {
 		}
 	}
 
+	private List<MeasurementVariable> createMeasurementVariableList() {
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		measurementVariables.add(this.createMeasurementVariable());
+		return measurementVariables;
+	}
+
+	private MeasurementVariable createMeasurementVariable() {
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setAlias(ALIAS);
+		measurementVariable.setName("Variable Name");
+		measurementVariable.setDataType("Numeric");
+		measurementVariable.setDataTypeId(TermId.CHARACTER_VARIABLE.getId());
+		return measurementVariable;
+	}
+
 	@Test(expected = PreconditionFailedException.class)
 	public void testImportDatasetFails_WarningsObsUnitIdNotBelongToDataset() {
 		final Integer studyId = 1;
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();
-		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", ALIAS);
 		final List<String> row1 = Arrays.asList("1", "1");
 		final List<String> row2 = Arrays.asList("2", "1");
 
@@ -519,14 +520,10 @@ public class DatasetServiceImplTest {
 
 		observationsPutRequestInput.setData(data);
 		observationsPutRequestInput.setProcessWarnings(true);
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariable.setDataType("Numeric");
-		measurementVariables.add(measurementVariable);
+		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
-		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		observationUnitDataMap.put(ALIAS, new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
 		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setVariables(observationUnitDataMap);
@@ -551,7 +548,7 @@ public class DatasetServiceImplTest {
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();
-		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A", "KSU_Date");
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", ALIAS, "KSU_Date");
 		final List<String> row1 = Arrays.asList("1", "1", "5/9/20");
 		final List<String> row2 = Arrays.asList("2", "1", "20201201");
 		data.add(header);
@@ -561,10 +558,7 @@ public class DatasetServiceImplTest {
 		observationsPutRequestInput.setData(data);
 		observationsPutRequestInput.setProcessWarnings(true);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariable.setDataTypeId(TermId.CHARACTER_VARIABLE.getId());
-		measurementVariable.setDataType("Numeric");
+		final MeasurementVariable measurementVariable = this.createMeasurementVariable();
 		final MeasurementVariable dateMV = new MeasurementVariable();
 		dateMV.setAlias("KSU_Date");
 		dateMV.setName("KSU_Date");
@@ -574,7 +568,7 @@ public class DatasetServiceImplTest {
 		measurementVariables.add(dateMV);
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
-		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		observationUnitDataMap.put(ALIAS, new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
 		observationUnitDataMap.put("KSU_Date", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
 		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(1);
@@ -605,7 +599,7 @@ public class DatasetServiceImplTest {
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();
-		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A", "KSU_Date");
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", ALIAS, "KSU_Date");
 		final List<String> row1 = Arrays.asList("1", "1", "5/9/20");
 
 		data.add(header);
@@ -614,10 +608,7 @@ public class DatasetServiceImplTest {
 		observationsPutRequestInput.setData(data);
 		observationsPutRequestInput.setProcessWarnings(true);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariable.setDataTypeId(TermId.CHARACTER_VARIABLE.getId());
-		measurementVariable.setDataType("Numeric");
+		final MeasurementVariable measurementVariable = this.createMeasurementVariable();
 		final MeasurementVariable dateMV = new MeasurementVariable();
 		dateMV.setAlias("KSU_Date");
 		dateMV.setName("KSU_Date");
@@ -627,7 +618,7 @@ public class DatasetServiceImplTest {
 		measurementVariables.add(dateMV);
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
-		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		observationUnitDataMap.put(ALIAS, new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
 		observationUnitDataMap.put("KSU_Date", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
 		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(1);
@@ -652,7 +643,7 @@ public class DatasetServiceImplTest {
 		final Integer datasetId = 3;
 		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
 		final List<List<String>> data = new ArrayList<>();
-		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A", "KSU_Date");
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", ALIAS, "KSU_Date");
 		final List<String> row1 = Arrays.asList("1", "1", "5/19/12");
 
 		data.add(header);
@@ -661,10 +652,7 @@ public class DatasetServiceImplTest {
 		observationsPutRequestInput.setData(data);
 		observationsPutRequestInput.setProcessWarnings(true);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariable.setDataTypeId(TermId.CHARACTER_VARIABLE.getId());
-		measurementVariable.setDataType("Numeric");
+		final MeasurementVariable measurementVariable = this.createMeasurementVariable();
 		final MeasurementVariable dateMV = new MeasurementVariable();
 		dateMV.setAlias("KSU_Date");
 		dateMV.setName("KSU_Date");
@@ -674,7 +662,7 @@ public class DatasetServiceImplTest {
 		measurementVariables.add(dateMV);
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
-		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		observationUnitDataMap.put(ALIAS, new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
 		observationUnitDataMap.put("KSU_Date", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
 		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(1);
