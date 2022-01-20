@@ -16,13 +16,13 @@ import org.springframework.validation.MapBindingResult;
 
 public class ObservationUnitsTableBuilder {
 
-	private static String OBS_UNIT_ID = "OBS_UNIT_ID";
+	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 
 	private Integer duplicatedFoundNumber;
 
 	public Table<String, String, String> build(final List<List<String>> data, final List<MeasurementVariable> datasetMeasurementVariables) throws ApiRequestValidationException {
 
-		duplicatedFoundNumber = 0;
+		this.duplicatedFoundNumber = 0;
 
 		final BindingResult
 				errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
@@ -37,7 +37,7 @@ public class ObservationUnitsTableBuilder {
 		}
 
 		// filter measurement variables from header
-		List<Integer> importMeasurementVariablesIndex = new ArrayList<>();
+		final List<Integer> importMeasurementVariablesIndex = new ArrayList<>();
 
 		for (final String header: headers) {
 			for (final MeasurementVariable measurementVariableDto: datasetMeasurementVariables) {
@@ -58,7 +58,7 @@ public class ObservationUnitsTableBuilder {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final Integer obsUnitIdIndex = headers.indexOf(OBS_UNIT_ID);
+		final int obsUnitIdIndex = headers.indexOf(OBS_UNIT_ID);
 
 		// Start table building, Table<row, column, value>
 		final Table<String, String, String> table = HashBasedTable.create();
@@ -75,14 +75,14 @@ public class ObservationUnitsTableBuilder {
 					table.put(observationUnitId, headers.get(index), row.get(index));
 				}
 			} else {
-				duplicatedFoundNumber++;
+				this.duplicatedFoundNumber++;
 			}
 		}
 		return table;
 	}
 
 	Integer getDuplicatedFoundNumber() {
-		return duplicatedFoundNumber;
+		return this.duplicatedFoundNumber;
 	}
 
 }
