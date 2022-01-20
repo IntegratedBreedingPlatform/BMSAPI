@@ -35,6 +35,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -63,6 +64,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -795,7 +797,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
 		final Collection<? extends GrantedAuthority> authorities = SecurityUtil.getLoggedInUserAuthorities();
 		// Allow updating of status if user has Full permission or user owns the list
-		if (authorities.stream().noneMatch(o -> o.getAuthority().equals(ADMIN)) && !germplasmList.getUserId()
+		if (authorities.stream().noneMatch( o ->
+			Arrays.asList(PermissionsEnum.ADMIN.name(),
+				PermissionsEnum.LISTS.name(),
+				PermissionsEnum.MANAGE_GERMPLASM_LISTS.name(),
+				PermissionsEnum.LOCK_UNLOCK_GERMPLASM_LIST.name()
+			).contains(o.getAuthority()))
+			&& !germplasmList.getUserId()
 			.equals(createdBy.getUserid())) {
 			this.errors.reject("list.toggle.status.not.owner", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -869,6 +877,22 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateProgram(cropName, programUUID);
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
+
+		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
+		final Collection<? extends GrantedAuthority> authorities = SecurityUtil.getLoggedInUserAuthorities();
+		// Allow updating of status if user has Full permission or user owns the list
+		if (authorities.stream().noneMatch(o ->
+			Arrays.asList(PermissionsEnum.ADMIN.name(),
+				PermissionsEnum.LISTS.name(),
+				PermissionsEnum.MANAGE_GERMPLASM_LISTS.name(),
+				PermissionsEnum.DELETE_GERMPLASM_LIST.name()
+			).contains(o.getAuthority()))
+			&& !germplasmList.getUserId()
+			.equals(createdBy.getUserid())) {
+			this.errors.reject("list.delete.not.owner", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 		this.germplasmListService.deleteGermplasmList(listId);
 	}
