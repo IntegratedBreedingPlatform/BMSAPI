@@ -19,7 +19,7 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 
 public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 
-	private ObservationUnitsTableBuilder observationUnitsTableBuilder = new ObservationUnitsTableBuilder();
+	private final ObservationUnitsTableBuilder observationUnitsTableBuilder = new ObservationUnitsTableBuilder();
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testBuildFailsWhenHeaderDoesNotContainsObsUnitId() throws Exception {
@@ -29,8 +29,8 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(headers);
 		data.add(row);
 		try {
-			observationUnitsTableBuilder.build(data, null);
-		} catch (ApiRequestValidationException e) {
+			this.observationUnitsTableBuilder.build(data, null);
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("required.header.obs.unit.id"));
 			throw e;
 		}
@@ -43,16 +43,22 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		final List<String> row = Arrays.asList("1", "2", "3");
 		data.add(headers);
 		data.add(row);
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariables.add(measurementVariable);
+		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList("A");
 		try {
-			observationUnitsTableBuilder.build(data, measurementVariables);
-		} catch (ApiRequestValidationException e) {
+			this.observationUnitsTableBuilder.build(data, measurementVariables);
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("duplicated.measurement.variables.not.allowed"));
 			throw e;
 		}
+	}
+
+	private List<MeasurementVariable> createMeasurementVariableList(final String variableAlias) {
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setAlias(variableAlias);
+		measurementVariable.setName("Variable Name");
+		measurementVariables.add(measurementVariable);
+		return measurementVariables;
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -62,13 +68,10 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		final List<String> row = Arrays.asList("1", "2");
 		data.add(headers);
 		data.add(row);
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("B");
-		measurementVariables.add(measurementVariable);
+		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList("B");
 		try {
-			observationUnitsTableBuilder.build(data, measurementVariables);
-		} catch (ApiRequestValidationException e) {
+			this.observationUnitsTableBuilder.build(data, measurementVariables);
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("no.measurement.variables.input"));
 			throw e;
 		}
@@ -81,13 +84,10 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		final List<String> row = Arrays.asList("", "2");
 		data.add(headers);
 		data.add(row);
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariables.add(measurementVariable);
+		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList("A");
 		try {
-			observationUnitsTableBuilder.build(data, measurementVariables);
-		} catch (ApiRequestValidationException e) {
+			this.observationUnitsTableBuilder.build(data, measurementVariables);
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("empty.observation.unit.id"));
 			throw e;
 		}
@@ -104,16 +104,13 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(row1);
 		data.add(row2);
 		data.add(row3);
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setAlias("A");
-		measurementVariables.add(measurementVariable);
-		final Table<String, String, String> table = observationUnitsTableBuilder.build(data, measurementVariables);
+		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList("A");
+		final Table<String, String, String> table = this.observationUnitsTableBuilder.build(data, measurementVariables);
 		assertThat(table.columnKeySet(), hasSize(1));
 		assertThat(table.rowKeySet(), hasSize(2));
 		assertThat(table.columnKeySet(), contains("A"));
 		assertThat(table.rowKeySet(), contains("Obs1", "Obs2"));
-		assertThat(observationUnitsTableBuilder.getDuplicatedFoundNumber(), is(1));
+		assertThat(this.observationUnitsTableBuilder.getDuplicatedFoundNumber(), is(1));
 		assertThat(table.get("Obs2", "A"), is("A2"));
 	}
 
