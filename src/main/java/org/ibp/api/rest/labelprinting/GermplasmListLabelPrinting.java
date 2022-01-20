@@ -227,6 +227,14 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 				this.getGermplasmFieldDataRowValue(germplasmSearchResponse, columns, key, id);
 			} else if (this.pedigreeFieldIds.contains(id)) {
 				this.getPedigreeFieldDataRowValue(germplasmSearchResponse, columns, key, id);
+
+				/*
+				 * Germplasm list data stores precalculated pedigree strings with a certain cross expansion level
+				 * in grpname
+				 */
+				if (LabelPrintingStaticField.CROSS.getFieldId().equals(id)) {
+					columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.CROSS.name()), ""));
+				}
 			} else if (this.defaultEntryDetailsFieldIds.contains(id)) {
 				this.getEntryDetailFieldDataRowValue(listData, columns, key, id);
 			} else {

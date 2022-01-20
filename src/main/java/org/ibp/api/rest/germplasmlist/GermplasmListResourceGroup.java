@@ -28,6 +28,7 @@ import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.germplasm.GermplasmListTemplateExportService;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.germplasm.ReorderEntriesLock;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -53,6 +54,8 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+
+import static org.apache.commons.lang3.math.NumberUtils.isNumber;
 
 @Api(value = "Germplasm List Services")
 @Controller
@@ -419,6 +422,22 @@ public class GermplasmListResourceGroup {
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final List<GermplasmListDataUpdateViewDTO> view) {
 		this.germplasmListDataService.updateGermplasmListDataView(listId, view);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation("Set generation level for list and fill with cross expansion")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/pedigree-generation-level", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<Void> fillWithCrossExpansion(@PathVariable final String cropName,
+		@PathVariable final Integer listId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody @ApiParam("a positive number, without quotation marks. E.g level: 2") final String level
+	) {
+		BaseValidator.checkArgument(isNumber(level), "error.germplasmlist.generationlevel.invalid");
+		final int levelInt = Integer.parseInt(level);
+		BaseValidator.checkArgument(levelInt > 0 && levelInt <= 10 , "error.germplasmlist.max.generationlevel");
+		this.germplasmListDataService.fillWithCrossExpansion(listId, levelInt);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

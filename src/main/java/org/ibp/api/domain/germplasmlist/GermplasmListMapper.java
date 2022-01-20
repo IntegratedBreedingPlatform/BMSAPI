@@ -39,6 +39,7 @@ public class GermplasmListMapper {
 				this.map().setOwnerId(this.source.getUserId());
 				this.map().setNotes(this.source.getNotes());
 				this.map().setListType(this.source.getType());
+				this.map().setGenerationLevel(this.source.getGenerationLevel());
 			}
 
 		});

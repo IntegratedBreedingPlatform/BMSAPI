@@ -246,11 +246,13 @@ public class GermplasmListLabelPrintingTest {
 		final Set<Integer> keys =
 			new HashSet<>(Arrays.asList(TermId.CROSS_FEMALE_GID.getId(), LabelPrintingStaticField.CROSS.getFieldId()));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
+		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
 		final Map<Integer, String> dataRow =
-			this.labelPrinting.getDataRow(keys, null, response, new HashMap<>(), new HashMap<>(), new HashMap<>());
+			this.labelPrinting.getDataRow(keys, listData, response, new HashMap<>(), new HashMap<>(), new HashMap<>());
 		Assert.assertEquals(2, dataRow.keySet().size());
 		Assert.assertEquals(response.getFemaleParentGID(), dataRow.get(TermId.CROSS_FEMALE_GID.getId()));
-		Assert.assertEquals(response.getPedigreeString(), dataRow.get(LabelPrintingStaticField.CROSS.getFieldId()));
+		Assert.assertEquals(listData.getData().get(GermplasmListStaticColumns.CROSS.name()),
+			dataRow.get(LabelPrintingStaticField.CROSS.getFieldId()));
 	}
 
 	@Test
@@ -332,6 +334,7 @@ public class GermplasmListLabelPrintingTest {
 		response.setData(new HashMap<>());
 		response.getData().put(GermplasmListStaticColumns.ENTRY_NO.name(), "1");
 		response.getData().put(GermplasmListStaticColumns.ENTRY_CODE.name(), RandomStringUtils.randomAlphanumeric(10));
+		response.getData().put(GermplasmListStaticColumns.CROSS.name(), RandomStringUtils.randomAlphanumeric(10));
 		return response;
 	}
 }
