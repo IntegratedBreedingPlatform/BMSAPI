@@ -368,7 +368,6 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiIgnore
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/toggle-status", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Boolean> toggleGermplasmListStatus(@PathVariable final String cropName,
@@ -469,7 +468,6 @@ public class GermplasmListResourceGroup {
 	}
 
 	@ApiOperation(value = "Delete germplasm list", notes = "Delete germplasm list.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'DELETE_GERMPLASM_LIST')")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/{listId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteGermplasmList(
