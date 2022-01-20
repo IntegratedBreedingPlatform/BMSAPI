@@ -351,9 +351,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
 		this.germplasmListValidator.validateListMetadata(request, currentProgram);
 		this.germplasmListValidator.validateParentFolder(request);
-		this.validateNodeIdAcceptingCropFolders(request.getParentFolderId(), currentProgram, ListNodeType.PARENT);
+		final Optional<GermplasmList> parentFolder = this.validateNodeIdAcceptingCropFolders(request.getParentFolderId(), currentProgram, ListNodeType.PARENT);
 
-		this.assignFolderDependentProperties(request, currentProgram);
+		this.assignFolderDependentProperties(request, currentProgram, parentFolder);
 
 		return this.germplasmListService.cloneGermplasmList(germplasmListId, request,
 			this.securityService.getCurrentlyLoggedInUser().getUserid());
@@ -368,16 +368,19 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
 
 		this.germplasmListValidator.validateParentFolder(germplasmListDto);
-		this.validateNodeIdAcceptingCropFolders(germplasmListDto.getParentFolderId(), currentProgram, ListNodeType.PARENT);
+		final Optional<GermplasmList> parentFolder = this.validateNodeIdAcceptingCropFolders(germplasmListDto.getParentFolderId(), currentProgram, ListNodeType.PARENT);
 
 		// process and assign defaults + more validations
 		this.processEntries(request, currentProgram);
 
-		this.assignFolderDependentProperties(germplasmListDto, currentProgram);
+		this.assignFolderDependentProperties(germplasmListDto, currentProgram, parentFolder);
 		// set updated listdto fields to request for now, listdto and generatorlistdto to merge in the future
-		request.setStatus(germplasmListDto.getStatus());
-		request.setProgramUUID(germplasmListDto.getProgramUUID());
+
+		//FIXME No sense to call a method to resolve values and reassign them to the request, split assignFolderDependentProperties
+		//in 3 functions
 		request.setParentFolderId(germplasmListDto.getParentFolderId());
+		request.setProgramUUID(germplasmListDto.getProgramUUID());
+		request.setStatus(germplasmListDto.getStatus());
 
 		final Integer loggedInUser = this.securityService.getCurrentlyLoggedInUser().getUserid();
 
@@ -385,19 +388,19 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.germplasmListService.create(request, loggedInUser);
 	}
 
-	private void assignFolderDependentProperties(final GermplasmListDto request, final String currentProgram) {
-		// properties that depend on CROP/PROGRAM folder
-		int status = GermplasmList.Status.LIST.getCode();
+	private void assignFolderDependentProperties(final GermplasmListDto request, final String currentProgram, final Optional<GermplasmList> parentFolderOptional) {
+
 		final String parentFolderId = request.getParentFolderId();
-		// If the germplasm list is saved in 'Crop lists' folder, the programUUID should be null
-		// so that the germplasm list will be accessible to all programs of the same crop.
-		if (CROP_LISTS.equals(parentFolderId)) {
-			// list should be locked by default if it is saved in 'Crop lists' folder.
-			status = GermplasmList.Status.LOCKED_LIST.getCode();
+
+		if (CROP_LISTS.equals(parentFolderId) || (parentFolderOptional.isPresent() && StringUtils.isEmpty(parentFolderOptional.get()
+			.getProgramUUID()))) {
+			request.setProgramUUID(null);
 		} else {
 			request.setProgramUUID(currentProgram);
 		}
-		request.setStatus(status);
+
+		request.setStatus((StringUtils.isEmpty(request.getProgramUUID())) ? GermplasmList.Status.LOCKED_LIST.getCode() :
+			GermplasmList.Status.LIST.getCode());
 
 		if (CROP_LISTS.equals(parentFolderId) || PROGRAM_LISTS.equals(parentFolderId)) {
 			request.setParentFolderId(null);
