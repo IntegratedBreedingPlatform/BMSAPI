@@ -50,8 +50,11 @@ public class ObservationsTableValidator {
 	public void validateObservationsValuesDataTypes(final Table<String, String, String> inputData,
 			final List<MeasurementVariable> measurementVariables) throws ApiRequestValidationException {
 
-		final Map<String, MeasurementVariable> mappedVariables = Maps.uniqueIndex(measurementVariables, MeasurementVariable::getAlias);
-
+		final Map<String, MeasurementVariable> mappedVariables = new HashMap<>();
+		measurementVariables.forEach(measurementVariable -> {
+			mappedVariables.putIfAbsent(measurementVariable.getName(), measurementVariable);
+			mappedVariables.putIfAbsent(measurementVariable.getAlias(), measurementVariable);
+		});
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
 		for (final String observationUnitId : inputData.rowKeySet()) {
