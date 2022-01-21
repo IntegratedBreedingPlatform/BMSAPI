@@ -919,10 +919,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	private Optional<GermplasmList> validateNodeIdAcceptingCropFolders(final String nodeId, final String programUUID, final ListNodeType nodeType) {
-		/**
-		 * Warning: Adding custom validation to show crop folders and list below those folders
-		 * It will need to be revisited when implementing full crop folder management
-		 */
+
 		this.validateNodeId(nodeId, nodeType);
 
 		if (Util.isPositiveInteger(nodeId)) {
