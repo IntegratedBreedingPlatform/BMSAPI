@@ -58,7 +58,8 @@ import java.util.stream.Collectors;
 public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 	static final String LABELS_FOR = "Labels-for-";
-	static final int DRVNM_ID = 5;
+	protected static final int DRVNM_ID = 5;
+	protected static final int MAX_FIXED_TYPE_INDEX = 10000;
 	private List<Field> defaultEntryDetailsFields;
 	private List<Integer> defaultEntryDetailsFieldIds;
 
@@ -357,8 +358,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 					fields.add(TermId.CROSS_FEMALE_PREFERRED_NAME.getId());
 					break;
 				default:
-					if (dto.getTermId() == GermplasmListLabelPrinting.DRVNM_ID || dto.getTermId() > 10000) {
-						fields.add(dto.getTermId() + 10000);
+					if (dto.getTermId() == GermplasmListLabelPrinting.DRVNM_ID || dto.getTermId() > GermplasmListLabelPrinting.MAX_FIXED_TYPE_INDEX) {
+						fields.add(dto.getTermId() + GermplasmListLabelPrinting.MAX_FIXED_TYPE_INDEX);
 					} else {
 						fields.add(dto.getTermId());
 					}
@@ -373,7 +374,6 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		labelPrintingPresetDTO.setFileConfiguration(filePresetConfigurationDTO);
 		labelPrintingPresetDTO.setSelectedFields(Arrays.asList(fields));
 		labelPrintingPresetDTO.setBarcodeSetting(new LabelPrintingPresetDTO.BarcodeSetting(false, false, null));
-		labelPrintingPresetDTO.setToolId(23);
 		labelPrintingPresetDTO.setIncludeHeadings(true);
 		labelPrintingPresetDTO.setToolSection(ToolSection.GERMPLASM_LIST_LABEL_PRINTING_PRESET.name());
 		labelPrintingPresetDTO.setType("LabelPrintingPreset");
