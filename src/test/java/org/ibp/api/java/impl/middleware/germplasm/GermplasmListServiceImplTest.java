@@ -453,7 +453,7 @@ public class GermplasmListServiceImplTest {
 		Mockito.doNothing().when(this.germplasmListValidator).validateFolderName(folderName);
 		Mockito.doNothing().when(this.germplasmListValidator).validateNotSameFolderNameInParent(folderName, parentId, PROGRAM_UUID);
 
-		Mockito.when(this.germplasmListServiceMiddleware.updateGermplasmListFolder(USER_ID, folderName, folderId, PROGRAM_UUID))
+		Mockito.when(this.germplasmListServiceMiddleware.updateGermplasmListFolder(folderName, folderId))
 			.thenReturn(folderId);
 
 		final Integer germplasmListFolderId =
@@ -463,7 +463,7 @@ public class GermplasmListServiceImplTest {
 
 		Mockito.verify(this.programValidator).validate(any(), any());
 		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListById(folderId);
-		Mockito.verify(this.germplasmListServiceMiddleware).updateGermplasmListFolder(USER_ID, folderName, folderId, PROGRAM_UUID);
+		Mockito.verify(this.germplasmListServiceMiddleware).updateGermplasmListFolder(folderName, folderId);
 		Mockito.verify(this.germplasmListValidator).validateNotSameFolderNameInParent(folderName, parentId, PROGRAM_UUID);
 		Mockito.verify(this.germplasmListValidator).validateFolderName(folderName);
 

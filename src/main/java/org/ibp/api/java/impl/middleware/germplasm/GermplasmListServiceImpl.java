@@ -661,12 +661,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		//Validate if there is a folder with same name in parent folder
-		this.germplasmListValidator.validateNotSameFolderNameInParent(newFolderName, germplasmList.getParentId(), programUUID);
+		//Preventing edition using the same list name
+		if (newFolderName.equalsIgnoreCase(germplasmList.getName())) {
+			return germplasmList.getId();
+		}
 
-		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
-		return this.germplasmListService.updateGermplasmListFolder(createdBy.getUserid(), newFolderName, Integer.valueOf(folderId),
-			programUUID);
+		//Validate if there is a folder with same name in parent folder
+		this.germplasmListValidator.validateNotSameFolderNameInParent(newFolderName, germplasmList.getParentId(), germplasmList.getProgramUUID());
+
+		return this.germplasmListService.updateGermplasmListFolder(newFolderName, Integer.valueOf(folderId));
 	}
 
 	@Override
