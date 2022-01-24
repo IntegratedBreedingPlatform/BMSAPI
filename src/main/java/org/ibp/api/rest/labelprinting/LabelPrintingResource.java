@@ -20,6 +20,7 @@ import org.ibp.api.rest.labelprinting.filegenerator.CSVLabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.ExcelLabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.LabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.PDFLabelsFileGenerator;
+import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -169,6 +170,23 @@ public class LabelPrintingResource {
 		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(file.getName())));
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+	}
+
+
+	@RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/labelPrinting/{labelPrintingType}/default-settings", method = RequestMethod.POST)
+	@ApiOperation(value = "Get the default preset settings, if exists, according to the specified printing label type and the input in the request body",
+		notes = "Returns if exists a default preset according to the printing label type and input in the request body.")
+	@ResponseBody
+	public ResponseEntity<LabelPrintingPresetDTO> getDefaultSettings(
+		@PathVariable final String cropname, @PathVariable final String programUUID,
+		@PathVariable final String labelPrintingType,
+		@RequestBody final LabelsInfoInput labelsInfoInput) {
+
+		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
+		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput, programUUID);
+
+		final LabelPrintingPresetDTO labelPrintingPresetDTO = labelPrintingStrategy.getDefaultSetting(labelsInfoInput, programUUID);
+		return new ResponseEntity<>(labelPrintingPresetDTO, HttpStatus.OK);
 	}
 
 	public LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {

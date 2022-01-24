@@ -1,11 +1,13 @@
 package org.ibp.api.rest.labelprinting;
 
 import com.google.common.collect.ImmutableList;
+import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
@@ -20,6 +22,7 @@ import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.germplasm.GermplasmListService;
+import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
@@ -27,6 +30,8 @@ import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
+import org.ibp.api.rest.preset.domain.FilePresetConfigurationDTO;
+import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -285,5 +290,93 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 	void setMaxTotalResults(final int maxTotalResults) {
 		this.maxTotalResults = maxTotalResults;
+	}
+
+	@Override
+	public LabelPrintingPresetDTO getDefaultSetting(final LabelsInfoInput labelsInfoInput, final String programUUID) {
+		final List<GermplasmListMeasurementVariableDTO> germplasmListMeasurementVariableDTOs =
+			this.germplasmListDataService.getGermplasmListDataTableHeader(labelsInfoInput.getListId(), programUUID);
+		final ArrayList<Integer> fields = new ArrayList<>();
+		germplasmListMeasurementVariableDTOs.stream().forEach(dto -> {
+			final TermId termId = TermId.getById(dto.getTermId());
+
+			switch (termId) {
+				case GID_ACTIVE_LOTS_COUNT:
+					fields.add(LabelPrintingStaticField.LOTS.getFieldId());
+					break;
+				case GID_AVAILABLE_BALANCE:
+					fields.add(TermId.AVAILABLE_INVENTORY.getId());
+					break;
+				case GID_UNIT:
+					fields.add(TermId.UNITS_INVENTORY.getId());
+					break;
+				case IMMEDIATE_SOURCE_GID:
+					fields.add(LabelPrintingStaticField.INMEDIATE_SOURCE_GID.getFieldId());
+					break;
+				case IMMEDIATE_SOURCE_NAME:
+					fields.add(LabelPrintingStaticField.INMEDIATE_SOURCE_PREFERRED_NAME.getFieldId());
+					break;
+				case GROUP_SOURCE_GID:
+					fields.add(LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId());
+					break;
+				case GROUP_SOURCE_NAME:
+					fields.add(LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId());
+					break;
+				case GUID:
+					fields.add(LabelPrintingStaticField.GUID.getFieldId());
+					break;
+				case GERMPLASM_REFERENCE:
+					fields.add(LabelPrintingStaticField.REFERENCE.getFieldId());
+					break;
+				case CROSS:
+					fields.add(LabelPrintingStaticField.CROSS.getFieldId());
+					break;
+				case BREEDING_METHOD_NAME:
+					fields.add(TermId.BREEDING_METHOD.getId());
+					break;
+				case BREEDING_METHOD_ABBREVIATION:
+					fields.add(LabelPrintingStaticField.METHOD_CODE.getFieldId());
+					break;
+				case BREEDING_METHOD_GROUP:
+					fields.add(LabelPrintingStaticField.METHOD_GROUP.getFieldId());
+					break;
+				case DESIG:
+					fields.add(TermId.PREFERRED_NAME.getId());
+					break;
+				case FGID:
+					fields.add(TermId.CROSS_FEMALE_GID.getId());
+					break;
+				case MGID:
+					fields.add(TermId.CROSS_MALE_GID.getId());
+					break;
+				case MALE_PARENT:
+					fields.add(TermId.CROSS_MALE_PREFERRED_NAME.getId());
+					break;
+				case FEMALE_PARENT:
+					fields.add(TermId.CROSS_FEMALE_PREFERRED_NAME.getId());
+					break;
+				case NONEXISTENT:
+				default:
+					if (dto.getTermId() == 5 || dto.getTermId() > 10000) {
+						fields.add(dto.getTermId() + 10000);
+					} else {
+						fields.add(dto.getTermId());
+					}
+					break;
+			}
+
+		});
+
+		final LabelPrintingPresetDTO labelPrintingPresetDTO = new LabelPrintingPresetDTO();
+		final FilePresetConfigurationDTO filePresetConfigurationDTO = new FilePresetConfigurationDTO();
+		filePresetConfigurationDTO.setOutputType(FileType.XLS.getExtension());
+		labelPrintingPresetDTO.setFileConfiguration(filePresetConfigurationDTO);
+		labelPrintingPresetDTO.setSelectedFields(Arrays.asList(fields));
+		labelPrintingPresetDTO.setBarcodeSetting(new LabelPrintingPresetDTO.BarcodeSetting(false, false, null));
+		labelPrintingPresetDTO.setToolId(23);
+		labelPrintingPresetDTO.setIncludeHeadings(true);
+		labelPrintingPresetDTO.setToolSection(ToolSection.GERMPLASM_LIST_LABEL_PRINTING_PRESET.name());
+		labelPrintingPresetDTO.setType("LabelPrintingPreset");
+		return labelPrintingPresetDTO;
 	}
 }
