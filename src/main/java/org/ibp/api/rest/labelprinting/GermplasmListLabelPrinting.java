@@ -59,7 +59,6 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 	static final String LABELS_FOR = "Labels-for-";
 	protected static final int DRVNM_ID = 5;
-	protected static final int MAX_FIXED_TYPE_INDEX = 10000;
 	private List<Field> defaultEntryDetailsFields;
 	private List<Integer> defaultEntryDetailsFieldIds;
 
@@ -358,8 +357,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 					fields.add(TermId.CROSS_FEMALE_PREFERRED_NAME.getId());
 					break;
 				default:
-					if (dto.getTermId() == GermplasmListLabelPrinting.DRVNM_ID || dto.getTermId() > GermplasmListLabelPrinting.MAX_FIXED_TYPE_INDEX) {
-						fields.add(dto.getTermId() + GermplasmListLabelPrinting.MAX_FIXED_TYPE_INDEX);
+					if (dto.getTermId() == GermplasmListLabelPrinting.DRVNM_ID || dto.getTermId() > GermplasmLabelPrinting.MAX_FIXED_TYPE_INDEX) {
+						fields.add(dto.getTermId() + GermplasmLabelPrinting.MAX_FIXED_TYPE_INDEX);
 					} else {
 						fields.add(dto.getTermId());
 					}

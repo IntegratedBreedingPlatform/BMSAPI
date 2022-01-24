@@ -600,7 +600,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	 * Requires no collision between non-fixed columns id
 	 * Allocates some space for future fixed-columns
 	 */
-	private static final Integer MAX_FIXED_TYPE_INDEX = 10000;
+	protected static final Integer MAX_FIXED_TYPE_INDEX = 10000;
 
 	static int toKey(final int id) {
 		return id + MAX_FIXED_TYPE_INDEX;
