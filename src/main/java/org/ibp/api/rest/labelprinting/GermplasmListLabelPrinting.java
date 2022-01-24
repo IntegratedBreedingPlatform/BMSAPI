@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 	static final String LABELS_FOR = "Labels-for-";
+	static final int DRVNM_ID = 5;
 	private List<Field> defaultEntryDetailsFields;
 	private List<Integer> defaultEntryDetailsFieldIds;
 
@@ -355,9 +356,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 				case FEMALE_PARENT:
 					fields.add(TermId.CROSS_FEMALE_PREFERRED_NAME.getId());
 					break;
-				case NONEXISTENT:
 				default:
-					if (dto.getTermId() == 5 || dto.getTermId() > 10000) {
+					if (dto.getTermId() == GermplasmListLabelPrinting.DRVNM_ID || dto.getTermId() > 10000) {
 						fields.add(dto.getTermId() + 10000);
 					} else {
 						fields.add(dto.getTermId());
