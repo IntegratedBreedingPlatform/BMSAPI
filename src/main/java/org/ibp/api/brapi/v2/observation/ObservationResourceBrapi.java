@@ -59,7 +59,7 @@ public class ObservationResourceBrapi {
 		@RequestParam(required = false) final String observationVariableDbId,
 		@ApiParam(value = "The unique ID of a study to filter on")
 		@RequestParam(required = false) final String studyDbId,
-		@ApiParam(value = "Common name for the crop associated with this study.")
+		@ApiParam(value = "The unique ID of a location where these observations were collected")
 		@RequestParam(required = false) final String locationDbId,
 		@ApiParam(value = "The unique ID of a trial to filter on")
 		@RequestParam(required = false) final String trialDbId,
@@ -94,7 +94,7 @@ public class ObservationResourceBrapi {
 		observationSearchRequestDto.setGermplasmDbIds(
 			StringUtils.isNotEmpty(germplasmDbId) ? Arrays.asList(germplasmDbId) : new ArrayList<>());
 		observationSearchRequestDto.setObservationVariableDbIds(
-			StringUtils.isNotEmpty(observationVariableDbId) ? Arrays.asList(Integer.valueOf(observationVariableDbId)) : new ArrayList<>());
+			StringUtils.isNotEmpty(observationVariableDbId) ? Arrays.asList(observationVariableDbId) : new ArrayList<>());
 		observationSearchRequestDto.setStudyDbIds(
 			StringUtils.isNotEmpty(studyDbId) ? Arrays.asList(Integer.valueOf(studyDbId)) : new ArrayList<>());
 		observationSearchRequestDto.setLocationDbIds(

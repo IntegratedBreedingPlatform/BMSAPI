@@ -315,6 +315,60 @@ public class ObservationUnitImportRequestValidatorTest {
 		assertThat(error.getArguments()[0], is("2"));
 	}
 
+	@Test
+	public void testPruneObservationUnitsInvalidForImport_importInvalidPlotCode() {
+		final StudyInstanceDto studyInstanceDto = new StudyInstanceDto();
+		studyInstanceDto.setTrialDbId(TRIAL_DBID);
+		studyInstanceDto.setProgramDbId(PROGRAM_DBID);
+		studyInstanceDto.setStudyDbId(STUDY_DBID);
+		Mockito.when(this.studyServiceBrapi.getStudyInstances(ArgumentMatchers.any(), ArgumentMatchers.isNull()))
+			.thenReturn(Collections.singletonList(studyInstanceDto));
+
+		Mockito.when(this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
+			.thenReturn(new HashMap<>());
+
+		final GermplasmDTO germplasmDTO = new GermplasmDTO();
+		germplasmDTO.setGermplasmDbId(GERMPLASM_DBID);
+		Mockito.when(this.germplasmService.searchGermplasmDTO(ArgumentMatchers.any(), ArgumentMatchers.isNull()))
+			.thenReturn(Collections.singletonList(germplasmDTO));
+
+		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = new ArrayList();
+		observationUnitImportRequestDtos.add(this.createObservationUnitImportRequestDto("0"));
+
+		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
+		Assert.assertTrue(result.hasErrors());
+		assertThat(result.getAllErrors(), hasSize(1));
+		final ObjectError error = result.getAllErrors().get(0);
+		Assert.assertEquals("observation.unit.import.plot.levelCode.invalid", error.getCode());
+	}
+
+	@Test
+	public void testPruneObservationUnitsInvalidForImport_importInvalidPlotCode_Empty() {
+		final StudyInstanceDto studyInstanceDto = new StudyInstanceDto();
+		studyInstanceDto.setTrialDbId(TRIAL_DBID);
+		studyInstanceDto.setProgramDbId(PROGRAM_DBID);
+		studyInstanceDto.setStudyDbId(STUDY_DBID);
+		Mockito.when(this.studyServiceBrapi.getStudyInstances(ArgumentMatchers.any(), ArgumentMatchers.isNull()))
+			.thenReturn(Collections.singletonList(studyInstanceDto));
+
+		Mockito.when(this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
+			.thenReturn(new HashMap<>());
+
+		final GermplasmDTO germplasmDTO = new GermplasmDTO();
+		germplasmDTO.setGermplasmDbId(GERMPLASM_DBID);
+		Mockito.when(this.germplasmService.searchGermplasmDTO(ArgumentMatchers.any(), ArgumentMatchers.isNull()))
+			.thenReturn(Collections.singletonList(germplasmDTO));
+
+		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = new ArrayList();
+		observationUnitImportRequestDtos.add(this.createObservationUnitImportRequestDto(""));
+
+		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
+		Assert.assertTrue(result.hasErrors());
+		assertThat(result.getAllErrors(), hasSize(1));
+		final ObjectError error = result.getAllErrors().get(0);
+		Assert.assertEquals("observation.unit.import.plot.levelCode.invalid", error.getCode());
+	}
+
 	private List<ObservationUnitImportRequestDto> createObservationUnitImportRequestDtos() {
 		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = new ArrayList<>();
 		observationUnitImportRequestDtos.add(this.createObservationUnitImportRequestDto());

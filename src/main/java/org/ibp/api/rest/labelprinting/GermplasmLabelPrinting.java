@@ -404,10 +404,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 				columns.put(key, Objects.toString(germplasmSearchResponse.getMethodName(), ""));
 				return;
 			case PREFERRED_ID:
-				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredId(), ""));
+				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPreferredId(), ""));
 				return;
 			case PREFERRED_NAME:
-				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPeferredName(), ""));
+				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPreferredName(), ""));
 				return;
 			case GERMPLASM_DATE:
 				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmDate(), ""));
