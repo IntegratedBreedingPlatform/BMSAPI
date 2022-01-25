@@ -29,6 +29,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
+import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -589,12 +590,17 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		return this.sortedByFields;
 	}
 
+	@Override
+	public LabelPrintingPresetDTO getDefaultSetting(final LabelsInfoInput labelsInfoInput, final String programUUID) {
+		return null;
+	}
+
 	/**
 	 * Identify non-fixed columns with id = MAX_FIXED_TYPE_INDEX + column-id
 	 * Requires no collision between non-fixed columns id
 	 * Allocates some space for future fixed-columns
 	 */
-	private static final Integer MAX_FIXED_TYPE_INDEX = 10000;
+	protected static final Integer MAX_FIXED_TYPE_INDEX = 10000;
 
 	static int toKey(final int id) {
 		return id + MAX_FIXED_TYPE_INDEX;
