@@ -172,7 +172,7 @@ public class LotServiceImpl implements LotService {
 					checkArgument(!gids.isEmpty(), "searchrequestid.no.results");
 					break;
 
-				case MANAGE_STUDY:
+				case MANAGE_STUDY_SOURCE:
 					final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest =
 						(GermplasmStudySourceSearchRequest) this.searchRequestService
 							.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(),
