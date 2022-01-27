@@ -8,18 +8,22 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.fest.util.Collections;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
+import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
@@ -73,6 +77,9 @@ public class DatasetResource {
 
 	@Autowired
 	private DatasetExportService datasetKsuExcelExportServiceImpl;
+
+	@Autowired
+	private SearchRequestService searchRequestService;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -235,6 +242,25 @@ public class DatasetResource {
 		headers.add("X-Filtered-Count", Long.toString(pageResult.getFilteredResults()));
 		headers.add("X-Total-Count", Long.toString(pageResult.getTotalResults()));
 		return new ResponseEntity<>(pageResult.getPageResults(), headers, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Post observation units search", notes = "Post observation units search.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/search", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchObservation(@PathVariable final String cropname, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId, //
+		@PathVariable final Integer datasetId, //
+		@RequestBody final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
+		Preconditions.checkNotNull(observationUnitsSearchDTO, "params cannot be null");
+		Preconditions.checkArgument(Collections.isEmpty(observationUnitsSearchDTO.getFilterColumns()), "filterColumns should be null or empty");
+
+		final String searchRequestId =
+			this.searchRequestService.saveSearchRequest(observationUnitsSearchDTO, ObservationUnitsSearchDTO.class).toString();
+		final SearchDto searchDto = new SearchDto(searchRequestId);
+		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse<SearchDto>(searchDto);
+
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve all the observation units in a simple JSON array table format",
