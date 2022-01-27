@@ -268,7 +268,7 @@ public class LotServiceImplTest {
 	public void testCreateLots_ThrowsException_WhenForManageStudyTheSearchRequestIdNoReturnGids() {
 		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
 		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
-		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY);
+		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
 		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
 
 		try {
