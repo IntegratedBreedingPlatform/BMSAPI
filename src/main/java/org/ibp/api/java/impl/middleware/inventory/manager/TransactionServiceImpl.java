@@ -173,10 +173,6 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public void saveDeposits(final LotDepositRequestDto lotDepositRequestDto, final TransactionStatus transactionStatus) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-
-		if (lotDepositRequestDto.getSourceStudyId() != null) {
-			this.studyValidator.validate(lotDepositRequestDto.getSourceStudyId(), true);
-		}
 		this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
 
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotDepositRequestDto.getSelectedLots());
