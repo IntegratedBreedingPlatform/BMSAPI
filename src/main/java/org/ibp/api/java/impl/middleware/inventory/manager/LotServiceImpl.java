@@ -6,6 +6,7 @@ import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
@@ -23,6 +24,8 @@ import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
@@ -44,6 +47,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -108,6 +112,9 @@ public class LotServiceImpl implements LotService {
 
 	@Autowired
 	private GermplasmSearchService germplasmSearchService;
+
+	@Autowired
+	private DatasetService studyDatasetService;
 
 	private static final String DEFAULT_STOCKID_PREFIX = "SID";
 
@@ -181,6 +188,17 @@ public class LotServiceImpl implements LotService {
 						GermplasmStudySourceDto::getGid).collect(Collectors.toList());
 					checkArgument(!gids.isEmpty(), "searchrequestid.no.results");
 					break;
+
+				case MANAGE_STUDY_PLOT:
+					final ObservationUnitsSearchDTO observationUnitsSearchDTO =
+						(ObservationUnitsSearchDTO)this.searchRequestService
+						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(),
+							ObservationUnitsSearchDTO.class);
+					final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(Integer.valueOf(observationUnitsSearchDTO.getDatasetId()));
+
+					gids = this.studyDatasetService.getObservationUnitRows(datasetDTO.getParentDatasetId(),
+						observationUnitsSearchDTO.getDatasetId(), observationUnitsSearchDTO, null).stream().map(
+						ObservationUnitRow::getGid).collect(Collectors.toList());
 				default:
 					break;
 			}
