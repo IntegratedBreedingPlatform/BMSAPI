@@ -5,6 +5,7 @@ import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
@@ -19,17 +20,22 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.hamcrest.collection.IsMapContaining;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotSplitValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +48,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.collections.Sets;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -87,6 +94,9 @@ public class LotServiceImplTest {
     @Mock
     private GermplasmValidator germplasmValidator;
 
+	@Mock
+	private StudyValidator studyValidator;
+
     @Mock
     private SecurityService securityService;
 
@@ -113,6 +123,12 @@ public class LotServiceImplTest {
 
     @Mock
     private GermplasmStudySourceService germplasmStudySourceService;
+
+	@Mock
+	private DatasetService studyDatasetService;
+
+	@Mock
+	private DatasetValidator datasetValidator;
 
     @Captor
     private ArgumentCaptor<Set> setCollectionArgumentCaptor;
@@ -265,11 +281,51 @@ public class LotServiceImplTest {
 	}
 
 	@Test
-	public void testCreateLots_ThrowsException_WhenForManageStudyTheSearchRequestIdNoReturnGids() {
+	public void testCreateLots_ThrowsException_when_study_source_with_search_request_id_no_return_gids() {
 		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
 		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
 		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
 		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
+
+		GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest = new GermplasmStudySourceSearchRequest();
+		Mockito.when(this.searchRequestService.getSearchRequest(Mockito.any(), Mockito.any())).thenReturn(germplasmStudySourceSearchRequest);
+		try {
+			this.lotService.createLots(LotServiceImplTest.PROGRAM_UUID, lotGeneratorBatchRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("searchrequestid.no.results"));
+		}
+	}
+
+	@Test
+	public void testCreateLots_ThrowsException_when_germplasm_Search_with_search_request_id_no_return_gids() {
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.GERMPLASM_SEARCH);
+		searchOriginCompositeDto.setSearchRequestId(1);
+		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
+
+		GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		Mockito.when(this.searchRequestService.getSearchRequest(Mockito.any(), Mockito.any())).thenReturn(germplasmSearchRequest);
+		try {
+			this.lotService.createLots(LotServiceImplTest.PROGRAM_UUID, lotGeneratorBatchRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("searchrequestid.no.results"));
+		}
+	}
+
+	@Test
+	public void testCreateLots_ThrowsException_when_study_plot_with_search_request_id_no_return_gids() {
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+		final DatasetDTO datasetDTO = new DatasetDTO(1);
+		datasetDTO.setParentDatasetId(2);
+		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_PLOT);
+		searchOriginCompositeDto.setSearchRequestId(1);
+		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
+
+		ObservationUnitsSearchDTO observationUnitsSearchDTO = new ObservationUnitsSearchDTO();
+		Mockito.when(this.searchRequestService.getSearchRequest(Mockito.any(), Mockito.any())).thenReturn(observationUnitsSearchDTO);
+		Mockito.when(this.studyDatasetService.getDataset(Mockito.any())).thenReturn(datasetDTO);
 
 		try {
 			this.lotService.createLots(LotServiceImplTest.PROGRAM_UUID, lotGeneratorBatchRequestDto);
