@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.fest.util.Collections;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -244,7 +243,7 @@ public class DatasetResource {
 		return new ResponseEntity<>(pageResult.getPageResults(), headers, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Post observation units search", notes = "Post observation units search.")
+	@ApiOperation(value = "Post observation-units search", notes = "Post observation-units search.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/search", method = RequestMethod.POST)
 	@ResponseBody
