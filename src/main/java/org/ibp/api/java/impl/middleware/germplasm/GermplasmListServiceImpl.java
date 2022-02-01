@@ -179,7 +179,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Boolean folderOnly) {
 
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-
 		this.validateProgram(crop, programUUID);
 		return this.getChildrenNodes(programUUID, parentId, folderOnly);
 	}
@@ -209,8 +208,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			} else if (GermplasmListServiceImpl.CROP_LISTS.equals(parentId)) {
 				rootLists = this.germplasmListManager.getAllTopLevelLists(null);
 			} else {
-				rootLists = this.germplasmListManager.getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID,
-					GermplasmListServiceImpl.BATCH_SIZE);
+				rootLists = this.germplasmListManager.getGermplasmListByParentFolderId(Integer.parseInt(parentId));
 			}
 
 			this.germplasmListManager.populateGermplasmListCreatedByName(rootLists);
@@ -352,7 +350,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
 		this.germplasmListValidator.validateListMetadata(request, currentProgram);
-		this.germplasmListValidator.validateParentFolder(request);
+		this.germplasmListValidator.validateParentFolder(request.getParentFolderId());
 		final Optional<GermplasmList> parentFolder = this.validateNodeIdAcceptingCropFolders(request.getParentFolderId(), currentProgram, ListNodeType.PARENT);
 
 		this.assignFolderDependentProperties(request, currentProgram, parentFolder);
@@ -367,27 +365,54 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final String currentProgram = ContextHolder.getCurrentProgram();
 
 		final GermplasmListDto germplasmListDto = new GermplasmListDto(request);
-		this.germplasmListValidator.validateListMetadata(germplasmListDto, currentProgram);
 
-		this.germplasmListValidator.validateParentFolder(germplasmListDto);
-		final Optional<GermplasmList> parentFolder = this.validateNodeIdAcceptingCropFolders(germplasmListDto.getParentFolderId(), currentProgram, ListNodeType.PARENT);
+		this.germplasmListValidator.validateParentFolder(request.getParentFolderId());
+		final Optional<GermplasmList> parentFolder = this.validateNodeIdAcceptingCropFolders(request.getParentFolderId(), currentProgram, ListNodeType.PARENT);
+
+		// programUUID, status and parentFolderId that are finally saved depends on
+		// 1)folder where it will be saved, 2) if this folder is real or artificial one (CROP or PROGRAM).
+		final String listProgramUUID = this.calculateFolderDependentProgram(request.getParentFolderId(), currentProgram, parentFolder);
+		final Integer listStatus = this.calculateFolderDependantStatus(listProgramUUID);
+		final String listParentFolderId = this.calculateFolderDependantParentId(request.getParentFolderId());
+
+		//TODO Fixed to use final programUUID, but it should look for the name inside the directory instead
+		this.germplasmListValidator.validateListMetadata(germplasmListDto, listProgramUUID);
 
 		// process and assign defaults + more validations
 		this.processEntries(request, currentProgram);
 
-		this.assignFolderDependentProperties(germplasmListDto, currentProgram, parentFolder);
-		// set updated listdto fields to request for now, listdto and generatorlistdto to merge in the future
-
-		//FIXME No sense to call a method to resolve values and reassign them to the request, split assignFolderDependentProperties
-		//in 3 functions
-		request.setParentFolderId(germplasmListDto.getParentFolderId());
-		request.setProgramUUID(germplasmListDto.getProgramUUID());
-		request.setStatus(germplasmListDto.getStatus());
+		// setting final values that will be saved.
+		request.setProgramUUID(listProgramUUID);
+		request.setStatus(listStatus);
+		request.setParentFolderId(listParentFolderId);
 
 		final Integer loggedInUser = this.securityService.getCurrentlyLoggedInUser().getUserid();
 
 		// finally save
 		return this.germplasmListService.create(request, loggedInUser);
+	}
+
+	private String calculateFolderDependentProgram(String parentFolderId, final String currentProgram,
+		final Optional<GermplasmList> parentFolderOptional) {
+		if (CROP_LISTS.equals(parentFolderId) || (parentFolderOptional.isPresent() && StringUtils.isEmpty(parentFolderOptional.get()
+			.getProgramUUID()))) {
+			return null;
+		} else {
+			return currentProgram;
+		}
+	}
+
+	private Integer calculateFolderDependantStatus(final String programUUID) {
+		return (StringUtils.isEmpty(programUUID)) ? GermplasmList.Status.LOCKED_LIST.getCode() :
+			GermplasmList.Status.LIST.getCode();
+	}
+
+	private String calculateFolderDependantParentId(final String parentFolderId) {
+		if (CROP_LISTS.equals(parentFolderId) || PROGRAM_LISTS.equals(parentFolderId)) {
+			return null;
+		} else {
+			return parentFolderId;
+		}
 	}
 
 	private void assignFolderDependentProperties(final GermplasmListDto request, final String currentProgram, final Optional<GermplasmList> parentFolderOptional) {

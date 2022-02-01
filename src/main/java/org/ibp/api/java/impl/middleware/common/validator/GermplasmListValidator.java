@@ -88,6 +88,7 @@ public class GermplasmListValidator {
 		this.validateListName(currentProgram, germplasmListDto.getListName(), germplasmListDto.getListId());
 	}
 
+	//TODO Find by name and parent instead of name and program
 	private void validateListName(final String currentProgram, final String name, final Integer listId) {
 		checkNotEmpty(name, "param.null", new String[] {"name"});
 		checkArgument(name.length() <= NAME_MAX_LENGTH, TEXT_FIELD_MAX_LENGTH, new String[] {"name", "50"});
@@ -131,8 +132,7 @@ public class GermplasmListValidator {
 		}
 	}
 
-	public void validateParentFolder(final GermplasmListDto request) {
-		final String parentFolderId = request.getParentFolderId();
+	public void validateParentFolder(final String parentFolderId) {
 		checkNotNull(parentFolderId, PARAM_NULL, new String[] {"parentFolderId"});
 	}
 
