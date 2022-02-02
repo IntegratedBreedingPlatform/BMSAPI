@@ -627,14 +627,24 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		this.germplasmListValidator.validateFolderName(folderName);
 		this.validateProgram(cropName, programUUID);
-		this.validateNodeIdAcceptingCropFolders(parentId, programUUID, ListNodeType.PARENT);
+		final Optional<GermplasmList> parentFolder = this.validateNodeIdAcceptingCropFolders(parentId, programUUID, ListNodeType.PARENT);
 
 		//Validate if there is a folder with same name in parent folder
 		final Integer parent = this.getFolderIdAsInteger(parentId);
 		this.germplasmListValidator.validateNotSameFolderNameInParent(folderName, parent, programUUID);
 
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
-		return this.germplasmListService.createGermplasmListFolder(createdBy.getUserid(), folderName, parent, programUUID);
+		final String dependantProgramUUID = this.calculateProgramUUID(programUUID, parentFolder, parentId);
+		return this.germplasmListService.createGermplasmListFolder(createdBy.getUserid(), folderName, parent, dependantProgramUUID);
+	}
+
+	private String calculateProgramUUID (final String currentProgramUUID, final Optional<GermplasmList> parentFolder, final String parentId) {
+		if (CROP_LISTS.equals(parentId) || (parentFolder.isPresent() && StringUtils.isEmpty(parentFolder.get()
+			.getProgramUUID()))) {
+			return null;
+		} else {
+			return currentProgramUUID;
+		}
 	}
 
 	@Override
