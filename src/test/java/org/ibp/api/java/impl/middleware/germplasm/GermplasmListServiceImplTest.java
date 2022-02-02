@@ -235,7 +235,7 @@ public class GermplasmListServiceImplTest {
 
 		this.germplasmListService.getGermplasmListChildrenNodes(CROP, program, parentId, Boolean.FALSE);
 		Mockito.verify(this.germplasmListManager, times(1))
-			.getGermplasmListByParentFolderId(Integer.parseInt(parentId), program);
+			.getGermplasmListByParentFolderId(Integer.parseInt(parentId));
 	}
 
 	private GermplasmList getGermplasmList(final Integer id) {
@@ -326,10 +326,10 @@ public class GermplasmListServiceImplTest {
 		request.setStatus(GermplasmList.Status.LIST.getCode());
 
 		this.germplasmListService.create(request);
-		final ArgumentCaptor<GermplasmListDto> metadataRequestCaptor = ArgumentCaptor.forClass(GermplasmListDto.class);
+		final ArgumentCaptor<GermplasmListGeneratorDTO> metadataRequestCaptor = ArgumentCaptor.forClass(GermplasmListGeneratorDTO.class);
 		Mockito.verify(this.germplasmListValidator)
 			.validateListMetadata(metadataRequestCaptor.capture(), ArgumentMatchers.eq(PROGRAM_UUID));
-		final GermplasmListDto metadata = metadataRequestCaptor.getValue();
+		final GermplasmListGeneratorDTO metadata = metadataRequestCaptor.getValue();
 		Assert.assertEquals(request.getCreationDate(), metadata.getCreationDate());
 		Assert.assertEquals(request.getListName(), metadata.getListName());
 		Assert.assertEquals(request.getDescription(), metadata.getDescription());
@@ -1421,12 +1421,12 @@ public class GermplasmListServiceImplTest {
 			.getAllTopLevelLists(GermplasmListServiceImplTest.PROGRAM_UUID);
 		// Folder IDs 4 and 5 under parent 2
 		Mockito.doReturn(Arrays.asList(this.getGermplasmList(4), this.getGermplasmList(5))).when(this.germplasmListManager)
-			.getGermplasmListByParentFolderId(2, GermplasmListServiceImplTest.PROGRAM_UUID);
+			.getGermplasmListByParentFolderId(2);
 		// Folder IDs 6 and 7 under parent 4
 		Mockito.doReturn(Arrays.asList(this.getGermplasmList(6), this.getGermplasmList(7))).when(this.germplasmListManager)
-			.getGermplasmListByParentFolderId(4, GermplasmListServiceImplTest.PROGRAM_UUID);
+			.getGermplasmListByParentFolderId(4);
 		Mockito.doReturn(Collections.singletonList(this.getGermplasmList(8))).when(this.germplasmListManager)
-			.getGermplasmListByParentFolderId(5, GermplasmListServiceImplTest.PROGRAM_UUID);
+			.getGermplasmListByParentFolderId(5);
 		Mockito.doReturn(Optional.of(this.getGermplasmList(new Random().nextInt()))).when(this.germplasmListServiceMiddleware)
 			.getGermplasmListById(any());
 
@@ -1879,11 +1879,12 @@ public class GermplasmListServiceImplTest {
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
 
 		final GermplasmListDto request = this.createGermplasmListRequest();
+		final String parentFolderId = request.getParentFolderId();
 		this.germplasmListService.clone(GERMPLASM_LIST_ID, request);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListMetadata(request, PROGRAM_UUID);
-		Mockito.verify(this.germplasmListValidator).validateParentFolder(request.getParentFolderId());
+		Mockito.verify(this.germplasmListValidator).validateParentFolder(parentFolderId);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
 
 		Mockito.verify(this.germplasmListServiceMiddleware).cloneGermplasmList(anyInt(), any(GermplasmListDto.class), anyInt());
