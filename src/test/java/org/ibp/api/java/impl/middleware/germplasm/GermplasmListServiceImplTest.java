@@ -330,11 +330,11 @@ public class GermplasmListServiceImplTest {
 		Mockito.verify(this.germplasmListValidator)
 			.validateListMetadata(metadataRequestCaptor.capture(), ArgumentMatchers.eq(PROGRAM_UUID));
 		final GermplasmListDto metadata = metadataRequestCaptor.getValue();
-		Assert.assertEquals(request.getDate(), metadata.getCreationDate());
-		Assert.assertEquals(request.getName(), metadata.getListName());
+		Assert.assertEquals(request.getCreationDate(), metadata.getCreationDate());
+		Assert.assertEquals(request.getListName(), metadata.getListName());
 		Assert.assertEquals(request.getDescription(), metadata.getDescription());
 		Assert.assertEquals(request.getNotes(), metadata.getNotes());
-		Assert.assertEquals(request.getType(), metadata.getListType());
+		Assert.assertEquals(request.getListType(), metadata.getListType());
 		Mockito.verify(this.germplasmListServiceMiddleware)
 			.create(request, this.loggedInUser.getUserid());
 	}
@@ -1627,7 +1627,7 @@ public class GermplasmListServiceImplTest {
 	public void testImportUpdates_OK() {
 
 		final GermplasmListGeneratorDTO germplasmListGeneratorDTO = Mockito.mock(GermplasmListGeneratorDTO.class);
-		Mockito.when(germplasmListGeneratorDTO.getId()).thenReturn(GERMPLASM_LIST_ID);
+		Mockito.when(germplasmListGeneratorDTO.getListId()).thenReturn(GERMPLASM_LIST_ID);
 
 		this.createMockListEntries(germplasmListGeneratorDTO, 2L);
 
@@ -1650,7 +1650,7 @@ public class GermplasmListServiceImplTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void testImportUpdates_listIsLocked() {
 		final GermplasmListGeneratorDTO germplasmListGeneratorDTO = Mockito.mock(GermplasmListGeneratorDTO.class);
-		Mockito.when(germplasmListGeneratorDTO.getId()).thenReturn(GERMPLASM_LIST_ID);
+		Mockito.when(germplasmListGeneratorDTO.getListId()).thenReturn(GERMPLASM_LIST_ID);
 		Mockito.when(germplasmListGeneratorDTO.getEntries()).thenReturn(Arrays.asList());
 
 		final GermplasmList germplasmList = this.createGermplasmListMock(true);
@@ -1669,7 +1669,7 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void testImportUpdates_invalidEntryNo() throws ApiRequestValidationException {
 		final GermplasmListGeneratorDTO germplasmListGeneratorDTO = Mockito.mock(GermplasmListGeneratorDTO.class);
-		Mockito.when(germplasmListGeneratorDTO.getId()).thenReturn(GERMPLASM_LIST_ID);
+		Mockito.when(germplasmListGeneratorDTO.getListId()).thenReturn(GERMPLASM_LIST_ID);
 
 		this.createMockListEntries(germplasmListGeneratorDTO, 1L);
 
@@ -1696,7 +1696,7 @@ public class GermplasmListServiceImplTest {
 		entry2.setEntryNo(2);
 		Mockito.when(germplasmListGeneratorDTO.getEntries()).thenReturn(Arrays.asList(entry1, entry2));
 
-		Mockito.when(this.germplasmListDataService.countSearchGermplasmListData(germplasmListGeneratorDTO.getId(),
+		Mockito.when(this.germplasmListDataService.countSearchGermplasmListData(germplasmListGeneratorDTO.getListId(),
 			new GermplasmListDataSearchRequest())).thenReturn(expectedEntriesCount);
 	}
 
@@ -1909,10 +1909,10 @@ public class GermplasmListServiceImplTest {
 
 	private GermplasmListGeneratorDTO createGermplasmList() {
 		final GermplasmListGeneratorDTO list = new GermplasmListGeneratorDTO();
-		list.setName(RandomStringUtils.random(50));
+		list.setListName(RandomStringUtils.random(50));
 		list.setDescription(RandomStringUtils.random(255));
-		list.setDate(new Date());
-		list.setType(GERMPLASM_LIST_TYPE);
+		list.setCreationDate(new Date());
+		list.setListType(GERMPLASM_LIST_TYPE);
 		list.setParentFolderId(GermplasmListServiceImpl.PROGRAM_LISTS);
 		final List<GermplasmListGeneratorDTO.GermplasmEntryDTO> entries = new ArrayList<>();
 		final GermplasmListGeneratorDTO.GermplasmEntryDTO entry1 = new GermplasmListGeneratorDTO.GermplasmEntryDTO();

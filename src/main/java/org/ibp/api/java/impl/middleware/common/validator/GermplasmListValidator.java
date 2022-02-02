@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListBasicInfoDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -67,7 +67,7 @@ public class GermplasmListValidator {
 		}
 	}
 
-	public void validateListMetadata(final GermplasmListDto germplasmListDto, final String currentProgram) {
+	public void validateListMetadata(final GermplasmListBasicInfoDTO germplasmListDto, final String currentProgram) {
 		checkNotNull(germplasmListDto, PARAM_NULL, new String[] {"request"});
 		checkNotNull(germplasmListDto.getCreationDate(), PARAM_NULL, new String[] {"date"});
 

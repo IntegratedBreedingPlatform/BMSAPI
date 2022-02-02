@@ -13,6 +13,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListBasicInfoDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
@@ -364,27 +365,16 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final String currentProgram = ContextHolder.getCurrentProgram();
 
-		final GermplasmListDto germplasmListDto = new GermplasmListDto(request);
-
 		this.germplasmListValidator.validateParentFolder(request.getParentFolderId());
 		final Optional<GermplasmList> parentFolder = this.validateNodeIdAcceptingCropFolders(request.getParentFolderId(), currentProgram, ListNodeType.PARENT);
 
-		// programUUID, status and parentFolderId that are finally saved depends on
-		// 1)folder where it will be saved, 2) if this folder is real or artificial one (CROP or PROGRAM).
-		final String listProgramUUID = this.calculateFolderDependentProgram(request.getParentFolderId(), currentProgram, parentFolder);
-		final Integer listStatus = this.calculateFolderDependantStatus(listProgramUUID);
-		final String listParentFolderId = this.calculateFolderDependantParentId(request.getParentFolderId());
+		this.assignFolderDependentProperties(request, currentProgram, parentFolder);
 
 		//TODO Fixed to use final programUUID, but it should look for the name inside the directory instead
-		this.germplasmListValidator.validateListMetadata(germplasmListDto, listProgramUUID);
+		this.germplasmListValidator.validateListMetadata(request, request.getProgramUUID());
 
 		// process and assign defaults + more validations
 		this.processEntries(request, currentProgram);
-
-		// setting final values that will be saved.
-		request.setProgramUUID(listProgramUUID);
-		request.setStatus(listStatus);
-		request.setParentFolderId(listParentFolderId);
 
 		final Integer loggedInUser = this.securityService.getCurrentlyLoggedInUser().getUserid();
 
@@ -392,30 +382,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.germplasmListService.create(request, loggedInUser);
 	}
 
-	private String calculateFolderDependentProgram(String parentFolderId, final String currentProgram,
-		final Optional<GermplasmList> parentFolderOptional) {
-		if (CROP_LISTS.equals(parentFolderId) || (parentFolderOptional.isPresent() && StringUtils.isEmpty(parentFolderOptional.get()
-			.getProgramUUID()))) {
-			return null;
-		} else {
-			return currentProgram;
-		}
-	}
-
-	private Integer calculateFolderDependantStatus(final String programUUID) {
-		return (StringUtils.isEmpty(programUUID)) ? GermplasmList.Status.LOCKED_LIST.getCode() :
-			GermplasmList.Status.LIST.getCode();
-	}
-
-	private String calculateFolderDependantParentId(final String parentFolderId) {
-		if (CROP_LISTS.equals(parentFolderId) || PROGRAM_LISTS.equals(parentFolderId)) {
-			return null;
-		} else {
-			return parentFolderId;
-		}
-	}
-
-	private void assignFolderDependentProperties(final GermplasmListDto request, final String currentProgram, final Optional<GermplasmList> parentFolderOptional) {
+	private void assignFolderDependentProperties(final GermplasmListBasicInfoDTO request, final String currentProgram, final Optional<GermplasmList> parentFolderOptional) {
 
 		final String parentFolderId = request.getParentFolderId();
 
@@ -436,7 +403,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public void importUpdates(final GermplasmListGeneratorDTO request) {
-		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(request.getId());
+		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(request.getListId());
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
 		this.processEntriesForUpdate(request);
@@ -553,12 +520,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private void processEntriesForUpdate(final GermplasmListGeneratorDTO request) {
 
-		BaseValidator.checkNotNull(request.getId(), "error.germplasmlist.importupdates.listid.mandatory");
+		BaseValidator.checkNotNull(request.getListId(), "error.germplasmlist.importupdates.listid.mandatory");
 
 		final Map<Integer, Variable> entryDetailVariablesById = this.extractVariableIds(request);
 
 		final int numberOfEntries =
-			(int) this.germplasmListDataService.countSearchGermplasmListData(request.getId(), new GermplasmListDataSearchRequest());
+			(int) this.germplasmListDataService.countSearchGermplasmListData(request.getListId(), new GermplasmListDataSearchRequest());
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			if (entry.getEntryNo() == null) {
 				throw new ApiValidationException("", "error.germplasmlist.importupdates.entryno.mandatory");
