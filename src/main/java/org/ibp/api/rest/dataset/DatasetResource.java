@@ -30,6 +30,8 @@ import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -49,6 +51,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -79,6 +82,9 @@ public class DatasetResource {
 
 	@Autowired
 	private SearchRequestService searchRequestService;
+
+	@Autowired
+	protected ResourceBundleMessageSource messageSource;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -251,8 +257,10 @@ public class DatasetResource {
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
 		@RequestBody final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
-		Preconditions.checkNotNull(observationUnitsSearchDTO, "params cannot be null");
-		Preconditions.checkArgument(Collections.isEmpty(observationUnitsSearchDTO.getFilterColumns()), "filterColumns should be null or empty");
+
+		final Locale locale = LocaleContextHolder.getLocale();
+		Preconditions.checkNotNull(observationUnitsSearchDTO, this.getMessageSource().getMessage("parameters.cannot.be.null", null, locale));
+		Preconditions.checkArgument(Collections.isEmpty(observationUnitsSearchDTO.getFilterColumns()), this.getMessageSource().getMessage("filter.columns.should.be.null.or.empty", null, locale));
 
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(observationUnitsSearchDTO, ObservationUnitsSearchDTO.class).toString();
@@ -512,4 +520,9 @@ public class DatasetResource {
 
 		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
+
+	public ResourceBundleMessageSource getMessageSource() {
+		return this.messageSource;
+	}
 }
+
