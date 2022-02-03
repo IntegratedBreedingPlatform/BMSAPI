@@ -89,7 +89,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	public static final String PROGRAM_LISTS = "LISTS";
 	public static final String CROP_LISTS = "CROPLISTS";
-	public static final int BATCH_SIZE = 500;
 
 	private static final String LEAD_CLASS = "lead";
 
@@ -698,7 +697,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				return new ApiRequestValidationException(this.errors.getAllErrors());
 			});
 
-		//TODO add validation to compare program that is sent via URL with the one on the list that will be moved.
+		if (germplasmListToMove.getProgramUUID() != null && programUUID!=null && !germplasmListToMove.getProgramUUID().equals(programUUID)) {
+			this.errors.reject("list.folder.id.not.exist", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 
 		if (this.folderHasChildren(Integer.parseInt(folderId))) {
 			this.errors.reject("list.move.folder.has.child", "");
@@ -731,8 +733,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		this.validateFolderNotCropNorProgramList(folderId);
 		this.validateProgram(cropName, programUUID);
-		final Optional<GermplasmList> germplasmList = this.validateFolderId(folderId, programUUID, ListNodeType.FOLDER);
-		final GermplasmList folder = germplasmList.get();
+		final GermplasmList folder = this.validateFolderId(folderId, programUUID, ListNodeType.FOLDER).get();
 
 		if (this.folderHasChildren(Integer.parseInt(folderId))) {
 			this.errors.reject("list.delete.folder.has.child", "");
@@ -955,14 +956,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private Integer getFolderIdAsInteger(final String folderId) {
 		return (CROP_LISTS.equals(folderId) || PROGRAM_LISTS.equals(folderId)) ? null : Integer.valueOf(folderId);
-	}
-
-	private GermplasmList getGermplasmListByIdAndProgramUUID(final String nodeId, final String programUUID, final ListNodeType nodeType) {
-		return this.germplasmListService.getGermplasmListByIdAndProgramUUID(Integer.parseInt(nodeId), programUUID)
-			.orElseThrow(() -> {
-				this.errors.reject("list." + nodeType.getValue() + ".id.not.exist", "");
-				return new ApiRequestValidationException(this.errors.getAllErrors());
-			});
 	}
 
 	public void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
