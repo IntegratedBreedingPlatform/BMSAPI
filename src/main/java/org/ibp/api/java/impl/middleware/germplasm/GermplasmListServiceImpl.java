@@ -259,10 +259,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<String> cropExpandedFolders = this.userProgramStateDataManager
 			.getUserProgramTreeState(Integer.parseInt(userId), null, ListTreeState.GERMPLASM_LIST.name());
 		this.setTreeExpandedFolders(programUUID, treeNodesList.get(0), cropExpandedFolders, false);
+
 		// Retrieve the list of "Program List" expanded nodes
-		final List<String> programExpandedFolders = this.userProgramStateDataManager
-			.getUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name());
-		this.setTreeExpandedFolders(programUUID, treeNodesList.get(1), programExpandedFolders, true);
+		if (StringUtils.isNotEmpty(programUUID)) {
+			final List<String> programExpandedFolders = this.userProgramStateDataManager
+				.getUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name());
+			this.setTreeExpandedFolders(programUUID, treeNodesList.get(1), programExpandedFolders, true);
+		}
 
 		return treeNodesList;
 	}
