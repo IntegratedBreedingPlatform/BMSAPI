@@ -688,7 +688,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		this.validateProgram(cropName, programUUID);
 
-		final Optional<GermplasmList> parentFolderOptional = this.validateFolderId(newParentFolderId, programUUID, ListNodeType.PARENT);
+		final Optional<GermplasmList> newParentFolder = this.validateFolderId(newParentFolderId, programUUID, ListNodeType.PARENT);
 		this.validateNodeId(folderId, ListNodeType.FOLDER);
 		this.validateFolderNotCropNorProgramList(folderId);
 
@@ -698,25 +698,25 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				return new ApiRequestValidationException(this.errors.getAllErrors());
 			});
 
-		this.getGermplasmListByIdAndProgramUUID(folderId, germplasmListToMove.getProgramUUID(), ListNodeType.FOLDER);
+		//TODO add validation to compare program that is sent via URL with the one on the list that will be moved.
 
-		if (this.isSourceItemHasChildren(Integer.parseInt(folderId), programUUID)) {
+		if (this.folderHasChildren(Integer.parseInt(folderId))) {
 			this.errors.reject("list.move.folder.has.child", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		final Integer parent = this.getFolderIdAsInteger(newParentFolderId);
 
+		final String dependantProgramUUID = this.calculateProgramUUID(programUUID, newParentFolder, newParentFolderId);
 
 		//Validate if there is a folder with same name in parent folder
-		this.germplasmListService.getGermplasmListByParentAndName(germplasmListToMove.getName(), parent, programUUID)
+		this.germplasmListService.getGermplasmListByParentAndName(germplasmListToMove.getName(), parent, dependantProgramUUID)
 			.ifPresent(germplasmList -> {
 				this.errors.reject("list.folder.name.exists", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			});
 
-		return this.germplasmListService.moveGermplasmListFolder(Integer.parseInt(folderId), parent,
-			(newParentFolderId.equals(CROP_LISTS)) ? null : programUUID);
+		return this.germplasmListService.moveGermplasmListFolder(Integer.parseInt(folderId), parent, dependantProgramUUID);
 	}
 
 	@Override
@@ -734,7 +734,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Optional<GermplasmList> germplasmList = this.validateFolderId(folderId, programUUID, ListNodeType.FOLDER);
 		final GermplasmList folder = germplasmList.get();
 
-		if (this.isSourceItemHasChildren(Integer.parseInt(folderId), programUUID)) {
+		if (this.folderHasChildren(Integer.parseInt(folderId))) {
 			this.errors.reject("list.delete.folder.has.child", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -940,9 +940,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 	}
 
-	private boolean isSourceItemHasChildren(final Integer nodeId, final String programUUID) {
+	private boolean folderHasChildren(final Integer nodeId) {
 		final List<GermplasmList> listChildren = this.germplasmListManager
-			.getGermplasmListByParentFolderId(nodeId, programUUID);
+			.getGermplasmListByParentFolderId(nodeId);
 		return !listChildren.isEmpty();
 	}
 
