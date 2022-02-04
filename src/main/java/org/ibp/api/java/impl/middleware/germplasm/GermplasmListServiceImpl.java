@@ -799,15 +799,22 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public void editListMetadata(final GermplasmListDto germplasmListDto, final String programUUID) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+
 		BaseValidator.checkNotNull(germplasmListDto.getListId(), "list.id.required");
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(germplasmListDto.getListId());
+
+		if (!StringUtils.isEmpty(germplasmList.getProgramUUID()) && !StringUtils.isEmpty(programUUID) && !programUUID.equals(
+			germplasmList.getProgramUUID())) {
+			this.errors.reject("list.does.not.match.program", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
 		this.germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
 
-		this.germplasmListValidator.validateListMetadata(germplasmListDto, programUUID);
+		this.germplasmListValidator.validateListMetadata(germplasmListDto, germplasmList.getProgramUUID());
 
-		// Throw exception for fields not supported for updating
-		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateListNonEditableFields(germplasmListDto, germplasmList);
 		this.germplasmListService.editListMetadata(germplasmListDto);
 	}
@@ -862,6 +869,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateProgram(cropName, programUUID);
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
+
+		if (!StringUtils.isEmpty(germplasmList.getProgramUUID()) && !StringUtils.isEmpty(programUUID) && !programUUID.equals(
+			germplasmList.getProgramUUID())) {
+			this.errors.reject("list.does.not.match.program", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
 		final Collection<? extends GrantedAuthority> authorities = SecurityUtil.getLoggedInUserAuthorities();
