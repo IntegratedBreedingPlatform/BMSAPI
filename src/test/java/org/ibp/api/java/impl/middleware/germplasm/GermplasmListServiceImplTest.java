@@ -1782,6 +1782,7 @@ public class GermplasmListServiceImplTest {
 	@Test
 	public void testEditListMetadata_OK() {
 		final GermplasmList germplasmList = new GermplasmList(GERMPLASM_LIST_ID);
+		germplasmList.setProgramUUID(PROGRAM_UUID);
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(GERMPLASM_LIST_ID)).thenReturn(germplasmList);
 		final GermplasmListDto request = new GermplasmListDto();
 		request.setListId(GERMPLASM_LIST_ID);
