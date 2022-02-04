@@ -50,8 +50,9 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 	private static final Set<Integer> LOCATION_TYPE = new HashSet<>(Arrays.asList(410, 405));
 
-	private static final String FILE_NAME = "GermplasmImportTemplate.xls";
-	private static final String FILE_NAME_FOR_IMPORT_UPDATE = "GermplasmUpdateTemplate.xls";
+	private static final String FILE_NAME = "GermplasmImportTemplate_";
+	private static final String FILE_NAME_FOR_IMPORT_UPDATE = "GermplasmUpdateTemplate_";
+	private static final String FILE_NAME_EXTENSION = ".xls";
 	private static final int CODES_SHEET_FIRST_COLUMN_INDEX = 0;
 	private static final int CODES_SHEET_SECOND_COLUMN_INDEX = 1;
 	private static final int COLUMN_WIDTH_PADDING = 6;
@@ -134,7 +135,8 @@ public class GermplasmExcelTemplateExportServiceImpl implements GermplasmTemplat
 			final String fileNameFullPath =
 				temporaryFolder.getAbsolutePath() + File.separator + (isGermplasmUpdateFormat ?
 					GermplasmExcelTemplateExportServiceImpl.FILE_NAME_FOR_IMPORT_UPDATE :
-					GermplasmExcelTemplateExportServiceImpl.FILE_NAME);
+					GermplasmExcelTemplateExportServiceImpl.FILE_NAME) + cropName.toLowerCase()
+					+ GermplasmExcelTemplateExportServiceImpl.FILE_NAME_EXTENSION;
 			return this.generateTemplateFile(fileNameFullPath, cropName, programUUID, isGermplasmUpdateFormat);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());

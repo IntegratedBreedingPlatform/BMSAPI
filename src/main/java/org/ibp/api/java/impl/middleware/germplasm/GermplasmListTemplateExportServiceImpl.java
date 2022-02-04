@@ -34,8 +34,9 @@ import java.util.Map;
 @Service
 public class GermplasmListTemplateExportServiceImpl implements GermplasmListTemplateExportService {
 
-	private static final String FILE_NAME_IMPORT = "GermplasmListImportTemplate.xls";
-	private static final String FILE_NAME_IMPORT_UPDATE = "GermplasmListImportUpdateTemplate.xls";
+	private static final String FILE_NAME_IMPORT = "GermplasmListImportTemplate_";
+	private static final String FILE_NAME_IMPORT_UPDATE = "GermplasmListImportUpdateTemplate_";
+	private static final String FILE_NAME_EXTENSION = ".xls";
 	private static final int COLUMN_WIDTH_PADDING = 6;
 	private static final int CHARACTER_WIDTH = 250;
 	private static final Map<String, ExcelCellStyleBuilder.ExcelCellStyle> IMPORT_LIST_HEADERS;
@@ -75,8 +76,8 @@ public class GermplasmListTemplateExportServiceImpl implements GermplasmListTemp
 			final File temporaryFolder = Files.createTempDir();
 			final String filename = isGermplasmListUpdateFormat ? GermplasmListTemplateExportServiceImpl.FILE_NAME_IMPORT_UPDATE :
 				GermplasmListTemplateExportServiceImpl.FILE_NAME_IMPORT;
-			final String fileNameFullPath =
-				temporaryFolder.getAbsolutePath() + File.separator + filename;
+			final String fileNameFullPath =	temporaryFolder.getAbsolutePath() + File.separator + filename + cropName.toLowerCase()
+				+ GermplasmListTemplateExportServiceImpl.FILE_NAME_EXTENSION;
 			return this.generateTemplateFile(fileNameFullPath, cropName, programUUID, isGermplasmListUpdateFormat);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
