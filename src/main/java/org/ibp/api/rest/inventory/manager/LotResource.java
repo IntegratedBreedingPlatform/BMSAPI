@@ -293,7 +293,7 @@ public class LotResource {
 				.searchLocations(cropName, new LocationSearchRequest(null, LotResource.STORAGE_LOCATION_TYPE, null, null, null),
 					null, null);
 
-		final File file = this.lotTemplateExportServiceImpl.export(locations, units);
+		final File file = this.lotTemplateExportServiceImpl.export(cropName, locations, units);
 		final HttpHeaders headers = new HttpHeaders();
 		headers
 			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));

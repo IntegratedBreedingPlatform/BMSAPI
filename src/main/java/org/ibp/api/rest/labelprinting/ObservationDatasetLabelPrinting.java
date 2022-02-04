@@ -33,6 +33,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
+import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -139,6 +140,11 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	public void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
 		super.validateLabelsGeneratorInputData(labelsGeneratorInput, programUUID);
+	}
+
+	@Override
+	public LabelPrintingPresetDTO getDefaultSetting(final LabelsInfoInput labelsInfoInput, final String programUUID) {
+		return null;
 	}
 
 	@Override
