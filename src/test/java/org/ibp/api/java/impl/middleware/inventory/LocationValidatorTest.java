@@ -23,7 +23,6 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -177,13 +176,13 @@ public class LocationValidatorTest {
 	@Test
 	public void testValidateSeedLocationAbbr_Success() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
-		final Location location = new Location();
-		location.setLabbr("DSS");
-		final List<Location> locationList = Collections.singletonList(location);
+		final LocationDTO location = new LocationDTO();
+		location.setAbbreviation("DSS");
+		final List<LocationDTO> locationList = Collections.singletonList(location);
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");
 
 		Mockito.when(this.locationService
-				.getFilteredLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, null), null))
+				.searchLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, null), null, null))
 			.thenReturn(locationList);
 		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
 
@@ -193,11 +192,11 @@ public class LocationValidatorTest {
 	@Test
 	public void testValidateSeedLocationAbbr_ThrowsException_WhenLocationAbbrListHaveInvalidAbbreviations() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
-		final List<Location> locationList = Collections.emptyList();
+		final List<LocationDTO> locationList = Collections.emptyList();
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");
 
 		Mockito.when(this.locationService
-				.getFilteredLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, null), null))
+				.searchLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbrList, null), null, null))
 			.thenReturn(locationList);
 		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
 

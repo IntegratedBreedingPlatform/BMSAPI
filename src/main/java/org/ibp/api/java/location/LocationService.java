@@ -4,7 +4,6 @@ import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.ibp.api.domain.location.LocationDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -15,9 +14,10 @@ public interface LocationService {
 
 	List<LocationTypeDTO> getLocationTypes();
 
-	long countLocations(String crop, LocationSearchRequest locationSearchRequest);
+	long countLocations(String crop, LocationSearchRequest locationSearchRequest, String programUUID);
 
-	List<LocationDto> getLocations(String crop, LocationSearchRequest locationSearchRequest, Pageable pageable);
+	List<LocationDTO> searchLocations(String crop, LocationSearchRequest locationSearchRequest, Pageable pageable,
+			String programUUID);
 
 	void deleteLocation(Integer locationId);
 

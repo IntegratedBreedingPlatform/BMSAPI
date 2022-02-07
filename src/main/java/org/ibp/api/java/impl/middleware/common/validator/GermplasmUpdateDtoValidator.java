@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -15,7 +16,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Location;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -236,9 +236,9 @@ public class GermplasmUpdateDtoValidator {
 
 		final List<String> abbreviations =
 			this.locationService
-				.getFilteredLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null), null)
+				.searchLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null), null, null)
 				.stream()
-				.map(Location::getLabbr).collect(
+				.map(LocationDTO::getAbbreviation).collect(
 				Collectors.toList());
 
 		locationAbbrs.removeAll(abbreviations);

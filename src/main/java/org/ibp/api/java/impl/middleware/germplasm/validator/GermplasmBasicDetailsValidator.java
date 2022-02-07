@@ -30,11 +30,11 @@ public class GermplasmBasicDetailsValidator {
 		BaseValidator.checkNotNull(germplasmBasicDetailsDto, "germplasm.import.request.null");
 		if (germplasmBasicDetailsDto.getBreedingLocationId() != null) {
 			if (this.locationService
-				.getFilteredLocations(
+				.searchLocations(
 					new LocationSearchRequest(null, null,
 						Collections.singletonList(germplasmBasicDetailsDto.getBreedingLocationId()), null,
 						null),
-					null).isEmpty()) {
+					null, null).isEmpty()) {
 				this.errors.reject("germplasm.update.breeding.location.invalid", "");
 			}
 		}

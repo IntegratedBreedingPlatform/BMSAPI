@@ -75,7 +75,7 @@ public class LocationResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return LocationResourceBrapi.this.locationMiddlewareService.countFilteredLocations(locationSearchRequest);
+					return LocationResourceBrapi.this.locationMiddlewareService.countFilteredLocations(locationSearchRequest, null);
 				}
 
 				@Override

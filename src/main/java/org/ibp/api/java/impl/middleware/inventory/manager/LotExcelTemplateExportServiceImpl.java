@@ -13,7 +13,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.ibp.api.domain.location.LocationDto;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
@@ -51,7 +51,7 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 	ResourceBundleMessageSource messageSource;
 
 	@Override
-	public File export(final String cropName, final List<LocationDto> locations, final List<VariableDetails> units) {
+	public File export(final String cropName, final List<LocationDTO> locations, final List<VariableDetails> units) {
 		try {
 			final File temporaryFolder = Files.createTempDir();
 
@@ -65,7 +65,7 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 		}
 	}
 
-	public File generateTemplateFile(final String fileNamePath, final List<LocationDto> locations, final List<VariableDetails> units)
+	public File generateTemplateFile(final String fileNamePath, final List<LocationDTO> locations, final List<VariableDetails> units)
 		throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
@@ -89,7 +89,7 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 		this.writeLotsHeader(xlsBook, xlsSheet, currentRowNum++);
 	}
 
-	private void writeCodesSheet(final HSSFWorkbook xlsBook, final List<LocationDto> locations, final List<VariableDetails> units) {
+	private void writeCodesSheet(final HSSFWorkbook xlsBook, final List<LocationDTO> locations, final List<VariableDetails> units) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet xlsSheet =
 			xlsBook.createSheet(this.messageSource.getMessage("export.inventory.manager.lot.template.sheet.codes", null, locale));
@@ -108,7 +108,7 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 	}
 
 	private int writeLocationSection(
-		final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final List<LocationDto> locations) {
+		final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final List<LocationDTO> locations) {
 		final CellStyle backgroundStyle = xlsBook.createCellStyle();
 		final HSSFFont blackFont = xlsBook.createFont();
 		blackFont.setFontName("calibri");
@@ -118,7 +118,7 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 
 		int rowNumIndex = currentRowNum;
 		int count = locations.size();
-		for (final LocationDto locationDto : locations) {
+		for (final LocationDTO locationDto : locations) {
 			final HSSFRow row = xlsSheet.createRow(rowNumIndex++);
 			row.setHeightInPoints(16);
 			this.writeCell(LotExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, locationDto.getAbbreviation(), count, xlsBook,

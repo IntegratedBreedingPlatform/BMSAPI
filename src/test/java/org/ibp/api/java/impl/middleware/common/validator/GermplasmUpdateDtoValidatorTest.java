@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -12,7 +13,6 @@ import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Location;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Test;
@@ -61,13 +61,14 @@ public class GermplasmUpdateDtoValidatorTest {
 		final Germplasm germplasm = new Germplasm(1);
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 
-		final Location location = new Location(1);
-		location.setLabbr("AFG");
+		final LocationDTO location = new LocationDTO();
+		location.setId(1);
+		location.setAbbreviation("AFG");
 
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setGid(germplasm.getGid());
 		germplasmUpdateDTO.setGermplasmUUID(germplasm.getGermplasmUUID());
-		germplasmUpdateDTO.setLocationAbbreviation(location.getLabbr());
+		germplasmUpdateDTO.setLocationAbbreviation(location.getAbbreviation());
 		germplasmUpdateDTO.setCreationDate("20200101");
 		germplasmUpdateDTO.setBreedingMethodAbbr(null);
 		germplasmUpdateDTO.getNames().put("DRVNM", randomAlphanumeric(10));
@@ -97,8 +98,8 @@ public class GermplasmUpdateDtoValidatorTest {
 			.thenReturn(Arrays.asList(new Germplasm(3), new Germplasm(4)));
 
 		when(this.locationService
-			.getFilteredLocations(new LocationSearchRequest(null, null, null,
-				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null), null))
+			.searchLocations(new LocationSearchRequest(null, null, null,
+				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null), null, null))
 			.thenReturn(Arrays.asList(location));
 
 		try {
@@ -188,9 +189,9 @@ public class GermplasmUpdateDtoValidatorTest {
 		germplasmUpdateDTO.setLocationAbbreviation("AFG");
 
 		when(this.locationService
-			.getFilteredLocations(new LocationSearchRequest(null, null, null,
-				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null), null))
-			.thenReturn(Arrays.asList(new Location()));
+			.searchLocations(new LocationSearchRequest(null, null, null,
+				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null), null, null))
+			.thenReturn(Arrays.asList(new LocationDTO()));
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);
