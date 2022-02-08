@@ -4,10 +4,10 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.java.impl.middleware.study.validator.StudyImportRequestValidator;
@@ -52,8 +52,8 @@ public class StudyImportRequestValidatorTest {
 			.thenReturn(Collections.singletonList(studySummary));
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(LOCATION_DBID)));
-		Mockito.when(this.locationService.getFilteredLocations(locationSearchRequest, null))
-			.thenReturn(Collections.singletonList(new Location()));
+		Mockito.when(this.locationService.searchLocations(locationSearchRequest, null, null))
+			.thenReturn(Collections.singletonList(new LocationDTO()));
 	}
 
 	@Test

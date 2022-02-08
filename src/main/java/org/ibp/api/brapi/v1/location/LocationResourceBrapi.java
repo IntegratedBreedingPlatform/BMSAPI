@@ -70,7 +70,7 @@ public class LocationResourceBrapi {
 		resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<Location>() {
 			@Override
 			public long getCount() {
-				return LocationResourceBrapi.this.locationService.countFilteredLocations(locationSearchRequest);
+				return LocationResourceBrapi.this.locationService.countFilteredLocations(locationSearchRequest, null);
 			}
 
 			@Override

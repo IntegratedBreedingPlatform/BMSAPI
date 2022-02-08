@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.program.ProgramFavoriteRequestDto;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
@@ -15,16 +14,12 @@ import org.ibp.api.java.impl.middleware.program.validator.ProgramFavoriteValidat
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -103,7 +98,7 @@ public class ProgramFavoriteValidatorTest {
 	@Test
 	public void testValidateAddFavorites_ThrowsException_WhenVariableIdNotExists(){
 		this.programFavoriteRequestDtos.setEntityIds(new HashSet<>(Arrays.asList(RandomUtils.nextInt())));
-		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.VARIABLE);
+		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.VARIABLES);
 		Mockito.when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(Arrays.asList());
 
 		try {
@@ -117,7 +112,7 @@ public class ProgramFavoriteValidatorTest {
 	@Test
 	public void testValidateAddFavorites_ThrowsException_WhenMethodIdNotExists(){
 		this.programFavoriteRequestDtos.setEntityIds(new HashSet<>(Arrays.asList(RandomUtils.nextInt())));
-		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.METHOD);
+		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.METHODS);
 		Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(),Mockito.any())).thenReturn(Arrays.asList());
 
 		try {

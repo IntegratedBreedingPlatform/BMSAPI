@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -15,7 +16,6 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -657,7 +657,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			breedingMethodDTO.setCode(RandomStringUtils.randomAlphabetic(3).toUpperCase());
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
 				.thenReturn(Collections.singletonList(breedingMethodDTO));
-			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
+			Mockito.when(this.locationService.searchLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull(), Mockito.isNull()))
 				.thenReturn(Collections.emptyList());
 			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -680,8 +680,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			breedingMethodDTO.setCode(RandomStringUtils.randomAlphabetic(3).toUpperCase());
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
 				.thenReturn(Collections.singletonList(breedingMethodDTO));
-			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
-				.thenReturn(Collections.singletonList(new Location()));
+			Mockito.when(this.locationService.searchLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull(), Mockito.isNull()))
+				.thenReturn(Collections.singletonList(new LocationDTO()));
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet())).thenReturn(Collections.emptyList());
 			this.germplasmImportRequestDtoValidator.validateBeforeSaving(this.programUUID, germplasmImportRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -706,8 +706,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			breedingMethodDTO.setCode(RandomStringUtils.randomAlphabetic(3).toUpperCase());
 			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
 				.thenReturn(Collections.singletonList(breedingMethodDTO));
-			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
-				.thenReturn(Collections.singletonList(new Location()));
+			Mockito.when(this.locationService.searchLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull(), Mockito.isNull()))
+				.thenReturn(Collections.singletonList(new LocationDTO()));
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.anySet()))
 				.thenReturn(Collections.singletonList(new GermplasmNameTypeDTO()));
 			Mockito.when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(
@@ -1007,7 +1007,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 		try {
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO1 = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO1.setLocationAbbr("LOC");
-			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
+			Mockito.when(this.locationService.searchLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull(), Mockito.isNull()))
 				.thenReturn(Collections.emptyList());
 			this.germplasmImportRequestDtoValidator
 				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));
@@ -1022,7 +1022,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 		try {
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO1 = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO1.setStorageLocationAbbr("LOC");
-			Mockito.when(this.locationService.getFilteredLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull()))
+			Mockito.when(this.locationService.searchLocations(Mockito.any(LocationSearchRequest.class), Mockito.isNull(), Mockito.isNull()))
 				.thenReturn(Collections.emptyList());
 			this.germplasmImportRequestDtoValidator
 				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO1));

@@ -6,9 +6,9 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -257,10 +257,10 @@ public class GermplasmImportRequestValidator {
 
 		return
 			this.locationService
-				.getFilteredLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null),
-					null)
+				.searchLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null),
+					null, null)
 				.stream().map(
-				Location::getLabbr).collect(
+				LocationDTO::getAbbreviation).collect(
 				Collectors.toList());
 
 	}

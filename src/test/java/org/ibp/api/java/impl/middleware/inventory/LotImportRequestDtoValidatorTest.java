@@ -1,11 +1,11 @@
 package org.ibp.api.java.impl.middleware.inventory;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -178,13 +178,13 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-		final List<Location> existingLocations = new ArrayList<>();
-		final Location seedStorageLocation = new Location();
-		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
+		final List<LocationDTO> existingLocations = new ArrayList<>();
+		final LocationDTO seedStorageLocation = new LocationDTO();
+		seedStorageLocation.setAbbreviation(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
 			this.locationService
-				.getFilteredLocations(Mockito.any(), Mockito.any()))
+				.searchLocations(Mockito.any(), Mockito.any(), Mockito.isNull()))
 			.thenReturn(existingLocations);
 
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
@@ -204,12 +204,12 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-		final List<Location> existingLocations = new ArrayList<>();
-		final Location seedStorageLocation = new Location();
-		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
+		final List<LocationDTO> existingLocations = new ArrayList<>();
+		final LocationDTO seedStorageLocation = new LocationDTO();
+		seedStorageLocation.setAbbreviation(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
+			this.locationService.searchLocations(Mockito.any(), Mockito.any(), Mockito.isNull()))
 			.thenReturn(existingLocations);
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), LotGeneratorInputDto.class.getName());
@@ -234,12 +234,12 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-		final List<Location> existingLocations = new ArrayList<>();
-		final Location seedStorageLocation = new Location();
-		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
+		final List<LocationDTO> existingLocations = new ArrayList<>();
+		final LocationDTO seedStorageLocation = new LocationDTO();
+		seedStorageLocation.setAbbreviation(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
+			this.locationService.searchLocations(Mockito.any(), Mockito.any(), Mockito.isNull()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
@@ -263,12 +263,12 @@ public class LotImportRequestDtoValidatorTest {
 		final LotItemDto lotItemDto = createLotItemDto();
 		final LotItemDto lotItemDto1 = createLotItemDto();
 
-		final List<Location> existingLocations = new ArrayList<>();
-		final Location seedStorageLocation = new Location();
-		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
+		final List<LocationDTO> existingLocations = new ArrayList<>();
+		final LocationDTO seedStorageLocation = new LocationDTO();
+		seedStorageLocation.setAbbreviation(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
+			this.locationService.searchLocations(Mockito.any(), Mockito.any(), Mockito.isNull()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
@@ -292,12 +292,12 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-		final List<Location> existingLocations = new ArrayList<>();
-		final Location seedStorageLocation = new Location();
-		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
+		final List<LocationDTO> existingLocations = new ArrayList<>();
+		final LocationDTO seedStorageLocation = new LocationDTO();
+		seedStorageLocation.setAbbreviation(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
+			this.locationService.searchLocations(Mockito.any(), Mockito.any(), Mockito.isNull()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
@@ -321,12 +321,12 @@ public class LotImportRequestDtoValidatorTest {
 
 		Mockito.doNothing().when(inventoryCommonValidator)
 			.validateUnitNames(Mockito.any(List.class), Mockito.any(BindingResult.class));
-		final List<Location> existingLocations = new ArrayList<>();
-		final Location seedStorageLocation = new Location();
-		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
+		final List<LocationDTO> existingLocations = new ArrayList<>();
+		final LocationDTO seedStorageLocation = new LocationDTO();
+		seedStorageLocation.setAbbreviation(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
+			this.locationService.searchLocations(Mockito.any(), Mockito.any(), Mockito.isNull()))
 			.thenReturn(existingLocations);
 
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
@@ -350,12 +350,12 @@ public class LotImportRequestDtoValidatorTest {
 		Mockito.doNothing().when(inventoryCommonValidator)
 			.validateUnitNames(Mockito.any(List.class), Mockito.any(BindingResult.class));
 
-		final List<Location> existingLocations = new ArrayList<>();
-		final Location seedStorageLocation = new Location();
-		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
+		final List<LocationDTO> existingLocations = new ArrayList<>();
+		final LocationDTO seedStorageLocation = new LocationDTO();
+		seedStorageLocation.setAbbreviation(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
-			this.locationService.getFilteredLocations(Mockito.any(), Mockito.any()))
+			this.locationService.searchLocations(Mockito.any(), Mockito.any(), Mockito.isNull()))
 			.thenReturn(existingLocations);
 		final LotImportRequestDto lotImportRequestDto = new LotImportRequestDto();
 		lotImportRequestDto.setLotList(lotList);
@@ -375,13 +375,13 @@ public class LotImportRequestDtoValidatorTest {
 		final List<LotItemDto> lotList = new ArrayList<>();
 		final LotItemDto lotItemDto = createLotItemDto();
 
-		final List<Location> existingLocations = new ArrayList<>();
-		final Location seedStorageLocation = new Location();
-		seedStorageLocation.setLabbr(SEED_STORAGE_LOCATION);
+		final List<LocationDTO> existingLocations = new ArrayList<>();
+		final LocationDTO seedStorageLocation = new LocationDTO();
+		seedStorageLocation.setAbbreviation(SEED_STORAGE_LOCATION);
 		existingLocations.add(seedStorageLocation);
 		Mockito.when(
 			this.locationService
-				.getFilteredLocations(Mockito.any(), Mockito.any()))
+				.searchLocations(Mockito.any(), Mockito.any(), Mockito.isNull()))
 			.thenReturn(existingLocations);
 
 		Mockito.doNothing().when(inventoryCommonValidator)
