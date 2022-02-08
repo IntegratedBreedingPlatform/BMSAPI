@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Api(value = "BrAPI v2 Sample Services")
@@ -157,4 +159,21 @@ public class SampleResourceBrapi {
 				});
 	}
 
+	@ApiOperation(value = "Get a sample by sampleDbId", notes = "Get the details of a specific Sample")
+	@RequestMapping(value = "/{crop}/brapi/v2/samples/{sampleDbId}", method = RequestMethod.GET)
+	@JsonView(BrapiView.BrapiV2.class)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<SampleObservationDto>> getSampleBySampleId(@PathVariable final String crop,
+		final @PathVariable String sampleDbId) {
+		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
+		requestDTO.setSampleDbIds(Collections.singletonList(sampleDbId));
+		final List<SampleObservationDto> sampleObservationDtos = this.sampleServiceBrapi.getSampleObservations(requestDTO, null);
+
+		if (!CollectionUtils.isEmpty(sampleObservationDtos)) {
+			return new ResponseEntity<>(new SingleEntityResponse<>(sampleObservationDtos.get(0)), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(new SingleEntityResponse<SampleObservationDto>().withMessage("not found sample"),
+				HttpStatus.NOT_FOUND);
+		}
+	}
 }

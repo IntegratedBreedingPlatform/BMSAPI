@@ -192,6 +192,18 @@
     ]
   },
   {
+    "service": "samples/{sampleDbId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
     "service": "search/samples",
     "dataTypes": [
       "application/json"
