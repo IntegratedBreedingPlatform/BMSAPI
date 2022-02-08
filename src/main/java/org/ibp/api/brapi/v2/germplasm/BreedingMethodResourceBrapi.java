@@ -12,7 +12,6 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -22,8 +21,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,10 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 @Api(value = "BrAPI Germplasm Services")
 @Controller
@@ -60,12 +54,13 @@ public class BreedingMethodResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return BreedingMethodResourceBrapi.this.breedingMethodService.countBreedingMethods(searchRequest);
+					return BreedingMethodResourceBrapi.this.breedingMethodService.countSearchBreedingMethods(searchRequest, null);
 				}
 
 				@Override
 				public List<BreedingMethodDTO> getResults(final PagedResult<BreedingMethodDTO> pagedResult) {
-					return BreedingMethodResourceBrapi.this.breedingMethodService.getBreedingMethods(crop, searchRequest, new PageRequest(finalPageNumber, finalPageSize));
+					return BreedingMethodResourceBrapi.this.breedingMethodService.searchBreedingMethods(
+							searchRequest, new PageRequest(finalPageNumber, finalPageSize), null);
 				}
 			});
 
