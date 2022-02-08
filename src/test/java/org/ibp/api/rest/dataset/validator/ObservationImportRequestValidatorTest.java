@@ -2,11 +2,13 @@ package org.ibp.api.rest.dataset.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
+import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
+import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
@@ -52,6 +54,9 @@ public class ObservationImportRequestValidatorTest {
 
     @Mock
     private VariableServiceBrapi variableServiceBrapi;
+
+    @Mock
+    private ObservationServiceBrapi observationServiceBrapi;
 
     @InjectMocks
     private ObservationImportRequestValidator observationImportRequestValidator;
@@ -288,6 +293,16 @@ public class ObservationImportRequestValidatorTest {
         final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
         Assert.assertTrue(result.hasErrors());
         Assert.assertEquals("observation.import.reference.source.exceeded.length", result.getAllErrors().get(0).getCode());
+    }
+
+    @Test
+    public void testPruneObservationInvalidForImport_ObservationAlreadyExisting() {
+        Mockito.when(this.observationServiceBrapi.searchObservations(ArgumentMatchers.any(ObservationSearchRequestDto.class), ArgumentMatchers.eq(null)))
+            .thenReturn(this.createObservationDtoList());
+        final List<ObservationDto> observationDtos = this.createObservationDtoList();
+        final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
+        Assert.assertTrue(result.hasErrors());
+        Assert.assertEquals("observation.import.already.existing", result.getAllErrors().get(0).getCode());
     }
 
 

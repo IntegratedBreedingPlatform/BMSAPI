@@ -15,6 +15,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
+import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -211,4 +212,13 @@ public abstract class LabelPrintingStrategy {
 			}
 		}
 	}
+
+	/**
+	 * Given labelInfoInput, it will get a LabelPrintingPresetDTO depending on the LabelPrintingType
+	 *
+	 * @param labelsInfoInput
+	 * @param programUUID
+	 * @return LabelPrintingPresetDTO
+	 */
+	abstract LabelPrintingPresetDTO getDefaultSetting(final LabelsInfoInput labelsInfoInput, final String programUUID);
 }

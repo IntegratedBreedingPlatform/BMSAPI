@@ -3,6 +3,8 @@ package org.ibp.api.java.impl.middleware.breedingmethod.validator;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.pojos.MethodType;
+import org.hamcrest.CoreMatchers;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,11 +15,14 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class BreedingMethodSearchRequestValidatorTest {
 
@@ -54,37 +59,20 @@ public class BreedingMethodSearchRequestValidatorTest {
     assertThat(actualProgramDTO.getUniqueID(), is(PROGRAM_UUID));
   }
 
-//  @Test
-//  public void shouldFailGetBreedingMethodsFilteringFavoritesWithoutProgramUUID() {
-//    try {
-//      final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, true);
-//      this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest, null);
-//      fail("Should have failed.");
-//    } catch (final Exception e) {
-//      MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-//      MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
-//          hasItem("breeding.methods.favorite.requires.program"));
-//    }
-//
-//    Mockito.verifyZeroInteractions(this.programValidator);
-//    Mockito.verifyZeroInteractions(this.middlewareBreedingMethodService);
-//  }
-//
-//  @Test
-//  public void shouldFailGetBreedingMethodsInvalidMethodType() {
-//    try {
-//      final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(null, null, false);
-//      searchRequest.setMethodTypes(Collections.singletonList("ABC"));
-//      this.breedingMethodService.getBreedingMethods(CROP_NAME, searchRequest, null);
-//      fail("Should have failed.");
-//    } catch (final Exception e) {
-//      MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-//      MatcherAssert.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
-//          hasItem("invalid.breeding.method.type"));
-//    }
-//
-//    Mockito.verifyZeroInteractions(this.programValidator);
-//    Mockito.verifyZeroInteractions(this.middlewareBreedingMethodService);
-//  }
+  @Test
+  public void testValidate_failInvalidMethodType() {
+    try {
+      final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
+      searchRequest.setMethodTypes(Collections.singletonList("ABC"));
+      this.validator.validate(CROP_NAME, searchRequest);
+      fail("Should have failed.");
+    } catch (final Exception e) {
+      assertThat(e, instanceOf(ApiRequestValidationException.class));
+      assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+          CoreMatchers.hasItem("invalid.breeding.method.type"));
+    }
+
+    Mockito.verifyNoInteractions(this.programValidator);
+  }
 
 }
