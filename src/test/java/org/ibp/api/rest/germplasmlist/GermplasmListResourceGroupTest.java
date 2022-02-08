@@ -83,7 +83,8 @@ public class GermplasmListResourceGroupTest extends ApiUnitTestBase {
 		final String userId = RandomStringUtils.randomNumeric(2);
 		final UserTreeState treeState = new UserTreeState();
 		treeState.setUserId(userId);
-		treeState.setFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, "5", "7"));
+		treeState.setProgramFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, "5", "7"));
+		treeState.setCropFolders(Lists.newArrayList(GermplasmListServiceImpl.CROP_LISTS, "15", "17"));
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/crops/{crop}/germplasm-lists/tree-state",
 			crop).param("programUUID", GermplasmListResourceGroupTest.PROGRAM_UUID).content(this.convertObjectToByte(treeState))
 			.contentType(this.contentType))

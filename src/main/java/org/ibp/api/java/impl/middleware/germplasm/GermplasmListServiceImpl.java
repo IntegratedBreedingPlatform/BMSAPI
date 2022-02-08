@@ -255,16 +255,29 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 		// Initialize crop and program folder nodes
 		final List<TreeNode> treeNodesList = this.getChildrenNodes(programUUID, null, false);
-		// Retrieve the list of expanded nodes
-		final List<String> treeFolders = this.userProgramStateDataManager
-			.getUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name());
-		if (!isEmpty(treeFolders)) {
+		// Retrieve the list of "Crop List" expanded nodes
+		final List<String> cropExpandedFolders = this.userProgramStateDataManager
+			.getUserProgramTreeState(Integer.parseInt(userId), null, ListTreeState.GERMPLASM_LIST.name());
+		this.setTreeExpandedFolders(programUUID, treeNodesList.get(0), cropExpandedFolders, false);
+
+		// Retrieve the list of "Program List" expanded nodes
+		if (StringUtils.isNotEmpty(programUUID)) {
+			final List<String> programExpandedFolders = this.userProgramStateDataManager
+				.getUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name());
+			this.setTreeExpandedFolders(programUUID, treeNodesList.get(1), programExpandedFolders, true);
+		}
+
+		return treeNodesList;
+	}
+
+	private void setTreeExpandedFolders(final String programUUID, final TreeNode rootNode, final List<String> expandedFolders, final boolean alwaysExpandRootNode) {
+		// If alwaysExpandRootNode = false, only retrieve children if there are other expanded sub-folders
+		if (!isEmpty(expandedFolders) && (alwaysExpandRootNode || expandedFolders.size() > 1)) {
 			final Map<String, TreeNode> folderParentNodeMap = new HashMap<>();
-			final TreeNode programRootNode = treeNodesList.get(1);
-			programRootNode.setChildren(this.getChildrenNodes(programUUID, programRootNode.getKey(), false));
-			programRootNode.getChildren().forEach(c -> folderParentNodeMap.put(c.getKey(), programRootNode));
-			for (int i = 1; i < treeFolders.size(); i++) {
-				final String finalKey = StringUtils.stripStart(treeFolders.get(i), " ");
+			rootNode.setChildren(this.getChildrenNodes(programUUID, rootNode.getKey(), false));
+			rootNode.getChildren().forEach(c -> folderParentNodeMap.put(c.getKey(), rootNode));
+			for (int i = 1; i < expandedFolders.size(); i++) {
+				final String finalKey = StringUtils.stripStart(expandedFolders.get(i), " ");
 				final Optional<Map.Entry<String, TreeNode>> parentNodeOpt =
 					folderParentNodeMap.entrySet().stream().filter(entry -> entry.getKey().equals(finalKey)).findFirst();
 				// Find parent node then look for the node to expand among the parent's children then finally expand that node
@@ -281,8 +294,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			}
 
 		}
-
-		return treeNodesList;
 	}
 
 	@Override
@@ -291,19 +302,25 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		checkNotNull(userTreeState, "param.null", new String[] {"treeState"});
 		this.validateProgram(crop, programUUID);
 
-		final String userId = userTreeState.getUserId();
-		this.userValidator.validateUserId(this.errors, userId);
+		final String userIdString = userTreeState.getUserId();
+		this.userValidator.validateUserId(this.errors, userIdString);
 
-		final List<String> folders = userTreeState.getFolders();
-		this.validateFolders(folders, programUUID);
+		final List<String> programFolders = userTreeState.getProgramFolders();
+		this.validateFolders(programFolders, programUUID);
+		final List<String> cropFolders = userTreeState.getCropFolders();
+		this.validateFolders(cropFolders, programUUID);
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		// Persist the tree state for user
-		this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), programUUID,
+		// Persist the Program and Crop tree state for user
+		final int userId = Integer.parseInt(userIdString);
+		this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(userId, programUUID,
 			ListTreeState.GERMPLASM_LIST.name(),
-			folders);
+			programFolders);
+		this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(userId, null,
+			ListTreeState.GERMPLASM_LIST.name(),
+			cropFolders);
 	}
 
 	private void validateFolders(final List<String> folders, final String programUUID) {
