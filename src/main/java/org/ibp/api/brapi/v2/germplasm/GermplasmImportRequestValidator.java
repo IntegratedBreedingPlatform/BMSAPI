@@ -228,10 +228,10 @@ public class GermplasmImportRequestValidator {
 			germplasmImportRequestDtoList.stream().filter(g -> StringUtils.isNotEmpty(g.getBreedingMethodDbId()))
 				.map(g -> Integer.parseInt(g.getBreedingMethodDbId())).collect(Collectors.toList());
 		final BreedingMethodSearchRequest searchRequest =
-			new BreedingMethodSearchRequest(null, null, false);
+			new BreedingMethodSearchRequest();
 		searchRequest.setMethodIds(breedingMethodIds);
 		return
-			this.breedingMethodService.getBreedingMethods(searchRequest, null).stream().map(m -> m.getMid().toString())
+			this.breedingMethodService.searchBreedingMethods(searchRequest, null, null).stream().map(m -> m.getMid().toString())
 				.collect(Collectors.toList());
 
 	}
@@ -257,7 +257,7 @@ public class GermplasmImportRequestValidator {
 
 		return
 			this.locationService
-				.searchLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null),
+				.searchLocations(new LocationSearchRequest(null, null, new ArrayList<>(locationAbbrs), null),
 					null, null)
 				.stream().map(
 				LocationDTO::getAbbreviation).collect(

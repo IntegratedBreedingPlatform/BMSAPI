@@ -102,7 +102,7 @@ public class ProgramFavoriteValidator {
 		final BreedingMethodSearchRequest methodSearchRequest = new BreedingMethodSearchRequest();
 		methodSearchRequest.setMethodIds(methodsIs.stream().collect(Collectors.toList()));
 
-		final List<Integer> breedingMethodIds = this.breedingMethodService.getBreedingMethods(methodSearchRequest, null) //
+		final List<Integer> breedingMethodIds = this.breedingMethodService.searchBreedingMethods(methodSearchRequest, null, null) //
 			.stream().map(BreedingMethodDTO::getMid).collect(Collectors.toList());
 
 		methodsIs.removeAll(breedingMethodIds);
