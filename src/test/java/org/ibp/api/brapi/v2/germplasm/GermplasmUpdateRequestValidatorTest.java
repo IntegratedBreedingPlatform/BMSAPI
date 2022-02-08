@@ -51,7 +51,7 @@ public class GermplasmUpdateRequestValidatorTest {
 		updateRequest.getAdditionalInfo().put(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(50));
 
 		Mockito.doReturn(Optional.of(new BreedingMethodDTO())).when(this.breedingMethodService).getBreedingMethod(ArgumentMatchers.anyInt());
-		Mockito.doReturn(1L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any());
+		Mockito.doReturn(1L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any(), ArgumentMatchers.isNull());
 
 		this.germplasmUpdateRequestValidator.validate(updateRequest);
 	}
@@ -81,7 +81,7 @@ public class GermplasmUpdateRequestValidatorTest {
 		updateRequest.getAdditionalInfo().put("", RandomStringUtils.randomAlphabetic(260));
 
 		Mockito.doReturn(Optional.empty()).when(this.breedingMethodService).getBreedingMethod(ArgumentMatchers.anyInt());
-		Mockito.doReturn(0L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any());
+		Mockito.doReturn(0L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any(), ArgumentMatchers.isNull());
 
 		try {
 			this.germplasmUpdateRequestValidator.validate(updateRequest);
@@ -114,7 +114,7 @@ public class GermplasmUpdateRequestValidatorTest {
 		updateRequest.setGermplasmPUI(RandomStringUtils.randomAlphabetic(260));
 
 		Mockito.doReturn(Optional.of(new BreedingMethodDTO())).when(this.breedingMethodService).getBreedingMethod(ArgumentMatchers.anyInt());
-		Mockito.doReturn(1L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any());
+		Mockito.doReturn(1L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any(), ArgumentMatchers.isNull());
 
 		try {
 			this.germplasmUpdateRequestValidator.validate(updateRequest);

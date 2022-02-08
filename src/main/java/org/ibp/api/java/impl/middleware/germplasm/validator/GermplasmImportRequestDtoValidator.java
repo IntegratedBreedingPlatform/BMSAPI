@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -17,7 +18,6 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
@@ -208,7 +208,7 @@ public class GermplasmImportRequestDtoValidator {
 			this.validatePUINotExists(germplasmImportDTOList);
 		}
 		this.validateNotDuplicatedPUI(germplasmImportDTOList);
-		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmImportDTOList);
+		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(germplasmImportDTOList);
 		this.validateAllLocationAbbreviationsExists(germplasmImportDTOList);
 		this.validateAllNameTypesExists(germplasmImportDTOList);
 		this.validateAllAttributesExists(programUUID, germplasmImportDTOList);
@@ -304,7 +304,7 @@ public class GermplasmImportRequestDtoValidator {
 		}
 
 		this.validateNotDuplicatedPUI(germplasmInventoryImportDTOList);
-		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(programUUID, germplasmInventoryImportDTOList);
+		this.validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(germplasmInventoryImportDTOList);
 		this.validateAllLocationAbbreviationsExists(germplasmInventoryImportDTOList);
 		this.validateAllStorageLocationAbbreviationsExists(germplasmInventoryImportDTOList);
 		this.validateAllNameTypesExists(germplasmInventoryImportDTOList);
@@ -332,17 +332,16 @@ public class GermplasmImportRequestDtoValidator {
 		}
 	}
 
-	private void validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(final String programUUID,
-		final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
+	private void validateAllBreedingMethodAbbreviationsExistsAndNotAcceptMutations(final List<? extends GermplasmImportDTO> germplasmImportDTOList) {
 		final Set<String> breedingMethodsAbbrs =
 			germplasmImportDTOList.stream().filter(g -> StringUtils.isNotEmpty(g.getBreedingMethodAbbr()))
 				.map(g -> g.getBreedingMethodAbbr().toUpperCase()).collect(
 				Collectors.toSet());
 		if (!breedingMethodsAbbrs.isEmpty()) {
-			final BreedingMethodSearchRequest searchRequest =
-				new BreedingMethodSearchRequest(null, new ArrayList<>(breedingMethodsAbbrs), false);
+			final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
+			searchRequest.setMethodAbbreviations(new ArrayList<>(breedingMethodsAbbrs));
 			final List<BreedingMethodDTO> existingBreedingMethods =
-				this.breedingMethodService.getBreedingMethods(searchRequest, null);
+				this.breedingMethodService.searchBreedingMethods(searchRequest, null, null);
 			if (breedingMethodsAbbrs.size() != existingBreedingMethods.size()) {
 				final List<String> existingBreedingMethodsCodes =
 					existingBreedingMethods.stream().map(
@@ -372,10 +371,10 @@ public class GermplasmImportRequestDtoValidator {
 		if (!locationAbbrs.isEmpty()) {
 			final List<String> existingLocations =
 				this.locationService
-					.getFilteredLocations(new LocationSearchRequest(null, null, null, new ArrayList<>(locationAbbrs), null),
-						null)
+					.searchLocations(new LocationSearchRequest(null, null, new ArrayList<>(locationAbbrs), null),
+						null, null)
 					.stream().map(
-					Location::getLabbr).collect(
+					LocationDTO::getAbbreviation).collect(
 					Collectors.toList());
 			if (locationAbbrs.size() != existingLocations.size()) {
 				locationAbbrs.removeAll(existingLocations);
@@ -391,11 +390,11 @@ public class GermplasmImportRequestDtoValidator {
 			germplasmInventoryImportDTOList.stream().filter(g -> StringUtils.isNotEmpty(g.getStorageLocationAbbr()))
 				.map(g -> g.getStorageLocationAbbr().toUpperCase()).distinct().collect(Collectors.toList());
 		if (!locationAbbreviations.isEmpty()) {
-			final List<Location> existingLocations =
-				this.locationService.getFilteredLocations(
-					new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, new ArrayList<>(locationAbbreviations), null), null);
+			final List<LocationDTO> existingLocations =
+				this.locationService.searchLocations(
+					new LocationSearchRequest(STORAGE_LOCATION_TYPE, null, new ArrayList<>(locationAbbreviations), null), null, null);
 			if (existingLocations.size() != locationAbbreviations.size()) {
-				final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
+				final List<String> existingAbbreviations = existingLocations.stream().map(LocationDTO::getAbbreviation).collect(Collectors.toList());
 				final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);
 				invalidAbbreviations.removeAll(existingAbbreviations);
 				this.errors

@@ -6,8 +6,8 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
-import org.generationcp.middleware.pojos.Location;
 import org.hamcrest.CoreMatchers;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Assert;
@@ -74,10 +74,10 @@ public class GermplasmImportRequestValidatorTest {
 	private void setupBreedingMethodAndLocationMocks() {
 		final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO();
 		breedingMethodDTO.setMid(MID);
-		Mockito.doReturn(Collections.singletonList(breedingMethodDTO)).when(this.breedingMethodService).getBreedingMethods(ArgumentMatchers.any(), ArgumentMatchers.any());
-		final Location location = new Location();
-		location.setLabbr(COUNTRY_OF_ORIGIN_CODE);
-		Mockito.doReturn(Collections.singletonList(location)).when(this.locationService).getFilteredLocations(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.doReturn(Collections.singletonList(breedingMethodDTO)).when(this.breedingMethodService).searchBreedingMethods(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.isNull());
+		final LocationDTO location = new LocationDTO();
+		location.setAbbreviation(COUNTRY_OF_ORIGIN_CODE);
+		Mockito.doReturn(Collections.singletonList(location)).when(this.locationService).searchLocations(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.isNull());
 	}
 
 	@Test
@@ -123,8 +123,8 @@ public class GermplasmImportRequestValidatorTest {
 		importRequest6.setAcquisitionDate("2021-02-21");
 		importRequest6.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
 
-		Mockito.doReturn(Collections.emptyList()).when(this.breedingMethodService).getBreedingMethods(ArgumentMatchers.any(), ArgumentMatchers.any());
-		Mockito.doReturn(Collections.emptyList()).when(this.locationService).getFilteredLocations(ArgumentMatchers.any(), ArgumentMatchers.any());
+		Mockito.doReturn(Collections.emptyList()).when(this.breedingMethodService).searchBreedingMethods(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.isNull());
+		Mockito.doReturn(Collections.emptyList()).when(this.locationService).searchLocations(ArgumentMatchers.any(), ArgumentMatchers.any(), Mockito.isNull());
 
 		final List<GermplasmImportRequest> list = new ArrayList<>();
 		list.add(importRequest1);
@@ -265,7 +265,7 @@ public class GermplasmImportRequestValidatorTest {
 		importRequest5.setGermplasmPUI(RandomStringUtils.randomAlphabetic(260));
 
 		Mockito.doReturn(Optional.of(new BreedingMethodDTO())).when(this.breedingMethodService).getBreedingMethod(ArgumentMatchers.anyInt());
-		Mockito.doReturn(1L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any());
+		Mockito.doReturn(1L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any(), ArgumentMatchers.isNull());
 
 		final List<GermplasmImportRequest> list = new ArrayList<>();
 		list.add(importRequest1);

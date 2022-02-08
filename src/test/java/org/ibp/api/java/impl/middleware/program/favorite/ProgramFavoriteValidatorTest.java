@@ -1,13 +1,11 @@
 package org.ibp.api.java.impl.middleware.program.favorite;
 
 import org.apache.commons.lang.math.RandomUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.program.ProgramFavoriteRequestDto;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
@@ -20,19 +18,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 public class ProgramFavoriteValidatorTest {
 
-	private final String PROGRAM_UUID = RandomStringUtils.randomAlphabetic(20);
-
-	private final Integer LOCATION_ID = RandomUtils.nextInt();
 	@Mock
 	private LocationDataManager locationDataManager;
 
@@ -103,7 +95,7 @@ public class ProgramFavoriteValidatorTest {
 	@Test
 	public void testValidateAddFavorites_ThrowsException_WhenVariableIdNotExists(){
 		this.programFavoriteRequestDtos.setEntityIds(new HashSet<>(Arrays.asList(RandomUtils.nextInt())));
-		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.VARIABLE);
+		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.VARIABLES);
 		Mockito.when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(Arrays.asList());
 
 		try {
@@ -117,8 +109,8 @@ public class ProgramFavoriteValidatorTest {
 	@Test
 	public void testValidateAddFavorites_ThrowsException_WhenMethodIdNotExists(){
 		this.programFavoriteRequestDtos.setEntityIds(new HashSet<>(Arrays.asList(RandomUtils.nextInt())));
-		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.METHOD);
-		Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(),Mockito.any())).thenReturn(Arrays.asList());
+		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.METHODS);
+		Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.isNull())).thenReturn(Arrays.asList());
 
 		try {
 			this.programFavoriteValidator.validateAddFavorites(null, this.programFavoriteRequestDtos);

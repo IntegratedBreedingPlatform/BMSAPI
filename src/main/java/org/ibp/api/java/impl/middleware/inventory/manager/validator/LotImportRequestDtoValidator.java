@@ -1,12 +1,12 @@
 package org.ibp.api.java.impl.middleware.inventory.manager.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -101,11 +101,11 @@ public class LotImportRequestDtoValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final List<Location> existingLocations =
-			this.locationService.getFilteredLocations(
-				new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null),null);
+		final List<LocationDTO> existingLocations =
+			this.locationService.searchLocations(
+				new LocationSearchRequest(STORAGE_LOCATION_TYPE, null, locationAbbreviations, null),null, null);
 		if (existingLocations.size() != locationAbbreviations.size()) {
-			final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
+			final List<String> existingAbbreviations = existingLocations.stream().map(LocationDTO::getAbbreviation).collect(Collectors.toList());
 			final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);
 			invalidAbbreviations.removeAll(existingAbbreviations);
 			errors.reject("lot.input.invalid.abbreviations", new String[] {Util.buildErrorMessageFromList(invalidAbbreviations, 3)}, "");

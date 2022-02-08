@@ -3,16 +3,17 @@ package org.ibp.api.java.impl.middleware.program;
 
 import org.generationcp.commons.util.InstallationDirectoryUtil;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -225,12 +226,14 @@ public class ProgramServiceImpl implements ProgramService {
 
 		final ProgramDTO programDTO = this.programService.addProgram(crop, programBasicDetailsDto);
 
+		final SqlTextFilter locationNameFilter = new SqlTextFilter(UNSPECIFIED_LOCATION, SqlTextFilter.Type.STARTSWITH);
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationName(UNSPECIFIED_LOCATION);
-		final List<Location> locations = this.locationService.getFilteredLocations(locationSearchRequest, null);
+		locationSearchRequest.setLocationNameFilter(locationNameFilter);
+
+		final List<LocationDTO> locations = this.locationService.searchLocations(locationSearchRequest, null, null);
 		if (!locations.isEmpty()) {
 			this.programFavoriteService
-				.addProgramFavorites(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, new HashSet<>(locations.get(0).getLocid()));
+				.addProgramFavorites(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, new HashSet<>(locations.get(0).getId()));
 		}
 
 		this.installationDirectoryUtil.createWorkspaceDirectoriesForProject(crop, programBasicDetailsDto.getName());

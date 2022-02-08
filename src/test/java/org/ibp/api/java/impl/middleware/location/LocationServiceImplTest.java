@@ -1,13 +1,13 @@
 package org.ibp.api.java.impl.middleware.location;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.pojos.Location;
-import org.ibp.api.domain.location.LocationDto;
 import org.ibp.api.java.impl.middleware.location.validator.LocationSearchRequestValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -36,33 +36,30 @@ public class LocationServiceImplTest {
 
 	@Test
 	public void countLocations() {
-		Mockito.when(this.locationMiddlewareService.countFilteredLocations(Mockito.any()))
+		Mockito.when(this.locationMiddlewareService.countFilteredLocations(Mockito.any(), ArgumentMatchers.isNull()))
 			.thenReturn(1l);
 
 		final long count =
-			this.locationService.countLocations(CROP, new LocationSearchRequest());
+			this.locationService.countLocations(CROP, new LocationSearchRequest(), null);
 
-		Mockito.verify(this.locationSearchRequestValidator).validate(Mockito.any(), Mockito.any());
 		assertThat(count, equalTo(1l));
 	}
 
 	@Test
 	public void testGetLocations() {
-		final String programUUID = "myprogram";
-		org.generationcp.middleware.pojos.Location locationMw = new Location();
+		LocationDTO locationMw = new LocationDTO();
 		final String locationName = RandomStringUtils.randomAlphabetic(10);
 		final String locationAbbreviation = RandomStringUtils.randomAlphabetic(3);
-		locationMw.setLname(locationName);
-		locationMw.setLabbr(locationAbbreviation);
+		locationMw.setName(locationName);
+		locationMw.setAbbreviation(locationAbbreviation);
 
-		Mockito.when(this.locationMiddlewareService.getFilteredLocations(Mockito.any(), Mockito.any()))
+		Mockito.when(this.locationMiddlewareService.searchLocations(Mockito.any(), Mockito.any(), Mockito.isNull()))
 			.thenReturn(
 				Collections.singletonList(locationMw));
 
-		final List<LocationDto> locationList =
-			this.locationService.getLocations(CROP, new LocationSearchRequest(), null);
+		final List<LocationDTO> locationList =
+			this.locationService.searchLocations(CROP, new LocationSearchRequest(), null, null);
 
-		Mockito.verify(this.locationSearchRequestValidator).validate(Mockito.any(), Mockito.any());
 		assertThat(locationList, hasSize(1));
 		assertThat(locationList.get(0).getName(), equalTo(locationName));
 		assertThat(locationList.get(0).getAbbreviation(), equalTo(locationAbbreviation));

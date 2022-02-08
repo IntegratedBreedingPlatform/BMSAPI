@@ -83,12 +83,12 @@ public class LocationValidator {
 			return;
 		}
 
-		final List<Location> existingLocations =
-			this.locationService.getFilteredLocations(
-				new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null), null);
+		final List<LocationDTO> existingLocations =
+			this.locationService.searchLocations(
+				new LocationSearchRequest(STORAGE_LOCATION_TYPE, null, locationAbbreviations, null), null, null);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 
-			final List<String> existingAbbreviations = existingLocations.stream().map(Location::getLabbr).collect(Collectors.toList());
+			final List<String> existingAbbreviations = existingLocations.stream().map(LocationDTO::getAbbreviation).collect(Collectors.toList());
 			final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);
 			invalidAbbreviations.removeAll(existingAbbreviations);
 			errors.reject("lot.input.invalid.abbreviations", new String[] {Util.buildErrorMessageFromList(invalidAbbreviations, 3)}, "");

@@ -60,7 +60,7 @@ public class ProgramFavoriteValidator {
 		if (!favorites.isEmpty()) {
 			List<Integer> favoritesIds = favorites.stream().map(ProgramFavorite::getEntityId).collect(Collectors.toList());
 			errors.reject("program.favorite.already.exists", new String[] {
-				String.join(",", Arrays.toString(favoritesIds.toArray())), favoriteType.getName()}, "");
+				String.join(",", Arrays.toString(favoritesIds.toArray())), favoriteType.name()}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 
 		}
@@ -69,14 +69,14 @@ public class ProgramFavoriteValidator {
 			case LOCATION:
 				this.validateLocationId(errors, entityIds);
 				break;
-			case METHOD:
+			case METHODS:
 				this.validateMethodId(errors, entityIds);
 				break;
-			case VARIABLE:
+			case VARIABLES:
 				this.validateVariableId(errors, programUUID, entityIds);
 				break;
 			default:
-				errors.reject("program.favorite.type.not.identified", new String[] {favoriteType.getName()}, "");
+				errors.reject("program.favorite.type.not.identified", new String[] {favoriteType.name()}, "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
@@ -102,7 +102,7 @@ public class ProgramFavoriteValidator {
 		final BreedingMethodSearchRequest methodSearchRequest = new BreedingMethodSearchRequest();
 		methodSearchRequest.setMethodIds(methodsIs.stream().collect(Collectors.toList()));
 
-		final List<Integer> breedingMethodIds = this.breedingMethodService.getBreedingMethods(methodSearchRequest, null) //
+		final List<Integer> breedingMethodIds = this.breedingMethodService.searchBreedingMethods(methodSearchRequest, null, null) //
 			.stream().map(BreedingMethodDTO::getMid).collect(Collectors.toList());
 
 		methodsIs.removeAll(breedingMethodIds);

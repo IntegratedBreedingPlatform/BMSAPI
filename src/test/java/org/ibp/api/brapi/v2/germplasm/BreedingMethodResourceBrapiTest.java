@@ -7,6 +7,7 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,8 @@ public class BreedingMethodResourceBrapiTest extends ApiUnitTestBase {
 		method.setMid(1);
 		list.add(method);
 
-		Mockito.doReturn(list).when(this.breedingMethodService).getBreedingMethods(Matchers.anyString(), Matchers.any(BreedingMethodSearchRequest.class), Matchers.any(Pageable.class));
+		Mockito.doReturn(list).when(this.breedingMethodService).searchBreedingMethods(Matchers.any(BreedingMethodSearchRequest.class), Matchers.any(Pageable.class),
+				ArgumentMatchers.isNull());
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/{cropName}/brapi/v2/breedingmethods", this.cropName).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
