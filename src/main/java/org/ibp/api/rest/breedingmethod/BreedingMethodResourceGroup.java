@@ -2,15 +2,19 @@ package org.ibp.api.rest.breedingmethod;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
 import org.generationcp.middleware.pojos.MethodGroup;
 import org.generationcp.middleware.pojos.MethodType;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
+import org.ibp.api.java.impl.middleware.breedingmethod.validator.BreedingMethodSearchRequestValidator;
+import org.ibp.api.rest.common.PaginatedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -29,6 +34,9 @@ public class BreedingMethodResourceGroup {
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
+
+	@Autowired
+	private BreedingMethodSearchRequestValidator breedingMethodSearchRequestValidator;
 
 	@ApiOperation(value = "Get breeding method")
 	@RequestMapping(value = "/crops/{cropName}/breedingmethods/{breedingMethodDbId}", method = RequestMethod.GET)
@@ -104,22 +112,19 @@ public class BreedingMethodResourceGroup {
 	}
 
 	@ApiOperation(value = "List breeding method filtered by favorites")
-	@RequestMapping(value = "/crops/{cropName}/breedingmethods", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/breedingmethods/search", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<List<BreedingMethodDTO>> getBreedingMethods(
+	public ResponseEntity<List<BreedingMethodDTO>> searchBreedingMethods(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@ApiParam(value = "method types to retrieve: GEN, DER, MAN")
-		@RequestParam(required = false) final List<String> methodTypes,
-		@ApiParam(value = "list of breeding method codes")
-		@RequestParam(required = false) final List<String> methodCodes,
-		@ApiParam(value = "retrieve favorite locations only", required = true)
-		@RequestParam final boolean favoritesOnly
-		) {
-		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest(programUUID, methodCodes, favoritesOnly);
-		searchRequest.setMethodTypes(methodTypes);
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(cropName, searchRequest, null);
-		return new ResponseEntity<>(breedingMethods, HttpStatus.OK);
+		@RequestBody final BreedingMethodSearchRequest request,
+		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+
+		this.breedingMethodSearchRequestValidator.validate(cropName, request);
+
+		return new PaginatedSearch().getPagedResult(() -> this.breedingMethodService.countSearchBreedingMethods(request, programUUID),
+				() -> this.breedingMethodService.searchBreedingMethods(request, pageable, programUUID),
+				pageable);
 	}
 
 }

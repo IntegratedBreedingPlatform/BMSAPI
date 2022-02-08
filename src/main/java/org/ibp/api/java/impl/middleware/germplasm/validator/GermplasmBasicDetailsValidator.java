@@ -31,7 +31,7 @@ public class GermplasmBasicDetailsValidator {
 		if (germplasmBasicDetailsDto.getBreedingLocationId() != null) {
 			if (this.locationService
 				.searchLocations(
-					new LocationSearchRequest(null, null,
+					new LocationSearchRequest(null,
 						Collections.singletonList(germplasmBasicDetailsDto.getBreedingLocationId()), null,
 						null),
 					null, null).isEmpty()) {

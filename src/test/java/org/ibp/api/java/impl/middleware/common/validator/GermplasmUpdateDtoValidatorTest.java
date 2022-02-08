@@ -17,6 +17,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -98,7 +99,7 @@ public class GermplasmUpdateDtoValidatorTest {
 			.thenReturn(Arrays.asList(new Germplasm(3), new Germplasm(4)));
 
 		when(this.locationService
-			.searchLocations(new LocationSearchRequest(null, null, null,
+			.searchLocations(new LocationSearchRequest(null, null,
 				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null), null, null))
 			.thenReturn(Arrays.asList(location));
 
@@ -189,7 +190,7 @@ public class GermplasmUpdateDtoValidatorTest {
 		germplasmUpdateDTO.setLocationAbbreviation("AFG");
 
 		when(this.locationService
-			.searchLocations(new LocationSearchRequest(null, null, null,
+			.searchLocations(new LocationSearchRequest(null, null,
 				new ArrayList<>(Arrays.asList(germplasmUpdateDTO.getLocationAbbreviation())), null), null, null))
 			.thenReturn(Arrays.asList(new LocationDTO()));
 
@@ -204,7 +205,8 @@ public class GermplasmUpdateDtoValidatorTest {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setBreedingMethodAbbr("UAC");
 
-		when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
+		when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(),
+				ArgumentMatchers.isNull()))
 			.thenReturn(Arrays.asList(new BreedingMethodDTO()));
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
