@@ -464,8 +464,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		int entryNo = 1;
 		boolean hasEntryNo = false;
-		boolean hasEntryCode = false;
-		boolean hasEntryCodeEmpty = false;
 		boolean hasSeedSource = false;
 		boolean hasSeedSourceEmpty = false;
 		boolean hasGroupName = false;
@@ -483,16 +481,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				entry.setEntryNo(entryNo++);
 			} else {
 				hasEntryNo = true;
-			}
-
-			if (isBlank(entry.getEntryCode())) {
-				entry.setEntryCode(String.valueOf(entry.getEntryNo()));
-				hasEntryCodeEmpty = true;
-			} else {
-				hasEntryCode = true;
-				if (entry.getEntryCode().length() > 47) {
-					throw new ApiValidationException("", "error.germplasmlist.save.entry.code.exceed.length");
-				}
 			}
 
 			if (isBlank(entry.getSeedSource())) {
@@ -513,9 +501,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 		if (hasEntryNo && entryNo > 1) {
 			throw new ApiValidationException("", "error.germplasmlist.save.entryno.gaps");
-		}
-		if (hasEntryCode && hasEntryCodeEmpty) {
-			throw new ApiValidationException("", ERROR_GERMPLASMLIST_SAVE_GAPS, ENTRY_CODE);
 		}
 		if (hasSeedSource && hasSeedSourceEmpty) {
 			throw new ApiValidationException("", ERROR_GERMPLASMLIST_SAVE_GAPS, SEED_SOURCE);
@@ -541,13 +526,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 			if (entry.getEntryNo() > numberOfEntries || entry.getEntryNo() < 1) {
 				throw new ApiRequestValidationException("invalid.entry.no.value", new String[] {entry.getEntryNo().toString()});
-			}
-
-			// Temporary workaround to allow users to edit ENTRY_CODE
-			if (!isBlank(entry.getEntryCode())) {
-				if (entry.getEntryCode().length() > 47) {
-					throw new ApiValidationException("", "error.germplasmlist.save.entry.code.exceed.length");
-				}
 			}
 
 			this.processEntryDetails(entry.getData(), entryDetailVariablesById);
