@@ -202,10 +202,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 	private List<Field> buildEntryDetailsFields() {
 		final String entryNoPropValue = this.getMessage("label.printing.field.germplasm.list.entry.no");
-		final String entryCodePropValue = this.getMessage("label.printing.field.germplasm.list.entry.code");
 		return ImmutableList.<Field>builder()
 			.add(new Field(TermId.ENTRY_NO.getId(), entryNoPropValue))
-			.add(new Field(TermId.ENTRY_CODE.getId(), entryCodePropValue))
 			.build();
 	}
 
@@ -270,10 +268,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final TermId term = TermId.getById(id);
 		switch (term) {
 			case ENTRY_NO:
-				columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.ENTRY_NO.name()), ""));
-				return;
-			case ENTRY_CODE:
-				columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.ENTRY_CODE.name()), ""));
+				columns.put(key, Objects.toString(listData.getData().get(TermId.ENTRY_NO.name()), ""));
 				return;
 			default:
 				//do nothing
@@ -355,6 +350,9 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 					break;
 				case FEMALE_PARENT:
 					fields.add(TermId.CROSS_FEMALE_PREFERRED_NAME.getId());
+					break;
+				case ENTRY_CODE:
+					fields.add(toKey(TermId.ENTRY_CODE.getId()));
 					break;
 				default:
 					if (dto.getTermId() == GermplasmListLabelPrinting.DRVNM_ID || dto.getTermId() > GermplasmLabelPrinting.MAX_FIXED_TYPE_INDEX) {

@@ -333,7 +333,6 @@ public class GermplasmListLabelPrintingTest {
 		response.setListDataId(Integer.valueOf(RandomStringUtils.randomNumeric(3)));
 		response.setData(new HashMap<>());
 		response.getData().put(GermplasmListStaticColumns.ENTRY_NO.name(), "1");
-		response.getData().put(GermplasmListStaticColumns.ENTRY_CODE.name(), RandomStringUtils.randomAlphanumeric(10));
 		response.getData().put(GermplasmListStaticColumns.CROSS.name(), RandomStringUtils.randomAlphanumeric(10));
 		return response;
 	}
