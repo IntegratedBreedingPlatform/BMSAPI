@@ -254,11 +254,13 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public boolean editProgram(final String cropName, final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		final String oldProjectName = this.programService.getProgramByUUID(programUUID).get().getName();
 		this.programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
 		if (programBasicDetailsDto.allAttributesNull()) {
 			return false;
 		}
 		this.programService.editProgram(programUUID, programBasicDetailsDto);
+		this.installationDirectoryUtil.renameOldWorkspaceDirectory(oldProjectName, cropName, programBasicDetailsDto.getName());
 		return true;
 	}
 }
