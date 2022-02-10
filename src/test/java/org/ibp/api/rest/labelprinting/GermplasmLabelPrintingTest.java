@@ -116,6 +116,7 @@ public class GermplasmLabelPrintingTest {
 	public void testGetOriginResourceMetadata() {
 		final OriginResourceMetadata originResourceMetadata =
 			this.germplasmLabelPrinting.getOriginResourceMetadata(this.labelsInfoInput, PROGRAM_UUID);
+		Assert.assertTrue(MapUtils.isEmpty(originResourceMetadata.getMetadata()));
 		Assert.assertTrue(originResourceMetadata.getDefaultFileName().startsWith(GermplasmLabelPrinting.ORIG_FINAL_NAME));
 	}
 
