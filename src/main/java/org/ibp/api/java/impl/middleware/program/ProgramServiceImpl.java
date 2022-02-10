@@ -23,6 +23,7 @@ import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.program.validator.AddProgramMemberRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.program.validator.ProgramBasicDetailsDtoValidator;
@@ -191,6 +192,8 @@ public class ProgramServiceImpl implements ProgramService {
 				if (workbenchProgram.getStartDate() != null) {
 					programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
 				}
+				programSummary.setLastOpenDate(Util.formatDateAsStringValue(workbenchProgram.getLastOpenDate(),
+					Util.FRONTEND_TIMESTAMP_FORMAT));
 				return programSummary;
 			}
 			return null;
