@@ -6,6 +6,7 @@ import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
@@ -23,6 +24,9 @@ import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
@@ -30,6 +34,7 @@ import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmS
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotImportRequestDtoValidator;
@@ -37,6 +42,7 @@ import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotInputVali
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotSplitValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -56,6 +62,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 @Transactional
@@ -109,6 +116,15 @@ public class LotServiceImpl implements LotService {
 	@Autowired
 	private GermplasmSearchService germplasmSearchService;
 
+	@Autowired
+	private DatasetService studyDatasetService;
+
+	@Autowired
+	private StudyValidator studyValidator;
+
+	@Autowired
+	private DatasetValidator datasetValidator;
+
 	private static final String DEFAULT_STOCKID_PREFIX = "SID";
 
 	@Override
@@ -152,11 +168,14 @@ public class LotServiceImpl implements LotService {
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(lotGeneratorBatchRequestDto.getSearchComposite(), errors);
 
 		final SearchCompositeDto<SearchOriginCompositeDto, Integer> searchComposite = lotGeneratorBatchRequestDto.getSearchComposite();
+		checkArgument(!isEmpty(searchComposite.getItemIds()) || searchComposite != null && searchComposite.isValid(),
+			"either.provide.a.list.of.items.or.a.composite");
+
 		List<Integer> gids = null;
 
 		if (searchComposite.getSearchRequest() != null) {
 			final SearchOriginCompositeDto.SearchOrigin searchOrigin = searchComposite.getSearchRequest().getSearchOrigin();
-			if (searchComposite.getSearchRequest().getSearchOrigin() == null) {
+			if (searchOrigin == null) {
 				errors.reject("search.origin.no.defined", searchComposite.getSearchRequest().getSearchOrigin().values(), "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
@@ -172,16 +191,29 @@ public class LotServiceImpl implements LotService {
 					checkArgument(!gids.isEmpty(), "searchrequestid.no.results");
 					break;
 
-				case MANAGE_STUDY:
+				case MANAGE_STUDY_SOURCE:
 					final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest =
 						(GermplasmStudySourceSearchRequest) this.searchRequestService
 							.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(),
 								GermplasmStudySourceSearchRequest.class);
+					studyValidator.validate(germplasmStudySourceSearchRequest.getStudyId(), false);
 					gids = this.germplasmStudySourceService.getGermplasmStudySources(germplasmStudySourceSearchRequest, null).stream().map(
 						GermplasmStudySourceDto::getGid).collect(Collectors.toList());
 					checkArgument(!gids.isEmpty(), "searchrequestid.no.results");
 					break;
-				default:
+
+				case MANAGE_STUDY_PLOT:
+					final ObservationUnitsSearchDTO observationUnitsSearchDTO =
+						(ObservationUnitsSearchDTO) this.searchRequestService
+							.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(),
+								ObservationUnitsSearchDTO.class);
+					final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(Integer.valueOf(observationUnitsSearchDTO.getDatasetId()));
+					studyValidator.validate(datasetDTO.getParentDatasetId(), false);
+					datasetValidator.validateDataset(datasetDTO.getParentDatasetId(), observationUnitsSearchDTO.getDatasetId());
+					gids = this.studyDatasetService.getObservationUnitRows(datasetDTO.getParentDatasetId(),
+						observationUnitsSearchDTO.getDatasetId(), observationUnitsSearchDTO, null).stream().map(
+						ObservationUnitRow::getGid).collect(Collectors.toList());
+					checkArgument(!gids.isEmpty(), "searchrequestid.no.results");
 					break;
 			}
 		} else {
