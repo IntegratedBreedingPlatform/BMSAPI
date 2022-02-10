@@ -98,6 +98,7 @@ public class LocationValidator {
 	private void validateLocationName(final String locationName) {
 		if(StringUtils.isBlank(locationName)) {
 			this.errors.reject("location.name.is.required", null, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (locationName.length() > LocationValidator.LOCATION_NAME_MAX_LENGTH) {
@@ -109,6 +110,7 @@ public class LocationValidator {
 	private void validateLocationAbbr(final String locationAbbr) {
 		if(StringUtils.isBlank(locationAbbr)) {
 			this.errors.reject("location.abbr.is.required", null, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (locationAbbr.length() > LocationValidator.LOCATION_ABBR_MAX_LENGTH) {
