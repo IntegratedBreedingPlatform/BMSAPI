@@ -292,14 +292,13 @@ public class GermplasmListLabelPrintingTest {
 	@Test
 	public void testGetDataRow_For_DefaultEntryDetailFields() {
 		this.labelPrinting.initStaticFields();
-		final Set<Integer> keys = new HashSet<>(Arrays.asList(TermId.ENTRY_NO.getId(), TermId.ENTRY_CODE.getId()));
+		final Set<Integer> keys = new HashSet<>(Arrays.asList(TermId.ENTRY_NO.getId()));
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, String> dataRow =
 			this.labelPrinting.getDataRow(keys, listData, response, new HashMap<>(), new HashMap<>(), new HashMap<>());
-		Assert.assertEquals(2, dataRow.keySet().size());
+		Assert.assertEquals(1, dataRow.keySet().size());
 		Assert.assertEquals(listData.getData().get(TermId.ENTRY_NO.name()), dataRow.get(TermId.ENTRY_NO.getId()));
-		Assert.assertEquals(listData.getData().get(TermId.ENTRY_CODE.name()), dataRow.get(TermId.ENTRY_CODE.getId()));
 	}
 
 	@Test
