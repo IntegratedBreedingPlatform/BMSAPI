@@ -9,10 +9,10 @@ import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
+import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
-import org.generationcp.middleware.domain.workbench.UserSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -200,15 +200,15 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final UserSearchRequest userSearchRequest,
+	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest,
 		final Pageable pageable) {
 
-		return this.userService.getProgramMembers(programUUID, userSearchRequest, pageable);
+		return this.userService.getProgramMembers(programUUID, searchRequest, pageable);
 	}
 
 	@Override
-	public long countAllProgramMembers(final String programUUID, final UserSearchRequest userSearchRequest) {
-		return this.userService.countAllProgramMembers(programUUID, userSearchRequest);
+	public long countAllProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest) {
+		return this.userService.countAllProgramMembers(programUUID, searchRequest);
 	}
 
 	@Override

@@ -3,9 +3,10 @@ package org.ibp.api.rest.program;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
+import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
-import org.generationcp.middleware.domain.workbench.UserSearchRequest;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.program.ProgramService;
@@ -54,7 +55,7 @@ public class ProgramMemberResource {
 		@PathVariable final String programUUID,
 		@ApiIgnore
 		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable,
-		@RequestBody UserSearchRequest userSearchRequest
+		@RequestBody ProgramMembersSearchRequest userSearchRequest
 	) {
 
 		return new PaginatedSearch().getPagedResult(() -> this.programService.countAllProgramMembers(programUUID, userSearchRequest),
@@ -79,7 +80,7 @@ public class ProgramMemberResource {
 		@PathVariable final String programUUID,
 		@ApiIgnore
 		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable,
-		@RequestBody UserSearchRequest userSearchRequest
+		@RequestBody ProgramEligibleUsersSearchRequest userSearchRequest
 	) {
 
 		return new PaginatedSearch().getPagedResult(() -> this.userService.countAllMembersEligibleUsers(programUUID, userSearchRequest),

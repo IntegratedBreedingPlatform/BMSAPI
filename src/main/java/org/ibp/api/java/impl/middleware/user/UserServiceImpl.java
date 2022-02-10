@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.user;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.security.SecurityUtil;
-import org.generationcp.middleware.domain.workbench.UserSearchRequest;
+import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -147,19 +147,19 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDetailDto> getMembersEligibleUsers(final String programUUID, final UserSearchRequest userSearchRequest,
+	public List<UserDetailDto> getMembersEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
 		final Pageable pageable) {
 
 		final List<UserDetailDto> result = new ArrayList<>();
 		final ModelMapper mapper = UserMapper.getInstance();
-		final List<UserDto> users = this.userService.getProgramMembersEligibleUsers(programUUID, userSearchRequest, pageable);
+		final List<UserDto> users = this.userService.getProgramMembersEligibleUsers(programUUID, searchRequest, pageable);
 		users.forEach(u -> result.add(mapper.map(u, UserDetailDto.class)));
 		return result;
 	}
 
 	@Override
-	public long countAllMembersEligibleUsers(final String programUUID, final UserSearchRequest userSearchRequest) {
-		return this.userService.countProgramMembersEligibleUsers(programUUID, userSearchRequest);
+	public long countAllMembersEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest) {
+		return this.userService.countProgramMembersEligibleUsers(programUUID, searchRequest);
 	}
 
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
