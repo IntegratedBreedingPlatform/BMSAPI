@@ -203,6 +203,15 @@ public class LocationValidator {
 		this.validateLocationNotUsedInAttribute(locationId);
 		this.validateLocationNotUsedInName(locationId);
 		this.validateLocationNotUsedInStudy(locationId);
+		this.validateLocationNotBelongToCountryTable(locationId);
+	}
+
+	private void validateLocationNotBelongToCountryTable(final Integer locationId) {
+		final boolean isCountryLocation = locationService.existsLocationAsCountry(locationId);
+		if (isCountryLocation) {
+			this.errors.reject("location.country.can.not.deletable", new String[] {locationId.toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	private void validateLocationNotUsedInLot(final Integer locationId) {
