@@ -47,7 +47,6 @@ public class GermplasmNameTypeValidator {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.validateExistingNameType(nameTypeId);
 		this.validateNameTypeBelongsToSystem(germplasmNameTypeDTO.getCode());
 		this.validateNameTypeBelongsToGermplasm(nameTypeId);
-		this.validateNameTypeBelongsToGermplasmList(germplasmNameTypeDTO.getName());
 	}
 
 	public void validateNameTypeModification(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
@@ -156,9 +155,7 @@ public class GermplasmNameTypeValidator {
 	private boolean isNameTypeInUse(final GermplasmNameTypeDTO germplasmNameTypeDTO) {
 		final boolean isSystem = SystemNameTypes.getTypes().contains(germplasmNameTypeDTO.getCode());
 		final boolean isNameTypeUsedInGermplasmName = this.germplasmNameService.isNameTypeUsedAsGermplasmName(germplasmNameTypeDTO.getId());
-		final boolean isNameTypeAssociatedToList =
-			this.germplasmNameTypeService.isNameTypeUsedInListDataProp(germplasmNameTypeDTO.getName());
-		return isSystem || isNameTypeUsedInGermplasmName || isNameTypeAssociatedToList;
+		return isSystem || isNameTypeUsedInGermplasmName;
 	}
 
 	private void validateNameTypeBelongsToSystem(final String code) {
@@ -172,16 +169,6 @@ public class GermplasmNameTypeValidator {
 		final boolean isNameTypeUsedInGermplasmName = this.germplasmNameService.isNameTypeUsedAsGermplasmName(nameTypeId);
 		if (isNameTypeUsedInGermplasmName) {
 			this.errors.reject("germplasm.name.type.is.in.use", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-	}
-
-	private void validateNameTypeBelongsToGermplasmList(final String name) {
-		final boolean isNameTypeAssociatedToList =
-			this.germplasmNameTypeService.isNameTypeUsedInListDataProp(name);
-
-		if (isNameTypeAssociatedToList) {
-			this.errors.reject("germplasm.name.type.associated.to.list", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
