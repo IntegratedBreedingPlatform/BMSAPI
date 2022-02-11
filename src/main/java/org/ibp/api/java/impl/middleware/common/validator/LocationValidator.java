@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.Util;
@@ -204,6 +206,29 @@ public class LocationValidator {
 		this.validateLocationNotUsedInName(locationId);
 		this.validateLocationNotUsedInStudy(locationId);
 		this.validateLocationNotBelongToCountryTable(locationId);
+		this.validateLocationNotUsedInFieldMap(locationId);
+
+	}
+
+	private void validateLocationNotUsedInFieldMap(final Integer locationId) {
+		final Location location = locationDataManager.getLocationByID(locationId);
+		List<Locdes> blocks = null;
+		if(location.getLtype() == 415){ // Field
+			blocks = locationDataManager.getLocdesByDval(locationId.toString());
+		}
+		if(location.getLtype() == 416){ // Block
+			blocks = locationDataManager.getLocdesByLocationId(locationId).stream().filter(locdes -> locdes.getTypeId() == 313).collect(Collectors.toList());
+
+		}
+		if (!CollectionUtils.isEmpty(blocks)) {
+			final List<Integer> locationIds = blocks.stream().map((locdes) -> locdes.getLocationId()).collect(Collectors.toList());
+			boolean isUsed = locationService.blockIdIsUsedInFieldMap(locationIds);
+			if (isUsed) {
+				this.errors.reject("location.is.used.in.field.map", new String[] {locationId.toString()}, "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
+
 	}
 
 	private void validateLocationNotBelongToCountryTable(final Integer locationId) {
