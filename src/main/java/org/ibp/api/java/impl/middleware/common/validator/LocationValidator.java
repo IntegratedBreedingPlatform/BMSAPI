@@ -214,10 +214,11 @@ public class LocationValidator {
 		final Location location = locationDataManager.getLocationByID(locationId);
 		List<Locdes> blocks = null;
 		if(location.getLtype() == 415){ // Field
-			blocks = locationDataManager.getLocdesByDval(locationId.toString());
+			blocks = locationDataManager.getLocdes(null, locationId.toString());
 		}
 		if(location.getLtype() == 416){ // Block
-			blocks = locationDataManager.getLocdesByLocationId(locationId).stream().filter(locdes -> locdes.getTypeId() == 313).collect(Collectors.toList());
+			blocks = locationDataManager.getLocdes(locationId, null).stream().filter(locdes -> locdes.getTypeId() == 313)
+				.collect(Collectors.toList());
 
 		}
 		if (!CollectionUtils.isEmpty(blocks)) {
