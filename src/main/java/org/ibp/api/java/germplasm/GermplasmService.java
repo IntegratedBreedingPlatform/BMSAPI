@@ -25,8 +25,6 @@ import java.util.Set;
 
 public interface GermplasmService {
 
-	int searchGermplasmCount(String searchText);
-
 	List<GermplasmSearchResponse> searchGermplasm(GermplasmSearchRequest germplasmSearchRequest, Pageable pageable, String programUUID);
 
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);

@@ -20,10 +20,7 @@ import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
-import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
@@ -76,9 +73,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private GermplasmDeleteValidator germplasmDeleteValidator;
 
 	private BindingResult errors;
-
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
 
 	@Autowired
 	private PedigreeService pedigreeService;
@@ -245,14 +239,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(final String query) {
 		return this.germplasmNameTypeService.searchNameTypes(query);
-	}
-
-	@Override
-	public int searchGermplasmCount(final String searchText) {
-
-		final GermplasmSearchParameter searchParameter = new GermplasmSearchParameter(searchText, Operation.LIKE, false, false, false);
-
-		return this.germplasmDataManager.countSearchForGermplasm(searchParameter);
 	}
 
 	@Override

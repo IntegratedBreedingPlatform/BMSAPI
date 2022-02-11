@@ -19,15 +19,12 @@ import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
-import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.hamcrest.MatcherAssert;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -406,16 +403,6 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.middlewareGermplasmService.getGermplasmDtoById(gid)).thenReturn(germplasmDto);
 		final GermplasmDto germplasmDtoById = this.germplasmServiceImpl.getGermplasmDtoById(gid);
 		assertThat(germplasmDtoById, is(germplasmDto));
-	}
-
-	@Test
-	public void testSearchGermplasmCount() {
-		final String text = StringUtils.randomAlphanumeric(30);
-		final GermplasmSearchParameter searchParameter = new GermplasmSearchParameter(text, Operation.LIKE, false, false, false);
-		Mockito.when(this.germplasmDataManager.countSearchForGermplasm(searchParameter)).thenReturn(5);
-		final long count = this.germplasmServiceImpl.searchGermplasmCount(text);
-		Mockito.verify(this.germplasmDataManager).countSearchForGermplasm(searchParameter);
-		assertThat(count, is(5L));
 	}
 
 	@Test
