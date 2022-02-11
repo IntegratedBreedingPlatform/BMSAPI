@@ -12,7 +12,8 @@ import java.util.List;
 public class UserTreeState {
 
 	private String userId;
-	private List<String> folders = new ArrayList<>();
+	private List<String> programFolders = new ArrayList<>();
+	private List<String> cropFolders = new ArrayList<>();
 
 	public UserTreeState() {
 
@@ -26,12 +27,20 @@ public class UserTreeState {
 		this.userId = userId;
 	}
 
-	public List<String> getFolders() {
-		return this.folders;
+	public List<String> getProgramFolders() {
+		return this.programFolders;
 	}
 
-	public void setFolders(final List<String> folders) {
-		this.folders = folders;
+	public void setProgramFolders(final List<String> programFolders) {
+		this.programFolders = programFolders;
+	}
+
+	public void setCropFolders(final List<String> cropFolders) {
+		this.cropFolders = cropFolders;
+	}
+
+	public List<String> getCropFolders() {
+		return this.cropFolders;
 	}
 
 	@Override

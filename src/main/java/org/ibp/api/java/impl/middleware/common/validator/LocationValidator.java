@@ -85,7 +85,7 @@ public class LocationValidator {
 
 		final List<LocationDTO> existingLocations =
 			this.locationService.searchLocations(
-				new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null), null, null);
+				new LocationSearchRequest(STORAGE_LOCATION_TYPE, null, locationAbbreviations, null), null, null);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 
 			final List<String> existingAbbreviations = existingLocations.stream().map(LocationDTO::getAbbreviation).collect(Collectors.toList());

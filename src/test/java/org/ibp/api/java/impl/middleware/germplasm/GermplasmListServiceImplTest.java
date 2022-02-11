@@ -1463,7 +1463,8 @@ public class GermplasmListServiceImplTest {
 		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
 		final UserTreeState treeState = new UserTreeState();
 		treeState.setUserId(userId);
-		treeState.setFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, "5", "7"));
+		treeState.setProgramFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, "5", "7"));
+		treeState.setCropFolders(Lists.newArrayList(GermplasmListServiceImpl.CROP_LISTS, "15", "17"));
 
 		this.germplasmListService
 			.saveGermplasmListTreeState(GermplasmListServiceImplTest.CROP, GermplasmListServiceImplTest.PROGRAM_UUID, treeState);
@@ -1475,11 +1476,11 @@ public class GermplasmListServiceImplTest {
 		Mockito.verify(this.userProgramStateDataManager)
 			.saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID,
 				ListTreeState.GERMPLASM_LIST
-					.name(), treeState.getFolders());
+					.name(), treeState.getProgramFolders());
 	}
 
 	@Test
-	public void testSaveTreeState_FolderDoesntExistInProgram() {
+	public void testSaveTreeState_ProgramFolderDoesntExistInProgram() {
 		final String invalidFolder = "7";
 		Mockito.doReturn(Optional.empty()).when(this.germplasmListServiceMiddleware)
 			.getGermplasmListById(Integer.parseInt(invalidFolder));
@@ -1489,7 +1490,7 @@ public class GermplasmListServiceImplTest {
 		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
 		final UserTreeState treeState = new UserTreeState();
 		treeState.setUserId(userId);
-		treeState.setFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, validFolder, invalidFolder));
+		treeState.setProgramFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, validFolder, invalidFolder));
 
 		try {
 			this.germplasmListService
@@ -1500,15 +1501,43 @@ public class GermplasmListServiceImplTest {
 			Mockito.verify(this.userProgramStateDataManager, Mockito.never())
 				.saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID,
 					ListTreeState.GERMPLASM_LIST
-						.name(), treeState.getFolders());
+						.name(), treeState.getProgramFolders());
 		}
 	}
 
 	@Test
-	public void testSaveTreeState_NoFolderToSave() {
+	public void testSaveTreeState_CropFolderDoesntExist() {
+		final String invalidFolder = "7";
+		Mockito.doReturn(Optional.empty()).when(this.germplasmListServiceMiddleware)
+			.getGermplasmListById(Integer.parseInt(invalidFolder));
+		final String validFolder = "5";
+		Mockito.doReturn(Optional.of(this.getGermplasmList(Integer.parseInt(validFolder)))).when(this.germplasmListServiceMiddleware)
+			.getGermplasmListByIdAndProgramUUID(Integer.parseInt(validFolder), GermplasmListServiceImplTest.PROGRAM_UUID);
 		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
 		final UserTreeState treeState = new UserTreeState();
 		treeState.setUserId(userId);
+		treeState.setProgramFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, "2", "3"));
+		treeState.setCropFolders(Lists.newArrayList(GermplasmListServiceImpl.CROP_LISTS, validFolder, invalidFolder));
+
+		try {
+			this.germplasmListService
+				.saveGermplasmListTreeState(GermplasmListServiceImplTest.CROP, GermplasmListServiceImplTest.PROGRAM_UUID, treeState);
+			Assert.fail("Should have thrown validation exception but did not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(e.getErrors().get(0).getCode(), is("list.folder.id.not.exist"));
+			Mockito.verify(this.userProgramStateDataManager, Mockito.never())
+				.saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID,
+					ListTreeState.GERMPLASM_LIST
+						.name(), treeState.getProgramFolders());
+		}
+	}
+
+	@Test
+	public void testSaveTreeState_NoProgramFolderToSave() {
+		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
+		final UserTreeState treeState = new UserTreeState();
+		treeState.setUserId(userId);
+		treeState.setCropFolders(Lists.newArrayList(GermplasmListServiceImpl.CROP_LISTS, "15", "17"));
 
 		try {
 			this.germplasmListService
@@ -1519,7 +1548,29 @@ public class GermplasmListServiceImplTest {
 			Mockito.verify(this.userProgramStateDataManager, Mockito.never())
 				.saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID,
 					ListTreeState.GERMPLASM_LIST
-						.name(), treeState.getFolders());
+						.name(), treeState.getProgramFolders());
+		}
+	}
+
+	@Test
+	public void testSaveTreeState_NoCropFolderToSave() {
+		Mockito.doReturn(Optional.of(this.getGermplasmList(new Random().nextInt()))).when(this.germplasmListServiceMiddleware)
+			.getGermplasmListById(any());
+		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
+		final UserTreeState treeState = new UserTreeState();
+		treeState.setUserId(userId);
+		treeState.setProgramFolders(Lists.newArrayList(GermplasmListServiceImpl.PROGRAM_LISTS, "15", "17"));
+
+		try {
+			this.germplasmListService
+				.saveGermplasmListTreeState(GermplasmListServiceImplTest.CROP, GermplasmListServiceImplTest.PROGRAM_UUID, treeState);
+			Assert.fail("Should have thrown validation exception but did not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(e.getErrors().get(0).getCode(), is("list.folders.empty"));
+			Mockito.verify(this.userProgramStateDataManager, Mockito.never())
+				.saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), GermplasmListServiceImplTest.PROGRAM_UUID,
+					ListTreeState.GERMPLASM_LIST
+						.name(), treeState.getProgramFolders());
 		}
 	}
 

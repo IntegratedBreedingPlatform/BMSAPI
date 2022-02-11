@@ -9,6 +9,7 @@ import org.generationcp.middleware.pojos.MethodType;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -47,7 +48,7 @@ public class ProgenitorsUpdateRequestDtoValidatorTest {
 	public void testValidate_ThrowsException_WhenMethodIsInvalid() {
 		try {
 			final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto = new ProgenitorsUpdateRequestDto(2, null, null, null);
-			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
+			Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 				.thenReturn(Collections.emptyList());
 			this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -59,7 +60,7 @@ public class ProgenitorsUpdateRequestDtoValidatorTest {
 	public void testValidate_ThrowsException_WhenInvalidGpidsCombination() {
 		try {
 			final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto = new ProgenitorsUpdateRequestDto(1, null, 1, null);
-			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
+			Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 				.thenReturn(Arrays.asList(this.getBreedingMethod(MethodType.GENERATIVE, 1)));
 			this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -71,7 +72,7 @@ public class ProgenitorsUpdateRequestDtoValidatorTest {
 	public void testValidate_ThrowsException_WhenNonAllowedOtherProgenitors() {
 		try {
 			final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto = new ProgenitorsUpdateRequestDto(1, 1, 0, Arrays.asList(3));
-			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
+			Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 				.thenReturn(Arrays.asList(this.getBreedingMethod(MethodType.GENERATIVE, 1)));
 			this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -83,7 +84,7 @@ public class ProgenitorsUpdateRequestDtoValidatorTest {
 	public void testValidate_ThrowsException_WhenOtherProgenitorsForNonGenerative() {
 		try {
 			final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto = new ProgenitorsUpdateRequestDto(1, 1, 4, Arrays.asList(3));
-			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
+			Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 				.thenReturn(Arrays.asList(this.getBreedingMethod(MethodType.DERIVATIVE, 1)));
 			this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -96,7 +97,7 @@ public class ProgenitorsUpdateRequestDtoValidatorTest {
 	public void testValidate_ThrowsException_WhenOtherProgenitorsGenerativeWithNonZeroMprgn() {
 		try {
 			final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto = new ProgenitorsUpdateRequestDto(1, 1, 4, Arrays.asList(3));
-			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
+			Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 				.thenReturn(Arrays.asList(this.getBreedingMethod(MethodType.GENERATIVE, 2)));
 			this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -109,7 +110,7 @@ public class ProgenitorsUpdateRequestDtoValidatorTest {
 	public void testValidate_ThrowsException_WhenInvalidOtherProgenitors() {
 		try {
 			final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto = new ProgenitorsUpdateRequestDto(1, 1, 4, Arrays.asList(0));
-			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
+			Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 				.thenReturn(Arrays.asList(this.getBreedingMethod(MethodType.GENERATIVE, 0)));
 			this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -121,7 +122,7 @@ public class ProgenitorsUpdateRequestDtoValidatorTest {
 	public void testValidate_ThrowsException_WhenNullOtherProgenitors() {
 		try {
 			final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto = new ProgenitorsUpdateRequestDto(1, 1, 4, Arrays.asList(0));
-			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
+			Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 				.thenReturn(Arrays.asList(this.getBreedingMethod(MethodType.GENERATIVE, 0)));
 			this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -133,7 +134,7 @@ public class ProgenitorsUpdateRequestDtoValidatorTest {
 	public void testValidate_ThrowsException_WhenProgenitorsContainsTheGidToUpdate() {
 		try {
 			final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto = new ProgenitorsUpdateRequestDto(1, 2, 4, Arrays.asList(7));
-			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
+			Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 				.thenReturn(Arrays.asList(this.getBreedingMethod(MethodType.GENERATIVE, 0)));
 			this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);
 		} catch (final ApiRequestValidationException e) {
@@ -145,7 +146,7 @@ public class ProgenitorsUpdateRequestDtoValidatorTest {
 	public void testValidate_ThrowsException_WhenInvalidProgenitors() {
 		try {
 			final ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto = new ProgenitorsUpdateRequestDto(1, 1, 4, Arrays.asList(7));
-			Mockito.when(this.breedingMethodService.getBreedingMethods(Mockito.any(BreedingMethodSearchRequest.class), Mockito.any()))
+			Mockito.when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 				.thenReturn(Arrays.asList(this.getBreedingMethod(MethodType.GENERATIVE, 0)));
 			Mockito.when(this.germplasmService.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Collections.emptyList());
 			this.progenitorsUpdateRequestDtoValidator.validate(gid, progenitorsUpdateRequestDto);

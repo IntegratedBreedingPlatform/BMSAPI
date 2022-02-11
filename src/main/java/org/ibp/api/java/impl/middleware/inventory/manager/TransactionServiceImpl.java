@@ -1,6 +1,9 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
@@ -10,11 +13,17 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.ibp.api.brapi.v2.inventory.TransactionMapper;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
@@ -88,6 +97,16 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	private LotInputValidator lotInputValidator;
+
+	@Autowired
+	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private DatasetValidator datasetValidator;
+
+	@Autowired
+	private DatasetService studyDatasetService;
+
 
 	@Override
 	public List<TransactionDto> searchTransactions(
@@ -173,10 +192,33 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public void saveDeposits(final LotDepositRequestDto lotDepositRequestDto, final TransactionStatus transactionStatus) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotDepositRequestDto.class.getName());
 
-		if (lotDepositRequestDto.getSourceStudyId() != null) {
-			this.studyValidator.validate(lotDepositRequestDto.getSourceStudyId(), true);
+		if (lotDepositRequestDto.getSearchComposite() != null && lotDepositRequestDto.getSearchComposite().getItemIds() == null) {
+			final SearchCompositeDto<SearchOriginCompositeDto, Integer> searchCompositeDto = lotDepositRequestDto.getSearchComposite();
+			if (searchCompositeDto.getSearchRequest() == null) {
+				errors.reject("search.origin.no.defined", searchCompositeDto.getSearchRequest().getSearchOrigin().values(), "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+
+			switch (searchCompositeDto.getSearchRequest().getSearchOrigin()) {
+				case MANAGE_STUDY_SOURCE:
+					final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest = (GermplasmStudySourceSearchRequest) this.searchRequestService
+							.getSearchRequest(searchCompositeDto.getSearchRequest().getSearchRequestId(),
+								GermplasmStudySourceSearchRequest.class);
+					studyValidator.validate(germplasmStudySourceSearchRequest.getStudyId(), false);
+					break;
+				case MANAGE_STUDY_PLOT:
+					final ObservationUnitsSearchDTO observationUnitsSearchDTO = (ObservationUnitsSearchDTO) this.searchRequestService
+							.getSearchRequest(searchCompositeDto.getSearchRequest().getSearchRequestId(),
+								ObservationUnitsSearchDTO.class);
+					final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(Integer.valueOf(observationUnitsSearchDTO.getDatasetId()));
+					studyValidator.validate(datasetDTO.getParentDatasetId(), false);
+					datasetValidator.validateDataset(datasetDTO.getParentDatasetId(), observationUnitsSearchDTO.getDatasetId());
+					break;
+			}
 		}
+
 		this.lotDepositRequestDtoValidator.validate(lotDepositRequestDto);
 
 		final LotsSearchDto searchDTO = this.searchRequestDtoResolver.getLotsSearchDto(lotDepositRequestDto.getSelectedLots());
