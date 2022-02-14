@@ -214,22 +214,6 @@ public class GermplasmNameTypeValidatorTest {
 	}
 
 	@Test
-	public void testValidateNameTypeDeletion_ThrowsException_WhenNameTypeIsUsedInList() {
-		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
-
-		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
-			.thenReturn(Optional.of(germplasmNameTypeDTO));
-
-		Mockito.when(this.germplasmNameTypeService.isNameTypeUsedInListDataProp(Mockito.any()))
-			.thenReturn(true);
-		try {
-			this.germplasmNameTypeValidator.validateNameTypeDeletion(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.associated.to.list"));
-		}
-	}
-
-	@Test
 	public void testValidateNameTypeDeletion_ThrowsException_WhenNameTypeIdIsUsedBySystem() {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
 		germplasmNameTypeDTO.setCode(SystemNameTypes.LNAME.getType());

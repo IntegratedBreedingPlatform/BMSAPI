@@ -139,11 +139,9 @@ public class TransactionServiceImplTest {
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(workbenchUser);
 
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-		lotDepositRequestDto.setSourceStudyId(99);
 		lotDepositRequestDto.setSelectedLots(new SearchCompositeDto<>());
 		this.transactionServiceImpl.saveDeposits(lotDepositRequestDto, transactionStatus);
 
-		Mockito.verify(this.studyValidator).validate(lotDepositRequestDto.getSourceStudyId(), true);
 		Mockito.verify(this.lotDepositRequestDtoValidator).validate(lotDepositRequestDto);
 		Mockito.verify(this.extendedLotListValidator)
 			.validateAllProvidedLotUUIDsExist(lotDtos, lotDepositRequestDto.getSelectedLots().getItemIds());
