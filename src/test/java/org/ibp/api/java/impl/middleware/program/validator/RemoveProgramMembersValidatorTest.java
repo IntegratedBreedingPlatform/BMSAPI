@@ -6,6 +6,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -29,6 +30,9 @@ public class RemoveProgramMembersValidatorTest {
 
 	@Mock
 	private UserService userService;
+
+	@Mock
+	private SecurityService securityService;
 
 	@InjectMocks
 	private RemoveProgramMembersValidator removeProgramMembersValidator;
