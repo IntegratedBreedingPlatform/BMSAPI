@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
@@ -33,7 +32,6 @@ import org.ibp.api.java.impl.middleware.germplasm.ReorderEntriesLock;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
-import org.ibp.api.rest.common.UserTreeState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
@@ -59,7 +57,7 @@ import static org.apache.commons.lang3.math.NumberUtils.isNumber;
 
 @Api(value = "Germplasm List Services")
 @Controller
-public class GermplasmListResourceGroup {
+public class GermplasmListResource {
 
 	private static final String MANAGE_GERMPLASM_LISTS_PERMISSIONS = "'LISTS', 'MANAGE_GERMPLASM_LISTS'";
 	private static final String MANAGE_GERMPLASM_PERMISSIONS = "'GERMPLASM', 'MANAGE_GERMPLASM'";
@@ -81,19 +79,6 @@ public class GermplasmListResourceGroup {
 
 	@Autowired
 	private ReorderEntriesLock reorderEntriesLock;
-
-	@ApiOperation(value = "Get germplasm lists given a tree parent node folder", notes = "Get germplasm lists given a tree parent node folder")
-	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<TreeNode>> getGermplasmListByParentFolderId(
-		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
-		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
-		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId,
-		@ApiParam(value = "Only folders") @RequestParam(required = true) final Boolean onlyFolders) {
-		final List<TreeNode> children =
-			this.germplasmListService.getGermplasmListChildrenNodes(crop, programUUID, parentFolderId, onlyFolders);
-		return new ResponseEntity<>(children, HttpStatus.OK);
-	}
 
 	@ApiOperation(value = "Create a new Germplasm list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.POST)
@@ -200,97 +185,18 @@ public class GermplasmListResourceGroup {
 
 				@Override
 				public long getCount() {
-					return GermplasmListResourceGroup.this.germplasmListService.countMyLists(programUUID, userId);
+					return GermplasmListResource.this.germplasmListService.countMyLists(programUUID, userId);
 				}
 
 				@Override
 				public List<MyListsDTO> getResults(final PagedResult<MyListsDTO> pagedResult) {
-					return GermplasmListResourceGroup.this.germplasmListService.getMyLists(programUUID, pageable, userId);
+					return GermplasmListResource.this.germplasmListService.getMyLists(programUUID, pageable, userId);
 				}
 			});
 		final List<MyListsDTO> pageResults = result.getPageResults();
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add("X-Total-Count", Long.toString(result.getTotalResults()));
 		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Create germplasm list folder", notes = "Create sample list folder.")
-	// TODO add specific permission to create list from germplasm manager? IBP-5387
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
-	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders", method = RequestMethod.POST)
-	@ResponseBody
-	public ResponseEntity createGermplasmListFolder(
-		@PathVariable final String crop,
-		@RequestParam(required = false) final String programUUID,
-		@RequestParam final String folderName,
-		@RequestParam final String parentId) {
-
-		final Integer folderId = this.germplasmListService.createGermplasmListFolder(crop, programUUID, folderName, parentId);
-		return new ResponseEntity<>(folderId, HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Update germplasm list folder", notes = "Update germplasm list folder.")
-	// TODO add specific permission to create list from germplasm manager? IBP-5387
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
-	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.PUT)
-	@ResponseBody
-	public ResponseEntity updateGermplasmListFolderName(
-		@PathVariable final String crop,
-		@PathVariable final String folderId,
-		@RequestParam(required = false) final String programUUID,
-		@RequestParam final String newFolderName) {
-
-		final Integer updatedFolderId = this.germplasmListService.updateGermplasmListFolderName(crop, programUUID, newFolderName, folderId);
-		return new ResponseEntity<>(updatedFolderId, HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Move germplasm list folder.", notes = "Move germplasm list folder.")
-	// TODO add specific permission to create list from germplasm manager? IBP-5387
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
-	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}/move", method = RequestMethod.PUT)
-	@ResponseBody
-	public ResponseEntity moveGermplasmList(
-		@PathVariable final String crop,
-		@PathVariable final String folderId,
-		@RequestParam(required = false) final String programUUID,
-		@RequestParam final String newParentId) {
-
-		final Integer movedFolderId = this.germplasmListService.moveGermplasmListFolder(crop, programUUID, folderId, newParentId);
-		return new ResponseEntity<>(movedFolderId, HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Delete germplasm list folder", notes = "Delete germplasm list folder.")
-	// TODO add specific permission to create list from germplasm manager? IBP-5387
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
-	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.DELETE)
-	@ResponseBody
-	public ResponseEntity deleteGermplasmListFolder(
-		@PathVariable final String crop,
-		@PathVariable final String folderId,
-		@RequestParam(required = false) final String programUUID) {
-		this.germplasmListService.deleteGermplasmListFolder(crop, programUUID, folderId);
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Get tree of expanded germplasm list folders last used by user", notes = "Get tree of expanded germplasm list folders last used by user")
-	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree-state", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<TreeNode>> getUserTreeState(
-		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
-		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
-		@ApiParam(value = "The User ID") @RequestParam(required = true) final String userId) {
-		return new ResponseEntity<>(this.germplasmListService.getUserTreeState(crop, programUUID, userId), HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Save hierarchy of germplasm list folders last used by user", notes = "Save hierarchy of germplasm list folders last used by user")
-	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree-state", method = RequestMethod.POST)
-	@ResponseBody
-	public ResponseEntity<Void> saveUserTreeState(
-		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
-		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
-		@RequestBody final UserTreeState treeState) {
-		this.germplasmListService.saveGermplasmListTreeState(crop, programUUID, treeState);
-		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation("Search germplasm lists")
