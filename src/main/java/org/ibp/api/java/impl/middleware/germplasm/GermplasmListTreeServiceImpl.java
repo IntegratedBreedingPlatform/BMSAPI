@@ -121,11 +121,11 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 			final List<UserDefinedField> listTypes = this.germplasmDataManager
 				.getUserDefinedFieldByFieldTableNameAndType(RowColumnType.LIST_TYPE.getFtable(), RowColumnType.LIST_TYPE.getFtype());
 
-			final List<TreeNode> childNodes = TreeViewUtil.convertGermplasmListToTreeView(rootLists, folderOnly, listTypes);
+			final List<TreeNode> children = TreeViewUtil.convertGermplasmListToTreeView(rootLists, folderOnly, listTypes);
 
 			final Map<Integer, ListMetadata> allListMetaData = this.germplasmListManager.getGermplasmListMetadata(rootLists);
 
-			for (final TreeNode newNode : childNodes) {
+			for (final TreeNode newNode : children) {
 				final ListMetadata nodeMetaData = allListMetaData.get(Integer.parseInt(newNode.getKey()));
 				if (nodeMetaData != null) {
 					if (nodeMetaData.getNumberOfChildren() > 0) {
@@ -138,7 +138,7 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 				}
 				newNode.setParentId(parentId);
 			}
-			return childNodes;
+			return children;
 		}
 		return treeNodes;
 	}
