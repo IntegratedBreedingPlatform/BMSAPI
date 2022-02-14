@@ -13,13 +13,17 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.SampleServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +37,9 @@ import static org.mockito.Mockito.doReturn;
 public class SampleResourceBrapiTest extends ApiUnitTestBase {
 
 	private static final SimpleDateFormat DATE_FORMAT = DateUtil.getSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+	@Autowired
+	private SampleServiceBrapi sampleServiceBrapi;
 
 	@Autowired
 	private SampleServiceBrapi sampleService;
@@ -162,5 +169,93 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.searchResultsDbId", Matchers.is(String.valueOf(searchResultsDbId))));
 
+	}
+
+	/**
+	 * Should respond with 200 and a Sample. * *
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testGetSample_foundASample() throws Exception {
+		final String sampleId = "a1w2xed2f";
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v2/samples/" + sampleId).build().encode();
+
+		final SampleObservationDto sampleObservationDto = this.getTestObservationDto();
+		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
+		requestDTO.setSampleDbIds(Collections.singletonList(sampleId));
+		Mockito.when(this.sampleServiceBrapi.getSampleObservations(requestDTO, null))
+			.thenReturn(com.beust.jcommander.internal.Lists.newArrayList(sampleObservationDto));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.additionalInfo",
+				Matchers.is(sampleObservationDto.getAdditionalInfo())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.externalReferences",
+				IsCollectionWithSize.hasSize(sampleObservationDto.getExternalReferences().size())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.externalReferences[0].referenceID",
+				Matchers.is(sampleObservationDto.getExternalReferences().get(0).getReferenceID())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.externalReferences[0].referenceSource",
+				Matchers.is(sampleObservationDto.getExternalReferences().get(0).getReferenceSource())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.studyDbId",
+				Matchers.is(sampleObservationDto.getStudyDbId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.column",
+				Matchers.is(sampleObservationDto.getColumn())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.germplasmDbId",
+				Matchers.is(sampleObservationDto.getGermplasmDbId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.observationUnitDbId",
+				Matchers.is(sampleObservationDto.getObservationUnitDbId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.plateDbId",
+				Matchers.is(sampleObservationDto.getPlateDbId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.plateName",
+				Matchers.is(sampleObservationDto.getPlateName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.programDbId",
+				Matchers.is(sampleObservationDto.getProgramDbId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.row",
+				Matchers.is(sampleObservationDto.getRow())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleBarcode",
+				Matchers.is(sampleObservationDto.getSampleBarcode())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleDbId",
+				Matchers.is(sampleObservationDto.getSampleDbId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleDescription",
+				Matchers.is(sampleObservationDto.getSampleDescription())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleGroupDbId",
+				Matchers.is(sampleObservationDto.getSampleGroupDbId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleName",
+				Matchers.is(sampleObservationDto.getSampleName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.samplePUI",
+				Matchers.is(sampleObservationDto.getSamplePUI())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleTimestamp",
+				Matchers.is(SampleResourceBrapiTest.DATE_FORMAT.format(sampleObservationDto.getSampleTimestamp()))))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleType",
+				Matchers.is(sampleObservationDto.getSampleType())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.takenBy",
+				Matchers.is(sampleObservationDto.getTakenBy())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.tissueType",
+				Matchers.is(sampleObservationDto.getTissueType())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.trialDbId",
+				Matchers.is(sampleObservationDto.getTrialDbId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.well",
+				Matchers.is(sampleObservationDto.getWell())));
+	}
+
+	/**
+	 * Should respond with 404. * *
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testGetSample_notFoundASample() throws Exception {
+		final String sampleId = "a1w2xed2f";
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v2/samples/" + sampleId).build().encode();
+
+		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
+		requestDTO.setSampleDbIds(Collections.singletonList(sampleId));
+		Mockito.when(this.sampleServiceBrapi.getSampleObservations(requestDTO, null)).thenReturn(new ArrayList<>());
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("not found sample"))) //
+		;
 	}
 }
