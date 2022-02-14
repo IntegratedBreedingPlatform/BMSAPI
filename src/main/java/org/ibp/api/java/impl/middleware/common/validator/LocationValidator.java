@@ -38,7 +38,7 @@ public class LocationValidator {
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 	private static final Integer LOCATION_NAME_MAX_LENGTH = 60;
 	private static final Integer LOCATION_ABBR_MAX_LENGTH = 12;
-
+	private static final Set<Integer> LOCATIONS_NOT_DELETABLES = new HashSet<>(Arrays.asList(9028, 6000, 6001));
 	@Autowired
 	private LocationDataManager locationDataManager;
 
@@ -200,6 +200,7 @@ public class LocationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
 		this.validateLocation(this.errors, locationId);
+		this.validateLocationNotdeletable(locationId);
 		this.validateLocationNotUsedInGermplasm(locationId);
 		this.validateLocationNotUsedInLot(locationId);
 		this.validateLocationNotUsedInAttribute(locationId);
@@ -208,6 +209,14 @@ public class LocationValidator {
 		this.validateLocationNotBelongToCountryTable(locationId);
 		this.validateLocationNotUsedInFieldMap(locationId);
 
+	}
+
+	private void validateLocationNotdeletable(final Integer locationId) {
+		final Location location = locationDataManager.getLocationByID(locationId);
+		if (LOCATIONS_NOT_DELETABLES.contains(locationId) || location.getLdefault()) {
+			this.errors.reject("location.not.deletable", new String[] {locationId.toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	private void validateLocationNotUsedInFieldMap(final Integer locationId) {
