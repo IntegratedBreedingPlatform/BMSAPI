@@ -113,4 +113,13 @@ public class LocationResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	// Temporaly resource until we remove the country table.
+	@ApiIgnore
+	@RequestMapping(value = "/crops/{cropName}/location-country", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<LocationDTO>> getCountryLocations(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.locationService.getCountries(), HttpStatus.OK);
+	}
 }

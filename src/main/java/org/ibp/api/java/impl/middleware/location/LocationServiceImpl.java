@@ -77,4 +77,9 @@ public class LocationServiceImpl implements LocationService {
 		return true;
 	}
 
+	@Override
+	public List<LocationDTO> getCountries() {
+		return this.locationMiddlewareService.getCountries();
+	}
+
 }
