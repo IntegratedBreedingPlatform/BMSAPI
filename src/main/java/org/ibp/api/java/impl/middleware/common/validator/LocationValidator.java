@@ -212,11 +212,9 @@ public class LocationValidator {
 	}
 
 	private void validateLocationNotdeletable(final Integer locationId) {
-		final Location location = locationDataManager.getLocationByID(locationId);
-		if (location == null) {
-			return;
-		}
-		if (LOCATIONS_NOT_DELETABLES.contains(locationId) || location.getLdefault()) {
+		final LocationDTO location = this.locationService.getLocation(locationId);
+
+		if (LOCATIONS_NOT_DELETABLES.contains(locationId) || location.isDefaultLocation()) {
 			this.errors.reject("location.not.deletable", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
