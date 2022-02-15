@@ -38,7 +38,7 @@ public class LocationValidator {
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 	private static final Integer LOCATION_NAME_MAX_LENGTH = 60;
 	private static final Integer LOCATION_ABBR_MAX_LENGTH = 12;
-	private static final Set<Integer> LOCATIONS_NOT_DELETABLES = new HashSet<>(Arrays.asList(9028, 6000, 6001));
+	private static final Set<String> LOCATIONS_NOT_DELETABLES = new HashSet<>(Arrays.asList("Unspecified Location", "Default Seed Store", "Default Breeding Location"));
 	@Autowired
 	private LocationDataManager locationDataManager;
 
@@ -184,6 +184,7 @@ public class LocationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
 
 		this.validateLocation(this.errors, locationId);
+		this.validateLocationNotEditable(locationId);
 		this.validateLocationName(locationRequestDto.getName());
 		this.validateLocationType(locationRequestDto.getType());
 		this.validateLocationAbbr(locationRequestDto.getAbbreviation());
@@ -200,7 +201,7 @@ public class LocationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
 		this.validateLocation(this.errors, locationId);
-		this.validateLocationNotdeletable(locationId);
+		this.validateLocationNotDeletable(locationId);
 		this.validateLocationNotUsedInGermplasm(locationId);
 		this.validateLocationNotUsedInLot(locationId);
 		this.validateLocationNotUsedInAttribute(locationId);
@@ -211,11 +212,20 @@ public class LocationValidator {
 
 	}
 
-	private void validateLocationNotdeletable(final Integer locationId) {
+	private void validateLocationNotDeletable(final Integer locationId) {
 		final LocationDTO location = this.locationService.getLocation(locationId);
 
-		if (LOCATIONS_NOT_DELETABLES.contains(locationId) || location.isDefaultLocation()) {
+		if (LOCATIONS_NOT_DELETABLES.contains(location.getName()) || location.isDefaultLocation()) {
 			this.errors.reject("location.not.deletable", new String[] {locationId.toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateLocationNotEditable(final Integer locationId) {
+		final LocationDTO location = this.locationService.getLocation(locationId);
+
+		if (LOCATIONS_NOT_DELETABLES.contains(location.getName())) {
+			this.errors.reject("location.not.editable", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
