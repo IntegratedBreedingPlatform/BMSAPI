@@ -340,7 +340,6 @@ public class StudyEntryServiceImplTest {
 		for (final GermplasmListData gData : listData) {
 			final StudyEntryDto entryDto = new StudyEntryDto();
 			entryDto.setGid(gData.getGid());
-			entryDto.setEntryCode(gData.getEntryCode());
 			entryDto.setEntryId(gData.getEntryId());
 			entryDtos.add(entryDto);
 		}

@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -34,7 +35,6 @@ public abstract class StudyEntryTestDataGenerator {
 													 final SystemDefinedEntryType systemDefinedEntryType) {
 		final StudyEntryDto studyEntryDto = new StudyEntryDto();
 		studyEntryDto.setEntryNumber(entryNumber);
-		studyEntryDto.setEntryCode(String.valueOf(entryNumber));
 		studyEntryDto.setDesignation("DESIG" + entryNumber);
 		studyEntryDto.setGid(germplasmId);
 
@@ -42,6 +42,7 @@ public abstract class StudyEntryTestDataGenerator {
 		properties.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(), "SOURCE" + entryNumber));
 		properties.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(), String.valueOf(systemDefinedEntryType.getEntryTypeCategoricalId())));
 		properties.put(TermId.GROUPGID.getId(), new StudyEntryPropertyData(null, TermId.GROUPGID.getId(), String.valueOf(0)));
+		properties.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(), String.valueOf(entryNumber)));
 		studyEntryDto.setProperties(properties);
 		return studyEntryDto;
 	}

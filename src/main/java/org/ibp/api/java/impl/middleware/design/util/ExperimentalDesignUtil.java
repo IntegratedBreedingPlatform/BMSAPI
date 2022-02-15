@@ -86,8 +86,9 @@ public class ExperimentalDesignUtil {
 			return new ObservationUnitData(termId, studyEntryDto.getDesignation());
 		} else if (termId == TermId.GID.getId()) {
 			return new ObservationUnitData(termId, String.valueOf(studyEntryDto.getGid()));
-		} else if (termId == TermId.ENTRY_CODE.getId()) {
-			return new ObservationUnitData(termId, studyEntryDto.getEntryCode());
+			// TODO: should get entry code from properties?
+//		} else if (termId == TermId.ENTRY_CODE.getId()) {
+//			return new ObservationUnitData(termId, studyEntryDto.getEntryCode());
 		} else if (termId == TermId.ENTRY_TYPE.getId()) {
 			final Optional<String> entryType = studyEntryDto.getStudyEntryPropertyValue(TermId.ENTRY_TYPE.getId());
 			return new ObservationUnitData(termId, entryType.orElse(StringUtils.EMPTY));

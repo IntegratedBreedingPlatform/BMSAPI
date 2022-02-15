@@ -50,7 +50,8 @@ public class StudyEntryMapper {
 				this.map().getGermplasmListEntrySummary().setGid(this.source.getGid());
 				this.using(new OptionalConverter(TermId.CROSS.getId())).map(this.source).getGermplasmListEntrySummary().setCross(null);
 				this.map().getGermplasmListEntrySummary().setDesignation(this.source.getDesignation());
-				this.map().getGermplasmListEntrySummary().setEntryCode(this.source.getEntryCode());
+				// TODO: should get entry code from properties?
+//				this.map().getGermplasmListEntrySummary().setEntryCode(this.source.getEntryCode());
 				this.using(new OptionalConverter(TermId.SEED_SOURCE.getId())).map(this.source).getGermplasmListEntrySummary().setSeedSource(null);
 			}
 		});
@@ -79,7 +80,6 @@ public class StudyEntryMapper {
 				this.map().setEntryId(this.source.getEntryId());
 				this.map().setGid(this.source.getGermplasmId());
 				this.map().setDesignation(this.source.getDesignation());
-				this.map().setEntryCode(this.source.getEntryCode());
 			}
 		});
 	}
@@ -93,7 +93,8 @@ public class StudyEntryMapper {
 			studyEntryDto.setGid(source.getGid());
 			studyEntryDto.setDesignation(gidDesignationMap.get(source.getGid()));
 			studyEntryDto.setEntryNumber(entryNumber);
-			studyEntryDto.setEntryCode(entryNumber.toString());
+			// TODO: should set entry code in properties?
+//			studyEntryDto.setEntryCode(entryNumber.toString());
 			studyEntryDto.setEntryId(entryNumber++);
 			studyEntryDto.setProperties(StudyEntryPropertiesMapper.map(source, germplasmDescriptorIds, entryTypeId, gidCrossMap.get(source.getGid())));
 			studyEntryDtos.add(studyEntryDto);
