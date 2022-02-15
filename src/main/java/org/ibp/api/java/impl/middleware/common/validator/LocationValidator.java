@@ -253,7 +253,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationNotBelongToCountryTable(final Integer locationId) {
-		final boolean isCountryLocation = locationService.existsLocationAsCountry(locationId);
+		final boolean isCountryLocation = locationService.isDefaultCountryLocation(locationId);
 		if (isCountryLocation) {
 			this.errors.reject("location.country.can.not.deletable", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
