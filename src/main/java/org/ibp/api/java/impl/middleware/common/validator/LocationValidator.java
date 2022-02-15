@@ -15,6 +15,7 @@ import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.Util;
@@ -226,18 +227,21 @@ public class LocationValidator {
 	}
 
 	private void validateLocationNotUsedInFieldMap(final LocationDTO locationDTO) {
-		List<Locdes> blocks = null;
-		if(locationDTO.getType() == 415){ // Field
-			blocks = locationDataManager.getLocdes(null, locationDTO.getId().toString());
+		List<Integer> blockIds = null;
+		if (locationDTO.getType() == LocdesType.FIELD.getId()) {
+			blockIds = locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString())).stream().map(Locdes::getLocationId).collect(Collectors.toList());
+		} else if (locationDTO.getType() == LocdesType.BLOCK.getId()) {
+			blockIds = locationDataManager.getLocdes(Arrays.asList(locationDTO.getId()), null).stream()
+				.filter(locdes -> locdes.getTypeId() == LocdesType.BLOCK_PARENT.getId()).map(Locdes::getLocationId).collect(Collectors.toList());
+		} else {
+			final List<Locdes> fieldParentLocation = locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString()));
+			if (!fieldParentLocation.isEmpty()) {
+				final List<String> fieldParentIds = fieldParentLocation.stream().map(Locdes::getLocationId).map(Object::toString).collect(Collectors.toList());
+				blockIds = locationDataManager.getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId).collect(Collectors.toList());
+			}
 		}
-		if(locationDTO.getType() == 416){ // Block
-			blocks = locationDataManager.getLocdes(locationDTO.getId(), null).stream().filter(locdes -> locdes.getTypeId() == 313)
-				.collect(Collectors.toList());
-
-		}
-		if (!CollectionUtils.isEmpty(blocks)) {
-			final List<Integer> locationIds = blocks.stream().map((locdes) -> locdes.getLocationId()).collect(Collectors.toList());
-			boolean isUsed = locationService.blockIdIsUsedInFieldMap(locationIds);
+		if (!CollectionUtils.isEmpty(blockIds)) {
+			boolean isUsed = locationService.blockIdIsUsedInFieldMap(blockIds);
 			if (isUsed) {
 				this.errors.reject("location.is.used.in.field.map", new String[] {locationDTO.getId().toString()}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
