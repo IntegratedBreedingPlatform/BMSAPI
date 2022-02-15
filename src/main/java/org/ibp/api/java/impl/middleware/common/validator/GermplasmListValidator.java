@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListBasicInfoDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -11,6 +11,7 @@ import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.impl.middleware.germplasm.GermplasmListTreeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -18,6 +19,8 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotEmpty;
@@ -25,6 +28,21 @@ import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.ch
 
 @Component
 public class GermplasmListValidator {
+
+	public enum ListNodeType {
+		PARENT("parent"),
+		FOLDER("folder");
+
+		private final String value;
+
+		ListNodeType(final String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return this.value;
+		}
+	}
 
 	public static final int NAME_MAX_LENGTH = 50;
 	public static final String PARAM_NULL = "param.null";
@@ -67,7 +85,7 @@ public class GermplasmListValidator {
 		}
 	}
 
-	public void validateListMetadata(final GermplasmListDto germplasmListDto, final String currentProgram) {
+	public void validateListMetadata(final GermplasmListBasicInfoDTO germplasmListDto, final String currentProgram) {
 		checkNotNull(germplasmListDto, PARAM_NULL, new String[] {"request"});
 		checkNotNull(germplasmListDto.getCreationDate(), PARAM_NULL, new String[] {"date"});
 
@@ -88,6 +106,7 @@ public class GermplasmListValidator {
 		this.validateListName(currentProgram, germplasmListDto.getListName(), germplasmListDto.getListId());
 	}
 
+	//TODO Find by name and parent instead of name and program
 	private void validateListName(final String currentProgram, final String name, final Integer listId) {
 		checkNotEmpty(name, "param.null", new String[] {"name"});
 		checkArgument(name.length() <= NAME_MAX_LENGTH, TEXT_FIELD_MAX_LENGTH, new String[] {"name", "50"});
@@ -131,9 +150,59 @@ public class GermplasmListValidator {
 		}
 	}
 
-	public void validateParentFolder(final GermplasmListDto request) {
-		final String parentFolderId = request.getParentFolderId();
+	public void validateParentFolder(final String parentFolderId) {
 		checkNotNull(parentFolderId, PARAM_NULL, new String[] {"parentFolderId"});
+	}
+
+	public Optional<GermplasmList> validateFolderId(final String folderId, final String programUUID, final ListNodeType nodeType) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
+		this.validateNodeId(folderId, nodeType);
+
+		if (Util.isPositiveInteger(folderId)) {
+
+			final GermplasmList folder = this.germplasmListService.getGermplasmListById(Integer.parseInt(folderId))
+				.orElseThrow(() -> {
+					this.errors.reject("list.folder.id.not.exist", "");
+					return new ApiRequestValidationException(this.errors.getAllErrors());
+				});
+
+			if (!folder.isFolder()) {
+				this.errors.reject("list.folder.id.not.exist", "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+
+			//verify that folder belongs to the program when it is not a crop folder
+			if (!StringUtils.isEmpty(folder.getProgramUUID())) {
+				if (StringUtils.isEmpty(programUUID) || !programUUID.equals(folder.getProgramUUID())) {
+					this.errors.reject("list.project.mandatory", "");
+					throw new ApiRequestValidationException(this.errors.getAllErrors());
+				}
+			}
+
+			return Optional.of(folder);
+		}
+
+		return Optional.empty();
+	}
+
+	public void validateNodeId(final String nodeId, final ListNodeType nodeType) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
+		if (!Objects.isNull(nodeId) && !GermplasmListTreeServiceImpl.PROGRAM_LISTS.equals(nodeId) && !GermplasmListTreeServiceImpl.CROP_LISTS.equals(nodeId) && !Util.isPositiveInteger(nodeId)) {
+			this.errors.reject("list." + nodeType.getValue() + ".id.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validateFolderHasNoChildren(final Integer nodeId, final String message) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
+		final List<GermplasmList> listChildren = this.germplasmListManager.getGermplasmListByParentFolderId(nodeId);
+		if (!listChildren.isEmpty()) {
+			this.errors.reject(message, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 }
