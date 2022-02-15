@@ -207,7 +207,7 @@ public class LocationValidator {
 		this.validateLocationNotUsedInAttribute(locationId);
 		this.validateLocationNotUsedInName(locationId);
 		this.validateLocationNotUsedInStudy(locationId);
-		this.validateLocationNotBelongToCountryTable(locationId);
+		this.validateLocationIsNotDefaultCountry(locationId);
 		this.validateLocationNotUsedInFieldMap(locationDTO);
 
 	}
@@ -250,7 +250,7 @@ public class LocationValidator {
 
 	}
 
-	private void validateLocationNotBelongToCountryTable(final Integer locationId) {
+	private void validateLocationIsNotDefaultCountry(final Integer locationId) {
 		final boolean isCountryLocation = locationService.isDefaultCountryLocation(locationId);
 		if (isCountryLocation) {
 			this.errors.reject("location.country.can.not.deletable", new String[] {locationId.toString()}, "");
