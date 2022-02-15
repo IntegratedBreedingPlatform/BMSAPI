@@ -113,7 +113,7 @@ public class LocationResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	// Temporaly resource until we remove the country table.
+	// temporary resource until we remove the country table. https://ibplatform.atlassian.net/browse/IBP-5462
 	@ApiIgnore
 	@RequestMapping(value = "/crops/{cropName}/location-country", method = RequestMethod.GET)
 	@ResponseBody
