@@ -115,7 +115,7 @@ public class LocationResource {
 
 	// temporary resource until we remove the country table. https://ibplatform.atlassian.net/browse/IBP-5462
 	@ApiIgnore
-	@RequestMapping(value = "/crops/{cropName}/location-country", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/location-countries", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<LocationDTO>> getCountryLocations(
 		@PathVariable final String cropName,
