@@ -121,18 +121,19 @@ public class LocationValidator {
 		}
 	}
 
-	public void validateLocation(final BindingResult errors, final Integer locationId) {
+	public LocationDTO validateLocation(final BindingResult errors, final Integer locationId) {
 		if (locationId == null) {
 			errors.reject("location.required", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final LocationDTO location = this.locationService.getLocation(locationId);
+		final LocationDTO locationDTO = this.locationService.getLocation(locationId);
 
-		if (location == null) {
+		if (locationDTO == null) {
 			errors.reject("location.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+		return locationDTO;
 	}
 
 	public void validateCreation(final LocationRequestDto locationRequestDto) {
@@ -183,14 +184,12 @@ public class LocationValidator {
 	public void validateUpdate(final Integer locationId, final LocationRequestDto locationRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
 
-		this.validateLocation(this.errors, locationId);
-		this.validateLocationNotEditable(locationId);
+		final LocationDTO locationDTO = this.validateLocation(this.errors, locationId);
+		this.validateLocationNotEditable(locationDTO);
 		this.validateLocationName(locationRequestDto.getName());
 		this.validateLocationType(locationRequestDto.getType());
 		this.validateLocationAbbr(locationRequestDto.getAbbreviation());
 		this.validateLocationAbbrNotExists(locationId, locationRequestDto.getAbbreviation());
-
-		final LocationDTO locationDTO = this.locationService.getLocation(locationId);
 
 		final Integer countryId = locationRequestDto.getCountryId();
 		final Integer provinceId = locationRequestDto.getProvinceId();
@@ -200,44 +199,39 @@ public class LocationValidator {
 	public void validateCanBeDeleted(final Integer locationId) {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
-		this.validateLocation(this.errors, locationId);
-		this.validateLocationNotDeletable(locationId);
+		final LocationDTO locationDTO = this.validateLocation(this.errors, locationId);
+		this.validateLocationNotDeletable(locationDTO);
 		this.validateLocationNotUsedInGermplasm(locationId);
 		this.validateLocationNotUsedInLot(locationId);
 		this.validateLocationNotUsedInAttribute(locationId);
 		this.validateLocationNotUsedInName(locationId);
 		this.validateLocationNotUsedInStudy(locationId);
 		this.validateLocationNotBelongToCountryTable(locationId);
-		this.validateLocationNotUsedInFieldMap(locationId);
+		this.validateLocationNotUsedInFieldMap(locationDTO);
 
 	}
 
-	private void validateLocationNotDeletable(final Integer locationId) {
-		final LocationDTO location = this.locationService.getLocation(locationId);
-
-		if (LOCATIONS_NOT_DELETABLES.contains(location.getName()) || location.isDefaultLocation()) {
-			this.errors.reject("location.not.deletable", new String[] {locationId.toString()}, "");
+	private void validateLocationNotDeletable(final LocationDTO locationDTO) {
+		if (LOCATIONS_NOT_DELETABLES.contains(locationDTO.getName()) || locationDTO.isDefaultLocation()) {
+			this.errors.reject("location.not.deletable", new String[] {locationDTO.getId().toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateLocationNotEditable(final Integer locationId) {
-		final LocationDTO location = this.locationService.getLocation(locationId);
-
-		if (LOCATIONS_NOT_DELETABLES.contains(location.getName())) {
-			this.errors.reject("location.not.editable", new String[] {locationId.toString()}, "");
+	private void validateLocationNotEditable(final LocationDTO locationDTO) {
+		if (LOCATIONS_NOT_DELETABLES.contains(locationDTO.getName())) {
+			this.errors.reject("location.not.editable", new String[] {locationDTO.getId().toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
-	private void validateLocationNotUsedInFieldMap(final Integer locationId) {
-		final Location location = locationDataManager.getLocationByID(locationId);
+	private void validateLocationNotUsedInFieldMap(final LocationDTO locationDTO) {
 		List<Locdes> blocks = null;
-		if(location.getLtype() == 415){ // Field
-			blocks = locationDataManager.getLocdes(null, locationId.toString());
+		if(locationDTO.getType() == 415){ // Field
+			blocks = locationDataManager.getLocdes(null, locationDTO.getId().toString());
 		}
-		if(location.getLtype() == 416){ // Block
-			blocks = locationDataManager.getLocdes(locationId, null).stream().filter(locdes -> locdes.getTypeId() == 313)
+		if(locationDTO.getType() == 416){ // Block
+			blocks = locationDataManager.getLocdes(locationDTO.getId(), null).stream().filter(locdes -> locdes.getTypeId() == 313)
 				.collect(Collectors.toList());
 
 		}
@@ -245,7 +239,7 @@ public class LocationValidator {
 			final List<Integer> locationIds = blocks.stream().map((locdes) -> locdes.getLocationId()).collect(Collectors.toList());
 			boolean isUsed = locationService.blockIdIsUsedInFieldMap(locationIds);
 			if (isUsed) {
-				this.errors.reject("location.is.used.in.field.map", new String[] {locationId.toString()}, "");
+				this.errors.reject("location.is.used.in.field.map", new String[] {locationDTO.getId().toString()}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
