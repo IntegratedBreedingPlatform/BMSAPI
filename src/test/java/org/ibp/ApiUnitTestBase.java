@@ -26,6 +26,7 @@ import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.germplasm.GermplasmListService;
+import org.ibp.api.java.germplasm.GermplasmListTreeService;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
@@ -280,7 +281,11 @@ public abstract class ApiUnitTestBase {
 			return Mockito.mock(GermplasmListService.class);
 		}
 
-
+		@Bean
+		@Primary
+		public GermplasmListTreeService germplasmListTreeService() {
+			return Mockito.mock(GermplasmListTreeService.class);
+		}
 
 	}
 
