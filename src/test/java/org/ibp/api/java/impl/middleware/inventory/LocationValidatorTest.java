@@ -46,7 +46,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 public class LocationValidatorTest {
 
 	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
-	public static final int LOCATION_ID = 6000;
+	public static final int LOCATION_ID = 5000;
 	public static final String STOCK_ID = "ABCD";
 	public static final String COMMENTS = "Comments";
 	public static final int GID = 1;
