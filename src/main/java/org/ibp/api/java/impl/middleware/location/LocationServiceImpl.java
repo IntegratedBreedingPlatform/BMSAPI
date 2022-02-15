@@ -54,8 +54,6 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public void deleteLocation(final Integer locationId) {
 		this.locationValidator.validateCanBeDeleted(locationId);
-		final Set<Integer> entityIds = ImmutableSet.of(locationId);
-		this.programFavoriteService.deleteProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, entityIds);
 		this.locationMiddlewareService.deleteLocation(locationId);
 	}
 
