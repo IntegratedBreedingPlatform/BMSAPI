@@ -251,7 +251,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationIsNotDefaultCountry(final Integer locationId) {
-		final boolean isCountryLocation = locationService.isDefaultCountryLocation(locationId);
+		final boolean isCountryLocation = this.locationService.isDefaultCountryLocation(locationId);
 		if (isCountryLocation) {
 			this.errors.reject("location.country.can.not.deletable", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
