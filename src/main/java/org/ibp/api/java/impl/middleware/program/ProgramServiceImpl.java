@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
+import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
@@ -22,6 +23,7 @@ import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.program.validator.AddProgramMemberRequestDtoValidator;
 import org.ibp.api.java.impl.middleware.program.validator.ProgramBasicDetailsDtoValidator;
@@ -190,6 +192,8 @@ public class ProgramServiceImpl implements ProgramService {
 				if (workbenchProgram.getStartDate() != null) {
 					programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
 				}
+				programSummary.setLastOpenDate(Util.formatDateAsStringValue(workbenchProgram.getLastOpenDate(),
+					Util.FRONTEND_TIMESTAMP_FORMAT));
 				return programSummary;
 			}
 			return null;
@@ -199,13 +203,15 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable) {
-		return this.userService.getProgramMembers(programUUID, pageable);
+	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest,
+		final Pageable pageable) {
+
+		return this.userService.getProgramMembers(programUUID, searchRequest, pageable);
 	}
 
 	@Override
-	public long countAllProgramMembers(final String programUUID) {
-		return this.userService.countAllProgramMembers(programUUID);
+	public long countAllProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest) {
+		return this.userService.countAllProgramMembers(programUUID, searchRequest);
 	}
 
 	@Override
@@ -251,11 +257,13 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public boolean editProgram(final String cropName, final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		final String oldProjectName = this.programService.getProgramByUUID(programUUID).get().getName();
 		this.programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
 		if (programBasicDetailsDto.allAttributesNull()) {
 			return false;
 		}
 		this.programService.editProgram(programUUID, programBasicDetailsDto);
+		this.installationDirectoryUtil.renameOldWorkspaceDirectory(oldProjectName, cropName, programBasicDetailsDto.getName());
 		return true;
 	}
 }

@@ -24,4 +24,6 @@ public interface LocationService {
 	LocationDTO createLocation(LocationRequestDto locationRequestDto);
 
 	boolean updateLocation(Integer locationId, LocationRequestDto locationRequestDto);
+
+	List<LocationDTO> getCountries();
 }

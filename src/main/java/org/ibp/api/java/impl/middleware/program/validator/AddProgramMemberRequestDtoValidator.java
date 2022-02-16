@@ -75,7 +75,7 @@ public class AddProgramMemberRequestDtoValidator {
 
 		//all users are eligible to be program members
 		final List<Integer> eligibleUserIds =
-			this.userService.getProgramMembersEligibleUsers(programUUID, null).stream().map(UserDto::getUserId)
+			this.userService.getProgramMembersEligibleUsers(programUUID, null, null).stream().map(UserDto::getUserId)
 				.collect(Collectors.toList());
 		if (!eligibleUserIds.containsAll(addProgramMemberRequestDto.getUserIds())) {
 			final List<Integer> invalidUsers = new ArrayList<>(addProgramMemberRequestDto.getUserIds());
