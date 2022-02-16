@@ -46,7 +46,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 public class LocationValidatorTest {
 
 	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
-	public static final int LOCATION_ID = 6000;
+	public static final int LOCATION_ID = 5000;
 	public static final String STOCK_ID = "ABCD";
 	public static final String COMMENTS = "Comments";
 	public static final int GID = 1;
@@ -394,8 +394,12 @@ public class LocationValidatorTest {
 			Arrays.asList(new org.generationcp.middleware.api.location.Location());
 		Mockito.when(this.locationService.getLocations(Mockito.any(), Mockito.any())).thenReturn(listLocations);
 
+		final LocationTypeDTO locationTypeDTO = new LocationTypeDTO();
+		locationTypeDTO.setId(LocationValidatorTest.LOCATION_TYPE);
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(Arrays.asList(locationTypeDTO));
+
 		final LocationRequestDto locationRequestDto =
-			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, null);
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, LocationValidatorTest.LOCATION_TYPE);
 
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
@@ -413,7 +417,13 @@ public class LocationValidatorTest {
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(locationDTO);
 		final String locationAbbrTooLong = RandomStringUtils.randomAlphabetic(13);
 		final LocationRequestDto locationRequestDto =
-			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, locationAbbrTooLong, null);
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, locationAbbrTooLong, LocationValidatorTest.LOCATION_TYPE);
+
+		final LocationTypeDTO locationTypeDTO = new LocationTypeDTO();
+		locationTypeDTO.setId(LocationValidatorTest.LOCATION_TYPE);
+
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(Arrays.asList(locationTypeDTO));
+
 
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
@@ -432,8 +442,14 @@ public class LocationValidatorTest {
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(locationDTO);
 		Mockito.when(this.locationService.getLocation(locationDTO.getCountryId())).thenReturn(new LocationDTO());
 
+		final LocationTypeDTO locationTypeDTO = new LocationTypeDTO();
+		locationTypeDTO.setId(LocationValidatorTest.LOCATION_TYPE);
+
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(Arrays.asList(locationTypeDTO));
+
 		final LocationRequestDto locationRequestDto =
-			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, null);
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, LocationValidatorTest.LOCATION_TYPE);
+		locationRequestDto.setCountryId(10);
 		locationRequestDto.setProvinceId(0);
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
@@ -450,8 +466,13 @@ public class LocationValidatorTest {
 		final LocationDTO locationDTO = new LocationDTO();
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(locationDTO);
 
+		final LocationTypeDTO locationTypeDTO = new LocationTypeDTO();
+		locationTypeDTO.setId(LocationValidatorTest.LOCATION_TYPE);
+
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(Arrays.asList(locationTypeDTO));
+
 		final LocationRequestDto locationRequestDto =
-			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, null);
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, LocationValidatorTest.LOCATION_TYPE);
 		locationRequestDto.setCountryId(0);
 
 		try {
@@ -466,8 +487,13 @@ public class LocationValidatorTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidate_update_ThrowsException_WhenProvinceNotBelongToCountry() {
 		final LocationRequestDto locationRequestDto =
-			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, null);
-		locationRequestDto.setProvinceId(10);
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, LocationValidatorTest.LOCATION_TYPE);
+		locationRequestDto.setProvinceId(5);
+		locationRequestDto.setCountryId(11);
+		final LocationTypeDTO locationTypeDTO = new LocationTypeDTO();
+		locationTypeDTO.setId(LocationValidatorTest.LOCATION_TYPE);
+
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(Arrays.asList(locationTypeDTO));
 
 		final LocationDTO country = new LocationDTO();
 		country.setCountryId(11);

@@ -93,7 +93,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programDTO.setName(programName);
 		programBasicDetailsDto.setName(programName);
 		programBasicDetailsDto.setStartDate("2020-10-10");
-		Mockito.when(programService.getProgram(cropName, programName)).thenReturn(Optional.of(programDTO));
+		Mockito.when(programService.getProgramByCropAndName(cropName, programName)).thenReturn(Optional.of(programDTO));
 		try {
 			programBasicDetailsDtoValidator.validateCreation(cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
@@ -142,7 +142,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programDTO.setName(programName);
 		programBasicDetailsDto.setName(programName);
 		programBasicDetailsDto.setStartDate("2020-10-10");
-		Mockito.when(programService.getProgram(cropName, programName)).thenReturn(Optional.of(programDTO));
+		Mockito.when(programService.getProgramByCropAndName(cropName, programName)).thenReturn(Optional.of(programDTO));
 		try {
 			programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {

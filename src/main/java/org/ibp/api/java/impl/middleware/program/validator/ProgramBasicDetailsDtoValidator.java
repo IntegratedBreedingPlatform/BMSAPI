@@ -35,7 +35,7 @@ public class ProgramBasicDetailsDtoValidator {
 		this.validateStartDate(errors, programBasicDetailsDto);
 		this.validateProgramName(errors, programBasicDetailsDto);
 
-		final Optional<ProgramDTO> programDTOOptional = this.programService.getProgram(cropName, programBasicDetailsDto.getName());
+		final Optional<ProgramDTO> programDTOOptional = this.programService.getProgramByCropAndName(cropName, programBasicDetailsDto.getName());
 		if (programDTOOptional.isPresent()) {
 			errors.reject("program.name.already.exists", new String[] {programBasicDetailsDto.getName(), cropName}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -51,7 +51,7 @@ public class ProgramBasicDetailsDtoValidator {
 
 		if (programBasicDetailsDto.getName() != null) {
 			this.validateProgramName(errors, programBasicDetailsDto);
-			final Optional<ProgramDTO> programDTOOptional = this.programService.getProgram(cropName, programBasicDetailsDto.getName());
+			final Optional<ProgramDTO> programDTOOptional = this.programService.getProgramByCropAndName(cropName, programBasicDetailsDto.getName());
 			if (programDTOOptional.isPresent() && !programUUID.equalsIgnoreCase(programDTOOptional.get().getUniqueID())) {
 				errors.reject("program.name.already.exists", new String[] {programBasicDetailsDto.getName(), cropName}, "");
 				throw new ApiRequestValidationException(errors.getAllErrors());

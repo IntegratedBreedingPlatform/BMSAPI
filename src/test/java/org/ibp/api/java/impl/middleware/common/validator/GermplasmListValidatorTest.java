@@ -456,8 +456,7 @@ public class GermplasmListValidatorTest {
 	@Test
 	public void validateParentFolderId_invalidNullParentFolder() {
 		try {
-			final GermplasmListDto emptyListDto = new GermplasmListDto();
-			this.germplasmListValidator.validateParentFolder(emptyListDto);
+			this.germplasmListValidator.validateParentFolder(null);
 			Assert.fail("Should have thrown validation exception but did not.");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
@@ -469,9 +468,130 @@ public class GermplasmListValidatorTest {
 
 	@Test
 	public void validateParentFolderId_OK() {
-		final GermplasmListDto listDto = new GermplasmListDto();
-		listDto.setParentFolderId("parentFolder");
-		this.germplasmListValidator.validateParentFolder(listDto);
+		this.germplasmListValidator.validateParentFolder("parentFolder");
+	}
+
+	@Test
+	public void validateFolderId_OK() {
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.isFolder()).thenReturn(true);
+		Mockito.when(actualFolder.getProgramUUID()).thenReturn(PROGRAM_UUID);
+		Mockito.when(this.germplasmListService.getGermplasmListById(folderId)).thenReturn(Optional.of(actualFolder));
+
+		this.germplasmListValidator.validateFolderId(folderId.toString(), PROGRAM_UUID, GermplasmListValidator.ListNodeType.FOLDER);
+
+		Mockito.verify(this.germplasmListService).getGermplasmListById(folderId);
+
+		Mockito.verifyNoMoreInteractions(this.germplasmListService);
+	}
+
+	@Test
+	public void validateFolderId_listNotFound() {
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		Mockito.when(this.germplasmListService.getGermplasmListById(folderId)).thenReturn(Optional.empty());
+
+		try {
+			this.germplasmListValidator.validateFolderId(folderId.toString(), PROGRAM_UUID, GermplasmListValidator.ListNodeType.FOLDER);
+			fail("Should have failed");
+		} catch (final Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				hasItem("list.folder.id.not.exist"));
+		}
+
+		Mockito.verify(this.germplasmListService).getGermplasmListById(folderId);
+
+		Mockito.verifyNoMoreInteractions(this.germplasmListService);
+	}
+
+
+	@Test
+	public void validateFolderId_NotFolder() {
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.isFolder()).thenReturn(false);
+		Mockito.when(actualFolder.getProgramUUID()).thenReturn(PROGRAM_UUID);
+		Mockito.when(this.germplasmListService.getGermplasmListById(folderId)).thenReturn(Optional.of(actualFolder));
+
+		try {
+			this.germplasmListValidator.validateFolderId(folderId.toString(), PROGRAM_UUID, GermplasmListValidator.ListNodeType.FOLDER);
+			fail("Should have failed");
+		} catch (final Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				hasItem("list.folder.id.not.exist"));
+		}
+
+		Mockito.verify(this.germplasmListService).getGermplasmListById(folderId);
+
+		Mockito.verifyNoMoreInteractions(this.germplasmListService);
+	}
+
+	@Test
+	public void validateFolderId_notCropFolderProgram() {
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.isFolder()).thenReturn(true);
+		Mockito.when(actualFolder.getProgramUUID()).thenReturn("ANOTHER_PROGRAM");
+		Mockito.when(this.germplasmListService.getGermplasmListById(folderId)).thenReturn(Optional.of(actualFolder));
+
+		try {
+			this.germplasmListValidator.validateFolderId(folderId.toString(), PROGRAM_UUID, GermplasmListValidator.ListNodeType.FOLDER);
+			fail("Should have failed");
+		} catch (final Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				hasItem("list.project.mandatory"));
+		}
+
+		Mockito.verify(this.germplasmListService).getGermplasmListById(folderId);
+
+		Mockito.verifyNoMoreInteractions(this.germplasmListService);
+	}
+
+	@Test
+	public void validateNodeId_invalidNotNumericNodeId() throws ApiRequestValidationException {
+		try {
+			this.germplasmListValidator.validateNodeId( "X", GermplasmListValidator.ListNodeType.FOLDER);
+			fail("Should have failed");
+		} catch (final Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				hasItem("list.folder.id.invalid"));
+		}
+
+	}
+
+	@Test
+	public void validateFolderHasNoChildren_listHasChildren() {
+
+		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
+
+		Mockito.when(this.germplasmListManager.getGermplasmListByParentFolderId(folderId))
+			.thenReturn(Collections.singletonList(Mockito.mock(GermplasmList.class)));
+
+		try {
+			this.germplasmListValidator.validateFolderHasNoChildren(folderId, "some.message");
+			fail("Should have failed");
+		} catch (final Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+			MatcherAssert.assertThat(
+				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				hasItem("some.message"));
+		}
+
+		Mockito.verify(this.germplasmListManager).getGermplasmListByParentFolderId(folderId);
+
+		Mockito.verifyNoMoreInteractions(this.germplasmListManager);
 	}
 
 }

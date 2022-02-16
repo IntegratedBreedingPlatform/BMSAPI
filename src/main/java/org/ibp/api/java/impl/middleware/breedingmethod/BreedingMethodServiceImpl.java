@@ -4,6 +4,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.MethodClassDTO;
+import org.generationcp.middleware.pojos.MethodType;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
 import org.ibp.api.java.impl.middleware.common.validator.BreedingMethodValidator;
@@ -47,12 +48,18 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 
 	@Override
 	public BreedingMethodDTO create(final BreedingMethodNewRequest breedingMethod) {
+		if (breedingMethod.getNumberOfProgenitors() == null) {
+			breedingMethod.setNumberOfProgenitors(this.getMprgn(breedingMethod.getType()));
+		}
 		this.breedingMethodValidator.validateCreation(breedingMethod);
 		return this.breedingMethodService.create(breedingMethod);
 	}
 
 	@Override
 	public BreedingMethodDTO edit(final Integer breedingMethodDbId, final BreedingMethodNewRequest breedingMethod) {
+		if (breedingMethod.getNumberOfProgenitors() == null) {
+			breedingMethod.setNumberOfProgenitors(this.getMprgn(breedingMethod.getType()));
+		}
 		this.breedingMethodValidator.validateEdition(breedingMethodDbId, breedingMethod);
 		return this.breedingMethodService.edit(breedingMethodDbId, breedingMethod);
 	}
@@ -74,4 +81,21 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		return this.breedingMethodService.countSearchBreedingMethods(searchRequest, programUUID);
 	}
 
+	public int getMprgn(final String mtype) {
+		int mprgn = 0;
+		final MethodType methodType = MethodType.getMethodType(mtype);
+		switch(methodType) {
+			case GENERATIVE:
+				mprgn = 2;
+				break;
+			case DERIVATIVE:
+			case MAINTENANCE:
+				mprgn = -1;
+				break;
+			default:
+				mprgn = 0;
+				break;
+		}
+		return mprgn;
+	}
 }

@@ -86,7 +86,7 @@ public class LocationResource {
 
 	@ApiOperation(value = "Create a new Location", notes = "Create a new Location")
 	@RequestMapping(value = "/crops/{cropName}/locations", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@ResponseBody
 	public ResponseEntity<LocationDTO> createLocation(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID, @RequestBody final LocationRequestDto locationRequestDto) {
@@ -94,9 +94,8 @@ public class LocationResource {
 	}
 
 	@ApiOperation(value = "Update Location", notes = "Update Location")
-	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.PATCH)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
-	@ResponseBody
+	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.PUT)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	public ResponseEntity<Void> updateLocation(@PathVariable final String cropName,
 		@PathVariable final Integer locationId,
 		@RequestParam(required = false) final String programUUID, @RequestBody final LocationRequestDto locationRequestDto) {
@@ -106,8 +105,7 @@ public class LocationResource {
 
 	@ApiOperation(value = "Delete Location", notes = "Delete Location")
 	@RequestMapping(value = "/crops/{cropName}/locations/{locationId}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS')")
-	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	public ResponseEntity<Void> deleteLocation(@PathVariable final String cropName,
 		@PathVariable final Integer locationId,
 		@RequestParam(required = false) final String programUUID) {
@@ -115,4 +113,13 @@ public class LocationResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	// temporary resource until we remove the country table. https://ibplatform.atlassian.net/browse/IBP-5462
+	@ApiIgnore
+	@RequestMapping(value = "/crops/{cropName}/location-countries", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<LocationDTO>> getCountryLocations(
+		@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.locationService.getCountries(), HttpStatus.OK);
+	}
 }

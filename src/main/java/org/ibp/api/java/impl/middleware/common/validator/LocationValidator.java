@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
@@ -13,6 +14,8 @@ import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.Util;
@@ -36,7 +39,7 @@ public class LocationValidator {
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 	private static final Integer LOCATION_NAME_MAX_LENGTH = 60;
 	private static final Integer LOCATION_ABBR_MAX_LENGTH = 12;
-
+	private static final Set<String> LOCATIONS_NOT_DELETABLES = new HashSet<>(Arrays.asList("Unspecified Location", "Default Seed Store", "Default Breeding Location"));
 	@Autowired
 	private LocationDataManager locationDataManager;
 
@@ -98,6 +101,7 @@ public class LocationValidator {
 	private void validateLocationName(final String locationName) {
 		if(StringUtils.isBlank(locationName)) {
 			this.errors.reject("location.name.is.required", null, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (locationName.length() > LocationValidator.LOCATION_NAME_MAX_LENGTH) {
@@ -109,6 +113,7 @@ public class LocationValidator {
 	private void validateLocationAbbr(final String locationAbbr) {
 		if(StringUtils.isBlank(locationAbbr)) {
 			this.errors.reject("location.abbr.is.required", null, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (locationAbbr.length() > LocationValidator.LOCATION_ABBR_MAX_LENGTH) {
@@ -117,18 +122,19 @@ public class LocationValidator {
 		}
 	}
 
-	public void validateLocation(final BindingResult errors, final Integer locationId) {
+	public LocationDTO validateLocation(final BindingResult errors, final Integer locationId) {
 		if (locationId == null) {
 			errors.reject("location.required", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final LocationDTO location = this.locationService.getLocation(locationId);
+		final LocationDTO locationDTO = this.locationService.getLocation(locationId);
 
-		if (location == null) {
+		if (locationDTO == null) {
 			errors.reject("location.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+		return locationDTO;
 	}
 
 	public void validateCreation(final LocationRequestDto locationRequestDto) {
@@ -179,35 +185,77 @@ public class LocationValidator {
 	public void validateUpdate(final Integer locationId, final LocationRequestDto locationRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
 
-		this.validateLocation(this.errors, locationId);
-		if (locationRequestDto.getName() != null) {
-			this.validateLocationName(locationRequestDto.getName());
-		}
+		final LocationDTO locationDTO = this.validateLocation(this.errors, locationId);
+		this.validateLocationNotEditable(locationDTO);
+		this.validateLocationName(locationRequestDto.getName());
+		this.validateLocationType(locationRequestDto.getType());
+		this.validateLocationAbbr(locationRequestDto.getAbbreviation());
+		this.validateLocationAbbrNotExists(locationId, locationRequestDto.getAbbreviation());
 
-		if (locationRequestDto.getType() != null) {
-			this.validateLocationType(locationRequestDto.getType());
-		}
-
-		if (locationRequestDto.getAbbreviation() != null) {
-			this.validateLocationAbbr(locationRequestDto.getAbbreviation());
-			this.validateLocationAbbrNotExists(locationId, locationRequestDto.getAbbreviation());
-		}
-
-		final LocationDTO locationDTO = this.locationService.getLocation(locationId);
-		final Integer countryId = locationRequestDto.getCountryId() != null ? locationRequestDto.getCountryId() : locationDTO.getCountryId();
-		final Integer provinceId = locationRequestDto.getProvinceId() != null ? locationRequestDto.getProvinceId() : locationDTO.getProvinceId();
+		final Integer countryId = locationRequestDto.getCountryId();
+		final Integer provinceId = locationRequestDto.getProvinceId();
 		this.validateCountryAndProvince(countryId, provinceId);
 	}
 
 	public void validateCanBeDeleted(final Integer locationId) {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
-		this.validateLocation(this.errors, locationId);
+		final LocationDTO locationDTO = this.validateLocation(this.errors, locationId);
+		this.validateLocationNotDeletable(locationDTO);
 		this.validateLocationNotUsedInGermplasm(locationId);
 		this.validateLocationNotUsedInLot(locationId);
 		this.validateLocationNotUsedInAttribute(locationId);
 		this.validateLocationNotUsedInName(locationId);
 		this.validateLocationNotUsedInStudy(locationId);
+		this.validateLocationIsNotDefaultCountry(locationId);
+		this.validateLocationNotUsedInFieldMap(locationDTO);
+
+	}
+
+	private void validateLocationNotDeletable(final LocationDTO locationDTO) {
+		if (LOCATIONS_NOT_DELETABLES.contains(locationDTO.getName()) || locationDTO.isDefaultLocation()) {
+			this.errors.reject("location.not.deletable", new String[] {locationDTO.getId().toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateLocationNotEditable(final LocationDTO locationDTO) {
+		if (LOCATIONS_NOT_DELETABLES.contains(locationDTO.getName())) {
+			this.errors.reject("location.not.editable", new String[] {locationDTO.getId().toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateLocationNotUsedInFieldMap(final LocationDTO locationDTO) {
+		List<Integer> blockIds = null;
+		if (locationDTO.getType() == LocdesType.FIELD.getId()) {
+			blockIds = locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString())).stream().map(Locdes::getLocationId).collect(Collectors.toList());
+		} else if (locationDTO.getType() == LocdesType.BLOCK.getId()) {
+			blockIds = locationDataManager.getLocdes(Arrays.asList(locationDTO.getId()), null).stream()
+				.filter(locdes -> locdes.getTypeId() == LocdesType.BLOCK_PARENT.getId()).map(Locdes::getLocationId).collect(Collectors.toList());
+		} else {
+			final List<Locdes> fieldParentLocation = locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString()));
+			if (!fieldParentLocation.isEmpty()) {
+				final List<String> fieldParentIds = fieldParentLocation.stream().map(Locdes::getLocationId).map(Object::toString).collect(Collectors.toList());
+				blockIds = locationDataManager.getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId).collect(Collectors.toList());
+			}
+		}
+		if (!CollectionUtils.isEmpty(blockIds)) {
+			boolean isUsed = locationService.blockIdIsUsedInFieldMap(blockIds);
+			if (isUsed) {
+				this.errors.reject("location.is.used.in.field.map", new String[] {locationDTO.getId().toString()}, "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
+
+	}
+
+	private void validateLocationIsNotDefaultCountry(final Integer locationId) {
+		final boolean isCountryLocation = locationService.isDefaultCountryLocation(locationId);
+		if (isCountryLocation) {
+			this.errors.reject("location.country.can.not.deletable", new String[] {locationId.toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	private void validateLocationNotUsedInLot(final Integer locationId) {
