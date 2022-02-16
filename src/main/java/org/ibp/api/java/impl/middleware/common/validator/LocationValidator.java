@@ -228,11 +228,11 @@ public class LocationValidator {
 
 	private void validateLocationNotUsedInFieldMap(final LocationDTO locationDTO) {
 		List<Integer> blockIds = null;
-		if (locationDTO.getType() == LocdesType.FIELD.getId()) {
+		if (locationDTO.getType().equals(LocdesType.FIELD.getId())) {
 			blockIds = locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString())).stream().map(Locdes::getLocationId).collect(Collectors.toList());
-		} else if (locationDTO.getType() == LocdesType.BLOCK.getId()) {
+		} else if (locationDTO.getType().equals(LocdesType.BLOCK.getId())) {
 			blockIds = locationDataManager.getLocdes(Arrays.asList(locationDTO.getId()), null).stream()
-				.filter(locdes -> locdes.getTypeId() == LocdesType.BLOCK_PARENT.getId()).map(Locdes::getLocationId).collect(Collectors.toList());
+				.filter(locdes -> locdes.getTypeId().equals(LocdesType.BLOCK_PARENT.getId())).map(Locdes::getLocationId).collect(Collectors.toList());
 		} else {
 			final List<Locdes> fieldParentLocation = locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString()));
 			if (!fieldParentLocation.isEmpty()) {
