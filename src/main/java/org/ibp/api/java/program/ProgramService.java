@@ -3,6 +3,7 @@ package org.ibp.api.java.program;
 
 import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
@@ -30,9 +31,9 @@ public interface ProgramService {
 
 	void saveOrUpdateProjectUserInfo(Integer userId, String  programUUID);
 
-	List<ProgramMemberDto> getProgramMembers(String programUUID, Pageable pageable);
+	List<ProgramMemberDto> getProgramMembers(String programUUID, ProgramMembersSearchRequest searchRequest, Pageable pageable);
 
-	long countAllProgramMembers(String programUUID);
+	long countAllProgramMembers(String programUUID, ProgramMembersSearchRequest searchRequest);
 
 	void addNewProgramMembers(String programUUID, AddProgramMemberRequestDto requestDto);
 

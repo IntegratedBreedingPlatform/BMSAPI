@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -49,9 +50,11 @@ public class BreedingMethodValidator {
 		checkNotNull(numberOfProgenitors, "field.is.required", new String[] {"numberOfProgenitors"});
 		this.validateProgenitorTypeDuo(numberOfProgenitors, methodType);
 
-		final String group = breedingMethod.getGroup();
-		final MethodGroup methodGroup = MethodGroup.getMethodGroup(group);
-		validateMethodGroup(group, methodGroup);
+		if(StringUtils.isNotBlank(breedingMethod.getGroup())){
+			final String group = breedingMethod.getGroup();
+			final MethodGroup methodGroup = MethodGroup.getMethodGroup(group);
+			validateMethodGroup(group, methodGroup);
+		}
 
 		final Integer methodClassId = breedingMethod.getMethodClass();
 		final MethodClass methodClass = MethodClass.getMethodClass(methodClassId);
@@ -67,29 +70,22 @@ public class BreedingMethodValidator {
 		if (!methodOptional.isPresent()) {
 			throw new ApiRequestValidationException("breeding.methods.not.exists", new Integer[] {breedingMethodDbId});
 		}
-		final BreedingMethodDTO breedingMethodDTO = methodOptional.get();
 
 		/*
 		 * Validate combinations of numberOfProgenitors, methodType, methodClasses
 		 * coming either from the request or the db
 		 */
 
-		final Integer numberOfProgenitors = breedingMethodRequest.getNumberOfProgenitors() != null
-			? breedingMethodRequest.getNumberOfProgenitors()
-			: breedingMethodDTO.getNumberOfProgenitors();
+		final Integer numberOfProgenitors = breedingMethodRequest.getNumberOfProgenitors();
 
 		final String breedingMethodRequestType = breedingMethodRequest.getType();
-		final String type = !isBlank(breedingMethodRequestType)
-			? breedingMethodRequestType
-			: breedingMethodDTO.getType();
+		final String type = breedingMethodRequestType;
 		final MethodType methodType = MethodType.getMethodType(type);
 
 		this.validateMethodType(type, methodType);
 		this.validateProgenitorTypeDuo(numberOfProgenitors, methodType);
 
-		final Integer methodClassId = breedingMethodRequest.getMethodClass() != null
-			? breedingMethodRequest.getMethodClass()
-			: breedingMethodDTO.getMethodClass();
+		final Integer methodClassId = breedingMethodRequest.getMethodClass();
 		final MethodClass methodClass = MethodClass.getMethodClass(methodClassId);
 
 		this.validateMethodClass(methodClassId, methodClass);

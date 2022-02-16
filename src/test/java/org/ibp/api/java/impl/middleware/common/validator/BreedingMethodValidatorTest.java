@@ -83,6 +83,7 @@ public class BreedingMethodValidatorTest {
 
 		final BreedingMethodDTO breedingMethodRequest = this.createBreedingMethod();
 		breedingMethodRequest.setNumberOfProgenitors(2);
+
 		try {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
 		} catch (final ApiRequestValidationException exception) {
@@ -91,7 +92,7 @@ public class BreedingMethodValidatorTest {
 
 		breedingMethodRequest.setNumberOfProgenitors(-1);
 		breedingMethodRequest.setType(MethodType.GENERATIVE.getCode());
-		this.breedingMethod.setMethodClass(MethodClass.CROSSING.getId());
+
 		try {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
 		} catch (final ApiRequestValidationException exception) {
@@ -101,20 +102,18 @@ public class BreedingMethodValidatorTest {
 		// Validate combinations from the request and the db
 
 		breedingMethodRequest.setNumberOfProgenitors(-1);
-		breedingMethodRequest.setType(null);
-		this.breedingMethod.setType(MethodType.GENERATIVE.getCode());
-		this.breedingMethod.setMethodClass(MethodClass.CROSSING.getId());
+		breedingMethodRequest.setType(MethodType.GENERATIVE.getCode());
+
 		try {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception.getErrors().get(0).getCode(), is("breeding.methods.invalid.numberOfProgenitors.generative"));
 		}
 
-		breedingMethodRequest.setNumberOfProgenitors(null);
-		breedingMethodRequest.setType(MethodType.DERIVATIVE.getCode());
-		this.breedingMethod.setType(MethodType.GENERATIVE.getCode());
-		this.breedingMethod.setMethodClass(MethodClass.CROSSING.getId());
-		this.breedingMethod.setNumberOfProgenitors(2);
+		breedingMethodRequest.setNumberOfProgenitors(2);
+		breedingMethodRequest.setType(MethodType.GENERATIVE.getCode());
+		breedingMethodRequest.setMethodClass(MethodClass.CROSSING.getId());
+
 		try {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
 		} catch (final ApiRequestValidationException exception) {
@@ -151,8 +150,7 @@ public class BreedingMethodValidatorTest {
 
 		breedingMethodRequest.setType(MethodType.GENERATIVE.getCode());
 		breedingMethodRequest.setNumberOfProgenitors(2);
-		breedingMethodRequest.setMethodClass(null);
-		this.breedingMethod.setMethodClass(MethodClass.BULKING.getId());
+		breedingMethodRequest.setMethodClass(MethodClass.BULKING.getId());
 
 		try {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
@@ -162,8 +160,7 @@ public class BreedingMethodValidatorTest {
 
 		breedingMethodRequest.setType(MethodType.DERIVATIVE.getCode());
 		breedingMethodRequest.setNumberOfProgenitors(-1);
-		breedingMethodRequest.setMethodClass(null);
-		this.breedingMethod.setMethodClass(MethodClass.CROSSING.getId());
+		breedingMethodRequest.setMethodClass(MethodClass.CROSSING.getId());
 
 		try {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
@@ -176,6 +173,7 @@ public class BreedingMethodValidatorTest {
 	public void validateEdition_Invalid_Type() {
 		final BreedingMethodDTO breedingMethodRequest = this.createBreedingMethod();
 		breedingMethodRequest.setType(randomAlphanumeric(10));
+
 		try {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
 		} catch (final ApiRequestValidationException exception) {
@@ -187,6 +185,7 @@ public class BreedingMethodValidatorTest {
 	public void validateEdition_Invalid_Group() {
 		final BreedingMethodDTO breedingMethodRequest = this.createBreedingMethod();
 		breedingMethodRequest.setGroup(randomAlphanumeric(10));
+
 		try {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
 		} catch (final ApiRequestValidationException exception) {

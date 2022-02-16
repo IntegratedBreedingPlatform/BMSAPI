@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.user;
 
+import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.domain.user.UserProfileUpdateRequestDTO;
@@ -22,8 +23,8 @@ public interface UserService {
 
 	void updateUserProfile(final UserProfileUpdateRequestDTO userProfileUpdateRequestDTO, final WorkbenchUser workbenchUser);
 
-	List<UserDetailDto> getMembersEligibleUsers(String programUUID, Pageable pageable);
+	List<UserDetailDto> getMembersEligibleUsers(String programUUID, ProgramEligibleUsersSearchRequest searchRequest, Pageable pageable);
 
-	long countAllMembersEligibleUsers(String programUUID);
+	long countAllMembersEligibleUsers(String programUUID, ProgramEligibleUsersSearchRequest searchRequest);
 
 }
