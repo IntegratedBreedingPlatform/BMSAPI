@@ -36,5 +36,6 @@ public interface StudyEntryService {
 
 	StudyEntryMetadata getStudyEntriesMetadata(Integer studyId, String programUuid);
 
-	List<MeasurementVariable> getEntryDescriptorColumns(Integer studyId);
+	List<MeasurementVariable> getEntryColumns(Integer studyId);
+
 }

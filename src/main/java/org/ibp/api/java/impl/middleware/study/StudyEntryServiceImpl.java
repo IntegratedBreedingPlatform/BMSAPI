@@ -133,7 +133,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasms(gids);
 		final Map<Integer, String> gidDesignationMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
-		final List<Integer> germplasmDescriptorIds = this.getEntryDescriptorColumns(studyId).stream()
+		final List<Integer> germplasmDescriptorIds = this.getEntryColumns(studyId).stream()
 			.map(measurementVariable -> measurementVariable.getTermId()).collect(Collectors.toList());
 
 		//Get the next entry number
@@ -162,7 +162,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		final Map<Integer, GermplasmListData> germplasmListDataMap =
 			germplasmList.getListData().stream().collect(Collectors.toMap(GermplasmListData::getEntryId, g -> g));
-		final List<Integer> germplasmDescriptorIds = this.getEntryDescriptorColumns(studyId).stream()
+		final List<Integer> germplasmDescriptorIds = this.getEntryColumns(studyId).stream()
 			.map(measurementVariable -> measurementVariable.getTermId()).collect(Collectors.toList());
 
 		for(final StudyEntryDto studyEntryDto: studyEntryDtoList) {
@@ -224,7 +224,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getEntryDescriptorColumns(final Integer studyId) {
+	public List<MeasurementVariable> getEntryColumns(final Integer studyId) {
 		this.studyValidator.validate(studyId, false);
 		final Integer plotDatasetId =
 			this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
@@ -232,19 +232,19 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final List<Integer> termsToRemove = Lists
 			.newArrayList(TermId.OBS_UNIT_ID.getId());
 
-		final List<MeasurementVariable> entryDescriptors =
-			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
-				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
+		final List<MeasurementVariable> columns =
+			this.datasetService.getObservationSetVariables(plotDatasetId,
+				Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
 
 		//Remove OBS_UNIT_ID column if present
-		entryDescriptors.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
+		columns.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
 		//Add Inventory related columns
-		entryDescriptors.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
-		entryDescriptors.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
-		entryDescriptors.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
+		columns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
+		columns.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
+		columns.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
 
-		return entryDescriptors;
+		return columns;
 	}
 
 	@Override

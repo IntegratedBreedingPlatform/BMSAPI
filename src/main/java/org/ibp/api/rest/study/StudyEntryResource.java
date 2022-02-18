@@ -163,7 +163,7 @@ public class StudyEntryResource {
 		@PathVariable final Integer studyId) {
 
 		final List<MeasurementVariable> entryDescriptors =
-			this.studyEntryService.getEntryDescriptorColumns(studyId);
+			this.studyEntryService.getEntryColumns(studyId);
 
 		return new ResponseEntity<>(entryDescriptors, HttpStatus.OK);
 	}
