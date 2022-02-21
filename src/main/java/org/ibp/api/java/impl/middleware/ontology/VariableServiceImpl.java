@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -21,6 +22,7 @@ import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariable
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
+import org.ibp.api.domain.ontology.AnalysisVariablesRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -76,8 +78,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
 
+	@Autowired
+	private OntologyVariableService ontologyVariableService;
+
 	@Override
-	public List<VariableDetails> getAllVariablesByFilter(final String cropName, final String programId, final String propertyId, final Boolean favourite) {
+	public List<VariableDetails> getAllVariablesByFilter(final String cropName, final String programId, final String propertyId,
+		final Boolean favourite) {
 
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<>(), VariableServiceImpl.VARIABLE_NAME);
 
@@ -99,7 +105,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		try {
 			final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
-					new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
+				new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
 			middlewareVariableFilter.setProgramUuid(programId);
 			if (favourite != null) {
 				middlewareVariableFilter.setFavoritesOnly(favourite);
@@ -146,7 +152,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			final ModelMapper mapper = OntologyMapper.getInstance();
 
 			final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
-					new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
+				new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
 
 			this.mapVariableFilter(variableFilter, middlewareVariableFilter);
 
@@ -215,7 +221,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			final ModelMapper mapper = OntologyMapper.getInstance();
 			final VariableDetails response = mapper.map(ontologyVariable, VariableDetails.class);
 
-			if(ontologyVariable.getIsSystem()){
+			if (ontologyVariable.getIsSystem()) {
 				response.getMetadata().setEditable(false);
 				response.getMetadata().setDeletable(false);
 				response.getMetadata().getUsage().setSystemVariable(true);
@@ -395,7 +401,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		// Note: Check if variable is deletable or not by checking its usage in variable
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId()),
-				errors);
+			errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -459,7 +465,6 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 	}
 
-
 	/**
 	 * <p>
 	 * Set current program in ContextHolder
@@ -485,7 +490,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	}
 
 	private void mapVariableFilter(final VariableFilter variableFilter,
-			final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter) {
+		final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter) {
 
 		middlewareVariableFilter.setProgramUuid(variableFilter.getProgramUuid());
 
@@ -535,9 +540,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	}
 
 	@Override
-	public List<VariableDetails> getVariablesByFilter(final VariableFilter  variableFilter) {
+	public List<VariableDetails> getVariablesByFilter(final VariableFilter variableFilter) {
 		final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
-				new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
+			new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
 		this.mapVariableFilter(variableFilter, middlewareVariableFilter);
 		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
 		final List<VariableDetails> variableDetailsList = new ArrayList<>();
@@ -552,6 +557,14 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	@Override
 	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
 		return this.ontologyVariableDataManager.searchAttributeVariables(query, programUUID);
+	}
+
+	@Override
+	public List<VariableDetails> createAnalysisVariables(final AnalysisVariablesRequest analysisVariablesRequest) {
+		final List<Variable> analysisVariables =
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesRequest.getVariableIds(),
+				analysisVariablesRequest.getAnalysisNames(), analysisVariablesRequest.getVariableType());
+		return new ArrayList<>();
 	}
 
 }

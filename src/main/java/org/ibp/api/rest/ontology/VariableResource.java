@@ -4,9 +4,9 @@ package org.ibp.api.rest.ontology;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
+import org.ibp.api.domain.ontology.AnalysisVariablesRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.java.ontology.VariableService;
@@ -187,6 +187,15 @@ public class VariableResource {
 		}
 
 		return new ResponseEntity<>(this.variableService.getVariablesByFilter(cropname, programUUID, variableFilter), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Create Analysis Variables", notes = "Create analysis variables")
+	@RequestMapping(value = "/{cropname}/variables/analysis", method = RequestMethod.POST)
+	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
+	public ResponseEntity<List<VariableDetails>> createAnalysisVariables(@PathVariable final String cropname, @RequestParam final String programUUID,
+		@RequestBody final AnalysisVariablesRequest analysisVariablesRequest) {
+		return new ResponseEntity<List<VariableDetails>>(this.variableService.createAnalysisVariables(analysisVariablesRequest), HttpStatus.CREATED);
 	}
 
 }
