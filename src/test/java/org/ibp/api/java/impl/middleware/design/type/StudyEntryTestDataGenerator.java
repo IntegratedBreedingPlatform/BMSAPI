@@ -39,10 +39,10 @@ public abstract class StudyEntryTestDataGenerator {
 		studyEntryDto.setGid(germplasmId);
 
 		final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
-		properties.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(), "SOURCE" + entryNumber));
-		properties.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(), String.valueOf(systemDefinedEntryType.getEntryTypeCategoricalId())));
-		properties.put(TermId.GROUPGID.getId(), new StudyEntryPropertyData(null, TermId.GROUPGID.getId(), String.valueOf(0)));
-		properties.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(), String.valueOf(entryNumber)));
+		properties.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(), "SOURCE" + entryNumber, null));
+		properties.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(), null, systemDefinedEntryType.getEntryTypeCategoricalId()));
+		properties.put(TermId.GROUPGID.getId(), new StudyEntryPropertyData(null, TermId.GROUPGID.getId(), String.valueOf(0), null));
+		properties.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(), String.valueOf(entryNumber), null));
 		studyEntryDto.setProperties(properties);
 		return studyEntryDto;
 	}
