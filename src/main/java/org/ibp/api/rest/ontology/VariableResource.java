@@ -193,9 +193,9 @@ public class VariableResource {
 	@RequestMapping(value = "/{cropname}/variables/analysis", method = RequestMethod.POST)
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
-	public ResponseEntity<List<VariableDetails>> createAnalysisVariables(@PathVariable final String cropname, @RequestParam final String programUUID,
+	public ResponseEntity<List<VariableDetails>> createAnalysisVariables(@PathVariable final String cropname,
 		@RequestBody final AnalysisVariablesRequest analysisVariablesRequest) {
-		return new ResponseEntity<List<VariableDetails>>(this.variableService.createAnalysisVariables(analysisVariablesRequest), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.variableService.createAnalysisVariables(analysisVariablesRequest), HttpStatus.CREATED);
 	}
 
 }

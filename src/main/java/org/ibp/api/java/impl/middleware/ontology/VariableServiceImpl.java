@@ -29,6 +29,8 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.AnalysisVariablesRequestValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.modelmapper.ModelMapper;
@@ -80,6 +82,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	@Autowired
 	private OntologyVariableService ontologyVariableService;
+
+	@Autowired
+	private TermValidator termValidator;
+
+	@Autowired
+	private AnalysisVariablesRequestValidator analysisVariablesRequestValidator;
 
 	@Override
 	public List<VariableDetails> getAllVariablesByFilter(final String cropName, final String programId, final String propertyId,
@@ -561,10 +569,20 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	@Override
 	public List<VariableDetails> createAnalysisVariables(final AnalysisVariablesRequest analysisVariablesRequest) {
-		final List<Variable> analysisVariables =
+
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		this.analysisVariablesRequestValidator.validate(analysisVariablesRequest, errors);
+		this.termValidator.validateTermIds(analysisVariablesRequest.getVariableIds(), errors);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final VariableFilter variableFilter = new VariableFilter();
+		final List<Integer> analysisVariables =
 			this.ontologyVariableService.createAnalysisVariables(analysisVariablesRequest.getVariableIds(),
 				analysisVariablesRequest.getAnalysisNames(), analysisVariablesRequest.getVariableType());
-		return new ArrayList<>();
+		analysisVariables.stream().forEach(variableFilter::addVariableId);
+		return this.getVariablesByFilter(variableFilter);
 	}
 
 }
