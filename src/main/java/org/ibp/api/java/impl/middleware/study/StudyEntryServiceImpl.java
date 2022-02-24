@@ -12,7 +12,6 @@ import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -118,7 +117,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final List<Integer> gids = this.searchRequestDtoResolver.resolveGidSearchDto(searchComposite);
 		this.germplasmValidator.validateGids(errors, gids);
 
-		this.middlewareStudyEntryService.saveStudyEntrues(studyId, gids);
+		this.middlewareStudyEntryService.saveStudyEntries(studyId, gids, studyEntryGeneratorRequestDto.getEntryTypeId());
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -14,7 +13,6 @@ import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
@@ -45,10 +43,8 @@ import org.springframework.validation.BindingResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -135,7 +131,7 @@ public class StudyEntryServiceImplTest {
 
 		Mockito.when(this.searchRequestDtoResolver.resolveGidSearchDto(searchCompositeDto)).thenReturn(gids);
 
-		Mockito.doNothing().when(this.middlewareStudyEntryService).saveStudyEntrues(studyId, gids);
+		Mockito.doNothing().when(this.middlewareStudyEntryService).saveStudyEntries(studyId, gids, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 
 		this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorRequestDto);
 
@@ -144,7 +140,7 @@ public class StudyEntryServiceImplTest {
 		Mockito.verify(this.searchCompositeDtoValidator)
 			.validateSearchCompositeDto(ArgumentMatchers.eq(searchCompositeDto), ArgumentMatchers.any(BindingResult.class));
 		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(gids));
-		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntrues(studyId, gids);
+		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(studyId, gids, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 
 		Mockito.verifyNoMoreInteractions(this.studyValidator);
 		Mockito.verifyNoMoreInteractions(this.entryTypeValidator);
@@ -159,7 +155,7 @@ public class StudyEntryServiceImplTest {
 		final Integer studyId = this.random.nextInt();
 		final Integer germplasmListId = this.random.nextInt();
 
-		Mockito.doNothing().when(this.middlewareStudyEntryService).saveStudyEntrues(studyId, Arrays.asList(germplasmListId));
+		Mockito.doNothing().when(this.middlewareStudyEntryService).saveStudyEntries(studyId, germplasmListId);
 
 		this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 
