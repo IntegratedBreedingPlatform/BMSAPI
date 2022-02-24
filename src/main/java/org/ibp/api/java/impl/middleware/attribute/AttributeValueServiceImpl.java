@@ -1,4 +1,4 @@
-package org.ibp.api.java.impl.middleware.attribute.brapi;
+package org.ibp.api.java.impl.middleware.attribute;
 
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
