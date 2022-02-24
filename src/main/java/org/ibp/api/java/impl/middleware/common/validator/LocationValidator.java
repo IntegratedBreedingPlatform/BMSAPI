@@ -228,20 +228,20 @@ public class LocationValidator {
 
 	private void validateLocationNotUsedInFieldMap(final LocationDTO locationDTO) {
 		List<Integer> blockIds = null;
-		if (locationDTO.getType() == LocdesType.FIELD.getId()) {
-			blockIds = locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString())).stream().map(Locdes::getLocationId).collect(Collectors.toList());
-		} else if (locationDTO.getType() == LocdesType.BLOCK.getId()) {
-			blockIds = locationDataManager.getLocdes(Arrays.asList(locationDTO.getId()), null).stream()
-				.filter(locdes -> locdes.getTypeId() == LocdesType.BLOCK_PARENT.getId()).map(Locdes::getLocationId).collect(Collectors.toList());
+		if (LocdesType.FIELD.getId().equals(locationDTO.getType())) {
+			blockIds = this.locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString())).stream().map(Locdes::getLocationId).collect(Collectors.toList());
+		} else if (LocdesType.BLOCK.getId().equals(locationDTO.getType())) {
+			blockIds = this.locationDataManager.getLocdes(Arrays.asList(locationDTO.getId()), null).stream()
+				.filter(locdes -> LocdesType.BLOCK_PARENT.getId().equals(locdes.getTypeId())).map(Locdes::getLocationId).collect(Collectors.toList());
 		} else {
-			final List<Locdes> fieldParentLocation = locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString()));
+			final List<Locdes> fieldParentLocation = this.locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString()));
 			if (!fieldParentLocation.isEmpty()) {
 				final List<String> fieldParentIds = fieldParentLocation.stream().map(Locdes::getLocationId).map(Object::toString).collect(Collectors.toList());
-				blockIds = locationDataManager.getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId).collect(Collectors.toList());
+				blockIds = this.locationDataManager.getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId).collect(Collectors.toList());
 			}
 		}
 		if (!CollectionUtils.isEmpty(blockIds)) {
-			boolean isUsed = locationService.blockIdIsUsedInFieldMap(blockIds);
+			final boolean isUsed = this.locationService.blockIdIsUsedInFieldMap(blockIds);
 			if (isUsed) {
 				this.errors.reject("location.is.used.in.field.map", new String[] {locationDTO.getId().toString()}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -251,7 +251,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationIsNotDefaultCountry(final Integer locationId) {
-		final boolean isCountryLocation = locationService.isDefaultCountryLocation(locationId);
+		final boolean isCountryLocation = this.locationService.isDefaultCountryLocation(locationId);
 		if (isCountryLocation) {
 			this.errors.reject("location.country.can.not.deletable", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
