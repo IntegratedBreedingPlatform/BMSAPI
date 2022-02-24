@@ -14,9 +14,9 @@ public interface StudyEntryService {
 
 	StudyEntryDto replaceStudyEntry(Integer studyId, Integer entryId, StudyEntryDto studyEntryDto);
 
-	List<StudyEntryDto> createStudyEntries(Integer studyId, StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto);
+	void createStudyEntries(Integer studyId, StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto);
 
-	List<StudyEntryDto> createStudyEntries(Integer studyId, Integer listId);
+	void createStudyEntries(Integer studyId, Integer listId);
 
 	List<StudyEntryDto> getStudyEntries(Integer studyId, StudyEntrySearchDto.Filter filter, Pageable pageable);
 

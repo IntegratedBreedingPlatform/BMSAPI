@@ -62,9 +62,10 @@ public class StudyEntryResource {
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
 		@ApiParam("Study Entry template for batch generation. SearchComposite is a list of gids")
 		@RequestBody final StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto) {
-		return new ResponseEntity<>(
-			this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorRequestDto),
-			HttpStatus.OK);
+
+		this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorRequestDto);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list id",
@@ -74,9 +75,10 @@ public class StudyEntryResource {
 	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
 		@RequestParam(value = "listId", required = true) final Integer listId) {
-		return new ResponseEntity<>(
-			this.studyEntryService.createStudyEntries(studyId, listId),
-			HttpStatus.OK);
+
+		this.studyEntryService.createStudyEntries(studyId, listId);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Delete germplasm entries in study",
