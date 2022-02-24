@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
+import com.google.common.collect.Multimap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
@@ -49,14 +50,23 @@ public class AnalysisVariablesRequestValidator {
 				errors.reject("analysis.variable.request.duplicate.analysis.names", "");
 			}
 		}
-		this.variablesShouldBeNumeric(analysisVariablesRequest.getVariableIds(), errors);
+		this.variablesShouldBeTraitsAndNumerical(analysisVariablesRequest.getVariableIds(), errors);
 	}
 
-	private void variablesShouldBeNumeric(final List<Integer> variableIds, final Errors errors) {
+	private void variablesShouldBeTraitsAndNumerical(final List<Integer> variableIds, final Errors errors) {
 		if (CollectionUtils.isNotEmpty(variableIds)) {
 			final VariableFilter variableFilter = new VariableFilter();
 			variableIds.forEach(variableFilter::addVariableId);
 			final Map<Integer, Variable> variableMap = this.ontologyVariableService.getVariablesWithFilterById(variableFilter);
+			final Multimap<Integer, VariableType> variableTypesMultimap =
+				this.ontologyVariableService.getVariableTypesOfVariables(variableIds);
+
+			final boolean hasNonTraitVariables =
+				variableTypesMultimap.asMap().entrySet().stream().anyMatch(e -> !e.getValue().contains(VariableType.TRAIT));
+			if (hasNonTraitVariables) {
+				errors.reject("analysis.variable.request.variables.should.be.traits", "");
+			}
+
 			final List<Variable> nonNumericVariables =
 				variableMap.values().stream().filter(v -> !DataType.NUMERIC_VARIABLE.getName().equals(v.getScale().getDataType().getName()))
 					.collect(Collectors.toList());
