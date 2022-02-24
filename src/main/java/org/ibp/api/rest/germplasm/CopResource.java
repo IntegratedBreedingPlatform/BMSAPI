@@ -47,6 +47,17 @@ public class CopResource {
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
+	@ApiOperation("Calculate coefficient of parentage for a list")
+	@RequestMapping(value = "/cop/calculation/list/{listId}", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<CopResponse> calculateCopMatrixForList(
+		@PathVariable final String cropName,
+		@PathVariable final Integer listId
+	) {
+		final CopResponse results = this.copService.calculateCoefficientOfParentage(listId);
+		return new ResponseEntity<>(results, HttpStatus.OK);
+	}
+
 	@ApiOperation("Cancel coefficient of parentage calculation jobs")
 	@RequestMapping(value = "/cop/calculation", method = RequestMethod.DELETE)
 	@ResponseBody
