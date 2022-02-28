@@ -11,10 +11,14 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.AttributeValueService;
-import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -39,6 +43,17 @@ public class AttributeValueResourceBrapiTest extends ApiUnitTestBase {
 
 	@Autowired
 	private SearchRequestService searchRequestService;
+
+
+	@Configuration
+	public static class TestConfiguration {
+
+		@Bean
+		@Primary
+		public AttributeValueService attributeValueService() {
+			return Mockito.mock(AttributeValueService.class);
+		}
+	}
 
 	private AttributeValueDto getTestAttributeValueDto() {
 		final AttributeValueDto attributeValueDto =
@@ -72,9 +87,8 @@ public class AttributeValueResourceBrapiTest extends ApiUnitTestBase {
 		doReturn(searchRequestDto).when(this.searchRequestService)
 			.getSearchRequest(searchResultsDbid, AttributeValueSearchRequestDto.class);
 		doReturn(attributeValueDtoList).when(this.attributeValueService)
-			.getAttributeValues(searchRequestDto,
-				new PageRequest(BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE), PROGRAM_UUID);
-
+			.getAttributeValues(ArgumentMatchers.any(AttributeValueSearchRequestDto.class), ArgumentMatchers.any(
+				Pageable.class), ArgumentMatchers.isNull());
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v2/search/attributevalues/" + searchResultsDbid)
 				.contentType(this.contentType)
 				.locale(Locale.getDefault()))
