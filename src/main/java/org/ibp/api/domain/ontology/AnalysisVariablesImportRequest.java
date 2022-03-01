@@ -6,10 +6,10 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.List;
 
 @AutoProperty
-public class AnalysisVariablesRequest {
+public class AnalysisVariablesImportRequest {
 
 	private List<Integer> variableIds;
-	private List<String> analysisNames;
+	private List<String> analysisMethodNames;
 	private String variableType;
 
 	public List<Integer> getVariableIds() {
@@ -20,12 +20,12 @@ public class AnalysisVariablesRequest {
 		this.variableIds = variableIds;
 	}
 
-	public List<String> getAnalysisNames() {
-		return this.analysisNames;
+	public List<String> getAnalysisMethodNames() {
+		return this.analysisMethodNames;
 	}
 
-	public void setAnalysisNames(final List<String> analysisNames) {
-		this.analysisNames = analysisNames;
+	public void setAnalysisMethodNames(final List<String> analysisMethodNames) {
+		this.analysisMethodNames = analysisMethodNames;
 	}
 
 	public String getVariableType() {

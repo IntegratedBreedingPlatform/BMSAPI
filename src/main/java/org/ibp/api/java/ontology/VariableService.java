@@ -3,7 +3,7 @@ package org.ibp.api.java.ontology;
 
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.AnalysisVariablesRequest;
+import org.ibp.api.domain.ontology.AnalysisVariablesImportRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 
@@ -80,5 +80,5 @@ public interface VariableService {
 
 	List<Variable> searchAttributeVariables(String query, String programUUID);
 
-	List<VariableDetails> createAnalysisVariables(AnalysisVariablesRequest analysisVariablesRequest);
+	List<VariableDetails> createAnalysisVariables(AnalysisVariablesImportRequest analysisVariablesImportRequest);
 }

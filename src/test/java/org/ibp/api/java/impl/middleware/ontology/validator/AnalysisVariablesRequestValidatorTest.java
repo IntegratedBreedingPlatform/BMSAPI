@@ -3,12 +3,14 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.ibp.api.domain.ontology.AnalysisVariablesRequest;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.ibp.api.domain.ontology.AnalysisVariablesImportRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AnalysisVariablesRequestValidatorTest {
@@ -34,15 +37,18 @@ public class AnalysisVariablesRequestValidatorTest {
 	@Mock
 	private OntologyVariableService ontologyVariableService;
 
+	@Mock
+	private OntologyDataManager ontologyDataManager;
+
 	@InjectMocks
 	private final AnalysisVariablesRequestValidator analysisVariablesRequestValidator = new AnalysisVariablesRequestValidator();
 
 	@Test
 	public void testValidate_RequiredFields() {
-		final AnalysisVariablesRequest analysisVariablesRequest = new AnalysisVariablesRequest();
-		this.analysisVariablesRequestValidator.validate(analysisVariablesRequest, this.errors);
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, this.errors);
 		Mockito.verify(this.errors).reject("analysis.variable.request.variable.type.is.required", "");
-		Mockito.verify(this.errors).reject("analysis.variable.request.analysis.names.are.required", "");
+		Mockito.verify(this.errors).reject("analysis.variable.request.analysis.method.names.are.required", "");
 		Mockito.verify(this.errors).reject("analysis.variable.request.variable.ids.are.required", "");
 	}
 
@@ -59,12 +65,12 @@ public class AnalysisVariablesRequestValidatorTest {
 		variableTypeMultimap.put(3, VariableType.TRAIT);
 		Mockito.when(this.ontologyVariableService.getVariableTypesOfVariables(any())).thenReturn(variableTypeMultimap);
 
-		final AnalysisVariablesRequest analysisVariablesRequest = new AnalysisVariablesRequest();
-		analysisVariablesRequest.setAnalysisNames(Arrays.asList("BLUEs", "blues", "BLUPs"));
-		analysisVariablesRequest.setVariableIds(variableIds);
-		analysisVariablesRequest.setVariableType(VariableType.ANALYSIS.getName());
-		this.analysisVariablesRequestValidator.validate(analysisVariablesRequest, this.errors);
-		Mockito.verify(this.errors).reject("analysis.variable.request.duplicate.analysis.names", "");
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "blues", "BLUPs"));
+		analysisVariablesImportRequest.setVariableIds(variableIds);
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, this.errors);
+		Mockito.verify(this.errors).reject("analysis.variable.request.duplicate.analysis.method.names", "");
 	}
 
 	@Test
@@ -80,11 +86,11 @@ public class AnalysisVariablesRequestValidatorTest {
 		variableTypeMultimap.put(3, VariableType.TRAIT);
 		Mockito.when(this.ontologyVariableService.getVariableTypesOfVariables(any())).thenReturn(variableTypeMultimap);
 
-		final AnalysisVariablesRequest analysisVariablesRequest = new AnalysisVariablesRequest();
-		analysisVariablesRequest.setAnalysisNames(Arrays.asList("BLUEs", "BLUPs"));
-		analysisVariablesRequest.setVariableIds(variableIds);
-		analysisVariablesRequest.setVariableType("Random Variable Type");
-		this.analysisVariablesRequestValidator.validate(analysisVariablesRequest, this.errors);
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs"));
+		analysisVariablesImportRequest.setVariableIds(variableIds);
+		analysisVariablesImportRequest.setVariableType("Random Variable Type");
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, this.errors);
 		Mockito.verify(this.errors).reject("analysis.variable.request.invalid.variable.type", "");
 	}
 
@@ -101,11 +107,11 @@ public class AnalysisVariablesRequestValidatorTest {
 		variableTypeMultimap.put(3, VariableType.TRAIT);
 		Mockito.when(this.ontologyVariableService.getVariableTypesOfVariables(any())).thenReturn(variableTypeMultimap);
 
-		final AnalysisVariablesRequest analysisVariablesRequest = new AnalysisVariablesRequest();
-		analysisVariablesRequest.setAnalysisNames(Arrays.asList("BLUEs", "BLUPs"));
-		analysisVariablesRequest.setVariableIds(variableIds);
-		analysisVariablesRequest.setVariableType(VariableType.ANALYSIS.getName());
-		this.analysisVariablesRequestValidator.validate(analysisVariablesRequest, this.errors);
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs"));
+		analysisVariablesImportRequest.setVariableIds(variableIds);
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, this.errors);
 
 		Mockito.verify(this.errors)
 			.reject("analysis.variable.request.variables.should.be.numeric.data.type.or.categorical.variable.values.are.numeric", "");
@@ -125,11 +131,11 @@ public class AnalysisVariablesRequestValidatorTest {
 		variableTypeMultimap.put(3, VariableType.TRAIT);
 		Mockito.when(this.ontologyVariableService.getVariableTypesOfVariables(any())).thenReturn(variableTypeMultimap);
 
-		final AnalysisVariablesRequest analysisVariablesRequest = new AnalysisVariablesRequest();
-		analysisVariablesRequest.setAnalysisNames(Arrays.asList("BLUEs", "BLUPs"));
-		analysisVariablesRequest.setVariableIds(variableIds);
-		analysisVariablesRequest.setVariableType(VariableType.ANALYSIS.getName());
-		this.analysisVariablesRequestValidator.validate(analysisVariablesRequest, this.errors);
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs"));
+		analysisVariablesImportRequest.setVariableIds(variableIds);
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, this.errors);
 
 		Mockito.verify(this.errors)
 			.reject("analysis.variable.request.variables.should.be.numeric.data.type.or.categorical.variable.values.are.numeric", "");
@@ -149,11 +155,11 @@ public class AnalysisVariablesRequestValidatorTest {
 		variableTypeMultimap.put(3, VariableType.TRAIT);
 		Mockito.when(this.ontologyVariableService.getVariableTypesOfVariables(any())).thenReturn(variableTypeMultimap);
 
-		final AnalysisVariablesRequest analysisVariablesRequest = new AnalysisVariablesRequest();
-		analysisVariablesRequest.setAnalysisNames(Arrays.asList("BLUEs", "BLUPs"));
-		analysisVariablesRequest.setVariableIds(variableIds);
-		analysisVariablesRequest.setVariableType(VariableType.ANALYSIS.getName());
-		this.analysisVariablesRequestValidator.validate(analysisVariablesRequest, this.errors);
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs"));
+		analysisVariablesImportRequest.setVariableIds(variableIds);
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, this.errors);
 
 		Mockito.verify(this.errors, Mockito.times(0))
 			.reject("analysis.variable.request.variables.should.be.numeric.data.type.or.categorical.variable.values.are.numeric", "");
@@ -172,13 +178,38 @@ public class AnalysisVariablesRequestValidatorTest {
 		variableTypeMultimap.put(3, VariableType.ENTRY_DETAIL);
 		Mockito.when(this.ontologyVariableService.getVariableTypesOfVariables(any())).thenReturn(variableTypeMultimap);
 
-		final AnalysisVariablesRequest analysisVariablesRequest = new AnalysisVariablesRequest();
-		analysisVariablesRequest.setAnalysisNames(Arrays.asList("BLUEs", "BLUPs"));
-		analysisVariablesRequest.setVariableIds(variableIds);
-		analysisVariablesRequest.setVariableType(VariableType.ANALYSIS.getName());
-		this.analysisVariablesRequestValidator.validate(analysisVariablesRequest, this.errors);
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs"));
+		analysisVariablesImportRequest.setVariableIds(variableIds);
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, this.errors);
 
 		Mockito.verify(this.errors).reject("analysis.variable.request.variables.should.be.traits", "");
+	}
+
+	@Test
+	public void testValidate_SomeVariablesDoNotExist() {
+		final List<Integer> variableIds = Arrays.asList(1, 2, 3);
+		final Map<Integer, Variable> variableMap =
+			this.createTestVariableMap(DataType.NUMERIC_VARIABLE, variableIds, new ArrayList<>());
+		Mockito.when(this.ontologyVariableService.getVariablesWithFilterById(any())).thenReturn(variableMap);
+
+		final Multimap<Integer, VariableType> variableTypeMultimap = ArrayListMultimap.create();
+		variableTypeMultimap.put(1, VariableType.TRAIT);
+		variableTypeMultimap.put(2, VariableType.TRAIT);
+		variableTypeMultimap.put(3, VariableType.TRAIT);
+		Mockito.when(this.ontologyVariableService.getVariableTypesOfVariables(any())).thenReturn(variableTypeMultimap);
+
+		final List<Term> terms = Arrays.asList(new Term(1, "", ""));
+		Mockito.when(this.ontologyDataManager.getTermsByIds(any())).thenReturn(terms);
+
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs"));
+		analysisVariablesImportRequest.setVariableIds(variableIds);
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, this.errors);
+
+		Mockito.verify(this.errors, Mockito.times(2)).reject(eq("variable.does.not.exist"), any(), any());
 	}
 
 	@Test
@@ -194,11 +225,14 @@ public class AnalysisVariablesRequestValidatorTest {
 		variableTypeMultimap.put(3, VariableType.TRAIT);
 		Mockito.when(this.ontologyVariableService.getVariableTypesOfVariables(any())).thenReturn(variableTypeMultimap);
 
-		final AnalysisVariablesRequest analysisVariablesRequest = new AnalysisVariablesRequest();
-		analysisVariablesRequest.setAnalysisNames(Arrays.asList("BLUEs", "BLUPs"));
-		analysisVariablesRequest.setVariableIds(variableIds);
-		analysisVariablesRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
-		this.analysisVariablesRequestValidator.validate(analysisVariablesRequest, this.errors);
+		final List<Term> terms = Arrays.asList(new Term(1, "", ""), new Term(2, "", ""), new Term(3, "", ""));
+		Mockito.when(this.ontologyDataManager.getTermsByIds(any())).thenReturn(terms);
+
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs"));
+		analysisVariablesImportRequest.setVariableIds(variableIds);
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, this.errors);
 		Mockito.verifyNoInteractions(this.errors);
 	}
 

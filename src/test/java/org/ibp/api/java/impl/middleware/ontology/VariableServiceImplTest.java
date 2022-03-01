@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.ontology;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.ibp.api.domain.ontology.AnalysisVariablesRequest;
+import org.ibp.api.domain.ontology.AnalysisVariablesImportRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.validator.AnalysisVariablesRequestValidator;
@@ -46,19 +46,18 @@ public class VariableServiceImplTest {
 	@Test
 	public void testCreateAnalysisVariables_OK() {
 
-		final AnalysisVariablesRequest analysisVariablesRequest = new AnalysisVariablesRequest();
-		analysisVariablesRequest.setVariableType("Analysis");
-		analysisVariablesRequest.setAnalysisNames(Arrays.asList("BLUEs"));
-		analysisVariablesRequest.setVariableIds(Arrays.asList(1));
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setVariableType("Analysis");
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs"));
+		analysisVariablesImportRequest.setVariableIds(Arrays.asList(1));
 
-		Mockito.when(this.ontologyVariableService.createAnalysisVariables(analysisVariablesRequest.getVariableIds(),
-			analysisVariablesRequest.getAnalysisNames(), analysisVariablesRequest.getVariableType())).thenReturn(Arrays.asList(1));
+		Mockito.when(this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest.getVariableIds(),
+			analysisVariablesImportRequest.getAnalysisMethodNames(), analysisVariablesImportRequest.getVariableType())).thenReturn(Arrays.asList(1));
 		Mockito.when(this.ontologyVariableDataManager.getWithFilter(any())).thenReturn(Arrays.asList(new Variable(2, "", "", "")));
 
-		final List<VariableDetails> result = this.variableService.createAnalysisVariables(analysisVariablesRequest);
+		final List<VariableDetails> result = this.variableService.createAnalysisVariables(analysisVariablesImportRequest);
 
-		Mockito.verify(this.analysisVariablesRequestValidator).validate(eq(analysisVariablesRequest), any());
-		Mockito.verify(this.termValidator).validateTermIds(eq(analysisVariablesRequest.getVariableIds()), any());
+		Mockito.verify(this.analysisVariablesRequestValidator).validate(eq(analysisVariablesImportRequest), any());
 		assertEquals("2", result.get(0).getId());
 
 	}
@@ -66,19 +65,19 @@ public class VariableServiceImplTest {
 	@Test
 	public void testCreateAnalysisVariables_ValidationError() {
 
-		final AnalysisVariablesRequest analysisVariablesRequest = new AnalysisVariablesRequest();
-		analysisVariablesRequest.setVariableType("Analysis");
-		analysisVariablesRequest.setAnalysisNames(Arrays.asList("BLUEs"));
-		analysisVariablesRequest.setVariableIds(Arrays.asList(1));
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setVariableType("Analysis");
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs"));
+		analysisVariablesImportRequest.setVariableIds(Arrays.asList(1));
 
 		Mockito.doAnswer(invocation -> {
 			final BindingResult errors = invocation.getArgument(1, BindingResult.class);
 			errors.reject("error");
 			return null;
-		}).when(this.analysisVariablesRequestValidator).validate(eq(analysisVariablesRequest), any());
+		}).when(this.analysisVariablesRequestValidator).validate(eq(analysisVariablesImportRequest), any());
 
 		try {
-			final List<VariableDetails> result = this.variableService.createAnalysisVariables(analysisVariablesRequest);
+			final List<VariableDetails> result = this.variableService.createAnalysisVariables(analysisVariablesImportRequest);
 			Assert.fail("Should throw an error");
 		} catch (final ApiRequestValidationException e) {
 			Mockito.verify(this.ontologyVariableService, Mockito.times(0)).createAnalysisVariables(any(), any(), any());

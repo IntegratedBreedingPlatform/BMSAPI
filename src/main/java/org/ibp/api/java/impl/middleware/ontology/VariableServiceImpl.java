@@ -22,7 +22,7 @@ import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariable
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.AnalysisVariablesRequest;
+import org.ibp.api.domain.ontology.AnalysisVariablesImportRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -568,19 +568,18 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	}
 
 	@Override
-	public List<VariableDetails> createAnalysisVariables(final AnalysisVariablesRequest analysisVariablesRequest) {
+	public List<VariableDetails> createAnalysisVariables(final AnalysisVariablesImportRequest analysisVariablesImportRequest) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
-		this.analysisVariablesRequestValidator.validate(analysisVariablesRequest, errors);
-		this.termValidator.validateTermIds(analysisVariablesRequest.getVariableIds(), errors);
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		final VariableFilter variableFilter = new VariableFilter();
 		final List<Integer> analysisVariables =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesRequest.getVariableIds(),
-				analysisVariablesRequest.getAnalysisNames(), analysisVariablesRequest.getVariableType());
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest.getVariableIds(),
+				analysisVariablesImportRequest.getAnalysisMethodNames(), analysisVariablesImportRequest.getVariableType());
 		analysisVariables.stream().forEach(variableFilter::addVariableId);
 		return this.getVariablesByFilter(variableFilter);
 	}
