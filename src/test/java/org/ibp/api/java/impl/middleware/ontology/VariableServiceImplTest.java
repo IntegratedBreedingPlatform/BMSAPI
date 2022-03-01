@@ -6,7 +6,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.ibp.api.domain.ontology.AnalysisVariablesImportRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.ontology.validator.AnalysisVariablesRequestValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.AnalysisVariablesImportRequestValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.junit.Assert;
@@ -38,7 +38,7 @@ public class VariableServiceImplTest {
 	private TermValidator termValidator;
 
 	@Mock
-	private AnalysisVariablesRequestValidator analysisVariablesRequestValidator;
+	private AnalysisVariablesImportRequestValidator analysisVariablesRequestValidator;
 
 	@InjectMocks
 	private VariableService variableService = new VariableServiceImpl();

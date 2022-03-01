@@ -29,7 +29,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.AnalysisVariablesRequestValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.AnalysisVariablesImportRequestValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.ontology.VariableService;
@@ -87,7 +87,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	private TermValidator termValidator;
 
 	@Autowired
-	private AnalysisVariablesRequestValidator analysisVariablesRequestValidator;
+	private AnalysisVariablesImportRequestValidator analysisVariablesRequestValidator;
 
 	@Override
 	public List<VariableDetails> getAllVariablesByFilter(final String cropName, final String programId, final String propertyId,

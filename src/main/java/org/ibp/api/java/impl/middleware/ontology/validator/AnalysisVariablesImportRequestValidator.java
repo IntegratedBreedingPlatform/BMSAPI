@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class AnalysisVariablesRequestValidator {
+public class AnalysisVariablesImportRequestValidator {
 
 	public static final List<String> SUPPORTED_VARIABLE_TYPES =
 		ListUtils.unmodifiableList(Arrays.asList(VariableType.ANALYSIS.getName(), VariableType.ANALYSIS_SUMMARY.getName()));

@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AnalysisVariablesRequestValidatorTest {
+public class AnalysisVariablesImportRequestValidatorTest {
 
 	@Mock
 	private BindingResult errors;
@@ -41,7 +41,7 @@ public class AnalysisVariablesRequestValidatorTest {
 	private OntologyDataManager ontologyDataManager;
 
 	@InjectMocks
-	private final AnalysisVariablesRequestValidator analysisVariablesRequestValidator = new AnalysisVariablesRequestValidator();
+	private final AnalysisVariablesImportRequestValidator analysisVariablesRequestValidator = new AnalysisVariablesImportRequestValidator();
 
 	@Test
 	public void testValidate_RequiredFields() {
@@ -250,6 +250,7 @@ public class AnalysisVariablesRequestValidatorTest {
 		final Variable variable = new Variable();
 		variable.setId(id);
 		variable.setScale(new Scale());
+		variable.getScale().setId(dataType.getId());
 		variable.getScale().setDataType(dataType);
 		for (final String categoricalValue : categoricalValues) {
 			variable.getScale().addCategory(new TermSummary(1, categoricalValue, ""));
