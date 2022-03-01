@@ -68,11 +68,21 @@ public class AnalysisVariablesRequestValidator {
 			}
 
 			final List<Variable> nonNumericVariables =
-				variableMap.values().stream().filter(v -> !DataType.NUMERIC_VARIABLE.getName().equals(v.getScale().getDataType().getName()))
+				variableMap.values().stream().filter(this::filterNonNumericVariableOrNonNumericCategoricalVariables)
 					.collect(Collectors.toList());
 			if (CollectionUtils.isNotEmpty(nonNumericVariables)) {
-				errors.reject("analysis.variable.request.variables.should.be.numeric.data.type", "");
+				errors.reject("analysis.variable.request.variables.should.be.numeric.data.type.or.categorical.variable.values.are.numeric", "");
 			}
+
 		}
+	}
+
+	private boolean filterNonNumericVariableOrNonNumericCategoricalVariables(final Variable variable) {
+		if (DataType.NUMERIC_VARIABLE.getName().equals(variable.getScale().getDataType().getName())) {
+			return false;
+		} else if (DataType.CATEGORICAL_VARIABLE.getName().equals(variable.getScale().getDataType().getName())) {
+			return variable.getScale().getCategories().stream().anyMatch(o -> !StringUtils.isNumeric(o.getName()));
+		}
+		return true;
 	}
 }
