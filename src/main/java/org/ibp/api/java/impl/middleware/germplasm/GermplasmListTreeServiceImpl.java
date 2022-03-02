@@ -223,13 +223,11 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 
 		// Persist the Program and Crop tree state for user
 		final int userId = Integer.parseInt(userIdString);
-		this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(userId, programUUID,
-			ListTreeState.GERMPLASM_LIST.name(),
+		this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(userId, programUUID, ListTreeState.GERMPLASM_LIST.name(),
 			programFolders);
 		if(userTreeState.getCropFolders() != null) {
 			final List<String> cropFolders = userTreeState.getCropFolders();
-			this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(userId, null,
-				ListTreeState.GERMPLASM_LIST.name(),
+			this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(userId, null, ListTreeState.GERMPLASM_LIST.name(),
 				cropFolders);
 		}
 	}
