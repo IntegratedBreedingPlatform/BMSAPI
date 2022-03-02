@@ -10,7 +10,7 @@ import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.ibp.api.domain.ontology.AnalysisVariablesImportRequest;
+import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -22,7 +23,6 @@ import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariable
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.AnalysisVariablesImportRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -30,7 +30,6 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.AnalysisVariablesImportRequestValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.modelmapper.ModelMapper;
@@ -82,9 +81,6 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	@Autowired
 	private OntologyVariableService ontologyVariableService;
-
-	@Autowired
-	private TermValidator termValidator;
 
 	@Autowired
 	private AnalysisVariablesImportRequestValidator analysisVariablesRequestValidator;
@@ -578,8 +574,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		final VariableFilter variableFilter = new VariableFilter();
 		final List<Integer> analysisVariables =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest.getVariableIds(),
-				analysisVariablesImportRequest.getAnalysisMethodNames(), analysisVariablesImportRequest.getVariableType());
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 		analysisVariables.stream().forEach(variableFilter::addVariableId);
 		return this.getVariablesByFilter(variableFilter);
 	}

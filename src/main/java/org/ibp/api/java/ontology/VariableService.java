@@ -3,7 +3,7 @@ package org.ibp.api.java.ontology;
 
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.AnalysisVariablesImportRequest;
+import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 

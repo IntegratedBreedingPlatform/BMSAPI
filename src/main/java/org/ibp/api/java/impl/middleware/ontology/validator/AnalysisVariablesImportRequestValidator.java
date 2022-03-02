@@ -11,7 +11,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.ibp.api.domain.ontology.AnalysisVariablesImportRequest;
+import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;

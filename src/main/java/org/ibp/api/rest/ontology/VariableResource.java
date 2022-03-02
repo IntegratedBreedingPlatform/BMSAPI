@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.AnalysisVariablesImportRequest;
+import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.java.ontology.VariableService;
