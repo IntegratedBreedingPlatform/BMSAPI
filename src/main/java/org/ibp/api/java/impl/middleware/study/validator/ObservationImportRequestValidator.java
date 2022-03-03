@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearc
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
+import org.generationcp.middleware.service.api.study.ScaleDTO;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -175,7 +176,7 @@ public class ObservationImportRequestValidator {
 			this.errors.reject("observation.import.value.exceeded.length", new String[] {index.toString()}, "");
 			return true;
 		}
-		final VariableDTO.Scale scale = variableDTOMap.get(dto.getObservationVariableDbId()).getScale();
+		final ScaleDTO scale = variableDTOMap.get(dto.getObservationVariableDbId()).getScale();
 		if (DataType.NUMERIC_VARIABLE.getBrapiName().equalsIgnoreCase(scale.getDataType()) && !StringUtils.isNumeric(dto.getValue())) {
 			this.errors.reject("observation.import.value.non.numeric", new String[] {index.toString()}, "");
 			return true;
