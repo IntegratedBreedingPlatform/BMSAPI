@@ -2,8 +2,9 @@ package org.ibp.api.rest.analysis;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.api.analysis.MeansRequestDto;
+import org.generationcp.middleware.api.analysis.MeansImportRequest;
 import org.ibp.api.java.analysis.AnalysisService;
+import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,13 +23,16 @@ public class AnalysisResource {
 	@Autowired
 	private AnalysisService analysisService;
 
+	@Autowired
+	private DatasetService datasetService;
+
 	@ApiOperation(value = "Create means dataset", notes = "Create means dataset")
 	@RequestMapping(value = "/crops/{cropName}/single-site-analysis/means", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<DatasetDTO> createMeansDataset(@PathVariable final String cropName,
-		@RequestBody final MeansRequestDto meansRequestDto) {
-		this.analysisService.createMeansDataset(meansRequestDto);
-		return new ResponseEntity<>(HttpStatus.OK);
+		@RequestBody final MeansImportRequest meansImportRequest) {
+		return new ResponseEntity<>(this.datasetService.getDataset(cropName, meansImportRequest.getStudyId(),
+			this.analysisService.createMeansDataset(meansImportRequest)), HttpStatus.OK);
 	}
 
 }

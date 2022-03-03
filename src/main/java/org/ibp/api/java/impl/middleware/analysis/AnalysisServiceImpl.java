@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.analysis;
 
-import org.generationcp.middleware.api.analysis.MeansRequestDto;
+import org.generationcp.middleware.api.analysis.MeansImportRequest;
 import org.ibp.api.java.analysis.AnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 	private org.generationcp.middleware.api.analysis.AnalysisService analysisMiddlewareService;
 
 	@Override
-	public void createMeansDataset(final MeansRequestDto meansInput) {
-		this.analysisMiddlewareService.createMeansDataset(meansInput);
+	public Integer createMeansDataset(final MeansImportRequest meansInput) {
+		return this.analysisMiddlewareService.createMeansDataset(meansInput);
 	}
 }

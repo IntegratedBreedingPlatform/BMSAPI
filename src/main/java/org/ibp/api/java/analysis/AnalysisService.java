@@ -1,9 +1,9 @@
 package org.ibp.api.java.analysis;
 
-import org.generationcp.middleware.api.analysis.MeansRequestDto;
+import org.generationcp.middleware.api.analysis.MeansImportRequest;
 
 public interface AnalysisService {
 
-	void createMeansDataset(MeansRequestDto meansInput);
+	Integer createMeansDataset(MeansImportRequest meansInput);
 
 }
