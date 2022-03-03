@@ -1,6 +1,6 @@
 package org.ibp.api.java.analysis;
 
-import org.generationcp.middleware.api.analysis.MeansImportRequest;
+import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
 
 public interface AnalysisService {
 

@@ -2,7 +2,7 @@ package org.ibp.api.rest.analysis;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.api.analysis.MeansImportRequest;
+import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
 import org.ibp.api.java.analysis.AnalysisService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.DatasetDTO;
