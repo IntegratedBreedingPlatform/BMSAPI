@@ -106,6 +106,7 @@ public class MeansImportRequestValidator {
 	}
 
 	protected void validateEntryNumber(final MeansImportRequest meansImportRequest, final BindingResult errors) {
+
 		final boolean hasBlankEntryNo = meansImportRequest.getData().stream().anyMatch(md -> md.getEntryNo() == null);
 		if (hasBlankEntryNo) {
 			errors.reject("means.import.means.entry.numbers.required", "");
@@ -122,7 +123,19 @@ public class MeansImportRequestValidator {
 				errors.reject("means.import.means.entry.numbers.do.not.exist",
 					new Object[] {StringUtils.join(nonExistingEntryNumbers, ", ")}, "");
 			}
+
+			final Map<Integer, List<MeansImportRequest.MeansData>> meansDataGroupByEnvironmentIdMap = meansImportRequest.
+				getData().stream().collect(Collectors.groupingBy(MeansImportRequest.MeansData::getEnvironmentId, Collectors.toList()));
+			final boolean hasDuplicateEntryNumbersPerEnvironment =
+				meansDataGroupByEnvironmentIdMap.values().stream().anyMatch(
+					meansDataList -> meansDataList.stream()
+						.collect(Collectors.groupingBy(MeansImportRequest.MeansData::getEntryNo, Collectors.counting()))
+						.entrySet().stream().anyMatch(e -> e.getValue() > 1));
+			if (hasDuplicateEntryNumbersPerEnvironment) {
+				errors.reject("means.import.means.duplicate.entry.numbers.per.environment", "");
+			}
 		}
+
 	}
 
 	protected void validateAnalysisVariableNames(final MeansImportRequest meansImportRequest, final BindingResult errors) {

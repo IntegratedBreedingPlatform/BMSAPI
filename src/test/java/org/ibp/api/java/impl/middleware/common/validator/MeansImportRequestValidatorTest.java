@@ -169,6 +169,20 @@ public class MeansImportRequestValidatorTest {
 	}
 
 	@Test
+	public void testValidateEntryNumber_DuplicateEntryNumbersPerEnvironment() {
+		when(this.studyDataManager.getStocksByStudyAndEntryNumbers(eq(1), any())).thenReturn(Arrays.asList(this.createStockModel("1")));
+
+		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
+		final MeansImportRequest.MeansData duplicateEntryNoMeansData = new MeansImportRequest.MeansData();
+		duplicateEntryNoMeansData.setEntryNo(1);
+		duplicateEntryNoMeansData.setEnvironmentId(1);
+		meansImportRequest.getData().add(duplicateEntryNoMeansData);
+		this.meansImportRequestValidator.validateEntryNumber(meansImportRequest, this.errors);
+
+		verify(this.errors).reject("means.import.means.duplicate.entry.numbers.per.environment", "");
+	}
+
+	@Test
 	public void testValidateAnalysisVariableNames_VariableNamesDoNotExist() {
 		when(this.ontologyVariableDataManager.getWithFilter(any())).thenReturn(new ArrayList<>());
 
