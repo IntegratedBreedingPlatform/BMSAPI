@@ -284,7 +284,11 @@ public class GermplasmResource {
 
 				@Override
 				public long getCount() {
-					return GermplasmResource.this.germplasmService.countSearchGermplasm(null, null);
+					/**
+					 * Excluding total count improves overall search from ~15s to 1s in wheat,brachiaria (~7M records)
+					 * excluding deleted germplasm in query being the main bottleneck
+					 */
+					return 0;
 				}
 
 				@Override
@@ -294,7 +298,7 @@ public class GermplasmResource {
 					 * This issues can no longer be replicated, hence we enable this again
 					 * to be able to consider the exact count when retrieving all results.
 					 */
-					return germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
+					return GermplasmResource.this.germplasmService.countGermplasmMatches(germplasmMatchRequestDto);
 				}
 
 				@Override
