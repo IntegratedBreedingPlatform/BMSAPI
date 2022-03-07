@@ -9,7 +9,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValue
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.ibp.api.brapi.AttributeValueService;
+import org.ibp.api.brapi.AttributeValueServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -43,7 +43,7 @@ public class AttributeValueResourceBrapi {
 	private SearchRequestService searchRequestService;
 
 	@Autowired
-	private AttributeValueService attributeValueService;
+	private AttributeValueServiceBrapi attributeValueServiceBrapi;
 
 	@ApiOperation(value = "Search attribute values", notes = "Submit a search request for attribute values")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/attributevalues", method = RequestMethod.POST)
@@ -118,13 +118,13 @@ public class AttributeValueResourceBrapi {
 
 					@Override
 					public long getCount() {
-						return AttributeValueResourceBrapi.this.attributeValueService.countAttributeValues(attributeValueSearchDTO,
+						return AttributeValueResourceBrapi.this.attributeValueServiceBrapi.countAttributeValues(attributeValueSearchDTO,
 							programUUID);
 					}
 
 					@Override
 					public List<AttributeValueDto> getResults(final PagedResult<AttributeValueDto> pagedResult) {
-						return AttributeValueResourceBrapi.this.attributeValueService
+						return AttributeValueResourceBrapi.this.attributeValueServiceBrapi
 							.getAttributeValues(attributeValueSearchDTO, new PageRequest(finalPageNumber, finalPageSize), programUUID);
 					}
 				});

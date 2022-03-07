@@ -10,7 +10,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValue
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.brapi.AttributeValueService;
+import org.ibp.api.brapi.AttributeValueServiceBrapi;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -39,7 +39,7 @@ public class AttributeValueResourceBrapiTest extends ApiUnitTestBase {
 	private static final String PROGRAM_UUID = "50a7e02e-db60-4240-bd64-417b34606e46";
 
 	@Autowired
-	private AttributeValueService attributeValueService;
+	private AttributeValueServiceBrapi attributeValueServiceBrapi;
 
 	@Autowired
 	private SearchRequestService searchRequestService;
@@ -50,8 +50,8 @@ public class AttributeValueResourceBrapiTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public AttributeValueService attributeValueService() {
-			return Mockito.mock(AttributeValueService.class);
+		public AttributeValueServiceBrapi attributeValueService() {
+			return Mockito.mock(AttributeValueServiceBrapi.class);
 		}
 	}
 
@@ -86,7 +86,7 @@ public class AttributeValueResourceBrapiTest extends ApiUnitTestBase {
 
 		doReturn(searchRequestDto).when(this.searchRequestService)
 			.getSearchRequest(searchResultsDbid, AttributeValueSearchRequestDto.class);
-		doReturn(attributeValueDtoList).when(this.attributeValueService)
+		doReturn(attributeValueDtoList).when(this.attributeValueServiceBrapi)
 			.getAttributeValues(ArgumentMatchers.any(AttributeValueSearchRequestDto.class), ArgumentMatchers.any(
 				Pageable.class), ArgumentMatchers.isNull());
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v2/search/attributevalues/" + searchResultsDbid)

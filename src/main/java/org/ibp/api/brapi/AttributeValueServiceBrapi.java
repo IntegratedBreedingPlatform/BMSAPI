@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface AttributeValueService {
+public interface AttributeValueServiceBrapi {
 
 	List<AttributeValueDto> getAttributeValues(AttributeValueSearchRequestDto attributeValueSearchDto,
 		Pageable pageable, String programUUID);
