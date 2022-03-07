@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
+import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
@@ -15,6 +16,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearc
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
+import org.generationcp.middleware.service.api.study.ScaleDTO;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -86,7 +88,7 @@ public class ObservationImportRequestValidator {
 		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
 		variableSearchRequestDTO.setObservationVariableDbIds(variableIds);
 		final Map<String, VariableDTO> variableDTOMap =
-			this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTO, null).stream()
+			this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT).stream()
 				.collect(Collectors.toMap(VariableDTO::getObservationVariableDbId, Function.identity()));
 
 		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
@@ -140,7 +142,8 @@ public class ObservationImportRequestValidator {
 		final ObservationDto dto, final Integer index) {
 		if (!studyVariableIdsMap.containsKey(dto.getStudyDbId())) {
 			variableSearchRequestDTO.setStudyDbId(Collections.singletonList(dto.getStudyDbId()));
-			final List<VariableDTO> variableDTOS = this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTO, null);
+			final List<VariableDTO> variableDTOS =
+				this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT);
 			List<String> studyVariableIds = new ArrayList<>();
 			if (!CollectionUtils.isEmpty(variableDTOS)) {
 				studyVariableIds = variableDTOS.stream().map(VariableDTO::getObservationVariableDbId)
@@ -175,7 +178,7 @@ public class ObservationImportRequestValidator {
 			this.errors.reject("observation.import.value.exceeded.length", new String[] {index.toString()}, "");
 			return true;
 		}
-		final VariableDTO.Scale scale = variableDTOMap.get(dto.getObservationVariableDbId()).getScale();
+		final ScaleDTO scale = variableDTOMap.get(dto.getObservationVariableDbId()).getScale();
 		if (DataType.NUMERIC_VARIABLE.getBrapiName().equalsIgnoreCase(scale.getDataType()) && !StringUtils.isNumeric(dto.getValue())) {
 			this.errors.reject("observation.import.value.non.numeric", new String[] {index.toString()}, "");
 			return true;
