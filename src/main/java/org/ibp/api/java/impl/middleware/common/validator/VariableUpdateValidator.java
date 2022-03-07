@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
+import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
@@ -68,7 +69,8 @@ public class VariableUpdateValidator {
 		}
 		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
 		variableSearchRequestDTO.setObservationVariableDbIds(Collections.singletonList(variableDTO.getObservationVariableDbId()));
-		final List<VariableDTO> variableDTOS = this.variableServiceBrapi.getObservationVariables(variableSearchRequestDTO, null);
+		final List<VariableDTO> variableDTOS =
+			this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT);
 		if (CollectionUtils.isEmpty(variableDTOS)) {
 			errors.reject("observation.variable.update.variable.id.invalid", new String[] {}, "");
 			return;

@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.brapi;
 
+import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.VariableServiceBrapi;
@@ -25,7 +26,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	public List<VariableDTO> getObservationVariables(final String crop, final VariableSearchRequestDTO requestDTO,
 		final Pageable pageable) {
-		final List<VariableDTO> observationVariables = this.middlewareVariableServiceBrapi.getObservationVariables(requestDTO, pageable);
+		final List<VariableDTO> observationVariables = this.middlewareVariableServiceBrapi.getVariables(requestDTO, pageable, VariableTypeGroup.TRAIT);
 		observationVariables.forEach(ov -> {
 			ov.setCommonCropName(crop);
 			ov.setCrop(crop);
@@ -34,7 +35,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	public long countObservationVariables(final VariableSearchRequestDTO requestDTO) {
-		return this.middlewareVariableServiceBrapi.countObservationVariables(requestDTO);
+		return this.middlewareVariableServiceBrapi.countVariables(requestDTO, VariableTypeGroup.TRAIT);
 	}
 
 	@Override
