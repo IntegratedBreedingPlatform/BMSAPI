@@ -27,7 +27,7 @@ public class AttributeServiceBrapiImplTest {
 	private VariableServiceBrapi middlewareVariableServiceBrapi;
 
 	@InjectMocks
-	private AttributeServiceBrapi attributeServiceBrapi = new AttributeServiceBrapiImpl();
+	private final AttributeServiceBrapi attributeServiceBrapi = new AttributeServiceBrapiImpl();
 
 	@Test
 	public void testCountGermplasmAttributes() {

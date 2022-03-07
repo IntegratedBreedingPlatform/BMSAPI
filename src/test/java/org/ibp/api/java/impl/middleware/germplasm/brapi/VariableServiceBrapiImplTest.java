@@ -28,7 +28,7 @@ public class VariableServiceBrapiImplTest {
     private VariableUpdateValidator variableUpdateValidator;
 
     @InjectMocks
-    private org.ibp.api.brapi.VariableServiceBrapi variableServiceBrapi = new VariableServiceBrapiImpl();
+    private final org.ibp.api.brapi.VariableServiceBrapi variableServiceBrapi = new VariableServiceBrapiImpl();
 
     @Test
     public void testCountObservationVariables() {
