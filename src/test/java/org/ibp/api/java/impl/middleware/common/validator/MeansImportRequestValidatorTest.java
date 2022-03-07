@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -218,27 +219,28 @@ public class MeansImportRequestValidatorTest {
 
 	private MeansImportRequest createMeansImportRequest() {
 
+		final Random random = new Random();
 		final MeansImportRequest meansImportRequest = new MeansImportRequest();
 		meansImportRequest.setStudyId(1);
 
 		final MeansImportRequest.MeansData meansData1 = new MeansImportRequest.MeansData();
 		meansData1.setEnvironmentId(1);
 		meansData1.setEntryNo(1);
-		final Map<String, String> values1 = new HashMap<>();
-		values1.put(EDIA_M_CM_BLUES, "2.2");
-		values1.put(EDIA_M_CM_BLUPS, "3.3");
-		values1.put(PH_M_CM_BLUES, "0.4");
-		values1.put(PH_M_CM_BLUPS, "9.5");
+		final Map<String, Double> values1 = new HashMap<>();
+		values1.put(EDIA_M_CM_BLUES, random.nextDouble());
+		values1.put(EDIA_M_CM_BLUPS, random.nextDouble());
+		values1.put(PH_M_CM_BLUES, random.nextDouble());
+		values1.put(PH_M_CM_BLUPS, random.nextDouble());
 		meansData1.setValues(values1);
 
 		final MeansImportRequest.MeansData meansData2 = new MeansImportRequest.MeansData();
 		meansData2.setEnvironmentId(2);
 		meansData2.setEntryNo(1);
-		final Map<String, String> values2 = new HashMap<>();
-		values2.put(EDIA_M_CM_BLUES, "1.2");
-		values2.put(EDIA_M_CM_BLUPS, "5.3");
-		values2.put(PH_M_CM_BLUES, "4.4");
-		values2.put(PH_M_CM_BLUPS, "5.5");
+		final Map<String, Double> values2 = new HashMap<>();
+		values2.put(EDIA_M_CM_BLUES, random.nextDouble());
+		values2.put(EDIA_M_CM_BLUPS, random.nextDouble());
+		values2.put(PH_M_CM_BLUES, random.nextDouble());
+		values2.put(PH_M_CM_BLUPS, random.nextDouble());
 		meansData2.setValues(values2);
 
 		final List<MeansImportRequest.MeansData> meansDataList = new ArrayList<>();
