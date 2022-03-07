@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -21,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.fail;
@@ -129,6 +129,15 @@ public class MeansImportRequestValidatorTest {
 	}
 
 	@Test
+	public void testCheckDataValuesIsEmpty() {
+		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
+		meansImportRequest.getData().get(0).setValues(null);
+		this.meansImportRequestValidator.checkDataValuesIsEmpty(meansImportRequest, this.errors);
+
+		verify(this.errors).reject("means.import.means.data.values.required", "");
+	}
+
+	@Test
 	public void testValidateEnvironmentId_HasBlankEnvironmentId() {
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
 		meansImportRequest.getData().get(0).setEnvironmentId(null);
@@ -208,38 +217,35 @@ public class MeansImportRequestValidatorTest {
 	}
 
 	private MeansImportRequest createMeansImportRequest() {
-		final String jsonString = "{\n"
-			+ "  \"data\": [\n"
-			+ "    {\n"
-			+ "      \"entryNo\": 1,\n"
-			+ "      \"environmentId\": 1,\n"
-			+ "      \"values\": {\n"
-			+ "            \"" + EDIA_M_CM_BLUES + "\": \"2.2\",\n"
-			+ "            \"" + EDIA_M_CM_BLUPS + "\": \"3.3\",\n"
-			+ "\t    \"" + PH_M_CM_BLUES + "\": \"4.4\",\n"
-			+ "\t    \"" + PH_M_CM_BLUPS + "\": \"5.5\"\n"
-			+ "          }\n"
-			+ "    },\n"
-			+ "    {\n"
-			+ "      \"entryNo\": 1,\n"
-			+ "      \"environmentId\": 2,\n"
-			+ "      \"values\": {\n"
-			+ "            \"" + EDIA_M_CM_BLUES + "\": \"1.2\",\n"
-			+ "            \"" + EDIA_M_CM_BLUPS + "\": \"5.3\",\n"
-			+ "\t    \"" + PH_M_CM_BLUES + "\": \"0.4\",\n"
-			+ "\t    \"" + PH_M_CM_BLUPS + "\": \"9.5\"\n"
-			+ "          }\n"
-			+ "    }\n"
-			+ "  ],\n"
-			+ "  \"studyId\": 1\n"
-			+ "}";
 
-		try {
-			return new ObjectMapper().readValue(jsonString, MeansImportRequest.class);
-		} catch (final Exception e) {
-			fail("Cannot create MeansImportRequest");
-			return null;
-		}
+		final MeansImportRequest meansImportRequest = new MeansImportRequest();
+		meansImportRequest.setStudyId(1);
+
+		final MeansImportRequest.MeansData meansData1 = new MeansImportRequest.MeansData();
+		meansData1.setEnvironmentId(1);
+		meansData1.setEntryNo(1);
+		final Map<String, String> values1 = new HashMap<>();
+		values1.put(EDIA_M_CM_BLUES, "2.2");
+		values1.put(EDIA_M_CM_BLUPS, "3.3");
+		values1.put(PH_M_CM_BLUES, "0.4");
+		values1.put(PH_M_CM_BLUPS, "9.5");
+		meansData1.setValues(values1);
+
+		final MeansImportRequest.MeansData meansData2 = new MeansImportRequest.MeansData();
+		meansData2.setEnvironmentId(2);
+		meansData2.setEntryNo(1);
+		final Map<String, String> values2 = new HashMap<>();
+		values2.put(EDIA_M_CM_BLUES, "1.2");
+		values2.put(EDIA_M_CM_BLUPS, "5.3");
+		values2.put(PH_M_CM_BLUES, "4.4");
+		values2.put(PH_M_CM_BLUPS, "5.5");
+		meansData2.setValues(values2);
+
+		final List<MeansImportRequest.MeansData> meansDataList = new ArrayList<>();
+		meansDataList.add(meansData1);
+		meansDataList.add(meansData2);
+		meansImportRequest.setData(meansDataList);
+		return meansImportRequest;
 	}
 
 	private Variable createVariable(final String name, final VariableType variableType) {

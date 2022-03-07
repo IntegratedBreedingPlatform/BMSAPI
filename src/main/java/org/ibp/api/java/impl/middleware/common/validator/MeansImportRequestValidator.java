@@ -17,9 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+import org.thymeleaf.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +49,7 @@ public class MeansImportRequestValidator {
 		this.validateEnvironmentId(meansImportRequest, errors);
 		// Validate means data
 		this.checkMeansDataIsEmpty(meansImportRequest, errors);
+		this.checkDataValuesIsEmpty(meansImportRequest, errors);
 		// Validate entryNumber
 		this.validateEntryNumber(meansImportRequest, errors);
 		// Validate analysis variable names
@@ -83,6 +86,12 @@ public class MeansImportRequestValidator {
 	protected void checkMeansDataIsEmpty(final MeansImportRequest meansImportRequest, final BindingResult errors) {
 		if (CollectionUtils.isEmpty(meansImportRequest.getData())) {
 			errors.reject("means.import.means.data.required", "");
+		}
+	}
+
+	protected void checkDataValuesIsEmpty(final MeansImportRequest meansImportRequest, final BindingResult errors) {
+		if (meansImportRequest.getData().stream().anyMatch(d -> MapUtils.isEmpty(d.getValues()))) {
+			errors.reject("means.import.means.data.values.required", "");
 		}
 	}
 
@@ -141,7 +150,9 @@ public class MeansImportRequestValidator {
 	protected void validateAnalysisVariableNames(final MeansImportRequest meansImportRequest, final BindingResult errors) {
 		if (CollectionUtils.isNotEmpty(meansImportRequest.getData())) {
 			final Set<String> analysisVariableNames =
-				meansImportRequest.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream).collect(Collectors.toSet());
+				meansImportRequest.getData().stream()
+					.map(o -> !MapUtils.isEmpty(o.getValues()) ? o.getValues().keySet() : new HashSet<String>()).flatMap(Set::stream)
+					.collect(Collectors.toSet());
 
 			final VariableFilter variableFilter = new VariableFilter();
 			analysisVariableNames.forEach(variableFilter::addName);
