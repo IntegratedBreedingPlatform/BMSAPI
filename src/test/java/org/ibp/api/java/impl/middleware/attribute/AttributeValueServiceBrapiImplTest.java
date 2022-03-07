@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AttributeValueServiceBrapiBrapiImplTest {
+public class AttributeValueServiceBrapiImplTest {
 
 	private static final int PAGE_SIZE = 10;
 	private static final int PAGE = 1;
