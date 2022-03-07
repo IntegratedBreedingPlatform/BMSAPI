@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.common.validator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
+import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -54,7 +55,8 @@ public class VariableUpdateValidatorTest {
 
 	@Before
 	public void setUp() {
-		Mockito.when(this.variableServiceBrapi.getObservationVariables(ArgumentMatchers.any(VariableSearchRequestDTO.class), ArgumentMatchers.eq(null)))
+		Mockito.when(this.variableServiceBrapi.getVariables(ArgumentMatchers.any(VariableSearchRequestDTO.class),
+			ArgumentMatchers.eq(null), ArgumentMatchers.eq(VariableTypeGroup.TRAIT)))
 				.thenReturn(Collections.singletonList(new VariableDTO()));
 	}
 
@@ -147,7 +149,8 @@ public class VariableUpdateValidatorTest {
 
 	@Test
 	public void testValidation_ValidateVariable_InvalidObservationVariableDbId() {
-		Mockito.when(this.variableServiceBrapi.getObservationVariables(ArgumentMatchers.any(VariableSearchRequestDTO.class), ArgumentMatchers.eq(null)))
+		Mockito.when(this.variableServiceBrapi.getVariables(ArgumentMatchers.any(VariableSearchRequestDTO.class),
+			ArgumentMatchers.eq(null), ArgumentMatchers.eq(VariableTypeGroup.TRAIT)))
 				.thenReturn(new ArrayList<>());
 
 		final VariableDTO variableDTO = new VariableDTO();
