@@ -118,7 +118,7 @@ public class AttributeValueResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testPostSearchGermplasm() throws Exception {
+	public void testPostAttributeValueSearch() throws Exception {
 
 		final String attributeValueId = String.valueOf(nextInt());
 		final Integer searchResultsDbId = 1;
