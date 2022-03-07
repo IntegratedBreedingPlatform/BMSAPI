@@ -40,7 +40,7 @@ public class AttributeServiceBrapiImplTest {
 	}
 
 	@Test
-	public void testGetObservationVariables() {
+	public void testGetGermplasmAttributes() {
 		final AttributeSearchRequestDTO requestDTO = new AttributeSearchRequestDTO();
 		final String cropName = "MAIZE";
 		final VariableDTO variableDTO = new VariableDTO();
