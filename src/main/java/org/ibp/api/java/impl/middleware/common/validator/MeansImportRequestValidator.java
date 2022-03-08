@@ -106,7 +106,7 @@ public class MeansImportRequestValidator {
 				existingEnvironmentIds =
 				this.studyDataManager.getInstanceGeolocationIdsMap(meansImportRequest.getStudyId()).values().stream().collect(
 					Collectors.toSet());
-			final Collection<Integer> nonExistingEnvironmentIds = CollectionUtils.disjunction(existingEnvironmentIds, environmentIds);
+			final Collection<Integer> nonExistingEnvironmentIds = CollectionUtils.subtract(environmentIds, existingEnvironmentIds);
 			if (CollectionUtils.isNotEmpty(nonExistingEnvironmentIds)) {
 				errors.reject("means.import.means.environment.ids.do.not.exist",
 					new Object[] {StringUtils.join(nonExistingEnvironmentIds, ", ")}, "");
@@ -127,7 +127,7 @@ public class MeansImportRequestValidator {
 				this.studyDataManager.getStocksByStudyAndEntryNumbers(meansImportRequest.getStudyId(), entryNumbers).stream()
 					.map(StockModel::getUniqueName).collect(
 						Collectors.toSet());
-			final Collection<String> nonExistingEntryNumbers = CollectionUtils.disjunction(existingEntryNumbers, entryNumbers);
+			final Collection<String> nonExistingEntryNumbers = CollectionUtils.subtract(entryNumbers, existingEntryNumbers);
 			if (CollectionUtils.isNotEmpty(nonExistingEntryNumbers)) {
 				errors.reject("means.import.means.entry.numbers.do.not.exist",
 					new Object[] {StringUtils.join(nonExistingEntryNumbers, ", ")}, "");
