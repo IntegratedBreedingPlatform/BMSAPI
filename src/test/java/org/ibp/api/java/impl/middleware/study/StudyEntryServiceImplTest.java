@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -14,9 +13,6 @@ import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
@@ -26,7 +22,6 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.hamcrest.collection.IsIn;
 import org.ibp.api.java.entrytype.EntryTypeService;
-import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -44,15 +39,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
-import org.thymeleaf.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -85,9 +77,6 @@ public class StudyEntryServiceImplTest {
 
 	@Mock
 	private GermplasmListValidator germplasmListValidator;
-
-	@Mock
-	private GermplasmListService germplasmListService;
 
 	@Mock
 	private TermValidator termValidator;
@@ -141,23 +130,8 @@ public class StudyEntryServiceImplTest {
 		studyEntryGeneratorRequestDto.setSearchComposite(searchCompositeDto);
 
 		Mockito.when(this.searchRequestDtoResolver.resolveGidSearchDto(searchCompositeDto)).thenReturn(gids);
-		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
-		Mockito.when(this.germplasmDataManager.getGermplasms(gids)).thenReturn(Collections.singletonList(germplasm));
-		final Map<Integer, String> gidDesignationMap = new HashMap<>();
-		gidDesignationMap.put(gid, "Designation");
-		Mockito.when(this.germplasmDataManager.getPreferredNamesByGids(gids)).thenReturn(gidDesignationMap);
 
-		final Random random = new Random();
-		final int datasetId = random.nextInt();
-		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetId(datasetId);
-		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
-		final List<DatasetDTO> datasetDTOS = Collections.singletonList(datasetDTO);
-		Mockito.when(this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
-			.thenReturn(datasetDTOS);
-
-		final Integer startingEntryNumber = 5;
-		Mockito.when(this.middlewareStudyEntryService.getNextEntryNumber(studyId)).thenReturn(startingEntryNumber);
+		Mockito.doNothing().when(this.middlewareStudyEntryService).saveStudyEntries(studyId, gids, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 
 		this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorRequestDto);
 
@@ -166,36 +140,34 @@ public class StudyEntryServiceImplTest {
 		Mockito.verify(this.searchCompositeDtoValidator)
 			.validateSearchCompositeDto(ArgumentMatchers.eq(searchCompositeDto), ArgumentMatchers.any(BindingResult.class));
 		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(gids));
+		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(studyId, gids, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+
+		Mockito.verifyNoMoreInteractions(this.studyValidator);
+		Mockito.verifyNoMoreInteractions(this.entryTypeValidator);
+		Mockito.verifyNoMoreInteractions(this.searchCompositeDtoValidator);
+		Mockito.verifyNoMoreInteractions(this.germplasmValidator);
+		Mockito.verifyNoMoreInteractions(this.middlewareStudyEntryService);
 	}
 
 	@Test
 	public void testCreateStudyEntriesList() {
 
-		final GermplasmList germplasmList = new GermplasmList();
-		final List<GermplasmListData> listData = new ArrayList<>();
-		germplasmList.setListData(listData);
-
 		final Integer studyId = this.random.nextInt();
 		final Integer germplasmListId = this.random.nextInt();
 
-		Mockito.when(this.germplasmListService.getGermplasmList(germplasmListId)).thenReturn(germplasmList);
-
-		final Random random = new Random();
-		final int datasetId = random.nextInt();
-		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetId(datasetId);
-		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
-		final List<DatasetDTO> datasetDTOS = Collections.singletonList(datasetDTO);
-		Mockito.when(this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
-			.thenReturn(datasetDTOS);
+		Mockito.doNothing().when(this.middlewareStudyEntryService).saveStudyEntries(studyId, germplasmListId);
 
 		this.studyEntryService.createStudyEntries(studyId, germplasmListId);
 
-		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
 		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
-		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
+		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(studyId, germplasmListId);
 
+		Mockito.verifyNoMoreInteractions(this.studyValidator);
+		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
+		Mockito.verifyNoMoreInteractions(this.studyEntryValidator);
+		Mockito.verifyNoMoreInteractions(this.middlewareStudyEntryService);
 	}
 
 	@Test
@@ -303,7 +275,7 @@ public class StudyEntryServiceImplTest {
 				crossVariable, gidVariable);
 
 		Mockito.when(this.datasetService.getObservationSetVariables(datasetId, Lists
-			.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()))).thenReturn(measurementVariables);
+			.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()))).thenReturn(measurementVariables);
 
 		final List<MeasurementVariable> results = this.studyEntryService.getEntryColumns(studyId);
 
@@ -316,66 +288,6 @@ public class StudyEntryServiceImplTest {
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_UNIT.getId()), IsIn.in(results));
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_AVAILABLE_BALANCE.getId()), IsIn.in(results));
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_ACTIVE_LOTS_COUNT.getId()), IsIn.in(results));
-	}
-
-	@Test
-	public void testCreateStudyGermplasmListDuplicateEntries() {
-
-		final GermplasmList germplasmList = new GermplasmList();
-		final List<GermplasmListData> listData = this.duplicateListData();
-		germplasmList.setListData(listData);
-
-		final Integer studyId = this.random.nextInt();
-		final Integer germplasmListId = this.random.nextInt();
-
-		Mockito.when(this.germplasmListService.getGermplasmList(germplasmListId)).thenReturn(germplasmList);
-
-		final Random random = new Random();
-		final int datasetId = random.nextInt();
-		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetId(datasetId);
-		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
-
-		final List<StudyEntryDto> entryDtos = new ArrayList<>();
-		for (final GermplasmListData gData : listData) {
-			final StudyEntryDto entryDto = new StudyEntryDto();
-			entryDto.setGid(gData.getGid());
-			entryDto.setEntryId(gData.getEntryId());
-			entryDtos.add(entryDto);
-		}
-		final List<DatasetDTO> datasetDTOS = Collections.singletonList(datasetDTO);
-		Mockito.when(this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
-			.thenReturn(datasetDTOS);
-		Mockito.when(this.middlewareStudyEntryService.saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList())).thenReturn(entryDtos);
-
-		final List<StudyEntryDto> studyEntryDtos = this.studyEntryService.createStudyEntries(studyId, germplasmListId);
-		Assert.assertNotNull("Duplicate gid in list should be accepted. ", studyEntryDtos);
-		org.junit.Assert.assertEquals("Must return same germplasm list data count", listData.size(),studyEntryDtos.size());
-		Mockito.verify(this.germplasmListValidator).validateGermplasmList(germplasmListId);
-		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.studyEntryValidator).validateStudyAlreadyHasStudyEntries(studyId);
-		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(ArgumentMatchers.eq(studyId), ArgumentMatchers.anyList());
-	}
-
-	private List<GermplasmListData> duplicateListData() {
-		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
-
-		final GermplasmListData data1 = new GermplasmListData();
-		data1.setGermplasm(germplasm);
-		data1.setGid(germplasm.getGid());
-		data1.setEntryId(1);
-		data1.setEntryCode(StringUtils.randomAlphanumeric(3));
-
-		final GermplasmListData data2 = new GermplasmListData();
-		data2.setGermplasm(germplasm);
-		data2.setGid(germplasm.getGid());
-		data2.setEntryId(2);
-		data2.setEntryCode(StringUtils.randomAlphanumeric(3));
-
-		final List<GermplasmListData> listData = new ArrayList<>();
-		listData.add(data1);
-		listData.add(data2);
-		return listData;
 	}
 
 }

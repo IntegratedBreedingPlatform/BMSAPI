@@ -14,23 +14,24 @@ import java.util.HashMap;
 public class TermValidator extends OntologyValidator implements org.springframework.validation.Validator {
 
 	@Override
-	public boolean supports(Class<?> aClass) {
+	public boolean supports(final Class<?> aClass) {
 		return TermRequest.class.equals(aClass);
 	}
 
 	@Override
-	public void validate(Object target, Errors errors) {
-		TermRequest request = (TermRequest) target;
+	public void validate(final Object target, final Errors errors) {
+		final TermRequest request = (TermRequest) target;
 		this.checkTermExist(request.getTermName(), request.getId(), request.getCvId(), errors);
 	}
 
-	public void validate(Integer termId) {
+	public void validate(final Integer termId) {
 
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
 		if (this.termDataManager.getTermById(termId) == null) {
 			errors.reject("variable.does.not.exist", new Object[] {termId}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
+
 }
