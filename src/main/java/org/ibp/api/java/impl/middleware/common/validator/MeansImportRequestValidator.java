@@ -50,7 +50,7 @@ public class MeansImportRequestValidator {
 		this.checkMeansDataIsEmpty(meansImportRequest);
 		this.checkDataValuesIsEmpty(meansImportRequest);
 		// Validate environmentId
-		this.validateEnvironmentId(meansImportRequest, errors);
+		this.validateEnvironmentId(meansImportRequest);
 		// Validate entryNumber
 		this.validateEntryNumber(meansImportRequest, errors);
 		// Validate analysis variable names
@@ -109,7 +109,8 @@ public class MeansImportRequestValidator {
 		}
 	}
 
-	protected void validateEnvironmentId(final MeansImportRequest meansImportRequest, final BindingResult errors) {
+	protected void validateEnvironmentId(final MeansImportRequest meansImportRequest) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
 		final boolean hasBlankEnvironmentId = meansImportRequest.getData().stream().anyMatch(md -> md.getEnvironmentId() == null);
 		if (hasBlankEnvironmentId) {
 			errors.reject("means.import.means.environment.ids.required", "");
@@ -125,6 +126,9 @@ public class MeansImportRequestValidator {
 				errors.reject("means.import.means.environment.ids.do.not.exist",
 					new Object[] {StringUtils.join(nonExistingEnvironmentIds, ", ")}, "");
 			}
+		}
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 

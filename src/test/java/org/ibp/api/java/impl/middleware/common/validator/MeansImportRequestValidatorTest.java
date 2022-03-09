@@ -163,9 +163,13 @@ public class MeansImportRequestValidatorTest {
 	public void testValidateEnvironmentId_HasBlankEnvironmentId() {
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
 		meansImportRequest.getData().get(0).setEnvironmentId(null);
-		this.meansImportRequestValidator.validateEnvironmentId(meansImportRequest, this.errors);
 
-		verify(this.errors).reject("means.import.means.environment.ids.required", "");
+		try {
+			this.meansImportRequestValidator.validateEnvironmentId(meansImportRequest);
+			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertEquals("means.import.means.environment.ids.required", e.getErrors().get(0).getCode());
+		}
 	}
 
 	@Test
@@ -173,10 +177,14 @@ public class MeansImportRequestValidatorTest {
 		when(this.studyDataManager.getInstanceGeolocationIdsMap(1)).thenReturn(new HashMap<>());
 
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
-		this.meansImportRequestValidator.validateEnvironmentId(meansImportRequest, this.errors);
 
-		verify(this.errors).reject("means.import.means.environment.ids.do.not.exist", new Object[] {
-			"1, 2"}, "");
+		try {
+			this.meansImportRequestValidator.validateEnvironmentId(meansImportRequest);
+			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertEquals("means.import.means.environment.ids.do.not.exist", e.getErrors().get(0).getCode());
+			assertEquals(new Object[] {"1, 2"}, e.getErrors().get(0).getArguments());
+		}
 	}
 
 	@Test
