@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.analysis;
 
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
-import org.ibp.api.java.analysis.AnalysisService;
+import org.ibp.api.java.analysis.SiteAnalysisService;
 import org.ibp.api.java.impl.middleware.common.validator.MeansImportRequestValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.modelmapper.Conditions;
@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class AnalysisServiceImpl implements AnalysisService {
+public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 
 	@Autowired
-	private org.generationcp.middleware.service.api.analysis.AnalysisService middlewareAnalysisService;
+	private org.generationcp.middleware.service.api.analysis.SiteAnalysisService middlewareSiteAnalysisService;
 
 	@Autowired
 	private DatasetService middlewareDatasetService;
@@ -27,7 +27,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 	@Override
 	public DatasetDTO createMeansDataset(final MeansImportRequest meansImportRequest) {
 		this.meansImportRequestValidator.validate(meansImportRequest);
-		final int meansDatasetId = this.middlewareAnalysisService.createMeansDataset(meansImportRequest);
+		final int meansDatasetId = this.middlewareSiteAnalysisService.createMeansDataset(meansImportRequest);
 		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(meansDatasetId);
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
