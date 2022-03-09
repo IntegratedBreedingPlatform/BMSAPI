@@ -1,5 +1,6 @@
 package org.ibp.api.rest.dataset.validator;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.ContextHolder;
@@ -25,18 +26,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 
@@ -72,7 +73,7 @@ public class StudyValidatorTest {
 		ContextHolder.setCurrentCrop("maize");
 	}
 
-	@Test (expected = ResourceNotFoundException.class)
+	@Test(expected = ResourceNotFoundException.class)
 	public void testStudyDoesNotExist() {
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();
@@ -80,7 +81,7 @@ public class StudyValidatorTest {
 		this.studyValidator.validate(studyId, ran.nextBoolean());
 	}
 
-	@Test (expected = ForbiddenException.class)
+	@Test(expected = ForbiddenException.class)
 	public void testStudyIsLocked() {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(USER_ID, new Role(2, "Breeder"));
 		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
@@ -281,6 +282,36 @@ public class StudyValidatorTest {
 			this.studyValidator.validateDeleteStudy(studyId);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("study.delete.not.permitted"));
+		}
+	}
+
+	@Test
+	public void testValidateStudyInstanceNumbers_SomeTrialInstanceNumberDoNotExist() {
+		final Integer studyId = RandomUtils.nextInt();
+		final Map<String, Integer> instanceGeolocationIdMap = new HashMap<>();
+		instanceGeolocationIdMap.put("1", RandomUtils.nextInt());
+		Mockito.when(this.studyDataManager.getInstanceGeolocationIdsMap(studyId)).thenReturn(instanceGeolocationIdMap);
+		try {
+			this.studyValidator.validateStudyInstanceNumbers(studyId, Sets.newHashSet(1, 2, 3));
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("study.trial.instances.do.not.exist"));
+			assertEquals(new Object[] {"2, 3"}, e.getErrors().get(0).getArguments());
+		}
+
+	}
+
+	@Test
+	public void testValidateStudyInstanceNumbers_Success() {
+		final Integer studyId = RandomUtils.nextInt();
+		final Map<String, Integer> instanceGeolocationIdMap = new HashMap<>();
+		instanceGeolocationIdMap.put("1", RandomUtils.nextInt());
+		instanceGeolocationIdMap.put("2", RandomUtils.nextInt());
+		instanceGeolocationIdMap.put("3", RandomUtils.nextInt());
+		Mockito.when(this.studyDataManager.getInstanceGeolocationIdsMap(studyId)).thenReturn(instanceGeolocationIdMap);
+		try {
+			this.studyValidator.validateStudyInstanceNumbers(studyId, Sets.newHashSet(1, 2, 3));
+		} catch (final ApiRequestValidationException e) {
+			Assert.fail("Should not throw an exception");
 		}
 	}
 

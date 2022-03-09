@@ -5,6 +5,6 @@ import org.ibp.api.rest.dataset.DatasetDTO;
 
 public interface SiteAnalysisService {
 
-	DatasetDTO createMeansDataset(MeansImportRequest meansInput);
+	DatasetDTO createMeansDataset(final Integer studyId, MeansImportRequest meansInput);
 
 }

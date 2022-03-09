@@ -23,11 +23,12 @@ public class SiteAnalysisResource {
 	private SiteAnalysisService siteAnalysisService;
 
 	@ApiOperation(value = "Create means dataset", notes = "Create means dataset")
-	@RequestMapping(value = "/crops/{cropName}/single-site-analysis/means", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/means-data", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<DatasetDTO> createMeansDataset(@PathVariable final String cropName,
+		@PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@RequestBody final MeansImportRequest meansImportRequest) {
-		final DatasetDTO meansDataset = this.siteAnalysisService.createMeansDataset(meansImportRequest);
+		final DatasetDTO meansDataset = this.siteAnalysisService.createMeansDataset(studyId, meansImportRequest);
 		meansDataset.setCropName(cropName);
 		return new ResponseEntity<>(meansDataset, HttpStatus.OK);
 	}
