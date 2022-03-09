@@ -10,6 +10,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -95,9 +97,13 @@ public class MeansImportRequestValidatorTest {
 	public void testValidateStudy_StudyIsRequired() {
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
 		meansImportRequest.setStudyId(null);
-		this.meansImportRequestValidator.validateStudy(meansImportRequest, this.errors);
 
-		verify(this.errors).reject("study.required", "");
+		try {
+			this.meansImportRequestValidator.validateStudy(meansImportRequest);
+			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertEquals("study.required", e.getErrors().get(0).getCode());
+		}
 	}
 
 	@Test
@@ -105,9 +111,13 @@ public class MeansImportRequestValidatorTest {
 		when(this.studyDataManager.getStudy(1)).thenReturn(null);
 
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
-		this.meansImportRequestValidator.validateStudy(meansImportRequest, this.errors);
+		try {
+			this.meansImportRequestValidator.validateStudy(meansImportRequest);
+			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertEquals("study.not.exist", e.getErrors().get(0).getCode());
+		}
 
-		verify(this.errors).reject("study.not.exist", "");
 	}
 
 	@Test
@@ -115,27 +125,38 @@ public class MeansImportRequestValidatorTest {
 		when(this.studyDataManager.getDataSetsByType(1, DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(Arrays.asList(new DataSet()));
 
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
-		this.meansImportRequestValidator.checkIfMeansDatasetAlreadyExists(meansImportRequest, this.errors);
-
-		verify(this.errors).reject("means.import.means.dataset.already.exists", "");
+		try {
+			this.meansImportRequestValidator.checkIfMeansDatasetAlreadyExists(meansImportRequest);
+			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertEquals("means.import.means.dataset.already.exists", e.getErrors().get(0).getCode());
+		}
 	}
 
 	@Test
 	public void testCheckMeansDataIsEmpty() {
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
 		meansImportRequest.setData(new ArrayList<>());
-		this.meansImportRequestValidator.checkMeansDataIsEmpty(meansImportRequest, this.errors);
 
-		verify(this.errors).reject("means.import.means.data.required", "");
+		try {
+			this.meansImportRequestValidator.checkMeansDataIsEmpty(meansImportRequest);
+			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertEquals("means.import.means.data.required", e.getErrors().get(0).getCode());
+		}
+
 	}
 
 	@Test
 	public void testCheckDataValuesIsEmpty() {
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
 		meansImportRequest.getData().get(0).setValues(null);
-		this.meansImportRequestValidator.checkDataValuesIsEmpty(meansImportRequest, this.errors);
-
-		verify(this.errors).reject("means.import.means.data.values.required", "");
+		try {
+			this.meansImportRequestValidator.checkDataValuesIsEmpty(meansImportRequest);
+			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertEquals("means.import.means.data.values.required", e.getErrors().get(0).getCode());
+		}
 	}
 
 	@Test
@@ -214,7 +235,7 @@ public class MeansImportRequestValidatorTest {
 		this.meansImportRequestValidator.validateAnalysisVariableNames(meansImportRequest, this.errors);
 
 		verify(this.errors).reject("means.import.means.variables.must.be.analysis.type",
-			new Object[] {EDIA_M_CM_BLUPS + ", " + PH_M_CM_BLUPS + ", " + EDIA_M_CM_BLUES + ", " + PH_M_CM_BLUES}, "");
+			new Object[] {PH_M_CM_BLUPS + ", " + PH_M_CM_BLUES + ", " + EDIA_M_CM_BLUPS + ", " + EDIA_M_CM_BLUES}, "");
 	}
 
 	private MeansImportRequest createMeansImportRequest() {

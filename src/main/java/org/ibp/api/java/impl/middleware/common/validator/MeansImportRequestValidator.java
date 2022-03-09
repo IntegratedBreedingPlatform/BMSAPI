@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.Study;
@@ -42,14 +43,14 @@ public class MeansImportRequestValidator {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
 
 		// Validate study
-		this.validateStudy(meansImportRequest, errors);
+		this.validateStudy(meansImportRequest);
 		// Check if means dataset already exists
-		this.checkIfMeansDatasetAlreadyExists(meansImportRequest, errors);
+		this.checkIfMeansDatasetAlreadyExists(meansImportRequest);
+		// Validate means data
+		this.checkMeansDataIsEmpty(meansImportRequest);
+		this.checkDataValuesIsEmpty(meansImportRequest);
 		// Validate environmentId
 		this.validateEnvironmentId(meansImportRequest, errors);
-		// Validate means data
-		this.checkMeansDataIsEmpty(meansImportRequest, errors);
-		this.checkDataValuesIsEmpty(meansImportRequest, errors);
 		// Validate entryNumber
 		this.validateEntryNumber(meansImportRequest, errors);
 		// Validate analysis variable names
@@ -61,7 +62,10 @@ public class MeansImportRequestValidator {
 
 	}
 
-	protected void validateStudy(final MeansImportRequest meansImportRequest, final BindingResult errors) {
+	protected void validateStudy(final MeansImportRequest meansImportRequest) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
+
 		if (meansImportRequest.getStudyId() == null) {
 			errors.reject("study.required", "");
 		} else {
@@ -70,28 +74,38 @@ public class MeansImportRequestValidator {
 				errors.reject("study.not.exist", "");
 			}
 		}
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
 	}
 
-	protected void checkIfMeansDatasetAlreadyExists(final MeansImportRequest meansImportRequest, final BindingResult errors) {
+	protected void checkIfMeansDatasetAlreadyExists(final MeansImportRequest meansImportRequest) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
 		if (meansImportRequest.getStudyId() != null) {
 			final List<DataSet> dataSetList =
 				this.studyDataManager.getDataSetsByType(meansImportRequest.getStudyId(), DatasetTypeEnum.MEANS_DATA.getId());
 			if (CollectionUtils.isNotEmpty(dataSetList)) {
 				errors.reject("means.import.means.dataset.already.exists", "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 		}
 
 	}
 
-	protected void checkMeansDataIsEmpty(final MeansImportRequest meansImportRequest, final BindingResult errors) {
+	protected void checkMeansDataIsEmpty(final MeansImportRequest meansImportRequest) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
 		if (CollectionUtils.isEmpty(meansImportRequest.getData())) {
 			errors.reject("means.import.means.data.required", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
-	protected void checkDataValuesIsEmpty(final MeansImportRequest meansImportRequest, final BindingResult errors) {
+	protected void checkDataValuesIsEmpty(final MeansImportRequest meansImportRequest) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
 		if (meansImportRequest.getData().stream().anyMatch(d -> MapUtils.isEmpty(d.getValues()))) {
 			errors.reject("means.import.means.data.values.required", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
@@ -156,8 +170,9 @@ public class MeansImportRequestValidator {
 
 			final VariableFilter variableFilter = new VariableFilter();
 			analysisVariableNames.forEach(variableFilter::addName);
-			final Map<String, Variable> variablesMapByName = this.ontologyVariableDataManager.getWithFilter(variableFilter).stream()
-				.collect(Collectors.toMap(Variable::getName, Function.identity()));
+			final Map<String, Variable> variablesMapByName =
+				new CaseInsensitiveMap(this.ontologyVariableDataManager.getWithFilter(variableFilter).stream()
+					.collect(Collectors.toMap(Variable::getName, Function.identity())));
 
 			final Set<String> nonExistingVariableNames =
 				analysisVariableNames.stream().filter(o -> !variablesMapByName.containsKey(o)).collect(Collectors.toSet());
