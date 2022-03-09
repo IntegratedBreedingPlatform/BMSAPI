@@ -5,7 +5,6 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
@@ -27,9 +26,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class MeansImportRequestValidator {
-
-	@Autowired
-	private StudyDataManager studyDataManager;
 
 	@Autowired
 	private StudyEntryService studyEntryService;
