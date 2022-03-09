@@ -65,8 +65,8 @@ public class MeansImportRequestValidatorTest {
 		study.setId(meansImportRequest.getStudyId());
 		study.setStudyType(new StudyTypeDto());
 		final Map<String, Integer> instanceGeolocationIdMap = new HashMap<>();
-		instanceGeolocationIdMap.put("1", meansImportRequest.getData().get(0).getEnvironmentId());
-		instanceGeolocationIdMap.put("2", meansImportRequest.getData().get(1).getEnvironmentId());
+		instanceGeolocationIdMap.put("1", meansImportRequest.getData().get(0).getEnvironmentNumber());
+		instanceGeolocationIdMap.put("2", meansImportRequest.getData().get(1).getEnvironmentNumber());
 		when(this.studyDataManager.getStudy(study.getId())).thenReturn(study);
 		when(this.studyDataManager.getDataSetsByType(study.getId(), DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(new ArrayList<>());
 		when(this.studyDataManager.getInstanceGeolocationIdsMap(study.getId())).thenReturn(instanceGeolocationIdMap);
@@ -166,10 +166,10 @@ public class MeansImportRequestValidatorTest {
 	@Test
 	public void testValidateEnvironmentId_HasBlankEnvironmentId() {
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
-		meansImportRequest.getData().get(0).setEnvironmentId(null);
+		meansImportRequest.getData().get(0).setEnvironmentNumber(null);
 
 		try {
-			this.meansImportRequestValidator.validateEnvironmentId(meansImportRequest);
+			this.meansImportRequestValidator.validateEnvironmentNumbers(meansImportRequest);
 			fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertEquals("means.import.means.environment.ids.required", e.getErrors().get(0).getCode());
@@ -183,7 +183,7 @@ public class MeansImportRequestValidatorTest {
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
 
 		try {
-			this.meansImportRequestValidator.validateEnvironmentId(meansImportRequest);
+			this.meansImportRequestValidator.validateEnvironmentNumbers(meansImportRequest);
 			fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertEquals("means.import.means.environment.ids.do.not.exist", e.getErrors().get(0).getCode());
@@ -218,7 +218,7 @@ public class MeansImportRequestValidatorTest {
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
 		final MeansImportRequest.MeansData duplicateEntryNoMeansData = new MeansImportRequest.MeansData();
 		duplicateEntryNoMeansData.setEntryNo(1);
-		duplicateEntryNoMeansData.setEnvironmentId(1);
+		duplicateEntryNoMeansData.setEnvironmentNumber(1);
 		meansImportRequest.getData().add(duplicateEntryNoMeansData);
 		this.meansImportRequestValidator.validateEntryNumber(meansImportRequest, this.errors);
 
@@ -257,7 +257,7 @@ public class MeansImportRequestValidatorTest {
 		meansImportRequest.setStudyId(1);
 
 		final MeansImportRequest.MeansData meansData1 = new MeansImportRequest.MeansData();
-		meansData1.setEnvironmentId(1);
+		meansData1.setEnvironmentNumber(1);
 		meansData1.setEntryNo(1);
 		final Map<String, Double> values1 = new HashMap<>();
 		values1.put(EDIA_M_CM_BLUES, random.nextDouble());
@@ -267,7 +267,7 @@ public class MeansImportRequestValidatorTest {
 		meansData1.setValues(values1);
 
 		final MeansImportRequest.MeansData meansData2 = new MeansImportRequest.MeansData();
-		meansData2.setEnvironmentId(2);
+		meansData2.setEnvironmentNumber(2);
 		meansData2.setEntryNo(1);
 		final Map<String, Double> values2 = new HashMap<>();
 		values2.put(EDIA_M_CM_BLUES, random.nextDouble());

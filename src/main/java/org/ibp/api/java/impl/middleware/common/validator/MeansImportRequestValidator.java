@@ -54,8 +54,8 @@ public class MeansImportRequestValidator {
 		// Validate means data
 		this.checkMeansDataIsEmpty(meansImportRequest);
 		this.checkDataValuesIsEmpty(meansImportRequest);
-		// Validate environmentId
-		this.validateEnvironmentId(meansImportRequest);
+		// Validate environmentNumber
+		this.validateEnvironmentNumbers(meansImportRequest);
 		// Validate entryNumber
 		this.validateEntryNumber(meansImportRequest, errors);
 		// Validate analysis variable names
@@ -114,22 +114,23 @@ public class MeansImportRequestValidator {
 		}
 	}
 
-	protected void validateEnvironmentId(final MeansImportRequest meansImportRequest) {
+	protected void validateEnvironmentNumbers(final MeansImportRequest meansImportRequest) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
-		final boolean hasBlankEnvironmentId = meansImportRequest.getData().stream().anyMatch(md -> md.getEnvironmentId() == null);
-		if (hasBlankEnvironmentId) {
-			errors.reject("means.import.means.environment.ids.required", "");
+		final boolean hasBlankEnvironmentNumbers = meansImportRequest.getData().stream().anyMatch(md -> md.getEnvironmentNumber() == null);
+		if (hasBlankEnvironmentNumbers) {
+			errors.reject("means.import.means.environment.numbers.required", "");
 		} else {
-			final Set<Integer> environmentIds =
-				meansImportRequest.getData().stream().map(MeansImportRequest.MeansData::getEnvironmentId).collect(Collectors.toSet());
+			final Set<Integer> environmentNumbers =
+				meansImportRequest.getData().stream().map(MeansImportRequest.MeansData::getEnvironmentNumber).collect(Collectors.toSet());
 			final Set<Integer>
-				existingEnvironmentIds =
-				this.studyDataManager.getInstanceGeolocationIdsMap(meansImportRequest.getStudyId()).values().stream().collect(
-					Collectors.toSet());
-			final Collection<Integer> nonExistingEnvironmentIds = CollectionUtils.subtract(environmentIds, existingEnvironmentIds);
-			if (CollectionUtils.isNotEmpty(nonExistingEnvironmentIds)) {
-				errors.reject("means.import.means.environment.ids.do.not.exist",
-					new Object[] {StringUtils.join(nonExistingEnvironmentIds, ", ")}, "");
+				existingEnvironmentNumbers =
+				this.studyDataManager.getInstanceGeolocationIdsMap(meansImportRequest.getStudyId()).keySet().stream().map(Integer::valueOf)
+					.collect(Collectors.toSet());
+			final Collection<Integer> nonExistingEnvironmentNumbers =
+				CollectionUtils.subtract(environmentNumbers, existingEnvironmentNumbers);
+			if (CollectionUtils.isNotEmpty(nonExistingEnvironmentNumbers)) {
+				errors.reject("means.import.means.environment.numbers.do.not.exist",
+					new Object[] {StringUtils.join(nonExistingEnvironmentNumbers, ", ")}, "");
 			}
 		}
 		if (errors.hasErrors()) {
@@ -159,10 +160,10 @@ public class MeansImportRequestValidator {
 					new Object[] {StringUtils.join(nonExistingEntryNumbers, ", ")}, "");
 			}
 
-			final Map<Integer, List<MeansImportRequest.MeansData>> meansDataGroupByEnvironmentIdMap = meansImportRequest.
-				getData().stream().collect(Collectors.groupingBy(MeansImportRequest.MeansData::getEnvironmentId, Collectors.toList()));
+			final Map<Integer, List<MeansImportRequest.MeansData>> meansDataGroupByEnvironmentNumberMap = meansImportRequest.
+				getData().stream().collect(Collectors.groupingBy(MeansImportRequest.MeansData::getEnvironmentNumber, Collectors.toList()));
 			final boolean hasDuplicateEntryNumbersPerEnvironment =
-				meansDataGroupByEnvironmentIdMap.values().stream().anyMatch(
+				meansDataGroupByEnvironmentNumberMap.values().stream().anyMatch(
 					meansDataList -> meansDataList.stream()
 						.collect(Collectors.groupingBy(MeansImportRequest.MeansData::getEntryNo, Collectors.counting()))
 						.entrySet().stream().anyMatch(e -> e.getValue() > 1));
