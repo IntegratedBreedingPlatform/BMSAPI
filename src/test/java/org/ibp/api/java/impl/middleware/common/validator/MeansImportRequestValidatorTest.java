@@ -8,7 +8,8 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Test;
@@ -47,6 +48,9 @@ public class MeansImportRequestValidatorTest {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Mock
+	private StudyEntryService studyEntryService;
+
+	@Mock
 	private BindingResult errors;
 
 	@InjectMocks
@@ -66,8 +70,8 @@ public class MeansImportRequestValidatorTest {
 		when(this.studyDataManager.getStudy(study.getId())).thenReturn(study);
 		when(this.studyDataManager.getDataSetsByType(study.getId(), DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(new ArrayList<>());
 		when(this.studyDataManager.getInstanceGeolocationIdsMap(study.getId())).thenReturn(instanceGeolocationIdMap);
-		when(this.studyDataManager.getStocksByStudyAndEntryNumbers(eq(study.getId()), any())).thenReturn(
-			Arrays.asList(this.createStockModel("1")));
+		when(this.studyEntryService.getStudyEntries(eq(study.getId()), any(), any())).thenReturn(
+			Arrays.asList(this.createStudyEntry(1)));
 		when(this.ontologyVariableDataManager.getWithFilter(any())).thenReturn(
 			Arrays.asList(this.createVariable(EDIA_M_CM_BLUPS, VariableType.ANALYSIS),
 				this.createVariable(PH_M_CM_BLUPS, VariableType.ANALYSIS),
@@ -198,7 +202,7 @@ public class MeansImportRequestValidatorTest {
 
 	@Test
 	public void testValidateEntryNumber_EntryNumbersDoNotExist() {
-		when(this.studyDataManager.getStocksByStudyAndEntryNumbers(eq(1), any())).thenReturn(new ArrayList<>());
+		when(this.studyEntryService.getStudyEntries(eq(1), any(), any())).thenReturn(new ArrayList<>());
 
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
 		this.meansImportRequestValidator.validateEntryNumber(meansImportRequest, this.errors);
@@ -209,7 +213,7 @@ public class MeansImportRequestValidatorTest {
 
 	@Test
 	public void testValidateEntryNumber_DuplicateEntryNumbersPerEnvironment() {
-		when(this.studyDataManager.getStocksByStudyAndEntryNumbers(eq(1), any())).thenReturn(Arrays.asList(this.createStockModel("1")));
+		when(this.studyEntryService.getStudyEntries(eq(1), any(), any())).thenReturn(Arrays.asList(this.createStudyEntry(1)));
 
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
 		final MeansImportRequest.MeansData duplicateEntryNoMeansData = new MeansImportRequest.MeansData();
@@ -286,10 +290,10 @@ public class MeansImportRequestValidatorTest {
 		return variable;
 	}
 
-	private StockModel createStockModel(final String entryNumber) {
-		final StockModel stockModel = new StockModel();
-		stockModel.setUniqueName(entryNumber);
-		return stockModel;
+	private StudyEntryDto createStudyEntry(final Integer entryNumber) {
+		final StudyEntryDto studyEntryDto = new StudyEntryDto();
+		studyEntryDto.setEntryNumber(entryNumber);
+		return studyEntryDto;
 	}
 
 }

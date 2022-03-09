@@ -7,11 +7,12 @@ import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.thymeleaf.util.MapUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +36,9 @@ public class MeansImportRequestValidator {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private StudyEntryService studyEntryService;
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -140,10 +145,13 @@ public class MeansImportRequestValidator {
 		} else {
 			final Set<String> entryNumbers =
 				meansImportRequest.getData().stream().map(m -> String.valueOf(m.getEntryNo())).collect(Collectors.toSet());
+
+			final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+			filter.setEntryNumbers(new ArrayList<>(entryNumbers));
 			final Set<String>
 				existingEntryNumbers =
-				this.studyDataManager.getStocksByStudyAndEntryNumbers(meansImportRequest.getStudyId(), entryNumbers).stream()
-					.map(StockModel::getUniqueName).collect(
+				this.studyEntryService.getStudyEntries(meansImportRequest.getStudyId(), filter, null).stream()
+					.map(e -> String.valueOf(e.getEntryNumber())).collect(
 						Collectors.toSet());
 			final Collection<String> nonExistingEntryNumbers = CollectionUtils.subtract(entryNumbers, existingEntryNumbers);
 			if (CollectionUtils.isNotEmpty(nonExistingEntryNumbers)) {
