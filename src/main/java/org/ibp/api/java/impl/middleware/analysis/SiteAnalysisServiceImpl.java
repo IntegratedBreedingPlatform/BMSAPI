@@ -40,8 +40,8 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 
 		this.studyValidator.validate(studyId, true);
 		this.studyValidator.validateStudyHasNoMeansDataset(studyId);
-		this.meansImportRequestValidator.validateEnvironmentNumberIsNotEmpty(meansImportRequest);
 		this.meansImportRequestValidator.validateMeansDataIsNotEmpty(meansImportRequest);
+		this.meansImportRequestValidator.validateEnvironmentNumberIsNotEmpty(meansImportRequest);
 		this.meansImportRequestValidator.validateDataValuesIsNotEmpty(meansImportRequest);
 		this.meansImportRequestValidator.validateEntryNumberIsNotEmptyAndDistinctPerEnvironment(meansImportRequest);
 		final Set<Integer> environmentNumbers =
