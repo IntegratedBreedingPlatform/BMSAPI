@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm.brapi;
 
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
+import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.v2.variable.VariableUpdateResponse;
@@ -27,14 +28,14 @@ public class VariableServiceBrapiImplTest {
     private VariableUpdateValidator variableUpdateValidator;
 
     @InjectMocks
-    private org.ibp.api.brapi.VariableServiceBrapi variableServiceBrapi = new VariableServiceBrapiImpl();
+    private final org.ibp.api.brapi.VariableServiceBrapi variableServiceBrapi = new VariableServiceBrapiImpl();
 
     @Test
     public void testCountObservationVariables() {
         final VariableSearchRequestDTO requestDTO = new VariableSearchRequestDTO();
-        Mockito.when(this.middlewareVariableServiceBrapi.countObservationVariables(requestDTO)).thenReturn((long)1);
+        Mockito.when(this.middlewareVariableServiceBrapi.countVariables(requestDTO, VariableTypeGroup.TRAIT)).thenReturn((long)1);
         Assert.assertEquals((long)1, this.variableServiceBrapi.countObservationVariables(requestDTO));
-        Mockito.verify(this.middlewareVariableServiceBrapi).countObservationVariables(requestDTO);
+        Mockito.verify(this.middlewareVariableServiceBrapi).countVariables(requestDTO, VariableTypeGroup.TRAIT);
     }
 
     @Test
@@ -43,10 +44,10 @@ public class VariableServiceBrapiImplTest {
         final String cropName = "MAIZE";
         final VariableDTO variableDTO = new VariableDTO();
         variableDTO.setCommonCropName(cropName);
-        Mockito.when(this.middlewareVariableServiceBrapi.getObservationVariables(requestDTO, null))
+        Mockito.when(this.middlewareVariableServiceBrapi.getVariables(requestDTO, null, VariableTypeGroup.TRAIT))
                 .thenReturn(Collections.singletonList(variableDTO));
         final List<VariableDTO> result = this.variableServiceBrapi.getObservationVariables(cropName, requestDTO, null);
-        Mockito.verify(this.middlewareVariableServiceBrapi).getObservationVariables(requestDTO, null);
+        Mockito.verify(this.middlewareVariableServiceBrapi).getVariables(requestDTO, null, VariableTypeGroup.TRAIT);
         Assert.assertEquals(1, result.size());
         Assert.assertEquals(variableDTO, result.get(0));
     }

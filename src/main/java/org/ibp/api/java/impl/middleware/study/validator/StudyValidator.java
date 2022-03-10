@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
@@ -20,12 +21,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class StudyValidator {
+
 	@Autowired
 	private SecurityService securityService;
 
@@ -158,6 +162,23 @@ public class StudyValidator {
 			this.errors.reject("study.delete.not.permitted", new String[] {workbenchUser.getPerson().getDisplayName()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 
+		}
+	}
+
+	public void validateStudyInstanceNumbers(final Integer studyId, final Set<Integer> instanceNumbers) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		final Set<Integer>
+			existingInstanceNumbers =
+			this.studyDataManager.getInstanceGeolocationIdsMap(studyId).keySet().stream().map(Integer::valueOf)
+				.collect(Collectors.toSet());
+		final Collection<Integer> nonExistingInstanceNumbers =
+			CollectionUtils.subtract(instanceNumbers, existingInstanceNumbers);
+		if (CollectionUtils.isNotEmpty(nonExistingInstanceNumbers)) {
+			this.errors.reject("study.trial.instances.do.not.exist",
+				new Object[] {org.apache.commons.lang.StringUtils.join(nonExistingInstanceNumbers, ", ")}, "");
+		}
+		if (this.errors.hasErrors()) {
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
