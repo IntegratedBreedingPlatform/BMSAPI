@@ -16,6 +16,8 @@ import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.api.study.StudyEntryObservationService;
+import org.generationcp.middleware.api.study.StudyEntryObservationServiceImpl;
 import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
@@ -826,6 +828,12 @@ public class MiddlewareFactory {
 	@DependsOn("WORKBENCH_SessionFactory")
 	public FeedbackService getFeedbackService() {
 		return new FeedbackServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StudyEntryObservationService getStudyEntryObservationService() {
+		return new StudyEntryObservationServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
