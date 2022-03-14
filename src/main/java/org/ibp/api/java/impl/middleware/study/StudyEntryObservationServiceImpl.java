@@ -65,6 +65,16 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		return this.studyEntryObservationService.updateObservation(stockPropertyData);
 	}
 
+	@Override
+	public void deleteObservation(final Integer studyId, final Integer datasetId, final Integer stockPropertyId) {
+		BaseValidator.checkNotNull(stockPropertyId, "param.null", new String[] {"stockPropertyId"});
+
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+
+		this.studyEntryObservationService.deleteObservation(stockPropertyId);
+	}
+
 	private void validateValue(final String value) {
 		if (value.length() > VALUE_MAX_LENGTH) {
 			this.errors.reject("study.entry.observation.invalid.length", "");

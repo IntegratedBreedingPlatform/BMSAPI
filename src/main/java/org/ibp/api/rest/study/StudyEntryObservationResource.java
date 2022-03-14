@@ -50,4 +50,18 @@ public class StudyEntryObservationResource {
 		return new ResponseEntity<>(stockPropertyId, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Deletes the given study entry observation", notes = "Deletes the given study entry observation")
+	// TODO: review permissions
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observations/{observationId}", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> deleteObservation(
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
+		@PathVariable final Integer observationId) {
+		this.studyEntryObservationService.deleteObservation(studyId, datasetId, observationId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 }

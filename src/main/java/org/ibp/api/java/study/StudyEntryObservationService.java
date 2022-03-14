@@ -8,8 +8,6 @@ public interface StudyEntryObservationService {
 
 	Integer updateObservation(Integer studyId, final Integer datasetId, StockPropertyData stockPropertyData);
 
-//	Integer studyId, Integer datasetId, Integer observationId, Integer observationUnitId, ObservationDto observationDto
-
-//	void delete(Integer listId, Integer observationId);
+	void deleteObservation(Integer studyId, Integer datasetId, Integer stockPropertyId);
 
 }
