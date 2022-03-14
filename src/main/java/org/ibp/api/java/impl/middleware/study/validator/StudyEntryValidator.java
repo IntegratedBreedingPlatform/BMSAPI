@@ -16,9 +16,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -95,7 +97,25 @@ public class StudyEntryValidator {
 				.collect(Collectors.toList());
 			final List<Integer> invalidEntryIds = entryIds.stream().filter(entryId -> !studyEntryIds.contains(entryId))
 				.collect(Collectors.toList());
-			errors.reject("invalid.entryids", new String[]{StringUtils.join(invalidEntryIds, ", ")}, "");
+			errors.reject("invalid.entryids", new String[] {StringUtils.join(invalidEntryIds, ", ")}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validateStudyContainsEntryNumbers(final Integer studyId, final Set<String> entryNumbers) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setEntryNumbers(new ArrayList<>(entryNumbers));
+		final List<StudyEntryDto> studyEntries =
+			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+
+		if (studyEntries.size() != entryNumbers.size()) {
+			final List<Integer> studyEntryNumbers = studyEntries.stream().map(StudyEntryDto::getEntryNumber)
+				.collect(Collectors.toList());
+			final List<String> invalidEntryNumbers =
+				entryNumbers.stream().filter(entryId -> !studyEntryNumbers.contains(Integer.valueOf(entryId)))
+					.collect(Collectors.toList());
+			this.errors.reject("invalid.entry.numbers", new String[] {StringUtils.join(invalidEntryNumbers, ", ")}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

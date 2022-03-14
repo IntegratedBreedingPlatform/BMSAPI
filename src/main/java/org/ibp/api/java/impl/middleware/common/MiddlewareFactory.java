@@ -16,6 +16,8 @@ import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
+import org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
@@ -28,6 +30,8 @@ import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapiImpl;
+import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueServiceBrapi;
+import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -833,6 +837,18 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmListDataService getGermplasmListDataSearchService() {
 		return new GermplasmListDataServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public AttributeValueServiceBrapi getAttributeValueService() {
+		return new AttributeValueServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public SiteAnalysisService getSiteAnalysisService() {
+		return new SiteAnalysisServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

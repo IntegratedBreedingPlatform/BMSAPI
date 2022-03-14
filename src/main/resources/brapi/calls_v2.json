@@ -286,6 +286,54 @@
     "versions": [
       "2.1"
     ]
+  },
+  {
+    "service": "search/attributes",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "search/attributes/{searchResultsDbId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "search/attributevalues",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "2.0"
+    ]
+  },
+  {
+    "service": "search/attributevalues/{searchResultsDbId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.0"
+    ]
   }
 ]
 }
