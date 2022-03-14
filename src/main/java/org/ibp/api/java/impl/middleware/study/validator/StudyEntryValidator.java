@@ -131,13 +131,4 @@ public class StudyEntryValidator {
 
 	}
 
-	public void validateStudyEntryHasNotVariable(final Integer entryId, final Integer variableId) {
-		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-
-		this.middlewareStudyEntryService.getByStockIdAndTypeId(entryId, variableId).ifPresent(stockProperty -> {
-			this.errors.reject("study.entry.already.has.variable", new String[] {String.valueOf(entryId)}, "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		});
-	}
-
 }

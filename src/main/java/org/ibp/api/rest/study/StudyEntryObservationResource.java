@@ -26,15 +26,28 @@ public class StudyEntryObservationResource {
 	// TODO: review permissions
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observations", method = RequestMethod.POST)
-	public ResponseEntity<Integer> createStudyListObservation(
+	public ResponseEntity<Integer> createObservation(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@RequestBody final StockPropertyData stockPropertyData) {
-		final Integer stockPropertyId = this.studyEntryObservationService.createObservation(programUUID, studyId, datasetId, stockPropertyData);
+		final Integer stockPropertyId = this.studyEntryObservationService.createObservation(studyId, datasetId, stockPropertyData);
 		return new ResponseEntity<>(stockPropertyId, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Updates the given study entry observation", notes = "Updates the given study entry observation")
+	// TODO: review permissions
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observations", method = RequestMethod.PATCH)
+	public ResponseEntity<Integer> updateObservation(
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
+		@RequestBody final StockPropertyData stockPropertyData) {
+		final Integer stockPropertyId = this.studyEntryObservationService.updateObservation(studyId, datasetId, stockPropertyData);
+		return new ResponseEntity<>(stockPropertyId, HttpStatus.OK);
+	}
 
 }
