@@ -25,42 +25,39 @@ public class StudyEntryObservationResource {
 	@ApiOperation(value = "Add new observation for a given study entry", notes = "Add new observation for a given study entry")
 	// TODO: review permissions
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observations", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations", method = RequestMethod.POST)
 	public ResponseEntity<Integer> createObservation(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId,
 		@RequestBody final StockPropertyData stockPropertyData) {
-		final Integer stockPropertyId = this.studyEntryObservationService.createObservation(studyId, datasetId, stockPropertyData);
+		final Integer stockPropertyId = this.studyEntryObservationService.createObservation(studyId, stockPropertyData);
 		return new ResponseEntity<>(stockPropertyId, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Updates the given study entry observation", notes = "Updates the given study entry observation")
 	// TODO: review permissions
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observations", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations", method = RequestMethod.PATCH)
 	public ResponseEntity<Integer> updateObservation(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId,
 		@RequestBody final StockPropertyData stockPropertyData) {
-		final Integer stockPropertyId = this.studyEntryObservationService.updateObservation(studyId, datasetId, stockPropertyData);
+		final Integer stockPropertyId = this.studyEntryObservationService.updateObservation(studyId, stockPropertyData);
 		return new ResponseEntity<>(stockPropertyId, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Deletes the given study entry observation", notes = "Deletes the given study entry observation")
 	// TODO: review permissions
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observations/{observationId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations/{observationId}", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> deleteObservation(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId,
 		@PathVariable final Integer observationId) {
-		this.studyEntryObservationService.deleteObservation(studyId, datasetId, observationId);
+		this.studyEntryObservationService.deleteObservation(studyId, observationId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

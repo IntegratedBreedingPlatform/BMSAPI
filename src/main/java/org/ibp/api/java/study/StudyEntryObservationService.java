@@ -4,10 +4,10 @@ import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 
 public interface StudyEntryObservationService {
 
-	Integer createObservation(Integer studyId, Integer datasetId, StockPropertyData stockPropertyData);
+	Integer createObservation(Integer studyId, StockPropertyData stockPropertyData);
 
-	Integer updateObservation(Integer studyId, final Integer datasetId, StockPropertyData stockPropertyData);
+	Integer updateObservation(Integer studyId, StockPropertyData stockPropertyData);
 
-	void deleteObservation(Integer studyId, Integer datasetId, Integer stockPropertyId);
+	void deleteObservation(Integer studyId, Integer stockPropertyId);
 
 }

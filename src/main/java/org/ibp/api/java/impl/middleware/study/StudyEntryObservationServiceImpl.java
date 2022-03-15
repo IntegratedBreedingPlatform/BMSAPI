@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationRequestDto;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
@@ -48,8 +49,8 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	private StudyEntryValidator studyEntryValidator;
 
 	@Override
-	public Integer createObservation(final Integer studyId,	final Integer datasetId, final StockPropertyData stockPropertyData) {
-		this.commonValidations(studyId, datasetId, stockPropertyData);
+	public Integer createObservation(final Integer studyId, final StockPropertyData stockPropertyData) {
+		this.commonValidations(studyId, stockPropertyData);
 		this.validateStudyEntryVariableShouldNotExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
 
 		this.setStockPropertyValue(stockPropertyData);
@@ -57,8 +58,8 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	}
 
 	@Override
-	public Integer updateObservation(final Integer studyId, final Integer datasetId, final StockPropertyData stockPropertyData) {
-		this.commonValidations(studyId, datasetId, stockPropertyData);
+	public Integer updateObservation(final Integer studyId, final StockPropertyData stockPropertyData) {
+		this.commonValidations(studyId, stockPropertyData);
 		this.validateStudyEntryVariableShouldExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
 
 		this.setStockPropertyValue(stockPropertyData);
@@ -66,11 +67,10 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	}
 
 	@Override
-	public void deleteObservation(final Integer studyId, final Integer datasetId, final Integer stockPropertyId) {
+	public void deleteObservation(final Integer studyId, final Integer stockPropertyId) {
 		BaseValidator.checkNotNull(stockPropertyId, "param.null", new String[] {"stockPropertyId"});
 
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateDataset(studyId, datasetId);
 
 		this.studyEntryObservationService.deleteObservation(stockPropertyId);
 	}
@@ -82,7 +82,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		}
 	}
 
-	private void commonValidations(final Integer studyId,	final Integer datasetId, final StockPropertyData stockPropertyData) {
+	private void commonValidations(final Integer studyId, final StockPropertyData stockPropertyData) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListObservationRequestDto.class.getName());
 		BaseValidator.checkNotNull(stockPropertyData, "param.null", new String[] {"request body"});
 		BaseValidator.checkNotNull(stockPropertyData.getVariableId(), "param.null", new String[] {"variableId"});
@@ -91,8 +91,9 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 
 		this.validateValue(stockPropertyData.getValue());
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateDataset(studyId, datasetId);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Arrays.asList(stockPropertyData.getVariableId()));
+
+		final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, dataSet.getId(), Arrays.asList(stockPropertyData.getVariableId()));
 		this.studyEntryValidator.validateStudyContainsEntries(studyId, Arrays.asList(stockPropertyData.getStockId()));
 	}
 

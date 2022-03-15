@@ -1,9 +1,10 @@
-package org.ibp.api.rest.dataset.validator;
+package org.ibp.api.java.impl.middleware.study.validator;
 
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -21,7 +22,6 @@ import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -46,6 +47,7 @@ public class StudyValidatorTest {
 
 	private static final Integer USER_ID = 10;
 	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphabetic(10);
+
 	@Mock
 	private SecurityService securityService;
 
@@ -312,6 +314,31 @@ public class StudyValidatorTest {
 			this.studyValidator.validateStudyInstanceNumbers(studyId, Sets.newHashSet(1, 2, 3));
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Should not throw an exception");
+		}
+	}
+
+	@Test
+	public void testValidateStudyHasPlotDataset_OK() {
+		final Integer studyId = RandomUtils.nextInt();
+		final DataSet dataset = Mockito.mock(DataSet.class);
+
+		Mockito.when(this.studyDataManager.findOneDataSetByType(studyId, DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(dataset);
+
+		final DataSet actualDataset = this.studyValidator.validateStudyHasPlotDataset(studyId);
+		assertThat(actualDataset, is(dataset));
+	}
+
+	@Test
+	public void testValidateStudyHasPlotDataset_invalidDatasetNotFound() {
+		final Integer studyId = RandomUtils.nextInt();
+
+		Mockito.when(this.studyDataManager.findOneDataSetByType(studyId, DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(null);
+
+		try {
+			this.studyValidator.validateStudyHasPlotDataset(studyId);
+			Assert.fail("Should have thrown an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("study.not.has.plot.dataset"));
 		}
 	}
 
