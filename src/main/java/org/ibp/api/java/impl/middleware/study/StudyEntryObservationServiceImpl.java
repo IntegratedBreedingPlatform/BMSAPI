@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationRequestDto;
 import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.StockProperty;
@@ -51,7 +52,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 
 	@Override
 	public Integer createObservation(final Integer studyId, final StockPropertyData stockPropertyData) {
-		this.commonValidations(studyId, stockPropertyData);
+		this.commonValidations(studyId, stockPropertyData, true);
 		this.validateStudyEntryVariableShouldNotExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
 
 		this.setCategoricalValueId(stockPropertyData);
@@ -60,7 +61,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 
 	@Override
 	public Integer updateObservation(final Integer studyId, final StockPropertyData stockPropertyData) {
-		this.commonValidations(studyId, stockPropertyData);
+		this.commonValidations(studyId, stockPropertyData, false);
 		this.validateStudyEntryVariableShouldExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
 
 		this.setCategoricalValueId(stockPropertyData);
@@ -84,7 +85,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		}
 	}
 
-	private void commonValidations(final Integer studyId, final StockPropertyData stockPropertyData) {
+	private void commonValidations(final Integer studyId, final StockPropertyData stockPropertyData, final boolean validateCreation) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListObservationRequestDto.class.getName());
 		BaseValidator.checkNotNull(stockPropertyData, "param.null", new String[] {"request body"});
 		BaseValidator.checkNotNull(stockPropertyData.getVariableId(), "param.null", new String[] {"variableId"});
@@ -92,7 +93,13 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		BaseValidator.checkNotNull(stockPropertyData.hasValue(), "param.null", new String[] {"value"});
 
 		this.validateValue(stockPropertyData.getValue());
-		this.validateVariableDataTypeValue(stockPropertyData.getVariableId(), stockPropertyData.getValue());
+		final Variable variable = this.validateVariableIdExists(stockPropertyData.getVariableId());
+		if (validateCreation || TermId.ENTRY_NO.getId() == variable.getId()) {
+			this.errors.reject("study.entry.observation.cannot.add.entry.number", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		this.validateVariableDataTypeValue(variable, stockPropertyData.getValue());
 
 		this.studyValidator.validate(studyId, true);
 
@@ -119,14 +126,17 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		});
 	}
 
-	private void validateVariableDataTypeValue(final Integer variableId, final String value) {
+	private Variable validateVariableIdExists(final Integer variableId) {
 		final Variable variable =
 			this.ontologyVariableDataManager.getVariable(null, variableId, false);
 		if (variable == null) {
 			this.errors.reject("study.entry.invalid.variable", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+		return variable;
+	}
 
+	private void validateVariableDataTypeValue(final Variable variable, final String value) {
 		if (!VariableValueUtil.isValidAttributeValue(variable, value)) {
 			this.errors.reject("invalid.variable.value", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
