@@ -4,6 +4,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationReq
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.util.VariableValueUtil;
@@ -53,7 +54,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		this.commonValidations(studyId, stockPropertyData);
 		this.validateStudyEntryVariableShouldNotExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
 
-		this.setStockPropertyValue(stockPropertyData);
+		this.setCategoricalValueId(stockPropertyData);
 		return this.studyEntryObservationService.createObservation(stockPropertyData);
 	}
 
@@ -62,7 +63,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		this.commonValidations(studyId, stockPropertyData);
 		this.validateStudyEntryVariableShouldExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
 
-		this.setStockPropertyValue(stockPropertyData);
+		this.setCategoricalValueId(stockPropertyData);
 		return this.studyEntryObservationService.updateObservation(stockPropertyData);
 	}
 
@@ -71,6 +72,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		BaseValidator.checkNotNull(stockPropertyId, "param.null", new String[] {"stockPropertyId"});
 
 		this.studyValidator.validate(studyId, true);
+		this.validateObservationBelongsToStudy(studyId, stockPropertyId);
 
 		this.studyEntryObservationService.deleteObservation(stockPropertyId);
 	}
@@ -90,6 +92,8 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		BaseValidator.checkNotNull(stockPropertyData.hasValue(), "param.null", new String[] {"value"});
 
 		this.validateValue(stockPropertyData.getValue());
+		this.validateVariableDataTypeValue(stockPropertyData.getVariableId(), stockPropertyData.getValue());
+
 		this.studyValidator.validate(studyId, true);
 
 		final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
@@ -115,10 +119,37 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		});
 	}
 
-	private void setStockPropertyValue(final StockPropertyData stockPropertyData) {
+	private void validateVariableDataTypeValue(final Integer variableId, final String value) {
+		final Variable variable =
+			this.ontologyVariableDataManager.getVariable(null, variableId, false);
+		if (variable == null) {
+			this.errors.reject("study.entry.invalid.variable", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (!VariableValueUtil.isValidAttributeValue(variable, value)) {
+			this.errors.reject("invalid.variable.value", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	private void setCategoricalValueId(final StockPropertyData stockPropertyData) {
 		final Variable variable = this.ontologyVariableDataManager.getVariable(null, stockPropertyData.getVariableId(), false);
 		stockPropertyData
 			.setCategoricalValueId(VariableValueUtil.resolveCategoricalValueId(variable, stockPropertyData.getValue()));
+	}
+
+	private void validateObservationBelongsToStudy(final Integer studyId, final Integer observationId) {
+		final StockProperty stockProperty = this.middlewareStudyEntryService.getByStockPropertyId(observationId);
+		if (stockProperty == null) {
+			this.errors.reject("study.entry.observation.not-found", new String[] {String.valueOf(observationId)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (!stockProperty.getStock().getProject().getProjectId().equals(studyId)) {
+			this.errors.reject("study.entry.observation.must.belong.to.study", new String[] {String.valueOf(observationId), String.valueOf(studyId)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 }
