@@ -65,6 +65,7 @@ public class GermplasmListVariableServiceImpl implements GermplasmListVariableSe
 		BaseValidator.checkNotEmpty(variableIds, "germplasm.list.variable.ids.can.not.be.empty");
 		this.germplasmListVariableValidator.validateAllVariableIdsAreVariables(variableIds);
 		this.germplasmListVariableValidator.validateAllVariableIdsAreAssociatedToList(listId, Lists.newArrayList(variableIds));
+		this.germplasmListVariableValidator.validateCanNotDeleteEntryNoVariable(variableIds);
 		this.germplasmListService.removeListVariables(listId, variableIds);
 	}
 
