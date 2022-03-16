@@ -9,7 +9,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListBasicInfoDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListGeneratorDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
@@ -22,6 +21,7 @@ import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -247,6 +247,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 					return entryDTO;
 				}).collect(Collectors.toList()));
 			}
+		} else {
+			// Remove ENTRY_NO variable to avoid create the input in list_data_details table.
+			// The value of ENTRY_NO is continued taken from listdata table.
+			request.getEntries().stream().forEach(germplasmEntry -> {
+				GermplasmListObservationDto germplasmListObservationDto = germplasmEntry.getData().get(TermId.ENTRY_NO.getId());
+				if (germplasmListObservationDto != null) {
+					germplasmEntry.getData().remove(TermId.ENTRY_NO.getId());
+				}
+			});
 		}
 
 		// process entries

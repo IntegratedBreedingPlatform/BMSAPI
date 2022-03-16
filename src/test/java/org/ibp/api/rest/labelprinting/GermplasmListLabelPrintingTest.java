@@ -185,7 +185,6 @@ public class GermplasmListLabelPrintingTest {
 		final Map<String, LabelType> labelTypeMap = labelTypes.stream().collect(Collectors.toMap(LabelType::getKey, Function.identity()));
 		Assert.assertEquals(4, labelTypes.size());
 		Assert.assertEquals(germplasmFields, labelTypeMap.get(GERMPLASM_DETAILS).getFields());
-		Assert.assertEquals(this.labelPrinting.getDefaultEntryDetailsFields(), labelTypeMap.get(ENTRY_DETAILS).getFields());
 		Assert.assertTrue(CollectionUtils.isEmpty(labelTypeMap.get(NAMES).getFields()));
 		Assert.assertTrue(CollectionUtils.isEmpty(labelTypeMap.get(ATTRIBUTES).getFields()));
 	}
@@ -290,18 +289,6 @@ public class GermplasmListLabelPrintingTest {
 	}
 
 	@Test
-	public void testGetDataRow_For_DefaultEntryDetailFields() {
-		this.labelPrinting.initStaticFields();
-		final Set<Integer> keys = new HashSet<>(Arrays.asList(TermId.ENTRY_NO.getId()));
-		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
-		final Map<Integer, String> dataRow =
-			this.labelPrinting.getDataRow(keys, listData, response, new HashMap<>(), new HashMap<>(), new HashMap<>());
-		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(listData.getData().get(TermId.ENTRY_NO.name()), dataRow.get(TermId.ENTRY_NO.getId()));
-	}
-
-	@Test
 	public void testGetDataRow_For_EntryDetailFields() {
 		this.labelPrinting.initStaticFields();
 		final Integer entryDetailVariableId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
@@ -331,7 +318,7 @@ public class GermplasmListLabelPrintingTest {
 		final GermplasmListDataSearchResponse response = new GermplasmListDataSearchResponse();
 		response.setListDataId(Integer.valueOf(RandomStringUtils.randomNumeric(3)));
 		response.setData(new HashMap<>());
-		response.getData().put(GermplasmListStaticColumns.ENTRY_NO.name(), "1");
+		response.getData().put(TermId.ENTRY_NO.name(), "1");
 		response.getData().put(GermplasmListStaticColumns.CROSS.name(), RandomStringUtils.randomAlphanumeric(10));
 		return response;
 	}
