@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmListSearchRequestDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.GermplasmListDTO;
@@ -27,11 +28,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Api(value = "BrAPI v2 Germplasm List Services")
 @Controller(value = "GermplasmListResourceBrapi")
 public class GermplasmListResourceBrapi {
+
+	private final static String ALLOWED_LIST_TYPE = "germplasm";
 
 	@Autowired
 	private GermplasmListServiceBrapi germplasmListServiceBrapi;
@@ -57,6 +61,10 @@ public class GermplasmListResourceBrapi {
 		@RequestParam(value = "page", required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
+
+		if(StringUtils.isNotEmpty(listType) && !ALLOWED_LIST_TYPE.equalsIgnoreCase(listType)) {
+			return new ResponseEntity<>(new EntityListResponse<>(new Result<>(new ArrayList<>())), HttpStatus.OK);
+		}
 
 		final GermplasmListSearchRequestDTO	requestDTO = new GermplasmListSearchRequestDTO(listType, listName, listDbId, listSource,
 			externalReferenceID, externalReferenceSource);
