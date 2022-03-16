@@ -18,12 +18,12 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 	private org.generationcp.middleware.api.brapi.GermplasmListServiceBrapi middlewareGermplasmListServiceBrapi;
 
 	@Override
-	public List<GermplasmListDTO> searchGermplasmListDTOs(GermplasmListSearchRequestDTO searchRequestDTO, Pageable pageable) {
+	public List<GermplasmListDTO> searchGermplasmListDTOs(final GermplasmListSearchRequestDTO searchRequestDTO, final Pageable pageable) {
 		return this.middlewareGermplasmListServiceBrapi.searchGermplasmListDTOs(searchRequestDTO, pageable);
 	}
 
 	@Override
-	public long countGermplasmListDTOs(GermplasmListSearchRequestDTO searchRequestDTO) {
+	public long countGermplasmListDTOs(final GermplasmListSearchRequestDTO searchRequestDTO) {
 		return this.middlewareGermplasmListServiceBrapi.countGermplasmListDTOs(searchRequestDTO);
 	}
 
