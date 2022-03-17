@@ -16,6 +16,8 @@ import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.api.brapi.GermplasmListServiceBrapi;
+import org.generationcp.middleware.api.brapi.GermplasmListServiceBrapiImpl;
 import org.generationcp.middleware.api.study.StudyEntryObservationService;
 import org.generationcp.middleware.api.study.StudyEntryObservationServiceImpl;
 import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
@@ -666,6 +668,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmServiceBrapi getGermplasmServiceBrapi() {
 		return new GermplasmServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmListServiceBrapi getGermplasmListServiceBrapi() {
+		return new GermplasmListServiceBrapiImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
