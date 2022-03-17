@@ -336,7 +336,7 @@
     ]
   },
   {
-    "service": "list",
+    "service": "lists",
     "dataTypes": [
       "application/json"
     ],
