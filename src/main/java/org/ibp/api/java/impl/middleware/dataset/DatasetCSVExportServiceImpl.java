@@ -21,13 +21,21 @@ import org.springframework.validation.MapBindingResult;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @Transactional
 public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
+
 	static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
+	static final String LOCATION_ABBR_VARIABLE_NAME = "LOCATION ABBREVIATION";
 
 	@Resource
 	private DatasetCSVGenerator datasetCSVGenerator;
@@ -53,14 +61,17 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 
 		final List<MeasurementVariable> allVariables = new ArrayList<>(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
+		this.addLocationAbbrColumn(allVariables);
+
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());
 	}
 
 	@Override
 	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(
 		final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(),
-			new ArrayList<>(selectedDatasetInstancesMap.keySet()));
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
+			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(),
+				new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 		this.transformEntryTypeValues(observationUnitRowMap);
 		this.addLocationIdValues(observationUnitRowMap, selectedDatasetInstancesMap);
 		return observationUnitRowMap;
@@ -80,13 +91,27 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		});
 	}
 
-	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
-		for(final Integer instanceId: observationUnitRowMap.keySet()) {
+	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+		for (final Integer instanceId : observationUnitRowMap.keySet()) {
 			final ObservationUnitData locationIdData = new ObservationUnitData();
 			locationIdData.setValue(selectedDatasetInstancesMap.get(instanceId).getLocationId().toString());
 			observationUnitRowMap.get(instanceId).forEach(row -> row.getVariables().put(LOCATION_ID_VARIABLE_NAME, locationIdData));
+			final ObservationUnitData locationAbbrData = new ObservationUnitData();
+			locationAbbrData.setValue(selectedDatasetInstancesMap.get(instanceId).getLocationAbbreviation().toString());
+			observationUnitRowMap.get(instanceId).forEach(row -> row.getVariables().put(LOCATION_ABBR_VARIABLE_NAME, locationAbbrData));
 		}
 
 	}
 
+	private void addLocationAbbrColumn(final List<MeasurementVariable> allVariables) {
+		final int indexOfLocationId = IntStream.range(0, allVariables.size())
+			.filter(i -> allVariables.get(i).getAlias().equals(TermId.LOCATION_ID.name()))
+			.findFirst().orElse(0);
+
+		final MeasurementVariable locationAbbrVariable = new MeasurementVariable();
+		locationAbbrVariable.setAlias(TermId.LOCATION_ABBR.name());
+		locationAbbrVariable.setName(LOCATION_ABBR_VARIABLE_NAME);
+		allVariables.add(indexOfLocationId + 1, locationAbbrVariable);
+	}
 }
