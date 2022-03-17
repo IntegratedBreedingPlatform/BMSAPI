@@ -31,11 +31,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.ArrayList;
 import java.util.List;
 
-@Api(value = "BrAPI v2 Germplasm List Services")
-@Controller(value = "GermplasmListResourceBrapi")
-public class GermplasmListResourceBrapi {
+@Api(value = "BrAPI v2 List Services")
+@Controller(value = "ListResourceBrapi")
+public class ListResourceBrapi {
 
-	private final static String ALLOWED_LIST_TYPE = "germplasm";
+	private static final String ALLOWED_LIST_TYPE = "germplasm";
 
 	@Autowired
 	private GermplasmListServiceBrapi germplasmListServiceBrapi;
@@ -44,8 +44,8 @@ public class GermplasmListResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/lists", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV2.class)
 	@ResponseBody
-	public ResponseEntity<EntityListResponse<GermplasmListDTO>> getSamples(@PathVariable final String crop,
-		@ApiParam(value = "The type of objects contained by this generic list")
+	public ResponseEntity<EntityListResponse<GermplasmListDTO>> getLists(@PathVariable final String crop,
+		@ApiParam(value = "The type of objects contained by this generic list(only 'germplasm' listType is supported)")
 		@RequestParam(value = "listType", required = false) final String listType,
 		@ApiParam(value = "The human readable name of this generic list")
 		@RequestParam(value = "listName", required = false) final String listName,
@@ -79,12 +79,12 @@ public class GermplasmListResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return GermplasmListResourceBrapi.this.germplasmListServiceBrapi.countGermplasmListDTOs(requestDTO);
+					return ListResourceBrapi.this.germplasmListServiceBrapi.countGermplasmListDTOs(requestDTO);
 				}
 
 				@Override
 				public List<GermplasmListDTO> getResults(final PagedResult<GermplasmListDTO> pagedResult) {
-					return GermplasmListResourceBrapi.this.germplasmListServiceBrapi.searchGermplasmListDTOs(requestDTO, pageRequest);
+					return ListResourceBrapi.this.germplasmListServiceBrapi.searchGermplasmListDTOs(requestDTO, pageRequest);
 				}
 			});
 
