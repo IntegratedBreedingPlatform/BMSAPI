@@ -25,7 +25,7 @@ public class AttributeValidator {
 	private static final List<Integer> ALLOWED_ATTRIBUTE_TYPES_IDS =
 		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId());
 
-	private static final Integer GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH = 255;
+	public static final Integer GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH = 5000;
 
 	@Autowired
 	private GermplasmAttributeService germplasmAttributeService;
