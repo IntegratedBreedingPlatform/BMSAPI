@@ -73,7 +73,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(),
 				new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 		this.transformEntryTypeValues(observationUnitRowMap);
-		this.addLocationIdValues(observationUnitRowMap, selectedDatasetInstancesMap);
+		this.addLocationValues(observationUnitRowMap, selectedDatasetInstancesMap);
 		return observationUnitRowMap;
 	}
 
@@ -91,7 +91,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		});
 	}
 
-	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+	void addLocationValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		for (final Integer instanceId : observationUnitRowMap.keySet()) {
 			final ObservationUnitData locationIdData = new ObservationUnitData();
@@ -107,7 +107,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	private void addLocationAbbrColumn(final List<MeasurementVariable> allVariables) {
 		final int indexOfLocationId = IntStream.range(0, allVariables.size())
 			.filter(i -> allVariables.get(i).getAlias().equals(TermId.LOCATION_ID.name()))
-			.findFirst().orElse(0);
+			.findFirst().orElse(-1);
 
 		final MeasurementVariable locationAbbrVariable = new MeasurementVariable();
 		locationAbbrVariable.setAlias(TermId.LOCATION_ABBR.name());

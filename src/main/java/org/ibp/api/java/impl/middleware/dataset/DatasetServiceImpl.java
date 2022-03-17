@@ -870,7 +870,7 @@ public class DatasetServiceImpl implements DatasetService {
 		return allVariables;
 	}
 
-	private void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
+	void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
 		final MeasurementVariable locationIdVariable = new MeasurementVariable();
 		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
 		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);
