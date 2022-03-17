@@ -5,24 +5,30 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.list.GermplasmListImportRequestDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmListSearchRequestDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.GermplasmListDTO;
+import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.ibp.api.brapi.GermplasmListServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +45,9 @@ public class GermplasmListResourceBrapi {
 
 	@Autowired
 	private GermplasmListServiceBrapi germplasmListServiceBrapi;
+
+	@Autowired
+	private BrapiResponseMessageGenerator<GermplasmListDTO> responseMessageGenerator;
 
 	@ApiOperation(value = "Get filtered set of generic lists", notes = "Get filtered set of generic lists")
 	@RequestMapping(value = "/{crop}/brapi/v2/lists", method = RequestMethod.GET)
@@ -95,6 +104,24 @@ public class GermplasmListResourceBrapi {
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
 		final EntityListResponse<GermplasmListDTO> entityListResponse = new EntityListResponse<>(metadata, result);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Create New List Objects", notes = "Create new list objects in the database")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS', 'MANAGE_GERMPLASM_LISTS')")
+	@RequestMapping(value = "/{crop}/brapi/v2/lists", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<EntityListResponse<GermplasmListDTO>> createStudies(@PathVariable final String crop,
+		@RequestBody final List<GermplasmListImportRequestDTO> germplasmListImportRequestDTOS) {
+		BaseValidator.checkNotNull(germplasmListImportRequestDTOS, "germplasm.list.import.request.null");
+		final GermplasmListImportResponse
+			germplasmListImportResponse = this.germplasmListServiceBrapi.createGermplasmLists(crop, germplasmListImportRequestDTOS);
+		final Result<GermplasmListDTO> results = new Result<GermplasmListDTO>().withData(germplasmListImportResponse.getEntityList());
+
+		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(germplasmListImportResponse));
+		final EntityListResponse<GermplasmListDTO> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
