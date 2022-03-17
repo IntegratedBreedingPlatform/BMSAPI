@@ -1,6 +1,7 @@
 package org.ibp.api.brapi.v2.list;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +19,8 @@ import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +31,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Api(value = "BrAPI v2 List Services")
 @Controller(value = "ListResourceBrapi")
@@ -39,6 +43,9 @@ public class ListResourceBrapi {
 
 	@Autowired
 	private GermplasmListServiceBrapi germplasmListServiceBrapi;
+
+	@Autowired
+	private ResourceBundleMessageSource messageSource;
 
 	@ApiOperation(value = "Get filtered set of generic lists", notes = "Get filtered set of generic lists")
 	@RequestMapping(value = "/{crop}/brapi/v2/lists", method = RequestMethod.GET)
@@ -63,7 +70,12 @@ public class ListResourceBrapi {
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
 		if(StringUtils.isNotEmpty(listType) && !ALLOWED_LIST_TYPE.equalsIgnoreCase(listType)) {
-			return new ResponseEntity<>(new EntityListResponse<>(new Result<>(new ArrayList<>())), HttpStatus.OK);
+			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",
+				this.messageSource.getMessage("list.list.type.invalid", null, LocaleContextHolder.getLocale())));
+			final Metadata metadata = new Metadata(null, status);
+			final EntityListResponse<GermplasmListDTO> entityListResponse = new EntityListResponse<>(metadata, new Result<>());
+
+			return new ResponseEntity<>(entityListResponse, HttpStatus.BAD_REQUEST);
 		}
 
 		final GermplasmListSearchRequestDTO	requestDTO = new GermplasmListSearchRequestDTO(listType, listName, listDbId, listSource,
