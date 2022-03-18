@@ -21,7 +21,12 @@ import org.springframework.validation.MapBindingResult;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +34,7 @@ import java.util.stream.Collectors;
 public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
 
 	static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
+	static final String LOCATION_ABBR_VARIABLE_NAME = "LOCATION ABBREVIATION";
 
 	@Resource
 	private DatasetCSVGenerator datasetCSVGenerator;
@@ -64,7 +70,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(),
 				new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 		this.transformEntryTypeValues(observationUnitRowMap);
-		this.addLocationIdValues(observationUnitRowMap, selectedDatasetInstancesMap);
+		this.addLocationValues(observationUnitRowMap, selectedDatasetInstancesMap);
 		return observationUnitRowMap;
 	}
 
@@ -82,11 +88,15 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		});
 	}
 
-	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+	void addLocationValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		for (final Integer instanceId : observationUnitRowMap.keySet()) {
 			final ObservationUnitData locationIdData = new ObservationUnitData();
 			locationIdData.setValue(selectedDatasetInstancesMap.get(instanceId).getLocationId().toString());
 			observationUnitRowMap.get(instanceId).forEach(row -> row.getVariables().put(LOCATION_ID_VARIABLE_NAME, locationIdData));
+			final ObservationUnitData locationAbbrData = new ObservationUnitData();
+			locationAbbrData.setValue(selectedDatasetInstancesMap.get(instanceId).getLocationAbbreviation().toString());
+			observationUnitRowMap.get(instanceId).forEach(row -> row.getVariables().put(LOCATION_ABBR_VARIABLE_NAME, locationAbbrData));
 		}
 
 	}
