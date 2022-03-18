@@ -237,6 +237,20 @@ public class StudyValidatorTest {
 	}
 
 	@Test
+	public void testValidateStudyHasNoSummaryStatisticsDataset() {
+		final Random ran = new Random();
+		final int studyId = ran.nextInt();
+		Mockito.when(this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId()))
+			.thenReturn(Boolean.TRUE);
+		try {
+			this.studyValidator.validateStudyHasNoSummaryStatisticsDataset(studyId);
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("study.has.summary.statistics.dataset"));
+		}
+	}
+
+	@Test
 	public void testValidateDeleteStudy_ThrowsException_WhenStudyNotExist() {
 		try {
 			final Integer studyId = RandomUtils.nextInt();

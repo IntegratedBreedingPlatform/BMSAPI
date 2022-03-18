@@ -80,8 +80,9 @@ public class SiteAnalysisServiceImplTest {
 		Assert.notNull(this.siteAnalysisService.createSummaryStatisticsDataset(studyId, summaryStatisticsImportRequest));
 
 		verify(this.studyValidator).validate(studyId, true);
-		verify(this.studyValidator).validateStudyHasNoMeansDataset(studyId);
+		verify(this.studyValidator).validateStudyHasNoSummaryStatisticsDataset(studyId);
 		verify(this.summaryStatisticsImportRequestValidator).validateEnvironmentNumberIsNotEmpty(summaryStatisticsImportRequest);
+		verify(this.summaryStatisticsImportRequestValidator).validateEnvironmentNumberIsDistinct(summaryStatisticsImportRequest);
 		verify(this.summaryStatisticsImportRequestValidator).validateSummaryDataIsNotEmpty(summaryStatisticsImportRequest);
 		verify(this.summaryStatisticsImportRequestValidator).validateDataValuesIsNotEmpty(summaryStatisticsImportRequest);
 		verify(this.studyValidator).validateStudyInstanceNumbers(studyId, Sets.newHashSet(1));

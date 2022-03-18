@@ -7,7 +7,6 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
 import org.generationcp.middleware.service.impl.analysis.SummaryStatisticsImportRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class SummaryStatisticsImportRequestValidator {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	public void validateEnvironmentNumberIsNotEmpty(final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), SummaryStatisticsImportRequest.class.getName());
 		final boolean hasBlankEnvironmentNumbers =
 			summaryStatisticsImportRequest.getData().stream().anyMatch(md -> md.getEnvironmentNumber() == null);
 		if (hasBlankEnvironmentNumbers) {
@@ -41,7 +40,7 @@ public class SummaryStatisticsImportRequestValidator {
 	}
 
 	public void validateSummaryDataIsNotEmpty(final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), SummaryStatisticsImportRequest.class.getName());
 		if (CollectionUtils.isEmpty(summaryStatisticsImportRequest.getData())) {
 			errors.reject("summary.statistics.import.data.required", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -49,7 +48,7 @@ public class SummaryStatisticsImportRequestValidator {
 	}
 
 	public void validateDataValuesIsNotEmpty(final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), SummaryStatisticsImportRequest.class.getName());
 		if (summaryStatisticsImportRequest.getData().stream().anyMatch(d -> MapUtils.isEmpty(d.getValues()))) {
 			errors.reject("summary.statistics.import.data.values.required", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -57,7 +56,7 @@ public class SummaryStatisticsImportRequestValidator {
 	}
 
 	public void validateAnalysisVariableNames(final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), MeansImportRequest.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), SummaryStatisticsImportRequest.class.getName());
 		if (CollectionUtils.isNotEmpty(summaryStatisticsImportRequest.getData())) {
 			final Set<String> analysisSummaryVariableNames =
 				summaryStatisticsImportRequest.getData().stream()
@@ -92,4 +91,15 @@ public class SummaryStatisticsImportRequestValidator {
 		}
 	}
 
+	public void validateEnvironmentNumberIsDistinct(final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), SummaryStatisticsImportRequest.class.getName());
+		final boolean hasDuplicateEnvironmentNumbers =
+			summaryStatisticsImportRequest.getData().stream()
+				.collect(Collectors.groupingBy(SummaryStatisticsImportRequest.SummaryData::getEnvironmentNumber, Collectors.counting()))
+				.entrySet().stream().anyMatch(e -> e.getValue() > 1);
+		if (hasDuplicateEnvironmentNumbers) {
+			errors.reject("summary.statistics.import.duplicate.environment.number", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
 }

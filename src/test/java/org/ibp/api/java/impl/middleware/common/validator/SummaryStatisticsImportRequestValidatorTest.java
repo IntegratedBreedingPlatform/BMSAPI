@@ -114,6 +114,20 @@ public class SummaryStatisticsImportRequestValidatorTest {
 		}
 	}
 
+	@Test
+	public void testValidateEnvironmentNumberIsDistinct() {
+		final SummaryStatisticsImportRequest summaryStatisticsImportRequest = this.createSummaryStatisticsImportRequest();
+		summaryStatisticsImportRequest.getData().get(1).setEnvironmentNumber(1);
+
+		try {
+			this.summaryStatisticsImportRequestValidator.validateEnvironmentNumberIsDistinct(summaryStatisticsImportRequest);
+			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertEquals("summary.statistics.import.duplicate.environment.number", e.getErrors().get(0).getCode());
+		}
+
+	}
+
 	private SummaryStatisticsImportRequest createSummaryStatisticsImportRequest() {
 
 		final Random random = new Random();

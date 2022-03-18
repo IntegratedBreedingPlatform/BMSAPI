@@ -65,9 +65,10 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	public DatasetDTO createSummaryStatisticsDataset(final Integer studyId,
 		final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
 		this.studyValidator.validate(studyId, true);
-		this.studyValidator.validateStudyHasNoMeansDataset(studyId);
+		this.studyValidator.validateStudyHasNoSummaryStatisticsDataset(studyId);
 		this.summaryStatisticsImportRequestValidator.validateSummaryDataIsNotEmpty(summaryStatisticsImportRequest);
 		this.summaryStatisticsImportRequestValidator.validateEnvironmentNumberIsNotEmpty(summaryStatisticsImportRequest);
+		this.summaryStatisticsImportRequestValidator.validateEnvironmentNumberIsDistinct(summaryStatisticsImportRequest);
 		this.summaryStatisticsImportRequestValidator.validateDataValuesIsNotEmpty(summaryStatisticsImportRequest);
 		final Set<Integer> environmentNumbers =
 			summaryStatisticsImportRequest.getData().stream().map(SummaryStatisticsImportRequest.SummaryData::getEnvironmentNumber)
