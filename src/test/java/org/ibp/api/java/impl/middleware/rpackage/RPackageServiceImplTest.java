@@ -1,9 +1,7 @@
 package org.ibp.api.java.impl.middleware.rpackage;
 
-import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.rpackage.RPackageDTO;
-import org.generationcp.middleware.pojos.workbench.RCall;
 import org.ibp.api.domain.rpackage.RCallDTO;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.rpackage.RPackageService;
@@ -18,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import static org.mockito.Mockito.times;
@@ -52,6 +51,8 @@ public class RPackageServiceImplTest {
 
 		Assert.assertEquals(rCallDTO.getEndpoint(), rCall.getEndpoint());
 		Assert.assertEquals(rCallDTO.getDescription(), rCall.getDescription());
+		Assert.assertEquals(rCallDTO.getrCallId(), rCall.getrCallId());
+		Assert.assertEquals(rCallDTO.isAggregate(), rCall.isAggregate());
 		Assert.assertEquals(rCallDTO.getParameters(), rCall.getParameters());
 
 	}
@@ -61,12 +62,12 @@ public class RPackageServiceImplTest {
 
 		final int packageId = this.random.nextInt();
 
-		when(this.rPackageMiddlewareService.getRPackageById(packageId)).thenReturn(Optional.absent());
+		when(this.rPackageMiddlewareService.getRPackageById(packageId)).thenReturn(Optional.empty());
 
 		try {
 			final List<RCallDTO> result = this.rPackageService.getRCallsByPackageId(packageId);
 			Assert.fail("Method should throw an error");
-		} catch (ResourceNotFoundException e) {
+		} catch (final ResourceNotFoundException e) {
 			verify(this.rPackageMiddlewareService, times(0)).getRCallsByPackageId(packageId);
 		}
 
@@ -80,6 +81,8 @@ public class RPackageServiceImplTest {
 		final Map<String, String> parameters = new HashMap<>();
 		parameters.put(RandomStringUtils.randomAlphanumeric(BOUND), RandomStringUtils.randomAlphanumeric(BOUND));
 		rCall.setParameters(parameters);
+		rCall.setrCallId(1);
+		rCall.setAggregate(true);
 
 		return rCall;
 
