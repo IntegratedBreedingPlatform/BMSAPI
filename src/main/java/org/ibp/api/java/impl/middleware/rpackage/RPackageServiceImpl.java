@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.rpackage;
 
-import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.rpackage.RPackageDTO;
 import org.ibp.api.domain.rpackage.RCallDTO;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -14,6 +13,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,15 +28,14 @@ public class RPackageServiceImpl implements RPackageService {
 
 		final Optional<RPackageDTO> rPackage = this.rPackageMiddlewareService.getRPackageById(packageId);
 		if (!rPackage.isPresent()) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("rpackage.does.not.exist", new Object[] {packageId}, "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
 		final ModelMapper mapper = new ModelMapper();
-		return this.rPackageMiddlewareService.getRCallsByPackageId(packageId).stream().map(o -> {
-			return mapper.map(o, RCallDTO.class);
-		}).collect(Collectors.toList());
+		return this.rPackageMiddlewareService.getRCallsByPackageId(packageId).stream().map(o -> mapper.map(o, RCallDTO.class))
+			.collect(Collectors.toList());
 	}
 
 }

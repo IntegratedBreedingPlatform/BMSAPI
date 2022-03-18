@@ -33,12 +33,14 @@ public class RPackageResourceTest extends ApiUnitTestBase {
 		when(this.rPackageService.getRCallsByPackageId(packageId)).thenReturn(Arrays.asList(rCallDTO));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/r-packages/{packageId}/r-calls", packageId)
-			.contentType(this.contentType))
+				.get("/r-packages/{packageId}/r-calls", packageId)
+				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(jsonPath("$[0].rCallId", Matchers.is(rCallDTO.getrCallId())))
 			.andExpect(jsonPath("$[0].description", Matchers.is(rCallDTO.getDescription())))
 			.andExpect(jsonPath("$[0].endpoint", Matchers.is(rCallDTO.getEndpoint())))
+			.andExpect(jsonPath("$[0].aggregate", Matchers.is(rCallDTO.isAggregate())))
 			.andExpect(jsonPath("$[0].parameters." + rCallDTO.getParameters().entrySet().iterator().next().getKey(),
 				Matchers.is(rCallDTO.getParameters().entrySet().iterator().next().getValue())));
 	}
@@ -47,6 +49,8 @@ public class RPackageResourceTest extends ApiUnitTestBase {
 		final RCallDTO rCallDTO = new RCallDTO();
 		rCallDTO.setDescription(RandomStringUtils.randomAlphanumeric(10));
 		rCallDTO.setEndpoint(RandomStringUtils.randomAlphanumeric(10));
+		rCallDTO.setAggregate(true);
+		rCallDTO.setrCallId(1);
 		final Map<String, String> parameters = new HashMap<>();
 		parameters.put(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10));
 		rCallDTO.setParameters(parameters);
