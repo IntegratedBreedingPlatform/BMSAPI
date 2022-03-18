@@ -1085,12 +1085,14 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testAddLocationIdVariable() {
+	public void testAddLocationVariables() {
 		final List<MeasurementVariable> measurementVariableList = new ArrayList<>();
-		this.studyDatasetService.addLocationIdVariable(measurementVariableList);
-		Assert.assertEquals(1, measurementVariableList.size());
+		this.studyDatasetService.addLocationVariables(measurementVariableList);
+		Assert.assertEquals(2, measurementVariableList.size());
 		Assert.assertEquals(TermId.LOCATION_ID.name(), measurementVariableList.get(0).getAlias());
-		Assert.assertEquals(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME, measurementVariableList.get(0).getName());
+		Assert.assertEquals(DatasetServiceImpl.LOCATION_ID_VARIABLE_NAME, measurementVariableList.get(0).getName());
+		Assert.assertEquals(TermId.LOCATION_ABBR.name(), measurementVariableList.get(1).getAlias());
+		Assert.assertEquals(DatasetServiceImpl.LOCATION_ABBR_VARIABLE_NAME, measurementVariableList.get(1).getName());
 	}
 
 }

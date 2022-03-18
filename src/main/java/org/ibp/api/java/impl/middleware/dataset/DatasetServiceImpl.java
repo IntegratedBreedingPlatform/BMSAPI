@@ -86,9 +86,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
 
-	private static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
+	static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
+	static final String LOCATION_ABBR_VARIABLE_NAME = "LOCATION ABBREVIATION";
 	private static final List<Integer> PROTECTED_VARIABLE_IDS =
-		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId());
+		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(), TermId.LOCATION_ABBR.getId());
 	public static final String MISSING_VALUE = "missing";
 	public static final String NOT_AVAILABLE_VALUE = "NA";
 	public static final String PARAM_NULL = "param.null";
@@ -820,7 +821,7 @@ public class DatasetServiceImpl implements DatasetService {
 			.getObservationSetVariables(environmentDatasetId, Lists.newArrayList(
 				VariableType.ENVIRONMENT_DETAIL.getId(),
 				VariableType.ENVIRONMENT_CONDITION.getId()));
-		this.addLocationIdVariable(environmentDetailAndConditionVariables);
+		this.addLocationVariables(environmentDetailAndConditionVariables);
 		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
 		Collections.sort(environmentDetailAndConditionVariables, (var1, var2) -> {
 			final String value1 = var1.getValue();
@@ -870,7 +871,11 @@ public class DatasetServiceImpl implements DatasetService {
 		return allVariables;
 	}
 
-	void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
+	void addLocationVariables(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
+		final MeasurementVariable locationAbbrVariable = new MeasurementVariable();
+		locationAbbrVariable.setAlias(TermId.LOCATION_ABBR.name());
+		locationAbbrVariable.setName(LOCATION_ABBR_VARIABLE_NAME);
+		environmentDetailAndConditionVariables.add(0, locationAbbrVariable);
 		final MeasurementVariable locationIdVariable = new MeasurementVariable();
 		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
 		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);

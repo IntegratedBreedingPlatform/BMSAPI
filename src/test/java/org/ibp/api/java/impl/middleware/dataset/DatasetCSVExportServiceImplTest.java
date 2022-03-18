@@ -64,7 +64,6 @@ public class DatasetCSVExportServiceImplTest {
 	private static final String TEST_ENTRY_DESCRIPTION = "Test Entry";
 	private static final String TEST_ENTRY_NAME = "T";
 	private static final Integer LOCATION_ID = 1;
-	private static final String LOCATION_ABBR = "LOC1";
 	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphabetic(10);
 
 	@Mock
@@ -276,11 +275,8 @@ public class DatasetCSVExportServiceImplTest {
 		final List<Integer> subObsTypeIds = new ArrayList<>();
 		subObsTypeIds.add(5);
 
-		final List<MeasurementVariable> measurementVariableList = this.datasetExportService.getColumns(1, 1);
+		this.datasetExportService.getColumns(1, 1);
 		Mockito.verify(this.studyDatasetService).getAllDatasetVariables(1, 1);
-		Assert.assertEquals(1, measurementVariableList.size());
-		Assert.assertEquals(TermId.LOCATION_ABBR.name(), measurementVariableList.get(0).getAlias());
-		Assert.assertEquals(DatasetCSVExportServiceImpl.LOCATION_ABBR_VARIABLE_NAME, measurementVariableList.get(0).getName());
 	}
 
 	@Test
@@ -297,11 +293,10 @@ public class DatasetCSVExportServiceImplTest {
 
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
 			this.createObservationUnitRowMap(TermId.LOCATION_ID.name(), "UNKNOWN");
-		this.datasetExportService.addLocationValues(observationUnitRowMap, studyInstanceHashMap);
+		this.datasetExportService.addLocationIdValues(observationUnitRowMap, studyInstanceHashMap);
 		final Map<String, ObservationUnitData> variables = observationUnitRowMap.get(5).get(0).getVariables();
-		Assert.assertEquals(3, variables.size());
+		Assert.assertEquals(2, variables.size());
 		Assert.assertEquals(LOCATION_ID.toString(), variables.get(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
-		Assert.assertEquals(LOCATION_ABBR, variables.get(DatasetCSVExportServiceImpl.LOCATION_ABBR_VARIABLE_NAME).getValue());
 	}
 
 	@Test
@@ -338,7 +333,6 @@ public class DatasetCSVExportServiceImplTest {
 		studyInstance.setInstanceNumber(this.random.nextInt());
 		studyInstance.setLocationName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		studyInstance.setLocationId(LOCATION_ID);
-		studyInstance.setLocationAbbreviation(LOCATION_ABBR);
 		return studyInstance;
 	}
 
