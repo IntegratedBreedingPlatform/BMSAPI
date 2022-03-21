@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.ibp.api.java.study.StudyEntryObservationService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,8 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 
 @Api(value = "Study Entry Observation Services")
 @Controller
@@ -59,6 +62,23 @@ public class StudyEntryObservationResource {
 		@PathVariable final Integer observationId) {
 		this.studyEntryObservationService.deleteObservation(studyId, observationId);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Count study entry observations", notes = "Returns count of study entry observations given a set of variables")
+	// TODO: review permissions
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations", method = RequestMethod.HEAD)
+	public ResponseEntity<Void> countObservationsByVariables(
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@RequestParam(value = "variableIds") final Integer[] variableIds) {
+
+		final long count = this.studyEntryObservationService.countObservationsByVariables(studyId, Arrays.asList(variableIds));
+		final HttpHeaders respHeaders = new HttpHeaders();
+		respHeaders.add("X-Total-Count", String.valueOf(count));
+
+		return new ResponseEntity<>(respHeaders, HttpStatus.OK);
 	}
 
 }

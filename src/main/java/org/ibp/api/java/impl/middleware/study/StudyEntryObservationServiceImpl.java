@@ -23,6 +23,7 @@ import org.springframework.validation.MapBindingResult;
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 @Transactional
@@ -76,6 +77,16 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		this.validateObservationBelongsToStudy(studyId, stockPropertyId);
 
 		this.studyEntryObservationService.deleteObservation(stockPropertyId);
+	}
+
+	@Override
+	public long countObservationsByVariables(final Integer studyId, final List<Integer> variableIds) {
+		this.studyValidator.validate(studyId, false);
+
+		final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, dataSet.getId(), variableIds);
+
+		return this.studyEntryObservationService.countObservationsByStudyAndVariables(studyId, variableIds);
 	}
 
 	private void validateValue(final String value) {
