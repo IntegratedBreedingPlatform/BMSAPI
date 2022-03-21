@@ -89,7 +89,7 @@ public class DatasetServiceImpl implements DatasetService {
 	static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
 	static final String LOCATION_ABBR_VARIABLE_NAME = "LOCATION ABBREVIATION";
 	private static final List<Integer> PROTECTED_VARIABLE_IDS =
-		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(), TermId.LOCATION_ABBR.getId());
+		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId());
 	public static final String MISSING_VALUE = "missing";
 	public static final String NOT_AVAILABLE_VALUE = "NA";
 	public static final String PARAM_NULL = "param.null";
