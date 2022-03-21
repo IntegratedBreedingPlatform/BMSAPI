@@ -73,7 +73,7 @@ public class SummaryStatisticsImportRequestValidator {
 				analysisSummaryVariableNames.stream().filter(o -> !variablesMapByName.containsKey(o)).collect(Collectors.toSet());
 
 			if (CollectionUtils.isNotEmpty(nonExistingVariableNames)) {
-				errors.reject("summary.statistics.analysis.summary.variable.names.do.not.exist",
+				errors.reject("summary.statistics.import.analysis.summary.variable.names.do.not.exist",
 					new Object[] {StringUtils.join(nonExistingVariableNames, ", ")}, "");
 			}
 

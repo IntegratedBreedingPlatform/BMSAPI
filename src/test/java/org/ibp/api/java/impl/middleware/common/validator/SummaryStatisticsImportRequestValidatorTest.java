@@ -86,7 +86,7 @@ public class SummaryStatisticsImportRequestValidatorTest {
 			this.summaryStatisticsImportRequestValidator.validateAnalysisVariableNames(SummaryStatisticsImportRequest);
 			fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
-			assertEquals("summary.statistics.analysis.summary.variable.names.do.not.exist", e.getErrors().get(0).getCode());
+			assertEquals("summary.statistics.import.analysis.summary.variable.names.do.not.exist", e.getErrors().get(0).getCode());
 			assertEquals(
 				new Object[] {EDIA_M_CM_Heritability + ", " + EDIA_M_CM_PValue + ", " + PH_M_CM_Heritability + ", " + PH_M_CM_PValue},
 				e.getErrors().get(0).getArguments());
