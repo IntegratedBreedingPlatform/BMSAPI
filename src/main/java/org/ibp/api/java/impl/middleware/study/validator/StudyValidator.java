@@ -142,6 +142,14 @@ public class StudyValidator {
 		}
 	}
 
+	public void validateStudyHasNoSummaryStatisticsDataset(final Integer studyId) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		if (this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
+			this.errors.reject("study.has.summary.statistics.dataset");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
 	public void validateDeleteStudy(final Integer studyId) {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		final Study study = this.studyDataManager.getStudy(studyId, false);
