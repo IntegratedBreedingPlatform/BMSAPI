@@ -3,6 +3,7 @@ package org.ibp.api.rest.analysis;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
+import org.generationcp.middleware.service.impl.analysis.SummaryStatisticsImportRequest;
 import org.ibp.api.java.analysis.SiteAnalysisService;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,18 @@ public class SiteAnalysisResource {
 		final DatasetDTO meansDataset = this.siteAnalysisService.createMeansDataset(studyId, meansImportRequest);
 		meansDataset.setCropName(cropName);
 		return new ResponseEntity<>(meansDataset, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Create summary statistics dataset", notes = "Create summary statistics dataset")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/summary-statistics", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<DatasetDTO> createSummaryStatisticsDataset(@PathVariable final String cropName,
+		@PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@RequestBody final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
+		final DatasetDTO summaryStatisticsDataset =
+			this.siteAnalysisService.createSummaryStatisticsDataset(studyId, summaryStatisticsImportRequest);
+		summaryStatisticsDataset.setCropName(cropName);
+		return new ResponseEntity<>(summaryStatisticsDataset, HttpStatus.OK);
 	}
 
 }

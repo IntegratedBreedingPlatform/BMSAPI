@@ -2,8 +2,10 @@ package org.ibp.api.java.impl.middleware.analysis;
 
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
+import org.generationcp.middleware.service.impl.analysis.SummaryStatisticsImportRequest;
 import org.ibp.api.java.analysis.SiteAnalysisService;
 import org.ibp.api.java.impl.middleware.common.validator.MeansImportRequestValidator;
+import org.ibp.api.java.impl.middleware.common.validator.SummaryStatisticsImportRequestValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
@@ -35,6 +37,9 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	@Autowired
 	private MeansImportRequestValidator meansImportRequestValidator;
 
+	@Autowired
+	private SummaryStatisticsImportRequestValidator summaryStatisticsImportRequestValidator;
+
 	@Override
 	public DatasetDTO createMeansDataset(final Integer studyId, final MeansImportRequest meansImportRequest) {
 
@@ -53,7 +58,31 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		this.meansImportRequestValidator.validateAnalysisVariableNames(meansImportRequest);
 
 		final int meansDatasetId = this.middlewareSiteAnalysisService.createMeansDataset(studyId, meansImportRequest);
-		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(meansDatasetId);
+		return this.getDatasetDTO(studyId, meansDatasetId);
+	}
+
+	@Override
+	public DatasetDTO createSummaryStatisticsDataset(final Integer studyId,
+		final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
+		this.studyValidator.validate(studyId, true);
+		this.studyValidator.validateStudyHasNoSummaryStatisticsDataset(studyId);
+		this.summaryStatisticsImportRequestValidator.validateSummaryDataIsNotEmpty(summaryStatisticsImportRequest);
+		this.summaryStatisticsImportRequestValidator.validateEnvironmentNumberIsNotEmpty(summaryStatisticsImportRequest);
+		this.summaryStatisticsImportRequestValidator.validateEnvironmentNumberIsDistinct(summaryStatisticsImportRequest);
+		this.summaryStatisticsImportRequestValidator.validateDataValuesIsNotEmpty(summaryStatisticsImportRequest);
+		final Set<Integer> environmentNumbers =
+			summaryStatisticsImportRequest.getData().stream().map(SummaryStatisticsImportRequest.SummaryData::getEnvironmentNumber)
+				.collect(Collectors.toSet());
+		this.studyValidator.validateStudyInstanceNumbers(studyId, environmentNumbers);
+		this.summaryStatisticsImportRequestValidator.validateAnalysisVariableNames(summaryStatisticsImportRequest);
+
+		final int summaryStatisticsDatasetId =
+			this.middlewareSiteAnalysisService.createSummaryStatisticsDataset(studyId, summaryStatisticsImportRequest);
+		return this.getDatasetDTO(studyId, summaryStatisticsDatasetId);
+	}
+
+	private DatasetDTO getDatasetDTO(final Integer studyId, final int datasetId) {
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final DatasetDTO returnValue = mapper.map(datasetDTO, DatasetDTO.class);
