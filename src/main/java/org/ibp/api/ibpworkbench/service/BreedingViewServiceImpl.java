@@ -62,7 +62,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			}
 
 			if (summaryOutputFilePath != null && !"".equals(summaryOutputFilePath)) {
-				this.importService.importSummaryStatsData(new File(summaryOutputFilePath), studyId);
+				this.importService.importSummaryStatisticsData(new File(summaryOutputFilePath), studyId);
 			}
 
 		} catch (final Exception e) {
