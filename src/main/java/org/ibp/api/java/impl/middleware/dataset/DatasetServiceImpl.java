@@ -77,10 +77,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @Transactional
@@ -872,10 +874,18 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	void addLocationVariables(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
-		final MeasurementVariable locationAbbrVariable = new MeasurementVariable();
-		locationAbbrVariable.setAlias(TermId.LOCATION_ABBR.name());
-		locationAbbrVariable.setName(LOCATION_ABBR_VARIABLE_NAME);
-		environmentDetailAndConditionVariables.add(0, locationAbbrVariable);
+		// check if LOCATION_ABBR already exists in the study, add if not present
+		final OptionalInt indexOfLocationAbbr = IntStream.range(0, environmentDetailAndConditionVariables.size())
+			.filter(i -> environmentDetailAndConditionVariables.get(i).getAlias().equals(TermId.LOCATION_ABBR.name()))
+			.findFirst();
+
+		if (!indexOfLocationAbbr.isPresent()) {
+			final MeasurementVariable locationAbbrVariable = new MeasurementVariable();
+			locationAbbrVariable.setAlias(TermId.LOCATION_ABBR.name());
+			locationAbbrVariable.setName(LOCATION_ABBR_VARIABLE_NAME);
+			environmentDetailAndConditionVariables.add(0, locationAbbrVariable);
+		}
+
 		final MeasurementVariable locationIdVariable = new MeasurementVariable();
 		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
 		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);
