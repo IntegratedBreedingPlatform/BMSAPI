@@ -74,6 +74,30 @@ public class AnalysisVariablesImportRequestValidatorTest {
 	}
 
 	@Test
+	public void testValidate_AnalysisMethodNamesWithBlankString() {
+		final List<Integer> variableIds = Arrays.asList(1, 2, 3);
+		final Map<Integer, Variable> variableMap =
+			this.createTestVariableMap(DataType.NUMERIC_VARIABLE, variableIds, new ArrayList<>());
+		Mockito.when(this.ontologyVariableService.getVariablesWithFilterById(any())).thenReturn(variableMap);
+
+		final Multimap<Integer, VariableType> variableTypeMultimap = ArrayListMultimap.create();
+		variableTypeMultimap.put(1, VariableType.TRAIT);
+		variableTypeMultimap.put(2, VariableType.TRAIT);
+		variableTypeMultimap.put(3, VariableType.TRAIT);
+		Mockito.when(this.ontologyVariableService.getVariableTypesOfVariables(any())).thenReturn(variableTypeMultimap);
+
+		final List<Term> terms = Arrays.asList(new Term(1, "", ""), new Term(2, "", ""), new Term(3, "", ""));
+		Mockito.when(this.ontologyDataManager.getTermsByIds(any())).thenReturn(terms);
+
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs", "    "));
+		analysisVariablesImportRequest.setVariableIds(variableIds);
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
+		this.analysisVariablesRequestValidator.validate(analysisVariablesImportRequest, this.errors);
+		Mockito.verify(this.errors).reject("analysis.variable.request.analysis.method.names.cannot.be.blank", "");
+	}
+
+	@Test
 	public void testValidate_InvalidVariableType() {
 		final List<Integer> variableIds = Arrays.asList(1, 2, 3);
 		final Map<Integer, Variable> variableMap =

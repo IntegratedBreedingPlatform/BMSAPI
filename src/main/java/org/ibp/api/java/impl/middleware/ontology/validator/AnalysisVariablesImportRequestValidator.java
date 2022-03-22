@@ -50,6 +50,10 @@ public class AnalysisVariablesImportRequestValidator {
 			analysisVariablesImportRequest.getVariableType())) {
 			errors.reject("analysis.variable.request.invalid.variable.type", "");
 		}
+		if (CollectionUtils.isNotEmpty(analysisVariablesImportRequest.getAnalysisMethodNames()) &&
+			analysisVariablesImportRequest.getAnalysisMethodNames().stream().anyMatch(StringUtils::isBlank)) {
+			errors.reject("analysis.variable.request.analysis.method.names.cannot.be.blank", "");
+		}
 
 		if (CollectionUtils.isNotEmpty(analysisVariablesImportRequest.getVariableIds())) {
 			final Set<Integer> existingVariableIds =
