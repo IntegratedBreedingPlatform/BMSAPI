@@ -876,7 +876,7 @@ public class DatasetServiceImpl implements DatasetService {
 	void addLocationVariables(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
 		// check if LOCATION_ABBR already exists in the study, add if not present
 		final OptionalInt indexOfLocationAbbr = IntStream.range(0, environmentDetailAndConditionVariables.size())
-			.filter(i -> environmentDetailAndConditionVariables.get(i).getAlias().equals(TermId.LOCATION_ABBR.name()))
+			.filter(i -> environmentDetailAndConditionVariables.get(i).getTermId() == TermId.LOCATION_ABBR.getId())
 			.findFirst();
 
 		if (!indexOfLocationAbbr.isPresent()) {
