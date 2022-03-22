@@ -216,7 +216,7 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, variableIds);
-		this.middlewareDatasetService.removeDatasetVariables(datasetId, variableIds);
+		this.middlewareDatasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 	}
 
 	@Override

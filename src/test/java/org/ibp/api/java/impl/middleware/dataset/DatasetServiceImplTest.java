@@ -201,7 +201,7 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateExistingDatasetVariables(studyId, datasetId, variableIds);
-		Mockito.verify(this.middlewareDatasetService).removeDatasetVariables(datasetId, variableIds);
+		Mockito.verify(this.middlewareDatasetService).removeDatasetVariables(studyId, datasetId, variableIds);
 	}
 
 	@Test
