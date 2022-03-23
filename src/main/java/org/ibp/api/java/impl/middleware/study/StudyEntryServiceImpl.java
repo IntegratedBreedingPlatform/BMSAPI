@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -201,7 +202,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		columns.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
 		columns.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
 
-		return columns;
+		final Map<Integer, MeasurementVariable> columnsIndexedByTermId =
+			columns.stream().collect(Collectors.toMap(MeasurementVariable::getTermId, standardVariable -> standardVariable));
+		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
+		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_NO.getId()));
+		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_TYPE.getId()));
+		orderedColumns.addAll(columnsIndexedByTermId.values());
+		return orderedColumns;
 	}
 
 	@Override
