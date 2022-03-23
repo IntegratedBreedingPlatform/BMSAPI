@@ -197,16 +197,19 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		//Remove OBS_UNIT_ID column if present
 		columns.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
-		//Add Inventory related columns
-		columns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
-		columns.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
-		columns.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
-
 		final Map<Integer, MeasurementVariable> columnsIndexedByTermId =
 			columns.stream().collect(Collectors.toMap(MeasurementVariable::getTermId, standardVariable -> standardVariable));
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
-		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_NO.getId()));
 		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_TYPE.getId()));
+		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_NO.getId()));
+		orderedColumns.add(columnsIndexedByTermId.remove(TermId.GID.getId()));
+		orderedColumns.add(columnsIndexedByTermId.remove(TermId.DESIG.getId()));
+
+		//Add Inventory related columns
+		orderedColumns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
+		orderedColumns.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
+		orderedColumns.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
+
 		orderedColumns.addAll(columnsIndexedByTermId.values());
 		return orderedColumns;
 	}
