@@ -1,5 +1,7 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
+import org.apache.commons.collections.map.CaseInsensitiveMap;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -51,7 +53,10 @@ public class VariableServiceImplTest {
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs"));
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(1));
 
-		Mockito.when(this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest)).thenReturn(Arrays.asList(1));
+		final MultiKeyMap createdAnalysisVariablesMap = MultiKeyMap.decorate(new CaseInsensitiveMap());
+		createdAnalysisVariablesMap.put("PH_M_CM", "BLUEs", 1);
+		Mockito.when(this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest))
+			.thenReturn(createdAnalysisVariablesMap);
 		Mockito.when(this.ontologyVariableDataManager.getWithFilter(any())).thenReturn(Arrays.asList(new Variable(2, "", "", "")));
 
 		final List<VariableDetails> result = this.variableService.createAnalysisVariables(analysisVariablesImportRequest);

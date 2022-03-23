@@ -574,7 +574,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		final VariableFilter variableFilter = new VariableFilter();
 		final List<Integer> analysisVariables =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			new ArrayList<Integer>(this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest).values());
 		analysisVariables.stream().forEach(variableFilter::addVariableId);
 		return this.getVariablesByFilter(variableFilter);
 	}
