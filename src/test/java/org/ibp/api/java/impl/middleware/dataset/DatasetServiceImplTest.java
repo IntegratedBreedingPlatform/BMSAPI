@@ -296,7 +296,8 @@ public class DatasetServiceImplTest {
 		final List<Map<String, Object>> listOfMap = new ArrayList<>();
 
 		Mockito.doReturn(listOfMap).when(this.middlewareDatasetService)
-			.getObservationUnitRowsAsMapList(ArgumentMatchers.eq(TEST_STUDY_IDENTIFIER), ArgumentMatchers.eq(1), ArgumentMatchers.any(ObservationUnitsSearchDTO.class), ArgumentMatchers.isNull());
+			.getObservationUnitRowsAsMapList(ArgumentMatchers.eq(TEST_STUDY_IDENTIFIER), ArgumentMatchers.eq(1),
+				ArgumentMatchers.any(ObservationUnitsSearchDTO.class), ArgumentMatchers.isNull());
 		final List<Map<String, Object>> result =
 			this.studyDatasetService.getObservationUnitRowsAsMapList(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO());
 
@@ -532,7 +533,7 @@ public class DatasetServiceImplTest {
 		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(
-			this.middlewareDatasetService.getObservationUnitsAsMap(anyInt(), anyListOf(MeasurementVariable.class), anyListOf(String.class)))
+				this.middlewareDatasetService.getObservationUnitsAsMap(anyInt(), anyListOf(MeasurementVariable.class), anyListOf(String.class)))
 			.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
@@ -591,7 +592,6 @@ public class DatasetServiceImplTest {
 			throw e;
 		}
 	}
-
 
 	@Test
 	public void testImportDataset_ImportKSUDateFormat() {
@@ -1085,8 +1085,25 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
-	public void testAddLocationVariables() {
+	public void testAddLocationVariables_emptyList() {
 		final List<MeasurementVariable> measurementVariableList = new ArrayList<>();
+
+		this.testAddLocationVariables(measurementVariableList);
+	}
+
+	@Test
+	public void testAddLocationVariables_locationAbbrAlreadyExists() {
+		final List<MeasurementVariable> measurementVariableList = new ArrayList<>();
+		final MeasurementVariable locationAbbrVariable = new MeasurementVariable();
+		locationAbbrVariable.setTermId(TermId.LOCATION_ABBR.getId());
+		locationAbbrVariable.setAlias(TermId.LOCATION_ABBR.name());
+		locationAbbrVariable.setName(DatasetServiceImpl.LOCATION_ABBR_VARIABLE_NAME);
+		measurementVariableList.add(0, locationAbbrVariable);
+
+		this.testAddLocationVariables(measurementVariableList);
+	}
+
+	private void testAddLocationVariables(final List<MeasurementVariable> measurementVariableList) {
 		this.studyDatasetService.addLocationVariables(measurementVariableList);
 		Assert.assertEquals(2, measurementVariableList.size());
 		Assert.assertEquals(TermId.LOCATION_ID.name(), measurementVariableList.get(0).getAlias());
@@ -1094,5 +1111,4 @@ public class DatasetServiceImplTest {
 		Assert.assertEquals(TermId.LOCATION_ABBR.name(), measurementVariableList.get(1).getAlias());
 		Assert.assertEquals(DatasetServiceImpl.LOCATION_ABBR_VARIABLE_NAME, measurementVariableList.get(1).getName());
 	}
-
 }
