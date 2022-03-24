@@ -341,7 +341,7 @@
       "application/json"
     ],
     "methods": [
-      "GET"
+      "GET", "POST"
     ],
     "versions": [
       "2.0"
