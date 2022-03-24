@@ -9,10 +9,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
-import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -23,9 +21,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,14 +33,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
 
-	static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
-	static final String LOCATION_ABBR_VARIABLE_NAME = "LOCATION ABBREVIATION";
-
 	@Resource
 	private DatasetCSVGenerator datasetCSVGenerator;
-
-	@Autowired
-	private DatasetService studyDatasetService;
 
 	@Override
 	public File export(
@@ -50,7 +44,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		try {
 			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetCSVGenerator, singleFile, CSV);
 		} catch (final IOException e) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("cannot.exportAsCSV.dataset", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
@@ -75,8 +69,9 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	}
 
 	void transformEntryTypeValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap) {
-		final List<Enumeration> entryTypes = this.ontologyDataManager
-			.getStandardVariable(TermId.ENTRY_TYPE.getId(), ContextHolder.getCurrentProgram()).getEnumerations();
+		final Optional<String> programOptional = ContextHolder.getCurrentProgramOptional();
+		final List<Enumeration> entryTypes = programOptional.isPresent() ? this.ontologyDataManager
+			.getStandardVariable(TermId.ENTRY_TYPE.getId(), programOptional.get()).getEnumerations() : Collections.emptyList();
 		final Map<String, String> entryTypeDescriptionNameMap =
 			entryTypes.stream().collect(Collectors.toMap(Enumeration::getDescription, Enumeration::getName));
 
@@ -90,15 +85,18 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 
 	void addLocationValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
-		for (final Integer instanceId : observationUnitRowMap.keySet()) {
+		for (final Map.Entry<Integer, List<ObservationUnitRow>> entry : observationUnitRowMap.entrySet()) {
+			final Integer instanceId = entry.getKey();
+			final StudyInstance instance = selectedDatasetInstancesMap.get(instanceId);
 			final ObservationUnitData locationIdData = new ObservationUnitData();
-			locationIdData.setValue(selectedDatasetInstancesMap.get(instanceId).getLocationId().toString());
-			observationUnitRowMap.get(instanceId).forEach(row -> row.getVariables().put(LOCATION_ID_VARIABLE_NAME, locationIdData));
+			locationIdData.setValue(instance.getLocationId().toString());
+			observationUnitRowMap.get(instanceId)
+				.forEach(row -> row.getVariables().put(DatasetServiceImpl.LOCATION_ID_VARIABLE_NAME, locationIdData));
 			final ObservationUnitData locationAbbrData = new ObservationUnitData();
-			locationAbbrData.setValue(selectedDatasetInstancesMap.get(instanceId).getLocationAbbreviation().toString());
-			observationUnitRowMap.get(instanceId).forEach(row -> row.getVariables().put(LOCATION_ABBR_VARIABLE_NAME, locationAbbrData));
+			locationAbbrData.setValue(instance.getLocationAbbreviation());
+			observationUnitRowMap.get(instanceId)
+				.forEach(row -> row.getVariables().put(DatasetServiceImpl.LOCATION_ABBR_VARIABLE_NAME, locationAbbrData));
 		}
-
 	}
 
 }

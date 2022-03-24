@@ -297,8 +297,8 @@ public class DatasetCSVExportServiceImplTest {
 		this.datasetExportService.addLocationValues(observationUnitRowMap, studyInstanceHashMap);
 		final Map<String, ObservationUnitData> variables = observationUnitRowMap.get(5).get(0).getVariables();
 		Assert.assertEquals(3, variables.size());
-		Assert.assertEquals(LOCATION_ID.toString(), variables.get(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
-		Assert.assertEquals(LOCATION_ABBR, variables.get(DatasetCSVExportServiceImpl.LOCATION_ABBR_VARIABLE_NAME).getValue());
+		Assert.assertEquals(LOCATION_ID.toString(), variables.get(DatasetServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
+		Assert.assertEquals(LOCATION_ABBR, variables.get(DatasetServiceImpl.LOCATION_ABBR_VARIABLE_NAME).getValue());
 	}
 
 	@Test
