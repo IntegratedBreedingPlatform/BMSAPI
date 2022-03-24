@@ -21,11 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -69,9 +67,8 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	}
 
 	void transformEntryTypeValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap) {
-		final Optional<String> programOptional = ContextHolder.getCurrentProgramOptional();
-		final List<Enumeration> entryTypes = programOptional.isPresent() ? this.ontologyDataManager
-			.getStandardVariable(TermId.ENTRY_TYPE.getId(), programOptional.get()).getEnumerations() : Collections.emptyList();
+		final List<Enumeration> entryTypes = this.ontologyDataManager
+			.getStandardVariable(TermId.ENTRY_TYPE.getId(), ContextHolder.getCurrentProgram()).getEnumerations();
 		final Map<String, String> entryTypeDescriptionNameMap =
 			entryTypes.stream().collect(Collectors.toMap(Enumeration::getDescription, Enumeration::getName));
 
