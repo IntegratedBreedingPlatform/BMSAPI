@@ -10,7 +10,6 @@ import org.generationcp.middleware.api.brapi.v2.list.GermplasmListImportRequestD
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmListSearchRequestDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.GermplasmListDTO;
-import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.ibp.api.brapi.GermplasmListServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
@@ -20,6 +19,7 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.list.validator.GermplasmListImportRequestValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +44,6 @@ import java.util.Map;
 @Api(value = "BrAPI v2 List Services")
 @Controller(value = "ListResourceBrapi")
 public class ListResourceBrapi {
-
-	private static final String ALLOWED_LIST_TYPE = "germplasm";
 
 	@Autowired
 	private GermplasmListServiceBrapi germplasmListServiceBrapi;
@@ -78,7 +76,7 @@ public class ListResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
-		if(StringUtils.isNotEmpty(listType) && !ALLOWED_LIST_TYPE.equalsIgnoreCase(listType)) {
+		if(StringUtils.isNotEmpty(listType) && !GermplasmListImportRequestValidator.ALLOWED_LIST_TYPE.equalsIgnoreCase(listType)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",
 				this.messageSource.getMessage("list.list.type.invalid", null, LocaleContextHolder.getLocale())));
 			final Metadata metadata = new Metadata(null, status);
@@ -87,8 +85,8 @@ public class ListResourceBrapi {
 			return new ResponseEntity<>(entityListResponse, HttpStatus.BAD_REQUEST);
 		}
 
-		final GermplasmListSearchRequestDTO	requestDTO = new GermplasmListSearchRequestDTO(listType, listName, listDbId, listSource,
-			externalReferenceID, externalReferenceSource);
+		final GermplasmListSearchRequestDTO	requestDTO = new GermplasmListSearchRequestDTO(listType, listName,
+			Collections.singletonList(listDbId), listSource, externalReferenceID, externalReferenceSource);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
