@@ -50,7 +50,8 @@ public class GermplasmListImportRequestValidator {
 		final List<Integer> userIds = importRequestDTOS.stream().filter(gl -> StringUtils.isNotEmpty(gl.getListOwnerPersonDbId()))
 			.map(gl -> Integer.parseInt(gl.getListOwnerPersonDbId())).collect(Collectors.toList());
 
-		final Map<String, WorkbenchUser> usersMap = this.userService.getUsersByIds(userIds).stream()
+		final Map<String, WorkbenchUser> usersMap = CollectionUtils.isEmpty(userIds) ? new HashMap<>()
+			: this.userService.getUsersByIds(userIds).stream()
 			.collect(Collectors.toMap(user -> user.getUserid().toString(), Function.identity()));
 		final List<String> germplasmListNames = new ArrayList<>();
 
@@ -83,7 +84,7 @@ public class GermplasmListImportRequestValidator {
 
 	boolean isListOwnerPersonDbIdInvalid(final Map<String, WorkbenchUser> userMap, final GermplasmListImportRequestDTO importRequestDTO,
 		final Integer index) {
-		if(StringUtils.isEmpty(importRequestDTO.getListOwnerPersonDbId())) {
+		if (StringUtils.isEmpty(importRequestDTO.getListOwnerPersonDbId())) {
 			this.errors.reject("list.import.owner.null", new String[] {index.toString()}, "");
 			return true;
 		}
@@ -148,16 +149,15 @@ public class GermplasmListImportRequestValidator {
 		if (importRequestDTO.getExternalReferences() != null) {
 			return importRequestDTO.getExternalReferences().stream().anyMatch(r -> {
 				if (r == null || StringUtils.isEmpty(r.getReferenceID()) || StringUtils.isEmpty(r.getReferenceSource())) {
-					this.errors.reject("trial.import.reference.null", new String[] {index.toString(), "externalReference"}, "");
+					this.errors.reject("list.import.reference.null", new String[] {index.toString()}, "");
 					return true;
 				}
 				if (StringUtils.isNotEmpty(r.getReferenceID()) && r.getReferenceID().length() > MAX_REFERENCE_ID_LENGTH) {
-					this.errors.reject("trial.import.reference.id.exceeded.length", new String[] {index.toString(), "referenceID"}, "");
+					this.errors.reject("list.import.reference.id.exceeded.length", new String[] {index.toString()}, "");
 					return true;
 				}
 				if (StringUtils.isNotEmpty(r.getReferenceSource()) && r.getReferenceSource().length() > MAX_REFERENCE_SOURCE_LENGTH) {
-					this.errors.reject("trial.import.reference.source.exceeded.length", new String[] {index.toString(), "referenceSource"},
-						"");
+					this.errors.reject("list.import.reference.source.exceeded.length", new String[] {index.toString()},"");
 					return true;
 				}
 				return false;
