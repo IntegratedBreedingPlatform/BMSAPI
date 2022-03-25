@@ -36,7 +36,7 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 	}
 
 	@Override
-	public GermplasmListImportResponse createGermplasmLists(final String crop, List<GermplasmListImportRequestDTO> importRequestDTOS) {
+	public GermplasmListImportResponse createGermplasmLists(List<GermplasmListImportRequestDTO> importRequestDTOS) {
 		final GermplasmListImportResponse response = new GermplasmListImportResponse();
 		final int originalListSize = importRequestDTOS.size();
 		int noOfCreatedLists = 0;

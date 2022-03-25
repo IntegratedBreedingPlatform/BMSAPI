@@ -14,6 +14,6 @@ public interface GermplasmListServiceBrapi {
 
 	long countGermplasmListDTOs(GermplasmListSearchRequestDTO searchRequestDTO);
 
-	GermplasmListImportResponse createGermplasmLists(String crop, List<GermplasmListImportRequestDTO> germplasmListImportRequestDTOS);
+	GermplasmListImportResponse createGermplasmLists(List<GermplasmListImportRequestDTO> germplasmListImportRequestDTOS);
 
 }

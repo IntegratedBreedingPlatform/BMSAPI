@@ -127,7 +127,7 @@ public class ListResourceBrapi {
 		@RequestBody final List<GermplasmListImportRequestDTO> germplasmListImportRequestDTOS) {
 		BaseValidator.checkNotNull(germplasmListImportRequestDTOS, "list.import.request.null");
 		final GermplasmListImportResponse
-			germplasmListImportResponse = this.germplasmListServiceBrapi.createGermplasmLists(crop, germplasmListImportRequestDTOS);
+			germplasmListImportResponse = this.germplasmListServiceBrapi.createGermplasmLists(germplasmListImportRequestDTOS);
 		final Result<GermplasmListDTO> results = new Result<GermplasmListDTO>().withData(germplasmListImportResponse.getEntityList());
 
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(germplasmListImportResponse));
