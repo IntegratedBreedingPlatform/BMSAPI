@@ -64,6 +64,7 @@ public class DatasetCSVExportServiceImplTest {
 	private static final String TEST_ENTRY_DESCRIPTION = "Test Entry";
 	private static final String TEST_ENTRY_NAME = "T";
 	private static final Integer LOCATION_ID = 1;
+	private static final String LOCATION_ABBR = "LOC1";
 	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphabetic(10);
 
 	@Mock
@@ -287,29 +288,23 @@ public class DatasetCSVExportServiceImplTest {
 	}
 
 	@Test
-	public void testAddLocationIdVariable() {
-		final List<MeasurementVariable> measurementVariableList = new ArrayList<>();
-		this.addLocationIdVariable(measurementVariableList);
-		Assert.assertEquals(1, measurementVariableList.size());
-		Assert.assertEquals(TermId.LOCATION_ID.name(), measurementVariableList.get(0).getAlias());
-		Assert.assertEquals(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME, measurementVariableList.get(0).getName());
-	}
-
-	@Test
-	public void testAddLocationIdValues() {
+	public void testAddLocationValues() {
 		final HashMap<Integer, StudyInstance> studyInstanceHashMap = new HashMap<>();
 		studyInstanceHashMap.put(5, this.createStudyInstance(5));
 
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.createObservationUnitRowMap(TermId.LOCATION_ID.name(), "UNKNOWN");
-		this.datasetExportService.addLocationIdValues(observationUnitRowMap, studyInstanceHashMap);
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
+			this.createObservationUnitRowMap(TermId.LOCATION_ID.name(), "UNKNOWN");
+		this.datasetExportService.addLocationValues(observationUnitRowMap, studyInstanceHashMap);
 		final Map<String, ObservationUnitData> variables = observationUnitRowMap.get(5).get(0).getVariables();
-		Assert.assertEquals(2, variables.size());
-		Assert.assertEquals(LOCATION_ID.toString(), variables.get(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
+		Assert.assertEquals(3, variables.size());
+		Assert.assertEquals(LOCATION_ID.toString(), variables.get(DatasetServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
+		Assert.assertEquals(LOCATION_ABBR, variables.get(DatasetServiceImpl.LOCATION_ABBR_VARIABLE_NAME).getValue());
 	}
 
 	@Test
 	public void testTransformEntryTypeValues() {
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.createObservationUnitRowMap(TermId.ENTRY_TYPE.name(), TEST_ENTRY_DESCRIPTION);
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
+			this.createObservationUnitRowMap(TermId.ENTRY_TYPE.name(), TEST_ENTRY_DESCRIPTION);
 		this.datasetExportService.transformEntryTypeValues(observationUnitRowMap);
 		final Map<String, ObservationUnitData> variables = observationUnitRowMap.get(5).get(0).getVariables();
 		Assert.assertEquals(1, variables.size());
@@ -325,7 +320,7 @@ public class DatasetCSVExportServiceImplTest {
 		variables.put(variableName, observationUnitData);
 		row.setVariables(variables);
 		observationUnitRowMap.put(5, Arrays.asList(row));
-		return  observationUnitRowMap;
+		return observationUnitRowMap;
 	}
 
 	private List<StudyInstance> createStudyInstances() {
@@ -340,6 +335,7 @@ public class DatasetCSVExportServiceImplTest {
 		studyInstance.setInstanceNumber(this.random.nextInt());
 		studyInstance.setLocationName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		studyInstance.setLocationId(LOCATION_ID);
+		studyInstance.setLocationAbbreviation(LOCATION_ABBR);
 		return studyInstance;
 	}
 
@@ -360,13 +356,6 @@ public class DatasetCSVExportServiceImplTest {
 		mvar3.setAlias("TRIAL_INSTANCE");
 		measurementVariables.add(mvar3);
 		return measurementVariables;
-	}
-
-	private void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
-		final MeasurementVariable locationIdVariable = new MeasurementVariable();
-		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
-		locationIdVariable.setName(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME);
-		environmentDetailAndConditionVariables.add(0, locationIdVariable);
 	}
 
 }
