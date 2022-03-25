@@ -105,7 +105,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 
 		this.validateValue(stockPropertyData.getValue());
 		final Variable variable = this.validateVariableIdExists(stockPropertyData.getVariableId());
-		if (validateCreation || TermId.ENTRY_NO.getId() == variable.getId()) {
+		if (validateCreation && TermId.ENTRY_NO.getId() == variable.getId()) {
 			this.errors.reject("study.entry.observation.cannot.add.entry.number", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
