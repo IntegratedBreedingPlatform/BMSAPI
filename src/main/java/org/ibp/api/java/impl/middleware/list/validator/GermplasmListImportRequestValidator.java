@@ -71,7 +71,7 @@ public class GermplasmListImportRequestValidator {
 			return false;
 		});
 
-		return errors;
+		return this.errors;
 	}
 
 	boolean isListTypeInvalid(final GermplasmListImportRequestDTO importRequestDTO, final Integer index) {
