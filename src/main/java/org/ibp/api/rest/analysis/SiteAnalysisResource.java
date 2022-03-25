@@ -29,7 +29,7 @@ public class SiteAnalysisResource {
 	public ResponseEntity<DatasetDTO> createMeansDataset(@PathVariable final String cropName,
 		@PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@RequestBody final MeansImportRequest meansImportRequest) {
-		final DatasetDTO meansDataset = this.siteAnalysisService.createMeansDataset(studyId, meansImportRequest);
+		final DatasetDTO meansDataset = this.siteAnalysisService.createMeansDataset(cropName, studyId, meansImportRequest);
 		meansDataset.setCropName(cropName);
 		return new ResponseEntity<>(meansDataset, HttpStatus.OK);
 	}
@@ -41,7 +41,7 @@ public class SiteAnalysisResource {
 		@PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@RequestBody final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
 		final DatasetDTO summaryStatisticsDataset =
-			this.siteAnalysisService.createSummaryStatisticsDataset(studyId, summaryStatisticsImportRequest);
+			this.siteAnalysisService.createSummaryStatisticsDataset(cropName, studyId, summaryStatisticsImportRequest);
 		summaryStatisticsDataset.setCropName(cropName);
 		return new ResponseEntity<>(summaryStatisticsDataset, HttpStatus.OK);
 	}

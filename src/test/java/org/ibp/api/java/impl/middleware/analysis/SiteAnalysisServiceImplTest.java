@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class SiteAnalysisServiceImplTest {
 
+	public static final String CROP_NAME = "maize";
 	@Mock
 	private org.generationcp.middleware.service.api.analysis.SiteAnalysisService middlewareSiteAnalysisService;
 
@@ -56,7 +57,7 @@ public class SiteAnalysisServiceImplTest {
 		when(this.middlewareDatasetService.getDataset(anyInt())).thenReturn(new DatasetDTO());
 
 		final MeansImportRequest meansImportRequest = this.createMeansImportRequest();
-		Assert.notNull(this.siteAnalysisService.createMeansDataset(studyId, meansImportRequest));
+		Assert.notNull(this.siteAnalysisService.createMeansDataset(CROP_NAME, studyId, meansImportRequest));
 
 		verify(this.studyValidator).validate(studyId, true);
 		verify(this.studyValidator).validateStudyHasNoMeansDataset(studyId);
@@ -67,7 +68,7 @@ public class SiteAnalysisServiceImplTest {
 		verify(this.studyValidator).validateStudyInstanceNumbers(studyId, Sets.newHashSet(1));
 		verify(this.studyEntryValidator).validateStudyContainsEntryNumbers(studyId, Sets.newHashSet("1"));
 		verify(this.meansImportRequestValidator).validateAnalysisVariableNames(meansImportRequest);
-		verify(this.middlewareSiteAnalysisService).createMeansDataset(studyId, meansImportRequest);
+		verify(this.middlewareSiteAnalysisService).createMeansDataset(CROP_NAME, studyId, meansImportRequest);
 	}
 
 	@Test
@@ -77,7 +78,7 @@ public class SiteAnalysisServiceImplTest {
 		when(this.middlewareDatasetService.getDataset(anyInt())).thenReturn(new DatasetDTO());
 
 		final SummaryStatisticsImportRequest summaryStatisticsImportRequest = this.createSummaryStatisticsImportRequest();
-		Assert.notNull(this.siteAnalysisService.createSummaryStatisticsDataset(studyId, summaryStatisticsImportRequest));
+		Assert.notNull(this.siteAnalysisService.createSummaryStatisticsDataset(CROP_NAME, studyId, summaryStatisticsImportRequest));
 
 		verify(this.studyValidator).validate(studyId, true);
 		verify(this.studyValidator).validateStudyHasNoSummaryStatisticsDataset(studyId);
@@ -87,7 +88,7 @@ public class SiteAnalysisServiceImplTest {
 		verify(this.summaryStatisticsImportRequestValidator).validateDataValuesIsNotEmpty(summaryStatisticsImportRequest);
 		verify(this.studyValidator).validateStudyInstanceNumbers(studyId, Sets.newHashSet(1));
 		verify(this.summaryStatisticsImportRequestValidator).validateAnalysisVariableNames(summaryStatisticsImportRequest);
-		verify(this.middlewareSiteAnalysisService).createSummaryStatisticsDataset(studyId, summaryStatisticsImportRequest);
+		verify(this.middlewareSiteAnalysisService).createSummaryStatisticsDataset(CROP_NAME, studyId, summaryStatisticsImportRequest);
 	}
 
 	private MeansImportRequest createMeansImportRequest() {
