@@ -200,8 +200,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final Map<Integer, MeasurementVariable> columnsIndexedByTermId =
 			columns.stream().collect(Collectors.toMap(MeasurementVariable::getTermId, standardVariable -> standardVariable));
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
-		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_TYPE.getId()));
 		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_NO.getId()));
+		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_TYPE.getId()));
 		orderedColumns.add(columnsIndexedByTermId.remove(TermId.GID.getId()));
 		orderedColumns.add(columnsIndexedByTermId.remove(TermId.DESIG.getId()));
 
