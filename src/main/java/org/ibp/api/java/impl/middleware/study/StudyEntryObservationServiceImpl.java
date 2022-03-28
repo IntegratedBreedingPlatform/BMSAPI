@@ -4,8 +4,10 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationReq
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.util.VariableValueUtil;
@@ -43,6 +45,12 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	private StudyEntryService middlewareStudyEntryService;
 
 	@Resource
+	protected StudyDataManager studyDataManager;
+
+	@Resource
+	protected DatasetService datasetService;
+
+	@Resource
 	private StudyValidator studyValidator;
 
 	@Resource
@@ -64,6 +72,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	public Integer updateObservation(final Integer studyId, final StockPropertyData stockPropertyData) {
 		this.commonValidations(studyId, stockPropertyData, false);
 		this.validateStudyEntryVariableShouldExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
+		this.validateNotUpdateEntryTypeIfDesignWasGenerated(studyId, stockPropertyData.getVariableId());
 
 		this.setCategoricalValueId(stockPropertyData);
 		return this.studyEntryObservationService.updateObservation(stockPropertyData);
@@ -154,12 +163,6 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		}
 	}
 
-	private void setCategoricalValueId(final StockPropertyData stockPropertyData) {
-		final Variable variable = this.ontologyVariableDataManager.getVariable(null, stockPropertyData.getVariableId(), false);
-		stockPropertyData
-			.setCategoricalValueId(VariableValueUtil.resolveCategoricalValueId(variable, stockPropertyData.getValue()));
-	}
-
 	private void validateObservationBelongsToStudy(final Integer studyId, final Integer observationId) {
 		final StockProperty stockProperty = this.middlewareStudyEntryService.getByStockPropertyId(observationId);
 		if (stockProperty == null) {
@@ -171,6 +174,22 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 			this.errors.reject("study.entry.observation.must.belong.to.study", new String[] {String.valueOf(observationId), String.valueOf(studyId)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+	}
+
+	private void validateNotUpdateEntryTypeIfDesignWasGenerated(final Integer studyId, final Integer variableId) {
+		if (TermId.ENTRY_TYPE.getId() == variableId) {
+			final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
+			if (this.studyDataManager.countExperiments(dataSet.getId()) > 0) {
+				this.errors.reject("study.entry.observation.cannot.update.entry-type", "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+		}
+	}
+
+	private void setCategoricalValueId(final StockPropertyData stockPropertyData) {
+		final Variable variable = this.ontologyVariableDataManager.getVariable(null, stockPropertyData.getVariableId(), false);
+		stockPropertyData
+			.setCategoricalValueId(VariableValueUtil.resolveCategoricalValueId(variable, stockPropertyData.getValue()));
 	}
 
 }
