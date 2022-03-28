@@ -41,7 +41,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	private SummaryStatisticsImportRequestValidator summaryStatisticsImportRequestValidator;
 
 	@Override
-	public DatasetDTO createMeansDataset(final Integer studyId, final MeansImportRequest meansImportRequest) {
+	public DatasetDTO createMeansDataset(final String crop, final Integer studyId, final MeansImportRequest meansImportRequest) {
 
 		this.studyValidator.validate(studyId, true);
 		this.studyValidator.validateStudyHasNoMeansDataset(studyId);
@@ -57,12 +57,12 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		this.studyEntryValidator.validateStudyContainsEntryNumbers(studyId, entryNumbers);
 		this.meansImportRequestValidator.validateAnalysisVariableNames(meansImportRequest);
 
-		final int meansDatasetId = this.middlewareSiteAnalysisService.createMeansDataset(studyId, meansImportRequest);
+		final int meansDatasetId = this.middlewareSiteAnalysisService.createMeansDataset(crop, studyId, meansImportRequest);
 		return this.getDatasetDTO(studyId, meansDatasetId);
 	}
 
 	@Override
-	public DatasetDTO createSummaryStatisticsDataset(final Integer studyId,
+	public DatasetDTO createSummaryStatisticsDataset(final String crop, final Integer studyId,
 		final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
 		this.studyValidator.validate(studyId, true);
 		this.studyValidator.validateStudyHasNoSummaryStatisticsDataset(studyId);
@@ -77,7 +77,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		this.summaryStatisticsImportRequestValidator.validateAnalysisVariableNames(summaryStatisticsImportRequest);
 
 		final int summaryStatisticsDatasetId =
-			this.middlewareSiteAnalysisService.createSummaryStatisticsDataset(studyId, summaryStatisticsImportRequest);
+			this.middlewareSiteAnalysisService.createSummaryStatisticsDataset(crop, studyId, summaryStatisticsImportRequest);
 		return this.getDatasetDTO(studyId, summaryStatisticsDatasetId);
 	}
 
