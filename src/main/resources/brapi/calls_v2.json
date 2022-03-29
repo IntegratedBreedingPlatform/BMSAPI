@@ -334,6 +334,18 @@
     "versions": [
       "2.0"
     ]
+  },
+  {
+    "service": "lists",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET", "POST"
+    ],
+    "versions": [
+      "2.0"
+    ]
   }
 ]
 }
