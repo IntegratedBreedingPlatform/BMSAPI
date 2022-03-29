@@ -72,7 +72,6 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	public Integer updateObservation(final Integer studyId, final StockPropertyData stockPropertyData) {
 		this.commonValidations(studyId, stockPropertyData, false);
 		this.validateStudyEntryVariableShouldExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
-		this.validateNotUpdateEntryTypeIfDesignWasGenerated(studyId, stockPropertyData.getVariableId());
 
 		this.setCategoricalValueId(stockPropertyData);
 		return this.studyEntryObservationService.updateObservation(stockPropertyData);
@@ -126,6 +125,8 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, dataSet.getId(), Arrays.asList(stockPropertyData.getVariableId()));
 		this.studyEntryValidator.validateStudyContainsEntries(studyId, Arrays.asList(stockPropertyData.getStockId()));
+
+		this.validateExperimentalDesginWasNotGenerated(studyId);
 	}
 
 	private void validateStudyEntryVariableShouldExist(final Integer entryId, final Integer variableId) {
@@ -176,13 +177,11 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		}
 	}
 
-	private void validateNotUpdateEntryTypeIfDesignWasGenerated(final Integer studyId, final Integer variableId) {
-		if (TermId.ENTRY_TYPE.getId() == variableId) {
-			final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
-			if (this.studyDataManager.countExperiments(dataSet.getId()) > 0) {
-				this.errors.reject("study.entry.observation.cannot.update.entry-type", "");
-				throw new ApiRequestValidationException(errors.getAllErrors());
-			}
+	private void validateExperimentalDesginWasNotGenerated(final Integer studyId) {
+		final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
+		if (this.studyDataManager.countExperiments(dataSet.getId()) > 0) {
+			this.errors.reject("study.entry.observation.cannot.create-or-edit", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
