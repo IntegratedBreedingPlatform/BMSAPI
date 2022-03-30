@@ -1,0 +1,126 @@
+package org.ibp.api.java.impl.middleware.germplasm.cop;
+
+import com.google.common.collect.Table;
+import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
+import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.concurrent.Future;
+
+@Service
+@Transactional
+public class CopServiceImpl implements CopService {
+
+	@Autowired
+	private CopServiceAsync copServiceAsync;
+
+	@Autowired
+	private org.generationcp.middleware.api.germplasm.pedigree.cop.CopService copServiceMiddleware;
+	
+	@Autowired
+	private GermplasmListDataService germplasmListDataService;
+
+	@Override
+	public CopResponse coefficientOfParentage(Set<Integer> gids, final Integer listId,
+		final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+
+		if (listId != null) {
+			gids = new LinkedHashSet<>(this.germplasmListDataService.getGidsByListId(listId));
+		}
+
+		if (this.copServiceAsync.threadExists(gids)) {
+			return new CopResponse(this.copServiceAsync.getProgress(gids));
+		}
+
+		if (listId != null) {
+			final File csv = getCsv(listId);
+			if (csv.exists()) {
+				return new CopResponse(true);
+			} else {
+				throw new MiddlewareRequestException("", "cop.csv.not.exists");
+			}
+		}
+
+		final Table<Integer, Integer, Double> matrix = this.copServiceMiddleware.getCopMatrixByGids(gids);
+
+		// if all cop values are calculated, return them
+		boolean someCopValuesExists = false;
+		for (final Integer gid1 : gids) {
+			for (final Integer gid2 : gids) {
+				if (matrix.contains(gid1, gid2) || matrix.contains(gid2, gid1)) {
+					someCopValuesExists = true;
+				}
+			}
+		}
+		if (someCopValuesExists) {
+			return new CopResponse(matrix);
+		}
+
+		// no thread nor matrix for gids
+		throw new MiddlewareRequestException("", "cop.no.queue.error");
+	}
+
+	@Override
+	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids, final Integer listId) {
+		final Table<Integer, Integer, Double> matrix = this.copServiceMiddleware.getCopMatrixByGids(gids);
+
+		// if all cop values are calculated, return them
+		boolean requiresProcessing = false;
+		for (final Integer gid1 : gids) {
+			for (final Integer gid2 : gids) {
+				if (!(matrix.contains(gid1, gid2) || matrix.contains(gid2, gid1))) {
+					requiresProcessing = true;
+				}
+			}
+		}
+
+		if (requiresProcessing) {
+			if (this.copServiceAsync.threadExists(gids)) {
+				throw new MiddlewareRequestException("", "cop.gids.in.queue", this.copServiceAsync.getProgress(gids));
+			}
+
+			this.copServiceAsync.prepareExecution(gids);
+			final Future<Boolean> booleanFuture = this.copServiceAsync.calculateAsync(gids, matrix, listId);
+			this.copServiceAsync.trackFutureTask(gids, booleanFuture);
+			return new CopResponse(this.copServiceAsync.getProgress(gids));
+		}
+
+		return new CopResponse(matrix);
+	}
+
+	@Override
+	public CopResponse calculateCoefficientOfParentage(final Integer listId) {
+		final Set<Integer> gids = new LinkedHashSet<>(this.germplasmListDataService.getGidsByListId(listId));
+		return this.calculateCoefficientOfParentage(gids, listId);
+	}
+
+	@Override
+	public void cancelJobs(Set<Integer> gids, final Integer listId) {
+		if (listId != null) {
+			gids = new LinkedHashSet<>(this.germplasmListDataService.getGidsByListId(listId));
+		}
+		this.copServiceAsync.cancelJobs(gids);
+	}
+
+	@Override
+	public File downloadCoefficientOfParentage(final Integer listId) {
+		return getCsv(listId);
+	}
+
+	private static File getCsv(final Integer listId) {
+		final String fileFullPath = CopUtils.getFileFullPath(listId);
+		final File file = new File(fileFullPath);
+		return file;
+	}
+
+}

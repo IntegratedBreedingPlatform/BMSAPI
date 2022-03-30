@@ -18,8 +18,6 @@ import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.brapi.GermplasmListServiceBrapi;
 import org.generationcp.middleware.api.brapi.GermplasmListServiceBrapiImpl;
-import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
-import org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
@@ -49,8 +47,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeService;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeServiceImpl;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopService;
-import org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceAsync;
-import org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceAsyncImpl;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceImpl;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
@@ -131,6 +127,7 @@ import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.generationcp.middleware.service.api.audit.GermplasmAuditService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
@@ -155,6 +152,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.impl.NamingConfigurationServiceImpl;
+import org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl;
 import org.generationcp.middleware.service.impl.audit.GermplasmAuditServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
@@ -181,6 +179,8 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SessionFactory;
 import org.ibp.api.java.germplasm.GermplasmCodeGenerationService;
 import org.ibp.api.java.impl.middleware.germplasm.GermplasmCodeGenerationServiceImpl;
+import org.ibp.api.java.impl.middleware.germplasm.cop.CopServiceAsync;
+import org.ibp.api.java.impl.middleware.germplasm.cop.CopServiceAsyncImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -200,6 +200,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Note: this configuration now contains beans not only from Middleware, so it's used as a general purpose factory
+ * TODO rename
+ */
 @Configuration
 @EnableTransactionManagement
 public class MiddlewareFactory {
@@ -396,7 +400,9 @@ public class MiddlewareFactory {
 	}
 
 	/**
-	 * Not bound to request, can be used in thread context (e.g async)
+	 * can be used to create async beans in thread context, not bound to request
+	 * Beans that inject these "async" beans must have request context,
+	 * to be able to resolve connection parameters (cropName, programUUID)
 	 */
 	@Bean
 	@Scope(value = "prototype")
@@ -699,7 +705,7 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public CopService getCopService() {
+	public CopService getCopServiceMiddleware() {
 		return new CopServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 

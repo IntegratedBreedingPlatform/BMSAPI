@@ -5,7 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
-import org.generationcp.middleware.api.germplasm.pedigree.cop.CopService;
+import org.ibp.api.java.impl.middleware.germplasm.cop.CopService;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
