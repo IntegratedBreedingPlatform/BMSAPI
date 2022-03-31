@@ -310,7 +310,7 @@ public class GermplasmLabelPrintingTest {
 		labelsGeneratorInput.setFileType(FileType.PDF);
 		final Map<Integer, String> dataRow = this.germplasmLabelPrinting.getDataRow(labelsGeneratorInput, keys, response, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(attributeValue.substring(0, 199) + "...", dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue.substring(0, 200) + "...", dataRow.get(attributeId));
 	}
 
 	@Test

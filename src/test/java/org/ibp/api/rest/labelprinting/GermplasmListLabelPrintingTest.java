@@ -315,7 +315,7 @@ public class GermplasmListLabelPrintingTest {
 			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, attributeValues, new HashMap<>(), new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values are truncated for PDF file type
-		Assert.assertEquals(attributeValue.substring(0, 199) + "...", dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue.substring(0, 200) + "...", dataRow.get(attributeId));
 	}
 
 	@Test

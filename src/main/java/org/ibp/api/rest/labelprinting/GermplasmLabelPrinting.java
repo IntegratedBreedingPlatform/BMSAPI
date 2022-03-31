@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
+	public static final int ATTRIBUTE_DISPLAY_MAX_LENGTH = 200;
 	List<Field> defaultPedigreeDetailsFields;
 	List<Field> defaultGermplasmDetailsFields;
 
@@ -334,8 +335,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			final String attributeValue = attributesByType.get(id);
 			if (attributeValue != null) {
 				// Truncate attribute values to 200 characters if export file type is PDF
-				columns.put(key, FileType.PDF.equals(labelsGeneratorInput.getFileType()) && StringUtils.length(attributeValue) > 200 ?
-					attributeValue.substring(0, 199) + "..." : attributeValue);
+				columns.put(key, FileType.PDF.equals(labelsGeneratorInput.getFileType()) && StringUtils.length(attributeValue) > GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH ?
+					attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "..." : attributeValue);
 			}
 		}
 
