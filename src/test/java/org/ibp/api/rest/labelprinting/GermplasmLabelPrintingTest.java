@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -243,19 +244,56 @@ public class GermplasmLabelPrintingTest {
 	}
 
 	@Test
-	public void testGetDataRow_For_AttributeFields() {
+	public void testGetDataRow_For_AttributeFields_WhenCSVFileType() {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
-		final String attributeValue = RandomStringUtils.randomAlphanumeric(10);
+		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
 		attributeValues.get(GID).put(GermplasmLabelPrinting.toId(attributeId), attributeValue);
 		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
+		labelsGeneratorInput.setFileType(FileType.CSV);
 		final Map<Integer, String> dataRow = this.germplasmLabelPrinting.getDataRow(labelsGeneratorInput, keys, response, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
+		// Verify that attribute values is not truncated for CSV file type
 		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
+	}
+
+	@Test
+	public void testGetDataRow_For_AttributeFields_WhenXLSFileType() {
+		this.germplasmLabelPrinting.initStaticFields();
+		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
+		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
+		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
+		attributeValues.put(GID, new HashMap<>());
+		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
+		attributeValues.get(GID).put(GermplasmLabelPrinting.toId(attributeId), attributeValue);
+		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
+		labelsGeneratorInput.setFileType(FileType.XLS);
+		final Map<Integer, String> dataRow = this.germplasmLabelPrinting.getDataRow(labelsGeneratorInput, keys, response, attributeValues, new HashMap<>());
+		Assert.assertEquals(1, dataRow.keySet().size());
+		// Verify that attribute values is not truncated for XLS file type
+		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
+	}
+
+	@Test
+	public void testGetDataRow_For_TruncateLongAttributeValues_WhenPDFExportType() {
+		this.germplasmLabelPrinting.initStaticFields();
+		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
+		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
+		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
+		attributeValues.put(GID, new HashMap<>());
+		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
+		attributeValues.get(GID).put(GermplasmLabelPrinting.toId(attributeId), attributeValue);
+		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
+		labelsGeneratorInput.setFileType(FileType.PDF);
+		final Map<Integer, String> dataRow = this.germplasmLabelPrinting.getDataRow(labelsGeneratorInput, keys, response, attributeValues, new HashMap<>());
+		Assert.assertEquals(1, dataRow.keySet().size());
+		Assert.assertEquals(attributeValue.substring(0, 199) + "...", dataRow.get(attributeId));
 	}
 
 	@Test
