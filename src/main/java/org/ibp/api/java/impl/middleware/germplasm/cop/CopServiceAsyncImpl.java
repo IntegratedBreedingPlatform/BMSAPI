@@ -203,8 +203,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 					}
 				}
 
-				// TODO option to write as gid1,gid2,value (some spreadsheets has max column)
-				final List<String[]> csvLines = new CopResponse(matrixRequest).getArray();
+				final List<String[]> csvLines = new CopResponse(matrixRequest).getArray2d();
 
 				if (this.fileStorageService.isConfigured()) {
 					this.fileStorageService.upload(
@@ -270,6 +269,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 			.map(Map.Entry::getKey)
 			.collect(toSet());
 
+		// what percentage of progress is done (isFinished) for the filtered queues
 		return gidProcessingQueue.entrySet().stream()
 			.filter(e -> gidsInQueue.contains(e.getKey()))
 			.map(Map.Entry::getValue)
