@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -169,7 +170,7 @@ public class GermplasmUpdateRequestValidator {
 	}
 
 	protected boolean attributeExceedsLength(final String attribute) {
-		return attribute.length() > GermplasmImportRequestValidator.ATTRIBUTE_MAX_LENGTH;
+		return attribute.length() > AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH;
 	}
 
 	protected boolean nameExceedsLength(final String name) {
