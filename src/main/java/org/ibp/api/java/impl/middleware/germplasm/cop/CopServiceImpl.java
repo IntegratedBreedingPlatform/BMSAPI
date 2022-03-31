@@ -5,14 +5,17 @@ import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
+import org.ibp.api.exception.ApiRuntime2Exception;
+import org.ibp.api.java.file.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -30,6 +33,9 @@ public class CopServiceImpl implements CopService {
 	@Autowired
 	private GermplasmListDataService germplasmListDataService;
 
+	@Autowired
+	private FileStorageService fileStorageService;
+
 	@Override
 	public CopResponse coefficientOfParentage(Set<Integer> gids, final Integer listId,
 		final HttpServletRequest request, final HttpServletResponse response) throws IOException {
@@ -43,8 +49,8 @@ public class CopServiceImpl implements CopService {
 		}
 
 		if (listId != null) {
-			final File csv = getCsv(listId);
-			if (csv.exists()) {
+			final byte[] csv = this.downloadFile(listId);
+			if (csv.length > 0) {
 				return new CopResponse(true);
 			} else {
 				throw new MiddlewareRequestException("", "cop.csv.not.exists");
@@ -113,14 +119,21 @@ public class CopServiceImpl implements CopService {
 	}
 
 	@Override
-	public File downloadCoefficientOfParentage(final Integer listId) {
-		return getCsv(listId);
+	public byte[] downloadFile(final Integer listId) throws IOException {
+		if (this.fileStorageService.isConfigured()) {
+			try {
+				return this.fileStorageService.getFile(CopUtils.getStorageFilePath(listId));
+			} catch (final RuntimeException ex) {
+				throw new ApiRuntime2Exception("", "cop.file.download.exception");
+			}
+		} else {
+			return getCsv(listId);
+		}
 	}
 
-	private static File getCsv(final Integer listId) {
-		final String fileFullPath = CopUtils.getFileFullPath(listId);
-		final File file = new File(fileFullPath);
-		return file;
+	private static byte[] getCsv(final Integer listId) throws IOException {
+		final String fileFullPath = CopUtils.getFileTempFullPath(listId);
+		return Files.readAllBytes(Paths.get(fileFullPath));
 	}
 
 }

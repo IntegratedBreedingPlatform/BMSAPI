@@ -4,6 +4,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopCalculation;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
@@ -11,8 +12,10 @@ import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.CopMatrix;
+import org.ibp.api.java.file.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -24,6 +27,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -72,10 +76,12 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	 */
 	private static final Map<Integer, Future<Boolean>> gidProcessingToFutureTask = new ConcurrentHashMap<>();
 
-
 	private static final boolean INCLUDE_DERIVATIVE_LINES = true;
 
 	private org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceAsync copServiceAsyncMiddleware;
+
+	@Autowired
+	private FileStorageService fileStorageService;
 
 	@Value("${cop.btype}")
 	private int bType;
@@ -197,12 +203,20 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 					}
 				}
 
-				final String fileFullPath = CopUtils.getFileFullPath(listId);
-				try (final CSVWriter csvWriter = new CSVWriter(
-					new OutputStreamWriter(new FileOutputStream(fileFullPath), StandardCharsets.UTF_8), ',')
-				) {
-					// TODO option to write as gid1,gid2,value (some spreadsheets has max column)
-					csvWriter.writeAll(new CopResponse(matrixRequest).getArray());
+				// TODO option to write as gid1,gid2,value (some spreadsheets has max column)
+				final List<String[]> csvLines = new CopResponse(matrixRequest).getArray();
+
+				if (this.fileStorageService.isConfigured()) {
+					this.fileStorageService.upload(
+						FileUtils.wrapAsMultipart(CopUtils.matrixToCsvBytes(csvLines)), CopUtils.getStorageFilePath(listId));
+
+				} else {
+					final String fileFullPath = CopUtils.getFileTempFullPath(listId);
+					try (final CSVWriter csvWriter = new CSVWriter(
+						new OutputStreamWriter(new FileOutputStream(fileFullPath), StandardCharsets.UTF_8), ',')
+					) {
+						csvWriter.writeAll(csvLines);
+					}
 				}
 			}
 

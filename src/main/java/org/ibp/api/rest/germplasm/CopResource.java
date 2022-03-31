@@ -93,17 +93,17 @@ public class CopResource {
 	@ApiOperation("Get coefficient of parentage as csv")
 	@RequestMapping(value = "/cop/csv/list/{listId}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<FileSystemResource> downloadCopMatrixAsCsv(
+	public ResponseEntity<byte[]> downloadCopMatrixAsCsv(
 		@PathVariable final String cropName,
 		@PathVariable final Integer listId
-	) {
-		final File file = this.copService.downloadCoefficientOfParentage(listId);
+	) throws IOException {
+		final byte[] file = this.copService.downloadFile(listId);
 
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
-		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(file.getName())));
-		final FileSystemResource fileSystemResource = new FileSystemResource(file);
-		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+		final String fileName = CopUtils.getFileName(listId);
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(fileName)));
+		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(fileName)));
+		return new ResponseEntity<>(file, headers, HttpStatus.OK);
 	}
 
 	// TODO delete if not used
@@ -116,6 +116,7 @@ public class CopResource {
 	) throws IOException {
 		final CopResponse results = this.copService.coefficientOfParentage(gids, null, null, null);
 
+		// FIXME avoid writing to disk
 		final File temporaryFolder = Files.createTempDir();
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + "COP.csv";
 		final File file = CopUtils.generateFile(results, fileNameFullPath);

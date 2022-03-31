@@ -45,7 +45,7 @@ public class FileStorageServiceFactory {
 	private String privateKeyPath;
 
 	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	@Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public FileStorageService getFileStorageService() {
 		if (this.hasAWSProperties()) {
 			return new AWSS3FileStorageServiceImpl();
@@ -58,7 +58,7 @@ public class FileStorageServiceFactory {
 	}
 
 	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	@Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public JSch getJsch() {
 		return new JSch();
 	}

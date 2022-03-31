@@ -31,5 +31,5 @@ public interface CopService {
 	 */
 	void cancelJobs(Set<Integer> gids, Integer listId);
 
-	File downloadCoefficientOfParentage(Integer listId);
+	byte[] downloadFile(Integer listId) throws IOException;
 }
