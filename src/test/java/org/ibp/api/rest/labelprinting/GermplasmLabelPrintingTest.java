@@ -244,7 +244,24 @@ public class GermplasmLabelPrintingTest {
 	}
 
 	@Test
-	public void testGetDataRow_For_AttributeFields_WhenCSVFileType() {
+	public void testGetDataRow_For_ShortAttributeValues() {
+		this.germplasmLabelPrinting.initStaticFields();
+		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
+		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
+		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
+		attributeValues.put(GID, new HashMap<>());
+		final String attributeValue = RandomStringUtils.randomAlphanumeric(100);
+		attributeValues.get(GID).put(GermplasmLabelPrinting.toId(attributeId), attributeValue);
+		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
+		labelsGeneratorInput.setFileType(FileType.PDF);
+		final Map<Integer, String> dataRow = this.germplasmLabelPrinting.getDataRow(labelsGeneratorInput, keys, response, attributeValues, new HashMap<>());
+		Assert.assertEquals(1, dataRow.keySet().size());
+		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
+	}
+
+	@Test
+	public void testGetDataRow_For_LongAttributeValuesNotTruncated_WhenCSVFileType() {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));

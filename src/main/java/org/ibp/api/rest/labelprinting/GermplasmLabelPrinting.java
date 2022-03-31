@@ -334,7 +334,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			final String attributeValue = attributesByType.get(id);
 			if (attributeValue != null) {
 				// Truncate attribute values to 200 characters if export file type is PDF
-				columns.put(key, FileType.PDF.equals(labelsGeneratorInput.getFileType())? attributeValue.substring(0, 199) + "..." : attributeValue);
+				columns.put(key, FileType.PDF.equals(labelsGeneratorInput.getFileType()) && StringUtils.length(attributeValue) > 200 ?
+					attributeValue.substring(0, 199) + "..." : attributeValue);
 			}
 		}
 
