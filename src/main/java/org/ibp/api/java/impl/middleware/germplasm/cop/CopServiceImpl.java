@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm.cop;
 
 import com.google.common.collect.Table;
+import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
@@ -14,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -77,7 +76,7 @@ public class CopServiceImpl implements CopService {
 	}
 
 	@Override
-	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids, final Integer listId) {
+	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids, final Integer listId, final BTypeEnum btype) {
 		final Table<Integer, Integer, Double> matrix = this.copServiceMiddleware.getCopMatrixByGids(gids);
 
 		// if all cop values are calculated, return them
@@ -96,7 +95,7 @@ public class CopServiceImpl implements CopService {
 			}
 
 			this.copServiceAsync.prepareExecution(gids);
-			final Future<Boolean> booleanFuture = this.copServiceAsync.calculateAsync(gids, matrix, listId);
+			final Future<Boolean> booleanFuture = this.copServiceAsync.calculateAsync(gids, matrix, listId, btype);
 			this.copServiceAsync.trackFutureTask(gids, booleanFuture);
 			return new CopResponse(this.copServiceAsync.getProgress(gids));
 		}
@@ -105,9 +104,9 @@ public class CopServiceImpl implements CopService {
 	}
 
 	@Override
-	public CopResponse calculateCoefficientOfParentage(final Integer listId) {
+	public CopResponse calculateCoefficientOfParentage(final Integer listId, final BTypeEnum btype) {
 		final Set<Integer> gids = new LinkedHashSet<>(this.germplasmListDataService.getGidsByListId(listId));
-		return this.calculateCoefficientOfParentage(gids, listId);
+		return this.calculateCoefficientOfParentage(gids, listId, btype);
 	}
 
 	@Override

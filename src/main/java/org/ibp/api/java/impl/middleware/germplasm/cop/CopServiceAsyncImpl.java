@@ -5,6 +5,7 @@ import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
+import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopCalculation;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
@@ -16,7 +17,6 @@ import org.ibp.api.java.file.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,9 +79,6 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	@Autowired
 	private FileStorageService fileStorageService;
 
-	@Value("${cop.btype}")
-	private int bType;
-
 	public CopServiceAsyncImpl(final HibernateSessionProvider sessionProvider) {
 		this.copServiceAsyncMiddleware = new org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceAsyncImpl(sessionProvider);
 	}
@@ -97,7 +94,8 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	public Future<Boolean> calculateAsync(
 		final Set<Integer> gids,
 		final Table<Integer, Integer, Double> matrix,
-		final Integer listId) {
+		final Integer listId,
+		final BTypeEnum btype) {
 
 		try {
 			final TreeBasedTable<Integer, Integer, Double> matrixNew = TreeBasedTable.create();
@@ -106,7 +104,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 			final Map<Integer, GermplasmTreeNode> nodes = new HashMap<>();
 
 			// matrix copy because CopCalculation also stores intermediate results
-			final CopCalculation copCalculation = new CopCalculation(HashBasedTable.create(matrix), this.bType);
+			final CopCalculation copCalculation = new CopCalculation(HashBasedTable.create(matrix), btype);
 
 			outer: for (final Integer gid1 : gids) {
 				inner: for (final Integer gid2 : gids) {

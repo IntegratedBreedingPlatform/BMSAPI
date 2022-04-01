@@ -4,6 +4,7 @@ import com.google.common.io.Files;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
 import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.java.file.FileStorageService;
@@ -48,9 +49,10 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<CopResponse> calculateCopMatrix(
 		@PathVariable final String cropName,
-		@RequestBody final Set<Integer> gids
+		@RequestBody final Set<Integer> gids,
+		@RequestParam final BTypeEnum btype
 	) {
-		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids, null);
+		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids, null, btype);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
@@ -59,12 +61,13 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<CopResponse> calculateCopMatrixForList(
 		@PathVariable final String cropName,
-		@PathVariable final Integer listId
+		@PathVariable final Integer listId,
+		@RequestParam final BTypeEnum btype
 	) {
 		if (!this.fileStorageService.isConfigured()) {
 			throw new ApiRuntime2Exception("", "cop.file.storage.not.configured");
 		}
-		final CopResponse results = this.copService.calculateCoefficientOfParentage(listId);
+		final CopResponse results = this.copService.calculateCoefficientOfParentage(listId, btype);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 

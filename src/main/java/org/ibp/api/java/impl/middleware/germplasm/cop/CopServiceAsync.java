@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm.cop;
 
 import com.google.common.collect.Table;
+import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -10,7 +11,7 @@ public interface CopServiceAsync {
 	Future<Boolean> calculateAsync(
 		Set<Integer> gids,
 		Table<Integer, Integer, Double> matrix,
-		final Integer listId);
+		final Integer listId, final BTypeEnum btype);
 
 	/**
 	 * Checks thread limit, put gids into queue
