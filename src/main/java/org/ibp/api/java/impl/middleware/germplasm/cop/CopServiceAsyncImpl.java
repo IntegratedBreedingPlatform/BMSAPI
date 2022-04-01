@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.germplasm.cop;
 
-import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
@@ -12,6 +11,7 @@ import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.CopMatrix;
+import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.java.file.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +21,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -208,21 +204,15 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 				if (this.fileStorageService.isConfigured()) {
 					this.fileStorageService.upload(
 						FileUtils.wrapAsMultipart(CopUtils.matrixToCsvBytes(csvLines)), CopUtils.getStorageFilePath(listId));
-
 				} else {
-					final String fileFullPath = CopUtils.getFileTempFullPath(listId);
-					try (final CSVWriter csvWriter = new CSVWriter(
-						new OutputStreamWriter(new FileOutputStream(fileFullPath), StandardCharsets.UTF_8), ',')
-					) {
-						csvWriter.writeAll(csvLines);
-					}
+					throw new ApiRuntime2Exception("", "cop.file.storage.not.configured");
 				}
 			}
 
 			info("cop: finish saving %s records", recordCount);
 
 			return new AsyncResult<>(Boolean.TRUE);
-		} catch (final RuntimeException | IOException ex) {
+		} catch (final RuntimeException ex) {
 			LOG.error("Error in CopServiceAsyncImpl.calculateAsync(), gids=" + gids + ", message: " + ex.getMessage(), ex);
 			return new AsyncResult<>(Boolean.FALSE);
 		} finally {

@@ -127,13 +127,8 @@ public class CopServiceImpl implements CopService {
 				throw new ApiRuntime2Exception("", "cop.file.download.exception");
 			}
 		} else {
-			return getCsv(listId);
+			throw new ApiRuntime2Exception("", "cop.file.storage.not.configured");
 		}
-	}
-
-	private static byte[] getCsv(final Integer listId) throws IOException {
-		final String fileFullPath = CopUtils.getFileTempFullPath(listId);
-		return Files.readAllBytes(Paths.get(fileFullPath));
 	}
 
 }
