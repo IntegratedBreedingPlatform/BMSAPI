@@ -245,7 +245,7 @@ public class AttributeValidatorTest {
 	@Test
 	public void testValidateGermplasmAttributeValue_ThrowsException_WhenValueIsInvalid() {
 		try {
-			final String invalidValue = RandomStringUtils.randomAlphabetic(256);
+			final String invalidValue = RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH + 1);
 			this.attributeValidator.validateGermplasmAttributeValue(this.errors, invalidValue);
 			Assert.fail("should throw an exception");
 		} catch(final ApiRequestValidationException e) {

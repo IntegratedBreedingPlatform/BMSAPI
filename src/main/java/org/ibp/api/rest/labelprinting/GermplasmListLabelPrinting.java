@@ -180,7 +180,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final List<Map<Integer, String>> data = new ArrayList<>();
 		for (final GermplasmListDataSearchResponse listData : listDataSearchResponseList) {
 			final Integer gid = (Integer) listData.getData().get(GermplasmListStaticColumns.GID.getName());
-			data.add(this.getDataRow(keys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues, entryDetailValues));
+			data.add(this.getDataRow(labelsGeneratorInput, keys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues, entryDetailValues));
 		}
 
 		return new LabelsData(LabelPrintingStaticField.GUID.getFieldId(), data);
@@ -206,7 +206,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		return entryDetailFields;
 	}
 
-	Map<Integer, String> getDataRow(
+	Map<Integer, String> getDataRow(final LabelsGeneratorInput labelsGeneratorInput,
 		final Set<Integer> keys, final GermplasmListDataSearchResponse listData,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
 		final Map<Integer, Map<Integer, String>> nameValues, final Map<Integer, Map<Integer, String>> entryDetailValues) {
@@ -227,7 +227,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 					columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.CROSS.name()), ""));
 				}
 			} else {
-				this.getAttributeOrNameDataRowValue(germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
+				this.getAttributeOrNameDataRowValue(labelsGeneratorInput, germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
 				this.getEntryDetailDataRowValue(listData, entryDetailValues, columns, key, id);
 			}
 		}

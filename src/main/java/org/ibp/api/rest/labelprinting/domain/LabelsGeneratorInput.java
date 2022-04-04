@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.ibp.api.rest.common.FileType;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -14,6 +15,9 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 
 	@JsonIgnore
 	private Set<Field> allAvailablefields;
+
+	@JsonIgnore
+	private FileType fileType;
 
 	private List<List<Integer>> fields;
 
@@ -32,7 +36,7 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 	private String fileName;
 
 	public List<List<Integer>> getFields() {
-		return fields;
+		return this.fields;
 	}
 
 	public void setFields(final List<List<Integer>> fields) {
@@ -40,7 +44,7 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 	}
 
 	public boolean isBarcodeRequired() {
-		return barcodeRequired;
+		return this.barcodeRequired;
 	}
 
 	public void setBarcodeRequired(final boolean barcodeRequired) {
@@ -48,7 +52,7 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 	}
 
 	public boolean isAutomaticBarcode() {
-		return automaticBarcode;
+		return this.automaticBarcode;
 	}
 
 	public void setAutomaticBarcode(final boolean automaticBarcode) {
@@ -64,7 +68,7 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 	}
 
 	public List<Integer> getBarcodeFields() {
-		return barcodeFields;
+		return this.barcodeFields;
 	}
 
 	public void setBarcodeFields(final List<Integer> barcodeFields) {
@@ -72,7 +76,7 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 	}
 
 	public String getFileName() {
-		return fileName;
+		return this.fileName;
 	}
 
 	public void setFileName(final String fileName) {
@@ -80,7 +84,15 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 	}
 
 	public Set<Field> getAllAvailablefields() {
-		return allAvailablefields;
+		return this.allAvailablefields;
+	}
+
+	public FileType getFileType() {
+		return this.fileType;
+	}
+
+	public void setFileType(final FileType fileType) {
+		this.fileType = fileType;
 	}
 
 	public void setAllAvailablefields(final Set<Field> allAvailablefields) {

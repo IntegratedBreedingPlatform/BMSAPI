@@ -148,7 +148,7 @@ public class LabelPrintingResource {
 		@RequestBody final LabelsGeneratorInput labelsGeneratorInput ) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
-		final LabelsFileGenerator labelsFileGenerator = this.getLabelsFileGenerator(fileExtension, labelPrintingStrategy);
+		final LabelsFileGenerator labelsFileGenerator = this.getLabelsFileGenerator(fileExtension, labelPrintingStrategy, labelsGeneratorInput);
 		labelPrintingStrategy.validateLabelsGeneratorInputData(labelsGeneratorInput, programUUID);
 
 		labelsGeneratorInput.setAllAvailablefields(labelPrintingStrategy.getAllAvailableFields(labelsGeneratorInput, programUUID));
@@ -255,7 +255,7 @@ public class LabelPrintingResource {
 		}
 	}
 
-	LabelsFileGenerator getLabelsFileGenerator(final String fileExtension, final LabelPrintingStrategy labelPrintingStrategy) {
+	LabelsFileGenerator getLabelsFileGenerator(final String fileExtension, final LabelPrintingStrategy labelPrintingStrategy, final LabelsGeneratorInput labelsGeneratorInput) {
 		final LabelsFileGenerator labelsFileGenerator;
 		final FileType fileType = FileType.getEnum(fileExtension);
 		if (fileType == null || !labelPrintingStrategy.getSupportedFileTypes().contains(fileType)) {
@@ -263,6 +263,7 @@ public class LabelPrintingResource {
 			errors.reject("file.type.not.supported", "");
 			throw new NotSupportedException(errors.getAllErrors().get(0));
 		}
+		labelsGeneratorInput.setFileType(fileType);
 		switch (fileType) {
 			case CSV:
 				labelsFileGenerator = this.csvLabelsFileGenerator;

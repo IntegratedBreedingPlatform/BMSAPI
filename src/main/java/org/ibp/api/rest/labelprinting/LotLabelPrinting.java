@@ -163,11 +163,11 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	 */
 	private static final Integer MAX_FIXED_TYPE_INDEX = 1000;
 
-	private static int toKey(final int id) {
+	static int toKey(final int id) {
 		return id + MAX_FIXED_TYPE_INDEX;
 	}
 
-	private static int toId(final int key) {
+	static int toId(final int key) {
 		if (key > MAX_FIXED_TYPE_INDEX) {
 			return key - MAX_FIXED_TYPE_INDEX;
 		}
@@ -263,13 +263,13 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		}
 
 		for (final ExtendedLotDto extendedLotDto : extendedLotDtos) {
-			data.add(this.getDataRow(keys, extendedLotDto, attributeValues, pedigreeByGID));
+			data.add(this.getDataRow(labelsGeneratorInput, keys, extendedLotDto, attributeValues, pedigreeByGID));
 		}
 
 		return new LabelsData(LOT_FIELD.LOT_UID.getId(), data);
 	}
 
-	private Map<Integer, String> getDataRow(
+	Map<Integer, String> getDataRow(final LabelsGeneratorInput labelsGeneratorInput,
 		final Set<Integer> keys,
 		final ExtendedLotDto extendedLotDto,
 		final Map<Integer, Map<Integer, String>> attributeValues,
@@ -364,7 +364,9 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 				if (attributesByType != null) {
 					final String attributeValue = attributesByType.get(id);
 					if (attributeValue != null) {
-						columns.put(key, attributeValue);
+						// Truncate attribute values to 200 characters if export file type is PDF
+						columns.put(key, FileType.PDF.equals(labelsGeneratorInput.getFileType()) && StringUtils.length(attributeValue) > GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH ?
+							attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "..." : attributeValue);
 					}
 				}
 

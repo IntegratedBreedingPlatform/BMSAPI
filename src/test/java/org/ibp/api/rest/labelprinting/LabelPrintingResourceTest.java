@@ -2,7 +2,9 @@ package org.ibp.api.rest.labelprinting;
 
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.rest.common.FileType;
+import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.filegenerator.CSVLabelsFileGenerator;
+import org.ibp.api.rest.labelprinting.filegenerator.ExcelLabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.LabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.PDFLabelsFileGenerator;
 import org.junit.Assert;
@@ -28,6 +30,9 @@ public class LabelPrintingResourceTest {
 	@Mock
 	private PDFLabelsFileGenerator pdfLabelsFileGenerator;
 
+	@Mock
+	private ExcelLabelsFileGenerator excelLabelsFileGenerator;
+
 	@InjectMocks
 	private LabelPrintingResource labelPrintingResource;
 
@@ -38,14 +43,21 @@ public class LabelPrintingResourceTest {
 	public void testGetLabelsFileGenerator() {
 		Mockito.when(this.subObservationDatasetLabelPrinting.getSupportedFileTypes())
 			.thenReturn(SubObservationDatasetLabelPrinting.SUPPORTED_FILE_TYPES);
-
+		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
 		LabelsFileGenerator fileGenerator =
-			this.labelPrintingResource.getLabelsFileGenerator(FileType.CSV.getExtension(), this.subObservationDatasetLabelPrinting);
+			this.labelPrintingResource.getLabelsFileGenerator(FileType.CSV.getExtension(), this.subObservationDatasetLabelPrinting, labelsGeneratorInput);
 		Assert.assertEquals(this.csvLabelsFileGenerator, fileGenerator);
+		Assert.assertEquals(FileType.CSV, labelsGeneratorInput.getFileType());
 
 		fileGenerator =
-			this.labelPrintingResource.getLabelsFileGenerator(FileType.PDF.getExtension(), this.subObservationDatasetLabelPrinting);
+			this.labelPrintingResource.getLabelsFileGenerator(FileType.PDF.getExtension(), this.subObservationDatasetLabelPrinting, labelsGeneratorInput);
 		Assert.assertEquals(this.pdfLabelsFileGenerator, fileGenerator);
+		Assert.assertEquals(FileType.PDF, labelsGeneratorInput.getFileType());
+
+		fileGenerator =
+			this.labelPrintingResource.getLabelsFileGenerator(FileType.XLS.getExtension(), this.subObservationDatasetLabelPrinting, labelsGeneratorInput);
+		Assert.assertEquals(this.excelLabelsFileGenerator, fileGenerator);
+		Assert.assertEquals(FileType.XLS, labelsGeneratorInput.getFileType());
 
 	}
 
