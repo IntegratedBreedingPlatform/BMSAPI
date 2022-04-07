@@ -55,10 +55,11 @@ public class FileResource {
 		@RequestPart("file") final MultipartFile file,
 		@RequestParam(required = false) final String observationUnitUUID,
 		@RequestParam(required = false) final String germplasmUUID,
+		@RequestParam(required = false) final Integer instanceId,
 		@RequestParam(required = false) final Integer termId
 	) {
 		this.validateFileStorage();
-		if (!isBlank(observationUnitUUID)) {
+		if (!isBlank(observationUnitUUID) || instanceId != null) {
 			FileResource.verifyHasAuthorityStudy(this.request);
 		} else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
@@ -66,7 +67,8 @@ public class FileResource {
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
 		BaseValidator.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID), "file.upload.entity.invalid");
 
-		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.upload(file, observationUnitUUID, germplasmUUID, termId);
+		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService
+			.upload(file, observationUnitUUID, germplasmUUID, instanceId, termId);
 		return new ResponseEntity<>(fileMetadataDTO, HttpStatus.CREATED);
 	}
 
