@@ -38,7 +38,7 @@ public class LocationServiceImpl implements LocationService {
 	public List<LocationTypeDTO> getLocationTypes(final Boolean excludeRestrictedTypes) {
 		if (Boolean.TRUE.equals(excludeRestrictedTypes)) {
 			return this.locationMiddlewareService.getLocationTypes().stream()
-				.filter((locationtype) -> !LocationServiceImpl.RESTRICTED_LOCATION_TYPE.contains(locationtype.getId())).collect(
+				.filter((locationType) -> !LocationServiceImpl.RESTRICTED_LOCATION_TYPE.contains(locationType.getId())).collect(
 					Collectors.toList());
 		}
 		return this.locationMiddlewareService.getLocationTypes();
