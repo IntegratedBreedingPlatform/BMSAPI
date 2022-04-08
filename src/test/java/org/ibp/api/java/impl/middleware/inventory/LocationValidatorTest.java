@@ -342,6 +342,25 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
+	public void testValidateCanBeDeleted_ThrowsException_WhenLocationTypeIsRestricted() {
+		final LocationDTO locationDTO = new LocationDTO();
+		locationDTO.setType(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.get(new Random().nextInt(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.size())));
+		locationDTO.setId(LocationValidatorTest.LOCATION_ID);
+
+		final List<LocationTypeDTO> locationTypeDTOS = this.buildLocationTypes(LocationServiceImpl.RESTRICTED_LOCATION_TYPE);
+
+		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(locationDTO);
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(locationTypeDTOS);
+		try {
+			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.with.location.type.restricted.cannot.deleted"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
 	public void testValidate_update_ThrowsException_WhenLocationIdIsInvalid() {
 		try {
 			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, new LocationRequestDto());
@@ -365,6 +384,28 @@ public class LocationValidatorTest {
 		} catch (final ApiRequestValidationException e) {
 			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.type.invalid"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidate_update_ThrowsException_WhenLocationTypeIsRestricted() {
+		final LocationRequestDto locationRequestDto =
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, 0);
+		final LocationDTO locationDTO = new LocationDTO();
+		locationDTO.setType(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.get(
+			new Random().nextInt(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.size())));
+		locationDTO.setId(LocationValidatorTest.LOCATION_ID);
+
+		final List<LocationTypeDTO> locationTypeDTOS = this.buildLocationTypes(LocationServiceImpl.RESTRICTED_LOCATION_TYPE);
+
+		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(locationDTO);
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(locationTypeDTOS);
+		try {
+			this.locationValidator.validateUpdate(LocationValidatorTest.LOCATION_ID, locationRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.with.location.type.restricted.cannot.edited"));
 			throw e;
 		}
 	}
@@ -565,6 +606,24 @@ public class LocationValidatorTest {
 		} catch (final ApiRequestValidationException e) {
 			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.type.invalid"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidate_create_ThrowsException_WhenLocationTypeIsRestricted() {
+		final LocationRequestDto locationRequestDto =
+			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, 0);
+		locationRequestDto.setType(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.get(
+			new Random().nextInt(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.size())));
+
+		final List<LocationTypeDTO> locationTypeDTOS = this.buildLocationTypes(Arrays.asList(locationRequestDto.getType()));
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(locationTypeDTOS);
+		try {
+			this.locationValidator.validateCreation(locationRequestDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.with.location.type.restricted.cannot.created"));
 			throw e;
 		}
 	}
