@@ -251,6 +251,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return studyEntryMetadata;
 	}
 
+	@Override
+	public void fillWithCrossExpansion(final Integer studyId, final Integer level) {
+		this.studyValidator.validate(studyId, true);
+
+		this.middlewareStudyEntryService.fillWithCrossExpansion(studyId, level);
+	}
+
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
 		final MeasurementVariable sampleColumn = new MeasurementVariable();
 		sampleColumn.setName(name);

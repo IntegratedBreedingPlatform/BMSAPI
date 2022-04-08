@@ -340,9 +340,9 @@ public class GermplasmListResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody @ApiParam("a positive number, without quotation marks. E.g level: 2") final String level
 	) {
-		BaseValidator.checkArgument(isNumber(level), "error.germplasmlist.generationlevel.invalid");
+		BaseValidator.checkArgument(isNumber(level), "error.generationlevel.invalid");
 		final int levelInt = Integer.parseInt(level);
-		BaseValidator.checkArgument(levelInt > 0 && levelInt <= 10 , "error.germplasmlist.max.generationlevel");
+		BaseValidator.checkArgument(levelInt > 0 && levelInt <= 10 , "error.generationlevel.max");
 		this.germplasmListDataService.fillWithCrossExpansion(listId, levelInt);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

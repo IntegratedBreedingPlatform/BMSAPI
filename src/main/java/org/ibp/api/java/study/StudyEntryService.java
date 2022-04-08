@@ -38,4 +38,6 @@ public interface StudyEntryService {
 
 	List<MeasurementVariable> getEntryColumns(Integer studyId);
 
+	void fillWithCrossExpansion(Integer studyId, Integer level);
+
 }

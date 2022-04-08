@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateReq
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.study.StudyEntryMetadata;
 import org.ibp.api.java.study.StudyEntryService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -32,6 +33,8 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
+
+import static org.apache.commons.lang3.math.NumberUtils.isNumber;
 
 // TODO: Move these services to StudyResource
 @Api(value = "Study Entry Services")
@@ -179,4 +182,21 @@ public class StudyEntryResource {
 
 		return new ResponseEntity<>(this.studyEntryService.getStudyEntriesMetadata(studyId, programUUID), HttpStatus.OK);
 	}
+
+	@ApiOperation("Set generation level for study and fill with cross expansion")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/pedigree-generation-level", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<Void> fillWithCrossExpansion(@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody @ApiParam("a positive number, without quotation marks. E.g level: 2") final String level
+	) {
+		BaseValidator.checkArgument(isNumber(level), "error.generationlevel.invalid");
+		final int levelInt = Integer.parseInt(level);
+		BaseValidator.checkArgument(levelInt > 0 && levelInt <= 10 , "error.generationlevel.max");
+		this.studyEntryService.fillWithCrossExpansion(studyId, levelInt);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 }
