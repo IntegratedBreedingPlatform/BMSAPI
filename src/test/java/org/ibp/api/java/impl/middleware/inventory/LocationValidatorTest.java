@@ -185,7 +185,7 @@ public class LocationValidatorTest {
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");
 
 		Mockito.when(this.locationService
-				.searchLocations(new LocationSearchRequest(STORAGE_LOCATION_TYPE, null, locationAbbrList, null), null, null))
+				.searchLocations(new LocationSearchRequest(this.STORAGE_LOCATION_TYPE, null, locationAbbrList, null), null, null))
 			.thenReturn(locationList);
 		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
 
@@ -199,7 +199,7 @@ public class LocationValidatorTest {
 		final List<String> locationAbbrList = Lists.newArrayList("DSS");
 
 		Mockito.when(this.locationService
-				.searchLocations(new LocationSearchRequest(STORAGE_LOCATION_TYPE, null, locationAbbrList, null), null, null))
+				.searchLocations(new LocationSearchRequest(this.STORAGE_LOCATION_TYPE, null, locationAbbrList, null), null, null))
 			.thenReturn(locationList);
 		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
 
@@ -212,8 +212,6 @@ public class LocationValidatorTest {
 	@Test
 	public void testValidateSeedLocationAbbr_ThrowsException_WhenLocationAbbrListIsNullOrEmpty() {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
-		final Location location = new Location();
-		location.setLabbr("DSS");
 		final List<String> locationAbbrList = Lists.newArrayList("");
 
 		this.locationValidator.validateSeedLocationAbbr(this.errors, locationAbbrList);
@@ -228,7 +226,7 @@ public class LocationValidatorTest {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
 
 		try {
-			this.locationValidator.validateLocation(errors, null);
+			this.locationValidator.validateLocation(this.errors, null);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.required"));
@@ -241,7 +239,7 @@ public class LocationValidatorTest {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotUpdateRequestDto.class.getName());
 
 		try {
-			this.locationValidator.validateLocation(errors, LocationValidatorTest.LOCATION_ID);
+			this.locationValidator.validateLocation(this.errors, LocationValidatorTest.LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(e.getErrors(), hasSize(1));
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.invalid"));
