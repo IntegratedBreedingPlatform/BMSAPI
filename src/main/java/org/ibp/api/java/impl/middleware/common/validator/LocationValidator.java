@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,7 @@ public class LocationValidator {
 	private static final Integer LOCATION_NAME_MAX_LENGTH = 60;
 	private static final Integer LOCATION_ABBR_MAX_LENGTH = 12;
 	private static final Set<String> LOCATIONS_NOT_DELETABLES = new HashSet<>(Arrays.asList("Unspecified Location", "Default Seed Store", "Default Breeding Location"));
+	private static final List<Integer> RESTRICTED_LOCATION_TYPE = Arrays.asList(401, 405, 406);
 	@Autowired
 	private LocationDataManager locationDataManager;
 
@@ -142,9 +144,20 @@ public class LocationValidator {
 
 		this.validateLocationName(locationRequestDto.getName());
 		this.validateLocationType(locationRequestDto.getType());
+		this.validateLocationTypeRestricted(locationRequestDto.getType(),"location.with.location.type.restricted.cannot.created");
 		this.validateLocationAbbr(locationRequestDto.getAbbreviation());
 		this.validateLocationAbbrNotExists(locationRequestDto.getAbbreviation());
 		this.validateCountryAndProvince(locationRequestDto.getCountryId(), locationRequestDto.getProvinceId());
+
+	}
+
+	private void validateLocationTypeRestricted(final Integer locationType, final String errorCode) {
+		if (RESTRICTED_LOCATION_TYPE.contains(locationType)) {
+			final Optional<LocationTypeDTO> locationTypeDTO =
+				this.locationService.getLocationTypes().stream().filter((ltype) -> ltype.getId().equals(locationType)).findFirst();
+			this.errors.reject(errorCode, new String[] {locationTypeDTO.get().getName()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 
 	}
 
@@ -217,6 +230,7 @@ public class LocationValidator {
 			this.errors.reject("location.not.deletable", new String[] {locationDTO.getId().toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+		this.validateLocationTypeRestricted(locationDTO.getType(), "location.with.location.type.restricted.cannot.deleted");
 	}
 
 	private void validateLocationNotEditable(final LocationDTO locationDTO) {
@@ -224,6 +238,7 @@ public class LocationValidator {
 			this.errors.reject("location.not.editable", new String[] {locationDTO.getId().toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+		this.validateLocationTypeRestricted(locationDTO.getType(), "location.with.location.type.restricted.cannot.edited");
 	}
 
 	private void validateLocationNotUsedInFieldMap(final LocationDTO locationDTO) {
