@@ -224,7 +224,7 @@ public class GermplasmImportRequestValidatorTest {
 		importRequest1.setBreedingMethodDbId(String.valueOf(MID));
 		importRequest1.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
 		// Invalid default display name
-			importRequest1.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(260));
+			importRequest1.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(5001));
 
 		final GermplasmImportRequest importRequest2 = new GermplasmImportRequest();
 		importRequest2.setAcquisitionDate("2021-02-21");
