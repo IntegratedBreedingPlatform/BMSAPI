@@ -65,7 +65,7 @@ public class FileResource {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
-		BaseValidator.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID), "file.upload.entity.invalid");
+		BaseValidator.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID) != (instanceId == null), "file.upload.entity.invalid");
 
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService
 			.upload(file, observationUnitUUID, germplasmUUID, instanceId, termId);
