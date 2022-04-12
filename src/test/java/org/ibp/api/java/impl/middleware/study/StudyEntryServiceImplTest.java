@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -13,11 +12,9 @@ import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
-import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.hamcrest.collection.IsIn;
@@ -53,12 +50,6 @@ public class StudyEntryServiceImplTest {
 
 	@Mock
 	private StudyValidator studyValidator;
-
-	@Mock
-	private PedigreeService pedigreeService;
-
-	@Mock
-	private CrossExpansionProperties crossExpansionProperties;
 
 	@Mock
 	private StudyEntryValidator studyEntryValidator;
@@ -108,14 +99,12 @@ public class StudyEntryServiceImplTest {
 		final Integer studyId = this.random.nextInt();
 		final Integer entryId = this.random.nextInt();
 		final Integer newGid = this.random.nextInt();
-		final String crossExpansion = RandomStringUtils.randomAlphabetic(20);
-		Mockito.doReturn(crossExpansion).when(this.pedigreeService).getCrossExpansion(newGid, this.crossExpansionProperties);
 		final StudyEntryDto dto = new StudyEntryDto();
 		dto.setGid(newGid);
 		this.studyEntryService.replaceStudyEntry(studyId, entryId, dto);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.studyEntryValidator).validate(studyId, entryId, newGid);
-		Mockito.verify(this.middlewareStudyEntryService).replaceStudyEntry(studyId, entryId, newGid, crossExpansion);
+		Mockito.verify(this.middlewareStudyEntryService).replaceStudyEntry(studyId, entryId, newGid);
 	}
 
 	@Test
@@ -279,7 +268,7 @@ public class StudyEntryServiceImplTest {
 
 		final List<MeasurementVariable> results = this.studyEntryService.getEntryColumns(studyId);
 
-		MatcherAssert.assertThat(results, IsCollectionWithSize.hasSize(8));
+		MatcherAssert.assertThat(results, IsCollectionWithSize.hasSize(9));
 		MatcherAssert.assertThat(entryCodeVariable, IsIn.in(results));
 		MatcherAssert.assertThat(entryNoVariable, IsIn.in(results));
 		MatcherAssert.assertThat(designationVariable, IsIn.in(results));

@@ -13,10 +13,8 @@ import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateReq
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
@@ -55,12 +53,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Resource
 	private StudyValidator studyValidator;
 
-	@Autowired
-	private PedigreeService pedigreeService;
-
-	@Autowired
-	private CrossExpansionProperties crossExpansionProperties;
-
 	@Resource
 	private StudyEntryValidator studyEntryValidator;
 
@@ -95,14 +87,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private OntologyDataManager ontologyDataManager;
 
 	@Override
-	public StudyEntryDto replaceStudyEntry(final Integer studyId, final Integer entryId,
-		final StudyEntryDto studyEntryDto) {
+	public void replaceStudyEntry(final Integer studyId, final Integer entryId, final StudyEntryDto studyEntryDto) {
 		final Integer gid = studyEntryDto.getGid();
 		this.studyValidator.validate(studyId, true);
 		this.studyEntryValidator.validate(studyId, entryId, gid);
 
-		return this.middlewareStudyEntryService
-			.replaceStudyEntry(studyId, entryId, gid, this.pedigreeService.getCrossExpansion(gid, this.crossExpansionProperties));
+		this.middlewareStudyEntryService.replaceStudyEntry(studyId, entryId, gid);
 	}
 
 	@Override

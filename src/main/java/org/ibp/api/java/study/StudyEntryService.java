@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface StudyEntryService {
 
-	StudyEntryDto replaceStudyEntry(Integer studyId, Integer entryId, StudyEntryDto studyEntryDto);
+	void replaceStudyEntry(Integer studyId, Integer entryId, StudyEntryDto studyEntryDto);
 
 	void createStudyEntries(Integer studyId, StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto);
 

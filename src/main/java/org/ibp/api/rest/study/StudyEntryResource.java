@@ -49,12 +49,11 @@ public class StudyEntryResource {
 		notes = "Replace germplasm entry in study")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<StudyEntryDto> replaceStudyEntry(final @PathVariable String cropname,
+	public ResponseEntity<Void> replaceStudyEntry(final @PathVariable String cropname,
 														   @PathVariable final String programUUID,
 														   @PathVariable final Integer studyId, @PathVariable final Integer entryId, @RequestBody final StudyEntryDto studyEntryDto) {
-		return new ResponseEntity<>(this.studyEntryService.replaceStudyEntry(studyId, entryId, studyEntryDto),
-			HttpStatus.OK);
-
+		this.studyEntryService.replaceStudyEntry(studyId, entryId, studyEntryDto);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm ids",
