@@ -93,7 +93,9 @@ public class FileMetadataResource {
 		@RequestParam(required = false) final String germplasmUUID,
 		@RequestParam(required = false) final Integer instanceId
 	) {
-		BaseValidator.checkArgument((datasetId == null) != isBlank(germplasmUUID) != (instanceId == null), "file.upload.detach.parameters.invalid");
+		//Check if only one of the parameters has value
+		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1)) == 1;
+		BaseValidator.checkArgument(valid, "file.upload.detach.parameters.invalid");
 		if (datasetId != null || instanceId != null) {
 			FileResource.verifyHasAuthorityStudy(this.request);
 		} else {
