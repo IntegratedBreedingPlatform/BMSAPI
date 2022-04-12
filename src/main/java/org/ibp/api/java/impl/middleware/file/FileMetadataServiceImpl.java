@@ -64,9 +64,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		if(!isBlank(observationUnitUUID)) {
 			path = this.fileMetadataService.getFilePathForObservationUnit(observationUnitUUID, file.getOriginalFilename());
 		} else if(!isBlank(germplasmUUID)) {
-			this.fileMetadataService.getFilePathForGermplasm(germplasmUUID, file.getOriginalFilename());
+			path = this.fileMetadataService.getFilePathForGermplasm(germplasmUUID, file.getOriginalFilename());
 		} else if(instanceId != null) {
-			this.fileMetadataService.getFilePathForEnvironment(instanceId, file.getOriginalFilename());
+			path = this.fileMetadataService.getFilePathForEnvironment(instanceId, file.getOriginalFilename());
 		}
 
 
