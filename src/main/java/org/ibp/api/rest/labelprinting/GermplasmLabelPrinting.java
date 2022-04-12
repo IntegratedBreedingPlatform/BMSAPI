@@ -59,6 +59,8 @@ import java.util.stream.Collectors;
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	public static final int ATTRIBUTE_DISPLAY_MAX_LENGTH = 200;
+	public static final int NAME_DISPLAY_MAX_LENGTH = 200;
+
 	List<Field> defaultPedigreeDetailsFields;
 	List<Field> defaultGermplasmDetailsFields;
 
@@ -311,21 +313,22 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse,
 		final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues) {
 
+		final boolean isPdf = FileType.PDF.equals(labelsGeneratorInput.getFileType());
 		final Map<Integer, String> columns = new HashMap<>();
 		for (final Integer key : keys) {
 			final int id = toId(key);
 			if (this.germplasmFieldIds.contains(id)) {
-				this.getGermplasmFieldDataRowValue(germplasmSearchResponse, columns, key, id);
+				this.getGermplasmFieldDataRowValue(isPdf, germplasmSearchResponse, columns, key, id);
 			} else if (this.pedigreeFieldIds.contains(id)) {
-				this.getPedigreeFieldDataRowValue(germplasmSearchResponse, columns, key, id);
+				this.getPedigreeFieldDataRowValue(isPdf, germplasmSearchResponse, columns, key, id);
 			} else {
-				this.getAttributeOrNameDataRowValue(labelsGeneratorInput, germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
+				this.getAttributeOrNameDataRowValue(isPdf, germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
 			}
 		}
 		return columns;
 	}
 
-	void getAttributeOrNameDataRowValue(final LabelsGeneratorInput labelsGeneratorInput,
+	void getAttributeOrNameDataRowValue(final boolean isPdf,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
 		final Map<Integer, Map<Integer, String>> nameValues, final Map<Integer, String> columns, final Integer key, final int id) {
 		// Not part of the fixed columns
@@ -335,8 +338,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			final String attributeValue = attributesByType.get(id);
 			if (attributeValue != null) {
 				// Truncate attribute values to 200 characters if export file type is PDF
-				columns.put(key, FileType.PDF.equals(labelsGeneratorInput.getFileType()) && StringUtils.length(attributeValue) > GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH ?
-					attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "..." : attributeValue);
+				columns.put(key, this.truncateValueIfPdf(isPdf, attributeValue, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH));
 			}
 		}
 
@@ -346,12 +348,17 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		if (namesByType != null) {
 			final String nameValue = namesByType.get(id);
 			if (nameValue != null) {
-				columns.put(key, nameValue);
+				columns.put(key, this.truncateValueIfPdf(isPdf, nameValue, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
 			}
 		}
 	}
 
-	void getPedigreeFieldDataRowValue(
+	private String truncateValueIfPdf(final boolean isPdf, final String value, final int maxLength) {
+		return isPdf && StringUtils.length(value) > maxLength ?
+			value.substring(0, maxLength) + "..." : value;
+	}
+
+	void getPedigreeFieldDataRowValue(final boolean isPdf,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, String> columns, final Integer key, final int id) {
 		final TermId term = TermId.getById(id);
 		switch (term) {
@@ -362,17 +369,20 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 				columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentGID(), ""));
 				return;
 			case CROSS_MALE_PREFERRED_NAME:
-				columns.put(key, Objects.toString(germplasmSearchResponse.getMaleParentPreferredName(), ""));
+				columns.put(key, Objects.toString(
+					this.truncateValueIfPdf(isPdf, germplasmSearchResponse.getMaleParentPreferredName(), NAME_DISPLAY_MAX_LENGTH), ""));
 				return;
 			case CROSS_FEMALE_PREFERRED_NAME:
-				columns.put(key, Objects.toString(germplasmSearchResponse.getFemaleParentPreferredName(), ""));
+				columns.put(key, Objects.toString(
+					this.truncateValueIfPdf(isPdf, germplasmSearchResponse.getFemaleParentPreferredName(), NAME_DISPLAY_MAX_LENGTH), ""));
 				return;
 			default:
 				//do nothing
 		}
 
 		final Optional<LabelPrintingStaticField> staticField = LabelPrintingStaticField.getByFieldId(id);
-		if(!staticField.isPresent()) return;
+		if (!staticField.isPresent())
+			return;
 		switch (staticField.get()) {
 			case CROSS:
 				columns.put(key, Objects.toString(germplasmSearchResponse.getPedigreeString(), ""));
@@ -388,7 +398,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		}
 	}
 
-	void getGermplasmFieldDataRowValue(
+	void getGermplasmFieldDataRowValue(final boolean isPdf,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, String> columns, final Integer key, final int id) {
 		final TermId term = TermId.getById(id);
 		switch (term) {
@@ -411,7 +421,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPreferredId(), ""));
 				return;
 			case PREFERRED_NAME:
-				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmPreferredName(), ""));
+				columns.put(key, Objects.toString(
+					this.truncateValueIfPdf(isPdf, germplasmSearchResponse.getGermplasmPreferredName(), NAME_DISPLAY_MAX_LENGTH), ""));
 				return;
 			case GERMPLASM_DATE:
 				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmDate(), ""));
@@ -427,7 +438,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		}
 
 		final Optional<LabelPrintingStaticField> staticField = LabelPrintingStaticField.getByFieldId(id);
-		if(!staticField.isPresent()) return;
+		if (!staticField.isPresent())
+			return;
 		switch (staticField.get()) {
 			case GUID:
 				columns.put(key, Objects.toString(germplasmSearchResponse.getGermplasmUUID(), ""));
