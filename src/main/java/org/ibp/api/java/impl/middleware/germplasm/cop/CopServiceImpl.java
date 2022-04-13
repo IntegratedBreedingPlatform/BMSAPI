@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm.cop;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
@@ -36,7 +37,7 @@ public class CopServiceImpl implements CopService {
 	private FileStorageService fileStorageService;
 
 	@Override
-	public CopResponse coefficientOfParentage(Set<Integer> gids, final Integer listId,
+	public CopResponse viewCoefficientOfParentage(Set<Integer> gids, final Integer listId,
 		final HttpServletRequest request, final HttpServletResponse response) throws IOException {
 
 		if (listId != null) {
@@ -76,15 +77,22 @@ public class CopServiceImpl implements CopService {
 	}
 
 	@Override
-	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids, final Integer listId, final BTypeEnum btype) {
-		final Table<Integer, Integer, Double> matrix = this.copServiceMiddleware.getCopMatrixByGids(gids);
+	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids, final Integer listId, final BTypeEnum btype,
+		final boolean reset) {
 
+		Table<Integer, Integer, Double> matrix = HashBasedTable.create();
 		// if all cop values are calculated, return them
 		boolean requiresProcessing = false;
-		for (final Integer gid1 : gids) {
-			for (final Integer gid2 : gids) {
-				if (!(matrix.contains(gid1, gid2) || matrix.contains(gid2, gid1))) {
-					requiresProcessing = true;
+
+		if (reset) {
+			requiresProcessing = true;
+		} else {
+			matrix = this.copServiceMiddleware.getCopMatrixByGids(gids);
+			for (final Integer gid1 : gids) {
+				for (final Integer gid2 : gids) {
+					if (!(matrix.contains(gid1, gid2) || matrix.contains(gid2, gid1))) {
+						requiresProcessing = true;
+					}
 				}
 			}
 		}
@@ -106,7 +114,7 @@ public class CopServiceImpl implements CopService {
 	@Override
 	public CopResponse calculateCoefficientOfParentage(final Integer listId, final BTypeEnum btype) {
 		final Set<Integer> gids = new LinkedHashSet<>(this.germplasmListDataService.getGidsByListId(listId));
-		return this.calculateCoefficientOfParentage(gids, listId, btype);
+		return this.calculateCoefficientOfParentage(gids, listId, btype, false);
 	}
 
 	@Override

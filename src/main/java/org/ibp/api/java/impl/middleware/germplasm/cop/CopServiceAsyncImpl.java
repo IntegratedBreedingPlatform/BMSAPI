@@ -178,7 +178,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 					for (final Integer column : rowEntrySet.getValue().keySet()) {
 						final Integer row = rowEntrySet.getKey();
 						final CopMatrix copMatrix = new CopMatrix(row, column, matrixNew.get(row, column));
-						this.copServiceAsyncMiddleware.save(copMatrix);
+						this.copServiceAsyncMiddleware.saveOrUpdate(copMatrix);
 					}
 				}
 			} else {

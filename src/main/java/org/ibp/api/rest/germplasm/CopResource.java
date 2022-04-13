@@ -3,6 +3,7 @@ package org.ibp.api.rest.germplasm;
 import com.google.common.io.Files;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
@@ -50,9 +51,11 @@ public class CopResource {
 	public ResponseEntity<CopResponse> calculateCopMatrix(
 		@PathVariable final String cropName,
 		@RequestBody final Set<Integer> gids,
-		@RequestParam final BTypeEnum btype
+		@RequestParam final BTypeEnum btype,
+		@ApiParam("whether to use or ignore pre-existing cop values. If true, re-calculate everything from scratch")
+		@RequestParam(required = false, defaultValue = "false") final boolean reset
 	) {
-		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids, null, btype);
+		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids, null, btype, reset);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
@@ -97,7 +100,7 @@ public class CopResource {
 	) throws IOException {
 		// Either listId or gids param
 		BaseValidator.checkArgument(isEmpty(gids) != (listId == null), "cop.params.gids.or.listid");
-		final CopResponse results = this.copService.coefficientOfParentage(gids, listId, request, response);
+		final CopResponse results = this.copService.viewCoefficientOfParentage(gids, listId, request, response);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
@@ -125,7 +128,7 @@ public class CopResource {
 		@PathVariable final String cropName,
 		@RequestParam final Set<Integer> gids
 	) throws IOException {
-		final CopResponse results = this.copService.coefficientOfParentage(gids, null, null, null);
+		final CopResponse results = this.copService.viewCoefficientOfParentage(gids, null, null, null);
 
 		// FIXME avoid writing to disk
 		final File temporaryFolder = Files.createTempDir();

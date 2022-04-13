@@ -13,14 +13,13 @@ public interface CopService {
 	/**
 	 * retrieve existing cop matrix if available. Does not trigger any calculation
 	 */
-	CopResponse coefficientOfParentage(
+	CopResponse viewCoefficientOfParentage(
 		Set<Integer> gids, Integer listId, HttpServletRequest request, HttpServletResponse response) throws IOException;
 
 	/**
 	 * retrieve existing cop matrix if available
 	 */
-	CopResponse calculateCoefficientOfParentage(
-		Set<Integer> gids, Integer listId, BTypeEnum btype);
+	CopResponse calculateCoefficientOfParentage(Set<Integer> gids, Integer listId, BTypeEnum btype, boolean reset);
 
 	/**
 	 * retrieve existing cop matrix if available
