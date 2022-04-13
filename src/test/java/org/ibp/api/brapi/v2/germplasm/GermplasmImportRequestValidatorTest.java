@@ -224,7 +224,7 @@ public class GermplasmImportRequestValidatorTest {
 		importRequest1.setBreedingMethodDbId(String.valueOf(MID));
 		importRequest1.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
 		// Invalid default display name
-			importRequest1.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(5001));
+		importRequest1.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(5001));
 
 		final GermplasmImportRequest importRequest2 = new GermplasmImportRequest();
 		importRequest2.setAcquisitionDate("2021-02-21");
@@ -232,7 +232,7 @@ public class GermplasmImportRequestValidatorTest {
 		importRequest2.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
 		importRequest2.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(20));
 		// Invalid accession number
-		importRequest2.setAccessionNumber(RandomStringUtils.randomAlphabetic(260));
+		importRequest2.setAccessionNumber(RandomStringUtils.randomAlphabetic(5001));
 
 		final GermplasmImportRequest importRequest3 = new GermplasmImportRequest();
 		importRequest3.setAcquisitionDate("2021-02-21");
@@ -241,7 +241,7 @@ public class GermplasmImportRequestValidatorTest {
 		importRequest3.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(20));
 		importRequest3.setAccessionNumber(RandomStringUtils.randomAlphabetic(20));
 		// Invalid genus
-		importRequest3.setGenus(RandomStringUtils.randomAlphabetic(260));
+		importRequest3.setGenus(RandomStringUtils.randomAlphabetic(5001));
 
 		final GermplasmImportRequest importRequest4 = new GermplasmImportRequest();
 		importRequest4.setAcquisitionDate("2021-02-21");
@@ -251,7 +251,7 @@ public class GermplasmImportRequestValidatorTest {
 		importRequest4.setAccessionNumber(RandomStringUtils.randomAlphabetic(20));
 		importRequest4.setGenus(RandomStringUtils.randomAlphabetic(20));
 		// Invalid pedigree
-		importRequest4.setPedigree(RandomStringUtils.randomAlphabetic(260));
+		importRequest4.setPedigree(RandomStringUtils.randomAlphabetic(5001));
 
 		final GermplasmImportRequest importRequest5 = new GermplasmImportRequest();
 		importRequest5.setAcquisitionDate("2021-02-21");
@@ -262,7 +262,7 @@ public class GermplasmImportRequestValidatorTest {
 		importRequest5.setGenus(RandomStringUtils.randomAlphabetic(20));
 		importRequest5.setPedigree(RandomStringUtils.randomAlphabetic(20));
 		// Invalid germplasm PUI
-		importRequest5.setGermplasmPUI(RandomStringUtils.randomAlphabetic(260));
+		importRequest5.setGermplasmPUI(RandomStringUtils.randomAlphabetic(5001));
 
 		Mockito.doReturn(Optional.of(new BreedingMethodDTO())).when(this.breedingMethodService).getBreedingMethod(ArgumentMatchers.anyInt());
 		Mockito.doReturn(1L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any(), ArgumentMatchers.isNull());

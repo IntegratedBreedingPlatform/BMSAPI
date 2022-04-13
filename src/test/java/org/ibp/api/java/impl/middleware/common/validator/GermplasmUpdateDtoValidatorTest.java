@@ -146,7 +146,7 @@ public class GermplasmUpdateDtoValidatorTest {
 	@Test
 	public void testValidate_InvalidAttributeAndNameValues() {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
-		germplasmUpdateDTO.getNames().put("DRVNM", randomAlphanumeric(300));
+		germplasmUpdateDTO.getNames().put("DRVNM", randomAlphanumeric(5001));
 		germplasmUpdateDTO.getNames().put("LNAME", "");
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
