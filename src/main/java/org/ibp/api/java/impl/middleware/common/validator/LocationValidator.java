@@ -41,7 +41,7 @@ public class LocationValidator {
 	private static final Integer LOCATION_NAME_MAX_LENGTH = 60;
 	private static final Integer LOCATION_ABBR_MAX_LENGTH = 12;
 	private static final Set<String> LOCATIONS_NOT_DELETABLES = new HashSet<>(Arrays.asList("Unspecified Location", "Default Seed Store", "Default Breeding Location"));
-	private static final List<Integer> RESTRICTED_LOCATION_TYPE = Arrays.asList(401, 405, 406);
+	private static final List<Integer> RESTRICTED_LOCATION_TYPES = Arrays.asList(401, 405, 406);
 	@Autowired
 	private LocationDataManager locationDataManager;
 
@@ -152,7 +152,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationTypeRestricted(final Integer locationType, final String errorCode) {
-		if (RESTRICTED_LOCATION_TYPE.contains(locationType)) {
+		if (RESTRICTED_LOCATION_TYPES.contains(locationType)) {
 			final Optional<LocationTypeDTO> locationTypeDTO =
 				this.locationService.getLocationTypes().stream().filter((ltype) -> ltype.getId().equals(locationType)).findFirst();
 			this.errors.reject(errorCode, new String[] {locationTypeDTO.get().getName()}, "");

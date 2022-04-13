@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class LocationServiceImpl implements LocationService {
 
-	public static final List<Integer> RESTRICTED_LOCATION_TYPE = Arrays.asList(401, 405, 406);
+	public static final List<Integer> RESTRICTED_LOCATION_TYPES = Arrays.asList(401, 405, 406);
 
 	@Autowired
 	private org.generationcp.middleware.api.location.LocationService locationMiddlewareService;
@@ -38,7 +38,7 @@ public class LocationServiceImpl implements LocationService {
 	public List<LocationTypeDTO> getLocationTypes(final Boolean excludeRestrictedTypes) {
 		if (Boolean.TRUE.equals(excludeRestrictedTypes)) {
 			return this.locationMiddlewareService.getLocationTypes().stream()
-				.filter((locationType) -> !LocationServiceImpl.RESTRICTED_LOCATION_TYPE.contains(locationType.getId())).collect(
+				.filter((locationType) -> !LocationServiceImpl.RESTRICTED_LOCATION_TYPES.contains(locationType.getId())).collect(
 					Collectors.toList());
 		}
 		return this.locationMiddlewareService.getLocationTypes();

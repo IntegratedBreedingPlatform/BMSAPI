@@ -344,10 +344,10 @@ public class LocationValidatorTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateCanBeDeleted_ThrowsException_WhenLocationTypeIsRestricted() {
 		final LocationDTO locationDTO = new LocationDTO();
-		locationDTO.setType(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.get(new Random().nextInt(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.size())));
+		locationDTO.setType(LocationServiceImpl.RESTRICTED_LOCATION_TYPES.get(new Random().nextInt(LocationServiceImpl.RESTRICTED_LOCATION_TYPES.size())));
 		locationDTO.setId(LocationValidatorTest.LOCATION_ID);
 
-		final List<LocationTypeDTO> locationTypeDTOS = this.buildLocationTypes(LocationServiceImpl.RESTRICTED_LOCATION_TYPE);
+		final List<LocationTypeDTO> locationTypeDTOS = this.buildLocationTypes(LocationServiceImpl.RESTRICTED_LOCATION_TYPES);
 
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(locationDTO);
 		Mockito.when(this.locationService.getLocationTypes()).thenReturn(locationTypeDTOS);
@@ -393,11 +393,11 @@ public class LocationValidatorTest {
 		final LocationRequestDto locationRequestDto =
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, 0);
 		final LocationDTO locationDTO = new LocationDTO();
-		locationDTO.setType(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.get(
-			new Random().nextInt(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.size())));
+		locationDTO.setType(LocationServiceImpl.RESTRICTED_LOCATION_TYPES.get(
+			new Random().nextInt(LocationServiceImpl.RESTRICTED_LOCATION_TYPES.size())));
 		locationDTO.setId(LocationValidatorTest.LOCATION_ID);
 
-		final List<LocationTypeDTO> locationTypeDTOS = this.buildLocationTypes(LocationServiceImpl.RESTRICTED_LOCATION_TYPE);
+		final List<LocationTypeDTO> locationTypeDTOS = this.buildLocationTypes(LocationServiceImpl.RESTRICTED_LOCATION_TYPES);
 
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(locationDTO);
 		Mockito.when(this.locationService.getLocationTypes()).thenReturn(locationTypeDTOS);
@@ -614,8 +614,8 @@ public class LocationValidatorTest {
 	public void testValidate_create_ThrowsException_WhenLocationTypeIsRestricted() {
 		final LocationRequestDto locationRequestDto =
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR, 0);
-		locationRequestDto.setType(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.get(
-			new Random().nextInt(LocationServiceImpl.RESTRICTED_LOCATION_TYPE.size())));
+		locationRequestDto.setType(LocationServiceImpl.RESTRICTED_LOCATION_TYPES.get(
+			new Random().nextInt(LocationServiceImpl.RESTRICTED_LOCATION_TYPES.size())));
 
 		final List<LocationTypeDTO> locationTypeDTOS = this.buildLocationTypes(Arrays.asList(locationRequestDto.getType()));
 		Mockito.when(this.locationService.getLocationTypes()).thenReturn(locationTypeDTOS);
