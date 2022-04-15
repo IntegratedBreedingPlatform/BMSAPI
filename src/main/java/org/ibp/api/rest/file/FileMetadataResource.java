@@ -72,7 +72,7 @@ public class FileMetadataResource {
 	@RequestMapping(value = "/filemetadata", method = RequestMethod.HEAD)
 	public ResponseEntity<Void> getFileCount(
 		@PathVariable final String cropName,
-		@RequestParam final List<Integer> variableIds,
+		@RequestParam(required = false) final List<Integer> variableIds,
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Integer datasetId,
 		@RequestParam(required = false) final String germplasmUUID,
@@ -109,7 +109,7 @@ public class FileMetadataResource {
 	@RequestMapping(value = "/filemetadata", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> removeFiles(
 		@PathVariable final String cropName,
-		@RequestParam final List<Integer> variableIds,
+		@RequestParam(required = false) final List<Integer> variableIds,
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Integer datasetId,
 		@RequestParam(required = false) final String germplasmUUID,
