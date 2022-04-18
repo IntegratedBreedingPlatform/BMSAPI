@@ -23,6 +23,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,6 @@ public class GermplasmImportRequestDtoValidator {
 	static final Integer STOCK_ID_MAX_LENGTH = 35;
 	static final Integer REFERENCE_MAX_LENGTH = 255;
 	public static final Integer NAME_MAX_LENGTH = 255;
-	public static final Integer ATTRIBUTE_MAX_LENGTH = 255;
 	private static final List<VariableType> ATTRIBUTE_TYPES =
 		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
 
@@ -533,7 +533,7 @@ public class GermplasmImportRequestDtoValidator {
 				return true;
 			}
 			return attributes.values().stream().anyMatch(n -> {
-				if (StringUtils.isNotEmpty(n) && n.length() > ATTRIBUTE_MAX_LENGTH) {
+				if (StringUtils.isNotEmpty(n) && n.length() > AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH) {
 					this.errors.reject("germplasm.import.attribute.value.invalid.length", "");
 					return true;
 				}

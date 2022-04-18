@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
+	public static final int ATTRIBUTE_DISPLAY_MAX_LENGTH = 200;
 	List<Field> defaultPedigreeDetailsFields;
 	List<Field> defaultGermplasmDetailsFields;
 
@@ -254,7 +255,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		// Data to be exported
 		final List<Map<Integer, String>> data = new ArrayList<>();
 		for (final GermplasmSearchResponse germplasmSearchResponse : responseList) {
-			data.add(this.getDataRow(keys, germplasmSearchResponse, attributeValues, nameValues));
+			data.add(this.getDataRow(labelsGeneratorInput, keys, germplasmSearchResponse, attributeValues, nameValues));
 		}
 
 		return new LabelsData(LabelPrintingStaticField.GUID.getFieldId(), data);
@@ -306,7 +307,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		germplasmSearchRequest.setAddedColumnsPropertyIds(new ArrayList<>(addedColumnsPropertyIds));
 	}
 
-	Map<Integer, String> getDataRow(
+	Map<Integer, String> getDataRow(final LabelsGeneratorInput labelsGeneratorInput,
 		final Set<Integer> keys, final GermplasmSearchResponse germplasmSearchResponse,
 		final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues) {
 
@@ -318,13 +319,13 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			} else if (this.pedigreeFieldIds.contains(id)) {
 				this.getPedigreeFieldDataRowValue(germplasmSearchResponse, columns, key, id);
 			} else {
-				this.getAttributeOrNameDataRowValue(germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
+				this.getAttributeOrNameDataRowValue(labelsGeneratorInput, germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
 			}
 		}
 		return columns;
 	}
 
-	void getAttributeOrNameDataRowValue(
+	void getAttributeOrNameDataRowValue(final LabelsGeneratorInput labelsGeneratorInput,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
 		final Map<Integer, Map<Integer, String>> nameValues, final Map<Integer, String> columns, final Integer key, final int id) {
 		// Not part of the fixed columns
@@ -333,7 +334,9 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		if (attributesByType != null) {
 			final String attributeValue = attributesByType.get(id);
 			if (attributeValue != null) {
-				columns.put(key, attributeValue);
+				// Truncate attribute values to 200 characters if export file type is PDF
+				columns.put(key, FileType.PDF.equals(labelsGeneratorInput.getFileType()) && StringUtils.length(attributeValue) > GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH ?
+					attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "..." : attributeValue);
 			}
 		}
 

@@ -11,6 +11,7 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,6 @@ import java.util.stream.IntStream;
 public class GermplasmImportRequestValidator {
 
 	public static final Integer NAME_MAX_LENGTH = 255;
-	public static final Integer ATTRIBUTE_MAX_LENGTH = 255;
 	public static final String GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH = "germplasm.create.name.exceeded.length";
 	public static final String GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH = "germplasm.create.attribute.exceeded.length";
 
@@ -291,7 +291,7 @@ public class GermplasmImportRequestValidator {
 	}
 
 	protected boolean attributeExceedsLength(final String attribute) {
-		return attribute.length() > ATTRIBUTE_MAX_LENGTH;
+		return attribute.length() > AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH;
 	}
 
 	protected boolean nameExceedsLength(final String name) {
