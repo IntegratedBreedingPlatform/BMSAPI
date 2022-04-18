@@ -13,6 +13,7 @@ import org.ibp.api.java.impl.middleware.germplasm.cop.CopService;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +47,9 @@ public class CopResource {
 	@Autowired
 	private FileStorageService fileStorageService;
 
+	@Value("${cop.max.entries}")
+	private Integer copMaxEntries;
+
 	@ApiOperation("Calculate coefficient of parentage")
 	@RequestMapping(value = "/cop/calculation", method = RequestMethod.POST)
 	@ResponseBody
@@ -55,10 +60,14 @@ public class CopResource {
 		@ApiParam("whether to use or ignore pre-existing cop values. If true, re-calculate everything from scratch")
 		@RequestParam(required = false, defaultValue = "false") final boolean reset
 	) {
+		BaseValidator.checkNotNull(gids, "param.null", new String[] {"gids"});
+		BaseValidator.checkNotNull(btype, "param.null", new String[] {"btype"});
+		BaseValidator.checkArgument(gids.size() <= this.copMaxEntries, "cop.calculation.max.entries", new Integer[] {this.copMaxEntries});
 		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids, null, btype, reset);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
+	@ApiIgnore // prototype, not part of release
 	@ApiOperation("Calculate coefficient of parentage for a list")
 	@RequestMapping(value = "/cop/calculation/list/{listId}", method = RequestMethod.POST)
 	@ResponseBody
@@ -88,6 +97,7 @@ public class CopResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiIgnore // prototype, not part of release
 	@ApiOperation("Get coefficient of parentage")
 	@RequestMapping(value = "/cop", method = RequestMethod.GET)
 	@ResponseBody
@@ -104,6 +114,7 @@ public class CopResource {
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
+	@ApiIgnore // prototype, not part of release
 	@ApiOperation("Get coefficient of parentage as csv")
 	@RequestMapping(value = "/cop/csv/list/{listId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -120,7 +131,6 @@ public class CopResource {
 		return new ResponseEntity<>(file, headers, HttpStatus.OK);
 	}
 
-	// TODO delete if not used
 	@ApiOperation("Get coefficient of parentage as csv")
 	@RequestMapping(value = "/cop/csv", method = RequestMethod.GET)
 	@ResponseBody
