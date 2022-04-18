@@ -97,7 +97,6 @@ public class CopResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiIgnore // prototype, not part of release
 	@ApiOperation("Get coefficient of parentage")
 	@RequestMapping(value = "/cop", method = RequestMethod.GET)
 	@ResponseBody
