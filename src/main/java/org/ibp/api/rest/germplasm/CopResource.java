@@ -61,6 +61,7 @@ public class CopResource {
 		@RequestParam(required = false, defaultValue = "false") final boolean reset
 	) {
 		BaseValidator.checkNotNull(gids, "param.null", new String[] {"gids"});
+		BaseValidator.checkArgument(gids.size() > 0, "param.null", new String[] {"gids"});
 		BaseValidator.checkNotNull(btype, "param.null", new String[] {"btype"});
 		BaseValidator.checkArgument(gids.size() <= this.copMaxEntries, "cop.calculation.max.entries", new Integer[] {this.copMaxEntries});
 		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids, null, btype, reset);
