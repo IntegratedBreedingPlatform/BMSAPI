@@ -56,9 +56,10 @@ public class LocationResource {
 	@ResponseBody
 	public ResponseEntity<List<LocationTypeDTO>> getLocationTypes(
 		@PathVariable final String cropName,
+		@RequestParam(required = false) final Boolean excludeRestrictedTypes,
 		@RequestParam(required = false) final String programUUID) {
 
-		return new ResponseEntity<>(this.locationService.getLocationTypes(), HttpStatus.OK);
+		return new ResponseEntity<>(this.locationService.getLocationTypes(excludeRestrictedTypes), HttpStatus.OK);
 	}
 
 	@ApiImplicitParams({
