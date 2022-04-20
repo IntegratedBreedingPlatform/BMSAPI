@@ -246,7 +246,7 @@ public class GermplasmNameRequestValidatorTest {
 	public void testValidateUpdateName_ThrowsException_WhenNameExceedMaxLength() {
 		try {
 			final GermplasmNameRequestDto germplasmNameRequestDto = new GermplasmNameRequestDto();
-			germplasmNameRequestDto.setName(RandomStringUtils.randomAlphabetic(256));
+			germplasmNameRequestDto.setName(RandomStringUtils.randomAlphabetic(5001));
 
 			final Name name = new Name(GermplasmNameRequestValidatorTest.NAME_ID);
 			name.setGermplasm(this.mockGermplasm());

@@ -33,7 +33,7 @@ import java.util.stream.IntStream;
 @Component
 public class GermplasmImportRequestValidator {
 
-	public static final Integer NAME_MAX_LENGTH = 255;
+	public static final Integer NAME_MAX_LENGTH = 5000;
 	public static final String GERMPLASM_CREATE_NAME_EXCEEDED_LENGTH = "germplasm.create.name.exceeded.length";
 	public static final String GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH = "germplasm.create.attribute.exceeded.length";
 

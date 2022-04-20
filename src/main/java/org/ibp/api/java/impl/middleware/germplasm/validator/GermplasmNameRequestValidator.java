@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Component
 public class GermplasmNameRequestValidator {
 
-    private static final Integer NAME_MAX_LENGTH = 255;
+    private static final Integer NAME_MAX_LENGTH = 5000;
     public static final String PUI = "PUI";
     public static final String GERMPLASM_PUI_DUPLICATE = "germplasm.name.pui.duplicate";
     private static final String HAS_EXISTING_PUI_NAME = "germplasm.has.pui";
