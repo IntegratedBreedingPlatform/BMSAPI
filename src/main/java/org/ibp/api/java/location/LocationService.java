@@ -12,7 +12,7 @@ public interface LocationService {
 
 	LocationDTO getLocation(Integer locationId);
 
-	List<LocationTypeDTO> getLocationTypes();
+	List<LocationTypeDTO> getLocationTypes(Boolean excludeRestrictedTypes);
 
 	long countLocations(String crop, LocationSearchRequest locationSearchRequest, String programUUID);
 
