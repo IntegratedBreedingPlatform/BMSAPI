@@ -221,6 +221,20 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test
+	public void testCreate_ShouldValidateGroupNameLength() {
+		try {
+			final GermplasmListGeneratorDTO request = this.createGermplasmList();
+			Mockito.when(
+					this.pedigreeService.getCrossExpansionsBulk(ArgumentMatchers.anySet(), ArgumentMatchers.isNull(), ArgumentMatchers.any()))
+				.thenReturn(Collections.singletonMap(GID1, RandomStringUtils.randomAlphanumeric(5001)));
+			this.germplasmListService.create(request);
+			Assert.fail();
+		} catch (final ApiValidationException e) {
+			Assert.assertThat(e.getErrorCode(), is("germplasm.list.resulting.grpname.exceeds.limit"));
+		}
+	}
+
+	@Test
 	public void testCreate_OK() {
 		final GermplasmListGeneratorDTO request = this.createGermplasmList();
 		request.setProgramUUID(PROGRAM_UUID);
@@ -735,7 +749,8 @@ public class GermplasmListServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListMetadata(request, PROGRAM_UUID);
 		Mockito.verify(this.germplasmListValidator).validateParentFolder(parentFolderId);
-		Mockito.verify(this.germplasmListValidator).validateFolderId(parentFolderId, PROGRAM_UUID, GermplasmListValidator.ListNodeType.PARENT);
+		Mockito.verify(this.germplasmListValidator)
+			.validateFolderId(parentFolderId, PROGRAM_UUID, GermplasmListValidator.ListNodeType.PARENT);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
 
 		Mockito.verify(this.germplasmListServiceMiddleware).cloneGermplasmList(anyInt(), any(GermplasmListDto.class), anyInt());
