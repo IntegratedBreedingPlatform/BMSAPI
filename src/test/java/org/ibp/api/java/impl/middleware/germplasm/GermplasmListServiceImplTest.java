@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -55,6 +56,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -119,6 +122,9 @@ public class GermplasmListServiceImplTest {
 
 	@Mock
 	private GermplasmListDataValidator germplasmListDataValidator;
+
+	@Mock
+	private CrossExpansionProperties crossExpansionProperties;
 
 	@Before
 	public void init() {
@@ -225,7 +231,8 @@ public class GermplasmListServiceImplTest {
 		try {
 			final GermplasmListGeneratorDTO request = this.createGermplasmList();
 			Mockito.when(
-					this.pedigreeService.getCrossExpansionsBulk(ArgumentMatchers.anySet(), ArgumentMatchers.isNull(), ArgumentMatchers.any()))
+					this.pedigreeService.getCrossExpansionsBulk(Stream.of(GID1, GID2)
+						.collect(Collectors.toCollection(HashSet::new)), null, this.crossExpansionProperties))
 				.thenReturn(Collections.singletonMap(GID1, RandomStringUtils.randomAlphanumeric(5001)));
 			this.germplasmListService.create(request);
 			Assert.fail();
