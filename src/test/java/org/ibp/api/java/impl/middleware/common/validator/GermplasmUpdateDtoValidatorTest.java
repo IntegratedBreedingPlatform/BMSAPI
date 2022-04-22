@@ -205,8 +205,9 @@ public class GermplasmUpdateDtoValidatorTest {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setBreedingMethodAbbr("UAC");
 
-		when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(),
-				ArgumentMatchers.isNull()))
+		when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class),
+			ArgumentMatchers.any(),
+			ArgumentMatchers.isNull()))
 			.thenReturn(Arrays.asList(new BreedingMethodDTO()));
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
@@ -282,4 +283,15 @@ public class GermplasmUpdateDtoValidatorTest {
 		Mockito.verifyZeroInteractions(errors);
 	}
 
+	@Test
+	public void testValidate_ProgenitorSameAsGid() {
+		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
+		germplasmUpdateDTO.setGid(1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 2);
+		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
+		final BindingResult errors = Mockito.mock(BindingResult.class);
+		this.germplasmUpdateDtoValidator.validateProgenitorMustNotBeGid(errors, germplasmUpdateList);
+		Mockito.verify(errors).reject("germplasm.update.progenitors.can.not.be.equals.to.gid");
+	}
 }

@@ -67,6 +67,7 @@ public class GermplasmUpdateDtoValidator {
 		this.validateBreedingMethod(errors, germplasmUpdateDTOList);
 		this.validateCreationDate(errors, germplasmUpdateDTOList);
 		this.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateDTOList);
+		this.validateProgenitorMustNotBeGid(errors, germplasmUpdateDTOList);
 		this.validateProgenitorsGids(errors, germplasmUpdateDTOList);
 
 		if (errors.hasErrors()) {
@@ -194,6 +195,15 @@ public class GermplasmUpdateDtoValidator {
 		}
 	}
 
+	protected void validateProgenitorMustNotBeGid(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+		// Find rows (GermplasmUpdateDTO) where gid = progenitor
+		final Optional<GermplasmUpdateDTO> germplasmWithSelfAsProgenitor =
+			germplasmUpdateDTOList.stream().filter(dto -> dto.getProgenitors().containsValue(dto.getGid())).findAny();
+		if (germplasmWithSelfAsProgenitor.isPresent()) {
+			errors.reject("germplasm.update.progenitors.can.not.be.equals.to.gid");
+		}
+	}
+
 	protected void validateGermplasmIdAndGermplasmUUID(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		// Find rows (GermplasmUpdateDTO) with blank GID and UUID.
 		final Optional<GermplasmUpdateDTO> germplasmWithNoIdentifier =
@@ -227,7 +237,7 @@ public class GermplasmUpdateDtoValidator {
 
 	}
 
-	protected void validateLocationAbbreviation(final BindingResult errors,	final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateLocationAbbreviation(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Set<String> locationAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getLocationAbbreviation()))
