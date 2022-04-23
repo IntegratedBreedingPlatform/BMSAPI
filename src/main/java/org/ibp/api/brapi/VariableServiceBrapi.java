@@ -14,4 +14,6 @@ public interface VariableServiceBrapi {
 	long countObservationVariables(VariableSearchRequestDTO requestDTO);
 
 	VariableUpdateResponse updateObservationVariable(String observationVariableDbId, VariableDTO variable);
+
+	List<VariableDTO> createObservationVariables(String crop, List<VariableDTO> variableDTOList);
 }

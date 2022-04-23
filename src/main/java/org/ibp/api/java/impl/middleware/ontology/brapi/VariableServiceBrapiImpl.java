@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -49,5 +50,16 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 			variableUpdateResponse.setErrors(e.getErrors());
 		}
 		return variableUpdateResponse;
+	}
+
+	@Override
+	public List<VariableDTO> createObservationVariables(final String crop, final List<VariableDTO> variableDTOList) {
+		// TODO: Validate
+		final List<VariableDTO> savedVariables = this.middlewareVariableServiceBrapi.createObservationVariables(variableDTOList);
+		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
+		// Fetch the saved observation variables from the database to populate the fields.
+		variableSearchRequestDTO.setObservationVariableDbIds(savedVariables.stream().map(VariableDTO::getObservationVariableDbId).collect(
+			Collectors.toList()));
+		return this.getObservationVariables(crop, variableSearchRequestDTO, null);
 	}
 }
