@@ -49,7 +49,7 @@ public class GermplasmListVariableServiceImpl implements GermplasmListVariableSe
 		final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmListVariableRequestDto.class.getName());
 		final GermplasmList germplasmList = germplasmListValidator.validateGermplasmList(listId);
-		germplasmListValidator.validateMaxVariablesAllowed(listId);
+		germplasmListValidator.validateMaxColumnsAndVariablesAllowed(listId, "list.add.variables.exceeded.maximun.allowed");
 		germplasmListValidator.validateListIsNotAFolder(germplasmList);
 		germplasmListValidator.validateListIsUnlocked(germplasmList);
 		germplasmListVariableValidator.validateAddVariableToList(listId, germplasmListVariableRequestDto);

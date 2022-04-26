@@ -67,7 +67,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	public void updateGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view) {
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
-		this.germplasmListValidator.validateMaxColumnsAllowed(listId);
+		this.germplasmListValidator.validateMaxColumnsAndVariablesAllowed(listId, "list.add.columns.exceeded.maximun.allowed");
 		this.germplasmListDataService.updateGermplasmListDataView(listId, view);
 	}
 

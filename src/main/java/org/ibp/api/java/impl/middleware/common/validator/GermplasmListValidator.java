@@ -152,7 +152,7 @@ public class GermplasmListValidator {
 		}
 	}
 
-	public void validateMaxColumnsAllowed(final Integer listId) {
+	public void validateMaxColumnsAndVariablesAllowed(final Integer listId, final String errorCode) {
 		final long countVariables = this.germplasmListService.countEntryDetailsNamesAndAttributesAdded(listId);
 		if (countVariables >= GermplasmListValidator.MAX_NUMBER_OF_COLUMNS_ALLOWED) {
 			this.errors.reject("list.add.columns.exceeded.maximun.allowed", "");
@@ -160,13 +160,6 @@ public class GermplasmListValidator {
 		}
 	}
 
-	public void validateMaxVariablesAllowed(final Integer listId) {
-		final long countVariables = this.germplasmListService.countEntryDetailsNamesAndAttributesAdded(listId);
-		if ( countVariables >= GermplasmListValidator.MAX_NUMBER_OF_COLUMNS_ALLOWED) {
-			this.errors.reject("list.add.variables.exceeded.maximun.allowed", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-	}
 	public void validateParentFolder(final String parentFolderId) {
 		checkNotNull(parentFolderId, PARAM_NULL, new String[] {"parentFolderId"});
 	}
