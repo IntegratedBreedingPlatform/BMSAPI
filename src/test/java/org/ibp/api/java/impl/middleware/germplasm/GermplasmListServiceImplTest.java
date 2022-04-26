@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -55,6 +56,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -119,6 +122,9 @@ public class GermplasmListServiceImplTest {
 
 	@Mock
 	private GermplasmListDataValidator germplasmListDataValidator;
+
+	@Mock
+	private CrossExpansionProperties crossExpansionProperties;
 
 	@Before
 	public void init() {
@@ -218,6 +224,21 @@ public class GermplasmListServiceImplTest {
 		final GermplasmListGeneratorDTO request = this.createGermplasmList();
 		this.germplasmListService.create(request);
 		Assert.assertThat(request.getEntries().get(1).getEntryCode(), is(String.valueOf(request.getEntries().get(1).getEntryNo())));
+	}
+
+	@Test
+	public void testCreate_ShouldValidateGroupNameLength() {
+		try {
+			final GermplasmListGeneratorDTO request = this.createGermplasmList();
+			Mockito.when(
+					this.pedigreeService.getCrossExpansionsBulk(Stream.of(GID1, GID2)
+						.collect(Collectors.toCollection(HashSet::new)), null, this.crossExpansionProperties))
+				.thenReturn(Collections.singletonMap(GID1, RandomStringUtils.randomAlphanumeric(5001)));
+			this.germplasmListService.create(request);
+			Assert.fail();
+		} catch (final ApiValidationException e) {
+			Assert.assertThat(e.getErrorCode(), is("germplasm.list.resulting.grpname.exceeds.limit"));
+		}
 	}
 
 	@Test
@@ -735,7 +756,8 @@ public class GermplasmListServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListMetadata(request, PROGRAM_UUID);
 		Mockito.verify(this.germplasmListValidator).validateParentFolder(parentFolderId);
-		Mockito.verify(this.germplasmListValidator).validateFolderId(parentFolderId, PROGRAM_UUID, GermplasmListValidator.ListNodeType.PARENT);
+		Mockito.verify(this.germplasmListValidator)
+			.validateFolderId(parentFolderId, PROGRAM_UUID, GermplasmListValidator.ListNodeType.PARENT);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
 
 		Mockito.verify(this.germplasmListServiceMiddleware).cloneGermplasmList(anyInt(), any(GermplasmListDto.class), anyInt());
