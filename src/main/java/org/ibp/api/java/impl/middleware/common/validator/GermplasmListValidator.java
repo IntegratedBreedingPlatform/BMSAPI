@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListBasicInfoDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
-import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -22,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotEmpty;
@@ -31,7 +29,7 @@ import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.ch
 @Component
 public class GermplasmListValidator {
 
-	public final static int MAX_NUMBER_OF_COLUMNS_ALLOWED = 50;
+	public final static long MAX_NUMBER_OF_COLUMNS_ALLOWED = 50;
 
 	public enum ListNodeType {
 		PARENT("parent"),
@@ -154,17 +152,21 @@ public class GermplasmListValidator {
 		}
 	}
 
-	public void validateExceededMaximunColumnsAllowed(final GermplasmList germplasmList ,final List<GermplasmListDataUpdateViewDTO> view) {
-		final int entryDetailsLength = germplasmList.getView().stream().filter(germplasmListDataView -> germplasmListDataView.isEntryDetailColumn()).collect(
-			Collectors.toList()).size();
-		final int columnsLength = view.stream().filter(germplasmListDataUpdateViewDTO -> !germplasmListDataUpdateViewDTO.getCategory().name().equals("STATIC")).collect(
-			Collectors.toList()).size();
-		if ((entryDetailsLength + columnsLength) > GermplasmListValidator.MAX_NUMBER_OF_COLUMNS_ALLOWED) {
+	public void validateMaxColumnsAllowed(final Integer listId) {
+		final long countVariables = this.germplasmListService.countEntryDetailsNamesAndAttributesAdded(listId);
+		if (countVariables >= GermplasmListValidator.MAX_NUMBER_OF_COLUMNS_ALLOWED) {
 			this.errors.reject("list.add.columns.exceeded.maximun.allowed", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
+	public void validateMaxVariablesAllowed(final Integer listId) {
+		final long countVariables = this.germplasmListService.countEntryDetailsNamesAndAttributesAdded(listId);
+		if ( countVariables >= GermplasmListValidator.MAX_NUMBER_OF_COLUMNS_ALLOWED) {
+			this.errors.reject("list.add.variables.exceeded.maximun.allowed", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
 	public void validateParentFolder(final String parentFolderId) {
 		checkNotNull(parentFolderId, PARAM_NULL, new String[] {"parentFolderId"});
 	}
