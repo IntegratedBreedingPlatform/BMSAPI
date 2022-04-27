@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
@@ -179,7 +180,7 @@ public class ObservationImportRequestValidator {
 			return true;
 		}
 		final ScaleDTO scale = variableDTOMap.get(dto.getObservationVariableDbId()).getScale();
-		if (DataType.NUMERIC_VARIABLE.getBrapiName().equalsIgnoreCase(scale.getDataType()) && !StringUtils.isNumeric(dto.getValue())) {
+		if (DataType.NUMERIC_VARIABLE.getBrapiName().equalsIgnoreCase(scale.getDataType()) && !NumberUtils.isNumber(dto.getValue())) {
 			this.errors.reject("observation.import.value.non.numeric", new String[] {index.toString()}, "");
 			return true;
 		}
