@@ -67,7 +67,7 @@ public class GermplasmUpdateDtoValidator {
 		this.validateBreedingMethod(errors, germplasmUpdateDTOList);
 		this.validateCreationDate(errors, germplasmUpdateDTOList);
 		this.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateDTOList);
-		this.validateProgenitorMustNotBeGid(errors, germplasmUpdateDTOList);
+		this.validateCannotAssignSelfAsProgenitor(errors, germplasmUpdateDTOList);
 		this.validateProgenitorsGids(errors, germplasmUpdateDTOList);
 
 		if (errors.hasErrors()) {
@@ -137,7 +137,7 @@ public class GermplasmUpdateDtoValidator {
 			germplasmUpdateDTOList.stream()
 				.map(o -> StringUtils.isNotEmpty(o.getPreferredNameType()) ? o.getPreferredNameType().toUpperCase() : null)
 				.filter(Objects::nonNull).collect(
-				Collectors.toSet()));
+					Collectors.toSet()));
 		final Set<String> existingNamesCodes =
 			this.germplasmService.filterGermplasmNameTypes(nameCodes).stream().map(nameType -> nameType.getCode().toUpperCase()).collect(
 				Collectors.toSet());
@@ -195,10 +195,20 @@ public class GermplasmUpdateDtoValidator {
 		}
 	}
 
-	protected void validateProgenitorMustNotBeGid(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateCannotAssignSelfAsProgenitor(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+		final Set<String> germplasmUUIDs =
+			germplasmUpdateDTOList.stream()
+				.map(dto -> dto.getGid() == null && StringUtils.isNotEmpty(dto.getGermplasmUUID()) ? dto.getGermplasmUUID() : null)
+				.filter(
+					Objects::nonNull).collect(Collectors.toSet());
+		final List<Germplasm> germplasmByUUIDs = this.germplasmMiddlewareService.getGermplasmByGUIDs(new ArrayList<>(germplasmUUIDs));
+		final Map<String, Integer> guuidGidMap = germplasmByUUIDs.stream()
+			.collect(Collectors.toMap(Germplasm::getGermplasmUUID, Germplasm::getGid));
+
 		// Find rows (GermplasmUpdateDTO) where gid = progenitor
 		final Optional<GermplasmUpdateDTO> germplasmWithSelfAsProgenitor =
-			germplasmUpdateDTOList.stream().filter(dto -> dto.getProgenitors().containsValue(dto.getGid())).findAny();
+			germplasmUpdateDTOList.stream().filter(dto -> dto.getProgenitors()
+				.containsValue(Optional.ofNullable(dto.getGid()).orElse(guuidGidMap.get(dto.getGermplasmUUID())))).findAny();
 		if (germplasmWithSelfAsProgenitor.isPresent()) {
 			errors.reject("germplasm.update.progenitors.can.not.be.equals.to.gid");
 		}
@@ -248,7 +258,7 @@ public class GermplasmUpdateDtoValidator {
 				.searchLocations(new LocationSearchRequest(null, null, new ArrayList<>(locationAbbrs), null), null, null)
 				.stream()
 				.map(LocationDTO::getAbbreviation).collect(
-				Collectors.toList());
+					Collectors.toList());
 
 		locationAbbrs.removeAll(abbreviations);
 
@@ -270,7 +280,7 @@ public class GermplasmUpdateDtoValidator {
 			this.breedingMethodService.searchBreedingMethods(breedingMethodSearchRequest, null, null)
 				.stream()
 				.map(BreedingMethodDTO::getCode).collect(
-				Collectors.toList());
+					Collectors.toList());
 
 		breedingMethodsAbbrs.removeAll(abbreviations);
 

@@ -291,7 +291,25 @@ public class GermplasmUpdateDtoValidatorTest {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 2);
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);
-		this.germplasmUpdateDtoValidator.validateProgenitorMustNotBeGid(errors, germplasmUpdateList);
+		this.germplasmUpdateDtoValidator.validateCannotAssignSelfAsProgenitor(errors, germplasmUpdateList);
+		Mockito.verify(errors).reject("germplasm.update.progenitors.can.not.be.equals.to.gid");
+	}
+
+	@Test
+	public void testValidate_ProgenitorSameAsGermplasmUUID() {
+		final String uuid = UUID.randomUUID().toString();
+		final Germplasm germplasm = new Germplasm(1);
+		germplasm.setGermplasmUUID(uuid);
+		when(this.germplasmMiddlewareService.getGermplasmByGUIDs(Mockito.anyList()))
+			.thenReturn(Arrays.asList(germplasm));
+
+		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
+		germplasmUpdateDTO.setGermplasmUUID(uuid);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 2);
+		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
+		final BindingResult errors = Mockito.mock(BindingResult.class);
+		this.germplasmUpdateDtoValidator.validateCannotAssignSelfAsProgenitor(errors, germplasmUpdateList);
 		Mockito.verify(errors).reject("germplasm.update.progenitors.can.not.be.equals.to.gid");
 	}
 }
