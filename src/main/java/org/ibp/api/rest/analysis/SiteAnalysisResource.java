@@ -9,6 +9,7 @@ import org.ibp.api.rest.dataset.DatasetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,7 @@ public class SiteAnalysisResource {
 	@ApiOperation(value = "Create means dataset", notes = "Create means dataset")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/means", method = RequestMethod.POST)
 	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	public ResponseEntity<DatasetDTO> createMeansDataset(@PathVariable final String cropName,
 		@PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@RequestBody final MeansImportRequest meansImportRequest) {
@@ -37,6 +39,7 @@ public class SiteAnalysisResource {
 	@ApiOperation(value = "Create summary statistics dataset", notes = "Create summary statistics dataset")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/summary-statistics", method = RequestMethod.POST)
 	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	public ResponseEntity<DatasetDTO> createSummaryStatisticsDataset(@PathVariable final String cropName,
 		@PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@RequestBody final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
