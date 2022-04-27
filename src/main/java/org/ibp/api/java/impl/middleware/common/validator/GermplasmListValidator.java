@@ -4,9 +4,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListBasicInfoDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotEmpty;
@@ -152,9 +155,23 @@ public class GermplasmListValidator {
 		}
 	}
 
-	public void validateMaxColumnsAndVariablesAllowed(final Integer listId, final String errorCode) {
+	public void validateMaxVariablesAllowed(final Integer listId) {
 		final long countVariables = this.germplasmListService.countEntryDetailsNamesAndAttributesAdded(listId);
 		if (countVariables >= GermplasmListValidator.MAX_NUMBER_OF_COLUMNS_ALLOWED) {
+			this.errors.reject("list.add.variables.exceeded.maximun.allowed", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validateMaxColumnsAllowed(final GermplasmList germplasmList ,final List<GermplasmListDataUpdateViewDTO> view) {
+		final long countVariables =
+			germplasmList.getView().stream().filter(germplasmListDataView -> germplasmListDataView.isEntryDetailColumn()).collect(
+				Collectors.toList()).size();
+		final long countColumnsToAdd =
+			view.stream().filter(germplasmListDataUpdateViewDTO -> !germplasmListDataUpdateViewDTO.getCategory().name().equals(
+				GermplasmListColumnCategory.STATIC.name())).collect(
+				Collectors.toList()).size();
+		if ((countVariables + countColumnsToAdd) > GermplasmListValidator.MAX_NUMBER_OF_COLUMNS_ALLOWED) {
 			this.errors.reject("list.add.columns.exceeded.maximun.allowed", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
