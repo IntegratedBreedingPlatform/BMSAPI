@@ -1,5 +1,6 @@
 package org.ibp.api.java.feedback;
 
+import org.generationcp.middleware.api.feedback.FeedbackDto;
 import org.generationcp.middleware.pojos.workbench.feedback.FeedbackFeature;
 
 public interface FeedbackService {
@@ -8,5 +9,5 @@ public interface FeedbackService {
 
 	void dontShowAgain(FeedbackFeature feature);
 
-	String getCollectorId(FeedbackFeature feature);
+	FeedbackDto getFeedBack(FeedbackFeature feature);
 }

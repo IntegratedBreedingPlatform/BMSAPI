@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.feedback;
 
+import org.generationcp.middleware.api.feedback.FeedbackDto;
 import org.generationcp.middleware.pojos.workbench.feedback.FeedbackFeature;
 import org.ibp.api.java.feedback.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 	}
 
 	@Override
-	public String getCollectorId(final FeedbackFeature feature) {
-		return this.feedbackService.getCollectorId(feature);
+	public FeedbackDto getFeedBack(final FeedbackFeature feature) {
+		return this.feedbackService.getFeedBack(feature);
 	}
 
 }

@@ -1,5 +1,6 @@
 package org.ibp.api.rest.feedback;
 
+import org.generationcp.middleware.api.feedback.FeedbackDto;
 import org.generationcp.middleware.pojos.workbench.feedback.FeedbackFeature;
 import org.ibp.api.java.feedback.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +34,13 @@ public class FeedbackResource {
 	}
 
 	@ApiIgnore
-	@RequestMapping(value = "/{feature}/collectorId", method = RequestMethod.GET)
-	public ResponseEntity<FeedbackResponse> getCollectorId(@PathVariable final FeedbackFeature feature) {
-		final FeedbackResponse feedbackResponse = new FeedbackResponse(this.feedbackService.getCollectorId(feature), feature);
-		return new ResponseEntity<>(feedbackResponse, HttpStatus.OK);
+	@RequestMapping(value = "/{feature}", method = RequestMethod.GET)
+	public ResponseEntity<FeedbackDto> getFeedBack(@PathVariable final FeedbackFeature feature) {
+		final FeedbackDto feebackDto = this.feedbackService.getFeedBack(feature);
+		if (feebackDto != null) {
+			return new ResponseEntity<>(feebackDto, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 }
