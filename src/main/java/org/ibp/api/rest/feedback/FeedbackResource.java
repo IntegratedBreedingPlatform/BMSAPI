@@ -32,4 +32,11 @@ public class FeedbackResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiIgnore
+	@RequestMapping(value = "/{feature}/collectorId", method = RequestMethod.GET)
+	public ResponseEntity<FeedbackResponse> getCollectorId(@PathVariable final FeedbackFeature feature) {
+		final FeedbackResponse feedbackResponse = new FeedbackResponse(this.feedbackService.getCollectorId(feature), feature);
+		return new ResponseEntity<>(feedbackResponse, HttpStatus.OK);
+	}
+
 }
