@@ -58,16 +58,21 @@ public class GermplasmUpdateDtoValidator {
 	public void validate(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmUpdateDTO.class.getName());
+		final Set<String> germplasmUUIDs =
+			germplasmUpdateDTOList.stream().map(dto -> StringUtils.isNotEmpty(dto.getGermplasmUUID()) ? dto.getGermplasmUUID() : null)
+				.filter(
+					Objects::nonNull).collect(Collectors.toSet());
+		final List<Germplasm> germplasmByUUIDs = this.germplasmMiddlewareService.getGermplasmByGUIDs(new ArrayList<>(germplasmUUIDs));
 
 		this.validateEmptyList(errors, germplasmUpdateDTOList);
 		this.validateAttributeAndNameCodes(errors, programUUID, germplasmUpdateDTOList);
 		this.validateAttributeAndNameValues(errors, germplasmUpdateDTOList);
-		this.validateGermplasmIdAndGermplasmUUID(errors, germplasmUpdateDTOList);
+		this.validateGermplasmIdAndGermplasmUUID(errors, germplasmUpdateDTOList, germplasmUUIDs, germplasmByUUIDs);
 		this.validateLocationAbbreviation(errors, germplasmUpdateDTOList);
 		this.validateBreedingMethod(errors, germplasmUpdateDTOList);
 		this.validateCreationDate(errors, germplasmUpdateDTOList);
 		this.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateDTOList);
-		this.validateCannotAssignSelfAsProgenitor(errors, germplasmUpdateDTOList);
+		this.validateCannotAssignSelfAsProgenitor(errors, germplasmUpdateDTOList, germplasmByUUIDs);
 		this.validateProgenitorsGids(errors, germplasmUpdateDTOList);
 
 		if (errors.hasErrors()) {
@@ -195,13 +200,8 @@ public class GermplasmUpdateDtoValidator {
 		}
 	}
 
-	protected void validateCannotAssignSelfAsProgenitor(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
-		final Set<String> germplasmUUIDs =
-			germplasmUpdateDTOList.stream()
-				.map(dto -> dto.getGid() == null && StringUtils.isNotEmpty(dto.getGermplasmUUID()) ? dto.getGermplasmUUID() : null)
-				.filter(
-					Objects::nonNull).collect(Collectors.toSet());
-		final List<Germplasm> germplasmByUUIDs = this.germplasmMiddlewareService.getGermplasmByGUIDs(new ArrayList<>(germplasmUUIDs));
+	protected void validateCannotAssignSelfAsProgenitor(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList,
+		final List<Germplasm> germplasmByUUIDs) {
 		final Map<String, Integer> guuidGidMap = germplasmByUUIDs.stream()
 			.collect(Collectors.toMap(Germplasm::getGermplasmUUID, Germplasm::getGid));
 
@@ -214,7 +214,8 @@ public class GermplasmUpdateDtoValidator {
 		}
 	}
 
-	protected void validateGermplasmIdAndGermplasmUUID(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateGermplasmIdAndGermplasmUUID(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList,
+		final Set<String> germplasmUUIDs, final List<Germplasm> germplasmByUUIDs) {
 		// Find rows (GermplasmUpdateDTO) with blank GID and UUID.
 		final Optional<GermplasmUpdateDTO> germplasmWithNoIdentifier =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isEmpty(dto.getGermplasmUUID()) && dto.getGid() == null).findAny();
@@ -224,13 +225,8 @@ public class GermplasmUpdateDtoValidator {
 
 		final Set<Integer> gids =
 			germplasmUpdateDTOList.stream().map(dto -> dto.getGid()).filter(Objects::nonNull).collect(Collectors.toSet());
-		final Set<String> germplasmUUIDs =
-			germplasmUpdateDTOList.stream().map(dto -> StringUtils.isNotEmpty(dto.getGermplasmUUID()) ? dto.getGermplasmUUID() : null)
-				.filter(
-					Objects::nonNull).collect(Collectors.toSet());
 
 		final List<Germplasm> germplasmByGIDs = this.germplasmMiddlewareService.getGermplasmByGIDs(new ArrayList<>(gids));
-		final List<Germplasm> germplasmByUUIDs = this.germplasmMiddlewareService.getGermplasmByGUIDs(new ArrayList<>(germplasmUUIDs));
 
 		final Set<Integer> existingGids = germplasmByGIDs.stream().map(Germplasm::getGid).collect(Collectors.toSet());
 		if (!gids.equals(existingGids)) {
