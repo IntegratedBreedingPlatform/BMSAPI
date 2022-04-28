@@ -34,6 +34,7 @@ import org.springframework.validation.BindingResult;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ObservationImportRequestValidatorTest {
@@ -129,6 +130,14 @@ public class ObservationImportRequestValidatorTest {
     }
 
     @Test
+    public void testPruneObservationValidForImport_NumericDecimalValue() {
+        final List<ObservationDto> observationDtos = this.createObservationDtoList();
+        observationDtos.get(0).setValue(String.valueOf(ThreadLocalRandom.current().nextDouble(0, 1000)));
+        final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
+        Assert.assertFalse(result.hasErrors());
+    }
+
+    @Test
     public void testPruneObservationInvalidForImport_InvalidDateFormat() {
         final List<ObservationDto> observationDtos = this.createObservationDtoList();
         final VariableDTO variableDTO = new VariableDTO();
@@ -144,7 +153,7 @@ public class ObservationImportRequestValidatorTest {
     }
 
     @Test
-    public void testruneObservationInvalidForImport_NoStudyDbId() {
+    public void testPruneObservationInvalidForImport_NoStudyDbId() {
         final List<ObservationDto> observationDtos = this.createObservationDtoList();
         observationDtos.get(0).setStudyDbId(null);
         final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
