@@ -60,6 +60,7 @@ public class GermplasmListDataServiceImplTest {
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
+		Mockito.verify(this.germplasmListValidator).validateMaxColumnsAllowed(germplasmList, view);
 		Mockito.verify(this.germplasmListDataServiceMiddleware).updateGermplasmListDataView(GERMPLASM_LIST_ID, view);
 
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
