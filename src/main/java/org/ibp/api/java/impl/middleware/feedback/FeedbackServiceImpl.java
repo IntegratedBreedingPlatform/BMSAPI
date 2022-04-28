@@ -23,4 +23,9 @@ public class FeedbackServiceImpl implements FeedbackService {
 		this.feedbackService.dontShowAgain(feature);
 	}
 
+	@Override
+	public String getCollectorId(final FeedbackFeature feature) {
+		return this.feedbackService.getCollectorId(feature);
+	}
+
 }
