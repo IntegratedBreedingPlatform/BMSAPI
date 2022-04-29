@@ -29,8 +29,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 	@Override
 	public Optional<FeedbackDto> getFeedback(final FeedbackFeature feature) {
-		Optional<Feedback> feedback = this.feedbackService.getFeedback(feature);
-		return Optional.ofNullable(new FeedbackDto(feedback.get()));
+		final Optional<Feedback> feedback = this.feedbackService.getFeedback(feature);
+		return feedback.isPresent() ? Optional.of(new FeedbackDto(feedback.get())) : Optional.empty();
 	}
 
 }
