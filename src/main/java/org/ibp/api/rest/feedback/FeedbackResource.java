@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/feedback")
 public class FeedbackResource {
@@ -36,9 +38,9 @@ public class FeedbackResource {
 	@ApiIgnore
 	@RequestMapping(value = "/{feature}", method = RequestMethod.GET)
 	public ResponseEntity<FeedbackDto> getFeedBack(@PathVariable final FeedbackFeature feature) {
-		final FeedbackDto feebackDto = this.feedbackService.getFeedback(feature);
-		if (feebackDto != null) {
-			return new ResponseEntity<>(feebackDto, HttpStatus.OK);
+		final Optional<FeedbackDto> feebackDto = this.feedbackService.getFeedback(feature);
+		if (feebackDto.isPresent()) {
+			return new ResponseEntity<>(feebackDto.get(), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
