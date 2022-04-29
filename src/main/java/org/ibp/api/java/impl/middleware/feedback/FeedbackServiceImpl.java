@@ -1,11 +1,14 @@
 package org.ibp.api.java.impl.middleware.feedback;
 
 import org.generationcp.middleware.api.feedback.FeedbackDto;
+import org.generationcp.middleware.pojos.workbench.feedback.Feedback;
 import org.generationcp.middleware.pojos.workbench.feedback.FeedbackFeature;
 import org.ibp.api.java.feedback.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -25,8 +28,13 @@ public class FeedbackServiceImpl implements FeedbackService {
 	}
 
 	@Override
-	public FeedbackDto getFeedBack(final FeedbackFeature feature) {
-		return this.feedbackService.getFeedBack(feature);
+	public FeedbackDto getFeedback(final FeedbackFeature feature) {
+		Optional<Feedback> feedback = this.feedbackService.getFeedback(feature);
+		if (feedback.isPresent()) {
+			return new FeedbackDto(feedback.get().getId(), feedback.get().getFeature(), feedback.get().getCollectorId(),
+				feedback.get().getAttempts(), feedback.get().isEnabled());
+		}
+		return null;
 	}
 
 }

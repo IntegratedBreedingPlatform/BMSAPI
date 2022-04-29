@@ -36,7 +36,7 @@ public class FeedbackResource {
 	@ApiIgnore
 	@RequestMapping(value = "/{feature}", method = RequestMethod.GET)
 	public ResponseEntity<FeedbackDto> getFeedBack(@PathVariable final FeedbackFeature feature) {
-		final FeedbackDto feebackDto = this.feedbackService.getFeedBack(feature);
+		final FeedbackDto feebackDto = this.feedbackService.getFeedback(feature);
 		if (feebackDto != null) {
 			return new ResponseEntity<>(feebackDto, HttpStatus.OK);
 		}

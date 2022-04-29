@@ -9,5 +9,5 @@ public interface FeedbackService {
 
 	void dontShowAgain(FeedbackFeature feature);
 
-	FeedbackDto getFeedBack(FeedbackFeature feature);
+	FeedbackDto getFeedback(FeedbackFeature feature);
 }
