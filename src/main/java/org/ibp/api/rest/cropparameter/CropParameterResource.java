@@ -43,12 +43,12 @@ public class CropParameterResource {
 	@ApiOperation("list configuration")
 	@RequestMapping(value = "/crop-parameters", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
-	public ResponseEntity<List<CropParameterDTO>> getCropParameter(
+	public ResponseEntity<List<CropParameterDTO>> getCropParameters(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
 	) {
-		return new ResponseEntity<>(this.cropParameterService.getCropParameter(pageable), HttpStatus.OK);
+		return new ResponseEntity<>(this.cropParameterService.getCropParameters(pageable), HttpStatus.OK);
 	}
 
 	@ApiOperation("Modify Crop parameter")

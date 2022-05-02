@@ -18,8 +18,8 @@ public class CropParameterServiceImpl implements CropParameterService {
 	private org.generationcp.middleware.api.cropparameter.CropParameterService cropParameterService;
 
 	@Override
-	public List<CropParameterDTO> getCropParameter(final Pageable pageable) {
-		return this.cropParameterService.getCropParameter(pageable).stream().map(CropParameterDTO::new).collect(Collectors.toList());
+	public List<CropParameterDTO> getCropParameters(final Pageable pageable) {
+		return this.cropParameterService.getCropParameters(pageable).stream().map(CropParameterDTO::new).collect(Collectors.toList());
 	}
 
 	@Override
