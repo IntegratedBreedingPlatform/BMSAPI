@@ -24,6 +24,8 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
+import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
+
 @Api("Crop Parameter services")
 @RestController
 @RequestMapping("/crops/{cropName}")
@@ -58,6 +60,7 @@ public class CropParameterResource {
 		@PathVariable final String key,
 		@RequestBody final CropParameterPatchRequestDTO request
 	) {
+		checkNotNull(request, "request.null");
 		this.cropParameterService.modifyCropParameter(key, request);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
