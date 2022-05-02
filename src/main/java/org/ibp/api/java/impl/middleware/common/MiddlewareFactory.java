@@ -36,8 +36,8 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitS
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
-import org.generationcp.middleware.api.config.ConfigService;
-import org.generationcp.middleware.api.config.ConfigServiceImpl;
+import org.generationcp.middleware.api.cropparameter.CropParameterService;
+import org.generationcp.middleware.api.cropparameter.CropParameterImpl;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
@@ -260,8 +260,8 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public ConfigService getConfigService() {
-		return new ConfigServiceImpl(this.getCropDatabaseSessionProvider());
+	public CropParameterService getCropParameterService() {
+		return new CropParameterImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
