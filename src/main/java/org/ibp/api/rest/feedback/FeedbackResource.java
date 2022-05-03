@@ -1,5 +1,6 @@
 package org.ibp.api.rest.feedback;
 
+import org.generationcp.middleware.api.feedback.FeedbackDto;
 import org.generationcp.middleware.pojos.workbench.feedback.FeedbackFeature;
 import org.ibp.api.java.feedback.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/feedback")
@@ -30,6 +33,16 @@ public class FeedbackResource {
 	public ResponseEntity<Void> dontShowAgain(@PathVariable final FeedbackFeature feature) {
 		this.feedbackService.dontShowAgain(feature);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiIgnore
+	@RequestMapping(value = "/{feature}", method = RequestMethod.GET)
+	public ResponseEntity<FeedbackDto> getFeedBack(@PathVariable final FeedbackFeature feature) {
+		final Optional<FeedbackDto> feebackDto = this.feedbackService.getFeedback(feature);
+		if (feebackDto.isPresent()) {
+			return new ResponseEntity<>(feebackDto.get(), HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 }
