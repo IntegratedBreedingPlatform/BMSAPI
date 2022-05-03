@@ -177,11 +177,21 @@ public abstract class AbstractDatasetExportService {
 			final String locationAbbr = StringUtil.truncate(selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(), 10, true);
 			final String datasetTypeName = StringUtil.truncate(datasetTypeMap.get(dataSetDto.getDatasetTypeId()).getName(), 10, true);
 			final String datasetName = StringUtil.truncate(dataSetDto.getName(), 30, true);
-			final String sanitizedFileName = FileUtils.sanitizeFileName(String
-				.format(
-					"%s_%s_%s_%s",
-					studyName + "-" + selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(),
-					locationAbbr, datasetTypeName, datasetName));
+			String sanitizedFileName = null;
+			if (dataSetDto.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+				sanitizedFileName = FileUtils.sanitizeFileName(String
+					.format(
+						"%s_%s_%s",
+						datasetName, selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(),
+						locationAbbr));
+			} else {
+				sanitizedFileName = FileUtils.sanitizeFileName(String
+					.format(
+						"%s_%s_%s_%s",
+						studyName + "-" + selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(),
+						locationAbbr, datasetTypeName, datasetName));
+			}
+
 			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedFileName, fileExtension);
 			files.add(
 				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID),
