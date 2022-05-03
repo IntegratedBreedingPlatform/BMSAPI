@@ -119,18 +119,6 @@ public class GermplasmListImportRequestValidatorTest {
 	}
 
 	@Test
-	public void testPruneListsInvalidForImport_WhereDateCreatedIsEmpty() {
-		final List<GermplasmListImportRequestDTO> list = this.createGermplasmListImportRequestDTOList();
-		list.get(0).setDateCreated(null);
-		final BindingResult result = this.validator.pruneListsInvalidForImport(list);
-		Assert.assertTrue(result.hasErrors());
-		Assert.assertEquals("list.import.date.created.null", result.getAllErrors().get(0).getCode());
-		Mockito.verify(this.germplasmListService).searchGermplasmList(ArgumentMatchers.any(GermplasmListSearchRequest.class),
-			ArgumentMatchers.isNull(), ArgumentMatchers.isNull());
-		Mockito.verify(this.userService).getUsersByIds(Collections.singletonList(LIST_OWNER_ID));
-	}
-
-	@Test
 	public void testPruneListsInvalidForImport_WhereDateCreatedIsInvalid() {
 		final List<GermplasmListImportRequestDTO> list = this.createGermplasmListImportRequestDTOList();
 		list.get(0).setDateCreated(RandomStringUtils.randomAlphanumeric(20));
@@ -176,18 +164,6 @@ public class GermplasmListImportRequestValidatorTest {
 		Mockito.verify(this.germplasmListService).searchGermplasmList(ArgumentMatchers.any(GermplasmListSearchRequest.class),
 			ArgumentMatchers.isNull(), ArgumentMatchers.isNull());
 		Mockito.verify(this.userService).getUsersByIds(Collections.singletonList(LIST_OWNER_ID));
-	}
-
-	@Test
-	public void testPruneListsInvalidForImport_WhereOwnerPersonDbIdIsEmpty() {
-		final List<GermplasmListImportRequestDTO> list = this.createGermplasmListImportRequestDTOList();
-		list.get(0).setListOwnerPersonDbId(null);
-		final BindingResult result = this.validator.pruneListsInvalidForImport(list);
-		Assert.assertTrue(result.hasErrors());
-		Assert.assertEquals("list.import.owner.null", result.getAllErrors().get(0).getCode());
-		Mockito.verify(this.germplasmListService).searchGermplasmList(ArgumentMatchers.any(GermplasmListSearchRequest.class),
-			ArgumentMatchers.isNull(), ArgumentMatchers.isNull());
-		Mockito.verify(this.userService, Mockito.never()).getUsersByIds(Collections.singletonList(LIST_OWNER_ID));
 	}
 
 	@Test

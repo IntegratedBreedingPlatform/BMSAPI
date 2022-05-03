@@ -84,12 +84,7 @@ public class GermplasmListImportRequestValidator {
 
 	boolean isListOwnerPersonDbIdInvalid(final Map<String, WorkbenchUser> userMap, final GermplasmListImportRequestDTO importRequestDTO,
 		final Integer index) {
-		if (StringUtils.isEmpty(importRequestDTO.getListOwnerPersonDbId())) {
-			this.errors.reject("list.import.owner.null", new String[] {index.toString()}, "");
-			return true;
-		}
-
-		if(!userMap.containsKey(importRequestDTO.getListOwnerPersonDbId())) {
+		if(!StringUtils.isEmpty(importRequestDTO.getListOwnerPersonDbId()) && !userMap.containsKey(importRequestDTO.getListOwnerPersonDbId())) {
 			this.errors.reject("list.import.owner.invalid", new String[] {index.toString()}, "");
 			return true;
 		}
@@ -131,15 +126,12 @@ public class GermplasmListImportRequestValidator {
 			return true;
 		}
 
-		if (StringUtils.isEmpty(importRequestDTO.getDateCreated())) {
-			this.errors.reject("list.import.date.created.null", new String[] {index.toString()}, "");
-			return true;
-		}
-
-		final Date dateCreated = Util.tryParseDate(importRequestDTO.getDateCreated(), Util.FRONTEND_DATE_FORMAT);
-		if (dateCreated == null) {
-			this.errors.reject("list.import.date.created.invalid.format", new String[] {index.toString()}, "");
-			return true;
+		if (importRequestDTO.getDateCreated() != null) {
+			final Date dateCreated = Util.tryParseDate(importRequestDTO.getDateCreated(), Util.FRONTEND_DATE_FORMAT);
+			if (dateCreated == null) {
+				this.errors.reject("list.import.date.created.invalid.format", new String[] {index.toString()}, "");
+				return true;
+			}
 		}
 
 		return false;
