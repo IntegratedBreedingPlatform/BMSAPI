@@ -106,6 +106,8 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 			// matrix copy because CopCalculation also stores intermediate results
 			final CopCalculation copCalculation = new CopCalculation(HashBasedTable.create(matrix), btype);
 
+			info("start COP async calculation - btype=%.0f", btype.getId());
+
 			outer: for (final Integer gid1 : gids) {
 				inner: for (final Integer gid2 : gids) {
 					if (!(matrix.contains(gid1, gid2) || matrix.contains(gid2, gid1))) {
