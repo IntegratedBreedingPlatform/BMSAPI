@@ -178,7 +178,7 @@ public abstract class AbstractDatasetExportService {
 			final String datasetTypeName = StringUtil.truncate(datasetTypeMap.get(dataSetDto.getDatasetTypeId()).getName(), 10, true);
 			final String datasetName = StringUtil.truncate(dataSetDto.getName(), 30, true);
 			String sanitizedFileName = null;
-			if (dataSetDto.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+			if (DatasetTypeEnum.PLOT_DATA.getId() == dataSetDto.getDatasetTypeId()) {
 				sanitizedFileName = FileUtils.sanitizeFileName(String
 					.format(
 						"%s_%s_%s",
