@@ -76,6 +76,10 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 
 	private org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceAsync copServiceAsyncMiddleware;
 
+	/*
+	 * Only scope=prototype beans can be injected here (thread context)
+	 * To inject other services, extend it and pass sessionProvider in constructor
+	 */
 	@Autowired
 	private FileStorageService fileStorageService;
 
