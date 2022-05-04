@@ -6,7 +6,7 @@ import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.brapi.VariableServiceBrapi;
 import org.ibp.api.brapi.v2.variable.VariableUpdateResponse;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.common.validator.VariableUpdateValidator;
+import org.ibp.api.java.impl.middleware.common.validator.VariableDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	@Autowired
-	private VariableUpdateValidator variableUpdateValidator;
+	private VariableDtoValidator variableDtoValidator;
 
 	@Autowired
 	private org.generationcp.middleware.api.brapi.VariableServiceBrapi middlewareVariableServiceBrapi;
@@ -43,7 +43,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	public VariableUpdateResponse updateObservationVariable(final String observationVariableDbId, final VariableDTO variable) {
 		final VariableUpdateResponse variableUpdateResponse = new VariableUpdateResponse();
 		try {
-			this.variableUpdateValidator.validate(observationVariableDbId, variable);
+			this.variableDtoValidator.validateForUpdate(observationVariableDbId, variable);
 			variableUpdateResponse.setEntityObject(this.middlewareVariableServiceBrapi.updateObservationVariable(variable));
 		} catch (final ApiRequestValidationException e) {
 			variableUpdateResponse.setEntityObject(variable);
@@ -54,7 +54,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	@Override
 	public List<VariableDTO> createObservationVariables(final String crop, final List<VariableDTO> variableDTOList) {
-		// TODO: Validate
+		this.variableDtoValidator.validateForCreate(variableDTOList);
 		final List<VariableDTO> savedVariables = this.middlewareVariableServiceBrapi.createObservationVariables(variableDTOList);
 		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
 		// Fetch the saved observation variables from the database to populate the fields.
