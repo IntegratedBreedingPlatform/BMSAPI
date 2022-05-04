@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.germplasm.cop;
 
-import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,12 +18,12 @@ public interface CopService {
 	/**
 	 * retrieve existing cop matrix if available
 	 */
-	CopResponse calculateCoefficientOfParentage(Set<Integer> gids, Integer listId, BTypeEnum btype, boolean reset);
+	CopResponse calculateCoefficientOfParentage(Set<Integer> gids, Integer listId, boolean reset);
 
 	/**
 	 * retrieve existing cop matrix if available
 	 */
-	CopResponse calculateCoefficientOfParentage(Integer listId, BTypeEnum btype);
+	CopResponse calculateCoefficientOfParentage(Integer listId);
 
 	/**
 	 * cancel job/s for the specified gids
