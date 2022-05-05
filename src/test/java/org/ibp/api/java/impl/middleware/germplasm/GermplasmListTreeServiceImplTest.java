@@ -340,6 +340,7 @@ public class GermplasmListTreeServiceImplTest {
 		final Integer newParentId = new Random().nextInt(Integer.MAX_VALUE);
 
 		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.getId()).thenReturn(folderId);
 		Mockito.when(actualFolder.getParentId()).thenReturn(newParentId);
 		Mockito.when(actualFolder.getName()).thenReturn(folderName);
 		Mockito.when(actualFolder.getProgramUUID()).thenReturn(PROGRAM_UUID);
@@ -365,12 +366,12 @@ public class GermplasmListTreeServiceImplTest {
 			.thenReturn(Optional.empty());
 
 		Mockito.when(this.germplasmListServiceMiddleware.moveGermplasmListFolder(folderId, newParentId, PROGRAM_UUID))
-			.thenReturn(folderId);
+			.thenReturn(actualFolder);
 
-		final Integer germplasmListFolderId =
+		final TreeNode movedNode =
 			this.germplasmListTreeService.moveGermplasmListNode(CROP, PROGRAM_UUID, String.valueOf(folderId), String.valueOf(newParentId));
-		assertNotNull(germplasmListFolderId);
-		assertThat(germplasmListFolderId, is(folderId));
+		assertNotNull(movedNode);
+		assertThat(movedNode.getKey(), is(folderId.toString()));
 
 		Mockito.verify(this.programValidator).validate(any(), any());
 		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListById(folderId);
@@ -392,6 +393,7 @@ public class GermplasmListTreeServiceImplTest {
 		final String newParentId = GermplasmListTreeServiceImpl.PROGRAM_LISTS;
 
 		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.getId()).thenReturn(folderId);
 		Mockito.when(actualFolder.getParentId()).thenReturn(null);
 		Mockito.when(actualFolder.getName()).thenReturn(folderName);
 		Mockito.when(actualFolder.getProgramUUID()).thenReturn(PROGRAM_UUID);
@@ -407,15 +409,15 @@ public class GermplasmListTreeServiceImplTest {
 			.thenReturn(Optional.empty());
 
 		Mockito.when(this.germplasmListServiceMiddleware.moveGermplasmListFolder(folderId, null, PROGRAM_UUID))
-			.thenReturn(folderId);
+			.thenReturn(actualFolder);
 
 		Mockito.when(this.germplasmListValidator.validateFolderId(newParentId, PROGRAM_UUID, GermplasmListValidator.ListNodeType.PARENT))
 			.thenReturn(Optional.of(actualFolder));
 
-		final Integer germplasmListFolderId =
+		final TreeNode treeNode =
 			this.germplasmListTreeService.moveGermplasmListNode(CROP, PROGRAM_UUID, String.valueOf(folderId), newParentId);
-		assertNotNull(germplasmListFolderId);
-		assertThat(germplasmListFolderId, is(folderId));
+		assertNotNull(treeNode);
+		assertThat(treeNode.getKey(), is(folderId.toString()));
 
 		Mockito.verify(this.programValidator).validate(any(), any());
 		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListById(folderId);
@@ -494,6 +496,7 @@ public class GermplasmListTreeServiceImplTest {
 		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
 
 		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.getId()).thenReturn(folderId);
 		Mockito.when(actualFolder.getParentId()).thenReturn(null);
 		Mockito.when(actualFolder.getName()).thenReturn(folderName);
 		Mockito.when(actualFolder.getProgramUUID()).thenReturn(PROGRAM_UUID);
@@ -505,13 +508,13 @@ public class GermplasmListTreeServiceImplTest {
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByParentAndName(folderName, null, null))
 			.thenReturn(Optional.empty());
 		Mockito.when(this.germplasmListServiceMiddleware.moveGermplasmListFolder(folderId, null, null))
-			.thenReturn(folderId);
+			.thenReturn(actualFolder);
 
 		Mockito.when(this.germplasmListValidator.validateGermplasmList(folderId)).thenReturn(actualFolder);
 
-		final Integer actualFolderId = this.germplasmListTreeService
+		final TreeNode treeNode = this.germplasmListTreeService
 			.moveGermplasmListNode(CROP, null, String.valueOf(folderId), GermplasmListTreeServiceImpl.CROP_LISTS);
-		assertThat(actualFolderId, is(folderId));
+		assertThat(treeNode.getKey(), is(folderId.toString()));
 
 		Mockito.verifyNoInteractions(this.programValidator);
 
@@ -529,6 +532,7 @@ public class GermplasmListTreeServiceImplTest {
 		final Integer folderId = new Random().nextInt(Integer.MAX_VALUE);
 
 		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.getId()).thenReturn(folderId);
 		Mockito.when(actualFolder.getParentId()).thenReturn(null);
 		Mockito.when(actualFolder.getName()).thenReturn(folderName);
 		Mockito.when(actualFolder.getProgramUUID()).thenReturn(null);
@@ -541,11 +545,11 @@ public class GermplasmListTreeServiceImplTest {
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByParentAndName(folderName, null, null))
 			.thenReturn(Optional.of(actualFolder));
 		Mockito.when(this.germplasmListServiceMiddleware.moveGermplasmListFolder(folderId, null, PROGRAM_UUID))
-			.thenReturn(folderId);
+			.thenReturn(actualFolder);
 
-		final Integer actualFolderId = this.germplasmListTreeService
+		final TreeNode treeNode = this.germplasmListTreeService
 			.moveGermplasmListNode(CROP, PROGRAM_UUID, String.valueOf(folderId), GermplasmListTreeServiceImpl.PROGRAM_LISTS);
-		assertThat(actualFolderId, is(folderId));
+		assertThat(treeNode.getKey(), is(folderId.toString()));
 
 		Mockito.verify(this.programValidator).validate(any(), any());
 		Mockito.verifyNoMoreInteractions(this.programValidator);
@@ -564,6 +568,7 @@ public class GermplasmListTreeServiceImplTest {
 		final Integer newParentId = new Random().nextInt(Integer.MAX_VALUE);
 
 		final GermplasmList actualFolder = Mockito.mock(GermplasmList.class);
+		Mockito.when(actualFolder.getId()).thenReturn(folderId);
 		Mockito.when(actualFolder.getParentId()).thenReturn(null);
 		Mockito.when(actualFolder.getName()).thenReturn(folderName);
 		Mockito.when(actualFolder.getProgramUUID()).thenReturn(null);
@@ -576,12 +581,11 @@ public class GermplasmListTreeServiceImplTest {
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByParentAndName(folderName, null, null))
 			.thenReturn(Optional.empty());
 		Mockito.when(this.germplasmListServiceMiddleware.moveGermplasmListFolder(folderId, null, null))
-			.thenReturn(folderId);
+			.thenReturn(actualFolder);
 
 		final GermplasmList parentFolder = Mockito.mock(GermplasmList.class);
 		Mockito.when(parentFolder.isFolder()).thenReturn(true);
 		Mockito.when(parentFolder.getProgramUUID()).thenReturn(PROGRAM_UUID);
-
 
 		Mockito.when(this.germplasmListServiceMiddleware.getGermplasmListByIdAndProgramUUID(newParentId, PROGRAM_UUID))
 			.thenReturn(Optional.of(parentFolder));
@@ -592,11 +596,11 @@ public class GermplasmListTreeServiceImplTest {
 			.thenReturn(Optional.empty());
 
 		Mockito.when(this.germplasmListServiceMiddleware.moveGermplasmListFolder(folderId, newParentId, PROGRAM_UUID))
-			.thenReturn(folderId);
+			.thenReturn(actualFolder);
 
-		final Integer actualFolderId = this.germplasmListTreeService
+		final TreeNode treeNode = this.germplasmListTreeService
 			.moveGermplasmListNode(CROP, PROGRAM_UUID, String.valueOf(folderId), String.valueOf(newParentId));
-		assertThat(actualFolderId, is(folderId));
+		assertThat(treeNode.getKey(), is(folderId.toString()));
 
 		Mockito.verify(this.programValidator).validate(any(), any());
 		Mockito.verifyNoMoreInteractions(this.programValidator);
