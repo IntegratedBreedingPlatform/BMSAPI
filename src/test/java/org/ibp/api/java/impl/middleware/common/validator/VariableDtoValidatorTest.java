@@ -351,6 +351,22 @@ public class VariableDtoValidatorTest {
 	}
 
 	@Test
+	public void testValidateContextOfUse_SpecifyOnlyOneValidValue() {
+		final VariableDTO variableDTO = new VariableDTO();
+		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
+		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(5));
+		variableDTO.getContextOfUse().add(VariableDTO.ContextOfUseEnum.MEANS.toString());
+		variableDTO.getContextOfUse().add(VariableDTO.ContextOfUseEnum.PLOT.toString());
+
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		this.variableDtoValidator.validateContextOfUse(variableDTO, errors);
+
+		Assert.assertEquals(1, errors.getAllErrors().size());
+		this.assertError(errors.getAllErrors(),
+			"observation.variable.context.of.use.specify.only.one.valid.value");
+	}
+
+	@Test
 	public void testValidateExistingObservationVariableName_VariableNameAlreadyExists() {
 		final VariableDTO variableDTO = new VariableDTO();
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(5));

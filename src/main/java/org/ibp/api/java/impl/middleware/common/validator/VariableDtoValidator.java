@@ -213,8 +213,11 @@ public class VariableDtoValidator {
 	protected void checkDuplicatePropertyScaleMethodCombination(final VariableDTO variableDTO, final BindingResult errors) {
 
 		if (StringUtils.isBlank(variableDTO.getMethod().getMethodDbId()) ||
+			!StringUtils.isNumeric(variableDTO.getMethod().getMethodDbId()) ||
 			StringUtils.isBlank(variableDTO.getTrait().getTraitDbId()) ||
-			StringUtils.isBlank(variableDTO.getScale().getScaleDbId())) {
+			!StringUtils.isNumeric(variableDTO.getTrait().getTraitDbId()) ||
+			StringUtils.isBlank(variableDTO.getScale().getScaleDbId()) ||
+			!StringUtils.isNumeric(variableDTO.getScale().getScaleDbId())) {
 			return;
 		}
 
@@ -242,6 +245,10 @@ public class VariableDtoValidator {
 		if (CollectionUtils.isNotEmpty(variableDTO.getContextOfUse()) && variableDTO.getContextOfUse().stream()
 			.anyMatch(s -> !validContextOfUse.contains(s))) {
 			errors.reject("observation.variable.invalid.context.of.use",
+				new Object[] {String.join(", ", validContextOfUse)}, "");
+		}
+		if (variableDTO.getContextOfUse().containsAll(validContextOfUse)) {
+			errors.reject("observation.variable.context.of.use.specify.only.one.valid.value",
 				new Object[] {String.join(", ", validContextOfUse)}, "");
 		}
 	}
