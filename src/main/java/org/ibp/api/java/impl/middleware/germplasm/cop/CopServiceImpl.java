@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.germplasm.cop;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.generationcp.middleware.api.cropparameter.CropParameterEnum;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
@@ -19,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -45,6 +48,9 @@ public class CopServiceImpl implements CopService {
 
 	@Autowired
 	private CropParameterService cropParameterService;
+
+	@Autowired
+	private GermplasmNameService germplasmNameService;
 
 	@Override
 	public CopResponse viewCoefficientOfParentage(Set<Integer> gids, final Integer listId,
@@ -79,7 +85,7 @@ public class CopServiceImpl implements CopService {
 			}
 		}
 		if (someCopValuesExists) {
-			return new CopResponse(matrix);
+			return new CopResponse(matrix, this.getGermplasmCommonNamesMap(gids));
 		}
 
 		// no thread nor matrix for gids
@@ -122,7 +128,11 @@ public class CopServiceImpl implements CopService {
 			return new CopResponse(this.copServiceAsync.getProgress(gids));
 		}
 
-		return new CopResponse(matrix);
+		return new CopResponse(matrix, this.getGermplasmCommonNamesMap(gids));
+	}
+
+	private Map<String, Map<Integer, String>> getGermplasmCommonNamesMap(final Set<Integer> gids) {
+		return this.germplasmNameService.getGermplasmCommonNamesMap(new ArrayList<>(gids));
 	}
 
 	@Override
