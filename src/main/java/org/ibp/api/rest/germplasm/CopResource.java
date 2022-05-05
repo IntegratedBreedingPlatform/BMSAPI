@@ -132,14 +132,15 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<FileSystemResource> getCopMatrixAsCsv(
 		@PathVariable final String cropName,
-		@RequestParam final Set<Integer> gids
+		@RequestParam final Set<Integer> gids,
+		@RequestParam final String nameKeySelected
 	) throws IOException {
 		final CopResponse results = this.copService.viewCoefficientOfParentage(gids, null, null, null);
 
 		// FIXME avoid writing to disk
 		final File temporaryFolder = Files.createTempDir();
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + "COP.csv";
-		final File file = CopUtils.generateFile(results, fileNameFullPath);
+		final File file = CopUtils.generateFile(results, nameKeySelected, fileNameFullPath);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
