@@ -187,11 +187,12 @@ public class VariableResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<VariableDTO>> createVariables(@PathVariable final String crop,
 		final @RequestBody List<VariableDTO> variableDTOList) {
-		final List<VariableDTO> savedVariables = this.variableServiceBrapi.createObservationVariables(crop, variableDTOList);
+		final VariableImportResponse response = this.variableServiceBrapi.createObservationVariables(crop, variableDTOList);
 		final Pagination pagination = new Pagination().withPageNumber(BrapiPagedResult.DEFAULT_PAGE_NUMBER).withPageSize(1)
-			.withTotalCount(Long.valueOf(savedVariables.size())).withTotalPages(1);
-		final Metadata metadata = new Metadata().withPagination(pagination);
-		final Result<VariableDTO> result = new Result<VariableDTO>().withData(savedVariables);
+			.withTotalCount(Long.valueOf(response.getCreatedSize())).withTotalPages(1);
+		final Metadata metadata =
+			new Metadata().withPagination(pagination).withStatus(this.responseMessageGenerator.getMessagesList(response));
+		final Result<VariableDTO> result = new Result<VariableDTO>().withData(response.getEntityList());
 		final EntityListResponse<VariableDTO> entityListResponse = new EntityListResponse<>(metadata, result);
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}

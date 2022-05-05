@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -64,20 +65,26 @@ public class VariableDtoValidator {
 
 	}
 
-	public void validateForCreate(final List<VariableDTO> variableDTOList) {
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		for (final VariableDTO variableDTO : variableDTOList) {
+	public BindingResult pruneVariablesInvalidForImport(final List<VariableDTO> variableDTOList) {
+		final BindingResult allErrors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		final Iterator<VariableDTO> variableDTOIterator = variableDTOList.iterator();
+		final List<String> existingVariableNames = this.getExistingVariableNames(variableDTOList);
+		while (variableDTOIterator.hasNext()) {
+			final VariableDTO variableDTO = variableDTOIterator.next();
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
 			this.validateObservationVariableName(variableDTO, errors);
 			this.validateTrait(variableDTO, errors);
 			this.validateMethod(variableDTO, errors);
 			this.validateScale(variableDTO, errors);
 			this.checkDuplicatePropertyScaleMethodCombination(variableDTO, errors);
 			this.validateContextOfUse(variableDTO, errors);
+			this.validateExistingObservationVariableName(variableDTO, existingVariableNames, errors);
+			if (errors.hasErrors()) {
+				allErrors.addAllErrors(errors);
+				variableDTOIterator.remove();
+			}
 		}
-		this.checkForExistingObservationVariableName(variableDTOList, errors);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		return allErrors;
 	}
 
 	protected void validateObservationVariableDbId(final String observationVariableDbId, final VariableDTO variableDTO,
@@ -239,24 +246,25 @@ public class VariableDtoValidator {
 		}
 	}
 
-	protected void checkForExistingObservationVariableName(final List<VariableDTO> variableDTOList, final BindingResult errors) {
-
+	protected List<String> getExistingVariableNames(final List<VariableDTO> variableDTOList) {
 		final List<String> observationVariableNames =
-			variableDTOList.stream().map(VariableDTO::getObservationVariableName).map(String::toUpperCase).collect(
-				Collectors.toList());
+			variableDTOList.stream().filter(o -> StringUtils.isNotEmpty(o.getObservationVariableName()))
+				.map(VariableDTO::getObservationVariableName).map(String::toUpperCase).collect(
+					Collectors.toList());
 		final VariableFilter variableFilter = new VariableFilter();
 		observationVariableNames.stream().forEach(variableFilter::addName);
-
-		final List<String> existingObservationVariableNames =
-			this.ontologyVariableDataManager.getWithFilter(variableFilter).stream().map(Variable::getName).map(String::toUpperCase).collect(
+		return this.ontologyVariableDataManager.getWithFilter(variableFilter).stream().map(Variable::getName).map(String::toUpperCase)
+			.collect(
 				Collectors.toList());
+	}
 
-		final List<String> invalidObservationVariableNames =
-			new ArrayList<>(CollectionUtils.intersection(existingObservationVariableNames, observationVariableNames));
-
-		if (CollectionUtils.isNotEmpty(invalidObservationVariableNames)) {
-			errors.reject("observation.variable.variable.names.already.exist",
-				new Object[] {String.join(", ", invalidObservationVariableNames)}, "");
+	protected void validateExistingObservationVariableName(final VariableDTO variableDTO,
+		final List<String> existingObservationVariableNames,
+		final BindingResult errors) {
+		if (existingObservationVariableNames.stream()
+			.anyMatch(variableName -> variableName.equalsIgnoreCase(variableDTO.getObservationVariableName()))) {
+			errors.reject("observation.variable.variable.name.already.exist",
+				new Object[] {variableDTO.getObservationVariableName()}, "");
 		}
 	}
 

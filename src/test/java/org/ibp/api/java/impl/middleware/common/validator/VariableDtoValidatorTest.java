@@ -33,6 +33,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
@@ -101,7 +103,7 @@ public class VariableDtoValidatorTest {
 	}
 
 	@Test
-	public void testValidateForCreate_Success() {
+	public void testPruneVariablesInvalidForImport() {
 
 		final VariableDTO variableDTO = new VariableDTO();
 		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
@@ -109,23 +111,15 @@ public class VariableDtoValidatorTest {
 		variableDTO.getTrait().setTraitDbId(RandomStringUtils.randomNumeric(5));
 		variableDTO.getMethod().setMethodDbId(RandomStringUtils.randomNumeric(5));
 		variableDTO.getScale().setScaleDbId(RandomStringUtils.randomNumeric(5));
-		try {
-			this.variableDtoValidator.validateForCreate(Arrays.asList(variableDTO));
-		} catch (final ApiRequestValidationException exception) {
-			fail("Should not throw an exception");
-		}
-	}
 
-	@Test
-	public void testValidateForCreate_Fail() {
+		final VariableDTO emptyVariableDTO = new VariableDTO();
 
-		final VariableDTO variableDTO = new VariableDTO();
-		try {
-			this.variableDtoValidator.validateForCreate(Arrays.asList(variableDTO));
-			fail("Should throw an exception");
-		} catch (final ApiRequestValidationException exception) {
-			// Do nothing
-		}
+		when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(new ArrayList<>());
+
+		final List<VariableDTO> variables = new ArrayList<>(Arrays.asList(variableDTO, emptyVariableDTO));
+		final BindingResult bindingResult = this.variableDtoValidator.pruneVariablesInvalidForImport(variables);
+		Assert.assertThat(variables.size(), is(equalTo(1)));
+		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
 	@Test
@@ -357,24 +351,17 @@ public class VariableDtoValidatorTest {
 	}
 
 	@Test
-	public void testCheckForExistingObservationVariableName_VariableNameAlreadyUsed() {
+	public void testValidateExistingObservationVariableName_VariableNameAlreadyExists() {
 		final VariableDTO variableDTO = new VariableDTO();
-		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(5));
-		variableDTO.getTrait().setTraitDbId(RandomStringUtils.randomNumeric(5));
-		variableDTO.getMethod().setMethodDbId(RandomStringUtils.randomNumeric(5));
-		variableDTO.getScale().setScaleDbId(RandomStringUtils.randomNumeric(5));
 
-		final Variable variable = new Variable();
-		variable.setId(1);
-		variable.setName(variableDTO.getObservationVariableName());
-		when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(Arrays.asList(variable));
+		final List<String> existingVariableNames = Arrays.asList(variableDTO.getObservationVariableName());
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
-		this.variableDtoValidator.checkForExistingObservationVariableName(Arrays.asList(variableDTO), errors);
+		this.variableDtoValidator.validateExistingObservationVariableName(variableDTO, existingVariableNames, errors);
 
 		Assert.assertEquals(1, errors.getAllErrors().size());
-		this.assertError(errors.getAllErrors(), "observation.variable.variable.names.already.exist");
+		this.assertError(errors.getAllErrors(), "observation.variable.variable.name.already.exist");
 	}
 
 	private void assertError(final List<ObjectError> objectErrorList, final String errorCode) {
