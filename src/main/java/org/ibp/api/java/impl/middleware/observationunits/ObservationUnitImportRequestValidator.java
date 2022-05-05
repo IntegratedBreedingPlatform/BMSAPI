@@ -40,8 +40,7 @@ public class ObservationUnitImportRequestValidator {
 	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
 	public static final String PLOT = "PLOT";
-	public static final String MEANS = "MEANS";
-	private static final List<String> OBSERVATION_LEVEL_NAMES = Arrays.asList(PLOT, "BLOCK", "REP", MEANS);
+	private static final List<String> OBSERVATION_LEVEL_NAMES = Arrays.asList(PLOT, "BLOCK", "REP");
 
 	@Autowired
 	private StudyServiceBrapi studyServiceBrapi;
@@ -220,24 +219,19 @@ public class ObservationUnitImportRequestValidator {
 		return this.errors;
 	}
 
-	private boolean isObservationLevelRelationshipNamesValid(final List<ObservationLevelRelationship> observationLevelRelationships,
-		final Integer index) {
+	private boolean isObservationLevelRelationshipNamesValid(final List<ObservationLevelRelationship> observationLevelRelationships, final Integer index) {
 		boolean hasPlot = false;
-		boolean hasMeans = false;
-		if (!CollectionUtils.isEmpty(observationLevelRelationships)) {
-			for (final ObservationLevelRelationship relationship : observationLevelRelationships) {
-				if (relationship.getLevelName().equalsIgnoreCase(PLOT)) {
+		if(!CollectionUtils.isEmpty(observationLevelRelationships)) {
+			for(final ObservationLevelRelationship relationship: observationLevelRelationships) {
+				if(relationship.getLevelName().equalsIgnoreCase(PLOT)) {
 					hasPlot = true;
 				}
-				if (relationship.getLevelName().equalsIgnoreCase(MEANS)) {
-					hasMeans = true;
-				}
-				if (!OBSERVATION_LEVEL_NAMES.contains(relationship.getLevelName().toUpperCase())) {
+				if(!OBSERVATION_LEVEL_NAMES.contains(relationship.getLevelName().toUpperCase())) {
 					this.errors.reject("observation.unit.import.invalid.observation.level.name", new String[] {index.toString()}, "");
 					return false;
 				}
 			}
-			if (hasPlot || hasMeans) {
+			if(hasPlot) {
 				return true;
 			}
 		}
