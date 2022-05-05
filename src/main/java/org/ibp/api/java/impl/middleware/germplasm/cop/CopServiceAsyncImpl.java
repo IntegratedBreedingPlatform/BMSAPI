@@ -76,6 +76,10 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 
 	private org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceAsync copServiceAsyncMiddleware;
 
+	/*
+	 * Only scope=prototype beans can be injected here (thread context)
+	 * To inject other services, extend it and pass sessionProvider in constructor
+	 */
 	@Autowired
 	private FileStorageService fileStorageService;
 
@@ -105,6 +109,8 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 
 			// matrix copy because CopCalculation also stores intermediate results
 			final CopCalculation copCalculation = new CopCalculation(HashBasedTable.create(matrix), btype);
+
+			info("start COP async calculation - btype=%.0f", btype.getId());
 
 			outer: for (final Integer gid1 : gids) {
 				inner: for (final Integer gid2 : gids) {
