@@ -4,12 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -154,6 +156,11 @@ public class ObservationUnitImportRequestValidator {
 				}
 			}
 
+			if (!this.isObservationLevelNameValid(position.getObservationLevel(), index)) {
+				iterator.remove();
+				continue;
+			}
+
 			if (!this.isObservationLevelRelationshipNamesValid(position.getObservationLevelRelationships(), index)) {
 				iterator.remove();
 				continue;
@@ -219,19 +226,32 @@ public class ObservationUnitImportRequestValidator {
 		return this.errors;
 	}
 
-	private boolean isObservationLevelRelationshipNamesValid(final List<ObservationLevelRelationship> observationLevelRelationships, final Integer index) {
+	private boolean isObservationLevelNameValid(final ObservationLevelRelationship observationLevelRelationship, final Integer index) {
+		// Support PLOT and MEANS level for now
+		final String meansLevelName = ObservationLevelMapper.getObservationLevelNameEnumByDataset(DatasetTypeEnum.MEANS_DATA);
+		final String plotLevelName = ObservationLevelMapper.getObservationLevelNameEnumByDataset(DatasetTypeEnum.PLOT_DATA);
+		if (observationLevelRelationship.getLevelName().equalsIgnoreCase(meansLevelName) || observationLevelRelationship.getLevelName()
+			.equalsIgnoreCase(plotLevelName)) {
+			this.errors.reject("observation.unit.import.invalid.observation.level.name", new String[] {index.toString()}, "");
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isObservationLevelRelationshipNamesValid(final List<ObservationLevelRelationship> observationLevelRelationships,
+		final Integer index) {
 		boolean hasPlot = false;
-		if(!CollectionUtils.isEmpty(observationLevelRelationships)) {
-			for(final ObservationLevelRelationship relationship: observationLevelRelationships) {
-				if(relationship.getLevelName().equalsIgnoreCase(PLOT)) {
+		if (!CollectionUtils.isEmpty(observationLevelRelationships)) {
+			for (final ObservationLevelRelationship relationship : observationLevelRelationships) {
+				if (relationship.getLevelName().equalsIgnoreCase(PLOT)) {
 					hasPlot = true;
 				}
-				if(!OBSERVATION_LEVEL_NAMES.contains(relationship.getLevelName().toUpperCase())) {
-					this.errors.reject("observation.unit.import.invalid.observation.level.name", new String[] {index.toString()}, "");
+				if (!OBSERVATION_LEVEL_NAMES.contains(relationship.getLevelName().toUpperCase())) {
+					this.errors.reject("observation.unit.import.invalid.observation.level.relationship.level.name", new String[] {index.toString()}, "");
 					return false;
 				}
 			}
-			if(hasPlot) {
+			if (hasPlot) {
 				return true;
 			}
 		}
