@@ -87,14 +87,14 @@ public class GermplasmListTreeResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}/move", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity moveGermplasmList(
+	public ResponseEntity<TreeNode> moveGermplasmList(
 		@PathVariable final String crop,
 		@PathVariable final String folderId,
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam final String newParentId) {
 
-		final Integer movedFolderId = this.germplasmListTreeService.moveGermplasmListNode(crop, programUUID, folderId, newParentId);
-		return new ResponseEntity<>(movedFolderId, HttpStatus.OK);
+		final TreeNode movedNode = this.germplasmListTreeService.moveGermplasmListNode(crop, programUUID, folderId, newParentId);
+		return new ResponseEntity<>(movedNode, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Delete germplasm list folder", notes = "Delete germplasm list folder.")
