@@ -49,7 +49,7 @@ public class GermplasmImportRequestDtoValidator {
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = Collections.singleton(1500);
 	static final Integer STOCK_ID_MAX_LENGTH = 35;
 	static final Integer REFERENCE_MAX_LENGTH = 255;
-	public static final Integer NAME_MAX_LENGTH = 255;
+	public static final Integer NAME_MAX_LENGTH = 5000;
 	private static final List<VariableType> ATTRIBUTE_TYPES =
 		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
 

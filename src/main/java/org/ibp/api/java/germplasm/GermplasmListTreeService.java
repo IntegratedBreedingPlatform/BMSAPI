@@ -18,7 +18,7 @@ public interface GermplasmListTreeService {
 
 	Integer updateGermplasmListFolderName(String cropName, String programUUID, String newFolderName, String folderId);
 
-	Integer moveGermplasmListNode(String cropName, String programUUID, String folderId, String newParentFolderId);
+	TreeNode moveGermplasmListNode(String cropName, String programUUID, String folderId, String newParentFolderId);
 
 	void deleteGermplasmListFolder(String cropName, String programUUID, String folderId);
 

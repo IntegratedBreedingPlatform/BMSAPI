@@ -36,6 +36,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.VariableValueUtil;
+import org.ibp.api.brapi.v2.germplasm.GermplasmImportRequestValidator;
 import org.ibp.api.domain.germplasmlist.GermplasmListMapper;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
@@ -180,7 +181,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListValidator.validateGermplasmList(germplasmListId);
 		this.germplasmListValidator.validateListMetadata(request, currentProgram);
 		this.germplasmListValidator.validateParentFolder(request.getParentFolderId());
-		final Optional<GermplasmList> parentFolder = this.germplasmListValidator.validateFolderId(request.getParentFolderId(), currentProgram, GermplasmListValidator.ListNodeType.PARENT);
+		final Optional<GermplasmList> parentFolder =
+			this.germplasmListValidator.validateFolderId(request.getParentFolderId(), currentProgram,
+				GermplasmListValidator.ListNodeType.PARENT);
 
 		GermplasmListHelper.assignFolderDependentProperties(request, currentProgram, parentFolder);
 
@@ -194,7 +197,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final String currentProgram = ContextHolder.getCurrentProgram();
 
 		this.germplasmListValidator.validateParentFolder(request.getParentFolderId());
-		final Optional<GermplasmList> parentFolder = this.germplasmListValidator.validateFolderId(request.getParentFolderId(), currentProgram, GermplasmListValidator.ListNodeType.PARENT);
+		final Optional<GermplasmList> parentFolder =
+			this.germplasmListValidator.validateFolderId(request.getParentFolderId(), currentProgram,
+				GermplasmListValidator.ListNodeType.PARENT);
 
 		GermplasmListHelper.assignFolderDependentProperties(request, currentProgram, parentFolder);
 
@@ -301,7 +306,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			}
 
 			if (isBlank(entry.getGroupName())) {
-				entry.setGroupName(crossExpansions.get(gid));
+				final String groupName = crossExpansions.get(gid);
+				if (StringUtils.isNotEmpty(groupName) && groupName.length() > GermplasmImportRequestValidator.NAME_MAX_LENGTH) {
+					throw new ApiValidationException("", "germplasm.list.resulting.grpname.exceeds.limit");
+				}
+				entry.setGroupName(groupName);
 				hasGroupNameEmpty = true;
 			} else {
 				hasGroupName = true;
@@ -415,7 +424,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListService.addGermplasmEntriesToList(germplasmListId, searchComposite, programUUID);
 	}
 
-
 	@Override
 	public GermplasmListDto getGermplasmListById(final Integer listId) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -449,7 +457,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
 		final Collection<? extends GrantedAuthority> authorities = SecurityUtil.getLoggedInUserAuthorities();
 		// Allow updating of status if user has Full permission or user owns the list
-		if (authorities.stream().noneMatch( o ->
+		if (authorities.stream().noneMatch(o ->
 			Arrays.asList(PermissionsEnum.ADMIN.name(),
 				PermissionsEnum.LISTS.name(),
 				PermissionsEnum.MANAGE_GERMPLASM_LISTS.name(),

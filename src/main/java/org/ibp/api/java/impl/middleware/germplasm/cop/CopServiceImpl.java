@@ -2,13 +2,17 @@ package org.ibp.api.java.impl.middleware.germplasm.cop;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import org.generationcp.middleware.api.cropparameter.CropParameterEnum;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
+import org.generationcp.middleware.pojos.CropParameter;
 import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.java.file.FileStorageService;
+import org.ibp.api.java.impl.middleware.cropparameter.CropParameterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
+
+import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
+import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
 
 @Service
 @Transactional
@@ -35,6 +45,12 @@ public class CopServiceImpl implements CopService {
 
 	@Autowired
 	private FileStorageService fileStorageService;
+
+	@Autowired
+	private CropParameterService cropParameterService;
+
+	@Autowired
+	private GermplasmNameService germplasmNameService;
 
 	@Override
 	public CopResponse viewCoefficientOfParentage(Set<Integer> gids, final Integer listId,
@@ -69,7 +85,7 @@ public class CopServiceImpl implements CopService {
 			}
 		}
 		if (someCopValuesExists) {
-			return new CopResponse(matrix);
+			return new CopResponse(matrix, this.getGermplasmCommonNamesMap(gids));
 		}
 
 		// no thread nor matrix for gids
@@ -77,8 +93,12 @@ public class CopServiceImpl implements CopService {
 	}
 
 	@Override
-	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids, final Integer listId, final BTypeEnum btype,
-		final boolean reset) {
+	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids, final Integer listId, final boolean reset) {
+
+		final Optional<CropParameter> cropParameter = this.cropParameterService.getCropParameter(CropParameterEnum.BTYPE);
+		checkArgument(cropParameter.isPresent(), "crop.parameter.not.exists", new String[] {CropParameterEnum.BTYPE.getKey()});
+		final Optional<BTypeEnum> btype = BTypeEnum.parse(cropParameter.get().getValue());
+		checkArgument(btype.isPresent(), "cop.btype.not.configured");
 
 		Table<Integer, Integer, Double> matrix = HashBasedTable.create();
 		// if all cop values are calculated, return them
@@ -103,18 +123,22 @@ public class CopServiceImpl implements CopService {
 			}
 
 			this.copServiceAsync.prepareExecution(gids);
-			final Future<Boolean> booleanFuture = this.copServiceAsync.calculateAsync(gids, matrix, listId, btype);
+			final Future<Boolean> booleanFuture = this.copServiceAsync.calculateAsync(gids, matrix, listId, btype.get());
 			this.copServiceAsync.trackFutureTask(gids, booleanFuture);
 			return new CopResponse(this.copServiceAsync.getProgress(gids));
 		}
 
-		return new CopResponse(matrix);
+		return new CopResponse(matrix, this.getGermplasmCommonNamesMap(gids));
+	}
+
+	private Map<String, Map<Integer, String>> getGermplasmCommonNamesMap(final Set<Integer> gids) {
+		return this.germplasmNameService.getGermplasmCommonNamesMap(new ArrayList<>(gids));
 	}
 
 	@Override
-	public CopResponse calculateCoefficientOfParentage(final Integer listId, final BTypeEnum btype) {
+	public CopResponse calculateCoefficientOfParentage(final Integer listId) {
 		final Set<Integer> gids = new LinkedHashSet<>(this.germplasmListDataService.getGidsByListId(listId));
-		return this.calculateCoefficientOfParentage(gids, listId, btype, false);
+		return this.calculateCoefficientOfParentage(gids, listId, false);
 	}
 
 	@Override

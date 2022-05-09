@@ -180,7 +180,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final List<Map<Integer, String>> data = new ArrayList<>();
 		for (final GermplasmListDataSearchResponse listData : listDataSearchResponseList) {
 			final Integer gid = (Integer) listData.getData().get(GermplasmListStaticColumns.GID.getName());
-			data.add(this.getDataRow(labelsGeneratorInput, keys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues, entryDetailValues));
+			data.add(this.getDataRow(labelsGeneratorInput, keys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues,
+				entryDetailValues));
 		}
 
 		return new LabelsData(LabelPrintingStaticField.GUID.getFieldId(), data);
@@ -211,13 +212,14 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
 		final Map<Integer, Map<Integer, String>> nameValues, final Map<Integer, Map<Integer, String>> entryDetailValues) {
 
+		final boolean isPdf = FileType.PDF.equals(labelsGeneratorInput.getFileType());
 		final Map<Integer, String> columns = new HashMap<>();
 		for (final Integer key : keys) {
 			final int id = toId(key);
 			if (this.germplasmFieldIds.contains(id)) {
-				this.getGermplasmFieldDataRowValue(germplasmSearchResponse, columns, key, id);
+				this.getGermplasmFieldDataRowValue(isPdf, germplasmSearchResponse, columns, key, id);
 			} else if (this.pedigreeFieldIds.contains(id)) {
-				this.getPedigreeFieldDataRowValue(germplasmSearchResponse, columns, key, id);
+				this.getPedigreeFieldDataRowValue(isPdf, germplasmSearchResponse, columns, key, id);
 
 				/*
 				 * Germplasm list data stores precalculated pedigree strings with a certain cross expansion level
@@ -227,7 +229,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 					columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.CROSS.name()), ""));
 				}
 			} else {
-				this.getAttributeOrNameDataRowValue(labelsGeneratorInput, germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
+				this.getAttributeOrNameDataRowValue(isPdf, germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
 				this.getEntryDetailDataRowValue(listData, entryDetailValues, columns, key, id);
 			}
 		}
@@ -345,7 +347,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 					fields.add(toKey(TermId.ENTRY_NO.getId()));
 					break;
 				default:
-					if (dto.getTermId() == GermplasmListLabelPrinting.DRVNM_ID || dto.getTermId() > GermplasmLabelPrinting.MAX_FIXED_TYPE_INDEX) {
+					if (dto.getTermId() == GermplasmListLabelPrinting.DRVNM_ID
+						|| dto.getTermId() > GermplasmLabelPrinting.MAX_FIXED_TYPE_INDEX) {
 						fields.add(dto.getTermId() + GermplasmLabelPrinting.MAX_FIXED_TYPE_INDEX);
 					} else {
 						fields.add(dto.getTermId());

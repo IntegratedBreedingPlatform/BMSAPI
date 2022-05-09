@@ -285,7 +285,7 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 	}
 
 	@Override
-	public Integer moveGermplasmListNode(final String cropName, final String programUUID, final String folderId,
+	public TreeNode moveGermplasmListNode(final String cropName, final String programUUID, final String folderId,
 		final String newParentFolderId) {
 
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -337,7 +337,11 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			});
 
-		return this.germplasmListService.moveGermplasmListFolder(Integer.parseInt(folderId), parent, dependantProgramUUID);
+		final GermplasmList germplasmList =
+			this.germplasmListService.moveGermplasmListFolder(Integer.parseInt(folderId), parent, dependantProgramUUID);
+		final List<UserDefinedField> listTypes = this.germplasmDataManager
+			.getUserDefinedFieldByFieldTableNameAndType(RowColumnType.LIST_TYPE.getFtable(), RowColumnType.LIST_TYPE.getFtype());
+		return TreeViewUtil.convertGermplasmListToTreeNode(germplasmList, false, listTypes);
 	}
 
 	@Override

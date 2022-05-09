@@ -78,7 +78,7 @@ public class GermplasmUpdateRequestValidatorTest {
 		updateRequest.getSynonyms().add(new Synonym("", ""));
 		final String nameType = RandomStringUtils.randomAlphabetic(10);
 		updateRequest.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), nameType));
-		updateRequest.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(260), nameType));
+		updateRequest.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(5001), nameType));
 		updateRequest.getAdditionalInfo().put("", RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH + 1));
 
 		Mockito.doReturn(Optional.empty()).when(this.breedingMethodService).getBreedingMethod(ArgumentMatchers.anyInt());
@@ -108,11 +108,11 @@ public class GermplasmUpdateRequestValidatorTest {
 		updateRequest.setBreedingMethodDbId("1012");
 		updateRequest.setCountryOfOriginCode("XYZ");
 		// Invalid name lengths for custom name fields
-		updateRequest.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(260));
-		updateRequest.setAccessionNumber(RandomStringUtils.randomAlphabetic(260));
-		updateRequest.setGenus(RandomStringUtils.randomAlphabetic(260));
-		updateRequest.setPedigree(RandomStringUtils.randomAlphabetic(260));
-		updateRequest.setGermplasmPUI(RandomStringUtils.randomAlphabetic(260));
+		updateRequest.setDefaultDisplayName(RandomStringUtils.randomAlphabetic(5001));
+		updateRequest.setAccessionNumber(RandomStringUtils.randomAlphabetic(5001));
+		updateRequest.setGenus(RandomStringUtils.randomAlphabetic(5001));
+		updateRequest.setPedigree(RandomStringUtils.randomAlphabetic(5001));
+		updateRequest.setGermplasmPUI(RandomStringUtils.randomAlphabetic(5001));
 
 		Mockito.doReturn(Optional.of(new BreedingMethodDTO())).when(this.breedingMethodService).getBreedingMethod(ArgumentMatchers.anyInt());
 		Mockito.doReturn(1L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any(), ArgumentMatchers.isNull());

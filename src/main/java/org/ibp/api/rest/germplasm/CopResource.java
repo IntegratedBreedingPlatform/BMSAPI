@@ -5,7 +5,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
 import org.ibp.api.exception.ApiRuntime2Exception;
@@ -56,15 +55,13 @@ public class CopResource {
 	public ResponseEntity<CopResponse> calculateCopMatrix(
 		@PathVariable final String cropName,
 		@RequestBody final Set<Integer> gids,
-		@RequestParam final BTypeEnum btype,
 		@ApiParam("whether to use or ignore pre-existing cop values. If true, re-calculate everything from scratch")
 		@RequestParam(required = false, defaultValue = "false") final boolean reset
 	) {
 		BaseValidator.checkNotNull(gids, "param.null", new String[] {"gids"});
 		BaseValidator.checkArgument(gids.size() > 0, "param.null", new String[] {"gids"});
-		BaseValidator.checkNotNull(btype, "param.null", new String[] {"btype"});
 		BaseValidator.checkArgument(gids.size() <= this.copMaxEntries, "cop.calculation.max.entries", new Integer[] {this.copMaxEntries});
-		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids, null, btype, reset);
+		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids, null, reset);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
@@ -74,13 +71,12 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<CopResponse> calculateCopMatrixForList(
 		@PathVariable final String cropName,
-		@PathVariable final Integer listId,
-		@RequestParam final BTypeEnum btype
+		@PathVariable final Integer listId
 	) {
 		if (!this.fileStorageService.isConfigured()) {
 			throw new ApiRuntime2Exception("", "cop.file.storage.not.configured");
 		}
-		final CopResponse results = this.copService.calculateCoefficientOfParentage(listId, btype);
+		final CopResponse results = this.copService.calculateCoefficientOfParentage(listId);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
@@ -136,14 +132,15 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<FileSystemResource> getCopMatrixAsCsv(
 		@PathVariable final String cropName,
-		@RequestParam final Set<Integer> gids
+		@RequestParam final Set<Integer> gids,
+		@RequestParam final String nameKeySelected
 	) throws IOException {
 		final CopResponse results = this.copService.viewCoefficientOfParentage(gids, null, null, null);
 
 		// FIXME avoid writing to disk
 		final File temporaryFolder = Files.createTempDir();
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + "COP.csv";
-		final File file = CopUtils.generateFile(results, fileNameFullPath);
+		final File file = CopUtils.generateFile(results, nameKeySelected, fileNameFullPath);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));

@@ -26,7 +26,9 @@ import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
@@ -146,7 +148,7 @@ public class GermplasmUpdateDtoValidatorTest {
 	@Test
 	public void testValidate_InvalidAttributeAndNameValues() {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
-		germplasmUpdateDTO.getNames().put("DRVNM", randomAlphanumeric(300));
+		germplasmUpdateDTO.getNames().put("DRVNM", randomAlphanumeric(5001));
 		germplasmUpdateDTO.getNames().put("LNAME", "");
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
@@ -170,7 +172,6 @@ public class GermplasmUpdateDtoValidatorTest {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setGid(1);
 		germplasmUpdateDTO.setGermplasmUUID(UUID.randomUUID().toString());
-
 		final Germplasm germplasm = new Germplasm(2);
 
 		when(this.germplasmMiddlewareService.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
@@ -205,8 +206,9 @@ public class GermplasmUpdateDtoValidatorTest {
 		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
 		germplasmUpdateDTO.setBreedingMethodAbbr("UAC");
 
-		when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class), ArgumentMatchers.any(),
-				ArgumentMatchers.isNull()))
+		when(this.breedingMethodService.searchBreedingMethods(ArgumentMatchers.any(BreedingMethodSearchRequest.class),
+			ArgumentMatchers.any(),
+			ArgumentMatchers.isNull()))
 			.thenReturn(Arrays.asList(new BreedingMethodDTO()));
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
@@ -282,4 +284,33 @@ public class GermplasmUpdateDtoValidatorTest {
 		Mockito.verifyZeroInteractions(errors);
 	}
 
+	@Test
+	public void testValidate_ProgenitorSameAsGid() {
+		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
+		germplasmUpdateDTO.setGid(1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 2);
+		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
+		final BindingResult errors = Mockito.mock(BindingResult.class);
+		this.germplasmUpdateDtoValidator.validateCannotAssignSelfAsProgenitor(errors, germplasmUpdateList,
+			Optional.of(Collections.emptySet()));
+		Mockito.verify(errors).reject("germplasm.update.progenitors.can.not.be.equals.to.gid");
+	}
+
+	@Test
+	public void testValidate_ProgenitorSameAsGermplasmUUID() {
+		final String uuid = UUID.randomUUID().toString();
+		final Germplasm germplasm = new Germplasm(1);
+		germplasm.setGermplasmUUID(uuid);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
+		germplasmUpdateDTO.setGermplasmUUID(uuid);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 2);
+		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
+		final BindingResult errors = Mockito.mock(BindingResult.class);
+		this.germplasmUpdateDtoValidator.validateCannotAssignSelfAsProgenitor(errors, germplasmUpdateList,
+			Optional.of(Collections.singleton(germplasm)));
+		Mockito.verify(errors).reject("germplasm.update.progenitors.can.not.be.equals.to.gid");
+	}
 }
