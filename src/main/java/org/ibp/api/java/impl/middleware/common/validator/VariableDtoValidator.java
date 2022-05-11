@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 public class VariableDtoValidator {
 
 	public static final int TERM_NAME_MAX_LENGTH = 32;
-	final Pattern variableNameValidPattern = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|\\s]");
+	final Pattern variableNameValidPattern = Pattern.compile("[$&+,./%')\\[}\\]{(\\\\\\-*^!`~:;=?@#|\\s]");
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;

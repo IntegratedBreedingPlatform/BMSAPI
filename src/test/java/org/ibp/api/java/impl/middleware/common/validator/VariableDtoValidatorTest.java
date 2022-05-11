@@ -207,7 +207,7 @@ public class VariableDtoValidatorTest {
 
 		final VariableDTO variableDTO = new VariableDTO();
 		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
-		variableDTO.setObservationVariableName("1kjsadjk_*&^%");
+		variableDTO.setObservationVariableName("1kjsadjk_*&^%-\\");
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
 		this.variableDtoValidator.validateObservationVariableName(variableDTO, errors);
 
