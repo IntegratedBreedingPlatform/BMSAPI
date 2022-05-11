@@ -52,6 +52,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -156,9 +157,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		this.germplasmListValidator.validateGermplasmList(listId);
 		this.studyEntryValidator.validateStudyAlreadyHasStudyEntries(studyId);
 
-		final ModelMapper mapper = StudyEntryMapper.getInstance();
-		final List<StudyEntryDto> studyEntryDtoList =
-			germplasmList.getListData().stream().map(l -> mapper.map(l, StudyEntryDto.class)).collect(Collectors.toList());
+		final Set<Integer> gids = germplasmList.getListData().stream()
+			.map(GermplasmListData::getGid)
+			.collect(Collectors.toSet());
+		final Map<Integer, String> designationByGids = this.germplasmDataManager.getPreferredNamesByGids(new ArrayList<>(gids));
+		final List<StudyEntryDto> studyEntryDtoList = StudyEntryMapper.map(germplasmList.getListData(), designationByGids);
 
 		final Map<Integer, GermplasmListData> germplasmListDataMap =
 			germplasmList.getListData().stream().collect(Collectors.toMap(GermplasmListData::getEntryId, g -> g));
