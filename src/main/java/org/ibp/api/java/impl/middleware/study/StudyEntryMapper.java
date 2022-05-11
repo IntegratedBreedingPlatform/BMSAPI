@@ -15,6 +15,7 @@ import org.modelmapper.spi.MappingContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StudyEntryMapper {
 
@@ -99,5 +100,19 @@ public class StudyEntryMapper {
 			studyEntryDtos.add(studyEntryDto);
 		}
 		return studyEntryDtos;
+	}
+
+	public static List<StudyEntryDto> map(final List<GermplasmListData> input, final Map<Integer, String> gidDesignationMap) {
+		return input.stream()
+			.map(germplasmListData -> {
+				final StudyEntryDto studyEntryDto = new StudyEntryDto();
+				studyEntryDto.setEntryNumber(germplasmListData.getEntryId());
+				studyEntryDto.setEntryId(germplasmListData.getEntryId());
+				studyEntryDto.setGid(germplasmListData.getGid());
+				studyEntryDto.setDesignation(gidDesignationMap.get(germplasmListData.getGid()));
+				studyEntryDto.setEntryCode(germplasmListData.getEntryCode());
+				return studyEntryDto;
+			})
+			.collect(Collectors.toList());
 	}
 }
