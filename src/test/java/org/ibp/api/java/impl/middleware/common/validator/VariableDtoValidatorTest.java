@@ -203,6 +203,19 @@ public class VariableDtoValidatorTest {
 	}
 
 	@Test
+	public void testValidateVariable_InvalidNameFormat() {
+
+		final VariableDTO variableDTO = new VariableDTO();
+		variableDTO.setObservationVariableDbId(RandomStringUtils.randomNumeric(5));
+		variableDTO.setObservationVariableName("1kjsadjk_*&^%");
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
+		this.variableDtoValidator.validateObservationVariableName(variableDTO, errors);
+
+		Assert.assertEquals(1, errors.getAllErrors().size());
+		this.assertError(errors.getAllErrors(), "observation.variable.variable.name.should.have.valid.pattern");
+	}
+
+	@Test
 	public void testCheckVariableIsUsedInStudy_PropertyScaleMethodMismatch() {
 
 		final Variable variable = new Variable();

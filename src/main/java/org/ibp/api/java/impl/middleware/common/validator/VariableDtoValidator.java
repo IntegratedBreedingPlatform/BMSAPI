@@ -29,12 +29,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
 public class VariableDtoValidator {
 
-	public static final int TERM_NAME_MAX_LENGTH = 200;
+	public static final int TERM_NAME_MAX_LENGTH = 32;
+	final Pattern variableNameValidPattern = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|\\s]");
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -58,6 +61,7 @@ public class VariableDtoValidator {
 		this.validateScale(variableDTO, errors);
 		this.checkVariableIsUsedInStudy(variableDTO, errors);
 		this.validateStudyDbIds(variableDTO, errors);
+		this.validateContextOfUse(variableDTO, errors);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -118,6 +122,10 @@ public class VariableDtoValidator {
 		if (!StringUtils.isEmpty(variableDTO.getObservationVariableName())
 			&& variableDTO.getObservationVariableName().length() > TERM_NAME_MAX_LENGTH) {
 			errors.reject("observation.variable.variable.name.max.length.exceeded", new String[] {}, "");
+		}
+		final Matcher matcher = this.variableNameValidPattern.matcher(variableDTO.getObservationVariableName());
+		if (matcher.find() || Character.isDigit(variableDTO.getObservationVariableName().charAt(0))) {
+			errors.reject("observation.variable.variable.name.should.have.valid.pattern", new String[] {}, "");
 		}
 	}
 
