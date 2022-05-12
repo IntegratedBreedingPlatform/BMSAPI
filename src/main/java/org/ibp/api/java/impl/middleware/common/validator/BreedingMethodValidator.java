@@ -25,7 +25,7 @@ import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.ch
 
 @Component
 public class BreedingMethodValidator {
-	
+
 	@Autowired
 	private BreedingMethodService breedingMethodService;
 
@@ -50,7 +50,7 @@ public class BreedingMethodValidator {
 		checkNotNull(numberOfProgenitors, "field.is.required", new String[] {"numberOfProgenitors"});
 		this.validateProgenitorTypeDuo(numberOfProgenitors, methodType);
 
-		if(StringUtils.isNotBlank(breedingMethod.getGroup())){
+		if (StringUtils.isNotBlank(breedingMethod.getGroup())) {
 			final String group = breedingMethod.getGroup();
 			final MethodGroup methodGroup = MethodGroup.getMethodGroup(group);
 			validateMethodGroup(group, methodGroup);
@@ -63,6 +63,8 @@ public class BreedingMethodValidator {
 		this.validateClassTypeDuo(methodClass, methodType);
 
 		this.validateFieldsLength(breedingMethod);
+
+		this.validatePrefix(breedingMethod);
 	}
 
 	public void validateEdition(final Integer breedingMethodDbId, final BreedingMethodNewRequest breedingMethodRequest) {
@@ -98,6 +100,8 @@ public class BreedingMethodValidator {
 		}
 
 		this.validateFieldsLength(breedingMethodRequest);
+		this.validatePrefix(breedingMethodRequest);
+
 	}
 
 	public void validateDeletion(final Integer breedingMethodDbId) {
@@ -110,7 +114,8 @@ public class BreedingMethodValidator {
 		Optional<Germplasm> germplasmOptional = this.germplasmService.findOneByMethodId(breedingMethodDbId);
 		if (germplasmOptional.isPresent()) {
 			throw new ApiRequestValidationException("breeding.methods.delete.has.germplasm",
-				new String[] {germplasmOptional.get().getGid().toString()}); }
+				new String[] {germplasmOptional.get().getGid().toString()});
+		}
 
 		final BreedingMethodDTO breedingMethodDTO = methodOptional.get();
 		final long projectCount = this.datasetService.countByVariableIdAndValue(TermId.BREEDING_METHOD_CODE.getId(),
@@ -119,8 +124,9 @@ public class BreedingMethodValidator {
 			throw new ApiRequestValidationException("breeding.methods.delete.has.projects", new Object[] {projectCount});
 		}
 
-		final long observationsCount = this.datasetService.countObservationsByVariableIdAndValue(TermId.BREEDING_METHOD_VARIATE_CODE.getId(),
-			breedingMethodDTO.getCode());
+		final long observationsCount =
+			this.datasetService.countObservationsByVariableIdAndValue(TermId.BREEDING_METHOD_VARIATE_CODE.getId(),
+				breedingMethodDTO.getCode());
 		if (observationsCount > 0) {
 			throw new ApiRequestValidationException("breeding.methods.delete.has.observations", new Object[] {observationsCount});
 		}
@@ -182,4 +188,13 @@ public class BreedingMethodValidator {
 			throw new ApiRequestValidationException("breeding.methods.invalid.group", new String[] {group, validGroups});
 		}
 	}
+
+	private void validatePrefix(final BreedingMethodNewRequest breedingMethodRequest) {
+		// Prefix is required only for GENERATIVE method.
+		if (MethodType.GENERATIVE.getCode().equalsIgnoreCase(breedingMethodRequest.getType()) && StringUtils.isBlank(
+			breedingMethodRequest.getPrefix())) {
+			throw new ApiRequestValidationException("field.is.required", new String[] {"prefix"});
+		}
+	}
+
 }
