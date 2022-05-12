@@ -73,9 +73,6 @@ public class ExperimentalDesignUtil {
 			final Integer entryNumber = studyEntryDto.getEntryNumber();
 			row.setEntryNumber(entryNumber);
 			return new ObservationUnitData(termId, String.valueOf(entryNumber));
-		} else if (termId == TermId.SEED_SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
-			final Optional<String> source = studyEntryDto.getStudyEntryPropertyValue(TermId.SEED_SOURCE.getId());
-			return new ObservationUnitData(termId, source.orElse(StringUtils.EMPTY));
 		} else if (termId == TermId.GROUPGID.getId()) {
 			final Optional<String> groupGID = studyEntryDto.getStudyEntryPropertyValue(TermId.GROUPGID.getId());
 			return new ObservationUnitData(termId, groupGID.orElse(StringUtils.EMPTY));

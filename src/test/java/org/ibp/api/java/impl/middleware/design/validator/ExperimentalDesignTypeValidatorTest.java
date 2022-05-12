@@ -765,7 +765,6 @@ public class ExperimentalDesignTypeValidatorTest {
 		germplasm.setDesignation("DESIG" + entryNo);
 
 		final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
-		properties.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(), "SOURCE" + entryNo, null));
 		properties.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(), null, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()));
 		properties.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), "", null));
 		properties.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(), String.valueOf(entryNo), null));
