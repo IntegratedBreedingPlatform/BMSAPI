@@ -1,6 +1,5 @@
 package org.ibp.api.rest.dataset.validator;
 
-import com.google.inject.matcher.Matchers;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
@@ -15,6 +14,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -107,7 +107,8 @@ public class ObservationUnitImportRequestValidatorTest {
 
 		Map<String, List<String>> plotObservationLevelRelationshipsByGeolocations = new HashMap();
 		plotObservationLevelRelationshipsByGeolocations.put(STUDY_DBID, Arrays.asList("1"));
-		Mockito.when(this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
+		Mockito.when(
+				this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
 			.thenReturn(plotObservationLevelRelationshipsByGeolocations);
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
@@ -253,12 +254,24 @@ public class ObservationUnitImportRequestValidatorTest {
 	}
 
 	@Test
-	public void testPruneStudiesInvalidForImport_WhereInvalidLevelName() {
+	public void testPruneStudiesInvalidForImport_WhereInvalidObservationRelationshipLevelName() {
 		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
-		observationUnitImportRequestDtos.get(0).getObservationUnitPosition().getObservationLevelRelationships().get(0).setLevelName("REP_NO");
+		observationUnitImportRequestDtos.get(0).getObservationUnitPosition().getObservationLevelRelationships().get(0)
+			.setLevelName("REP_NO");
 		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
 		Assert.assertTrue(result.hasErrors());
-		Assert.assertEquals("observation.unit.import.invalid.observation.level.name", result.getAllErrors().get(0).getCode());
+		Assert.assertEquals("observation.unit.import.invalid.observation.level.relationship.level.name",
+			result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
+	public void testPruneStudiesInvalidForImport_WhereInvalidObservationLevelName() {
+		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
+		observationUnitImportRequestDtos.get(0).getObservationUnitPosition().getObservationLevel().setLevelName("Invalid Level Name");
+		final BindingResult result = this.validator.pruneObservationUnitsInvalidForImport(observationUnitImportRequestDtos);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("observation.unit.import.invalid.observation.level.name",
+			result.getAllErrors().get(0).getCode());
 	}
 
 	@Test
@@ -274,7 +287,8 @@ public class ObservationUnitImportRequestValidatorTest {
 	public void testPruneObservationUnitsInvalidForImport_importExistingPlotCode() {
 		Map<String, List<String>> plotObservationLevelRelationshipsByGeolocations = new HashMap();
 		plotObservationLevelRelationshipsByGeolocations.put(STUDY_DBID, Arrays.asList("1"));
-		Mockito.when(this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
+		Mockito.when(
+				this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
 			.thenReturn(plotObservationLevelRelationshipsByGeolocations);
 
 		final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos = this.createObservationUnitImportRequestDtos();
@@ -293,7 +307,8 @@ public class ObservationUnitImportRequestValidatorTest {
 		Mockito.when(this.studyServiceBrapi.getStudyInstances(ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 			.thenReturn(Collections.singletonList(studyInstanceDto));
 
-		Mockito.when(this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
+		Mockito.when(
+				this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
 			.thenReturn(new HashMap<>());
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
@@ -324,7 +339,8 @@ public class ObservationUnitImportRequestValidatorTest {
 		Mockito.when(this.studyServiceBrapi.getStudyInstances(ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 			.thenReturn(Collections.singletonList(studyInstanceDto));
 
-		Mockito.when(this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
+		Mockito.when(
+				this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
 			.thenReturn(new HashMap<>());
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
@@ -351,7 +367,8 @@ public class ObservationUnitImportRequestValidatorTest {
 		Mockito.when(this.studyServiceBrapi.getStudyInstances(ArgumentMatchers.any(), ArgumentMatchers.isNull()))
 			.thenReturn(Collections.singletonList(studyInstanceDto));
 
-		Mockito.when(this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
+		Mockito.when(
+				this.observationUnitService.getPlotObservationLevelRelationshipsByGeolocations(new HashSet<>(Arrays.asList(STUDY_DBID))))
 			.thenReturn(new HashMap<>());
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
@@ -387,7 +404,8 @@ public class ObservationUnitImportRequestValidatorTest {
 		dto.setGermplasmDbId(GERMPLASM_DBID);
 		dto.setGermplasmDbId(GERMPLASM_DBID);
 
-		dto.setObservationUnitPosition(this.createObservationUnitPosition(Collections.singletonList(this.createObservationLevelRelationship(levelCode))));
+		dto.setObservationUnitPosition(
+			this.createObservationUnitPosition(Collections.singletonList(this.createObservationLevelRelationship(levelCode))));
 		return dto;
 	}
 
@@ -397,6 +415,8 @@ public class ObservationUnitImportRequestValidatorTest {
 		observationUnitPosition.setPositionCoordinateX("1");
 		observationUnitPosition.setPositionCoordinateY("1");
 		observationUnitPosition.setObservationLevelRelationships(observationLevelRelationships);
+		observationUnitPosition.setObservationLevel(
+			new ObservationLevelRelationship(null, null, DatasetTypeEnum.PLOT_DATA.getName(), null));
 		return observationUnitPosition;
 	}
 
