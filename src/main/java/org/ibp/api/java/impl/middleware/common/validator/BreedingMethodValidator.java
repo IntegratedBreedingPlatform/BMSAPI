@@ -25,7 +25,9 @@ import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.ch
 
 @Component
 public class BreedingMethodValidator {
-	
+
+	public static final String FIELD_IS_REQUIRED = "field.is.required";
+	public static final String TEXT_FIELD_MAX_LENGTH = "text.field.max.length";
 	@Autowired
 	private BreedingMethodService breedingMethodService;
 
@@ -37,9 +39,9 @@ public class BreedingMethodValidator {
 
 	public void validateCreation(final BreedingMethodNewRequest breedingMethod) {
 		checkNotNull(breedingMethod, "request.null");
-		checkArgument(!isBlank(breedingMethod.getName()), "field.is.required", new String[] {"name"});
-		checkArgument(!isBlank(breedingMethod.getCode()), "field.is.required", new String[] {"code"});
-		checkArgument(!isBlank(breedingMethod.getDescription()), "field.is.required", new String[] {"description"});
+		checkArgument(!isBlank(breedingMethod.getName()), FIELD_IS_REQUIRED, new String[] {"name"});
+		checkArgument(!isBlank(breedingMethod.getCode()), FIELD_IS_REQUIRED, new String[] {"code"});
+		checkArgument(!isBlank(breedingMethod.getDescription()), FIELD_IS_REQUIRED, new String[] {"description"});
 
 		final String type = breedingMethod.getType();
 		final MethodType methodType = MethodType.getMethodType(type);
@@ -47,10 +49,10 @@ public class BreedingMethodValidator {
 		this.validateMethodType(type, methodType);
 
 		final Integer numberOfProgenitors = breedingMethod.getNumberOfProgenitors();
-		checkNotNull(numberOfProgenitors, "field.is.required", new String[] {"numberOfProgenitors"});
+		checkNotNull(numberOfProgenitors, FIELD_IS_REQUIRED, new String[] {"numberOfProgenitors"});
 		this.validateProgenitorTypeDuo(numberOfProgenitors, methodType);
 
-		if(StringUtils.isNotBlank(breedingMethod.getGroup())){
+		if (StringUtils.isNotBlank(breedingMethod.getGroup())) {
 			final String group = breedingMethod.getGroup();
 			final MethodGroup methodGroup = MethodGroup.getMethodGroup(group);
 			validateMethodGroup(group, methodGroup);
@@ -63,6 +65,8 @@ public class BreedingMethodValidator {
 		this.validateClassTypeDuo(methodClass, methodType);
 
 		this.validateFieldsLength(breedingMethod);
+
+		this.validatePrefix(breedingMethod);
 	}
 
 	public void validateEdition(final Integer breedingMethodDbId, final BreedingMethodNewRequest breedingMethodRequest) {
@@ -98,6 +102,8 @@ public class BreedingMethodValidator {
 		}
 
 		this.validateFieldsLength(breedingMethodRequest);
+		this.validatePrefix(breedingMethodRequest);
+
 	}
 
 	public void validateDeletion(final Integer breedingMethodDbId) {
@@ -110,7 +116,8 @@ public class BreedingMethodValidator {
 		Optional<Germplasm> germplasmOptional = this.germplasmService.findOneByMethodId(breedingMethodDbId);
 		if (germplasmOptional.isPresent()) {
 			throw new ApiRequestValidationException("breeding.methods.delete.has.germplasm",
-				new String[] {germplasmOptional.get().getGid().toString()}); }
+				new String[] {germplasmOptional.get().getGid().toString()});
+		}
 
 		final BreedingMethodDTO breedingMethodDTO = methodOptional.get();
 		final long projectCount = this.datasetService.countByVariableIdAndValue(TermId.BREEDING_METHOD_CODE.getId(),
@@ -119,8 +126,9 @@ public class BreedingMethodValidator {
 			throw new ApiRequestValidationException("breeding.methods.delete.has.projects", new Object[] {projectCount});
 		}
 
-		final long observationsCount = this.datasetService.countObservationsByVariableIdAndValue(TermId.BREEDING_METHOD_VARIATE_CODE.getId(),
-			breedingMethodDTO.getCode());
+		final long observationsCount =
+			this.datasetService.countObservationsByVariableIdAndValue(TermId.BREEDING_METHOD_VARIATE_CODE.getId(),
+				breedingMethodDTO.getCode());
 		if (observationsCount > 0) {
 			throw new ApiRequestValidationException("breeding.methods.delete.has.observations", new Object[] {observationsCount});
 		}
@@ -128,22 +136,22 @@ public class BreedingMethodValidator {
 
 	private void validateFieldsLength(final BreedingMethodNewRequest breedingMethod) {
 		final String name = breedingMethod.getName();
-		checkArgument(name == null || name.length() <= 50, "text.field.max.length", new String[] {"name", "50"});
+		checkArgument(name == null || name.length() <= 50, TEXT_FIELD_MAX_LENGTH, new String[] {"name", "50"});
 
 		final String code = breedingMethod.getCode();
-		checkArgument(code == null || code.length() <= 8, "text.field.max.length", new String[] {"code", "8"});
+		checkArgument(code == null || code.length() <= 8, TEXT_FIELD_MAX_LENGTH, new String[] {"code", "8"});
 
 		final String description = breedingMethod.getDescription();
-		checkArgument(description == null || description.length() <= 255, "text.field.max.length", new String[] {"description", "255"});
+		checkArgument(description == null || description.length() <= 255, TEXT_FIELD_MAX_LENGTH, new String[] {"description", "255"});
 
 		checkArgument(breedingMethod.getSeparator() == null || breedingMethod.getSeparator().length() <= 255,
-			"text.field.max.length", new String[] {"separator", "255"});
+			TEXT_FIELD_MAX_LENGTH, new String[] {"separator", "255"});
 		checkArgument(breedingMethod.getPrefix() == null || breedingMethod.getPrefix().length() <= 255,
-			"text.field.max.length", new String[] {"prefix", "255"});
+			TEXT_FIELD_MAX_LENGTH, new String[] {"prefix", "255"});
 		checkArgument(breedingMethod.getCount() == null || breedingMethod.getCount().length() <= 255,
-			"text.field.max.length", new String[] {"count", "255"});
+			TEXT_FIELD_MAX_LENGTH, new String[] {"count", "255"});
 		checkArgument(breedingMethod.getSuffix() == null || breedingMethod.getSuffix().length() <= 255,
-			"text.field.max.length", new String[] {"suffix", "255"});
+			TEXT_FIELD_MAX_LENGTH, new String[] {"suffix", "255"});
 	}
 
 	private void validateMethodType(final String type, final MethodType methodType) {
@@ -182,4 +190,13 @@ public class BreedingMethodValidator {
 			throw new ApiRequestValidationException("breeding.methods.invalid.group", new String[] {group, validGroups});
 		}
 	}
+
+	private void validatePrefix(final BreedingMethodNewRequest breedingMethodRequest) {
+		// Prefix is required only for GENERATIVE method.
+		if (MethodType.GENERATIVE.getCode().equalsIgnoreCase(breedingMethodRequest.getType()) && StringUtils.isBlank(
+			breedingMethodRequest.getPrefix())) {
+			throw new ApiRequestValidationException(FIELD_IS_REQUIRED, new String[] {"prefix"});
+		}
+	}
+
 }

@@ -10,6 +10,7 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitP
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -154,7 +155,7 @@ public class ObservationUnitImportRequestValidator {
 				}
 			}
 
-			if (!this.isObservationLevelRelationshipNamesValid(position.getObservationLevelRelationships(), index)) {
+			if (!this.isObservationLevelNameValid(position.getObservationLevel(), index)) {
 				iterator.remove();
 				continue;
 			}
@@ -171,67 +172,99 @@ public class ObservationUnitImportRequestValidator {
 				continue;
 			}
 
-			final boolean isPlotLevelCodeInValid = position.getObservationLevelRelationships().stream().anyMatch(
-				levelRelationship -> {
-					final String levelCode = levelRelationship.getLevelCode();
-					return levelRelationship.getLevelName().equalsIgnoreCase(PLOT) && (!isNumber(levelCode) || parseInt(levelCode) < 1);
-				}
-			);
-			if (isPlotLevelCodeInValid) {
-				this.errors.reject("observation.unit.import.plot.levelCode.invalid", new String[] {index.toString()}, "");
-				iterator.remove();
-				continue;
-			}
+			if (position.getObservationLevel().getLevelName().equalsIgnoreCase(DatasetTypeEnum.PLOT_DATA.getName())) {
 
-			if (this.checkPlotLevelCodeExists(plotObservationLevelRelationshipsByStudyDbIds.get(dto.getStudyDbId()),
-				dto.getObservationUnitPosition().getObservationLevelRelationships())) {
-				this.errors.reject("observation.unit.import.plot.levelCode.exists", new String[] {index.toString()}, "");
-				iterator.remove();
-				continue;
-			}
-
-			//Check for duplicate plot level codes
-			if (validPlotObservationLevelRelationshipsByStudyDbIds.containsKey(dto.getStudyDbId())) {
-				final Set<String> validPlotLevelCodes = validPlotObservationLevelRelationshipsByStudyDbIds.get(dto.getStudyDbId());
-				final Optional<ObservationLevelRelationship> duplicatedPlot =
-					dto.getObservationUnitPosition().getObservationLevelRelationships()
-						.stream()
-						.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(PLOT) &&
-							validPlotLevelCodes.contains(levelRelationship.getLevelCode()))
-						.findFirst();
-				if (duplicatedPlot.isPresent()) {
-					this.errors.reject("observation.unit.import.plot.levelCode.duplicated", new String[] {index.toString()}, "");
+				if (!this.isObservationLevelRelationshipNamesValid(position.getObservationLevelRelationships(), index)) {
 					iterator.remove();
 					continue;
 				}
-			} else {
-				validPlotObservationLevelRelationshipsByStudyDbIds.put(dto.getStudyDbId(), new HashSet<>());
+
+				final boolean isPlotLevelCodeInValid =
+					position.getObservationLevelRelationships()
+						.stream().anyMatch(
+							levelRelationship -> {
+								final String levelCode = levelRelationship.getLevelCode();
+								return levelRelationship.getLevelName().equalsIgnoreCase(PLOT) && (!isNumber(levelCode)
+									|| parseInt(levelCode) < 1);
+							}
+						);
+				if (isPlotLevelCodeInValid) {
+					this.errors.reject("observation.unit.import.plot.levelCode.invalid", new String[] {index.toString()}, "");
+					iterator.remove();
+					continue;
+				}
+
+				if (this.checkPlotLevelCodeExists(plotObservationLevelRelationshipsByStudyDbIds.get(dto.getStudyDbId()),
+					dto.getObservationUnitPosition().getObservationLevelRelationships())) {
+					this.errors.reject("observation.unit.import.plot.levelCode.exists", new String[] {index.toString()}, "");
+					iterator.remove();
+					continue;
+				}
+
+				//Check for duplicate plot level codes
+				if (validPlotObservationLevelRelationshipsByStudyDbIds.containsKey(dto.getStudyDbId())) {
+					final Set<String> validPlotLevelCodes = validPlotObservationLevelRelationshipsByStudyDbIds.get(dto.getStudyDbId());
+					final Optional<ObservationLevelRelationship> duplicatedPlot =
+						dto.getObservationUnitPosition().getObservationLevelRelationships()
+							.stream()
+							.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(PLOT) &&
+								validPlotLevelCodes.contains(levelRelationship.getLevelCode()))
+							.findFirst();
+					if (duplicatedPlot.isPresent()) {
+						this.errors.reject("observation.unit.import.plot.levelCode.duplicated", new String[] {index.toString()}, "");
+						iterator.remove();
+						continue;
+					}
+				} else {
+					validPlotObservationLevelRelationshipsByStudyDbIds.put(dto.getStudyDbId(), new HashSet<>());
+				}
+
+				// Add valid plot level codes
+				if (!CollectionUtils.isEmpty(position.getObservationLevelRelationships())) {
+					position.getObservationLevelRelationships()
+						.stream()
+						.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(PLOT))
+						.forEach(levelRelationship ->
+							validPlotObservationLevelRelationshipsByStudyDbIds.get(dto.getStudyDbId())
+								.add(levelRelationship.getLevelCode()));
+				}
 			}
 
-			// Add valid plot level codes
-			position.getObservationLevelRelationships()
-				.stream()
-				.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(PLOT))
-				.forEach(levelRelationship ->
-					validPlotObservationLevelRelationshipsByStudyDbIds.get(dto.getStudyDbId()).add(levelRelationship.getLevelCode()));
 		}
 
 		return this.errors;
 	}
 
-	private boolean isObservationLevelRelationshipNamesValid(final List<ObservationLevelRelationship> observationLevelRelationships, final Integer index) {
+	private boolean isObservationLevelNameValid(final ObservationLevelRelationship observationLevel, final Integer index) {
+
+		if (observationLevel == null) {
+			this.errors.reject("observation.unit.import.observation.level.null", new String[] {index.toString()}, "");
+			return false;
+		}
+		// Support PLOT and MEANS level for now
+		if (DatasetTypeEnum.MEANS_DATA.getName().equalsIgnoreCase(observationLevel.getLevelName())
+			|| DatasetTypeEnum.PLOT_DATA.getName().equalsIgnoreCase(observationLevel.getLevelName())) {
+			return true;
+		}
+		this.errors.reject("observation.unit.import.invalid.observation.level.name", new String[] {index.toString()}, "");
+		return false;
+	}
+
+	private boolean isObservationLevelRelationshipNamesValid(final List<ObservationLevelRelationship> observationLevelRelationships,
+		final Integer index) {
 		boolean hasPlot = false;
-		if(!CollectionUtils.isEmpty(observationLevelRelationships)) {
-			for(final ObservationLevelRelationship relationship: observationLevelRelationships) {
-				if(relationship.getLevelName().equalsIgnoreCase(PLOT)) {
+		if (!CollectionUtils.isEmpty(observationLevelRelationships)) {
+			for (final ObservationLevelRelationship relationship : observationLevelRelationships) {
+				if (relationship.getLevelName().equalsIgnoreCase(PLOT)) {
 					hasPlot = true;
 				}
-				if(!OBSERVATION_LEVEL_NAMES.contains(relationship.getLevelName().toUpperCase())) {
-					this.errors.reject("observation.unit.import.invalid.observation.level.name", new String[] {index.toString()}, "");
+				if (!OBSERVATION_LEVEL_NAMES.contains(relationship.getLevelName().toUpperCase())) {
+					this.errors.reject("observation.unit.import.invalid.observation.level.relationship.level.name",
+						new String[] {index.toString()}, "");
 					return false;
 				}
 			}
-			if(hasPlot) {
+			if (hasPlot) {
 				return true;
 			}
 		}
