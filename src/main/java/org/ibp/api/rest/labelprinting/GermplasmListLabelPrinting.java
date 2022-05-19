@@ -296,10 +296,10 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 					fields.add(TermId.UNITS_INVENTORY.getId());
 					break;
 				case IMMEDIATE_SOURCE_GID:
-					fields.add(LabelPrintingStaticField.INMEDIATE_SOURCE_GID.getFieldId());
+					fields.add(LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId());
 					break;
 				case IMMEDIATE_SOURCE_NAME:
-					fields.add(LabelPrintingStaticField.INMEDIATE_SOURCE_PREFERRED_NAME.getFieldId());
+					fields.add(LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId());
 					break;
 				case GROUP_SOURCE_GID:
 					fields.add(LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId());

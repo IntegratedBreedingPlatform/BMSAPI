@@ -387,11 +387,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			case CROSS:
 				columns.put(key, Objects.toString(germplasmSearchResponse.getPedigreeString(), ""));
 				return;
-			case INMEDIATE_SOURCE_GID:
+			case IMMEDIATE_SOURCE_GID:
 				columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourceGID(), ""));
 				return;
-			case INMEDIATE_SOURCE_PREFERRED_NAME:
-				columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourcePreferredName(), ""));
+			case IMMEDIATE_SOURCE_NAME:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourceName(), ""));
 				return;
 			default:
 				//do nothing
@@ -521,11 +521,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.CROSS_FEMALE_PREFERRED_NAME);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.INMEDIATE_SOURCE_GID.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId())) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.IMMEDIATE_SOURCE_GID);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.INMEDIATE_SOURCE_PREFERRED_NAME.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId())) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.IMMEDIATE_SOURCE);
 		}
 	}
@@ -536,9 +536,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final String maleParentGIDPropValue = this.getMessage("label.printing.field.pedigree.male.parent.gid");
 		final String maleParentPreferredNamePropValue = this.getMessage("label.printing.field.pedigree.male.parent.preferred.name");
 		final String femaleParentPreferredNamePropValue = this.getMessage("label.printing.field.pedigree.female.parent.preferred.name");
-		final String inmediateSourceGIDPropValue = this.getMessage("label.printing.field.pedigree.inmediate.souce.gid");
-		final String inmediateSourcePreferredNamePropValue =
-			this.getMessage("label.printing.field.pedigree.inmediate.source.preferred.name");
+		final String immediateSourceGIDPropValue = this.getMessage("label.printing.field.pedigree.immediate.souce.gid");
+		final String immediateSourceNamePropValue = this.getMessage("label.printing.field.pedigree.immediate.source.name");
 
 		return ImmutableList.<Field>builder()
 			.add(new Field(LabelPrintingStaticField.CROSS.getFieldId(), crossPropValue))
@@ -546,9 +545,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			.add(new Field(TermId.CROSS_MALE_GID.getId(), maleParentGIDPropValue))
 			.add(new Field(TermId.CROSS_MALE_PREFERRED_NAME.getId(), maleParentPreferredNamePropValue))
 			.add(new Field(TermId.CROSS_FEMALE_PREFERRED_NAME.getId(), femaleParentPreferredNamePropValue))
-			.add(new Field(LabelPrintingStaticField.INMEDIATE_SOURCE_GID.getFieldId(), inmediateSourceGIDPropValue))
-			.add(
-				new Field(LabelPrintingStaticField.INMEDIATE_SOURCE_PREFERRED_NAME.getFieldId(), inmediateSourcePreferredNamePropValue))
+			.add(new Field(LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId(), immediateSourceGIDPropValue))
+			.add(new Field(LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId(), immediateSourceNamePropValue))
 			.build();
 	}
 
