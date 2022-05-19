@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.ontology.brapi;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -69,15 +67,12 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		}
 
 		final List<VariableDTO> variables = this.middlewareVariableServiceBrapi.createObservationVariables(variableDTOList);
-		if (CollectionUtils.isNotEmpty(variables)) {
-			final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
-			// Fetch the saved observation variables from the database to populate the fields.
-			variableSearchRequestDTO.setObservationVariableDbIds(variables.stream().map(VariableDTO::getObservationVariableDbId).collect(
-				Collectors.toList()));
-			final List<VariableDTO> createdVariables = this.getObservationVariables(crop, variableSearchRequestDTO, null);
-			response.setEntityList(createdVariables);
-			response.setCreatedSize(createdVariables.size());
-		}
+		variables.forEach(ov -> {
+			ov.setCommonCropName(crop);
+			ov.setCrop(crop);
+		});
+		response.setEntityList(variables);
+		response.setCreatedSize(variables.size());
 		return response;
 	}
 }
