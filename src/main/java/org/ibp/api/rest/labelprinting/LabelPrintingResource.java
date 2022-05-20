@@ -62,6 +62,9 @@ public class LabelPrintingResource {
 	private LabelPrintingStrategy germplasmListLabelPrinting;
 
 	@Autowired
+	private LabelPrintingStrategy studyEntriesLabelPrinting;
+
+	@Autowired
 	private CSVLabelsFileGenerator csvLabelsFileGenerator;
 
 	@Autowired
@@ -220,6 +223,9 @@ public class LabelPrintingResource {
 			case GERMPLASM_LIST:
 				labelPrintingStrategy = this.germplasmListLabelPrinting;
 				break;
+			case STUDY_ENTRIES:
+				labelPrintingStrategy = this.studyEntriesLabelPrinting;
+				break;
 			default:
 				labelPrintingStrategy = null;
 		}
@@ -231,6 +237,7 @@ public class LabelPrintingResource {
 		switch (labelPrintingTypeEnum) {
 			case OBSERVATION_DATASET:
 			case SUBOBSERVATION_DATASET:
+			case STUDY_ENTRIES:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.STUDIES.name())
 					|| this.request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name());
