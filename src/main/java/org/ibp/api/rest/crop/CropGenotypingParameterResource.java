@@ -6,6 +6,7 @@ import org.ibp.api.java.crop.CropGenotypingParameterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ public class CropGenotypingParameterResource {
 
 	@ApiOperation(value = "Update crop genotyping parameter", notes = "")
 	@RequestMapping(value = "/{cropName}/crop-genotyping-parameter", method = RequestMethod.PUT)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
 	public ResponseEntity<Void> updateCropTypeDetails(@PathVariable final String cropName,
 		@RequestBody final CropGenotypingParameterDTO cropGenotypingParameterDTO) {
 		this.cropGenotypingParameterService.updateCropGenotypingParameter(cropGenotypingParameterDTO);
@@ -35,6 +37,7 @@ public class CropGenotypingParameterResource {
 
 	@ApiOperation(value = "Create crop genotyping parameter", notes = "")
 	@RequestMapping(value = "/{cropName}/crop-genotyping-parameter", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
 	public ResponseEntity<Void> createCropTypeDetails(@PathVariable final String cropName,
 		@RequestBody final CropGenotypingParameterDTO cropGenotypingParameterDTO) {
 		this.cropGenotypingParameterService.createCropGenotypingParameter(cropGenotypingParameterDTO);
