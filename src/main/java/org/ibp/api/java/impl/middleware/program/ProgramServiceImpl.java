@@ -18,7 +18,6 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -34,6 +33,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,9 +72,6 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Autowired
 	private StudyService studyService;
-
-	@Autowired
-	private MethodService methodService;
 
 	@Autowired
 	private GermplasmListService germplasmListService;
@@ -194,6 +191,7 @@ public class ProgramServiceImpl implements ProgramService {
 				}
 				programSummary.setLastOpenDate(Util.formatDateAsStringValue(workbenchProgram.getLastOpenDate(),
 					Util.FRONTEND_TIMESTAMP_FORMAT));
+				programSummary.setDefaultLocationId(this.locationService.getProgramLocationDefault(programUUID).getLocationId());
 				return programSummary;
 			}
 			return null;
@@ -242,6 +240,8 @@ public class ProgramServiceImpl implements ProgramService {
 				.addProgramFavorites(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, new HashSet<>(locations.get(0).getId()));
 		}
 
+		this.locationService.saveProgramLocationDefault(programDTO.getUniqueID(), programBasicDetailsDto.getDefaultLocationId());
+		programDTO.setDefaultLocationId(programBasicDetailsDto.getDefaultLocationId());
 		this.installationDirectoryUtil.createWorkspaceDirectoriesForProject(crop, programBasicDetailsDto.getName());
 
 		return programDTO;
@@ -264,6 +264,9 @@ public class ProgramServiceImpl implements ProgramService {
 		}
 		this.programService.editProgram(programUUID, programBasicDetailsDto);
 		this.installationDirectoryUtil.renameOldWorkspaceDirectory(oldProjectName, cropName, programBasicDetailsDto.getName());
+		if(programBasicDetailsDto.getDefaultLocationId() != null) {
+			this.locationService.updateProgramLocationDefault(programUUID, programBasicDetailsDto.getDefaultLocationId());
+		}
 		return true;
 	}
 }
