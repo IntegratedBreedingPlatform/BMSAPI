@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
+import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -162,12 +163,12 @@ public class StudyEntryResource {
 		+ "some calculated inventory columns")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/table/columns", method = RequestMethod.GET)
-	public ResponseEntity<List<MeasurementVariable>> getEntryTableColumns(@PathVariable final String crop,
+	public ResponseEntity<List<MeasurementVariable>> getEntryTableHeader(@PathVariable final String crop,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
 
 		final List<MeasurementVariable> entryDescriptors =
-			this.studyEntryService.getEntryColumns(studyId);
+			this.studyEntryService.getEntryTableHeader(studyId);
 
 		return new ResponseEntity<>(entryDescriptors, HttpStatus.OK);
 	}
@@ -196,6 +197,16 @@ public class StudyEntryResource {
 		BaseValidator.checkArgument(levelInt > 0 && levelInt <= 10 , "error.generationlevel.max");
 		this.studyEntryService.fillWithCrossExpansion(studyId, levelInt);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiIgnore
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/columns", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<StudyEntryColumnDTO>> getStudyEntriesColumns(@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.studyEntryService.getStudyEntryColumns(studyId), HttpStatus.OK);
 	}
 
 }

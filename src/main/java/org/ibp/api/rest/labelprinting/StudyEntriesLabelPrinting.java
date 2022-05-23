@@ -122,7 +122,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		labelTypes.add(attributesType);
 
 
-		final List<MeasurementVariable> variables = this.studyEntryService.getEntryColumns(labelsInfoInput.getStudyId());
+		final List<MeasurementVariable> variables = this.studyEntryService.getEntryTableHeader(labelsInfoInput.getStudyId());
 
 		variables.forEach((Variable) -> {
 			final Field field = new Field(Variable);

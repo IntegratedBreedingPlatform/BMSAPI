@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
@@ -172,7 +173,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getEntryColumns(final Integer studyId) {
+	public List<MeasurementVariable> getEntryTableHeader(final Integer studyId) {
 		this.studyValidator.validate(studyId, false);
 		final Integer plotDatasetId =
 			this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
@@ -246,6 +247,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		this.studyValidator.validate(studyId, true);
 
 		this.middlewareStudyEntryService.fillWithCrossExpansion(studyId, level);
+	}
+
+	@Override
+	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
+		return this.middlewareStudyEntryService.getStudyEntryColumns(studyId);
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {

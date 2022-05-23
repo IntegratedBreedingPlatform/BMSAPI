@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
+import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.java.impl.middleware.study.StudyEntryMetadata;
 import org.springframework.data.domain.Pageable;
@@ -36,8 +37,10 @@ public interface StudyEntryService {
 
 	StudyEntryMetadata getStudyEntriesMetadata(Integer studyId, String programUuid);
 
-	List<MeasurementVariable> getEntryColumns(Integer studyId);
+	List<MeasurementVariable> getEntryTableHeader(Integer studyId);
 
 	void fillWithCrossExpansion(Integer studyId, Integer level);
+
+	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId);
 
 }

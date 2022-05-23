@@ -266,7 +266,7 @@ public class StudyEntryServiceImplTest {
 		Mockito.when(this.datasetService.getObservationSetVariables(datasetId, Lists
 			.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()))).thenReturn(measurementVariables);
 
-		final List<MeasurementVariable> results = this.studyEntryService.getEntryColumns(studyId);
+		final List<MeasurementVariable> results = this.studyEntryService.getEntryTableHeader(studyId);
 
 		MatcherAssert.assertThat(results, IsCollectionWithSize.hasSize(9));
 		MatcherAssert.assertThat(entryCodeVariable, IsIn.in(results));
