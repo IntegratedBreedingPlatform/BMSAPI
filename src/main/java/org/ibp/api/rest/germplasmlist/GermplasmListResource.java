@@ -21,7 +21,6 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.domain.germplasm.GermplasmListTypeDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.germplasm.GermplasmListDataService;
@@ -225,7 +224,7 @@ public class GermplasmListResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ", 'SEARCH_GERMPLASM_LISTS')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm-lists/{listId}/search", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasmListData(
+	public ResponseEntity<SearchDto> postSearchGermplasmListData(
 		@PathVariable final String cropName,
 		@PathVariable final Integer listId,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
@@ -233,10 +232,7 @@ public class GermplasmListResource {
 
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(request, GermplasmListDataSearchRequest.class).toString();
-		final SearchDto searchDto = new SearchDto(searchRequestId);
-		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse<>(searchDto);
-
-		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+		return new ResponseEntity<>(new SearchDto(searchRequestId), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Returns a germplasm list data by a given germplasm list id")

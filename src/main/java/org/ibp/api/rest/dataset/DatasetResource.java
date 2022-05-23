@@ -19,7 +19,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryRepla
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.search.SearchDto;
@@ -253,7 +252,7 @@ public class DatasetResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/search", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchObservation(@PathVariable final String cropname, @PathVariable final String programUUID,
+	public ResponseEntity<SearchDto> postSearchObservation(@PathVariable final String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
 		@RequestBody final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
@@ -264,10 +263,7 @@ public class DatasetResource {
 
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(observationUnitsSearchDTO, ObservationUnitsSearchDTO.class).toString();
-		final SearchDto searchDto = new SearchDto(searchRequestId);
-		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse<SearchDto>(searchDto);
-
-		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+		return new ResponseEntity<>(new SearchDto(searchRequestId), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve all the observation units in a simple JSON array table format",
