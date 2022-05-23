@@ -140,7 +140,8 @@ public class VariableResourceBrapi {
 		@PathVariable final String observationVariableDbId,
 		@RequestBody final VariableDTO variable) {
 
-		final VariableUpdateResponse variableUpdateResponse = this.variableServiceBrapi.updateObservationVariable(observationVariableDbId, variable);
+		final VariableUpdateResponse variableUpdateResponse =
+			this.variableServiceBrapi.updateObservationVariable(observationVariableDbId, variable);
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(variableUpdateResponse));
 		final SingleEntityResponse<VariableDTO> variableResponse =
 			new SingleEntityResponse<>(variableUpdateResponse.getEntityObject()).withMetadata(metadata);
@@ -148,7 +149,7 @@ public class VariableResourceBrapi {
 	}
 
 	private ResponseEntity<EntityListResponse<VariableDTO>> getSearchResults(final String crop, final VariableSearchRequestDTO requestDTO,
-																			 final Integer currentPage, final Integer pageSize) {
+		final Integer currentPage, final Integer pageSize) {
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 
@@ -177,6 +178,22 @@ public class VariableResourceBrapi {
 
 		final EntityListResponse<VariableDTO> entityListResponse = new EntityListResponse<>(metadata, result);
 
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Add new Observation Variables", notes = "Add new Observation Variables to the system.")
+	@RequestMapping(value = "/{crop}/brapi/v2/variables", method = RequestMethod.POST)
+	@JsonView(BrapiView.BrapiV2.class)
+	@ResponseBody
+	public ResponseEntity<EntityListResponse<VariableDTO>> createVariables(@PathVariable final String crop,
+		final @RequestBody List<VariableDTO> variableDTOList) {
+		final VariableImportResponse response = this.variableServiceBrapi.createObservationVariables(crop, variableDTOList);
+		final Pagination pagination = new Pagination().withPageNumber(BrapiPagedResult.DEFAULT_PAGE_NUMBER).withPageSize(1)
+			.withTotalCount(Long.valueOf(response.getCreatedSize())).withTotalPages(1);
+		final Metadata metadata =
+			new Metadata().withPagination(pagination).withStatus(this.responseMessageGenerator.getMessagesList(response));
+		final Result<VariableDTO> result = new Result<VariableDTO>().withData(response.getEntityList());
+		final EntityListResponse<VariableDTO> entityListResponse = new EntityListResponse<>(metadata, result);
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
