@@ -6,7 +6,7 @@ public interface CropGenotypingParameterService {
 
 	CropGenotypingParameterDTO getCropGenotypingParameter(String cropname);
 
-	void updateCropGenotypingParameter(CropGenotypingParameterDTO cropGenotypingParameterDTO);
+	void updateCropGenotypingParameter(String cropName, CropGenotypingParameterDTO cropGenotypingParameterDTO);
 
-	void createCropGenotypingParameter(CropGenotypingParameterDTO cropGenotypingParameterDTO);
+	void createCropGenotypingParameter(String cropName, CropGenotypingParameterDTO cropGenotypingParameterDTO);
 }

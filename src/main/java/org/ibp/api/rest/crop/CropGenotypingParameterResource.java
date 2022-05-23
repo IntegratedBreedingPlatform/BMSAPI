@@ -31,7 +31,7 @@ public class CropGenotypingParameterResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
 	public ResponseEntity<Void> updateCropTypeDetails(@PathVariable final String cropName,
 		@RequestBody final CropGenotypingParameterDTO cropGenotypingParameterDTO) {
-		this.cropGenotypingParameterService.updateCropGenotypingParameter(cropGenotypingParameterDTO);
+		this.cropGenotypingParameterService.updateCropGenotypingParameter(cropName, cropGenotypingParameterDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -40,7 +40,7 @@ public class CropGenotypingParameterResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
 	public ResponseEntity<Void> createCropTypeDetails(@PathVariable final String cropName,
 		@RequestBody final CropGenotypingParameterDTO cropGenotypingParameterDTO) {
-		this.cropGenotypingParameterService.createCropGenotypingParameter(cropGenotypingParameterDTO);
+		this.cropGenotypingParameterService.createCropGenotypingParameter(cropName, cropGenotypingParameterDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
