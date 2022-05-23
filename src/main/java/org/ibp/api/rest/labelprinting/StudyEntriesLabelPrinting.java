@@ -165,9 +165,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		studyEntryDtos.forEach((studyEntry) -> {
 			final Map<Integer, String> row = new HashMap<>();
 			keys.forEach((key) -> {
-				if (TermId.GID.equals(key)) {
-					row.put(key, String.valueOf(studyEntry.getGid()));
-				} else if (studyEntry.getProperties().containsKey(key)) {
+				if (studyEntry.getProperties().containsKey(key)) {
 					final StudyEntryPropertyData data = studyEntry.getProperties().get(key);
 					row.put(key,
 						truncateValueIfPdf(isPdf, data.getPropertyValue(), StudyEntriesLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
