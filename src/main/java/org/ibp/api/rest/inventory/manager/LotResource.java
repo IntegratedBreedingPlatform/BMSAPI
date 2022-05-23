@@ -27,7 +27,6 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.Util;
-import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
@@ -121,17 +120,13 @@ public class LotResource {
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('VIEW_LOTS')" + PermissionsEnum.HAS_CREATE_LOTS_BATCH)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchLots(
+	public ResponseEntity<SearchDto> postSearchLots(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final LotsSearchDto lotsSearchDto) {
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(lotsSearchDto, LotsSearchDto.class).toString();
-
-		final SearchDto searchDto = new SearchDto(searchRequestId);
-		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse<SearchDto>(searchDto);
-
-		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+		return new ResponseEntity<>(new SearchDto(searchRequestId), HttpStatus.OK);
 
 	}
 
@@ -194,14 +189,12 @@ public class LotResource {
 	@RequestMapping(value = "/crops/{cropName}/lots", method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('CREATE_LOTS')")
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<String>> createLot(
+	public ResponseEntity<String> createLot(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@ApiParam("Lot to be created")
 		@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
-		final SingleEntityResponse<String> singleEntityResponse =
-			new SingleEntityResponse<>(this.lotService.saveLot(lotGeneratorInputDto));
-		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+		return new ResponseEntity<>(this.lotService.saveLot(lotGeneratorInputDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create multiple lots")
