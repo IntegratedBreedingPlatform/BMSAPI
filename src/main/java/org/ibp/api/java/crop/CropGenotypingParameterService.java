@@ -9,4 +9,6 @@ public interface CropGenotypingParameterService {
 	void updateCropGenotypingParameter(String cropName, CropGenotypingParameterDTO cropGenotypingParameterDTO);
 
 	void createCropGenotypingParameter(String cropName, CropGenotypingParameterDTO cropGenotypingParameterDTO);
+
+	String getToken(String cropName);
 }

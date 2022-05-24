@@ -197,6 +197,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
+import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
@@ -884,6 +885,11 @@ public class MiddlewareFactory {
 	@DependsOn("WORKBENCH_SessionFactory")
 	public FeedbackService getFeedbackService() {
 		return new FeedbackServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

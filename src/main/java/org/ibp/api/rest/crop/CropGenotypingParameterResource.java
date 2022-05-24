@@ -44,4 +44,10 @@ public class CropGenotypingParameterResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Generate token", notes = "Get the token using the credentials in Crop Genotype Parameter configuration")
+	@RequestMapping(value = "/{cropName}/crop-genotyping-parameter/token", method = RequestMethod.GET)
+	public ResponseEntity<String> getToken(@PathVariable final String cropName) {
+		return new ResponseEntity<>(this.cropGenotypingParameterService.getToken(cropName), HttpStatus.OK);
+	}
+
 }
