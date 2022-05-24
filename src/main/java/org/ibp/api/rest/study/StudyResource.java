@@ -12,7 +12,9 @@ import org.generationcp.middleware.api.study.MyStudiesService;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
@@ -34,7 +36,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Api(value = "Study Services")
 @Controller
@@ -49,6 +55,9 @@ public class StudyResource {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private FieldbookService fieldbookService;
 
 	@ApiOperation(value = "Check if a study is sampled.",
 			notes = "Returns boolean indicating if there are samples associated to the study.")
@@ -160,4 +169,28 @@ public class StudyResource {
 			pageable);
 	}
 
+	/**
+	 * Delete field map.
+	 *
+	 * @param form the form
+	 * @param model the model
+	 * @return the string
+	 */
+	@ApiOperation(value = "Delete specified fieldmaps of study", notes = "Delete specified fieldmaps of study")
+	@ResponseBody
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/deleteFieldmap/{ids}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	public ResponseEntity<Void>  deleteFieldMap(@PathVariable final String ids,
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@RequestParam(required = false) final String allExistingFieldmapSelected,
+		@RequestParam(required = true) final Integer datasetId) {
+		final List<Integer> trialIds = Arrays.stream(ids.split(",")).map(Integer::valueOf).collect(Collectors.toList());
+		final boolean isAllExistingFieldmapSelected = "Y".equals(allExistingFieldmapSelected);
+
+		this.fieldbookService.deleteAllFieldMapsByTrialInstanceIds(trialIds, datasetId, isAllExistingFieldmapSelected);
+
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
 }
