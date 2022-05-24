@@ -9,10 +9,12 @@ import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.ibp.api.java.study.StudyEntryService;
@@ -53,7 +55,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 
 	protected static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
-	public static final String ORIG_FINAL_NAME = "study-entries-labels";
+	public static final String ORIG_FINAL_NAME = "entries";
 
 	@Autowired
 	ResourceBundleMessageSource messageSource;
@@ -69,6 +71,9 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 
 	@Autowired
 	GermplasmNameService germplasmNameService;
+
+	@Autowired
+	private StudyDataManager studyDataManager;
 
 	@Override
 	void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput, final String programUUID) {
@@ -86,7 +91,9 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput, final String programUUID) {
-			final String fileName = FileNameGenerator.generateFileName(StudyEntriesLabelPrinting.ORIG_FINAL_NAME);
+		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
+		final String tempFileName = study.getStudyName().concat("_").concat(StudyEntriesLabelPrinting.ORIG_FINAL_NAME);
+		final String fileName = FileNameGenerator.generateFileName(tempFileName);
 			return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
 	}
 
