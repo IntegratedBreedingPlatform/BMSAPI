@@ -191,9 +191,9 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		final Map<Integer, String> attributeMap = attributeValues.get(studyEntry.getGid());
 		final Map<Integer, String> nameMap = nameValues.get(studyEntry.getGid());
 
-		if (attributeMap.containsKey(id)) {
+		if (attributeMap != null && attributeMap.containsKey(id)) {
 			row.put(id, truncateValueIfPdf(isPdf, attributeMap.get(id), StudyEntriesLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH));
-		} else if (nameMap.containsKey(id)) {
+		} else if (nameMap != null && nameMap.containsKey(id)) {
 			row.put(id, truncateValueIfPdf(isPdf, nameMap.get(id), StudyEntriesLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
 		}
 	}
