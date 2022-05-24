@@ -237,10 +237,11 @@ public class LabelPrintingResource {
 		switch (labelPrintingTypeEnum) {
 			case OBSERVATION_DATASET:
 			case SUBOBSERVATION_DATASET:
-			case STUDY_ENTRIES:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.STUDIES.name())
 					|| this.request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name());
+			case STUDY_ENTRIES:
+				return true;
 			case LOT:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())
