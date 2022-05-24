@@ -86,4 +86,9 @@ public class LocationServiceImpl implements LocationService {
 		return this.locationMiddlewareService.getCountries();
 	}
 
+	@Override
+	public LocationDTO getDefaultLocation(final String programUUID) {
+		return this.locationMiddlewareService.getDefaultLocation(programUUID);
+	}
+
 }
