@@ -23,7 +23,6 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.Util;
-import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -104,17 +103,13 @@ public class TransactionResource {
 	@RequestMapping(value = "/crops/{cropName}/transactions/search", method = RequestMethod.POST)
 	@PreAuthorize(HAS_MANAGE_TRANSACTIONS + " or hasAnyAuthority('VIEW_TRANSACTIONS')")
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchTransactions(
+	public ResponseEntity<SearchDto> postSearchTransactions(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final TransactionsSearchDto transactionsSearchDto) {
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(transactionsSearchDto, TransactionsSearchDto.class).toString();
-
-		final SearchDto searchDto = new SearchDto(searchRequestId);
-		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<>(searchDto);
-
-		return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
+		return new ResponseEntity<>(new SearchDto(searchRequestId), HttpStatus.OK);
 
 	}
 
