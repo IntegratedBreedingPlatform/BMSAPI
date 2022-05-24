@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
@@ -54,6 +55,7 @@ public class BreedingMethodValidatorTest {
 		breedingMethod.setType(MethodType.GENERATIVE.getCode());
 		breedingMethod.setMethodClass(MethodClass.CROSSING.getId());
 		breedingMethod.setNumberOfProgenitors(2);
+		breedingMethod.setPrefix(RandomStringUtils.randomAlphabetic(5));
 		this.breedingMethodValidator.validateCreation(breedingMethod);
 	}
 
@@ -67,6 +69,22 @@ public class BreedingMethodValidatorTest {
 			this.breedingMethodValidator.validateCreation(breedingMethod);
 		} catch (final ApiRequestValidationException ex) {
 			assertThat(ex.getErrors().get(0).getCode(), is("breeding.methods.invalid.numberOfProgenitors.generative"));
+		}
+
+	}
+
+	@Test
+	public void validateCreation_RequirePrefixForGenerativeType() {
+		final BreedingMethodNewRequest breedingMethod = this.createBreedingMethodNewRequest();
+		breedingMethod.setType(MethodType.GENERATIVE.getCode());
+		breedingMethod.setNumberOfProgenitors(2);
+		breedingMethod.setMethodClass(MethodClass.CROSSING.getId());
+		breedingMethod.setPrefix("");
+
+		try {
+			this.breedingMethodValidator.validateCreation(breedingMethod);
+		} catch (final ApiRequestValidationException ex) {
+			assertThat(ex.getErrors().get(0).getCode(), is("field.is.required"));
 		}
 
 	}
@@ -113,6 +131,7 @@ public class BreedingMethodValidatorTest {
 		breedingMethodRequest.setNumberOfProgenitors(2);
 		breedingMethodRequest.setType(MethodType.GENERATIVE.getCode());
 		breedingMethodRequest.setMethodClass(MethodClass.CROSSING.getId());
+		breedingMethodRequest.setPrefix(RandomStringUtils.randomAlphabetic(5));
 
 		try {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
@@ -190,6 +209,20 @@ public class BreedingMethodValidatorTest {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception.getErrors().get(0).getCode(), is("breeding.methods.invalid.group"));
+		}
+	}
+
+	@Test
+	public void validateEdition_RequirePrefixForGenerativeType() {
+		final BreedingMethodDTO breedingMethodRequest = this.createBreedingMethod();
+		breedingMethodRequest.setType(MethodType.GENERATIVE.getCode());
+		breedingMethodRequest.setNumberOfProgenitors(2);
+		breedingMethodRequest.setMethodClass(MethodClass.CROSSING.getId());
+		breedingMethodRequest.setPrefix("");
+		try {
+			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception.getErrors().get(0).getCode(), is("field.is.required"));
 		}
 	}
 

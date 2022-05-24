@@ -12,9 +12,9 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeSummaryDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
@@ -26,7 +26,6 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRe
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.germplasm.GermplasmDeleteResponse;
 import org.ibp.api.domain.search.SearchDto;
@@ -109,7 +108,7 @@ public class GermplasmResource {
 	@RequestMapping(value = "/crops/{cropName}/germplasm/search", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'SEARCH_GERMPLASM')" + HAS_GERMPLASM_SEARCH)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasm(
+	public ResponseEntity<SearchDto> postSearchGermplasm(
 		@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final GermplasmSearchRequest germplasmSearchRequest) {
@@ -118,10 +117,7 @@ public class GermplasmResource {
 
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(germplasmSearchRequest, GermplasmSearchRequest.class).toString();
-		final SearchDto searchDto = new SearchDto(searchRequestId);
-		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse<SearchDto>(searchDto);
-
-		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+		return new ResponseEntity<>(new SearchDto(searchRequestId), HttpStatus.OK);
 
 	}
 

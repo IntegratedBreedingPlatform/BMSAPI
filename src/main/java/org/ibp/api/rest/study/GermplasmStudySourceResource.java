@@ -8,7 +8,6 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
-import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.study.GermplasmStudySourceService;
@@ -74,17 +73,13 @@ public class GermplasmStudySourceResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')"
 		+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<SearchDto>> postGermplasmStudySourceTable(final @PathVariable String cropname,
+	public ResponseEntity<SearchDto> postGermplasmStudySourceTable(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest
 	) {
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(germplasmStudySourceSearchRequest, GermplasmStudySourceSearchRequest.class).toString();
-
-		final SearchDto searchDto = new SearchDto(searchRequestId);
-		final SingleEntityResponse<SearchDto> singleEntityResponse = new SingleEntityResponse <SearchDto>(searchDto);
-
-		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
+		return new ResponseEntity<>(new SearchDto(searchRequestId), HttpStatus.OK);
 
 	}
 
