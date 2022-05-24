@@ -44,7 +44,7 @@ public class CropGenotypingParameterValidator {
 		this.validateTokenEndpoint(cropGenotypingParameterDTO, errors);
 		this.validateCredentials(cropGenotypingParameterDTO, errors);
 		this.validateProgramId(cropGenotypingParameterDTO, errors);
-		this.validateCropGenotypingParameterDoesNotExist(cropGenotypingParameterDTO, errors);
+		this.validateCropGenotypingParameterId(cropGenotypingParameterDTO, errors);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -63,19 +63,24 @@ public class CropGenotypingParameterValidator {
 		}
 	}
 
-	protected void validateCropGenotypingParameterDoesNotExist(final CropGenotypingParameterDTO cropGenotypingParameterDTO,
+	protected void validateCropGenotypingParameterId(final CropGenotypingParameterDTO cropGenotypingParameterDTO,
 		final BindingResult errors) {
-		if (StringUtils.isNotBlank(cropGenotypingParameterDTO.getCropName())) {
-			final Optional<CropGenotypingParameterDTO> cropGenotypingParameter =
-				this.cropGenotypingParameterService.getCropGenotypingParameter(cropGenotypingParameterDTO.getCropName());
-			if (!cropGenotypingParameter.isPresent()) {
-				errors.reject("crop.genotyping.parameter.record.not.exists", new String[] {cropGenotypingParameterDTO.getCropName()}, "");
-			}
+		final Optional<CropGenotypingParameterDTO> cropGenotypingParameter =
+			this.cropGenotypingParameterService.getCropGenotypingParameterById(cropGenotypingParameterDTO.getGenotypingParameterId());
+		if (!cropGenotypingParameter.isPresent()) {
+			errors.reject("crop.genotyping.parameter.record.id.not.exists",
+				new String[] {String.valueOf(cropGenotypingParameterDTO.getGenotypingParameterId())}, "");
 		}
+		if (cropGenotypingParameter.isPresent() && !cropGenotypingParameter.get().getCropName()
+			.equalsIgnoreCase(cropGenotypingParameterDTO.getCropName())) {
+			errors.reject("crop.genotyping.parameter.genotyping.parameter.crop.name.mismatch");
+		}
+
 	}
 
-	protected void validateCropName(final String pathCropName, final CropGenotypingParameterDTO cropGenotypingParameterDTO, final BindingResult errors) {
-		if (!pathCropName.equalsIgnoreCase(cropGenotypingParameterDTO.getCropName())) {
+	protected void validateCropName(final String pathCropName, final CropGenotypingParameterDTO cropGenotypingParameterDTO,
+		final BindingResult errors) {
+		if (StringUtils.isNotBlank(pathCropName) && !pathCropName.equalsIgnoreCase(cropGenotypingParameterDTO.getCropName())) {
 			errors.reject("crop.genotyping.parameter.crop.name.path.mismatch");
 		}
 		if (StringUtils.isBlank(cropGenotypingParameterDTO.getCropName())) {

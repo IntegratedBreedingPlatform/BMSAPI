@@ -56,8 +56,9 @@ public class CropGenotypingParameterValidatorTest {
 	@Test
 	public void testValidateEdition_OK() {
 		final CropGenotypingParameterDTO cropGenotypingParameterDTO = this.getCropGenotypingParameterDTO();
-		when(this.cropGenotypingParameterService.getCropGenotypingParameter(cropGenotypingParameterDTO.getCropName())).thenReturn(
-			Optional.of(new CropGenotypingParameterDTO()));
+		when(this.cropGenotypingParameterService.getCropGenotypingParameterById(
+			cropGenotypingParameterDTO.getGenotypingParameterId())).thenReturn(
+			Optional.of(cropGenotypingParameterDTO));
 		try {
 			this.cropGenotypingParameterValidator.validateEdition(cropGenotypingParameterDTO.getCropName(), cropGenotypingParameterDTO);
 		} catch (final ApiRequestValidationException exception) {
@@ -69,7 +70,7 @@ public class CropGenotypingParameterValidatorTest {
 	@Test
 	public void testValidateEdition_Fail() {
 		final CropGenotypingParameterDTO cropGenotypingParameterDTO = this.getCropGenotypingParameterDTO();
-		cropGenotypingParameterDTO.setCropName(null);
+		cropGenotypingParameterDTO.setCropName("");
 		try {
 			this.cropGenotypingParameterValidator.validateEdition(cropGenotypingParameterDTO.getCropName(), cropGenotypingParameterDTO);
 			Assert.fail("Should not throw an exception");
@@ -92,14 +93,28 @@ public class CropGenotypingParameterValidatorTest {
 	}
 
 	@Test
-	public void testValidateEdition_GenotypingParameterForCropDoesNotExist() {
+	public void testvalidateCropGenotypingParameterId_RecordDoesNotExist() {
 		final CropGenotypingParameterDTO cropGenotypingParameterDTO = this.getCropGenotypingParameterDTO();
-		when(this.cropGenotypingParameterService.getCropGenotypingParameter(cropGenotypingParameterDTO.getCropName())).thenReturn(
+		cropGenotypingParameterDTO.setGenotypingParameterId(1);
+		when(this.cropGenotypingParameterService.getCropGenotypingParameterById(
+			cropGenotypingParameterDTO.getGenotypingParameterId())).thenReturn(
 			Optional.empty());
+		this.cropGenotypingParameterValidator.validateCropGenotypingParameterId(cropGenotypingParameterDTO, this.errors);
+		Mockito.verify(this.errors).reject("crop.genotyping.parameter.record.id.not.exists",
+			new String[] {String.valueOf(cropGenotypingParameterDTO.getGenotypingParameterId())}, "");
+	}
 
-		this.cropGenotypingParameterValidator.validateCropGenotypingParameterDoesNotExist(cropGenotypingParameterDTO, this.errors);
-		Mockito.verify(this.errors).reject("crop.genotyping.parameter.record.not.exists",
-			new String[] {cropGenotypingParameterDTO.getCropName()}, "");
+	@Test
+	public void testvalidateCropGenotypingParameterId_CropNameDoesNotMatch() {
+		final CropGenotypingParameterDTO cropGenotypingParameterDTO = this.getCropGenotypingParameterDTO();
+		final CropGenotypingParameterDTO cropGenotypingParameterDTOWithDifferentCrop = this.getCropGenotypingParameterDTO();
+		cropGenotypingParameterDTOWithDifferentCrop.setCropName("some crop");
+		cropGenotypingParameterDTO.setGenotypingParameterId(1);
+		when(this.cropGenotypingParameterService.getCropGenotypingParameterById(
+			cropGenotypingParameterDTO.getGenotypingParameterId())).thenReturn(
+			Optional.of(cropGenotypingParameterDTOWithDifferentCrop));
+		this.cropGenotypingParameterValidator.validateCropGenotypingParameterId(cropGenotypingParameterDTO, this.errors);
+		Mockito.verify(this.errors).reject("crop.genotyping.parameter.genotyping.parameter.crop.name.mismatch");
 
 	}
 
@@ -107,12 +122,13 @@ public class CropGenotypingParameterValidatorTest {
 	public void testValidateCropName() {
 		final CropGenotypingParameterDTO cropGenotypingParameterDTO = new CropGenotypingParameterDTO();
 
-		this.cropGenotypingParameterValidator.validateCropName("some crop name", cropGenotypingParameterDTO, this.errors);
-		Mockito.verify(this.errors).reject("crop.genotyping.parameter.crop.name.path.mismatch");
-
 		this.cropGenotypingParameterValidator.validateCropName(cropGenotypingParameterDTO.getCropName(), cropGenotypingParameterDTO,
 			this.errors);
 		Mockito.verify(this.errors).reject("crop.genotyping.parameter.crop.name.is.required");
+
+		cropGenotypingParameterDTO.setCropName("maize");
+		this.cropGenotypingParameterValidator.validateCropName("wheat", cropGenotypingParameterDTO, this.errors);
+		Mockito.verify(this.errors).reject("crop.genotyping.parameter.crop.name.path.mismatch");
 
 		cropGenotypingParameterDTO.setCropName(RandomStringUtils.random(CropGenotypingParameterValidator.CROP_NAME_MAXLENGTH + 1));
 		this.cropGenotypingParameterValidator.validateCropName(cropGenotypingParameterDTO.getCropName(), cropGenotypingParameterDTO,
@@ -173,6 +189,7 @@ public class CropGenotypingParameterValidatorTest {
 
 	private CropGenotypingParameterDTO getCropGenotypingParameterDTO() {
 		final CropGenotypingParameterDTO cropGenotypingParameterDTO = new CropGenotypingParameterDTO();
+		cropGenotypingParameterDTO.setGenotypingParameterId(1);
 		cropGenotypingParameterDTO.setCropName(RandomStringUtils.randomAlphanumeric(10));
 		cropGenotypingParameterDTO.setEndpoint(RandomStringUtils.randomAlphanumeric(10));
 		cropGenotypingParameterDTO.setTokenEndpoint(RandomStringUtils.randomAlphanumeric(10));
