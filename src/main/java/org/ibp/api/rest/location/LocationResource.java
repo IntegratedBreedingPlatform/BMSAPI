@@ -52,7 +52,7 @@ public class LocationResource {
 	}
 
 	@ApiOperation(value = "Get default location")
-	@RequestMapping(value = "/crops/{cropName}/locations/default/{programUUID}", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/locations/default", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<LocationDTO> getLocation(
 		@PathVariable final String cropName,
