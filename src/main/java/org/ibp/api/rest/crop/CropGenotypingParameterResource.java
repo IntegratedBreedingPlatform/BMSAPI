@@ -21,13 +21,13 @@ public class CropGenotypingParameterResource {
 	private CropGenotypingParameterService cropGenotypingParameterService;
 
 	@ApiOperation(value = "Get crop genotyping parameter", notes = "")
-	@RequestMapping(value = "/{cropName}/crop-genotyping-parameter", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropName}/crop-genotyping-parameters", method = RequestMethod.GET)
 	public ResponseEntity<CropGenotypingParameterDTO> getCropGenotypingParameter(@PathVariable final String cropName) {
 		return new ResponseEntity<>(this.cropGenotypingParameterService.getCropGenotypingParameter(cropName), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update crop genotyping parameter", notes = "")
-	@RequestMapping(value = "/{cropName}/crop-genotyping-parameter", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{cropName}/crop-genotyping-parameters", method = RequestMethod.PUT)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
 	public ResponseEntity<Void> updateCropTypeDetails(@PathVariable final String cropName,
 		@RequestBody final CropGenotypingParameterDTO cropGenotypingParameterDTO) {
@@ -36,7 +36,7 @@ public class CropGenotypingParameterResource {
 	}
 
 	@ApiOperation(value = "Create crop genotyping parameter", notes = "")
-	@RequestMapping(value = "/{cropName}/crop-genotyping-parameter", method = RequestMethod.POST)
+	@RequestMapping(value = "/{cropName}/crop-genotyping-parameters", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
 	public ResponseEntity<Void> createCropTypeDetails(@PathVariable final String cropName,
 		@RequestBody final CropGenotypingParameterDTO cropGenotypingParameterDTO) {
@@ -45,7 +45,7 @@ public class CropGenotypingParameterResource {
 	}
 
 	@ApiOperation(value = "Generate token", notes = "Get the token using the credentials in Crop Genotype Parameter configuration")
-	@RequestMapping(value = "/{cropName}/crop-genotyping-parameter/token", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropName}/crop-genotyping-parameters/token", method = RequestMethod.GET)
 	public ResponseEntity<String> getToken(@PathVariable final String cropName) {
 		return new ResponseEntity<>(this.cropGenotypingParameterService.getToken(cropName), HttpStatus.OK);
 	}
