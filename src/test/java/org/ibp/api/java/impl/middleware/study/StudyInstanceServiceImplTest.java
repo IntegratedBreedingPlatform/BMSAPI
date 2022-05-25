@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -30,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -63,6 +66,9 @@ public class StudyInstanceServiceImplTest {
 	private ObservationValidator observationValidator;
 
 	@Mock
+	private LocationService locationService;
+
+	@Mock
 	private StudyService studyService;
 
 	@InjectMocks
@@ -81,6 +87,7 @@ public class StudyInstanceServiceImplTest {
 
 		final int studyId = this.random.nextInt(BOUND);
 		final int datasetId = this.random.nextInt(BOUND);
+		final String programUUID = UUID.randomUUID().toString();
 		final int instanceNumber = 99;
 
 		final org.generationcp.middleware.service.impl.study.StudyInstance existingStudyInstance =
@@ -100,13 +107,21 @@ public class StudyInstanceServiceImplTest {
 				nextInstanceNumber,
 				RandomStringUtils.random(BOUND), false);
 
+		final LocationDTO programDefaultLocation = new LocationDTO();
+		programDefaultLocation.setId(1);
+		programDefaultLocation.setName(newStudyInstance.getLocationName());
+		programDefaultLocation.setAbbreviation(newStudyInstance.getLocationAbbreviation());
+
 		when(this.studyService.getEnvironmentDatasetId(studyId))
 			.thenReturn(datasetId);
-		when(this.middlewareStudyInstanceService.createStudyInstances(this.maizeCropType, studyId, datasetId, 1))
+		when(
+			this.middlewareStudyInstanceService.createStudyInstances(this.maizeCropType, studyId, datasetId, programDefaultLocation.getId(),
+				1))
 			.thenReturn(Collections.singletonList(newStudyInstance));
+		when(this.locationService.getDefaultLocation(programUUID)).thenReturn(programDefaultLocation);
 
 		final List<org.ibp.api.domain.study.StudyInstance>
-			result = this.studyInstanceService.createStudyInstances(this.maizeCropType.getCropName(), studyId, 1);
+			result = this.studyInstanceService.createStudyInstances(this.maizeCropType.getCropName(), studyId, programUUID, 1);
 
 		verify(this.studyValidator).validate(studyId, true);
 
@@ -245,7 +260,8 @@ public class StudyInstanceServiceImplTest {
 		Mockito.verify(this.datasetValidator)
 			.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 				instanceObservationData.getVariableId()));
-		Mockito.verify(this.observationValidator).validateVariableValue(instanceObservationData.getVariableId(), instanceObservationData.getValue());
+		Mockito.verify(this.observationValidator)
+			.validateVariableValue(instanceObservationData.getVariableId(), instanceObservationData.getValue());
 		Mockito.verify(this.middlewareStudyInstanceService).addInstanceObservation(instanceObservationData);
 		Mockito.verify(this.datasetValidator)
 			.validateVariableBelongsToVariableType(datasetId, instanceObservationData.getVariableId(),
@@ -276,7 +292,8 @@ public class StudyInstanceServiceImplTest {
 		Mockito.verify(this.datasetValidator)
 			.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 				instanceObservationData.getVariableId()));
-		Mockito.verify(this.observationValidator).validateVariableValue(instanceObservationData.getVariableId(), instanceObservationData.getValue());
+		Mockito.verify(this.observationValidator)
+			.validateVariableValue(instanceObservationData.getVariableId(), instanceObservationData.getValue());
 		Mockito.verify(this.middlewareStudyInstanceService).updateInstanceObservation(instanceObservationData);
 		Mockito.verify(this.datasetValidator)
 			.validateVariableBelongsToVariableType(datasetId, instanceObservationData.getVariableId(),
@@ -297,7 +314,8 @@ public class StudyInstanceServiceImplTest {
 		when(this.studyService.getEnvironmentDatasetId(studyId))
 			.thenReturn(datasetId);
 
-		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationDataId, instanceObservationData.getVariableId()))
+		when(this.middlewareStudyInstanceService.getInstanceObservation(instanceId, observationDataId,
+			instanceObservationData.getVariableId()))
 			.thenReturn(Optional.empty());
 
 		try {
@@ -371,7 +389,8 @@ public class StudyInstanceServiceImplTest {
 		when(this.studyService.getEnvironmentDatasetId(studyId))
 			.thenReturn(datasetId);
 
-		when(this.middlewareStudyInstanceService.getInstanceDescriptorData(instanceId, descriptorDataId, instanceDescriptorData.getVariableId()))
+		when(this.middlewareStudyInstanceService.getInstanceDescriptorData(instanceId, descriptorDataId,
+			instanceDescriptorData.getVariableId()))
 			.thenReturn(Optional.of(instanceDescriptorData));
 
 		this.studyInstanceService.updateInstanceDescriptorData(studyId, instanceId, descriptorDataId, instanceDescriptorData);
@@ -381,7 +400,8 @@ public class StudyInstanceServiceImplTest {
 		Mockito.verify(this.datasetValidator)
 			.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 				instanceDescriptorData.getVariableId()));
-		Mockito.verify(this.observationValidator).validateVariableValue(instanceDescriptorData.getVariableId(), instanceDescriptorData.getValue());
+		Mockito.verify(this.observationValidator)
+			.validateVariableValue(instanceDescriptorData.getVariableId(), instanceDescriptorData.getValue());
 		Mockito.verify(this.middlewareStudyInstanceService).updateInstanceDescriptorData(instanceDescriptorData);
 		Mockito.verify(this.datasetValidator)
 			.validateVariableBelongsToVariableType(datasetId, instanceDescriptorData.getVariableId(),
@@ -402,7 +422,8 @@ public class StudyInstanceServiceImplTest {
 		when(this.studyService.getEnvironmentDatasetId(studyId))
 			.thenReturn(datasetId);
 
-		when(this.middlewareStudyInstanceService.getInstanceDescriptorData(instanceId, observationDataId, instanceDescriptorData.getVariableId()))
+		when(this.middlewareStudyInstanceService.getInstanceDescriptorData(instanceId, observationDataId,
+			instanceDescriptorData.getVariableId()))
 			.thenReturn(Optional.empty());
 
 		try {
@@ -416,7 +437,8 @@ public class StudyInstanceServiceImplTest {
 			Mockito.verify(this.datasetValidator)
 				.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 					instanceDescriptorData.getVariableId()));
-			Mockito.verify(this.observationValidator).validateVariableValue(instanceDescriptorData.getVariableId(), instanceDescriptorData.getValue());
+			Mockito.verify(this.observationValidator)
+				.validateVariableValue(instanceDescriptorData.getVariableId(), instanceDescriptorData.getValue());
 			Mockito.verify(this.datasetValidator)
 				.validateVariableBelongsToVariableType(datasetId, instanceDescriptorData.getVariableId(),
 					VariableType.ENVIRONMENT_DETAIL.getId());
@@ -440,7 +462,8 @@ public class StudyInstanceServiceImplTest {
 
 		final InstanceDescriptorData differentInstanceDescriptorData = new InstanceDescriptorData();
 		differentInstanceDescriptorData.setVariableId(TermId.BLOCK_NAME.getId());
-		when(this.middlewareStudyInstanceService.getInstanceDescriptorData(instanceId, descriptorDataId, instanceDescriptorData.getVariableId()))
+		when(this.middlewareStudyInstanceService.getInstanceDescriptorData(instanceId, descriptorDataId,
+			instanceDescriptorData.getVariableId()))
 			.thenReturn(Optional.of(differentInstanceDescriptorData));
 
 		try {
@@ -454,7 +477,8 @@ public class StudyInstanceServiceImplTest {
 			Mockito.verify(this.datasetValidator)
 				.validateExistingDatasetVariables(studyId, datasetId, Collections.singletonList(
 					instanceDescriptorData.getVariableId()));
-			Mockito.verify(this.observationValidator).validateVariableValue(instanceDescriptorData.getVariableId(), instanceDescriptorData.getValue());
+			Mockito.verify(this.observationValidator)
+				.validateVariableValue(instanceDescriptorData.getVariableId(), instanceDescriptorData.getValue());
 			Mockito.verify(this.datasetValidator)
 				.validateVariableBelongsToVariableType(datasetId, instanceDescriptorData.getVariableId(),
 					VariableType.ENVIRONMENT_DETAIL.getId());
