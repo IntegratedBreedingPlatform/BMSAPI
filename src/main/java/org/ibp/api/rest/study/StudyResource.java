@@ -12,8 +12,6 @@ import org.generationcp.middleware.api.study.MyStudiesService;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -36,11 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Api(value = "Study Services")
 @Controller
@@ -171,25 +165,19 @@ public class StudyResource {
 
 	/**
 	 * Delete field map.
-	 *
-	 * @param form the form
-	 * @param model the model
-	 * @return the string
 	 */
 	@ApiOperation(value = "Delete specified fieldmaps of study", notes = "Delete specified fieldmaps of study")
 	@ResponseBody
-	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/deleteFieldmap/{ids}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/Fieldmap/deletion", method = RequestMethod.POST,
+		produces = "application/json; charset=utf-8")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	public ResponseEntity<Void>  deleteFieldMap(@PathVariable final String ids,
+	public ResponseEntity<Void> deleteFieldMap(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@RequestParam(required = false) final String allExistingFieldmapSelected,
-		@RequestParam(required = true) final Integer datasetId) {
-		final List<Integer> trialIds = Arrays.stream(ids.split(",")).map(Integer::valueOf).collect(Collectors.toList());
-		final boolean isAllExistingFieldmapSelected = "Y".equals(allExistingFieldmapSelected);
-
-		this.fieldbookService.deleteAllFieldMapsByTrialInstanceIds(trialIds, datasetId, isAllExistingFieldmapSelected);
+		@RequestBody final FieldmapRequestDto requestDto) {
+		this.fieldbookService.deleteAllFieldMapsByTrialInstanceIds(
+			requestDto.getInstanceIds(), requestDto.getDatasetId(), requestDto.isAllExistingFieldmapSelected());
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
