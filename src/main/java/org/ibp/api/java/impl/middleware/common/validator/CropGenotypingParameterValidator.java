@@ -65,13 +65,20 @@ public class CropGenotypingParameterValidator {
 
 	protected void validateCropGenotypingParameterId(final CropGenotypingParameterDTO cropGenotypingParameterDTO,
 		final BindingResult errors) {
+
+		if (cropGenotypingParameterDTO.getGenotypingParameterId() <= 0) {
+			errors.reject("crop.genotyping.parameter.record.id.is.required",
+				new String[] {}, "");
+			return;
+		}
 		final Optional<CropGenotypingParameterDTO> cropGenotypingParameter =
 			this.cropGenotypingParameterService.getCropGenotypingParameterById(cropGenotypingParameterDTO.getGenotypingParameterId());
 		if (!cropGenotypingParameter.isPresent()) {
 			errors.reject("crop.genotyping.parameter.record.id.not.exists",
 				new String[] {String.valueOf(cropGenotypingParameterDTO.getGenotypingParameterId())}, "");
 		}
-		if (cropGenotypingParameter.isPresent() && !cropGenotypingParameter.get().getCropName()
+		if (cropGenotypingParameter.isPresent() && StringUtils.isNotBlank(cropGenotypingParameterDTO.getCropName())
+			&& !cropGenotypingParameter.get().getCropName()
 			.equalsIgnoreCase(cropGenotypingParameterDTO.getCropName())) {
 			errors.reject("crop.genotyping.parameter.genotyping.parameter.crop.name.mismatch");
 		}
@@ -80,15 +87,17 @@ public class CropGenotypingParameterValidator {
 
 	protected void validateCropName(final String pathCropName, final CropGenotypingParameterDTO cropGenotypingParameterDTO,
 		final BindingResult errors) {
-		if (StringUtils.isNotBlank(pathCropName) && !pathCropName.equalsIgnoreCase(cropGenotypingParameterDTO.getCropName())) {
-			errors.reject("crop.genotyping.parameter.crop.name.path.mismatch");
-		}
 		if (StringUtils.isBlank(cropGenotypingParameterDTO.getCropName())) {
 			errors.reject("crop.genotyping.parameter.crop.name.is.required");
+			return;
 		}
 		if (StringUtils.isNotBlank(cropGenotypingParameterDTO.getCropName())
 			&& cropGenotypingParameterDTO.getCropName().length() > CROP_NAME_MAXLENGTH) {
 			errors.reject("crop.genotyping.parameter.crop.name.exceeded.max.length", new Integer[] {CROP_NAME_MAXLENGTH}, "");
+			return;
+		}
+		if (StringUtils.isNotBlank(pathCropName) && !pathCropName.equalsIgnoreCase(cropGenotypingParameterDTO.getCropName())) {
+			errors.reject("crop.genotyping.parameter.crop.name.path.mismatch");
 		}
 	}
 

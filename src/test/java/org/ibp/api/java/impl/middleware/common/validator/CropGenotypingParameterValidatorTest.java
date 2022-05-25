@@ -93,6 +93,15 @@ public class CropGenotypingParameterValidatorTest {
 	}
 
 	@Test
+	public void testvalidateCropGenotypingParameterId_IDIsRequired() {
+		final CropGenotypingParameterDTO cropGenotypingParameterDTO = this.getCropGenotypingParameterDTO();
+		cropGenotypingParameterDTO.setGenotypingParameterId(0);
+		this.cropGenotypingParameterValidator.validateCropGenotypingParameterId(cropGenotypingParameterDTO, this.errors);
+		Mockito.verify(this.errors).reject("crop.genotyping.parameter.record.id.is.required",
+			new String[] {}, "");
+	}
+
+	@Test
 	public void testvalidateCropGenotypingParameterId_RecordDoesNotExist() {
 		final CropGenotypingParameterDTO cropGenotypingParameterDTO = this.getCropGenotypingParameterDTO();
 		cropGenotypingParameterDTO.setGenotypingParameterId(1);
