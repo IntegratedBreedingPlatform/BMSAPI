@@ -321,7 +321,7 @@ public class StudyInstanceServiceImplTest {
 		try {
 			this.studyInstanceService.updateInstanceObservation(studyId, instanceId, observationDataId, instanceObservationData);
 			fail("method should throw an error");
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Assert
 				.assertTrue(Arrays.asList(e.getErrors().get(0).getCodes()).contains(StudyInstanceServiceImpl.INVALID_ENVIRONMENT_DATA_ID));
 			Mockito.verify(this.studyValidator).validate(studyId, true);
@@ -359,7 +359,7 @@ public class StudyInstanceServiceImplTest {
 		try {
 			this.studyInstanceService.updateInstanceObservation(studyId, instanceId, observationId, instanceObservationData);
 			fail("method should throw an error");
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Assert.assertTrue(
 				Arrays.asList(e.getErrors().get(0).getCodes()).contains(StudyInstanceServiceImpl.INVALID_VARIABLE_FOR_ENVIRONMENT_DATA));
 			Mockito.verify(this.studyValidator).validate(studyId, true);
@@ -429,7 +429,7 @@ public class StudyInstanceServiceImplTest {
 		try {
 			this.studyInstanceService.updateInstanceDescriptorData(studyId, instanceId, observationDataId, instanceDescriptorData);
 			fail("method should throw an error");
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Assert
 				.assertTrue(Arrays.asList(e.getErrors().get(0).getCodes()).contains(StudyInstanceServiceImpl.INVALID_ENVIRONMENT_DATA_ID));
 			Mockito.verify(this.studyValidator).validate(studyId, true);
@@ -469,7 +469,7 @@ public class StudyInstanceServiceImplTest {
 		try {
 			this.studyInstanceService.updateInstanceDescriptorData(studyId, instanceId, descriptorDataId, instanceDescriptorData);
 			fail("method should throw an error");
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Assert.assertTrue(
 				Arrays.asList(e.getErrors().get(0).getCodes()).contains(StudyInstanceServiceImpl.INVALID_VARIABLE_FOR_ENVIRONMENT_DATA));
 			Mockito.verify(this.studyValidator).validate(studyId, true);

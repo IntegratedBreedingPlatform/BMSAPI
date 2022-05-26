@@ -41,7 +41,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 	@Test
 	public void testValidateCreation_throwsException_whenRequestBodyIsNull() {
 		try {
-			programBasicDetailsDtoValidator.validateCreation(cropName, null);
+			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, null);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("param.null"));
 		}
@@ -52,7 +52,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
 		programBasicDetailsDto.setStartDate("10102020");
 		try {
-			programBasicDetailsDtoValidator.validateCreation(cropName, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("param.null"));
 		}
@@ -63,7 +63,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
 		programBasicDetailsDto.setName(RandomStringUtils.randomAlphabetic(10));
 		try {
-			programBasicDetailsDtoValidator.validateCreation(cropName, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("param.null"));
 		}
@@ -76,7 +76,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programBasicDetailsDto.setStartDate("4040202020");
 		programBasicDetailsDto.setDefaultLocationId(1);
 		try {
-			programBasicDetailsDtoValidator.validateCreation(cropName, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.start.date.invalid"));
 		}
@@ -89,7 +89,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programBasicDetailsDto.setStartDate("2020-10-10");
 		programBasicDetailsDto.setDefaultLocationId(1);
 		try {
-			programBasicDetailsDtoValidator.validateCreation(cropName, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.name.max.length.exceeded"));
 		}
@@ -104,11 +104,11 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programBasicDetailsDto.setName(programName);
 		programBasicDetailsDto.setStartDate("2020-10-10");
 		programBasicDetailsDto.setDefaultLocationId(1);
-		Mockito.when(programService.getProgramByCropAndName(cropName, programName)).thenReturn(Optional.of(programDTO));
+		Mockito.when(this.programService.getProgramByCropAndName(this.cropName, programName)).thenReturn(Optional.of(programDTO));
 		Mockito.when(this.locationService.searchLocations(ArgumentMatchers.any(LocationSearchRequest.class),
 			ArgumentMatchers.isNull(), ArgumentMatchers.isNull())).thenReturn(Collections.singletonList(new LocationDTO()));
 		try {
-			programBasicDetailsDtoValidator.validateCreation(cropName, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.name.already.exists"));
 		}
@@ -123,7 +123,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programBasicDetailsDto.setName(programName);
 		programBasicDetailsDto.setStartDate("2020-10-10");
 		try {
-			programBasicDetailsDtoValidator.validateCreation(cropName, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("param.null"));
 		}
@@ -139,7 +139,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programBasicDetailsDto.setStartDate("2020-10-10");
 		programBasicDetailsDto.setDefaultLocationId(1);
 		try {
-			programBasicDetailsDtoValidator.validateCreation(cropName, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.default.location.id.invalid"));
 		}
@@ -150,7 +150,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
 		programBasicDetailsDto.setStartDate("4040202020");
 		try {
-			programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateEdition(this.cropName, this.programUUID, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.start.date.invalid"));
 		}
@@ -161,7 +161,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
 		programBasicDetailsDto.setName(RandomStringUtils.randomAlphabetic(300));
 		try {
-			programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateEdition(this.cropName, this.programUUID, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.name.max.length.exceeded"));
 		}
@@ -172,7 +172,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
 		programBasicDetailsDto.setName("|");
 		try {
-			programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateEdition(this.cropName, this.programUUID, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.name.invalid.characters"));
 		}
@@ -186,9 +186,9 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programDTO.setName(programName);
 		programBasicDetailsDto.setName(programName);
 		programBasicDetailsDto.setStartDate("2020-10-10");
-		Mockito.when(programService.getProgramByCropAndName(cropName, programName)).thenReturn(Optional.of(programDTO));
+		Mockito.when(this.programService.getProgramByCropAndName(this.cropName, programName)).thenReturn(Optional.of(programDTO));
 		try {
-			programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
+			this.programBasicDetailsDtoValidator.validateEdition(this.cropName, this.programUUID, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.name.already.exists"));
 		}

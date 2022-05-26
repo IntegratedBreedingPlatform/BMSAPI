@@ -18,8 +18,9 @@ public interface LocationService {
 
 	long countLocations(String crop, LocationSearchRequest locationSearchRequest, String programUUID);
 
-	List<LocationDTO> searchLocations(String crop, LocationSearchRequest locationSearchRequest, Pageable pageable,
-			String programUUID);
+	List<LocationDTO> searchLocations(
+		String crop, LocationSearchRequest locationSearchRequest, Pageable pageable,
+		String programUUID);
 
 	void deleteLocation(Integer locationId);
 

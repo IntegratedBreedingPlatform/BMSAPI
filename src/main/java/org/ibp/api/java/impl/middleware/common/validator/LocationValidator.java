@@ -16,7 +16,6 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
-import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.Util;
@@ -41,7 +40,8 @@ public class LocationValidator {
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 	private static final Integer LOCATION_NAME_MAX_LENGTH = 60;
 	private static final Integer LOCATION_ABBR_MAX_LENGTH = 12;
-	private static final Set<String> LOCATIONS_NOT_DELETABLES = new HashSet<>(Arrays.asList("Unspecified Location", "Default Seed Store", "Default Breeding Location"));
+	private static final Set<String> LOCATIONS_NOT_DELETABLES =
+		new HashSet<>(Arrays.asList("Unspecified Location", "Default Seed Store", "Default Breeding Location"));
 	private static final List<Integer> RESTRICTED_LOCATION_TYPES = Arrays.asList(401, 405, 406);
 	@Autowired
 	private LocationDataManager locationDataManager;
@@ -94,7 +94,8 @@ public class LocationValidator {
 				new LocationSearchRequest(STORAGE_LOCATION_TYPE, null, locationAbbreviations, null), null, null);
 		if (existingLocations.size() != locationAbbreviations.size()) {
 
-			final List<String> existingAbbreviations = existingLocations.stream().map(LocationDTO::getAbbreviation).collect(Collectors.toList());
+			final List<String> existingAbbreviations =
+				existingLocations.stream().map(LocationDTO::getAbbreviation).collect(Collectors.toList());
 			final List<String> invalidAbbreviations = new ArrayList<>(locationAbbreviations);
 			invalidAbbreviations.removeAll(existingAbbreviations);
 			errors.reject("lot.input.invalid.abbreviations", new String[] {Util.buildErrorMessageFromList(invalidAbbreviations, 3)}, "");
@@ -102,7 +103,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationName(final String locationName) {
-		if(StringUtils.isBlank(locationName)) {
+		if (StringUtils.isBlank(locationName)) {
 			this.errors.reject("location.name.is.required", null, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -114,7 +115,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationAbbr(final String locationAbbr) {
-		if(StringUtils.isBlank(locationAbbr)) {
+		if (StringUtils.isBlank(locationAbbr)) {
 			this.errors.reject("location.abbr.is.required", null, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -145,7 +146,7 @@ public class LocationValidator {
 
 		this.validateLocationName(locationRequestDto.getName());
 		this.validateLocationType(locationRequestDto.getType());
-		this.validateLocationTypeRestricted(locationRequestDto.getType(),"location.with.location.type.restricted.cannot.created");
+		this.validateLocationTypeRestricted(locationRequestDto.getType(), "location.with.location.type.restricted.cannot.created");
 		this.validateLocationAbbr(locationRequestDto.getAbbreviation());
 		this.validateLocationAbbrNotExists(locationRequestDto.getAbbreviation());
 		this.validateCountryAndProvince(locationRequestDto.getCountryId(), locationRequestDto.getProvinceId());
@@ -236,7 +237,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationNotProgramDefault(final Integer locationId) {
-		if(this.locationService.isProgramLocationDefault(locationId)) {
+		if (this.locationService.isProgramLocationDefault(locationId)) {
 			this.errors.reject("location.program.default", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -253,15 +254,21 @@ public class LocationValidator {
 	private void validateLocationNotUsedInFieldMap(final LocationDTO locationDTO) {
 		List<Integer> blockIds = null;
 		if (LocdesType.FIELD.getId().equals(locationDTO.getType())) {
-			blockIds = this.locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString())).stream().map(Locdes::getLocationId).collect(Collectors.toList());
+			blockIds =
+				this.locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString())).stream().map(Locdes::getLocationId)
+					.collect(Collectors.toList());
 		} else if (LocdesType.BLOCK.getId().equals(locationDTO.getType())) {
 			blockIds = this.locationDataManager.getLocdes(Arrays.asList(locationDTO.getId()), null).stream()
-				.filter(locdes -> LocdesType.BLOCK_PARENT.getId().equals(locdes.getTypeId())).map(Locdes::getLocationId).collect(Collectors.toList());
+				.filter(locdes -> LocdesType.BLOCK_PARENT.getId().equals(locdes.getTypeId())).map(Locdes::getLocationId)
+				.collect(Collectors.toList());
 		} else {
-			final List<Locdes> fieldParentLocation = this.locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString()));
+			final List<Locdes> fieldParentLocation =
+				this.locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString()));
 			if (!fieldParentLocation.isEmpty()) {
-				final List<String> fieldParentIds = fieldParentLocation.stream().map(Locdes::getLocationId).map(Object::toString).collect(Collectors.toList());
-				blockIds = this.locationDataManager.getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId).collect(Collectors.toList());
+				final List<String> fieldParentIds =
+					fieldParentLocation.stream().map(Locdes::getLocationId).map(Object::toString).collect(Collectors.toList());
+				blockIds = this.locationDataManager.getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId)
+					.collect(Collectors.toList());
 			}
 		}
 		if (!CollectionUtils.isEmpty(blockIds)) {

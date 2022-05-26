@@ -760,7 +760,7 @@ public class LocationValidatorTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidate_ThrowsException_WhenProvinceIsInvalid() {
-		Mockito.when(this.locationService.getLocationTypes()).thenReturn(buildLocationTypes(Arrays.asList(LocationValidatorTest.LOCATION_TYPE)));
+		Mockito.when(this.locationService.getLocationTypes()).thenReturn(this.buildLocationTypes(Arrays.asList(LocationValidatorTest.LOCATION_TYPE)));
 		final LocationRequestDto locationRequestDto =
 			this.buildLocationRequestDto(LocationValidatorTest.LOCATION_NAME, LocationValidatorTest.LOCATION_ABBR,
 				LocationValidatorTest.LOCATION_TYPE);
