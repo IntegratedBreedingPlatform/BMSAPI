@@ -300,6 +300,20 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
+	public void testValidateCanBeDeleted_ThrowsException_WhenLocationIsProgramLocationDefault() {
+		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(new LocationDTO());
+		Mockito.when(this.locationService.isProgramLocationDefault(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
+
+		try {
+			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.program.default"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateCanBeDeleted_ThrowsException_WhenLocationBelongsToAttribute() {
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(new LocationDTO());
 		Mockito.when(this.germplasmAttributeService.isLocationUsedInAttribute(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
