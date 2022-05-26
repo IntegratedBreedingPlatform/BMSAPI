@@ -159,4 +159,5 @@ public class StudyResource {
 			() -> this.studyService.getFilteredStudies(programUUID, studySearchRequest, pageable),
 			pageable);
 	}
+
 }
