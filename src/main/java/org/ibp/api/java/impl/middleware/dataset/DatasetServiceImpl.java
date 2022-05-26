@@ -27,7 +27,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryRepla
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
@@ -45,10 +44,10 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
-import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -133,16 +132,13 @@ public class DatasetServiceImpl implements DatasetService {
 	private OntologyDataManager ontologyDataManager;
 
 	@Autowired
-	private StudyService studyService;
-
-	@Autowired
 	private StudyTransactionsService studyTransactionsService;
 
 	@Autowired
 	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Autowired
-	private LotService lotService;
+	private TermValidator termValidator;
 
 	static final String PLOT_DATASET_NAME = "Observations";
 
@@ -966,6 +962,14 @@ public class DatasetServiceImpl implements DatasetService {
 	public Long countObservationUnits(final Integer datasetId) {
 		return this.middlewareDatasetService.countObservationUnits(datasetId);
 
+	}
+
+	@Override
+	public void updateDatasetProperties(final Integer studyId, final List<Integer> variableIds) {
+		this.studyValidator.validate(studyId, true);
+		variableIds.forEach(this.termValidator::validate);
+
+		this.middlewareDatasetService.updateDatasetProperties(studyId, variableIds);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
