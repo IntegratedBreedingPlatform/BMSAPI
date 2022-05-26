@@ -193,8 +193,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
 		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_NO.getId()));
 		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_TYPE.getId()));
-		orderedColumns.add(columnsIndexedByTermId.remove(TermId.GID.getId()));
-		orderedColumns.add(columnsIndexedByTermId.remove(TermId.DESIG.getId()));
 
 		//Add Inventory related columns
 		orderedColumns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
