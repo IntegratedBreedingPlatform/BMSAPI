@@ -12,7 +12,7 @@ import org.generationcp.middleware.api.study.MyStudiesService;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
@@ -49,9 +49,6 @@ public class StudyResource {
 
 	@Autowired
 	private SecurityService securityService;
-
-	@Autowired
-	private FieldbookService fieldbookService;
 
 	@ApiOperation(value = "Check if a study is sampled.",
 			notes = "Returns boolean indicating if there are samples associated to the study.")
@@ -161,24 +158,5 @@ public class StudyResource {
 			() -> this.studyService.countFilteredStudies(programUUID, studySearchRequest),
 			() -> this.studyService.getFilteredStudies(programUUID, studySearchRequest, pageable),
 			pageable);
-	}
-
-	/**
-	 * Delete field map.
-	 */
-	@ApiOperation(value = "Delete specified fieldmaps of study", notes = "Delete specified fieldmaps of study")
-	@ResponseBody
-	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/Fieldmap/deletion", method = RequestMethod.POST,
-		produces = "application/json; charset=utf-8")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	public ResponseEntity<Void> deleteFieldMap(
-		@PathVariable final String cropName,
-		@PathVariable final String programUUID,
-		@PathVariable final Integer studyId,
-		@RequestBody final FieldmapRequestDto requestDto) {
-		this.fieldbookService.deleteAllFieldMapsByTrialInstanceIds(
-			requestDto.getInstanceIds(), requestDto.getDatasetId(), requestDto.isAllExistingFieldmapSelected());
-
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
