@@ -16,6 +16,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.Util;
@@ -215,6 +216,7 @@ public class LocationValidator {
 
 		final LocationDTO locationDTO = this.validateLocation(this.errors, locationId);
 		this.validateLocationNotDeletable(locationDTO);
+		this.validateLocationNotProgramDefault(locationId);
 		this.validateLocationNotUsedInGermplasm(locationId);
 		this.validateLocationNotUsedInLot(locationId);
 		this.validateLocationNotUsedInAttribute(locationId);
@@ -231,6 +233,13 @@ public class LocationValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		this.validateLocationTypeRestricted(locationDTO.getType(), "location.with.location.type.restricted.cannot.deleted");
+	}
+
+	private void validateLocationNotProgramDefault(final Integer locationId) {
+		if(this.locationService.isProgramLocationDefault(locationId)) {
+			this.errors.reject("location.program.default", new String[] {locationId.toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	private void validateLocationNotEditable(final LocationDTO locationDTO) {
