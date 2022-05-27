@@ -36,8 +36,8 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitS
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
-import org.generationcp.middleware.api.cropparameter.CropParameterService;
 import org.generationcp.middleware.api.cropparameter.CropParameterImpl;
+import org.generationcp.middleware.api.cropparameter.CropParameterService;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
@@ -131,6 +131,7 @@ import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.generationcp.middleware.service.api.audit.GermplasmAuditService;
+import org.generationcp.middleware.service.api.crop.CropGenotypingParameterService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
@@ -156,6 +157,7 @@ import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.impl.NamingConfigurationServiceImpl;
 import org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl;
 import org.generationcp.middleware.service.impl.audit.GermplasmAuditServiceImpl;
+import org.generationcp.middleware.service.impl.crop.CropGenotypingParameterServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
@@ -195,6 +197,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
+import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
@@ -311,7 +314,6 @@ public class MiddlewareFactory {
 	public OntologyVariableService getOntologyVariableService() {
 		return new OntologyVariableServiceImpl(this.getCropDatabaseSessionProvider());
 	}
-
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -874,9 +876,20 @@ public class MiddlewareFactory {
 	}
 
 	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public CropGenotypingParameterService getCropGenotypingParameterService() {
+		return new CropGenotypingParameterServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
 	@DependsOn("WORKBENCH_SessionFactory")
 	public FeedbackService getFeedbackService() {
 		return new FeedbackServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
