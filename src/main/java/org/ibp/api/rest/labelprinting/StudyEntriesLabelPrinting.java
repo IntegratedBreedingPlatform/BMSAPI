@@ -178,7 +178,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 				}else if (studyEntry.getProperties().containsKey(key)) {
 					final StudyEntryPropertyData data = studyEntry.getProperties().get(key);
 					row.put(key,
-						truncateValueIfPdf(isPdf, data.getPropertyValue(), StudyEntriesLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
+						truncateValueIfPdf(isPdf, data.getValue(), StudyEntriesLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
 				} else {
 					this.getAttributeOrNameDataRowValue(isPdf, studyEntry, attributeValues, nameValues, key, row);
 				}
