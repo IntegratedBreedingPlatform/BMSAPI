@@ -1,6 +1,10 @@
 package org.ibp.api.java.impl.middleware.program.validator;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.api.program.ProgramService;
@@ -13,7 +17,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -25,17 +31,23 @@ public class ProgramBasicDetailsDtoValidator {
 	@Autowired
 	private ProgramService programService;
 
+	@Autowired
+	private LocationService locationService;
+
 	public void validateCreation(final String cropName, final ProgramBasicDetailsDto programBasicDetailsDto) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), AddProgramMemberRequestDto.class.getName());
 
 		BaseValidator.checkNotNull(programBasicDetailsDto, "param.null", new String[] {"request body"});
 		BaseValidator.checkNotEmpty(programBasicDetailsDto.getName(), "param.null", new String[] {"name"});
 		BaseValidator.checkNotEmpty(programBasicDetailsDto.getStartDate(), "param.null", new String[] {"startDate"});
+		BaseValidator.checkNotEmpty(programBasicDetailsDto.getDefaultLocationId(), "param.null", new String[] {"defaultLocationId"});
 
 		this.validateStartDate(errors, programBasicDetailsDto);
 		this.validateProgramName(errors, programBasicDetailsDto);
+		this.validateDefaultLocationId(errors, programBasicDetailsDto);
 
-		final Optional<ProgramDTO> programDTOOptional = this.programService.getProgramByCropAndName(cropName, programBasicDetailsDto.getName());
+		final Optional<ProgramDTO> programDTOOptional =
+			this.programService.getProgramByCropAndName(cropName, programBasicDetailsDto.getName());
 		if (programDTOOptional.isPresent()) {
 			errors.reject("program.name.already.exists", new String[] {programBasicDetailsDto.getName(), cropName}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -51,11 +63,16 @@ public class ProgramBasicDetailsDtoValidator {
 
 		if (programBasicDetailsDto.getName() != null) {
 			this.validateProgramName(errors, programBasicDetailsDto);
-			final Optional<ProgramDTO> programDTOOptional = this.programService.getProgramByCropAndName(cropName, programBasicDetailsDto.getName());
+			final Optional<ProgramDTO> programDTOOptional =
+				this.programService.getProgramByCropAndName(cropName, programBasicDetailsDto.getName());
 			if (programDTOOptional.isPresent() && !programUUID.equalsIgnoreCase(programDTOOptional.get().getUniqueID())) {
 				errors.reject("program.name.already.exists", new String[] {programBasicDetailsDto.getName(), cropName}, "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
+		}
+
+		if (programBasicDetailsDto.getDefaultLocationId() != null) {
+			this.validateDefaultLocationId(errors, programBasicDetailsDto);
 		}
 
 	}
@@ -80,6 +97,17 @@ public class ProgramBasicDetailsDtoValidator {
 	private void validateStartDate(final BindingResult errors, final ProgramBasicDetailsDto programBasicDetailsDto) {
 		if (Util.tryParseDate(programBasicDetailsDto.getStartDate(), Util.FRONTEND_DATE_FORMAT) == null) {
 			errors.reject("program.start.date.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+	}
+
+	private void validateDefaultLocationId(final BindingResult errors, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+		locationSearchRequest.setLocationIds(Collections.singletonList(programBasicDetailsDto.getDefaultLocationId()));
+
+		final List<LocationDTO> locations = this.locationService.searchLocations(locationSearchRequest, null, null);
+		if (CollectionUtils.isEmpty(locations)) {
+			errors.reject("program.default.location.id.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}

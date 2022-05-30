@@ -18,7 +18,6 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -72,9 +71,6 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Autowired
 	private StudyService studyService;
-
-	@Autowired
-	private MethodService methodService;
 
 	@Autowired
 	private GermplasmListService germplasmListService;
@@ -192,8 +188,10 @@ public class ProgramServiceImpl implements ProgramService {
 				if (workbenchProgram.getStartDate() != null) {
 					programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
 				}
-				programSummary.setLastOpenDate(Util.formatDateAsStringValue(workbenchProgram.getLastOpenDate(),
+				programSummary.setLastOpenDate(Util.formatDateAsStringValue(
+					workbenchProgram.getLastOpenDate(),
 					Util.FRONTEND_TIMESTAMP_FORMAT));
+				programSummary.setDefaultLocationId(this.locationService.getProgramLocationDefault(programUUID).getLocationId());
 				return programSummary;
 			}
 			return null;
@@ -203,7 +201,8 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest,
+	public List<ProgramMemberDto> getProgramMembers(
+		final String programUUID, final ProgramMembersSearchRequest searchRequest,
 		final Pageable pageable) {
 
 		return this.userService.getProgramMembers(programUUID, searchRequest, pageable);
@@ -239,9 +238,12 @@ public class ProgramServiceImpl implements ProgramService {
 		final List<LocationDTO> locations = this.locationService.searchLocations(locationSearchRequest, null, null);
 		if (!locations.isEmpty()) {
 			this.programFavoriteService
-				.addProgramFavorites(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, new HashSet<>(locations.get(0).getId()));
+				.addProgramFavorites(
+					programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, new HashSet<>(locations.get(0).getId()));
 		}
 
+		this.locationService.saveProgramLocationDefault(programDTO.getUniqueID(), programBasicDetailsDto.getDefaultLocationId());
+		programDTO.setDefaultLocationId(programBasicDetailsDto.getDefaultLocationId());
 		this.installationDirectoryUtil.createWorkspaceDirectoriesForProject(crop, programBasicDetailsDto.getName());
 
 		return programDTO;
@@ -264,6 +266,9 @@ public class ProgramServiceImpl implements ProgramService {
 		}
 		this.programService.editProgram(programUUID, programBasicDetailsDto);
 		this.installationDirectoryUtil.renameOldWorkspaceDirectory(oldProjectName, cropName, programBasicDetailsDto.getName());
+		if (programBasicDetailsDto.getDefaultLocationId() != null) {
+			this.locationService.updateProgramLocationDefault(programUUID, programBasicDetailsDto.getDefaultLocationId());
+		}
 		return true;
 	}
 }
