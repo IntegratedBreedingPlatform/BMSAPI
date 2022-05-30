@@ -104,29 +104,29 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		// Germplasm Details labels
 		final String germplasmDetailsPropValue = this.getMessage("label.printing.germplasm.details");
 		final String entryDetailsPropValue = this.getMessage("label.printing.entry.details");
-		final String namesPropValue = this.getMessage("label.printing.names.details");
-		final String attributesPropValue = this.getMessage("label.printing.attributes.details");
+		// final String namesPropValue = this.getMessage("label.printing.names.details");
+		// final String attributesPropValue = this.getMessage("label.printing.attributes.details");
 
 
 		final LabelType germplasmLabelType = new LabelType(germplasmDetailsPropValue, germplasmDetailsPropValue);
 		final LabelType entryDetailsLabelType = new LabelType(entryDetailsPropValue, entryDetailsPropValue);
-		final LabelType namesType = new LabelType(namesPropValue, namesPropValue);
-		final LabelType attributesType = new LabelType(attributesPropValue, attributesPropValue);
+		// final LabelType namesType = new LabelType(namesPropValue, namesPropValue);
+		// final LabelType attributesType = new LabelType(attributesPropValue, attributesPropValue);
 
 		final List<Field> germplasmFields = new LinkedList<>();
 		final List<Field> entryDetailsFields = new LinkedList<>();
-		final List<Field> nameFields = new LinkedList<>();
-		final List<Field> attributeFields = new LinkedList<>();
+		// final List<Field> nameFields = new LinkedList<>();
+		// final List<Field> attributeFields = new LinkedList<>();
 
 		germplasmLabelType.setFields(germplasmFields);
 		entryDetailsLabelType.setFields(entryDetailsFields);
-		namesType.setFields(nameFields);
-		attributesType.setFields(attributeFields);
+		// namesType.setFields(nameFields);
+		// attributesType.setFields(attributeFields);
 
 		labelTypes.add(germplasmLabelType);
 		labelTypes.add(entryDetailsLabelType);
-		labelTypes.add(namesType);
-		labelTypes.add(attributesType);
+		// labelTypes.add(namesType);
+		// labelTypes.add(attributesType);
 
 
 		final List<MeasurementVariable> variables = this.studyEntryService.getEntryTableHeader(labelsInfoInput.getStudyId());
@@ -137,10 +137,11 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 				germplasmFields.add(field);
 			} else if (VariableType.ENTRY_DETAIL.equals(Variable.getVariableType())) {
 				entryDetailsFields.add(field);
-			} else if (VariableType.GERMPLASM_PASSPORT.equals(Variable.getVariableType()) || VariableType.GERMPLASM_ATTRIBUTE.equals(Variable.getVariableType())) {
-				attributeFields.add(field);
 			}
-			// TODO: Fix how the Names would be retrieve from the getEntryColumns service
+			//TODO: Commented code until it would be implemented the Attributes and Names.
+			 /*else if (VariableType.GERMPLASM_PASSPORT.equals(Variable.getVariableType()) || VariableType.GERMPLASM_ATTRIBUTE.equals(Variable.getVariableType())) {
+				attributeFields.add(field);
+			}*/
 		});
 
 		return labelTypes;
