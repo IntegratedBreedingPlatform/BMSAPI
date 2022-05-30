@@ -2,7 +2,6 @@ package org.ibp.api.java.study;
 
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
-import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.ibp.api.domain.study.StudyInstance;
 
 import java.util.List;
@@ -10,7 +9,8 @@ import java.util.Optional;
 
 public interface StudyInstanceService {
 
-	List<StudyInstance> createStudyInstances(final String cropName, final int studyId, final Integer numberOfInstancesToGenerate);
+	List<StudyInstance> createStudyInstances(final String cropName, final int studyId, String programUUID,
+		final Integer numberOfInstancesToGenerate);
 
 	List<StudyInstance> getStudyInstances(int studyId);
 

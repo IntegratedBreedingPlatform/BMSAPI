@@ -1,5 +1,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.generationcp.middleware.domain.dms.InstanceVariableData;
@@ -45,6 +47,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Resource
+	private LocationService locationService;
+
+	@Resource
 	private StudyValidator studyValidator;
 
 	@Resource
@@ -60,7 +65,9 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private StudyService studyService;
 
 	@Override
-	public List<StudyInstance> createStudyInstances(final String cropName, final int studyId, final Integer numberOfInstancesToGenerate) {
+	public List<StudyInstance> createStudyInstances(
+		final String cropName, final int studyId, final String programUUID,
+		final Integer numberOfInstancesToGenerate) {
 		if (numberOfInstancesToGenerate < 1 || numberOfInstancesToGenerate > 999) {
 			throw new ApiRuntime2Exception("", "Invalid number of instances to generate. Please specify number between 1 to 999.");
 		}
@@ -68,10 +75,13 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 		final Integer datasetId = this.studyService.getEnvironmentDatasetId(studyId);
+
 		// Add Study Instances in Environment (Summary Data) Dataset
+		final LocationDTO programDefaultLocation = this.locationService.getDefaultLocation(programUUID);
 		final List<org.generationcp.middleware.service.impl.study.StudyInstance> instances =
 			this.middlewareStudyInstanceService
-				.createStudyInstances(cropType, studyId, datasetId, numberOfInstancesToGenerate);
+				.createStudyInstances(cropType, studyId, datasetId, (programDefaultLocation != null) ? programDefaultLocation.getId() : 0,
+					numberOfInstancesToGenerate);
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final List<StudyInstance> studyInstances = new ArrayList<>();
@@ -113,7 +123,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public InstanceObservationData addInstanceObservation(final Integer studyId, final Integer instanceId,
+	public InstanceObservationData addInstanceObservation(
+		final Integer studyId, final Integer instanceId,
 		final InstanceObservationData instanceObservationData) {
 		this.validateInstanceData(studyId, instanceId, instanceObservationData, VariableType.ENVIRONMENT_CONDITION);
 
@@ -123,7 +134,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public InstanceObservationData updateInstanceObservation(final Integer studyId, final Integer instanceId,
+	public InstanceObservationData updateInstanceObservation(
+		final Integer studyId, final Integer instanceId,
 		final Integer observationDataId,
 		final InstanceObservationData instanceObservationData) {
 		this.validateInstanceData(studyId, instanceId, instanceObservationData, VariableType.ENVIRONMENT_CONDITION);
@@ -149,7 +161,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public InstanceDescriptorData addInstanceDescriptorData(final Integer studyId, final Integer instanceId,
+	public InstanceDescriptorData addInstanceDescriptorData(
+		final Integer studyId, final Integer instanceId,
 		final InstanceDescriptorData instanceDescriptorData) {
 
 		this.validateInstanceData(studyId, instanceId, instanceDescriptorData, VariableType.ENVIRONMENT_DETAIL);
@@ -159,7 +172,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	}
 
 	@Override
-	public InstanceDescriptorData updateInstanceDescriptorData(final Integer studyId, final Integer instanceId,
+	public InstanceDescriptorData updateInstanceDescriptorData(
+		final Integer studyId, final Integer instanceId,
 		final Integer descriptorDataId,
 		final InstanceDescriptorData instanceDescriptorData) {
 		this.validateInstanceData(studyId, instanceId, instanceDescriptorData, VariableType.ENVIRONMENT_DETAIL);
@@ -184,7 +198,8 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		return instanceDescriptorData;
 	}
 
-	private void validateInstanceData(final Integer studyId, final Integer instanceId, final InstanceVariableData instanceVariableData,
+	private void validateInstanceData(
+		final Integer studyId, final Integer instanceId, final InstanceVariableData instanceVariableData,
 		final VariableType variableType) {
 		this.studyValidator.validate(studyId, true);
 		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));

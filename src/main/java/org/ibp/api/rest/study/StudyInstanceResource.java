@@ -38,7 +38,7 @@ public class StudyInstanceResource {
 	public ResponseEntity<List<StudyInstance>> createStudyInstances(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestParam final Integer numberOfInstancesToGenerate) {
-		return new ResponseEntity<>(this.studyInstanceService.createStudyInstances(cropname, studyId, numberOfInstancesToGenerate),
+		return new ResponseEntity<>(this.studyInstanceService.createStudyInstances(cropname, studyId, programUUID, numberOfInstancesToGenerate),
 			HttpStatus.OK);
 
 	}
