@@ -194,12 +194,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_NO.getId()));
 		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_TYPE.getId()));
 
+		orderedColumns.addAll(columnsIndexedByTermId.values());
+
 		//Add Inventory related columns
 		orderedColumns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
 		orderedColumns.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
 		orderedColumns.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
 
-		orderedColumns.addAll(columnsIndexedByTermId.values());
 		return orderedColumns;
 	}
 
