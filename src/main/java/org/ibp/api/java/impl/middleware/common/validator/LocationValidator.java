@@ -229,7 +229,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationNotDeletable(final LocationDTO locationDTO) {
-		if (LOCATIONS_NOT_DELETABLES.contains(locationDTO.getName()) || locationDTO.isDefaultLocation()) {
+		if (LOCATIONS_NOT_DELETABLES.contains(locationDTO.getName())) {
 			this.errors.reject("location.not.deletable", new String[] {locationDTO.getId().toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
