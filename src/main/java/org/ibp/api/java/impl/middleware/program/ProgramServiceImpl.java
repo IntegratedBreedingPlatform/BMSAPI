@@ -92,8 +92,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public List<ProgramDTO> listProgramsByCropNameAndUser(final ProgramSearchRequest programSearchRequest) {
 		try {
-			//FIXME Should use programService instead
-			return this.convertToProgramSummaries(this.workbenchDataManager.getProjects(null, programSearchRequest));
+			return this.convertToProgramSummaries(this.programService.getProjects(null, programSearchRequest));
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
@@ -127,7 +126,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public List<ProgramDetailsDto> getProgramDetailsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
-		final List<Project> projectList = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
+		final List<Project> projectList = this.programService.getProjects(pageable, programSearchRequest);
 		if (!projectList.isEmpty()) {
 			for (final Project project : projectList) {
 				final WorkbenchUser user = this.userService.getUserById(project.getUserId());
