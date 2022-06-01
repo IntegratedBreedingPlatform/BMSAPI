@@ -2,6 +2,7 @@
 package org.ibp.api.security;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -43,6 +44,9 @@ public class WorkbenchUserDetailsServiceTest {
 	private UserService userService;
 
 	@Mock
+	private ProgramService programService;
+
+	@Mock
 	private PermissionService permissionService;
 
 	@Mock
@@ -67,7 +71,7 @@ public class WorkbenchUserDetailsServiceTest {
 
 		final Project project = new Project();
 		project.setProjectId(new Long(1));
-		Mockito.when(this.workbenchDataManager.getProjectByUuid(PROGRAM_UUID)).thenReturn(project);
+		Mockito.when(this.programService.getProjectByUuid(PROGRAM_UUID)).thenReturn(project);
 		Mockito.when(this.cropService.getAvailableCropsForUser(WorkbenchUserDetailsServiceTest.USER_ID)).thenReturn(Arrays.asList(CROP_NAME));
 	}
 
