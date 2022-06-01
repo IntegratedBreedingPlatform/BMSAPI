@@ -2,6 +2,7 @@
 package org.ibp.api.rest.ontology;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Method;
@@ -66,10 +67,19 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		public ModelService modelService(){
 			return Mockito.mock(ModelService.class);
 		}
+
+		@Bean
+		@Primary
+		public ProgramService programService(){
+			return Mockito.mock(ProgramService.class);
+		}
 	}
 
 	@Autowired
 	protected ModelService modelService;
+
+	@Autowired
+	protected ProgramService programService;
 
 	@Autowired
 	private TermDataManager termDataManager;
@@ -102,7 +112,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
 
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(this.programUuid, this.cropName);
+		Mockito.doReturn(project).when(this.programService).getProjectByUuidAndCrop(this.programUuid, this.cropName);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(this.programUuid);
 		Mockito.doReturn(variables).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
@@ -144,7 +154,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
 
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(this.programUuid, this.cropName);
+		Mockito.doReturn(project).when(this.programService).getProjectByUuidAndCrop(this.programUuid, this.cropName);
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, ontologyVariable.getId(),
 				true);
 		Mockito.doReturn(
@@ -218,7 +228,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager).getTermById(methodId);
 		Mockito.doReturn(TestDataProvider.getScaleTerm()).when(this.termDataManager).getTermById(scaleId);
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(this.programUuid, this.cropName);
+		Mockito.doReturn(project).when(this.programService).getProjectByUuidAndCrop(this.programUuid, this.cropName);
 
 		// Mock OntologyVariableInfo Class and when addDatasetVariable method called it will set id to 1 and return (self member alter if void is
 		// return type of method)
@@ -282,7 +292,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		variableFilter.addPropertyId(propertyId);
 		variableFilter.addScaleId(scaleId);
 
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(this.programUuid, this.cropName);
+		Mockito.doReturn(project).when(this.programService).getProjectByUuidAndCrop(this.programUuid, this.cropName);
 		Mockito.doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());
 		Mockito.doReturn(variableTerm).when(this.termDataManager).getTermByNameAndCvId(variable.getName(), CvId.VARIABLES.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId, true);

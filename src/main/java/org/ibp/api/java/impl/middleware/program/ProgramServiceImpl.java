@@ -14,7 +14,6 @@ import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -29,7 +28,6 @@ import org.ibp.api.java.impl.middleware.program.validator.ProgramBasicDetailsDto
 import org.ibp.api.java.impl.middleware.program.validator.RemoveProgramMembersValidator;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,10 +41,6 @@ import java.util.Set;
 @Service
 @Transactional
 public class ProgramServiceImpl implements ProgramService {
-
-	@Autowired
-	@Lazy
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private org.generationcp.middleware.api.program.ProgramService programService;
@@ -165,7 +159,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public ProgramDTO getByUUIDAndCrop(final String crop, final String programUUID) {
 		try {
-			final Project workbenchProgram = this.workbenchDataManager.getProjectByUuidAndCrop(programUUID, crop);
+			final Project workbenchProgram = this.programService.getProjectByUuidAndCrop(programUUID, crop);
 			if (workbenchProgram != null) {
 				final ProgramDTO programSummary = new ProgramDTO();
 				programSummary.setId(workbenchProgram.getProjectId().toString());

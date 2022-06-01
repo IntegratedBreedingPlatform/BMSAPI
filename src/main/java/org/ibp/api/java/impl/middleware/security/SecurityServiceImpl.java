@@ -2,13 +2,12 @@
 package org.ibp.api.java.impl.middleware.security;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -19,11 +18,10 @@ import java.util.List;
 public class SecurityServiceImpl implements SecurityService {
 
 	@Autowired
-	@Lazy
-	private WorkbenchDataManager workbenchDataManager;
+	private UserService userService;
 
 	@Autowired
-	private UserService userService;
+	private ProgramService programService;
 
 	@Override
 	public boolean isAccessible(final GermplasmList germplasmList, final String cropname) {
@@ -46,7 +44,7 @@ public class SecurityServiceImpl implements SecurityService {
 	private boolean loggedInUserIsMemberOf(final String programUniqueId, final String cropname) {
 		if (!StringUtils.isBlank(programUniqueId)) {
 			final WorkbenchUser loggedInUser = this.getCurrentlyLoggedInUser();
-			final Project program = this.workbenchDataManager.getProjectByUuidAndCrop(programUniqueId, cropname);
+			final Project program = this.programService.getProjectByUuidAndCrop(programUniqueId, cropname);
 			final List<WorkbenchUser> allProgramMembers = this.userService.getUsersByProjectId(program.getProjectId());
 			return allProgramMembers.contains(loggedInUser);
 		}
@@ -62,8 +60,7 @@ public class SecurityServiceImpl implements SecurityService {
 		return this.userService.getUserByUsername(authentication.getName());
 	}
 
-	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
+	public void setProgramService(final ProgramService programService) {
+		this.programService = programService;
 	}
-
 }
