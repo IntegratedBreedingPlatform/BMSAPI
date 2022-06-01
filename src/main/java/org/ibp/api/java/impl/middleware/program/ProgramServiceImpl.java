@@ -83,7 +83,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public List<ProgramDTO> listProgramsByCropName(final String cropName) {
 		try {
-			return this.convertToProgramSummaries(this.workbenchDataManager.getProjectsByCropName(cropName));
+			return this.convertToProgramSummaries(this.programService.getProjectsByCropName(cropName));
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
