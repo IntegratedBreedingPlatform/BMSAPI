@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -44,9 +43,6 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 
 	@Autowired
 	private PermissionService permissionService;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private CropService cropService;

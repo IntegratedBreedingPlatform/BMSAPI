@@ -6,7 +6,6 @@ import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
@@ -51,9 +50,6 @@ public class WorkbenchUserDetailsServiceTest {
 
 	@Mock
 	private ContextResolver contextResolver;
-
-	@Mock
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Mock
 	private CropService cropService;

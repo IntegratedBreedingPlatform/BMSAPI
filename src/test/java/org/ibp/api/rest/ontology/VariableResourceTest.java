@@ -67,12 +67,6 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		public ModelService modelService(){
 			return Mockito.mock(ModelService.class);
 		}
-
-		@Bean
-		@Primary
-		public ProgramService programService(){
-			return Mockito.mock(ProgramService.class);
-		}
 	}
 
 	@Autowired

@@ -28,6 +28,7 @@ import org.ibp.api.java.impl.middleware.program.validator.ProgramBasicDetailsDto
 import org.ibp.api.java.impl.middleware.program.validator.RemoveProgramMembersValidator;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +44,8 @@ import java.util.Set;
 public class ProgramServiceImpl implements ProgramService {
 
 	@Autowired
-	private org.generationcp.middleware.api.program.ProgramService programService;
+	@Lazy
+	private org.generationcp.middleware.api.program.ProgramService programServiceMw;
 
 	@Autowired
 	private UserService userService;
@@ -77,7 +79,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public List<ProgramDTO> listProgramsByCropName(final String cropName) {
 		try {
-			return this.convertToProgramSummaries(this.programService.getProjectsByCropName(cropName));
+			return this.convertToProgramSummaries(this.programServiceMw.getProjectsByCropName(cropName));
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
@@ -86,7 +88,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public List<ProgramDTO> listProgramsByCropNameAndUser(final ProgramSearchRequest programSearchRequest) {
 		try {
-			return this.convertToProgramSummaries(this.programService.getProjects(null, programSearchRequest));
+			return this.convertToProgramSummaries(this.programServiceMw.getProjects(null, programSearchRequest));
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
@@ -120,7 +122,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public List<ProgramDetailsDto> getProgramDetailsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
-		final List<Project> projectList = this.programService.getProjects(pageable, programSearchRequest);
+		final List<Project> projectList = this.programServiceMw.getProjects(pageable, programSearchRequest);
 		if (!projectList.isEmpty()) {
 			for (final Project project : projectList) {
 				final WorkbenchUser user = this.userService.getUserById(project.getUserId());
@@ -138,28 +140,28 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public long countProgramsByFilter(final ProgramSearchRequest programSearchRequest) {
-		return this.programService.countFilteredPrograms(programSearchRequest);
+		return this.programServiceMw.countFilteredPrograms(programSearchRequest);
 	}
 
 	@Override
 	public List<ProgramDTO> getFilteredPrograms(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
-		return this.programService.filterPrograms(programSearchRequest, pageable);
+		return this.programServiceMw.filterPrograms(programSearchRequest, pageable);
 	}
 
 	@Override
 	public ProgramDTO getLastOpenedProject(final Integer userId) {
-		return this.programService.getLastOpenedProject(userId);
+		return this.programServiceMw.getLastOpenedProject(userId);
 	}
 
 	@Override
 	public void saveOrUpdateProjectUserInfo(final Integer userId, final String programUUID) {
-		this.programService.saveOrUpdateProjectUserInfo(userId, programUUID);
+		this.programServiceMw.saveOrUpdateProjectUserInfo(userId, programUUID);
 	}
 
 	@Override
 	public ProgramDTO getByUUIDAndCrop(final String crop, final String programUUID) {
 		try {
-			final Project workbenchProgram = this.programService.getProjectByUuidAndCrop(programUUID, crop);
+			final Project workbenchProgram = this.programServiceMw.getProjectByUuidAndCrop(programUUID, crop);
 			if (workbenchProgram != null) {
 				final ProgramDTO programSummary = new ProgramDTO();
 				programSummary.setId(workbenchProgram.getProjectId().toString());
@@ -209,20 +211,20 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public void addNewProgramMembers(final String programUUID, final AddProgramMemberRequestDto requestDto) {
 		this.addProgramMemberRequestDtoValidator.validate(programUUID, requestDto);
-		this.programService.addProgramMembers(programUUID, requestDto);
+		this.programServiceMw.addProgramMembers(programUUID, requestDto);
 	}
 
 	@Override
 	public void removeProgramMembers(final String programUUID, final Set<Integer> userIds) {
 		this.removeProgramMembersValidator.validate(programUUID, userIds);
-		this.programService.removeProgramMembers(programUUID, new ArrayList<>(userIds));
+		this.programServiceMw.removeProgramMembers(programUUID, new ArrayList<>(userIds));
 	}
 
 	@Override
 	public ProgramDTO createProgram(final String crop, final ProgramBasicDetailsDto programBasicDetailsDto) {
 		this.programBasicDetailsDtoValidator.validateCreation(crop, programBasicDetailsDto);
 
-		final ProgramDTO programDTO = this.programService.addProgram(crop, programBasicDetailsDto);
+		final ProgramDTO programDTO = this.programServiceMw.addProgram(crop, programBasicDetailsDto);
 
 		final SqlTextFilter locationNameFilter = new SqlTextFilter(UNSPECIFIED_LOCATION, SqlTextFilter.Type.STARTSWITH);
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
@@ -247,17 +249,17 @@ public class ProgramServiceImpl implements ProgramService {
 		this.studyService.deleteProgramStudies(programUUID);
 		this.programFavoriteService.deleteAllProgramFavorites(programUUID);
 		this.germplasmListService.deleteProgramGermplasmLists(programUUID);
-		this.programService.deleteProgramAndDependencies(programUUID);
+		this.programServiceMw.deleteProgramAndDependencies(programUUID);
 	}
 
 	@Override
 	public boolean editProgram(final String cropName, final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
-		final String oldProjectName = this.programService.getProgramByUUID(programUUID).get().getName();
+		final String oldProjectName = this.programServiceMw.getProgramByUUID(programUUID).get().getName();
 		this.programBasicDetailsDtoValidator.validateEdition(cropName, programUUID, programBasicDetailsDto);
 		if (programBasicDetailsDto.allAttributesNull()) {
 			return false;
 		}
-		this.programService.editProgram(programUUID, programBasicDetailsDto);
+		this.programServiceMw.editProgram(programUUID, programBasicDetailsDto);
 		this.installationDirectoryUtil.renameOldWorkspaceDirectory(oldProjectName, cropName, programBasicDetailsDto.getName());
 		if (programBasicDetailsDto.getDefaultLocationId() != null) {
 			this.locationService.updateProgramLocationDefault(programUUID, programBasicDetailsDto.getDefaultLocationId());

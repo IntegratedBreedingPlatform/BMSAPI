@@ -3,7 +3,6 @@ package org.ibp.api.rest.ontology;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -61,13 +60,7 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 			return Mockito.mock(ModelService.class);
 		}
 
-		@Bean
-		@Primary
-		public org.generationcp.middleware.api.program.ProgramService programService() {
-			return Mockito.mock( org.generationcp.middleware.api.program.ProgramService.class);
-		}
 	}
-
 
 	@Autowired
 	protected ModelService modelService;
@@ -77,9 +70,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
-
-	@Autowired
-	private ProgramService programService;
 
 	@Autowired
 	private ContextUtil contextUtil;
@@ -93,7 +83,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		final Project project = new Project();
 		project.setUniqueID(PROGRAM_UUID);
 		project.setProjectId(1l);
-		Mockito.doReturn(project).when(this.programService).getLastOpenedProjectAnyUser();
 		Mockito.doReturn(PROGRAM_UUID).when(this.contextUtil).getCurrentProgramUUID();
 		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 

@@ -22,7 +22,7 @@ public class ProgramValidator extends BaseValidator implements Validator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProgramValidator.class);
 
 	@Autowired
-	public ProgramService programService;
+	public ProgramService programServiceMw;
 
 	@Override
 	public boolean supports(Class<?> aClass) {
@@ -46,7 +46,7 @@ public class ProgramValidator extends BaseValidator implements Validator {
 
 	protected void checkIfProgramExist(String fieldName, ProgramDTO program, Errors errors) {
 		try {
-			Project project = this.programService.getProjectByUuidAndCrop(program.getUniqueID(), program.getCrop());
+			Project project = this.programServiceMw.getProjectByUuidAndCrop(program.getUniqueID(), program.getCrop());
 			if (Objects.equals(project, null)) {
 				this.addCustomError(errors, fieldName, ProgramValidator.PROGRAM_DOES_NOT_EXIST, null);
 				return;
@@ -62,6 +62,6 @@ public class ProgramValidator extends BaseValidator implements Validator {
 	}
 
 	public void setProgramService(final ProgramService programService) {
-		this.programService = programService;
+		this.programServiceMw = programService;
 	}
 }
