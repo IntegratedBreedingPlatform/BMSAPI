@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -191,7 +192,9 @@ public class ProgramServiceImpl implements ProgramService {
 				programSummary.setLastOpenDate(Util.formatDateAsStringValue(
 					workbenchProgram.getLastOpenDate(),
 					Util.FRONTEND_TIMESTAMP_FORMAT));
-				programSummary.setBreedingLocationDefaultId(this.locationService.getProgramLocationDefault(programUUID).getBreedingLocationId());
+				final ProgramLocationDefault programLocationDefault = this.locationService.getProgramLocationDefault(programUUID);
+				programSummary.setBreedingLocationDefaultId(programLocationDefault.getBreedingLocationId());
+				programSummary.setStorageLocationDefaultId(programLocationDefault.getStorageLocationId());
 				return programSummary;
 			}
 			return null;
@@ -268,8 +271,8 @@ public class ProgramServiceImpl implements ProgramService {
 		}
 		this.programService.editProgram(programUUID, programBasicDetailsDto);
 		this.installationDirectoryUtil.renameOldWorkspaceDirectory(oldProjectName, cropName, programBasicDetailsDto.getName());
-		if (programBasicDetailsDto.getBreedingLocationDefaultId() != null) {
-			this.locationService.updateProgramLocationDefault(programUUID, programBasicDetailsDto.getBreedingLocationDefaultId());
+		if (programBasicDetailsDto.getBreedingLocationDefaultId() != null || programBasicDetailsDto.getStorageLocationDefaultId() != null) {
+			this.locationService.updateProgramLocationDefault(programUUID, programBasicDetailsDto);
 		}
 		return true;
 	}

@@ -141,7 +141,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		try {
 			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.default.location.id.invalid"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.breeding.location.default.id.invalid"));
 		}
 	}
 

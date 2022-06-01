@@ -14,6 +14,8 @@ public interface LocationService {
 
 	LocationDTO getBreedingLocationDefault(String programUUID);
 
+	LocationDTO getStorageLocationDefault(String programUUID);
+
 	List<LocationTypeDTO> getLocationTypes(Boolean excludeRestrictedTypes);
 
 	long countLocations(String crop, LocationSearchRequest locationSearchRequest, String programUUID);
