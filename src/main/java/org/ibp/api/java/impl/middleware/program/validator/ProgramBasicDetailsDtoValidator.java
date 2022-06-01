@@ -40,7 +40,7 @@ public class ProgramBasicDetailsDtoValidator {
 		BaseValidator.checkNotNull(programBasicDetailsDto, "param.null", new String[] {"request body"});
 		BaseValidator.checkNotEmpty(programBasicDetailsDto.getName(), "param.null", new String[] {"name"});
 		BaseValidator.checkNotEmpty(programBasicDetailsDto.getStartDate(), "param.null", new String[] {"startDate"});
-		BaseValidator.checkNotEmpty(programBasicDetailsDto.getDefaultLocationId(), "param.null", new String[] {"defaultLocationId"});
+		BaseValidator.checkNotEmpty(programBasicDetailsDto.getBreedingLocationDefaultId(), "param.null", new String[] {"defaultLocationId"});
 
 		this.validateStartDate(errors, programBasicDetailsDto);
 		this.validateProgramName(errors, programBasicDetailsDto);
@@ -71,7 +71,7 @@ public class ProgramBasicDetailsDtoValidator {
 			}
 		}
 
-		if (programBasicDetailsDto.getDefaultLocationId() != null) {
+		if (programBasicDetailsDto.getBreedingLocationDefaultId() != null) {
 			this.validateDefaultLocationId(errors, programBasicDetailsDto);
 		}
 
@@ -103,7 +103,7 @@ public class ProgramBasicDetailsDtoValidator {
 
 	private void validateDefaultLocationId(final BindingResult errors, final ProgramBasicDetailsDto programBasicDetailsDto) {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationIds(Collections.singletonList(programBasicDetailsDto.getDefaultLocationId()));
+		locationSearchRequest.setLocationIds(Collections.singletonList(programBasicDetailsDto.getBreedingLocationDefaultId()));
 
 		final List<LocationDTO> locations = this.locationService.searchLocations(locationSearchRequest, null, null);
 		if (CollectionUtils.isEmpty(locations)) {

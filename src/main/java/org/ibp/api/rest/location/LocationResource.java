@@ -52,12 +52,12 @@ public class LocationResource {
 	}
 
 	@ApiOperation(value = "Get default location")
-	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/locations/default", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/locations/breeding-location-default", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<LocationDTO> getLocation(
+	public ResponseEntity<LocationDTO> getBreedingLocationDefault(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID) {
-		return new ResponseEntity<>(this.locationService.getDefaultLocation(programUUID), HttpStatus.OK);
+		return new ResponseEntity<>(this.locationService.getBreedingLocationDefault(programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get location types")

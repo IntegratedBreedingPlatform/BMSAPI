@@ -74,7 +74,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
 		programBasicDetailsDto.setName(RandomStringUtils.randomAlphabetic(10));
 		programBasicDetailsDto.setStartDate("4040202020");
-		programBasicDetailsDto.setDefaultLocationId(1);
+		programBasicDetailsDto.setBreedingLocationDefaultId(1);
 		try {
 			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
@@ -87,7 +87,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
 		programBasicDetailsDto.setName(RandomStringUtils.randomAlphabetic(300));
 		programBasicDetailsDto.setStartDate("2020-10-10");
-		programBasicDetailsDto.setDefaultLocationId(1);
+		programBasicDetailsDto.setBreedingLocationDefaultId(1);
 		try {
 			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
@@ -103,7 +103,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programDTO.setName(programName);
 		programBasicDetailsDto.setName(programName);
 		programBasicDetailsDto.setStartDate("2020-10-10");
-		programBasicDetailsDto.setDefaultLocationId(1);
+		programBasicDetailsDto.setBreedingLocationDefaultId(1);
 		Mockito.when(this.programService.getProgramByCropAndName(this.cropName, programName)).thenReturn(Optional.of(programDTO));
 		Mockito.when(this.locationService.searchLocations(ArgumentMatchers.any(LocationSearchRequest.class),
 			ArgumentMatchers.isNull(), ArgumentMatchers.isNull())).thenReturn(Collections.singletonList(new LocationDTO()));
@@ -137,7 +137,7 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programDTO.setName(programName);
 		programBasicDetailsDto.setName(programName);
 		programBasicDetailsDto.setStartDate("2020-10-10");
-		programBasicDetailsDto.setDefaultLocationId(1);
+		programBasicDetailsDto.setBreedingLocationDefaultId(1);
 		try {
 			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {

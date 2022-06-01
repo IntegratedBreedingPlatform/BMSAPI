@@ -12,7 +12,7 @@ public interface LocationService {
 
 	LocationDTO getLocation(Integer locationId);
 
-	LocationDTO getDefaultLocation(String programUUID);
+	LocationDTO getBreedingLocationDefault(String programUUID);
 
 	List<LocationTypeDTO> getLocationTypes(Boolean excludeRestrictedTypes);
 

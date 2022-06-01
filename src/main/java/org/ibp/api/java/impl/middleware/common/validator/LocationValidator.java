@@ -237,8 +237,13 @@ public class LocationValidator {
 	}
 
 	private void validateLocationNotProgramDefault(final Integer locationId) {
-		if (this.locationService.isProgramLocationDefault(locationId)) {
-			this.errors.reject("location.program.default", new String[] {locationId.toString()}, "");
+		if (this.locationService.isProgramBreedingLocationDefault(locationId)) {
+			this.errors.reject("location.program.breeding.location.default", new String[] {locationId.toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (this.locationService.isProgramStorageLocationDefault(locationId)) {
+			this.errors.reject("location.program.storage.location.default", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

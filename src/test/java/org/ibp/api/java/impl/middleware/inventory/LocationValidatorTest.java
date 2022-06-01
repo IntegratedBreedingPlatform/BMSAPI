@@ -302,7 +302,7 @@ public class LocationValidatorTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateCanBeDeleted_ThrowsException_WhenLocationIsProgramLocationDefault() {
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(new LocationDTO());
-		Mockito.when(this.locationService.isProgramLocationDefault(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
+		Mockito.when(this.locationService.isProgramBreedingLocationDefault(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
 
 		try {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);

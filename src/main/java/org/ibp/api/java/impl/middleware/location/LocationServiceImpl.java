@@ -89,8 +89,8 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public LocationDTO getDefaultLocation(final String programUUID) {
-		return this.locationMiddlewareService.getDefaultLocation(programUUID);
+	public LocationDTO getBreedingLocationDefault(final String programUUID) {
+		return this.locationMiddlewareService.getBreedingLocationDefault(programUUID);
 	}
 
 }

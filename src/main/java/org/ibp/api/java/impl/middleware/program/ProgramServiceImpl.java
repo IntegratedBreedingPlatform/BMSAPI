@@ -191,7 +191,7 @@ public class ProgramServiceImpl implements ProgramService {
 				programSummary.setLastOpenDate(Util.formatDateAsStringValue(
 					workbenchProgram.getLastOpenDate(),
 					Util.FRONTEND_TIMESTAMP_FORMAT));
-				programSummary.setDefaultLocationId(this.locationService.getProgramLocationDefault(programUUID).getLocationId());
+				programSummary.setBreedingLocationDefaultId(this.locationService.getProgramLocationDefault(programUUID).getBreedingLocationId());
 				return programSummary;
 			}
 			return null;
@@ -242,8 +242,10 @@ public class ProgramServiceImpl implements ProgramService {
 					programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, new HashSet<>(locations.get(0).getId()));
 		}
 
-		this.locationService.saveProgramLocationDefault(programDTO.getUniqueID(), programBasicDetailsDto.getDefaultLocationId());
-		programDTO.setDefaultLocationId(programBasicDetailsDto.getDefaultLocationId());
+		this.locationService.saveProgramLocationDefault(programDTO.getUniqueID(), programBasicDetailsDto.getBreedingLocationDefaultId(),
+			programBasicDetailsDto.getStorageLocationDefaultId());
+		programDTO.setBreedingLocationDefaultId(programBasicDetailsDto.getBreedingLocationDefaultId());
+		programDTO.setStorageLocationDefaultId(programBasicDetailsDto.getStorageLocationDefaultId());
 		this.installationDirectoryUtil.createWorkspaceDirectoriesForProject(crop, programBasicDetailsDto.getName());
 
 		return programDTO;
@@ -266,8 +268,8 @@ public class ProgramServiceImpl implements ProgramService {
 		}
 		this.programService.editProgram(programUUID, programBasicDetailsDto);
 		this.installationDirectoryUtil.renameOldWorkspaceDirectory(oldProjectName, cropName, programBasicDetailsDto.getName());
-		if (programBasicDetailsDto.getDefaultLocationId() != null) {
-			this.locationService.updateProgramLocationDefault(programUUID, programBasicDetailsDto.getDefaultLocationId());
+		if (programBasicDetailsDto.getBreedingLocationDefaultId() != null) {
+			this.locationService.updateProgramLocationDefault(programUUID, programBasicDetailsDto.getBreedingLocationDefaultId());
 		}
 		return true;
 	}

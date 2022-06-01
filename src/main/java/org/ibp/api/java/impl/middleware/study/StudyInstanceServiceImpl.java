@@ -77,7 +77,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final Integer datasetId = this.studyService.getEnvironmentDatasetId(studyId);
 
 		// Add Study Instances in Environment (Summary Data) Dataset
-		final LocationDTO programDefaultLocation = this.locationService.getDefaultLocation(programUUID);
+		final LocationDTO programDefaultLocation = this.locationService.getBreedingLocationDefault(programUUID);
 		final List<org.generationcp.middleware.service.impl.study.StudyInstance> instances =
 			this.middlewareStudyInstanceService
 				.createStudyInstances(cropType, studyId, datasetId, (programDefaultLocation != null) ? programDefaultLocation.getId() : 0,
