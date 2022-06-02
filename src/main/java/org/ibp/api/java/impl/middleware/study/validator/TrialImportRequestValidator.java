@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.Util;
@@ -33,10 +33,10 @@ public class TrialImportRequestValidator {
 	public static final String CONTACT_INFO_VALUE_EXCEEDED_LENGTH = "trial.import.contact.info.value.exceeded.length";
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private FieldbookService fieldbookService;
 
 	@Autowired
-	private FieldbookService fieldbookService;
+	private ProgramService programService;
 
 	protected BindingResult errors;
 
@@ -110,7 +110,7 @@ public class TrialImportRequestValidator {
 			return true;
 		}
 
-		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(t.getProgramDbId(), crop);
+		final Project project = this.programService.getProjectByUuidAndCrop(t.getProgramDbId(), crop);
 		if (project == null) {
 			this.errors.reject("trial.import.program.dbid.invalid", new String[] {index.toString()}, "");
 			return true;

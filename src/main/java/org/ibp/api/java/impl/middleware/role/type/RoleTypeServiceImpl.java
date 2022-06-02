@@ -26,4 +26,5 @@ public class RoleTypeServiceImpl implements RoleTypeService {
 			.collect(Collectors.toList());
 		return roleTypeDtos;
 	}
+
 }

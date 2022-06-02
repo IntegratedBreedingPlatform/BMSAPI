@@ -2,8 +2,8 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.junit.After;
@@ -21,7 +21,7 @@ import java.util.HashMap;
 public class ProgramValidatorTest {
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
+	private ProgramService programService;
 
 	private ProgramValidator programValidator;
 
@@ -29,7 +29,7 @@ public class ProgramValidatorTest {
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
 		this.programValidator = new ProgramValidator();
-		this.programValidator.setWorkbenchDataManager(this.workbenchDataManager);
+		this.programValidator.setProgramService(this.programService);
 	}
 
 	@After
@@ -61,7 +61,7 @@ public class ProgramValidatorTest {
 		program.setCrop(cropname);
 		program.setUniqueID(programId);
 
-		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectByUuidAndCrop(programId, cropname);
+		Mockito.doReturn(null).when(this.programService).getProjectByUuidAndCrop(programId, cropname);
 
 		this.programValidator.validate(program, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -85,7 +85,7 @@ public class ProgramValidatorTest {
 		project.setProjectName("Crop_Program");
 		project.setCropType(new CropType("rice"));
 
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(programId, cropname);
+		Mockito.doReturn(project).when(this.programService).getProjectByUuidAndCrop(programId, cropname);
 
 		this.programValidator.validate(program, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -109,7 +109,7 @@ public class ProgramValidatorTest {
 		project.setProjectName("Crop_Program");
 		project.setCropType(new CropType(cropname));
 
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(programId, cropname);
+		Mockito.doReturn(project).when(this.programService).getProjectByUuidAndCrop(programId, cropname);
 
 		this.programValidator.validate(program, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());

@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.security;
 
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -20,7 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class SecurityServiceImplTest {
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
+	private ProgramService programService;
 
 	@Mock
 	private UserService userService;
@@ -101,7 +101,7 @@ public class SecurityServiceImplTest {
 		final Project listProgram = new Project();
 		listProgram.setProjectId(2L);
 		listProgram.setUniqueID(list.getProgramUUID());
-		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
+		Mockito.when(this.programService.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
 		// Logged in user = me is not a the member
 		Mockito.when(this.userService.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
 			Lists.newArrayList(this.otherBreeder));
@@ -126,7 +126,7 @@ public class SecurityServiceImplTest {
 		listProgram.setProjectId(2L);
 		listProgram.setUniqueID(list.getProgramUUID());
 
-		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
+		Mockito.when(this.programService.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
 
 		// Logged in user = me is a the member
 		Mockito.when(this.userService.getUsersByProjectId(listProgram.getProjectId())).thenReturn(

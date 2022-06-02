@@ -92,7 +92,6 @@ public abstract class ApiUnitTestBase {
 	@Autowired
 	protected ObjectMapper jsonMapper;
 
-
 	@Configuration
 	public static class TestConfiguration {
 
@@ -112,6 +111,12 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public WorkbenchDataManager workbenchDataManager() {
 			return Mockito.mock(WorkbenchDataManager.class);
+		}
+
+		@Bean
+		@Primary
+		public org.generationcp.middleware.api.program.ProgramService programServiceMw() {
+			return Mockito.mock(org.generationcp.middleware.api.program.ProgramService.class);
 		}
 
 		@Bean
