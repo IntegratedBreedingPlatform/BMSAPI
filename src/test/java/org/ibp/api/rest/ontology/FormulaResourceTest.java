@@ -4,8 +4,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.apache.commons.jexl3.JexlException;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -60,6 +60,9 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	private FormulaService service;
 
 	@Autowired
+	private ProgramService programService;
+
+	@Autowired
 	private DerivedVariableProcessor processor;
 
 	@Resource
@@ -90,7 +93,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		project.setProjectId(1l);
 		ContextHolder.setCurrentCrop(this.cropName);
 		ContextHolder.setCurrentProgram(this.programUuid);
-		Mockito.doReturn(project).when(this.workbenchDataManager).getLastOpenedProjectAnyUser();
+		Mockito.doReturn(project).when(this.programService).getLastOpenedProjectAnyUser();
 	}
 
 	@Test

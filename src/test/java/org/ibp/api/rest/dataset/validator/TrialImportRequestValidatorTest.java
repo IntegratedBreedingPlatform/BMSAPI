@@ -3,11 +3,10 @@ package org.ibp.api.rest.dataset.validator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.user.ContactDto;
-import org.generationcp.middleware.util.Util;
 import org.ibp.api.java.impl.middleware.study.validator.TrialImportRequestValidator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,7 +19,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +32,7 @@ public class TrialImportRequestValidatorTest {
 	private static final String TRIAL_NAME = RandomStringUtils.randomAlphabetic(10);
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
+	private ProgramService programService;
 
 	@Mock
 	private FieldbookService fieldbookService;
@@ -44,7 +42,7 @@ public class TrialImportRequestValidatorTest {
 
 	@Before
 	public void setUp() {
-		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(PROGRAM_UUID, CROP)).thenReturn(new Project());
+		Mockito.when(this.programService.getProjectByUuidAndCrop(PROGRAM_UUID, CROP)).thenReturn(new Project());
 		Mockito.when(this.fieldbookService.getProjectIdByNameAndProgramUUID(TRIAL_NAME, PROGRAM_UUID)).thenReturn(null);
 	}
 
@@ -95,7 +93,7 @@ public class TrialImportRequestValidatorTest {
 
 	@Test
 	public void testPruneTrialsInvalidForImport_WhereProgramDbIdIsInvalid() {
-		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(PROGRAM_UUID, CROP)).thenReturn(null);
+		Mockito.when(this.programService.getProjectByUuidAndCrop(PROGRAM_UUID, CROP)).thenReturn(null);
 		final List<TrialImportRequestDTO> dtoList = this.createTrialImportRequestDTOList();
 		final BindingResult result = this.trialImportRequestValidator.pruneTrialsInvalidForImport(dtoList, CROP);
 		Assert.assertTrue(result.hasErrors());

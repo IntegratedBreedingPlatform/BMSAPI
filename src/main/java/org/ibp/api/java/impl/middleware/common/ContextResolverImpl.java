@@ -8,6 +8,7 @@ import org.ibp.api.java.program.ProgramService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -27,6 +28,7 @@ public class ContextResolverImpl implements ContextResolver {
 	private CropService cropService;
 
 	@Autowired
+	@Lazy
 	private ProgramService programService;
 
 	@Override

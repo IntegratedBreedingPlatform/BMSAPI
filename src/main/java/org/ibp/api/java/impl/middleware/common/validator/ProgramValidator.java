@@ -2,8 +2,8 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ public class ProgramValidator extends BaseValidator implements Validator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProgramValidator.class);
 
 	@Autowired
-	public WorkbenchDataManager workbenchDataManager;
+	public ProgramService programServiceMw;
 
 	@Override
 	public boolean supports(Class<?> aClass) {
@@ -46,7 +46,7 @@ public class ProgramValidator extends BaseValidator implements Validator {
 
 	protected void checkIfProgramExist(String fieldName, ProgramDTO program, Errors errors) {
 		try {
-			Project project = this.workbenchDataManager.getProjectByUuidAndCrop(program.getUniqueID(), program.getCrop());
+			Project project = this.programServiceMw.getProjectByUuidAndCrop(program.getUniqueID(), program.getCrop());
 			if (Objects.equals(project, null)) {
 				this.addCustomError(errors, fieldName, ProgramValidator.PROGRAM_DOES_NOT_EXIST, null);
 				return;
@@ -61,7 +61,7 @@ public class ProgramValidator extends BaseValidator implements Validator {
 		}
 	}
 
-	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
+	public void setProgramService(final ProgramService programService) {
+		this.programServiceMw = programService;
 	}
 }

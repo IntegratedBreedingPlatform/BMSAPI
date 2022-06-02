@@ -3,10 +3,10 @@ package org.ibp.api.security;
 import liquibase.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -45,10 +45,10 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	private PermissionService permissionService;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
-	private CropService cropService;
+	private ProgramService programService;
 
 	public WorkbenchUserDetailsService() {
 
@@ -110,7 +110,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	}
 
 	private Integer getProgramId(final String programUUID) {
-		final Project project = this.workbenchDataManager.getProjectByUuid(programUUID);
+		final Project project = this.programService.getProjectByUuid(programUUID);
 		return project != null ? project.getProjectId().intValue() : null;
 	}
 

@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.tool;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.domain.workbench.ToolDTO;
 import org.generationcp.middleware.domain.workbench.ToolLinkDTO;
@@ -53,6 +54,9 @@ public class ToolServiceImpl implements ToolService {
 	@Autowired
 	public WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	public ProgramService programService;
+
 	private BindingResult errors;
 
 	@Override
@@ -62,7 +66,7 @@ public class ToolServiceImpl implements ToolService {
 
 		this.validateProgram(cropName, programUUID);
 
-		final Project project = this.workbenchDataManager.getProjectByUuid(programUUID);
+		final Project project = this.programService.getProjectByUuid(programUUID);
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		final List<PermissionDto> permissions =
 			this.permissionService.getPermissionLinks(loggedInUser.getUserid(), cropName, project.getProjectId().intValue());
