@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
@@ -48,7 +48,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public GermplasmAttributeRequestDto createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto,
+	public AttributeRequestDto createGermplasmAttribute(final Integer gid, final AttributeRequestDto dto,
 		final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
@@ -59,7 +59,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public GermplasmAttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId, final GermplasmAttributeRequestDto dto, final String programUUID) {
+	public AttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId, final AttributeRequestDto dto, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.attributeValidator.validateAttribute(errors, gid, dto, attributeId);

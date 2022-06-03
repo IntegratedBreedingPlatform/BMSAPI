@@ -4,7 +4,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
@@ -78,7 +78,7 @@ public class AttributeValidator {
 		}
 	}
 
-	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto) {
+	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final AttributeRequestDto dto) {
 		//FIXME Search by gid and variableId, to be addressed in IBP-4765
 		final List<GermplasmAttributeDto> germplasmAttributeDtos =
 			this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
@@ -101,7 +101,7 @@ public class AttributeValidator {
 		}
 	}
 
-	void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
+	void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final AttributeRequestDto dto,
 		final Integer attributeId) {
 		//FIXME Search by attributeId, to be addressed in IBP-4765
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
@@ -123,7 +123,7 @@ public class AttributeValidator {
 		}
 	}
 
-	public void validateAttribute(final BindingResult errors, final Integer gid, final GermplasmAttributeRequestDto dto,
+	public void validateAttribute(final BindingResult errors, final Integer gid, final AttributeRequestDto dto,
 		final Integer attributeId) {
 		BaseValidator.checkNotNull(dto, "param.null", new String[] {"request body"});
 		BaseValidator.checkNotNull(dto.getVariableId(), "param.null", new String[] {"variableId"});

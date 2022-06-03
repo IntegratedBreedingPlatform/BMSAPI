@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -54,7 +54,7 @@ public class GermplasmAttributeServiceImplTest {
 
 	@Test
 	public void testCreateGermplasmAttribute() {
-		final GermplasmAttributeRequestDto dto = this.createGermplasmAttributeRequestDto();
+		final AttributeRequestDto dto = this.createGermplasmAttributeRequestDto();
 		dto.setVariableId(VARIABLE_ID);
 		this.germplasmAttributeServiceImpl
 			.createGermplasmAttribute(GID, dto, GermplasmAttributeServiceImplTest.PROGRAM_UUID);
@@ -68,7 +68,7 @@ public class GermplasmAttributeServiceImplTest {
 
 	@Test
 	public void testUpdateGermplasmAttribute() {
-		final GermplasmAttributeRequestDto dto = this.createGermplasmAttributeRequestDto();
+		final AttributeRequestDto dto = this.createGermplasmAttributeRequestDto();
 		this.germplasmAttributeServiceImpl.updateGermplasmAttribute(GID, GERMPLASM_ATTRIBUTE_ID, dto, GermplasmAttributeServiceImplTest.PROGRAM_UUID);
 		Mockito.verify(this.attributeValidator).validateAttribute(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(GID),
 			ArgumentMatchers.eq(dto), ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
@@ -86,8 +86,8 @@ public class GermplasmAttributeServiceImplTest {
 		Mockito.verify(this.germplasmAttributeService).deleteGermplasmAttribute(ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_ID));
 	}
 
-	public GermplasmAttributeRequestDto createGermplasmAttributeRequestDto() {
-		final GermplasmAttributeRequestDto germplasmAttributeRequestDto = new GermplasmAttributeRequestDto();
+	public AttributeRequestDto createGermplasmAttributeRequestDto() {
+		final AttributeRequestDto germplasmAttributeRequestDto = new AttributeRequestDto();
 		germplasmAttributeRequestDto.setLocationId(0);
 		return germplasmAttributeRequestDto;
 	}
