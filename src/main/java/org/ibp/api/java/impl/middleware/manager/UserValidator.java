@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -69,6 +70,9 @@ public class UserValidator {
 
 	@Autowired
 	protected WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	protected ProgramService programService;
 
 	@Autowired
 	private SecurityService securityService;
@@ -273,7 +277,7 @@ public class UserValidator {
 						this.errors.reject("user.invalid.program.role", new String[] {role.getId().toString()}, "");
 
 					} else {
-						final Project project = this.workbenchDataManager
+						final Project project = this.programService
 							.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
 						if (project == null) {
 							this.errors.reject("user.invalid.crop.program.pair",

@@ -33,7 +33,7 @@ public class ProgramBasicDetailsDtoValidator {
 	private static final char[] INVALID_CHARS = {'\\', '/', ':', '*', '?', '"', '<', '>', '|'};
 
 	@Autowired
-	private ProgramService programService;
+	private ProgramService programServiceMw;
 
 	@Autowired
 	private LocationService locationService;
@@ -52,7 +52,7 @@ public class ProgramBasicDetailsDtoValidator {
 		this.validateDefaultLocationId(errors, programBasicDetailsDto);
 
 		final Optional<ProgramDTO> programDTOOptional =
-			this.programService.getProgramByCropAndName(cropName, programBasicDetailsDto.getName());
+			this.programServiceMw.getProgramByCropAndName(cropName, programBasicDetailsDto.getName());
 		if (programDTOOptional.isPresent()) {
 			errors.reject("program.name.already.exists", new String[] {programBasicDetailsDto.getName(), cropName}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -69,7 +69,7 @@ public class ProgramBasicDetailsDtoValidator {
 		if (programBasicDetailsDto.getName() != null) {
 			this.validateProgramName(errors, programBasicDetailsDto);
 			final Optional<ProgramDTO> programDTOOptional =
-				this.programService.getProgramByCropAndName(cropName, programBasicDetailsDto.getName());
+				this.programServiceMw.getProgramByCropAndName(cropName, programBasicDetailsDto.getName());
 			if (programDTOOptional.isPresent() && !programUUID.equalsIgnoreCase(programDTOOptional.get().getUniqueID())) {
 				errors.reject("program.name.already.exists", new String[] {programBasicDetailsDto.getName(), cropName}, "");
 				throw new ApiRequestValidationException(errors.getAllErrors());

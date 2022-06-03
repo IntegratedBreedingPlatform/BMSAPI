@@ -3,9 +3,9 @@ package org.ibp.api.java.impl.middleware.user;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.security.SecurityUtil;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
 	protected SecurityService securityService;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private ProgramService programService;
 
 	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
 
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
 		try {
-			final Project project = this.workbenchDataManager.getProjectByUuid(projectUUID);
+			final Project project = this.programService.getProjectByUuid(projectUUID);
 			if (project != null) {
 				//TODO Create a new mapper to map from WorkbenchUser to UserDto, out of the scope for IBP-2792
 				final List<WorkbenchUser> workbenchUsers = this.userService.getUsersByProjectId(project.getProjectId());

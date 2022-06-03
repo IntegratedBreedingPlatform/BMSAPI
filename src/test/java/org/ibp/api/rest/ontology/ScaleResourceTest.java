@@ -1,12 +1,10 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.List;
-
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Scale;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -31,7 +29,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.List;
 
 /**
  * Tests to check Scale API Services Extended from {@link ApiUnitTestBase} for basic mock of services and common methods
@@ -61,8 +59,8 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		public ModelService modelService() {
 			return Mockito.mock(ModelService.class);
 		}
-	}
 
+	}
 
 	@Autowired
 	protected ModelService modelService;
@@ -72,9 +70,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private ContextUtil contextUtil;
@@ -88,7 +83,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		final Project project = new Project();
 		project.setUniqueID(PROGRAM_UUID);
 		project.setProjectId(1l);
-		Mockito.doReturn(project).when(this.workbenchDataManager).getLastOpenedProjectAnyUser();
 		Mockito.doReturn(PROGRAM_UUID).when(this.contextUtil).getCurrentProgramUUID();
 		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 
