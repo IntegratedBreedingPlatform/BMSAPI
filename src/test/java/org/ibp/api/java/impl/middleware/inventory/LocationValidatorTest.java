@@ -300,7 +300,7 @@ public class LocationValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testValidateCanBeDeleted_ThrowsException_WhenLocationIsProgramLocationDefault() {
+	public void testValidateCanBeDeleted_ThrowsException_WhenLocationIsProgramBreedingLocationDefault() {
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(new LocationDTO());
 		Mockito.when(this.locationService.isProgramBreedingLocationDefault(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
 
@@ -308,7 +308,21 @@ public class LocationValidatorTest {
 			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(e.getErrors(), hasSize(1));
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.program.default"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.program.breeding.location.default.java.lang.Integer"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testValidateCanBeDeleted_ThrowsException_WhenLocationIsProgramStorageLocationDefault() {
+		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(new LocationDTO());
+		Mockito.when(this.locationService.isProgramStorageLocationDefault(LocationValidatorTest.LOCATION_ID)).thenReturn(true);
+
+		try {
+			this.locationValidator.validateCanBeDeleted(LocationValidatorTest.LOCATION_ID);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(e.getErrors(), hasSize(1));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("location.program.storage.location.default.java.lang.Integer"));
 			throw e;
 		}
 	}
