@@ -5,13 +5,17 @@ import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.location.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +23,19 @@ import java.util.stream.Collectors;
 public class LocationServiceImpl implements LocationService {
 
 	public static final List<Integer> RESTRICTED_LOCATION_TYPES = Arrays.asList(401, 405, 406);
+
+	private enum DEFAULT_LOCATION_TYPE {
+		BREEDING_LOCATION("BREEDING_LOCATION"), STORAGE_LOCATION("STORAGE_LOCATION");
+		private final String name;
+
+		DEFAULT_LOCATION_TYPE(final String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return this.name;
+		}
+	}
 
 	@Autowired
 	private org.generationcp.middleware.api.location.LocationService locationMiddlewareService;
@@ -89,13 +106,19 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public LocationDTO getBreedingLocationDefault(final String programUUID) {
-		return this.locationMiddlewareService.getBreedingLocationDefault(programUUID);
-	}
-
-	@Override
-	public LocationDTO getStorageLocationDefault(final String programUUID) {
-		return this.locationMiddlewareService.getStorageLocationDefault(programUUID);
+	public LocationDTO getDefaultLocation(final String programUUID, final String defaultLocationType) {
+		if(DEFAULT_LOCATION_TYPE.BREEDING_LOCATION.getName().equalsIgnoreCase(defaultLocationType)) {
+			return this.locationMiddlewareService.getDefaultBreedingLocation(programUUID);
+		} else if (DEFAULT_LOCATION_TYPE.STORAGE_LOCATION.getName().equalsIgnoreCase(defaultLocationType)) {
+			return this.locationMiddlewareService.getDefaultStorageLocation(programUUID);
+		} else {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
+			final List<String > defaultLocationTypes =
+				Arrays.stream(DEFAULT_LOCATION_TYPE.values()).map(DEFAULT_LOCATION_TYPE::getName).collect(Collectors.toList());
+			errors.reject("location.invalid.default.location.type",
+				new String[] {String.join(", ", defaultLocationTypes)}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 	}
 
 }

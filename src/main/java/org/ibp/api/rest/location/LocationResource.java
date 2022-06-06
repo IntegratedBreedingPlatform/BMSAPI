@@ -51,22 +51,14 @@ public class LocationResource {
 		return new ResponseEntity<>(this.locationService.getLocation(locationId), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get breeding location default")
-	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/locations/breeding-location-default", method = RequestMethod.GET)
+	@ApiOperation(value = "Get default location")
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/locations/default/{defaultLocationType}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<LocationDTO> getBreedingLocationDefault(
+	public ResponseEntity<LocationDTO> getDefaultLocation(
 		@PathVariable final String cropName,
-		@PathVariable final String programUUID) {
-		return new ResponseEntity<>(this.locationService.getBreedingLocationDefault(programUUID), HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Get storage location default")
-	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/locations/storage-location-default", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<LocationDTO> getStorageLocationDefault(
-		@PathVariable final String cropName,
-		@PathVariable final String programUUID) {
-		return new ResponseEntity<>(this.locationService.getStorageLocationDefault(programUUID), HttpStatus.OK);
+		@PathVariable final String programUUID,
+		@PathVariable final String defaultLocationType) {
+		return new ResponseEntity<>(this.locationService.getDefaultLocation(programUUID, defaultLocationType), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get location types")

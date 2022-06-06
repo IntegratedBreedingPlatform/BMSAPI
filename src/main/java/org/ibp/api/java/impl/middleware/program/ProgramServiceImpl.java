@@ -234,11 +234,14 @@ public class ProgramServiceImpl implements ProgramService {
 		locationSearchRequest.setLocationNameFilter(locationNameFilter);
 
 		final List<LocationDTO> locations = this.locationService.searchLocations(locationSearchRequest, null, null);
+		final Set<Integer> favoriteLocations = new HashSet<>();
 		if (!locations.isEmpty()) {
-			this.programFavoriteService
-				.addProgramFavorites(
-					programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, new HashSet<>(locations.get(0).getId()));
+			favoriteLocations.add(locations.get(0).getId());
 		}
+		// Save location defaults as program favorites
+		favoriteLocations.add(programBasicDetailsDto.getBreedingLocationDefaultId());
+		favoriteLocations.add(programBasicDetailsDto.getStorageLocationDefaultId());
+		this.programFavoriteService.addProgramFavorites(programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, favoriteLocations);
 
 		this.locationService.saveProgramLocationDefault(programDTO.getUniqueID(), programBasicDetailsDto.getBreedingLocationDefaultId(),
 			programBasicDetailsDto.getStorageLocationDefaultId());
