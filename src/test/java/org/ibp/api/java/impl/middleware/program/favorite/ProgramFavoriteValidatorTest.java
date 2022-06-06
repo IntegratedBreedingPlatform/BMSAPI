@@ -125,6 +125,7 @@ public class ProgramFavoriteValidatorTest {
 	public void testValidateDeleteFavorites_ThrowsException_WhenLocationUsedAsDefault(){
 		final ProgramFavorite programFavorite = new ProgramFavorite();
 		programFavorite.setProgramFavoriteId(1);
+		programFavorite.setEntityId(1);
 		Mockito.when(this.programFavoriteService.getProgramFavorites(ArgumentMatchers.any(),
 			ArgumentMatchers.eq(ProgramFavorite.FavoriteType.LOCATION), ArgumentMatchers.eq(null)))
 			.thenReturn(Arrays.asList(programFavorite));
