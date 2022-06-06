@@ -49,9 +49,8 @@ public class ProgramFavoriteResource {
 	public ResponseEntity<Void> deleteFavorites(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@RequestParam(value = "programFavoriteIds", required = true) final Set<Integer> programFavoriteIds) {
-		if (!CollectionUtils.isEmpty(programFavoriteIds)) {
-			programFavoriteService.deleteProgramFavorites(programUUID, programFavoriteIds);
-		}
+		this.programFavoriteValidator.validateDeleteFavorites(programUUID, programFavoriteIds);
+		this.programFavoriteService.deleteProgramFavorites(programUUID, programFavoriteIds);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
