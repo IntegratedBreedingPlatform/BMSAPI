@@ -1,7 +1,6 @@
 package org.ibp.api.rest.program;
 
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.middleware.api.program.ProgramFavoriteDTO;
 import org.generationcp.middleware.api.program.ProgramFavoriteRequestDto;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;

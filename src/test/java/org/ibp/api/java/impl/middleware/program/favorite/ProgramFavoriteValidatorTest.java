@@ -48,14 +48,14 @@ public class ProgramFavoriteValidatorTest {
 
 	@Before
 	public void setup() {
-		programFavoriteRequestDtos = new ProgramFavoriteRequestDto();
+		this.programFavoriteRequestDtos = new ProgramFavoriteRequestDto();
 		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
 	public void testValidateAddFavorites_ThrowsException_WhenEntityListIsEmpty(){
 		try {
-		this.programFavoriteValidator.validateAddFavorites(null, programFavoriteRequestDtos);
+		this.programFavoriteValidator.validateAddFavorites(null, this.programFavoriteRequestDtos);
 			Assert.fail("Should have thrown validation exception for Entity list empty but did not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("program.favorite.entity.list.id.required", e.getErrors().get(0).getCode());

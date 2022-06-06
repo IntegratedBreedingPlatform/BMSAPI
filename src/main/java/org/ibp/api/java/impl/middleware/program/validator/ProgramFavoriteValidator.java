@@ -58,7 +58,7 @@ public class ProgramFavoriteValidator {
 		final List<ProgramFavorite> favorites = this.programFavoriteService.getProgramFavorites(programUUID, favoriteType, entityIds);
 
 		if (!favorites.isEmpty()) {
-			List<Integer> favoritesIds = favorites.stream().map(ProgramFavorite::getEntityId).collect(Collectors.toList());
+			final List<Integer> favoritesIds = favorites.stream().map(ProgramFavorite::getEntityId).collect(Collectors.toList());
 			errors.reject("program.favorite.already.exists", new String[] {
 				String.join(",", Arrays.toString(favoritesIds.toArray())), favoriteType.name()}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -99,7 +99,7 @@ public class ProgramFavoriteValidator {
 			final ProgramLocationDefault programLocationDefault = this.locationService.getProgramLocationDefault(programUUID);
 			final List<Integer> locationDefaults =
 				Arrays.asList(programLocationDefault.getBreedingLocationId(), programLocationDefault.getStorageLocationId());
-			List<Integer> invalidLocationIds = locationDefaults.stream()
+			final List<Integer> invalidLocationIds = locationDefaults.stream()
 				.filter(programFavoriteLocationIds::contains).collect(Collectors.toList());
 			if (CollectionUtils.isNotEmpty(invalidLocationIds)) {
 				errors.reject("program.favorite.location.used.as.default", new String[] {
@@ -141,7 +141,7 @@ public class ProgramFavoriteValidator {
 	}
 
 	private void validateLocationId(final BindingResult errors, final Set<Integer> locationsIds) {
-		final List<Location> locations = locationDataManager.getLocationsByIDs(Lists.newArrayList(locationsIds));
+		final List<Location> locations = this.locationDataManager.getLocationsByIDs(Lists.newArrayList(locationsIds));
 		final List<Integer> locIds = locations.stream().map(Location::getLocid).collect(Collectors.toList());
 
 		locationsIds.removeAll(locIds);
