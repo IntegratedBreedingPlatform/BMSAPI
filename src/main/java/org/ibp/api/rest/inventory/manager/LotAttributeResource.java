@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.ibp.api.java.inventory.manager.LotAttributeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
+
 @Api(value = "Lot Attribute Services")
 @Controller
 public class LotAttributeResource {
@@ -25,6 +28,14 @@ public class LotAttributeResource {
 	private LotAttributeService lotAttributeService;
 
 	private static final String HAS_MANAGE_LOTS = "hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_INVENTORY', 'MANAGE_LOTS')";
+
+	@ApiOperation(value = "Returns lot attributes filtered by lot ID", notes = "Returns lot attributes by lot ID")
+	@RequestMapping(value = "/crops/{cropName}/lot/{lotId}/attributes", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmAttributeDto>> getLotAttributeDtos(@PathVariable final String cropName,
+		@PathVariable final Integer lotId) {
+		return new ResponseEntity<>(this.lotAttributeService.getLotAttributeDtos(lotId), HttpStatus.OK);
+	}
 
 	@ApiOperation(value = "Create attribute for specified lot", notes = "Create attribute for specified lot")
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('UPDATE_LOTS')")
