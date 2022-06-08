@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -66,13 +68,19 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 			response.setErrors(bindingResult.getAllErrors());
 		}
 
-		final List<VariableDTO> variables = this.middlewareVariableServiceBrapi.createObservationVariables(variableDTOList);
-		variables.forEach(ov -> {
-			ov.setCommonCropName(crop);
-			ov.setCrop(crop);
-		});
-		response.setEntityList(variables);
-		response.setCreatedSize(variables.size());
+		if (!CollectionUtils.isEmpty(variableDTOList)) {
+			final List<VariableDTO> variables = this.middlewareVariableServiceBrapi.createObservationVariables(variableDTOList);
+			variables.forEach(ov -> {
+				ov.setCommonCropName(crop);
+				ov.setCrop(crop);
+			});
+			response.setEntityList(variables);
+			response.setCreatedSize(variables.size());
+		} else {
+			response.setEntityList(new ArrayList<>());
+			response.setCreatedSize(0);
+		}
+
 		return response;
 	}
 }
