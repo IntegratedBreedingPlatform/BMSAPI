@@ -17,8 +17,8 @@ public class LotAttributeServiceImpl implements LotAttributeService {
 	private org.generationcp.middleware.service.api.inventory.LotAttributeService lotAttributeService;
 
 	@Override
-	public List<GermplasmAttributeDto> getLotAttributeDtos(final Integer lotId) {
-		return this.lotAttributeService.getLotAttributeDtos(lotId);
+	public List<GermplasmAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
+		return this.lotAttributeService.getLotAttributeDtos(lotId, programUUID);
 	}
 
 	@Override

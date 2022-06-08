@@ -78,6 +78,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		org.generationcp.middleware.domain.ontology.VariableType.SELECTION_METHOD.getId(), //
 		org.generationcp.middleware.domain.ontology.VariableType.ENVIRONMENT_CONDITION.getId(), //
 		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getId(), //
+		org.generationcp.middleware.domain.ontology.VariableType.INVENTORY_ATTRIBUTE.getId(), //
 		org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_PASSPORT.getId());
 
 	@Override

@@ -33,8 +33,9 @@ public class LotAttributeResource {
 	@RequestMapping(value = "/crops/{cropName}/lot/{lotId}/attributes", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<GermplasmAttributeDto>> getLotAttributeDtos(@PathVariable final String cropName,
-		@PathVariable final Integer lotId) {
-		return new ResponseEntity<>(this.lotAttributeService.getLotAttributeDtos(lotId), HttpStatus.OK);
+		@PathVariable final Integer lotId,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.lotAttributeService.getLotAttributeDtos(lotId, programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create attribute for specified lot", notes = "Create attribute for specified lot")

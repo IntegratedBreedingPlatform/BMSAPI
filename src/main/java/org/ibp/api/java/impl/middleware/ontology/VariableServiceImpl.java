@@ -64,6 +64,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		VariableType.SELECTION_METHOD.getId(), //
 		VariableType.ENVIRONMENT_CONDITION.getId(), //
 		VariableType.GERMPLASM_ATTRIBUTE.getId(), //
+		VariableType.INVENTORY_ATTRIBUTE.getId(), //
 		VariableType.GERMPLASM_PASSPORT.getId(),
 		VariableType.ENTRY_DETAIL.getId());
 
