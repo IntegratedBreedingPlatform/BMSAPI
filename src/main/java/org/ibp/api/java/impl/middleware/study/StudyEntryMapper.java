@@ -79,7 +79,6 @@ public class StudyEntryMapper {
 				this.map().setEntryNumber(this.source.getEntryId());
 				this.map().setEntryId(this.source.getEntryId());
 				this.map().setGid(this.source.getGermplasmId());
-				this.map().setDesignation(this.source.getDesignation());
 				this.map().setEntryCode(this.source.getEntryCode());
 			}
 		});
