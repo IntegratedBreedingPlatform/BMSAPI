@@ -3,19 +3,15 @@ package org.ibp.api.java.impl.middleware.program;
 
 import org.generationcp.commons.util.InstallationDirectoryUtil;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
-import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
-import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
-import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ProgramLocationDefault;
-import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
@@ -75,7 +71,6 @@ public class ProgramServiceImpl implements ProgramService {
 	private final InstallationDirectoryUtil installationDirectoryUtil = new InstallationDirectoryUtil();
 
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
 
 	@Override
 	public List<ProgramDTO> listProgramsByCropName(final String cropName) {
@@ -228,17 +223,6 @@ public class ProgramServiceImpl implements ProgramService {
 		this.programBasicDetailsDtoValidator.validateCreation(crop, programBasicDetailsDto);
 
 		final ProgramDTO programDTO = this.programServiceMw.addProgram(crop, programBasicDetailsDto);
-
-		final SqlTextFilter locationNameFilter = new SqlTextFilter(UNSPECIFIED_LOCATION, SqlTextFilter.Type.STARTSWITH);
-		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationNameFilter(locationNameFilter);
-
-		final List<LocationDTO> locations = this.locationService.searchLocations(locationSearchRequest, null, null);
-		if (!locations.isEmpty()) {
-			this.programFavoriteService
-				.addProgramFavorites(
-					programDTO.getUniqueID(), ProgramFavorite.FavoriteType.LOCATION, new HashSet<>(locations.get(0).getId()));
-		}
 
 		this.locationService.saveProgramLocationDefault(programDTO.getUniqueID(), programBasicDetailsDto.getBreedingLocationDefaultId(),
 			programBasicDetailsDto.getStorageLocationDefaultId());
