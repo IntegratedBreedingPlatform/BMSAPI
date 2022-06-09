@@ -188,18 +188,28 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		//Remove OBS_UNIT_ID column if present
 		columns.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
-		final Map<Integer, MeasurementVariable> columnsIndexedByTermId =
-			columns.stream().collect(Collectors.toMap(MeasurementVariable::getTermId, standardVariable -> standardVariable));
-		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
-		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_NO.getId()));
-		orderedColumns.add(columnsIndexedByTermId.remove(TermId.ENTRY_TYPE.getId()));
+		final List<MeasurementVariable> descriptors = new ArrayList<>();
+		final Map<Integer, MeasurementVariable> entryDetails = new HashMap<>();
+		columns.stream().forEach(variable -> {
+			if (variable.getVariableType() == VariableType.ENTRY_DETAIL) {
+				entryDetails.put(variable.getTermId(), variable);
+			} else {
+				descriptors.add(variable);
+			}
+		});
 
-		orderedColumns.addAll(columnsIndexedByTermId.values());
+		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
+		orderedColumns.add(entryDetails.remove(TermId.ENTRY_NO.getId()));
+		orderedColumns.add(entryDetails.remove(TermId.ENTRY_TYPE.getId()));
+
+		orderedColumns.addAll(descriptors);
 
 		//Add Inventory related columns
 		orderedColumns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
 		orderedColumns.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
 		orderedColumns.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
+
+		orderedColumns.addAll(entryDetails.values());
 
 		return orderedColumns;
 	}
