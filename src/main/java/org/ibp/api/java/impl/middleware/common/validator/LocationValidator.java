@@ -199,7 +199,7 @@ public class LocationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
 
 		final LocationDTO locationDTO = this.validateLocation(this.errors, locationId);
-		this.validateLocationTypeRestricted(locationDTO.getType(), "location.with.location.type.restricted.cannot.edited");
+		this.validateLocationNotEditable(locationDTO);
 		this.validateLocationName(locationRequestDto.getName());
 		this.validateLocationType(locationRequestDto.getType());
 		this.validateLocationAbbr(locationRequestDto.getAbbreviation());
@@ -214,7 +214,7 @@ public class LocationValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
 		final LocationDTO locationDTO = this.validateLocation(this.errors, locationId);
-		this.validateLocationTypeRestricted(locationDTO.getType(), "location.with.location.type.restricted.cannot.deleted");
+		this.validateLocationNotDeletable(locationDTO);
 		this.validateLocationNotProgramDefault(locationId);
 		this.validateLocationNotUsedInGermplasm(locationId);
 		this.validateLocationNotUsedInLot(locationId);
@@ -224,6 +224,14 @@ public class LocationValidator {
 		this.validateLocationIsNotDefaultCountry(locationId);
 		this.validateLocationNotUsedInFieldMap(locationDTO);
 
+	}
+
+	private void validateLocationNotDeletable(final LocationDTO locationDTO) {
+		if (Location.UNSPECIFIED_LOCATION.equalsIgnoreCase(locationDTO.getName())) {
+			this.errors.reject("location.not.deletable", new String[] {locationDTO.getId().toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		this.validateLocationTypeRestricted(locationDTO.getType(), "location.with.location.type.restricted.cannot.deleted");
 	}
 
 	private void validateLocationNotProgramDefault(final Integer locationId) {
@@ -236,6 +244,14 @@ public class LocationValidator {
 			this.errors.reject("location.program.storage.location.default", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+	}
+
+	private void validateLocationNotEditable(final LocationDTO locationDTO) {
+		if (Location.UNSPECIFIED_LOCATION.equalsIgnoreCase(locationDTO.getName())) {
+			this.errors.reject("location.not.editable", new String[] {locationDTO.getId().toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		this.validateLocationTypeRestricted(locationDTO.getType(), "location.with.location.type.restricted.cannot.edited");
 	}
 
 	private void validateLocationNotUsedInFieldMap(final LocationDTO locationDTO) {
