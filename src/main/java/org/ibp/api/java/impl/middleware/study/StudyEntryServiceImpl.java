@@ -207,26 +207,26 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public long countAllStudyTestEntries(final Integer studyId) {
 		return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
-			Collections.singletonList(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+			Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
 	}
 
 	@Override
 	public long countAllCheckTestEntries(final Integer studyId, final String programUuid, final Boolean checkOnly) {
 		if(checkOnly) {
 			return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
-				Collections.singletonList(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())));
+				Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())));
 		} else {
 			final List<Enumeration> entryTypes = this.entryTypeService.getEntryTypes(programUuid);
-			final List<String> checkEntryTypeIds = entryTypes.stream()
+			final List<Integer> checkEntryTypeIds = entryTypes.stream()
 				.filter(entryType -> entryType.getId() != SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())
-				.map(entryType -> String.valueOf(entryType.getId())).collect(Collectors.toList());
+				.map(entryType -> entryType.getId()).collect(Collectors.toList());
 			return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId, checkEntryTypeIds);
 		}
 	}
 
   @Override public long countAllNonReplicatedTestEntries(final Integer studyId) {
 	return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
-			Collections.singletonList(String.valueOf(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())));
+			Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())));
   }
 
   @Override

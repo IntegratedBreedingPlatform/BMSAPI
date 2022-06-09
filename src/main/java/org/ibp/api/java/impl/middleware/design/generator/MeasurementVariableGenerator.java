@@ -45,7 +45,7 @@ public class MeasurementVariableGenerator {
 			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getId();
 		final Set<MeasurementVariable> measurementVariables =
 			new HashSet<>(this.datasetService.getDatasetMeasurementVariablesByVariableType(plotDatasetId,
-				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId())));
+				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId())));
 
 		measurementVariables.addAll(
 			this.convertToMeasurementVariables(experimentDesignFactors, VariableType.ENVIRONMENT_DETAIL, experimentalDesignInput,
