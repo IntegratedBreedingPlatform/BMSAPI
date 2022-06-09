@@ -93,6 +93,8 @@ public class StudyEntryResource {
 		@PathVariable final Integer studyId) {
 
 		this.studyEntryService.deleteStudyEntries(studyId);
+		// TODO: this action must be moved to study PATH resource
+		this.studyEntryService.fillWithCrossExpansion(studyId, null);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
@@ -197,6 +199,17 @@ public class StudyEntryResource {
 		BaseValidator.checkArgument(levelInt > 0 && levelInt <= 10 , "error.generationlevel.max");
 		this.studyEntryService.fillWithCrossExpansion(studyId, levelInt);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation("Get cross expansion level for study")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/pedigree-generation-level", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Integer> getCrossExpansionLevel(@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@RequestParam(required = false) final String programUUID) {
+		final Integer crossExpansionLevel = this.studyEntryService.getCrossExpansionLevel(studyId);
+		return new ResponseEntity<>(crossExpansionLevel, HttpStatus.OK);
 	}
 
 	@ApiIgnore

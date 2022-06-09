@@ -249,6 +249,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
+	public Integer getCrossExpansionLevel(final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
+		return this.middlewareStudyEntryService.getCrossGenerationLevel(studyId);
+	}
+
+	@Override
 	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId) {
 		this.studyValidator.validate(studyId, false);
 		return this.middlewareStudyEntryService.getStudyEntryColumns(studyId);
