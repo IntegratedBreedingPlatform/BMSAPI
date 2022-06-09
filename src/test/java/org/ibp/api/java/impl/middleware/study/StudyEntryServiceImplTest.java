@@ -169,13 +169,13 @@ public class StudyEntryServiceImplTest {
 		final Long nonReplicatedEntriesCount = Long.valueOf(3);
 
 		Mockito.when(this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
-			Collections.singletonList(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()))))
+			Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()))))
 			.thenReturn(testEntriesCount);
 		Mockito.when(this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
-			Collections.singletonList(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()))))
+			Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()))))
 			.thenReturn(checkEntriesCount);
 		Mockito.when(this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
-				Collections.singletonList(String.valueOf(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId()))))
+				Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId()))))
 				.thenReturn(nonReplicatedEntriesCount);
 
 		final List<Enumeration> enumerations = new ArrayList<>();
@@ -190,13 +190,13 @@ public class StudyEntryServiceImplTest {
 
 		Mockito.when(this.entryTypeService.getEntryTypes(programUUID)).thenReturn(enumerations);
 
-		final List<String> checkEntryTypeIds = enumerations.stream()
+		final List<Integer> checkEntryTypeIds = enumerations.stream()
 			.filter(entryType -> entryType.getId() != SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())
-			.map(entryType -> String.valueOf(entryType.getId())).collect(Collectors.toList());
+			.map(entryType -> entryType.getId()).collect(Collectors.toList());
 
-		final List<String> nonReplicatedEntryTypeIds = enumerations.stream()
+		final List<Integer> nonReplicatedEntryTypeIds = enumerations.stream()
 				.filter(entryType -> entryType.getId() == SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())
-				.map(entryType -> String.valueOf(entryType.getId())).collect(Collectors.toList());
+				.map(entryType -> entryType.getId()).collect(Collectors.toList());
 
 
 		Mockito.when(this.middlewareStudyEntryService
