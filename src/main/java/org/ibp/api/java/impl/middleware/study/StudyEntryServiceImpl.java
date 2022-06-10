@@ -44,10 +44,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -192,7 +192,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		columns.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
 		final List<MeasurementVariable> descriptors = new ArrayList<>();
-		final Map<Integer, MeasurementVariable> entryDetails = new HashMap<>();
+		// Using LinkedHashMap to preserve the order by rank of the variables
+		final Map<Integer, MeasurementVariable> entryDetails = new LinkedHashMap<>();
 		columns.stream().forEach(variable -> {
 			if (variable.getVariableType() == VariableType.ENTRY_DETAIL) {
 				entryDetails.put(variable.getTermId(), variable);
@@ -201,29 +202,29 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			}
 		});
 
+		final List<MeasurementVariable> sortedColumns = new ArrayList<>();
+		sortedColumns.add(entryDetails.remove(TermId.ENTRY_NO.getId()));
+		// Despite ENTRY_TYPE should mandatory, the user can import a study without it via 'Import datasets' module.
+		if (entryDetails.containsKey(TermId.ENTRY_TYPE.getId())) {
+			sortedColumns.add(entryDetails.remove(TermId.ENTRY_TYPE.getId()));
+		}
+
+		// Sort descriptors by how they are arranged in StudyEntryDescriptorColumns::rank
 		descriptors.sort(
 			Comparator.nullsLast(Comparator.comparing(descriptor -> {
 				final StudyEntryDescriptorColumns column = StudyEntryDescriptorColumns.getByTermId(descriptor.getTermId());
 				return column == null ? Integer.MAX_VALUE : column.getRank();
 			})));
-
-		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
-		orderedColumns.add(entryDetails.remove(TermId.ENTRY_NO.getId()));
-		// Despite ENTRY_TYPE is mandatory, the user can import a study without it via 'Import datasets' module.
-		if (entryDetails.containsKey(TermId.ENTRY_TYPE.getId())) {
-			orderedColumns.add(entryDetails.remove(TermId.ENTRY_TYPE.getId()));
-		}
-
-		orderedColumns.addAll(descriptors);
+		sortedColumns.addAll(descriptors);
 
 		//Add Inventory related columns
-		orderedColumns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
-		orderedColumns.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
-		orderedColumns.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
+		sortedColumns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
+		sortedColumns.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
+		sortedColumns.add(this.buildVirtualColumn("UNIT", TermId.GID_UNIT));
 
-		orderedColumns.addAll(entryDetails.values());
+		sortedColumns.addAll(entryDetails.values());
 
-		return orderedColumns;
+		return sortedColumns;
 	}
 
 	@Override
