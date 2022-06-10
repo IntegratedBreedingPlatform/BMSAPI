@@ -82,7 +82,8 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		BaseValidator.checkNotNull(stockPropertyId, "param.null", new String[] {"stockPropertyId"});
 
 		this.studyValidator.validate(studyId, true);
-		this.validateObservationBelongsToStudy(studyId, stockPropertyId);
+		final StockProperty stockProperty = this.validateObservationBelongsToStudy(studyId, stockPropertyId);
+		this.validateNotDeletingEntryType(stockProperty);
 
 		this.studyEntryObservationService.deleteObservation(stockPropertyId);
 	}
@@ -164,7 +165,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		}
 	}
 
-	private void validateObservationBelongsToStudy(final Integer studyId, final Integer observationId) {
+	private StockProperty validateObservationBelongsToStudy(final Integer studyId, final Integer observationId) {
 		final StockProperty stockProperty = this.middlewareStudyEntryService.getByStockPropertyId(observationId);
 		if (stockProperty == null) {
 			this.errors.reject("study.entry.observation.not-found", new String[] {String.valueOf(observationId)}, "");
@@ -173,6 +174,14 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 
 		if (!stockProperty.getStock().getProject().getProjectId().equals(studyId)) {
 			this.errors.reject("study.entry.observation.must.belong.to.study", new String[] {String.valueOf(observationId), String.valueOf(studyId)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		return stockProperty;
+	}
+
+	private void validateNotDeletingEntryType(final StockProperty stockProperty) {
+		if (stockProperty.getTypeId() == TermId.ENTRY_TYPE.getId()) {
+			this.errors.reject("study.entry.observation.entry-type.cannot.deleted", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
