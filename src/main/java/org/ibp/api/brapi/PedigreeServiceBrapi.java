@@ -7,6 +7,6 @@ import java.util.Map;
 
 public interface PedigreeServiceBrapi {
 
-	List<PedigreeNodeDTO> updatePedigree(Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap);
+	List<PedigreeNodeDTO> updatePedigreeNodes(Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap);
 
 }

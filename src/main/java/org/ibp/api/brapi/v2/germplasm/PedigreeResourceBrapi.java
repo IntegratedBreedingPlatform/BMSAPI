@@ -2,8 +2,8 @@ package org.ibp.api.brapi.v2.germplasm;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.api.brapi.PedigreeServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
+import org.ibp.api.brapi.PedigreeServiceBrapi;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Result;
@@ -30,7 +30,7 @@ public class PedigreeResourceBrapi {
 	@ApiOperation(value = "Send a list of pedigree nodes to update existing information on a server", notes = "Send a list of pedigree nodes to update existing information on a server")
 	@RequestMapping(value = "/{crop}/brapi/v2/pedigree", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<EntityListResponse<PedigreeNodeDTO>> updatePedigree(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<PedigreeNodeDTO>> updatePedigreeNodes(@PathVariable final String crop,
 		@RequestBody final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap) {
 		final List<PedigreeNodeDTO> pedigreeNodeDTOList = this.pedigreeServiceBrapi.updatePedigreeNodes(pedigreeNodeDTOMap);
 		final Result<PedigreeNodeDTO> results = new Result<PedigreeNodeDTO>().withData(pedigreeNodeDTOList);
