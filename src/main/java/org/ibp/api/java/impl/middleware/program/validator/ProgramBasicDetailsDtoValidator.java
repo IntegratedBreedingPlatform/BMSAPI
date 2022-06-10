@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.program.validator;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
@@ -17,10 +16,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class ProgramBasicDetailsDtoValidator {
@@ -40,7 +42,8 @@ public class ProgramBasicDetailsDtoValidator {
 		BaseValidator.checkNotNull(programBasicDetailsDto, "param.null", new String[] {"request body"});
 		BaseValidator.checkNotEmpty(programBasicDetailsDto.getName(), "param.null", new String[] {"name"});
 		BaseValidator.checkNotEmpty(programBasicDetailsDto.getStartDate(), "param.null", new String[] {"startDate"});
-		BaseValidator.checkNotEmpty(programBasicDetailsDto.getDefaultLocationId(), "param.null", new String[] {"defaultLocationId"});
+		BaseValidator.checkNotEmpty(programBasicDetailsDto.getBreedingLocationDefaultId(), "param.null", new String[] {"breedingLocationDefaultId"});
+		BaseValidator.checkNotEmpty(programBasicDetailsDto.getStorageLocationDefaultId(), "param.null", new String[] {"storageLocationDefaultId"});
 
 		this.validateStartDate(errors, programBasicDetailsDto);
 		this.validateProgramName(errors, programBasicDetailsDto);
@@ -71,7 +74,7 @@ public class ProgramBasicDetailsDtoValidator {
 			}
 		}
 
-		if (programBasicDetailsDto.getDefaultLocationId() != null) {
+		if (programBasicDetailsDto.getBreedingLocationDefaultId() != null) {
 			this.validateDefaultLocationId(errors, programBasicDetailsDto);
 		}
 
@@ -103,11 +106,20 @@ public class ProgramBasicDetailsDtoValidator {
 
 	private void validateDefaultLocationId(final BindingResult errors, final ProgramBasicDetailsDto programBasicDetailsDto) {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationIds(Collections.singletonList(programBasicDetailsDto.getDefaultLocationId()));
+		locationSearchRequest.setLocationIds(Arrays.asList(programBasicDetailsDto.getBreedingLocationDefaultId(),
+			programBasicDetailsDto.getStorageLocationDefaultId()));
 
 		final List<LocationDTO> locations = this.locationService.searchLocations(locationSearchRequest, null, null);
-		if (CollectionUtils.isEmpty(locations)) {
-			errors.reject("program.default.location.id.invalid", "");
+		final Map<Integer, LocationDTO> locationDTOMap =
+			locations.stream().collect(Collectors.toMap(LocationDTO::getId, Function.identity()));
+
+		if (!locationDTOMap.containsKey(programBasicDetailsDto.getBreedingLocationDefaultId())) {
+			errors.reject("program.breeding.location.default.id.invalid", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		if (!locationDTOMap.containsKey(programBasicDetailsDto.getStorageLocationDefaultId())) {
+			errors.reject("program.storage.location.default.id.invalid", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}

@@ -118,7 +118,7 @@ public class StudyInstanceServiceImplTest {
 			this.middlewareStudyInstanceService.createStudyInstances(this.maizeCropType, studyId, datasetId, programDefaultLocation.getId(),
 				1))
 			.thenReturn(Collections.singletonList(newStudyInstance));
-		when(this.locationService.getDefaultLocation(programUUID)).thenReturn(programDefaultLocation);
+		when(this.locationService.getDefaultBreedingLocation(programUUID)).thenReturn(programDefaultLocation);
 
 		final List<org.ibp.api.domain.study.StudyInstance>
 			result = this.studyInstanceService.createStudyInstances(this.maizeCropType.getCropName(), studyId, programUUID, 1);
