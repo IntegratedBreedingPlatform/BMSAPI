@@ -210,7 +210,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
 		orderedColumns.add(entryDetails.remove(TermId.ENTRY_NO.getId()));
 		// Despite ENTRY_TYPE is mandatory, the user can import a study without it via 'Import datasets' module.
-		if (entryDetails.containsKey(TermId.ENTRY_TYPE)) {
+		if (entryDetails.containsKey(TermId.ENTRY_TYPE.getId())) {
 			orderedColumns.add(entryDetails.remove(TermId.ENTRY_TYPE.getId()));
 		}
 
