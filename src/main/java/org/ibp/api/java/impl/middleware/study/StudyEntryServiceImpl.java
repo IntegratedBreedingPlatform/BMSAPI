@@ -16,6 +16,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
@@ -39,12 +40,14 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -197,6 +200,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				descriptors.add(variable);
 			}
 		});
+
+		descriptors.sort(
+			Comparator.nullsLast(Comparator.comparing(descriptor -> {
+				final StudyEntryDescriptorColumns column = StudyEntryDescriptorColumns.getByTermId(descriptor.getTermId());
+				return column == null ? Integer.MAX_VALUE : column.getRank();
+			})));
 
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
 		orderedColumns.add(entryDetails.remove(TermId.ENTRY_NO.getId()));
