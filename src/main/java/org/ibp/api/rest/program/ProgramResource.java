@@ -126,7 +126,7 @@ public class ProgramResource {
 
     @ApiOperation(value = "Edit a program", notes = "Edit a program")
     @RequestMapping(value = "/crops/{cropName}/programs/{programUUID}", method = RequestMethod.PATCH)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
     public ResponseEntity<Void> editProgram(@PathVariable final String cropName, @PathVariable final String programUUID,
         @RequestBody final ProgramBasicDetailsDto programBasicDetailsDto) {
         final boolean updateExecuted = this.programService.editProgram(cropName, programUUID, programBasicDetailsDto);
