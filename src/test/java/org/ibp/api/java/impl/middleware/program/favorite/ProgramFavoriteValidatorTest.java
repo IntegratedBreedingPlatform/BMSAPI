@@ -2,13 +2,14 @@ package org.ibp.api.java.impl.middleware.program.favorite;
 
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.program.ProgramFavoriteRequestDto;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.program.validator.ProgramFavoriteValidator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,7 +39,7 @@ public class ProgramFavoriteValidatorTest {
 	private ProgramFavoriteService programFavoriteService;
 
 	@Mock
-	private LocationValidator locationValidator;
+	private LocationService locationService;
 
 	@InjectMocks
 	private ProgramFavoriteValidator programFavoriteValidator;
@@ -47,14 +48,14 @@ public class ProgramFavoriteValidatorTest {
 
 	@Before
 	public void setup() {
-		programFavoriteRequestDtos = new ProgramFavoriteRequestDto();
+		this.programFavoriteRequestDtos = new ProgramFavoriteRequestDto();
 		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
 	public void testValidateAddFavorites_ThrowsException_WhenEntityListIsEmpty(){
 		try {
-		this.programFavoriteValidator.validateAddFavorites(null, programFavoriteRequestDtos);
+		this.programFavoriteValidator.validateAddFavorites(null, this.programFavoriteRequestDtos);
 			Assert.fail("Should have thrown validation exception for Entity list empty but did not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("program.favorite.entity.list.id.required", e.getErrors().get(0).getCode());
@@ -117,6 +118,27 @@ public class ProgramFavoriteValidatorTest {
 			Assert.fail("Should have thrown validation exception for method id unexisting but did not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("program.favorite.breeding.methods.not.identified", e.getErrors().get(0).getCode());
+		}
+	}
+
+	@Test
+	public void testValidateDeleteFavorites_ThrowsException_WhenLocationUsedAsDefault(){
+		final ProgramFavorite programFavorite = new ProgramFavorite();
+		programFavorite.setProgramFavoriteId(1);
+		programFavorite.setEntityId(1);
+		Mockito.when(this.programFavoriteService.getProgramFavorites(ArgumentMatchers.any(),
+			ArgumentMatchers.eq(ProgramFavorite.FavoriteType.LOCATION), ArgumentMatchers.eq(null)))
+			.thenReturn(Arrays.asList(programFavorite));
+		final ProgramLocationDefault programLocationDefault = new ProgramLocationDefault();
+		programLocationDefault.setStorageLocationId(1);
+		programLocationDefault.setBreedingLocationId(1);
+		Mockito.when(this.locationService.getProgramLocationDefault(ArgumentMatchers.any()))
+			.thenReturn(programLocationDefault);
+		try {
+			this.programFavoriteValidator.validateDeleteFavorites(null, new HashSet<>(Arrays.asList(1)));
+			Assert.fail("Should have thrown validation exception for program favorite location used as default but did not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertEquals("program.favorite.location.used.as.default", e.getErrors().get(0).getCode());
 		}
 	}
 }
