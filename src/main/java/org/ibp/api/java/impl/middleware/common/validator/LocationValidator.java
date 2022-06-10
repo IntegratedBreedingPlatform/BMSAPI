@@ -40,8 +40,6 @@ public class LocationValidator {
 	private static final Set<Integer> STORAGE_LOCATION_TYPE = new HashSet<>(Arrays.asList(1500));
 	private static final Integer LOCATION_NAME_MAX_LENGTH = 60;
 	private static final Integer LOCATION_ABBR_MAX_LENGTH = 12;
-	private static final Set<String> LOCATIONS_NOT_DELETABLES =
-		new HashSet<>(Arrays.asList("Unspecified Location", "Default Seed Store", "Default Breeding Location"));
 	private static final List<Integer> RESTRICTED_LOCATION_TYPES = Arrays.asList(401, 405, 406);
 	@Autowired
 	private LocationDataManager locationDataManager;
@@ -229,7 +227,7 @@ public class LocationValidator {
 	}
 
 	private void validateLocationNotDeletable(final LocationDTO locationDTO) {
-		if (LOCATIONS_NOT_DELETABLES.contains(locationDTO.getName()) || locationDTO.isDefaultLocation()) {
+		if (Location.UNSPECIFIED_LOCATION.equalsIgnoreCase(locationDTO.getName())) {
 			this.errors.reject("location.not.deletable", new String[] {locationDTO.getId().toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -237,14 +235,19 @@ public class LocationValidator {
 	}
 
 	private void validateLocationNotProgramDefault(final Integer locationId) {
-		if (this.locationService.isProgramLocationDefault(locationId)) {
-			this.errors.reject("location.program.default", new String[] {locationId.toString()}, "");
+		if (this.locationService.isProgramBreedingLocationDefault(locationId)) {
+			this.errors.reject("location.program.breeding.location.default", new String[] {locationId.toString()}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		if (this.locationService.isProgramStorageLocationDefault(locationId)) {
+			this.errors.reject("location.program.storage.location.default", new String[] {locationId.toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
 	private void validateLocationNotEditable(final LocationDTO locationDTO) {
-		if (LOCATIONS_NOT_DELETABLES.contains(locationDTO.getName())) {
+		if (Location.UNSPECIFIED_LOCATION.equalsIgnoreCase(locationDTO.getName())) {
 			this.errors.reject("location.not.editable", new String[] {locationDTO.getId().toString()}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}

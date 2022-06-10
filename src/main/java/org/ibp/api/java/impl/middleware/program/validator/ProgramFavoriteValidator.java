@@ -5,6 +5,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.program.ProgramFavoriteRequestDto;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -12,9 +13,9 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -29,10 +30,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class ProgramFavoriteValidator {
-
-	@Autowired
-	private LocationValidator locationValidator;
-
 	@Autowired
 	private LocationDataManager locationDataManager;
 
@@ -44,6 +41,9 @@ public class ProgramFavoriteValidator {
 
 	@Autowired
 	private ProgramFavoriteService programFavoriteService;
+
+	@Autowired
+	private LocationService locationService;
 
 	public void validateAddFavorites(final String programUUID, final ProgramFavoriteRequestDto programFavoriteRequestDtos) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), ProgramFavoriteRequestDto.class.getName());
@@ -58,7 +58,7 @@ public class ProgramFavoriteValidator {
 		final List<ProgramFavorite> favorites = this.programFavoriteService.getProgramFavorites(programUUID, favoriteType, entityIds);
 
 		if (!favorites.isEmpty()) {
-			List<Integer> favoritesIds = favorites.stream().map(ProgramFavorite::getEntityId).collect(Collectors.toList());
+			final List<Integer> favoritesIds = favorites.stream().map(ProgramFavorite::getEntityId).collect(Collectors.toList());
 			errors.reject("program.favorite.already.exists", new String[] {
 				String.join(",", Arrays.toString(favoritesIds.toArray())), favoriteType.name()}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -81,6 +81,34 @@ public class ProgramFavoriteValidator {
 		}
 
 	}
+
+	public void validateDeleteFavorites(final String programUUID, final Set<Integer> entityIds) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		if (CollectionUtils.isEmpty(entityIds)) {
+			errors.reject("program.favorite.entity.list.id.required", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final List<ProgramFavorite> favoriteLocations =
+			this.programFavoriteService.getProgramFavorites(programUUID, ProgramFavorite.FavoriteType.LOCATION, null);
+		final List<Integer> programFavoriteLocationIds =
+			favoriteLocations.stream().filter(pf ->entityIds.contains(pf.getProgramFavoriteId()))
+				.map(ProgramFavorite::getEntityId).collect(Collectors.toList());
+
+		if(CollectionUtils.isNotEmpty(programFavoriteLocationIds)) {
+			final ProgramLocationDefault programLocationDefault = this.locationService.getProgramLocationDefault(programUUID);
+			final List<Integer> locationDefaults =
+				Arrays.asList(programLocationDefault.getBreedingLocationId(), programLocationDefault.getStorageLocationId());
+			final List<Integer> invalidLocationIds = locationDefaults.stream()
+				.filter(programFavoriteLocationIds::contains).collect(Collectors.toList());
+			if (CollectionUtils.isNotEmpty(invalidLocationIds)) {
+				errors.reject("program.favorite.location.used.as.default", new String[] {
+					String.join(",", Arrays.toString(invalidLocationIds.toArray()))}, "");
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+		}
+	}
+
 
 	private void validateVariableId(final BindingResult errors, final String programUUID, final Set<Integer> variableIds) {
 		final VariableFilter variableFilter = new VariableFilter();
@@ -113,7 +141,7 @@ public class ProgramFavoriteValidator {
 	}
 
 	private void validateLocationId(final BindingResult errors, final Set<Integer> locationsIds) {
-		final List<Location> locations = locationDataManager.getLocationsByIDs(Lists.newArrayList(locationsIds));
+		final List<Location> locations = this.locationDataManager.getLocationsByIDs(Lists.newArrayList(locationsIds));
 		final List<Integer> locIds = locations.stream().map(Location::getLocid).collect(Collectors.toList());
 
 		locationsIds.removeAll(locIds);

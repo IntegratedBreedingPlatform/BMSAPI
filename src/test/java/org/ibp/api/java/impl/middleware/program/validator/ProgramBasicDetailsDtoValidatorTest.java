@@ -74,7 +74,8 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
 		programBasicDetailsDto.setName(RandomStringUtils.randomAlphabetic(10));
 		programBasicDetailsDto.setStartDate("4040202020");
-		programBasicDetailsDto.setDefaultLocationId(1);
+		programBasicDetailsDto.setBreedingLocationDefaultId(1);
+		programBasicDetailsDto.setStorageLocationDefaultId(6000);
 		try {
 			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
@@ -87,7 +88,8 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
 		programBasicDetailsDto.setName(RandomStringUtils.randomAlphabetic(300));
 		programBasicDetailsDto.setStartDate("2020-10-10");
-		programBasicDetailsDto.setDefaultLocationId(1);
+		programBasicDetailsDto.setBreedingLocationDefaultId(1);
+		programBasicDetailsDto.setStorageLocationDefaultId(6000);
 		try {
 			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
@@ -103,10 +105,13 @@ public class ProgramBasicDetailsDtoValidatorTest {
 		programDTO.setName(programName);
 		programBasicDetailsDto.setName(programName);
 		programBasicDetailsDto.setStartDate("2020-10-10");
-		programBasicDetailsDto.setDefaultLocationId(1);
+		programBasicDetailsDto.setBreedingLocationDefaultId(1);
+		programBasicDetailsDto.setStorageLocationDefaultId(1);
 		Mockito.when(this.programService.getProgramByCropAndName(this.cropName, programName)).thenReturn(Optional.of(programDTO));
+		final LocationDTO locationDTO = new LocationDTO();
+		locationDTO.setId(1);
 		Mockito.when(this.locationService.searchLocations(ArgumentMatchers.any(LocationSearchRequest.class),
-			ArgumentMatchers.isNull(), ArgumentMatchers.isNull())).thenReturn(Collections.singletonList(new LocationDTO()));
+			ArgumentMatchers.isNull(), ArgumentMatchers.isNull())).thenReturn(Collections.singletonList(locationDTO));
 		try {
 			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
@@ -130,18 +135,40 @@ public class ProgramBasicDetailsDtoValidatorTest {
 	}
 
 	@Test
-	public void testValidateCreation_throwsException_whenDefaultLocationIdIsInvalid() {
+	public void testValidateCreation_throwsException_whenBreedingLocationDefaultIdIsInvalid() {
 		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
 		final String programName = RandomStringUtils.randomAlphabetic(20);
 		final ProgramDTO programDTO = new ProgramDTO();
 		programDTO.setName(programName);
 		programBasicDetailsDto.setName(programName);
 		programBasicDetailsDto.setStartDate("2020-10-10");
-		programBasicDetailsDto.setDefaultLocationId(1);
+		programBasicDetailsDto.setBreedingLocationDefaultId(1);
+		programBasicDetailsDto.setStorageLocationDefaultId(6000);
+		final LocationDTO locationDTO = new LocationDTO();
+		locationDTO.setId(1);
+		Mockito.when(this.locationService.searchLocations(ArgumentMatchers.any(LocationSearchRequest.class),
+			ArgumentMatchers.isNull(), ArgumentMatchers.isNull())).thenReturn(Collections.singletonList(locationDTO));
 		try {
 			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.default.location.id.invalid"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.storage.location.default.id.invalid"));
+		}
+	}
+
+	@Test
+	public void testValidateCreation_throwsException_whenStorageLocationDefaultIdIsInvalid() {
+		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
+		final String programName = RandomStringUtils.randomAlphabetic(20);
+		final ProgramDTO programDTO = new ProgramDTO();
+		programDTO.setName(programName);
+		programBasicDetailsDto.setName(programName);
+		programBasicDetailsDto.setStartDate("2020-10-10");
+		programBasicDetailsDto.setBreedingLocationDefaultId(1);
+		programBasicDetailsDto.setStorageLocationDefaultId(6000);
+		try {
+			this.programBasicDetailsDtoValidator.validateCreation(this.cropName, programBasicDetailsDto);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.breeding.location.default.id.invalid"));
 		}
 	}
 
