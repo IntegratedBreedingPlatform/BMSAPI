@@ -1,7 +1,6 @@
 package org.ibp.api.rest.program;
 
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.middleware.api.program.ProgramFavoriteDTO;
 import org.generationcp.middleware.api.program.ProgramFavoriteRequestDto;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
@@ -49,9 +48,8 @@ public class ProgramFavoriteResource {
 	public ResponseEntity<Void> deleteFavorites(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@RequestParam(value = "programFavoriteIds", required = true) final Set<Integer> programFavoriteIds) {
-		if (!CollectionUtils.isEmpty(programFavoriteIds)) {
-			programFavoriteService.deleteProgramFavorites(programUUID, programFavoriteIds);
-		}
+		this.programFavoriteValidator.validateDeleteFavorites(programUUID, programFavoriteIds);
+		this.programFavoriteService.deleteProgramFavorites(programUUID, programFavoriteIds);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
