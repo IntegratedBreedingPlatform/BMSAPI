@@ -210,11 +210,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		}
 
 		// Sort descriptors by how they are arranged in StudyEntryDescriptorColumns::rank
-		descriptors.sort(
-			Comparator.nullsLast(Comparator.comparing(descriptor -> {
-				final StudyEntryDescriptorColumns column = StudyEntryDescriptorColumns.getByTermId(descriptor.getTermId());
-				return column == null ? Integer.MAX_VALUE : column.getRank();
-			})));
+		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
 
 		//Add Inventory related columns
