@@ -112,15 +112,6 @@ public class ObservationImportRequestValidatorTest {
     }
 
     @Test
-    public void testPruneObservationInvalidForImport_NoGermplasmDbId() {
-        final List<ObservationDto> observationDtos = this.createObservationDtoList();
-        observationDtos.get(0).setGermplasmDbId(null);
-        final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
-        Assert.assertTrue(result.hasErrors());
-        Assert.assertEquals("observation.import.germplasmDbId.required", result.getAllErrors().get(0).getCode());
-    }
-
-    @Test
     public void testPruneObservationInvalidForImport_NonNumericValue() {
         final List<ObservationDto> observationDtos = this.createObservationDtoList();
         observationDtos.get(0).setValue(RandomStringUtils.randomAlphabetic(5));
@@ -150,15 +141,6 @@ public class ObservationImportRequestValidatorTest {
         final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
         Assert.assertTrue(result.hasErrors());
         Assert.assertEquals("observation.import.value.invalid.date", result.getAllErrors().get(0).getCode());
-    }
-
-    @Test
-    public void testPruneObservationInvalidForImport_NoStudyDbId() {
-        final List<ObservationDto> observationDtos = this.createObservationDtoList();
-        observationDtos.get(0).setStudyDbId(null);
-        final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
-        Assert.assertTrue(result.hasErrors());
-        Assert.assertEquals("observation.import.studyDbId.required", result.getAllErrors().get(0).getCode());
     }
 
     @Test
