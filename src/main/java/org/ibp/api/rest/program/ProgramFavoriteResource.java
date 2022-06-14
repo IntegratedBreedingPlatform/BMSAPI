@@ -31,7 +31,7 @@ public class ProgramFavoriteResource {
 
 	@ApiOperation(value = "Add Favorites", notes = "Add Favorites")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/favorites", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	@ResponseBody
 	public ResponseEntity<List<ProgramFavoriteDTO>> addFavorite(@PathVariable final String cropName,
 		@PathVariable final String programUUID, @RequestBody final ProgramFavoriteRequestDto programFavoriteRequestDtos) {
@@ -44,7 +44,7 @@ public class ProgramFavoriteResource {
 
 	@ApiOperation(value = "Delete Favorites", notes = "Delete Favorites")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/favorites", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	public ResponseEntity<Void> deleteFavorites(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@RequestParam(value = "programFavoriteIds", required = true) final Set<Integer> programFavoriteIds) {
