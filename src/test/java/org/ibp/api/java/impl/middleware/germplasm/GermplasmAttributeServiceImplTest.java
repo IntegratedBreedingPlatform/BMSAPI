@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmAttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;

@@ -1,9 +1,8 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
-import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
+import org.generationcp.middleware.domain.shared.RecordAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
@@ -58,9 +57,9 @@ public class GermplasmAttributeValidator extends AttributeValidator{
 
 	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final AttributeRequestDto dto) {
 		//FIXME Search by gid and variableId, to be addressed in IBP-4765
-		final List<GermplasmAttributeDto> germplasmAttributeDtos =
+		final List<RecordAttributeDto> germplasmAttributeDtos =
 			this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
-		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
+		final List<RecordAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getVariableId().equals(dto.getVariableId())).collect(Collectors.toList());
 		if (!existingGermplasmAttributes.isEmpty()) {
 			errors.reject("attribute.name.invalid.existing", new String[] {"Germplasm", existingGermplasmAttributes.get(0).getVariableName()}, "");
@@ -69,9 +68,9 @@ public class GermplasmAttributeValidator extends AttributeValidator{
 	}
 
 	public void validateGermplasmAttributeExists(final BindingResult errors, final Integer gid, final Integer attributeId) {
-		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
+		final List<RecordAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid,
 			null, null);
-		final List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
+		final List<RecordAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if(existingGermplasmAttributes.isEmpty()) {
 			errors.reject("attribute.id.invalid.not.existing", new String[] {"Germplasm", String.valueOf(attributeId)}, "");
@@ -82,10 +81,10 @@ public class GermplasmAttributeValidator extends AttributeValidator{
 	void validateGermplasmAttributeForUpdate(final BindingResult errors, final Integer gid, final AttributeRequestDto dto,
 		final Integer attributeId) {
 		//FIXME Search by attributeId, to be addressed in IBP-4765
-		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
+		final List<RecordAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(gid, null, null);
 
 		// Filter by germplasm attribute id
-		List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
+		List<RecordAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if(existingGermplasmAttributes.isEmpty()) {
 			errors.reject("attribute.id.invalid.not.existing", new String[] {"Germplasm", String.valueOf(attributeId)}, "");

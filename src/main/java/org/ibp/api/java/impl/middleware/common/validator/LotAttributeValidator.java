@@ -1,8 +1,8 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
+import org.generationcp.middleware.domain.shared.RecordAttributeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -59,9 +59,9 @@ public class LotAttributeValidator extends AttributeValidator{
 	}
 
 	void validateLotAttributeShouldNotExist(final BindingResult errors, final Integer lotId, final AttributeRequestDto dto) {
-		final List<GermplasmAttributeDto> lotAttributeDtos =
+		final List<RecordAttributeDto> lotAttributeDtos =
 			this.lotAttributeService.getLotAttributeDtos(lotId, null);
-		final List<GermplasmAttributeDto> existingLotAttributes = lotAttributeDtos.stream()
+		final List<RecordAttributeDto> existingLotAttributes = lotAttributeDtos.stream()
 			.filter(existing -> existing.getVariableId().equals(dto.getVariableId())).collect(Collectors.toList());
 		if (!existingLotAttributes.isEmpty()) {
 			errors.reject("attribute.name.invalid.existing", new String[] {"Lot", existingLotAttributes.get(0).getVariableName()}, "");
@@ -71,10 +71,10 @@ public class LotAttributeValidator extends AttributeValidator{
 
 	void validateLotAttributeForUpdate(final BindingResult errors, final Integer lotId, final AttributeRequestDto dto,
 		final Integer attributeId) {
-		final List<GermplasmAttributeDto> lotAttributeDtos =
+		final List<RecordAttributeDto> lotAttributeDtos =
 			this.lotAttributeService.getLotAttributeDtos(lotId, null);
 
-		List<GermplasmAttributeDto> existingLotAttributes = lotAttributeDtos.stream()
+		List<RecordAttributeDto> existingLotAttributes = lotAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if(existingLotAttributes.isEmpty()) {
 			errors.reject("attribute.id.invalid.not.existing", new String[] {"Lot", String.valueOf(attributeId)}, "");
@@ -92,9 +92,9 @@ public class LotAttributeValidator extends AttributeValidator{
 	public void validateLotAttributeExists(final BindingResult errors, final Integer lotId, final Integer attributeId) {
 		this.validateLot(errors, lotId);
 
-		final List<GermplasmAttributeDto> lotAttributeDtos =
+		final List<RecordAttributeDto> lotAttributeDtos =
 			this.lotAttributeService.getLotAttributeDtos(lotId, null);
-		final List<GermplasmAttributeDto> existingLotAttributes = lotAttributeDtos.stream()
+		final List<RecordAttributeDto> existingLotAttributes = lotAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if(existingLotAttributes.isEmpty()) {
 			errors.reject("attribute.id.invalid.not.existing", new String[] {"Lot", String.valueOf(attributeId)}, "");

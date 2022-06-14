@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
-import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
+import org.generationcp.middleware.domain.shared.RecordAttributeDto;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LotAttributeValidator;
 import org.ibp.api.java.inventory.manager.LotAttributeService;
@@ -28,7 +28,7 @@ public class LotAttributeServiceImpl implements LotAttributeService {
 	private LocationValidator locationValidator;
 
 	@Override
-	public List<GermplasmAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
+	public List<RecordAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
 		return this.lotAttributeService.getLotAttributeDtos(lotId, programUUID);
 	}
 
