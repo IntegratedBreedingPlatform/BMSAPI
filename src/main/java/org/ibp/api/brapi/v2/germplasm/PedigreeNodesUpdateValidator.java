@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Component
 public class PedigreeNodesUpdateValidator {
@@ -52,12 +53,19 @@ public class PedigreeNodesUpdateValidator {
 		final Map<String, GermplasmDto> germplasmMapByUUIDs = this.getGermplasmMapByUUIDs(pedigreeNodeDTOMap);
 		final Map<String, BreedingMethodDTO> breedingMethodDTOMapByIds = this.getBreedingMethodMapByIds(pedigreeNodeDTOMap);
 
+		final List<PedigreeNodeDTO> pedigreeNodeDTOList = new ArrayList<>(pedigreeNodeDTOMap.values());
+		final Map<PedigreeNodeDTO, Integer> indexMap = IntStream.range(0, pedigreeNodeDTOMap.size()).boxed()
+			.collect(Collectors.toMap(pedigreeNodeDTOList::get, i -> i));
+
 		pedigreeNodeDTOMap.entrySet().removeIf(entry -> {
+
+			final Integer index = indexMap.get(entry.getValue()) + 1;
+
 			final String germplasmDbIdMapKey = entry.getKey();
 			final PedigreeNodeDTO pedigreeNodeDTO = entry.getValue();
-			return !this.validateGermplasmDbId(germplasmDbIdMapKey, pedigreeNodeDTO, germplasmMapByUUIDs, errors)
-				|| !this.validateBreedingMethod(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs, errors)
-				|| !this.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs, errors);
+			return !this.validateGermplasmDbId(germplasmDbIdMapKey, pedigreeNodeDTO, germplasmMapByUUIDs, errors, index)
+				|| !this.validateBreedingMethod(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs, errors, index)
+				|| !this.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs, errors, index);
 		});
 
 		return errors;
@@ -110,25 +118,26 @@ public class PedigreeNodesUpdateValidator {
 	}
 
 	protected boolean validateGermplasmDbId(final String mapKey, final PedigreeNodeDTO pedigreeNodeDTO,
-		final Map<String, GermplasmDto> germplasmMapByUUIDs, final BindingResult errors) {
+		final Map<String, GermplasmDto> germplasmMapByUUIDs, final BindingResult errors, final int index) {
 
 		if (StringUtils.isBlank(mapKey)) {
-			errors.reject("pedigree.nodes.update.missing.key", "");
+			errors.reject("pedigree.nodes.update.missing.key", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 
 		if (StringUtils.isBlank(pedigreeNodeDTO.getGermplasmDbId())) {
-			errors.reject("pedigree.nodes.update.missing.germplasmdbid", "");
+			errors.reject("pedigree.nodes.update.missing.germplasmdbid", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 
 		if (!mapKey.equals(pedigreeNodeDTO.getGermplasmDbId())) {
-			errors.reject("pedigree.nodes.update.key.germplasmdbid.mismatch", "");
+			errors.reject("pedigree.nodes.update.key.germplasmdbid.mismatch", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 
 		if (!germplasmMapByUUIDs.containsKey(pedigreeNodeDTO.getGermplasmDbId())) {
-			errors.reject("pedigree.nodes.update.invalid.germplasmdbid", new String[] {pedigreeNodeDTO.getGermplasmDbId()}, "");
+			errors.reject("pedigree.nodes.update.invalid.germplasmdbid",
+				new String[] {String.valueOf(index), pedigreeNodeDTO.getGermplasmDbId()}, "");
 			return false;
 		}
 		return true;
@@ -136,19 +145,20 @@ public class PedigreeNodesUpdateValidator {
 
 	protected boolean validateBreedingMethod(final PedigreeNodeDTO pedigreeNodeDTO,
 		final Map<String, BreedingMethodDTO> breedingMethodDTOMapByIds, final Map<String, GermplasmDto> germplasmMapByUUIDs,
-		final BindingResult errors) {
+		final BindingResult errors, final int index) {
 		if (StringUtils.isBlank(pedigreeNodeDTO.getBreedingMethodDbId())) {
-			errors.reject("pedigree.nodes.update.missing.breedingmethoddbid", "");
+			errors.reject("pedigree.nodes.update.missing.breedingmethoddbid", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 		if (!breedingMethodDTOMapByIds.containsKey(pedigreeNodeDTO.getBreedingMethodDbId())) {
-			errors.reject("pedigree.nodes.update.invalid.breedingmethoddbid", new String[] {pedigreeNodeDTO.getBreedingMethodDbId()}, "");
+			errors.reject("pedigree.nodes.update.invalid.breedingmethoddbid",
+				new String[] {String.valueOf(index), pedigreeNodeDTO.getBreedingMethodDbId()}, "");
 			return false;
 		}
 		if (!pedigreeNodeDTO.getBreedingMethodDbId()
 			.equals(germplasmMapByUUIDs.get(pedigreeNodeDTO.getGermplasmDbId()).getBreedingMethodId().toString())) {
 			errors.reject("pedigree.nodes.update.breedingmethoddbid.do.not.match.the.existing.germplasm.breeding.method",
-				new String[] {pedigreeNodeDTO.getBreedingMethodDbId()}, "");
+				new String[] {String.valueOf(index), pedigreeNodeDTO.getBreedingMethodDbId()}, "");
 			return false;
 		}
 		return true;
@@ -156,78 +166,79 @@ public class PedigreeNodesUpdateValidator {
 
 	protected boolean validateParents(final PedigreeNodeDTO pedigreeNodeDTO,
 		final Map<String, BreedingMethodDTO> breedingMethodDTOMapByIds, final Map<String, GermplasmDto> germplasmMapByUUIDs,
-		final BindingResult errors) {
+		final BindingResult errors, final int index) {
 		if (CollectionUtils.isEmpty(pedigreeNodeDTO.getParents())) {
-			errors.reject("pedigree.nodes.update.missing.parents", "");
+			errors.reject("pedigree.nodes.update.missing.parents", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 
 		if (pedigreeNodeDTO.getParents().stream().anyMatch(p -> ParentType.fromString(p.getParentType()) == null)) {
-			errors.reject("pedigree.nodes.invalid.parent.type", "");
+			errors.reject("pedigree.nodes.invalid.parent.type", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 
 		final BreedingMethodDTO breedingMethodDTO = breedingMethodDTOMapByIds.get(pedigreeNodeDTO.getBreedingMethodDbId());
 
 		if (GENERATIVE.equals(breedingMethodDTO.getType())) {
-			return this.validateGenerativeParents(pedigreeNodeDTO, germplasmMapByUUIDs, errors);
+			return this.validateGenerativeParents(pedigreeNodeDTO, germplasmMapByUUIDs, errors, index);
 		} else {
-			return this.validateDerivativeParents(pedigreeNodeDTO, germplasmMapByUUIDs, errors);
+			return this.validateDerivativeParents(pedigreeNodeDTO, germplasmMapByUUIDs, errors, index);
 		}
 	}
 
 	private boolean validateDerivativeParents(final PedigreeNodeDTO pedigreeNodeDTO, final Map<String, GermplasmDto> germplasmMapByUUIDs,
-		final BindingResult errors) {
+		final BindingResult errors, final int index) {
 		final List<PedigreeNodeReferenceDTO> populationParent =
 			pedigreeNodeDTO.getParents().stream().filter(dto -> ParentType.POPULATION.name().equals(dto.getParentType()))
 				.collect(Collectors.toList());
 		final List<PedigreeNodeReferenceDTO> selfParent =
 			pedigreeNodeDTO.getParents().stream().filter(dto -> ParentType.SELF.name().equals(dto.getParentType()))
 				.collect(Collectors.toList());
-		if (CollectionUtils.isEmpty(populationParent) && CollectionUtils.isEmpty(selfParent)) {
-			errors.reject("pedigree.nodes.update.both.group.source.and.immediate.source.parents.must.be.specified", "");
+		if (CollectionUtils.isEmpty(populationParent) || CollectionUtils.isEmpty(selfParent)) {
+			errors.reject("pedigree.nodes.update.both.group.source.and.immediate.source.parents.must.be.specified",
+				new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 		if (populationParent.size() > 1) {
-			errors.reject("pedigree.nodes.update.only.one.population.parent.can.be.specified", "");
+			errors.reject("pedigree.nodes.update.only.one.population.parent.can.be.specified", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 		if (selfParent.size() > 1) {
-			errors.reject("pedigree.nodes.update.only.one.self.parent.can.be.specified", "");
+			errors.reject("pedigree.nodes.update.only.one.self.parent.can.be.specified", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 		if (!germplasmMapByUUIDs.containsKey(populationParent.get(0).getGermplasmDbId())) {
 			errors.reject("pedigree.nodes.update.population.parent.invalid.germplasmdbid",
-				new String[] {populationParent.get(0).getGermplasmDbId()}, "");
+				new String[] {String.valueOf(index), populationParent.get(0).getGermplasmDbId()}, "");
 			return false;
 		}
 		if (!germplasmMapByUUIDs.containsKey(selfParent.get(0).getGermplasmDbId())) {
 			errors.reject("pedigree.nodes.update.self.parent.invalid.germplasmdbid",
-				new String[] {selfParent.get(0).getGermplasmDbId()}, "");
+				new String[] {String.valueOf(index), selfParent.get(0).getGermplasmDbId()}, "");
 			return false;
 		}
 		return true;
 	}
 
 	private boolean validateGenerativeParents(final PedigreeNodeDTO pedigreeNodeDTO, final Map<String, GermplasmDto> germplasmMapByUUIDs,
-		final BindingResult errors) {
+		final BindingResult errors, final int index) {
 		final List<PedigreeNodeReferenceDTO> femaleParent =
 			pedigreeNodeDTO.getParents().stream().filter(dto -> ParentType.FEMALE.name().equals(dto.getParentType()))
 				.collect(Collectors.toList());
 		final List<PedigreeNodeReferenceDTO> maleParents =
 			pedigreeNodeDTO.getParents().stream().filter(dto -> ParentType.MALE.name().equals(dto.getParentType()))
 				.collect(Collectors.toList());
-		if (CollectionUtils.isEmpty(femaleParent) && CollectionUtils.isEmpty(maleParents)) {
-			errors.reject("pedigree.nodes.update.both.female.and.male.parents.must.be.specified", "");
+		if (CollectionUtils.isEmpty(femaleParent) || CollectionUtils.isEmpty(maleParents)) {
+			errors.reject("pedigree.nodes.update.both.female.and.male.parents.must.be.specified", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 		if (femaleParent.size() > 1) {
-			errors.reject("pedigree.nodes.update.only.one.female.parent.can.be.specified", "");
+			errors.reject("pedigree.nodes.update.only.one.female.parent.can.be.specified", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
 		if (!germplasmMapByUUIDs.containsKey(femaleParent.get(0).getGermplasmDbId())) {
 			errors.reject("pedigree.nodes.update.female.parent.invalid.germplasmdbid",
-				new String[] {femaleParent.get(0).getGermplasmDbId()}, "");
+				new String[] {String.valueOf(index), femaleParent.get(0).getGermplasmDbId()}, "");
 			return false;
 		}
 		boolean isMaleParentInvalidGermplasmDbId = false;
@@ -235,12 +246,12 @@ public class PedigreeNodesUpdateValidator {
 		for (final PedigreeNodeReferenceDTO maleParent : maleParents) {
 			if (!germplasmMapByUUIDs.containsKey(maleParent.getGermplasmDbId())) {
 				errors.reject("pedigree.nodes.update.male.parent.invalid.germplasmdbid",
-					new String[] {maleParent.getGermplasmDbId()}, "");
+					new String[] {String.valueOf(index), maleParent.getGermplasmDbId()}, "");
 				isMaleParentInvalidGermplasmDbId = true;
 			}
 			if (maleParent.getGermplasmDbId().equals(pedigreeNodeDTO.getGermplasmDbId())) {
 				errors.reject("pedigree.nodes.update.male.progenitors.can.not.be.equals.to.germplasmdbid",
-					new String[] {maleParent.getGermplasmDbId()}, "");
+					new String[] {String.valueOf(index), maleParent.getGermplasmDbId()}, "");
 				isMaleParentGermplasmDbIdIsSameAsTheGermplasm = true;
 			}
 		}
