@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface LotAttributeService {
 
-	List<GermplasmAttributeDto> getLotAttributeDtos(Integer gid, String programUUID);
+	List<GermplasmAttributeDto> getLotAttributeDtos(Integer lotId, String programUUID);
 
-	AttributeRequestDto createLotAttribute(Integer gid, AttributeRequestDto dto);
+	AttributeRequestDto createLotAttribute(Integer lotId, AttributeRequestDto dto);
 
-	AttributeRequestDto updateLotAttribute(Integer attributeId, AttributeRequestDto dto);
+	AttributeRequestDto updateLotAttribute(Integer lotId, Integer attributeId, AttributeRequestDto dto);
 
-	void deleteLotAttribute(Integer attributeId);
+	void deleteLotAttribute(Integer lotId, Integer attributeId);
 }

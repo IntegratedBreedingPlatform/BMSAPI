@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class AttributeValidatorTest {
+public class GermplasmAttributeValidatorTest {
 
 	private static final String VARIABLE_NAME = "STAT_ACC";
 	private static final Integer GID = 1;
@@ -52,7 +52,7 @@ public class AttributeValidatorTest {
 	private BindingResult errors;
 
 	@InjectMocks
-	private AttributeValidator attributeValidator;
+	private GermplasmAttributeValidator germplasmAttributeValidator;
 
 	@Before
 	public void beforeEachTest() {
@@ -66,14 +66,14 @@ public class AttributeValidatorTest {
 
 	@Test
 	public void testValidateAttributeType_ValidAttributeTypeValue() {
-		this.attributeValidator.validateAttributeType(this.errors, VariableType.GERMPLASM_ATTRIBUTE.getId());
+		this.germplasmAttributeValidator.validateAttributeType(this.errors, VariableType.GERMPLASM_ATTRIBUTE.getId());
 		Assert.assertFalse(this.errors.hasErrors());
 	}
 
 	@Test
 	public void testValidateAttributeType_ThrowsException_WhenAttributeTypeValueIsInvalid() {
 		try {
-			this.attributeValidator.validateAttributeType(this.errors, VariableType.TRAIT.getId());
+			this.germplasmAttributeValidator.validateAttributeType(this.errors, VariableType.TRAIT.getId());
 			Assert.fail("should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.variable.type.invalid", this.errors.getAllErrors().get(0).getCode());
@@ -86,7 +86,7 @@ public class AttributeValidatorTest {
 
 		Mockito.doReturn(Lists.newArrayList()).when(this.ontologyVariableDataManager).getWithFilter(Mockito.any());
 
-		this.attributeValidator.validateAttributeIds(this.errors, Lists.newArrayList(String.valueOf(attributeById)));
+		this.germplasmAttributeValidator.validateAttributeIds(this.errors, Lists.newArrayList(String.valueOf(attributeById)));
 		Assert.assertEquals("attribute.invalid", this.errors.getAllErrors().get(0).getCode());
 	}
 
@@ -102,7 +102,7 @@ public class AttributeValidatorTest {
 		final List<Variable> attributeLists = Lists.newArrayList(variable);
 		Mockito.doReturn(attributeLists).when(this.ontologyVariableDataManager).getWithFilter(Mockito.any());
 
-		this.attributeValidator.validateAttributeIds(bindingResult, Lists.newArrayList(String.valueOf(attributeById)));
+		this.germplasmAttributeValidator.validateAttributeIds(bindingResult, Lists.newArrayList(String.valueOf(attributeById)));
 
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
@@ -112,7 +112,7 @@ public class AttributeValidatorTest {
 		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(GID, VariableType.GERMPLASM_ATTRIBUTE.getId(), null))
 			.thenReturn(Collections.emptyList());
 		final AttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
-		this.attributeValidator.validateGermplasmAttributeShouldNotExist(this.errors, GID, germplasmAttributeRequestDto);
+		this.germplasmAttributeValidator.validateGermplasmAttributeShouldNotExist(this.errors, GID, germplasmAttributeRequestDto);
 		Assert.assertFalse(this.errors.hasErrors());
 	}
 
@@ -126,7 +126,7 @@ public class AttributeValidatorTest {
 			germplasmAttributeDto.setVariableId(VARIABLE_ID);
 			Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(GID, null, null))
 				.thenReturn(Collections.singletonList(germplasmAttributeDto));
-			this.attributeValidator.validateGermplasmAttributeShouldNotExist(this.errors, GID, germplasmAttributeRequestDto);
+			this.germplasmAttributeValidator.validateGermplasmAttributeShouldNotExist(this.errors, GID, germplasmAttributeRequestDto);
 			Assert.fail("should throw an exception");
 		} catch(final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.name.invalid.existing", this.errors.getAllErrors().get(0).getCode());
@@ -139,7 +139,7 @@ public class AttributeValidatorTest {
 		final GermplasmAttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
 		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(GID, null, null))
 			.thenReturn(Collections.singletonList(germplasmAttributeDto));
-		this.attributeValidator.validateGermplasmAttributeExists(this.errors, GID, ATTRIBUTE_ID);
+		this.germplasmAttributeValidator.validateGermplasmAttributeExists(this.errors, GID, ATTRIBUTE_ID);
 		Assert.assertFalse(this.errors.hasErrors());
 	}
 
@@ -148,7 +148,7 @@ public class AttributeValidatorTest {
 		try {
 			Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(GID, null, null))
 				.thenReturn(Collections.emptyList());
-			this.attributeValidator.validateGermplasmAttributeExists(this.errors, GID, ATTRIBUTE_ID);
+			this.germplasmAttributeValidator.validateGermplasmAttributeExists(this.errors, GID, ATTRIBUTE_ID);
 			Assert.fail("should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.id.invalid.not.existing", this.errors.getAllErrors().get(0).getCode());
@@ -165,7 +165,7 @@ public class AttributeValidatorTest {
 
 		final AttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
 		germplasmAttributeRequestDto.setVariableId(VARIABLE_ID);
-		this.attributeValidator.validateGermplasmAttributeForUpdate(this.errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
+		this.germplasmAttributeValidator.validateGermplasmAttributeForUpdate(this.errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
 		Assert.assertFalse(this.errors.hasErrors());
 	}
 
@@ -179,7 +179,7 @@ public class AttributeValidatorTest {
 				.thenReturn(Collections.singletonList(germplasmAttributeDto));
 
 			final AttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
-			this.attributeValidator.validateGermplasmAttributeForUpdate(errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
+			this.germplasmAttributeValidator.validateGermplasmAttributeForUpdate(errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
 			Assert.fail("should throw an exception");
 		}catch(final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.id.invalid.not.existing", errors.getAllErrors().get(0).getCode());
@@ -199,7 +199,7 @@ public class AttributeValidatorTest {
 
 			final AttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
 			germplasmAttributeRequestDto.setVariableId(VARIABLE_ID);
-			this.attributeValidator.validateGermplasmAttributeForUpdate(errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
+			this.germplasmAttributeValidator.validateGermplasmAttributeForUpdate(errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
 			Assert.fail("should throw an exception");
 		}catch(final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.variable.id.invalid.not.existing", errors.getAllErrors().get(0).getCode());
@@ -230,7 +230,7 @@ public class AttributeValidatorTest {
 		try (final MockedStatic<VariableValueUtil> variableValueUtilMockedStatic = Mockito.mockStatic(VariableValueUtil.class)) {
 			variableValueUtilMockedStatic.when(() -> VariableValueUtil.isValidAttributeValue(Mockito.any(), Mockito.any()))
 				.thenReturn(true);
-			this.attributeValidator.validateAttribute(this.errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
+			this.germplasmAttributeValidator.validateAttribute(this.errors, GID, germplasmAttributeRequestDto, ATTRIBUTE_ID);
 			Assert.assertFalse(this.errors.hasErrors());
 		}
 	}
@@ -238,15 +238,16 @@ public class AttributeValidatorTest {
 	@Test
 	public void testValidateGermplasmAttributeValue_WhenValueIsValid() {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-		this.attributeValidator.validateGermplasmAttributeValue(errors, GERMPLASM_ATTRIBUTE_VALUE);
+		this.germplasmAttributeValidator.validateAttributeValue(errors, GERMPLASM_ATTRIBUTE_VALUE);
 		Assert.assertFalse(errors.hasErrors());
 	}
 
 	@Test
 	public void testValidateGermplasmAttributeValue_ThrowsException_WhenValueIsInvalid() {
 		try {
-			final String invalidValue = RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH + 1);
-			this.attributeValidator.validateGermplasmAttributeValue(this.errors, invalidValue);
+			final String invalidValue = RandomStringUtils.randomAlphabetic(
+				GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH + 1);
+			this.germplasmAttributeValidator.validateAttributeValue(this.errors, invalidValue);
 			Assert.fail("should throw an exception");
 		} catch(final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.value.invalid.length", this.errors.getAllErrors().get(0).getCode());
@@ -255,14 +256,14 @@ public class AttributeValidatorTest {
 
 	@Test
 	public void testValidateGermplasmAttributeDate_WhenDateIsValid() {
-		this.attributeValidator.validateGermplasmAttributeDate(this.errors, GERMPLASM_ATTRIBUTE_DATE);
+		this.germplasmAttributeValidator.validateAttributeDate(this.errors, GERMPLASM_ATTRIBUTE_DATE);
 		Assert.assertFalse(this.errors.hasErrors());
 	}
 
 	@Test
-	public void testValidateGermplasmAttributeDate_ThrowException_WhenDateIsValid() {
+	public void testValidateGermplasmAttributeDate_ThrowException_WhenDateIsInvalid() {
 		try{
-			this.attributeValidator.validateGermplasmAttributeDate(this.errors, "2021-03-16");
+			this.germplasmAttributeValidator.validateAttributeDate(this.errors, "2021-03-16");
 			Assert.fail("should throw an exception");
 		} catch(final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.date.invalid.format", this.errors.getAllErrors().get(0).getCode());
@@ -272,7 +273,7 @@ public class AttributeValidatorTest {
 	@Test
 	public void testValidateAttributeVariable_ThrowException_WhenVariableIsNull() {
 		try {
-			this.attributeValidator.validateAttributeVariable(this.errors, null);
+			this.germplasmAttributeValidator.validateAttributeVariable(this.errors, null, VariableType.getGermplasmAttributeVariableTypes());
 			Assert.fail("should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.variable.invalid", this.errors.getAllErrors().get(0).getCode());
@@ -284,7 +285,7 @@ public class AttributeValidatorTest {
 		try {
 			final Variable variable = new Variable();
 			variable.addVariableType(VariableType.TRAIT);
-			this.attributeValidator.validateAttributeVariable(this.errors, variable);
+			this.germplasmAttributeValidator.validateAttributeVariable(this.errors, variable, VariableType.getGermplasmAttributeVariableTypes());
 			Assert.fail("should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("attribute.variable.type.invalid", this.errors.getAllErrors().get(0).getCode());
@@ -297,7 +298,7 @@ public class AttributeValidatorTest {
 			try (final MockedStatic<VariableValueUtil> variableValueUtilMockedStatic = Mockito.mockStatic(VariableValueUtil.class)) {
 				variableValueUtilMockedStatic.when(() -> VariableValueUtil.isValidAttributeValue(Mockito.any(), Mockito.any()))
 					.thenReturn(false);
-				this.attributeValidator.validateVariableDataTypeValue(this.errors, new Variable(), RandomStringUtils.randomAlphabetic(20));
+				this.germplasmAttributeValidator.validateVariableDataTypeValue(this.errors, new Variable(), RandomStringUtils.randomAlphabetic(20));
 			}
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertEquals("invalid.variable.value", this.errors.getAllErrors().get(0).getCode());

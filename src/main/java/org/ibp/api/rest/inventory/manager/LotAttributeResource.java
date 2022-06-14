@@ -59,7 +59,7 @@ public class LotAttributeResource {
 		@ApiParam("Only the following fields can be updated: value, date, and locationId") @RequestBody
 		final AttributeRequestDto requestDto) {
 		return new ResponseEntity<>(
-			this.lotAttributeService.updateLotAttribute(attributeId, requestDto),
+			this.lotAttributeService.updateLotAttribute(lotId, attributeId, requestDto),
 			HttpStatus.OK);
 	}
 
@@ -70,7 +70,7 @@ public class LotAttributeResource {
 	public ResponseEntity<Void> deleteLotAttribute(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer lotId, @PathVariable final Integer attributeId) {
-		this.lotAttributeService.deleteLotAttribute(attributeId);
+		this.lotAttributeService.deleteLotAttribute(lotId, attributeId);
 		return new ResponseEntity<>(HttpStatus.OK);
 
 	}

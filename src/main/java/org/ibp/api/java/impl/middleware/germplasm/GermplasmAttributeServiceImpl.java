@@ -5,7 +5,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
-import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmAttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	private org.generationcp.middleware.api.germplasm.GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
-	private AttributeValidator attributeValidator;
+	private GermplasmAttributeValidator germplasmAttributeValidator;
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
@@ -42,7 +42,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		if (variableTypeId != null) {
-			this.attributeValidator.validateAttributeType(errors, variableTypeId);
+			this.germplasmAttributeValidator.validateAttributeType(errors, variableTypeId);
 		}
 		return this.germplasmAttributeService.getGermplasmAttributeDtos(gid, variableTypeId, programUUID);
 	}
@@ -52,7 +52,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
-		this.attributeValidator.validateAttribute(errors, gid, dto, null);
+		this.germplasmAttributeValidator.validateAttribute(errors, gid, dto, null);
 		this.locationValidator.validateLocation(errors, dto.getLocationId());
 		this.germplasmAttributeService.createGermplasmAttribute(gid, dto);
 		return dto;
@@ -62,7 +62,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	public AttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId, final AttributeRequestDto dto, final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
-		this.attributeValidator.validateAttribute(errors, gid, dto, attributeId);
+		this.germplasmAttributeValidator.validateAttribute(errors, gid, dto, attributeId);
 		this.locationValidator.validateLocation(errors, dto.getLocationId());
 		this.germplasmAttributeService.updateGermplasmAttribute(attributeId, dto);
 		return dto;
@@ -72,7 +72,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	public void deleteGermplasmAttribute(final Integer gid, final Integer attributeId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
-		this.attributeValidator.validateGermplasmAttributeExists(errors, gid, attributeId);
+		this.germplasmAttributeValidator.validateGermplasmAttributeExists(errors, gid, attributeId);
 		this.germplasmAttributeService.deleteGermplasmAttribute(attributeId);
 	}
 
@@ -100,7 +100,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
-		this.attributeValidator.validateAttributeIds(this.errors, attributeDbIds);
+		this.germplasmAttributeValidator.validateAttributeIds(this.errors, attributeDbIds);
 		if (this.errors.hasErrors()) {
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
