@@ -207,12 +207,14 @@ public class PedigreeNodesUpdateValidator {
 			errors.reject("pedigree.nodes.update.only.one.self.parent.can.be.specified", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
-		if (!germplasmMapByUUIDs.containsKey(populationParent.get(0).getGermplasmDbId())) {
+		if (StringUtils.isNotEmpty(populationParent.get(0).getGermplasmDbId()) && !germplasmMapByUUIDs.containsKey(
+			populationParent.get(0).getGermplasmDbId())) {
 			errors.reject("pedigree.nodes.update.population.parent.invalid.germplasmdbid",
 				new String[] {String.valueOf(index), populationParent.get(0).getGermplasmDbId()}, "");
 			return false;
 		}
-		if (!germplasmMapByUUIDs.containsKey(selfParent.get(0).getGermplasmDbId())) {
+		if (StringUtils.isNotEmpty(selfParent.get(0).getGermplasmDbId()) && !germplasmMapByUUIDs.containsKey(
+			selfParent.get(0).getGermplasmDbId())) {
 			errors.reject("pedigree.nodes.update.self.parent.invalid.germplasmdbid",
 				new String[] {String.valueOf(index), selfParent.get(0).getGermplasmDbId()}, "");
 			return false;
@@ -236,7 +238,8 @@ public class PedigreeNodesUpdateValidator {
 			errors.reject("pedigree.nodes.update.only.one.female.parent.can.be.specified", new String[] {String.valueOf(index)}, "");
 			return false;
 		}
-		if (!germplasmMapByUUIDs.containsKey(femaleParent.get(0).getGermplasmDbId())) {
+		if (StringUtils.isNotEmpty(femaleParent.get(0).getGermplasmDbId()) && !germplasmMapByUUIDs.containsKey(
+			femaleParent.get(0).getGermplasmDbId())) {
 			errors.reject("pedigree.nodes.update.female.parent.invalid.germplasmdbid",
 				new String[] {String.valueOf(index), femaleParent.get(0).getGermplasmDbId()}, "");
 			return false;
@@ -244,12 +247,13 @@ public class PedigreeNodesUpdateValidator {
 		boolean isMaleParentInvalidGermplasmDbId = false;
 		boolean isMaleParentGermplasmDbIdIsSameAsTheGermplasm = false;
 		for (final PedigreeNodeReferenceDTO maleParent : maleParents) {
-			if (!germplasmMapByUUIDs.containsKey(maleParent.getGermplasmDbId())) {
+			if (StringUtils.isNotEmpty(maleParent.getGermplasmDbId()) && !germplasmMapByUUIDs.containsKey(maleParent.getGermplasmDbId())) {
 				errors.reject("pedigree.nodes.update.male.parent.invalid.germplasmdbid",
 					new String[] {String.valueOf(index), maleParent.getGermplasmDbId()}, "");
 				isMaleParentInvalidGermplasmDbId = true;
 			}
-			if (maleParent.getGermplasmDbId().equals(pedigreeNodeDTO.getGermplasmDbId())) {
+			if (StringUtils.isNotEmpty(maleParent.getGermplasmDbId()) && maleParent.getGermplasmDbId()
+				.equals(pedigreeNodeDTO.getGermplasmDbId())) {
 				errors.reject("pedigree.nodes.update.male.progenitors.can.not.be.equals.to.germplasmdbid",
 					new String[] {String.valueOf(index), maleParent.getGermplasmDbId()}, "");
 				isMaleParentGermplasmDbIdIsSameAsTheGermplasm = true;

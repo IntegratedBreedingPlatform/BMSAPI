@@ -329,6 +329,24 @@ public class PedigreeNodesUpdateValidatorTest {
 		Mockito.verify(this.errors)
 			.reject("pedigree.nodes.update.male.parent.invalid.germplasmdbid", new String[] {"1", String.valueOf(maleParentDbId)}, "");
 
+		// Null Female germplasmDbId
+		pedigreeNodeDTO.getParents().get(0).setGermplasmDbId(null);
+		germplasmMapByUUIDs.clear();
+		germplasmMapByUUIDs.put(String.valueOf(maleParentDbId), new GermplasmDto());
+		assertTrue(
+			this.pedigreeNodesUpdateValidatorUnderTest.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs,
+				this.errors, 1));
+		Mockito.verifyNoMoreInteractions(this.errors);
+
+		// Null Male germplasmDbId
+		pedigreeNodeDTO.getParents().get(1).setGermplasmDbId(null);
+		germplasmMapByUUIDs.clear();
+		germplasmMapByUUIDs.put(String.valueOf(femaleParentDbId), new GermplasmDto());
+		assertTrue(
+			this.pedigreeNodesUpdateValidatorUnderTest.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs,
+				this.errors, 1));
+		Mockito.verifyNoMoreInteractions(this.errors);
+
 	}
 
 	@Test
@@ -441,6 +459,24 @@ public class PedigreeNodesUpdateValidatorTest {
 			.reject("pedigree.nodes.update.self.parent.invalid.germplasmdbid",
 				new String[] {"1", String.valueOf(immediateSourceParentDbId)},
 				"");
+
+		// Null Group Source germplasmDbId
+		pedigreeNodeDTO.getParents().get(0).setGermplasmDbId(null);
+		germplasmMapByUUIDs.clear();
+		germplasmMapByUUIDs.put(String.valueOf(immediateSourceParentDbId), new GermplasmDto());
+		assertTrue(
+			this.pedigreeNodesUpdateValidatorUnderTest.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs,
+				this.errors, 1));
+		Mockito.verifyNoMoreInteractions(this.errors);
+
+		// Null Immediate Source germplasmDbId
+		pedigreeNodeDTO.getParents().get(1).setGermplasmDbId(null);
+		germplasmMapByUUIDs.clear();
+		germplasmMapByUUIDs.put(String.valueOf(groupSourceParentDbId), new GermplasmDto());
+		assertTrue(
+			this.pedigreeNodesUpdateValidatorUnderTest.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs,
+				this.errors, 1));
+		Mockito.verifyNoMoreInteractions(this.errors);
 
 	}
 
