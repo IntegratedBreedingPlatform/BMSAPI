@@ -29,6 +29,8 @@ public class LotAttributeServiceImpl implements LotAttributeService {
 
 	@Override
 	public List<RecordAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
+		this.lotAttributeValidator.validateLot(errors, lotId);
 		return this.lotAttributeService.getLotAttributeDtos(lotId, programUUID);
 	}
 
