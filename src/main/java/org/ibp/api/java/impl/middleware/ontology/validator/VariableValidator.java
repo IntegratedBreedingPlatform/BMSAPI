@@ -57,6 +57,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE = "variable.scale.system.datatype";
 	private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE = "variable.type.analysis.can.not.club.with.other";
 
+	private static final String VARIABLE_TYPE_INVENTORY_ATTRIBUTE_SHOULD_BE_USED_SINGLE = "variable.type.inventory.attribute.can.not.club.with.other";
+
 	private static final String VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE = "variable.type.germplasm.attribute.can.not.club.with.other";
 	private static final String VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE = "variable.type.germplasm.passport.can.not.club.with.other";
 	private static final String VARIABLE_TYPE_ENTRY_DETAIL_SHOULD_BE_USED_SINGLE = "variable.type.entry.detail.can.not.club.with.other";
@@ -441,6 +443,10 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE, new Object[]{"Variable Type"});
 		}
 
+		if (this.isInventoryAttributeVariable(variable) && variable.getVariableTypes().size() > 1) {
+			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_INVENTORY_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+		}
+
 		if (this.isGermplasmAttributeVariable(variable) && variable.getVariableTypes().size() > 1) {
 			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
 		}
@@ -628,6 +634,10 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private boolean isAnalysisVariable(final VariableDetails variable) {
 		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.ANALYSIS.getName());
     }
+
+	private boolean isInventoryAttributeVariable(final VariableDetails variable) {
+		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.INVENTORY_ATTRIBUTE.getName());
+	}
 
 	private boolean isGermplasmAttributeVariable(final VariableDetails variable) {
 		return variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_ATTRIBUTE.getName());
