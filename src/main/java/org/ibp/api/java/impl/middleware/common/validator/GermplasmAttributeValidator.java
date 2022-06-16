@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.domain.shared.RecordAttributeDto;
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
@@ -36,7 +37,7 @@ public class GermplasmAttributeValidator extends AttributeValidator{
 	}
 
 	public void validateAttributeIds(final BindingResult errors, final List<String> attributeIds) {
-		if (attributeIds == null || attributeIds.isEmpty()) {
+		if (CollectionUtils.isEmpty(attributeIds)) {
 			return;
 		}
 
