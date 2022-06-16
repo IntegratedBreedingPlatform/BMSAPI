@@ -3,7 +3,7 @@ package org.ibp.api.rest.germplasm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.middleware.domain.shared.RecordAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class GermplasmAttributeResource {
 	@ApiOperation(value = "Returns germplasm attributes filtered by gid and attribute type", notes = "Returns germplasm attributes by gid and attribute type")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<RecordAttributeDto>> getGermplasmAttributeDtos(@PathVariable final String cropName,
+	public ResponseEntity<List<AttributeDto>> getGermplasmAttributeDtos(@PathVariable final String cropName,
 		@PathVariable final Integer gid,
 		@RequestParam(required = false) final Integer variableTypeId,
 		@RequestParam(required = false) final String programUUID) {

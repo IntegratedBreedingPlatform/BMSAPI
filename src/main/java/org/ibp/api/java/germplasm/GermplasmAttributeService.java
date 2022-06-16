@@ -1,7 +1,7 @@
 package org.ibp.api.java.germplasm;
 
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
-import org.generationcp.middleware.domain.shared.RecordAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.springframework.data.domain.Pageable;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface GermplasmAttributeService {
 
-	List<RecordAttributeDto> getGermplasmAttributeDtos(Integer gid, Integer variableTypeId, String programUUID);
+	List<AttributeDto> getGermplasmAttributeDtos(Integer gid, Integer variableTypeId, String programUUID);
 
 	AttributeRequestDto createGermplasmAttribute(Integer gid, AttributeRequestDto germplasmAttributeRequestDto,
 		String programUUID);

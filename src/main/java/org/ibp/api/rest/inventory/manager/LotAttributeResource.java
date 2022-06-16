@@ -4,7 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
-import org.generationcp.middleware.domain.shared.RecordAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.ibp.api.java.inventory.manager.LotAttributeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ public class LotAttributeResource {
 	@ApiOperation(value = "Returns lot attributes filtered by lot ID", notes = "Returns lot attributes by lot ID")
 	@RequestMapping(value = "/crops/{cropName}/lot/{lotId}/attributes", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<RecordAttributeDto>> getLotAttributeDtos(@PathVariable final String cropName,
+	public ResponseEntity<List<AttributeDto>> getLotAttributeDtos(@PathVariable final String cropName,
 		@PathVariable final Integer lotId,
 		@RequestParam(required = false) final String programUUID) {
 		return new ResponseEntity<>(this.lotAttributeService.getLotAttributeDtos(lotId, programUUID), HttpStatus.OK);

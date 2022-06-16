@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
-import org.generationcp.middleware.domain.shared.RecordAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -153,7 +153,7 @@ public class LotAttributeValidatorTest {
 	public void testValidateLotAttributeShouldNotExist_ThrowsException_WhenLotAttributeIsExisting() {
 		try {
 			final AttributeRequestDto attributeRequestDto = this.createAttributeRequestDto();
-			final RecordAttributeDto attributeDto = new RecordAttributeDto();
+			final AttributeDto attributeDto = new AttributeDto();
 			attributeDto.setVariableId(VARIABLE_ID);
 			Mockito.when(this.lotAttributeService.getLotAttributeDtos(LOT_ID, null))
 				.thenReturn(Collections.singletonList(attributeDto));
@@ -171,7 +171,7 @@ public class LotAttributeValidatorTest {
 
 	@Test
 	public void testValidateLotAttributeForUpdate_WhenLotAttributeIsValid() {
-		final RecordAttributeDto attributeDto = this.createAttributeDto();
+		final AttributeDto attributeDto = this.createAttributeDto();
 		attributeDto.setVariableId(VARIABLE_ID);
 		Mockito.when(this.lotAttributeService.getLotAttributeDtos(LOT_ID, null))
 			.thenReturn(Collections.singletonList(attributeDto));
@@ -186,7 +186,7 @@ public class LotAttributeValidatorTest {
 	public void testValidateLotAttribute_ThrowsException_WhenAttributeIdIsNotExisting() {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		try{
-			final RecordAttributeDto attributeDto = this.createAttributeDto();
+			final AttributeDto attributeDto = this.createAttributeDto();
 			attributeDto.setId(2);
 			Mockito.when(this.lotAttributeService.getLotAttributeDtos(LOT_ID, null))
 				.thenReturn(Collections.singletonList(attributeDto));
@@ -204,7 +204,7 @@ public class LotAttributeValidatorTest {
 	public void testValidateLotAttribute_ThrowsException_WhenAttributeCodeIsInvalid() {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		try{
-			final RecordAttributeDto attributeDto = this.createAttributeDto();
+			final AttributeDto attributeDto = this.createAttributeDto();
 			attributeDto.setVariableName("ATTRIBUTE");
 			attributeDto.setVariableId(2);
 			Mockito.when(this.lotAttributeService.getLotAttributeDtos(LOT_ID, null))
@@ -220,7 +220,7 @@ public class LotAttributeValidatorTest {
 
 	@Test
 	public void testValidateLotAttributeExists_WhenLotAttributeIsExisting() {
-		final RecordAttributeDto attributeDto = this.createAttributeDto();
+		final AttributeDto attributeDto = this.createAttributeDto();
 		Mockito.when(this.lotAttributeService.getLotAttributeDtos(LOT_ID, null))
 			.thenReturn(Collections.singletonList(attributeDto));
 		this.lotAttributeValidator.validateLotAttributeExists(this.errors, LOT_ID, ATTRIBUTE_ID);
@@ -247,8 +247,8 @@ public class LotAttributeValidatorTest {
 		return attributeRequestDto;
 	}
 
-	private RecordAttributeDto createAttributeDto() {
-		final RecordAttributeDto attributeDto = new RecordAttributeDto();
+	private AttributeDto createAttributeDto() {
+		final AttributeDto attributeDto = new AttributeDto();
 		attributeDto.setVariableName(VARIABLE_NAME);
 		attributeDto.setId(ATTRIBUTE_ID);
 		return attributeDto;
