@@ -96,7 +96,7 @@ public class GermplasmUpdateDtoValidator {
 	private boolean areAttributesInvalid(final Map<String, String> attributes, final BindingResult errors) {
 		if (attributes != null) {
 			return attributes.values().stream().anyMatch(n -> {
-				if (StringUtils.isNotEmpty(n) && n.length() > AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH) {
+				if (StringUtils.isNotEmpty(n) && n.length() > GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH) {
 					errors.reject("germplasm.import.attribute.value.invalid.length", "");
 					return true;
 				}
@@ -150,7 +150,7 @@ public class GermplasmUpdateDtoValidator {
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(programUUID);
-		VariableType.getAttributeVariableTypes().forEach(variableFilter::addVariableType);
+		VariableType.getGermplasmAttributeVariableTypes().forEach(variableFilter::addVariableType);
 		attributesCodes.forEach(variableFilter::addName);
 
 		final List<Variable> existingAttributeVariables =

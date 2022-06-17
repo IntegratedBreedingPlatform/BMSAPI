@@ -8,7 +8,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.hamcrest.CoreMatchers;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmAttributeValidator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,12 +74,14 @@ public class GermplasmUpdateRequestValidatorTest {
 		updateRequest.setAcquisitionDate("20210221");
 		updateRequest.setBreedingMethodDbId("1012");
 		updateRequest.setCountryOfOriginCode("XYZ");
-		updateRequest.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH + 1));
+		updateRequest.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(
+			GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH + 1));
 		updateRequest.getSynonyms().add(new Synonym("", ""));
 		final String nameType = RandomStringUtils.randomAlphabetic(10);
 		updateRequest.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), nameType));
 		updateRequest.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(5001), nameType));
-		updateRequest.getAdditionalInfo().put("", RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH + 1));
+		updateRequest.getAdditionalInfo().put("", RandomStringUtils.randomAlphabetic(
+			GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH + 1));
 
 		Mockito.doReturn(Optional.empty()).when(this.breedingMethodService).getBreedingMethod(ArgumentMatchers.anyInt());
 		Mockito.doReturn(0L).when(this.locationService).countFilteredLocations(ArgumentMatchers.any(), ArgumentMatchers.isNull());
