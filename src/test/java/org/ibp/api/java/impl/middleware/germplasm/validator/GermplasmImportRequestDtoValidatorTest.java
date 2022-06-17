@@ -19,7 +19,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
-import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmAttributeValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -464,7 +464,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final Map<String, String> names = new HashMap<>();
 			names.put("LNAME", "MYNAME");
 			final Map<String, String> attributes = new HashMap<>();
-			attributes.put(null, RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH));
+			attributes.put(null, RandomStringUtils.randomAlphabetic(GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH));
 			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
 			germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GID);
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
@@ -482,8 +482,8 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final Map<String, String> names = new HashMap<>();
 			names.put("LNAME", "MYNAME");
 			final Map<String, String> attributes = new HashMap<>();
-			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH));
-			attributes.put("note", RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH));
+			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH));
+			attributes.put("note", RandomStringUtils.randomAlphabetic(GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH));
 			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
 			germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GID);
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
@@ -501,7 +501,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final Map<String, String> names = new HashMap<>();
 			names.put("LNAME", "MYNAME");
 			final Map<String, String> attributes = new HashMap<>();
-			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH + 1));
+			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH + 1));
 			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
 			germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GID);
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
@@ -698,7 +698,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 			final Map<String, String> names = new HashMap<>();
 			names.put("LNAME", "MYNAME");
 			final Map<String, String> attributes = new HashMap<>();
-			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH));
+			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH));
 			final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
 			germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GID);
 			germplasmImportRequestDto.setGermplasmList(Collections.singletonList(new GermplasmImportDTO(1, null, "ARG", "MUT",
@@ -918,7 +918,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 		try {
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO = new GermplasmInventoryImportDTO();
 			final Map<String, String> attributes = new HashMap<>();
-			attributes.put("note", RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH + 1));
+			attributes.put("note", RandomStringUtils.randomAlphabetic(GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH + 1));
 			germplasmInventoryImportDTO.setAttributes(attributes);
 			this.germplasmImportRequestDtoValidator
 				.validateImportLoadedData(this.programUUID, Collections.singletonList(germplasmInventoryImportDTO));
@@ -1054,7 +1054,7 @@ public class GermplasmImportRequestDtoValidatorTest {
 	public void testValidateImportLoadedData_ThrowsException_WhenAttributeIsNotFound() {
 		try {
 			final Map<String, String> attributes = new HashMap<>();
-			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(AttributeValidator.GERMPLASM_ATTRIBUTE_VALUE_MAX_LENGTH));
+			attributes.put("NOTE", RandomStringUtils.randomAlphabetic(GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH));
 			final GermplasmInventoryImportDTO germplasmInventoryImportDTO1 = new GermplasmInventoryImportDTO();
 			germplasmInventoryImportDTO1.setAttributes(attributes);
 			Mockito.when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(
