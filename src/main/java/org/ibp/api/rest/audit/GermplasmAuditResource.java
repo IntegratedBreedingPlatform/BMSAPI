@@ -8,7 +8,7 @@ import org.generationcp.middleware.service.impl.audit.GermplasmOtherProgenitorsA
 import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmReferenceAuditDTO;
 import org.ibp.api.java.audit.GermplasmAuditService;
-import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmAttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmNameRequestValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -41,7 +41,7 @@ public class GermplasmAuditResource {
 	private GermplasmNameRequestValidator germplasmNameRequestValidator;
 
 	@Autowired
-	private AttributeValidator attributeValidator;
+	private GermplasmAttributeValidator germplasmAttributeValidator;
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
@@ -81,7 +81,7 @@ public class GermplasmAuditResource {
 		final Pageable pageable) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.attributeValidator.validateGermplasmAttributeExists(errors, gid, attributeId);
+		this.germplasmAttributeValidator.validateGermplasmAttributeExists(errors, gid, attributeId);
 
 		return new PaginatedSearch().getPagedResult(() -> this.auditService.countAttributeChangesByNameId(attributeId),
 			() -> this.auditService.getAttributeChangesByAttributeId(attributeId, pageable),
