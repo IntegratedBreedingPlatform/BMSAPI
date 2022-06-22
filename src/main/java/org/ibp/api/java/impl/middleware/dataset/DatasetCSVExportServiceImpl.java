@@ -70,7 +70,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		final List<Enumeration> entryTypes = this.ontologyDataManager
 			.getStandardVariable(TermId.ENTRY_TYPE.getId(), ContextHolder.getCurrentProgram()).getEnumerations();
 		final Map<String, String> entryTypeDescriptionNameMap =
-			entryTypes.stream().collect(Collectors.toMap(Enumeration::getDescription, Enumeration::getName));
+			entryTypes.stream().collect(Collectors.toMap(Enumeration::getName, Enumeration::getDescription));
 
 		final List<ObservationUnitRow> allRows =
 			observationUnitRowMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
