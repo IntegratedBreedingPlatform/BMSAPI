@@ -43,6 +43,17 @@ public class BrapiResponseMessageGenerator<T> {
 		return messagesList;
 	}
 
+	public List<Map<String, String>> getMessagesList(final BrapiBatchUpdateResponse<T> batchUpdateResponse) {
+		final List<Map<String, String>> messagesList = new ArrayList<>();
+		final String entity = this.messageSource.getMessage(batchUpdateResponse.getEntity(), null, LocaleContextHolder.getLocale());
+		final Map<String, String> messageInfo = this.createInfoMessage(this.messageSource.getMessage("message.batch.updated.successfully",
+			new Object[] {batchUpdateResponse.getUpdatedSize(), batchUpdateResponse.getUpdateListSize(), entity},
+			LocaleContextHolder.getLocale()));
+		messagesList.add(messageInfo);
+		this.addErrorMessageList(messagesList, batchUpdateResponse.getErrors());
+		return messagesList;
+	}
+
 	private Map<String, String> createInfoMessage(final String message) {
 		final Map<String, String> messageInfo = new HashMap<>();
 		final String messageHeader = this.messageSource.getMessage("message.header", null, LocaleContextHolder.getLocale());
