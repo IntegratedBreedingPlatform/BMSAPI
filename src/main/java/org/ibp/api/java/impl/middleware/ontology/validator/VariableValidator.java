@@ -411,6 +411,25 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			this.addCustomError(errors, "variableTypes", BaseValidator.LIST_SHOULD_NOT_BE_EMPTY, new Object[] {"variable type"});
 		}
 
+		// 17.1 validate Germplasm Descriptor type
+		final boolean hasGermplasmDescriptorType =
+			variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_DESCRIPTOR.getName());
+
+		if (hasGermplasmDescriptorType) {
+			if(StringUtils.isBlank(variable.getId())){
+				this.addCustomError(errors, "variableTypes", BaseValidator.GERMPLASM_DESCRIPTOR_IS_RESTRICTED, new Object[] {"Variable Type"});
+			}else{
+				final Integer requestId = Integer.valueOf(variable.getId());
+				final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true);
+				final boolean containsGermplasmDescriptorType = oldVariable.getVariableTypes()
+					.contains(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_DESCRIPTOR);
+				if (!containsGermplasmDescriptorType) {
+					this.addCustomError(errors, "variableTypes", BaseValidator.GERMPLASM_DESCRIPTOR_IS_RESTRICTED, new Object[] {"Variable Type"});
+
+				}
+			}
+		}
+
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
