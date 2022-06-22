@@ -22,6 +22,8 @@ import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
 import org.generationcp.middleware.api.brapi.ObservationServiceBrapiImpl;
+import org.generationcp.middleware.api.brapi.PedigreeServiceBrapi;
+import org.generationcp.middleware.api.brapi.PedigreeServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.SampleServiceBrapi;
 import org.generationcp.middleware.api.brapi.SampleServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
@@ -889,6 +891,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public CropGenotypingParameterService getCropGenotypingParameterService() {
 		return new CropGenotypingParameterServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public PedigreeServiceBrapi getPedigreeServiceBrapi() {
+		return new PedigreeServiceBrapiImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
