@@ -301,16 +301,6 @@ public class DatasetCSVExportServiceImplTest {
 		Assert.assertEquals(LOCATION_ABBR, variables.get(DatasetServiceImpl.LOCATION_ABBR_VARIABLE_NAME).getValue());
 	}
 
-	@Test
-	public void testTransformEntryTypeValues() {
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
-			this.createObservationUnitRowMap(TermId.ENTRY_TYPE.name(), TEST_ENTRY_DESCRIPTION);
-		this.datasetExportService.transformEntryTypeValues(observationUnitRowMap);
-		final Map<String, ObservationUnitData> variables = observationUnitRowMap.get(5).get(0).getVariables();
-		Assert.assertEquals(1, variables.size());
-		Assert.assertEquals(TEST_ENTRY_NAME, variables.get(TermId.ENTRY_TYPE.name()).getValue());
-	}
-
 	private Map<Integer, List<ObservationUnitRow>> createObservationUnitRowMap(final String variableName, final String value) {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
 		final ObservationUnitRow row = new ObservationUnitRow();
