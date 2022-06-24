@@ -61,7 +61,7 @@ public class StudyEntryResource {
 		notes = "Create germplasm entries in study based on the specified germplasm ids")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
+	public ResponseEntity<Void> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
 		@ApiParam("Study Entry template for batch generation. SearchComposite is a list of gids")
 		@RequestBody final StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto) {
@@ -75,7 +75,7 @@ public class StudyEntryResource {
 		notes = "Create germplasm entries in study based on the specified germplasm list id ")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
+	public ResponseEntity<Void> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
 		@RequestParam(value = "listId", required = true) final Integer listId) {
 
