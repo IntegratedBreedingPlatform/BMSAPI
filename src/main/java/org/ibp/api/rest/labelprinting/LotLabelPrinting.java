@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
@@ -8,6 +9,7 @@ import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.service.api.inventory.LotAttributeService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.inventory.manager.LotService;
@@ -32,6 +34,7 @@ import org.springframework.validation.ObjectError;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,12 +55,17 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	private GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
+	private LotAttributeService lotAttributeService;
+
+	@Autowired
 	private SearchRequestService searchRequestService;
 
 	@Autowired
 	private LotService lotService;
 
 	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
+
+	private Set<Integer> lotAttributeKeys;
 
 
 	// Lot IDs
@@ -156,24 +164,6 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			.map(field -> new Field(field.getId(), field.getName()))
 			.collect(Collectors.toList()));
 
-	/**
-	 * Identify non-fixed columns with id = MAX_FIXED_TYPE_INDEX + column-id
-	 * Requires no collision between non-fixed columns id
-	 * Allocates some space for future fixed-columns
-	 */
-	private static final Integer MAX_FIXED_TYPE_INDEX = 1000;
-
-	static int toKey(final int id) {
-		return id + MAX_FIXED_TYPE_INDEX;
-	}
-
-	static int toId(final int key) {
-		if (key > MAX_FIXED_TYPE_INDEX) {
-			return key - MAX_FIXED_TYPE_INDEX;
-		}
-		return key;
-	}
-
 	@Override
 	void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		if (labelsInfoInput.getSearchRequestId() == null) {
@@ -235,7 +225,11 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 				.collect(Collectors.toList()));
 			labelTypes.add(germplasmLabelTypes);
+			this.populateLotAttributesLabelType(programUUID, labelTypes, extendedLotDtos);
+		} else {
+			this.populateAttributesLabelType(programUUID, labelTypes, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
 		}
+
 		return labelTypes;
 	}
 
@@ -246,7 +240,10 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final LotsSearchDto searchDto =
 			(LotsSearchDto) this.searchRequestService.getSearchRequest(searchRequestId, LotsSearchDto.class);
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLotsApplyExportResultsLimit(searchDto, null);
-		final Map<Integer, Map<Integer, String>> attributeValues = this.lotService.getGermplasmAttributeValues(searchDto);
+		final Map<Integer, Map<Integer, String>> germplasmAttributeValues = this.lotService.getGermplasmAttributeValues(searchDto);
+		final Map<Integer, Map<Integer, String>> lotAttributeValues =
+			this.lotAttributeService.getAttributesByLotIdsMap(extendedLotDtos.stream().map(lot -> lot.getLotId()).collect(
+				Collectors.toList()));
 
 		// Data to be exported
 		final List<Map<Integer, String>> data = new ArrayList<>();
@@ -263,7 +260,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		}
 
 		for (final ExtendedLotDto extendedLotDto : extendedLotDtos) {
-			data.add(this.getDataRow(labelsGeneratorInput, keys, extendedLotDto, attributeValues, pedigreeByGID));
+			data.add(
+				this.getDataRow(labelsGeneratorInput, keys, extendedLotDto, germplasmAttributeValues, lotAttributeValues, pedigreeByGID));
 		}
 
 		return new LabelsData(LOT_FIELD.LOT_UID.getId(), data);
@@ -272,7 +270,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	Map<Integer, String> getDataRow(final LabelsGeneratorInput labelsGeneratorInput,
 		final Set<Integer> keys,
 		final ExtendedLotDto extendedLotDto,
-		final Map<Integer, Map<Integer, String>> attributeValues,
+		final Map<Integer, Map<Integer, String>> germplasmAttributeValues,
+		final Map<Integer, Map<Integer, String>> lotAttributeValues,
 		final Map<String, String> pedigreeByGID) {
 
 		final Map<Integer, String> columns = new HashMap<>();
@@ -357,23 +356,41 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 					default:
 						break;
 				}
+			} else if (CollectionUtils.isNotEmpty(this.lotAttributeKeys) && this.lotAttributeKeys.contains(key)) {
+				this.addAttributeColumns(labelsGeneratorInput, columns, key, id,
+					lotAttributeValues.get(extendedLotDto.getLotId()));
 			} else {
-				// Not part of the fixed columns
+				// Not part of the fixed columns or lot attributes
 				// Attributes
-				final Map<Integer, String> attributesByType = attributeValues.get(extendedLotDto.getGid());
-				if (attributesByType != null) {
-					final String attributeValue = attributesByType.get(id);
-					if (attributeValue != null) {
-						// Truncate attribute values to 200 characters if export file type is PDF
-						columns.put(key, FileType.PDF.equals(labelsGeneratorInput.getFileType()) && StringUtils.length(attributeValue) > GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH ?
-							attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "..." : attributeValue);
-					}
-				}
-
+				this.addAttributeColumns(labelsGeneratorInput, columns, key, id,
+					germplasmAttributeValues.get(extendedLotDto.getGid()));
 			}
 		}
 
 		return columns;
+	}
+
+	private void addAttributeColumns(final LabelsGeneratorInput labelsGeneratorInput, final Map<Integer, String> columns,
+		final Integer key, final int id, final Map<Integer, String> attributesByType) {
+		if (attributesByType != null) {
+			final String attributeValue = attributesByType.get(id);
+			if (attributeValue != null) {
+				// Truncate attribute values to 200 characters if export file type is PDF
+				columns.put(key, FileType.PDF.equals(labelsGeneratorInput.getFileType())
+					&& StringUtils.length(attributeValue) > GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH ?
+					attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "..." : attributeValue);
+			}
+		}
+	}
+
+	void populateLotAttributesLabelType(
+		final String programUUID, final List<LabelType> labelTypes, final List<ExtendedLotDto> lotDtos) {
+		final List<Integer> lotIds = lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toList());
+		final List<Variable> attributeVariables = this.lotAttributeService.getLotAttributeVariables(lotIds, programUUID);
+
+		this.populateAttributesLabelType(programUUID, labelTypes, lotIds, attributeVariables);
+		this.lotAttributeKeys = (attributeVariables.stream()
+			.map(var -> toKey(var.getId())).collect(Collectors.toSet()));
 	}
 
 	@Override

@@ -44,6 +44,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -201,26 +202,18 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		namesType.setFields(new ArrayList<>());
 		labelTypes.add(namesType);
 
-		// Attributes labels
-		final String attributesPropValue = this.getMessage("label.printing.attributes.details");
-		final LabelType attributesType = new LabelType(attributesPropValue, attributesPropValue);
-		attributesType.setFields(new ArrayList<>());
-		labelTypes.add(attributesType);
-
 		if (!germplasmSearchResponses.isEmpty()) {
 			final List<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
 			final List<Variable> attributeVariables = this.germplasmAttributeService.getGermplasmAttributeVariables(gids, programUUID);
 			final List<GermplasmNameTypeDTO> nameTypes = this.germplasmNameTypeService.getNameTypesByGIDList(gids);
 
+			this.populateAttributesLabelType(programUUID, labelTypes, gids, attributeVariables);
+
 			namesType.getFields().addAll(nameTypes.stream()
 				.map(nameType -> new Field(toKey(nameType.getId()), nameType.getCode()))
 				.collect(Collectors.toList()));
-
-			attributesType.getFields().addAll(attributeVariables.stream()
-				.map(attributeVariable -> new Field(
-					toKey(attributeVariable.getId()),
-					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
-				.collect(Collectors.toList()));
+		} else {
+			this.populateAttributesLabelType(programUUID, labelTypes, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
 		}
 	}
 
@@ -608,24 +601,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	public LabelPrintingPresetDTO getDefaultSetting(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		return null;
-	}
-
-	/**
-	 * Identify non-fixed columns with id = MAX_FIXED_TYPE_INDEX + column-id
-	 * Requires no collision between non-fixed columns id
-	 * Allocates some space for future fixed-columns
-	 */
-	protected static final Integer MAX_FIXED_TYPE_INDEX = 10000;
-
-	static int toKey(final int id) {
-		return id + MAX_FIXED_TYPE_INDEX;
-	}
-
-	static int toId(final int key) {
-		if (key > MAX_FIXED_TYPE_INDEX) {
-			return key - MAX_FIXED_TYPE_INDEX;
-		}
-		return key;
 	}
 
 	public String getMessage(final String code) {

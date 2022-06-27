@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
-import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.domain.shared.AttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LotAttributeValidator;
 import org.ibp.api.java.inventory.manager.LotAttributeService;
@@ -13,6 +13,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -59,4 +60,8 @@ public class LotAttributeServiceImpl implements LotAttributeService {
 		this.lotAttributeService.deleteLotAttribute(attributeId);
 	}
 
+	@Override
+	public Map<Integer, Map<Integer, String>> getAttributesByLotIdsMap(final List<Integer> lotIds) {
+		return this.lotAttributeService.getAttributesByLotIdsMap(lotIds);
+	}
 }

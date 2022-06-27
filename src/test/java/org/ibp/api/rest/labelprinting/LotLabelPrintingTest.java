@@ -37,7 +37,8 @@ public class LotLabelPrintingTest {
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow = this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, new HashMap<>());
+		final Map<Integer, String> dataRow =
+			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
 	}
@@ -55,7 +56,8 @@ public class LotLabelPrintingTest {
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow = this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, new HashMap<>());
+		final Map<Integer, String> dataRow =
+			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is not truncated for CSV file type
 		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
@@ -74,7 +76,8 @@ public class LotLabelPrintingTest {
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow = this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, new HashMap<>());
+		final Map<Integer, String> dataRow =
+			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is not truncated for XLS file type
 		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
@@ -93,7 +96,8 @@ public class LotLabelPrintingTest {
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow = this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, new HashMap<>());
+		final Map<Integer, String> dataRow =
+			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is truncated for PDF file type
 		Assert.assertEquals(attributeValue.substring(0, 200) + "...", dataRow.get(attributeId));
