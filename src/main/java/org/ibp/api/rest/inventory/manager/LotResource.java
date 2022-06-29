@@ -251,7 +251,7 @@ public class LotResource {
 
 		try {
 			this.inventoryLock.lockWrite();
-			this.lotService.updateLots(extendedLotDtos, lotRequest);
+			this.lotService.updateLots(extendedLotDtos, lotRequest, programUUID);
 		} finally {
 			this.inventoryLock.unlockWrite();
 		}
