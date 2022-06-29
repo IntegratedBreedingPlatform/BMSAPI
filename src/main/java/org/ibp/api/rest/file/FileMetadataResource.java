@@ -76,9 +76,10 @@ public class FileMetadataResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Integer datasetId,
 		@RequestParam(required = false) final String germplasmUUID,
-		@RequestParam(required = false) final Integer instanceId
+		@RequestParam(required = false) final Integer instanceId,
+		@RequestParam(required = false) final Integer lotId
 	) {
-		final Integer count = this.fileMetadataServiceMiddleware.getAll(variableIds, datasetId, germplasmUUID, instanceId).size();
+		final Integer count = this.fileMetadataServiceMiddleware.getAll(variableIds, datasetId, germplasmUUID, instanceId, lotId).size();
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add("X-Total-Count", String.valueOf(count));
 		return new ResponseEntity<>(headers, HttpStatus.OK);
@@ -91,10 +92,11 @@ public class FileMetadataResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Integer datasetId,
 		@RequestParam(required = false) final String germplasmUUID,
-		@RequestParam(required = false) final Integer instanceId
+		@RequestParam(required = false) final Integer instanceId,
+		@RequestParam(required = false) final Integer lotId
 	) {
 		//Check if only one of the parameters has value
-		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1)) == 1;
+		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1) + ((lotId == null)? 0 : 1)) == 1;
 		BaseValidator.checkArgument(valid, "file.upload.detach.parameters.invalid");
 		if (datasetId != null || instanceId != null) {
 			FileResource.verifyHasAuthorityStudy(this.request);
@@ -102,7 +104,7 @@ public class FileMetadataResource {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
 
-		this.fileMetadataServiceMiddleware.detachFiles(variableIds, datasetId, germplasmUUID, instanceId);
+		this.fileMetadataServiceMiddleware.detachFiles(variableIds, datasetId, germplasmUUID, instanceId, lotId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -113,10 +115,11 @@ public class FileMetadataResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Integer datasetId,
 		@RequestParam(required = false) final String germplasmUUID,
-		@RequestParam(required = false) final Integer instanceId
+		@RequestParam(required = false) final Integer instanceId,
+		@RequestParam(required = false) final Integer lotId
 	) {
 		//Check if only one of the parameters has value
-		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1)) == 1;
+		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1) + ((lotId == null)? 0 : 1)) == 1;
 		BaseValidator.checkArgument(valid, "file.upload.detach.parameters.invalid");
 		this.validateFileStorage();
 		if (datasetId != null || instanceId != null) {
@@ -125,7 +128,7 @@ public class FileMetadataResource {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
 
-		this.fileMetadataService.removeFiles(variableIds, datasetId, germplasmUUID, instanceId);
+		this.fileMetadataService.removeFiles(variableIds, datasetId, germplasmUUID, instanceId, lotId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
