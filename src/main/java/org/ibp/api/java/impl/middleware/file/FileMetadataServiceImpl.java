@@ -69,7 +69,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		} else if(instanceId != null) {
 			path = this.fileMetadataService.getFilePathForEnvironment(instanceId, file.getOriginalFilename());
 		} else if(lotId != null) {
-			path = this.fileMetadataService.getFilePathForLot(instanceId, file.getOriginalFilename());
+			path = this.fileMetadataService.getFilePathForLot(lotId, file.getOriginalFilename());
 		}
 
 
