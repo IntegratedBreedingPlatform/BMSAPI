@@ -16,7 +16,6 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +61,9 @@ public class ProgramResourceBrapiv2Test extends ApiUnitTestBase {
     @Before
     public void setup() {
         this.crops = this.getAllCrops();
-        Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(this.crops);
+        Mockito.when(this.cropServiceMW.getInstalledCropDatabases()).thenReturn(this.crops);
 
-		Mockito.when(this.workbenchDataManager.getAvailableCropsForUser(Mockito.anyInt())).thenReturn(this.crops);
+		Mockito.when(this.cropServiceMW.getAvailableCropsForUser(Mockito.anyInt())).thenReturn(this.crops);
 
 		this.user.setName(RandomStringUtils.randomAlphabetic(10));
 		this.user.setUserid(Integer.parseInt(RandomStringUtils.randomNumeric(5)));

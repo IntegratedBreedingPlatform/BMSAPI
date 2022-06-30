@@ -11,6 +11,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.MatcherAssert;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.After;
@@ -21,6 +22,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
@@ -61,8 +63,12 @@ public class UserValidatorTest {
 	@Mock
 	private SecurityService securityService;
 
+	@Mock
+	private CropService cropService;
+
 	@After
 	public void validate() {
+		MockitoAnnotations.openMocks(this);
 		Mockito.validateMockitoUsage();
 	}
 
@@ -387,8 +393,7 @@ public class UserValidatorTest {
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
 
-		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses())
-			.thenReturn(Arrays.asList(new CropType("maize"), new CropType("wheat")));
+		Mockito.when(this.cropService.getInstalledCrops()).thenReturn(Arrays.asList("maize", "wheat"));
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
