@@ -117,13 +117,11 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
-import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.MethodServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
-import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.NamingConfigurationService;
@@ -661,12 +659,6 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public RulesService getRulesService() {
 		return new RulesServiceImpl();
-	}
-
-	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public InventoryService getInventoryService() {
-		return new InventoryServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
