@@ -1,13 +1,9 @@
 
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.java.impl.middleware.common.Constants;
 import org.slf4j.Logger;
@@ -16,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 @Component
 public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
@@ -24,7 +22,7 @@ public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOG = LoggerFactory.getLogger(CropNameValidationInterceptor.class);
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropServiceMW;
 
 	@Autowired
 	private RequestInformationProvider requestInformationProvider;
@@ -38,7 +36,7 @@ public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
 			String cropName = uriTemplateVars.get(Constants.CROPNAME_URI_PARAM);
 			ErrorResponse errorResponse = null;
 			try {
-				CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
+				CropType cropType = this.cropServiceMW.getCropTypeByName(cropName);
 				if (cropType == null) {
 					errorResponse = new ErrorResponse("error", "Invalid crop name path parameter: " + cropName);
 				}
@@ -86,8 +84,8 @@ public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
 		}
 	}
 
-	protected void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
+	protected void setCropServiceMW(CropService cropServiceMW) {
+		this.cropServiceMW = cropServiceMW;
 	}
 
 	protected void setRequestInformationProvider(RequestInformationProvider requestInformationProvider) {

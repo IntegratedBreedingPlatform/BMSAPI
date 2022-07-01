@@ -38,6 +38,8 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitS
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
+import org.generationcp.middleware.api.crop.CropService;
+import org.generationcp.middleware.api.crop.CropServiceImpl;
 import org.generationcp.middleware.api.cropparameter.CropParameterImpl;
 import org.generationcp.middleware.api.cropparameter.CropParameterService;
 import org.generationcp.middleware.api.file.FileMetadataService;
@@ -895,6 +897,12 @@ public class MiddlewareFactory {
 	@DependsOn("WORKBENCH_SessionFactory")
 	public FeedbackService getFeedbackService() {
 		return new FeedbackServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@DependsOn("WORKBENCH_SessionFactory")
+	public CropService getCropService() {
+		return new CropServiceImpl(this.getWorkbenchSessionProvider());
 	}
 
 	@Bean

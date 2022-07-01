@@ -37,8 +37,6 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	private static final String WHEAT = "Wheat";
 	private static final String RICE = "Rice";
 	private static final String MAIZE = "Maize";
-	private static final String INVALID_CROP = "maize";
-	private static final String INVALID_BRAPI_V1_PROGRAMS = "/" + ProgramResourceBrapiTest.INVALID_CROP + "/brapi/v1/programs";
 	private static final String MAIZE_BRAPI_V1_PROGRAMS = "/maize/brapi/v1/programs";
 	final static String PROGRAM_UUID_RICE = "92c47f83-4427-44c9-982f-b611b8917a2d";
 	final static String PROGRAM_UUID_WHEAT = "2ca55832-5c5d-404f-b05c-bc6e305c8b76";
@@ -58,11 +56,14 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	@Autowired
 	private CropService cropService;
 
+	@Autowired
+	private org.generationcp.middleware.api.crop.CropService cropServiceMW;
+
 	@Before
 	public void setup() {
 		this.crops = this.getAllCrops();
-		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(this.crops);
-		Mockito.when(this.workbenchDataManager.getAvailableCropsForUser(Mockito.anyInt())).thenReturn(this.crops);
+		Mockito.when(this.cropServiceMW.getInstalledCropDatabases()).thenReturn(this.crops);
+		Mockito.when(this.cropServiceMW.getAvailableCropsForUser(Mockito.anyInt())).thenReturn(this.crops);
 		final WorkbenchUser user = new WorkbenchUser();
 		user.setName(RandomStringUtils.randomAlphabetic(10));
 		user.setUserid(Integer.parseInt(RandomStringUtils.randomNumeric(5)));

@@ -1,12 +1,12 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.generationcp.middleware.domain.dms.InstanceVariableData;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -44,7 +44,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private org.generationcp.middleware.service.api.study.StudyInstanceService middlewareStudyInstanceService;
 
 	@Resource
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropServiceMW;
 
 	@Resource
 	private LocationService locationService;
@@ -73,7 +73,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		}
 		this.studyValidator.validate(studyId, true);
 
-		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
+		final CropType cropType = this.cropServiceMW.getCropTypeByName(cropName);
 		final Integer datasetId = this.studyService.getEnvironmentDatasetId(studyId);
 
 		// Add Study Instances in Environment (Summary Data) Dataset
