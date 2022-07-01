@@ -14,8 +14,13 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.impl.middleware.germplasm.workbook.generator.OntologyVariableSheetGenerator;
 import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -35,6 +40,7 @@ import java.util.Locale;
 public class LotExcelTemplateExportServiceImpl implements LotTemplateExportService {
 
 	private static final String FILE_NAME = "basic_template_import_lots_";
+	private static final String FILE_NAME_UPDATE = "basic_template_import_update_lots_";
 	private static final String FILE_EXTENSION = ".xls";
 
 	private static final int LOTS_SHEET_GID_COLUMN_INDEX = 0;
@@ -50,14 +56,22 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 	@Autowired
 	ResourceBundleMessageSource messageSource;
 
+	@Autowired
+	protected OntologyVariableDataManager ontologyVariableDataManager;
+
+	@Autowired
+	protected OntologyVariableSheetGenerator ontologyVariableSheetGenerator;
+
 	@Override
-	public File export(final String cropName, final List<LocationDTO> locations, final List<VariableDetails> units) {
+	public File export(final String programUUID, final String cropName, final List<LocationDTO> locations,
+		final List<VariableDetails> units, final boolean isUpdateFormat) {
 		try {
 			final File temporaryFolder = Files.createTempDir();
 
-			final String fileNameFullPath =	temporaryFolder.getAbsolutePath() + File.separator
-				+ LotExcelTemplateExportServiceImpl.FILE_NAME + cropName.toLowerCase() + LotExcelTemplateExportServiceImpl.FILE_EXTENSION;
-			return this.generateTemplateFile(fileNameFullPath, locations, units);
+			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator
+				+ (isUpdateFormat ? FILE_NAME_UPDATE : FILE_NAME) + cropName.toLowerCase()
+				+ LotExcelTemplateExportServiceImpl.FILE_EXTENSION;
+			return this.generateTemplateFile(fileNameFullPath, locations, units, programUUID, isUpdateFormat);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.exportAsXLS.lot.template", "");
@@ -65,13 +79,14 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 		}
 	}
 
-	public File generateTemplateFile(final String fileNamePath, final List<LocationDTO> locations, final List<VariableDetails> units)
+	public File generateTemplateFile(final String fileNamePath, final List<LocationDTO> locations, final List<VariableDetails> units,
+		final String programUUID, final boolean isUpdateFormat)
 		throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
 		final File file = new File(fileNamePath);
-		this.writeLotsSheet(xlsBook);
-		this.writeCodesSheet(xlsBook, locations, units);
+		this.writeLotsSheet(xlsBook, isUpdateFormat);
+		this.writeCodesSheet(xlsBook, locations, units, programUUID, isUpdateFormat);
 
 		try (final FileOutputStream fos = new FileOutputStream(file)) {
 			xlsBook.write(fos);
@@ -80,16 +95,17 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 		return file;
 	}
 
-	private void writeLotsSheet(final HSSFWorkbook xlsBook) {
+	private void writeLotsSheet(final HSSFWorkbook xlsBook, final boolean isUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet xlsSheet =
 			xlsBook.createSheet(this.messageSource.getMessage("export.inventory.manager.lot.template.sheet.lots", null, locale));
 		int currentRowNum = 0;
 
-		this.writeLotsHeader(xlsBook, xlsSheet, currentRowNum++);
+		this.writeLotsHeader(xlsBook, xlsSheet, currentRowNum++, isUpdateFormat);
 	}
 
-	private void writeCodesSheet(final HSSFWorkbook xlsBook, final List<LocationDTO> locations, final List<VariableDetails> units) {
+	private void writeCodesSheet(final HSSFWorkbook xlsBook, final List<LocationDTO> locations, final List<VariableDetails> units,
+		final String programUUID, final boolean isUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet xlsSheet =
 			xlsBook.createSheet(this.messageSource.getMessage("export.inventory.manager.lot.template.sheet.codes", null, locale));
@@ -105,6 +121,15 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 		xlsSheet.setColumnWidth(LotExcelTemplateExportServiceImpl.CODES_SHEET_FIRST_COLUMN_INDEX, 34 * 250);
 		xlsSheet.setColumnWidth(LotExcelTemplateExportServiceImpl.CODES_SHEET_SECOND_COLUMN_INDEX, 65 * 250);
 
+		if (isUpdateFormat) {
+			final VariableFilter attributeFilter = new VariableFilter();
+			attributeFilter.setProgramUuid(programUUID);
+			attributeFilter.addVariableType(VariableType.INVENTORY_ATTRIBUTE);
+			final List<Variable> attributeVariables = this.ontologyVariableDataManager.getWithFilter(attributeFilter);
+
+			this.ontologyVariableSheetGenerator.writeOntologyVariableSheet(xlsBook, "export.germplasm.list.template.sheet.attributes",
+				attributeVariables);
+		}
 	}
 
 	private int writeLocationSection(
@@ -155,7 +180,7 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 
 	private void writeCell(
 		final int codesSheetFirstColumnIndex, final String value, final int count, final HSSFWorkbook xlsBook, final HSSFRow row) {
-		HSSFCell cell = row.createCell(codesSheetFirstColumnIndex, CellType.STRING);
+		final HSSFCell cell = row.createCell(codesSheetFirstColumnIndex, CellType.STRING);
 		cell.setCellStyle(this.getcellStyle(
 			xlsBook,
 			codesSheetFirstColumnIndex == 0 ? IndexedColors.AQUA.getIndex() : IndexedColors.OLIVE_GREEN.getIndex()));
@@ -168,7 +193,7 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 	}
 
 	private void writeLotsHeader(
-		final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum) {
+		final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum, final boolean isUpdateFormat) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFRow row = xlsSheet.createRow(currentRowNum);
 		row.setHeightInPoints(16);
@@ -179,7 +204,11 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 
 		HSSFCell cell = row.createCell(LotExcelTemplateExportServiceImpl.LOTS_SHEET_GID_COLUMN_INDEX, CellType.STRING);
 		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.ORANGE.getIndex()));
-		cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.gid.column", null, locale));
+		if (isUpdateFormat) {
+			cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.lotuid.column", null, locale));
+		} else {
+			cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.gid.column", null, locale));
+		}
 
 		cell = row.createCell(LotExcelTemplateExportServiceImpl.LOTS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX, CellType.STRING);
 		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
@@ -190,23 +219,29 @@ public class LotExcelTemplateExportServiceImpl implements LotTemplateExportServi
 		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
 		cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.units.column", null, locale));
 
-		cell = row.createCell(LotExcelTemplateExportServiceImpl.LOTS_SHEET_AMOUNT_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
-		cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.amount.column", null, locale));
+		if (!isUpdateFormat) {
+			cell = row.createCell(LotExcelTemplateExportServiceImpl.LOTS_SHEET_AMOUNT_COLUMN_INDEX, CellType.STRING);
+			cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
+			cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.amount.column", null, locale));
 
-		cell = row.createCell(LotExcelTemplateExportServiceImpl.LOTS_SHEET_STOCK_ID_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
-		cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.stock.id.column", null, locale));
+			cell = row.createCell(LotExcelTemplateExportServiceImpl.LOTS_SHEET_STOCK_ID_COLUMN_INDEX, CellType.STRING);
+			cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
+			cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.stock.id.column", null, locale));
+		}
 
-		cell = row.createCell(LotExcelTemplateExportServiceImpl.LOTS_SHEET_NOTES_COLUMN_INDEX, CellType.STRING);
+		final int notesIndex = isUpdateFormat ? LotExcelTemplateExportServiceImpl.LOTS_SHEET_NOTES_COLUMN_INDEX - 2 :
+			LotExcelTemplateExportServiceImpl.LOTS_SHEET_NOTES_COLUMN_INDEX;
+		cell = row.createCell(notesIndex, CellType.STRING);
 		cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.YELLOW.getIndex()));
 		cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.notes.column", null, locale));
 
 		xlsSheet.setColumnWidth(LotExcelTemplateExportServiceImpl.LOTS_SHEET_GID_COLUMN_INDEX, 8 * 250);
 		xlsSheet.setColumnWidth(LotExcelTemplateExportServiceImpl.LOTS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX, 34 * 250);
 		xlsSheet.setColumnWidth(LotExcelTemplateExportServiceImpl.LOTS_SHEET_UNITS_COLUMN_INDEX, 10 * 250);
-		xlsSheet.setColumnWidth(LotExcelTemplateExportServiceImpl.LOTS_SHEET_AMOUNT_COLUMN_INDEX, 13 * 250);
-		xlsSheet.setColumnWidth(LotExcelTemplateExportServiceImpl.LOTS_SHEET_STOCK_ID_COLUMN_INDEX, 13 * 250);
+		if (!isUpdateFormat) {
+			xlsSheet.setColumnWidth(LotExcelTemplateExportServiceImpl.LOTS_SHEET_AMOUNT_COLUMN_INDEX, 13 * 250);
+			xlsSheet.setColumnWidth(LotExcelTemplateExportServiceImpl.LOTS_SHEET_STOCK_ID_COLUMN_INDEX, 13 * 250);
+		}
 		xlsSheet.setColumnWidth(LotExcelTemplateExportServiceImpl.LOTS_SHEET_NOTES_COLUMN_INDEX, 10 * 250);
 	}
 
