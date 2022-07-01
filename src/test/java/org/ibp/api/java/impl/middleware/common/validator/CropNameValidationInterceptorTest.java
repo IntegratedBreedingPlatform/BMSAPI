@@ -1,14 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import java.io.IOException;
-import java.util.HashMap;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,10 +10,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
+
 public class CropNameValidationInterceptorTest {
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropServiceMW;
 
 	@Mock
 	private RequestInformationProvider requestInformationProvider;
@@ -44,7 +43,7 @@ public class CropNameValidationInterceptorTest {
 		MockitoAnnotations.initMocks(this);
 
 		this.validationInterceptor = new CropNameValidationInterceptor();
-		this.validationInterceptor.setWorkbenchDataManager(this.workbenchDataManager);
+		this.validationInterceptor.setCropServiceMW(this.cropServiceMW);
 		this.validationInterceptor.setRequestInformationProvider(this.requestInformationProvider);
 
 		Mockito.when(this.response.getOutputStream()).thenReturn(this.responseOutputStream);
@@ -57,7 +56,7 @@ public class CropNameValidationInterceptorTest {
 		testPathParameters.put("cropname", "wheat");
 
 		Mockito.when(this.requestInformationProvider.getUrlTemplateAttributes()).thenReturn(testPathParameters);
-		Mockito.when(this.workbenchDataManager.getCropTypeByName("wheat")).thenReturn(new CropType("wheat"));
+		Mockito.when(this.cropServiceMW.getCropTypeByName("wheat")).thenReturn(new CropType("wheat"));
 
 		Assert.assertTrue("Expecting handler to continue processing by returning true.",
 				this.validationInterceptor.preHandle(this.request, this.response, this.handler));
@@ -70,7 +69,7 @@ public class CropNameValidationInterceptorTest {
 		testPathParameters.put("cropname", "nonExistantCrop");
 
 		Mockito.when(this.requestInformationProvider.getUrlTemplateAttributes()).thenReturn(testPathParameters);
-		Mockito.when(this.workbenchDataManager.getCropTypeByName("nonExistantCrop")).thenReturn(null);
+		Mockito.when(this.cropServiceMW.getCropTypeByName("nonExistantCrop")).thenReturn(null);
 
 		Assert.assertFalse("Expecting handler to abort processing by returning false.",
 				this.validationInterceptor.preHandle(this.request, this.response, this.handler));
@@ -82,7 +81,7 @@ public class CropNameValidationInterceptorTest {
 		HashMap<String, String> testPathParameters = new HashMap<String, String>();
 
 		Mockito.when(this.requestInformationProvider.getUrlTemplateAttributes()).thenReturn(testPathParameters);
-		Mockito.when(this.workbenchDataManager.getCropTypeByName("wheat")).thenReturn(new CropType("wheat"));
+		Mockito.when(this.cropServiceMW.getCropTypeByName("wheat")).thenReturn(new CropType("wheat"));
 
 		Assert.assertTrue("Expecting handler to continue processing by returning true when there is no cropname parameter present.",
 				this.validationInterceptor.preHandle(this.request, this.response, this.handler));

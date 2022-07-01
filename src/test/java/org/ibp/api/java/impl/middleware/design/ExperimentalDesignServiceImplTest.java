@@ -1,9 +1,9 @@
 package org.ibp.api.java.impl.middleware.design;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
@@ -13,10 +13,10 @@ import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
-import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
@@ -74,7 +74,7 @@ public class ExperimentalDesignServiceImplTest {
 	private ExperimentalDesignTypeService designTypeService;
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropServiceMW;
 
 	@InjectMocks
 	private ExperimentalDesignServiceImpl experimentDesignService;
@@ -111,7 +111,7 @@ public class ExperimentalDesignServiceImplTest {
 		Mockito.verify(this.instanceValidator).validateInstanceNumbers(STUDY_ID, this.designInput.getTrialInstancesForDesignGeneration());
 		Mockito.verifyZeroInteractions(this.studyService);
 		Mockito.verifyZeroInteractions(this.middlewareStudyEntryService);
-		Mockito.verifyZeroInteractions(this.workbenchDataManager);
+		Mockito.verifyZeroInteractions(this.cropServiceMW);
 		Mockito.verifyZeroInteractions(this.experimentalDesignTypeValidator);
 		Mockito.verifyZeroInteractions(this.middlewareExperimentDesignService);
 	}
@@ -128,7 +128,7 @@ public class ExperimentalDesignServiceImplTest {
 
 	@Test
 	public void testGenerateDesign() {
-		Mockito.doReturn(this.cropType).when(this.workbenchDataManager).getCropTypeByName(CROP);
+		Mockito.doReturn(this.cropType).when(this.cropServiceMW).getCropTypeByName(CROP);
 		Mockito.doReturn(PROGRAM_UUID).when(this.studyService).getProgramUUID(STUDY_ID);
 		Mockito.doReturn(this.studyList).when(this.middlewareStudyEntryService).getStudyEntries(STUDY_ID);
 		Mockito.doReturn(this.rows).when(this.designTypeService).generateDesign(STUDY_ID, this.designInput, PROGRAM_UUID, this.studyList);

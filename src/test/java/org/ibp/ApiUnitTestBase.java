@@ -84,7 +84,7 @@ public abstract class ApiUnitTestBase {
 	private WebApplicationContext webApplicationContext;
 
 	@Autowired
-	protected WorkbenchDataManager workbenchDataManager;
+	protected org.generationcp.middleware.api.crop.CropService cropServiceMW;
 
 	@Autowired
 	protected StudyDataManager studyDataManager;
@@ -105,6 +105,12 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public CropService cropService() {
 			return Mockito.mock(CropService.class);
+		}
+
+		@Bean
+		@Primary
+		public org.generationcp.middleware.api.crop.CropService cropServiceMW() {
+			return Mockito.mock(org.generationcp.middleware.api.crop.CropService.class);
 		}
 
 		@Bean
@@ -298,7 +304,7 @@ public abstract class ApiUnitTestBase {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
-		Mockito.doReturn(new CropType(this.cropName)).when(this.workbenchDataManager).getCropTypeByName(this.cropName);
+		Mockito.doReturn(new CropType(this.cropName)).when(this.cropServiceMW).getCropTypeByName(this.cropName);
 		this.loadPreAuthorizedRole();
 	}
 
