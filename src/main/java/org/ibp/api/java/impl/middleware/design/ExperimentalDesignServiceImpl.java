@@ -1,8 +1,8 @@
 package org.ibp.api.java.impl.middleware.design;
 
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
@@ -29,7 +29,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -61,7 +65,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 	private ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Resource
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropServiceMW;
 
 	@Resource
 	private DesignLicenseService designLicenseService;
@@ -94,7 +98,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 		final List<MeasurementVariable> measurementVariables =
 			experimentalDesignTypeService.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 
-		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
+		final CropType cropType = this.cropServiceMW.getCropTypeByName(cropName);
 		this.experimentDesignMiddlewareService
 			.saveExperimentDesign(cropType, studyId, measurementVariables,
 				this.createInstanceObservationUnitRowsMap(observationUnitRows));

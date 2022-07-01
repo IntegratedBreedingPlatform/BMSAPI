@@ -16,6 +16,7 @@ import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -79,6 +80,9 @@ public class UserValidator {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private CropService cropService;
 
 	private BindingResult errors;
 
@@ -226,8 +230,7 @@ public class UserValidator {
 			// Crops in the list MUST exist
 			final Set<String> cropsUsedInUserRoles =
 				userRoles.stream().filter(p -> p.getCrop() != null).map(p -> p.getCrop().getCropName()).collect(Collectors.toSet());
-			final List<String> installedCrops =
-				this.workbenchDataManager.getInstalledCropDatabses().stream().map(p -> p.getCropName()).collect(Collectors.toList());
+			final List<String> installedCrops = this.cropService.getInstalledCrops();
 
 			if (!installedCrops.containsAll(cropsUsedInUserRoles)) {
 				this.errors.reject("user.crop.not.exist",
