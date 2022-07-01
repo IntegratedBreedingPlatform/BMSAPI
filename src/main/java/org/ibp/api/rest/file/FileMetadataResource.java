@@ -100,6 +100,8 @@ public class FileMetadataResource {
 		BaseValidator.checkArgument(valid, "file.upload.detach.parameters.invalid");
 		if (datasetId != null || instanceId != null) {
 			FileResource.verifyHasAuthorityStudy(this.request);
+		}  else if(lotId != null) {
+			FileResource.verifyHasAuthorityLots(request);
 		} else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
@@ -124,7 +126,9 @@ public class FileMetadataResource {
 		this.validateFileStorage();
 		if (datasetId != null || instanceId != null) {
 			FileResource.verifyHasAuthorityStudy(this.request);
-		} else {
+		} else if (lotId != null) {
+			FileResource.verifyHasAuthorityLots(request);
+		}  else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
 

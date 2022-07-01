@@ -62,7 +62,9 @@ public class FileResource {
 		this.validateFileStorage();
 		if (!isBlank(observationUnitUUID) || instanceId != null) {
 			FileResource.verifyHasAuthorityStudy(this.request);
-		} else {
+		} else if(lotId != null) {
+			verifyHasAuthorityLots(request);
+		}  else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
@@ -107,6 +109,8 @@ public class FileResource {
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(fileUUID);
 		if (!isBlank(fileMetadataDTO.getObservationUnitUUID())) {
 			verifyHasAuthorityStudy(this.request);
+		} else if(fileMetadataDTO.getLotId() != null) {
+			verifyHasAuthorityLots(request);
 		} else {
 			verifyHasAuthorityGermplasm(this.request);
 		}
@@ -147,6 +151,16 @@ public class FileResource {
 			|| request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name())
 			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_OBSERVATION_UNITS.name())
 			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_FILES.name()))) {
+			throw new AccessDeniedException("");
+		}
+	}
+
+	public static void verifyHasAuthorityLots(final HttpServletRequest request) {
+		if (!(request.isUserInRole(PermissionsEnum.ADMIN.name())
+			|| request.isUserInRole(PermissionsEnum.MANAGE_INVENTORY.name())
+			|| request.isUserInRole(PermissionsEnum.MANAGE_LOTS.name())
+			|| request.isUserInRole(PermissionsEnum.UPDATE_LOTS.name())
+			|| request.isUserInRole(PermissionsEnum.MI_MANAGE_FILES.name()))) {
 			throw new AccessDeniedException("");
 		}
 	}
