@@ -100,7 +100,7 @@ public class LotLabelPrintingTest {
 			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is truncated for PDF file type
-		Assert.assertEquals(attributeValue.substring(0, 200) + "...", dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "...", dataRow.get(attributeId));
 	}
 
 }
