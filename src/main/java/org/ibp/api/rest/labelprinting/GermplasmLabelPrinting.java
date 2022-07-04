@@ -59,8 +59,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
-	public static final int ATTRIBUTE_DISPLAY_MAX_LENGTH = 200;
-	public static final int NAME_DISPLAY_MAX_LENGTH = 200;
+	public static final int ATTRIBUTE_DISPLAY_MAX_LENGTH = 150;
+	public static final int NAME_DISPLAY_MAX_LENGTH = 150;
 
 	List<Field> defaultPedigreeDetailsFields;
 	List<Field> defaultGermplasmDetailsFields;
