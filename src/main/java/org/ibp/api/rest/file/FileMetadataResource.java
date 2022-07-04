@@ -101,7 +101,7 @@ public class FileMetadataResource {
 		if (datasetId != null || instanceId != null) {
 			FileResource.verifyHasAuthorityStudy(this.request);
 		}  else if(lotId != null) {
-			FileResource.verifyHasAuthorityLots(request);
+			FileResource.verifyHasAuthorityLots(this.request);
 		} else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
@@ -127,7 +127,7 @@ public class FileMetadataResource {
 		if (datasetId != null || instanceId != null) {
 			FileResource.verifyHasAuthorityStudy(this.request);
 		} else if (lotId != null) {
-			FileResource.verifyHasAuthorityLots(request);
+			FileResource.verifyHasAuthorityLots(this.request);
 		}  else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
