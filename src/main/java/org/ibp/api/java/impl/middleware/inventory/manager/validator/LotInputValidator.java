@@ -154,6 +154,8 @@ public class LotInputValidator {
 			}
 
 			this.validateNewLotUIDs(lotUpdateRequestDto.getMultiInput().getLotList());
+
+			this.inventoryCommonValidator.validateAttributeValues(lotUpdateRequestDto.getMultiInput().getLotList(), this.errors);
 		}
 
 		if (this.errors.hasErrors()) {
