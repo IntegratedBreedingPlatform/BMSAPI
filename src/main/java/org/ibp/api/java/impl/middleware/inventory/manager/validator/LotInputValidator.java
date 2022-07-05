@@ -18,6 +18,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.common.validator.GermplasmAttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.InventoryUnitValidator;
 import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
@@ -155,7 +156,7 @@ public class LotInputValidator {
 
 			this.validateNewLotUIDs(lotUpdateRequestDto.getMultiInput().getLotList());
 
-			this.inventoryCommonValidator.validateAttributeValues(lotUpdateRequestDto.getMultiInput().getLotList(), this.errors);
+			this.validateAttributeValues(lotUpdateRequestDto.getMultiInput().getLotList(), this.errors);
 		}
 
 		if (this.errors.hasErrors()) {
@@ -259,6 +260,19 @@ public class LotInputValidator {
 			}
 		}
 
+	}
+
+	private void validateAttributeValues(final List<LotMultiUpdateRequestDto.LotUpdateDto> lotUpdateDtos, final BindingResult errors) {
+		lotUpdateDtos.stream().forEach(lotUpdateDto -> {
+			if (!lotUpdateDto.getAttributes().isEmpty()) {
+				lotUpdateDto.getAttributes().values().stream().forEach(n -> {
+					if (StringUtils.isNotEmpty(n) && n.length() > GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH) {
+						errors.reject("attribute.value.invalid.length", "");
+						throw new ApiRequestValidationException(errors.getAllErrors());
+					}
+				});
+			}
+		});
 	}
 
 }
