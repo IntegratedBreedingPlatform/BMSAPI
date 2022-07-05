@@ -131,14 +131,6 @@ public class DatasetCSVExportServiceImplTest {
 		this.dataSetDTO.setParentDatasetId(1);
 
 		when(this.datasetTypeService.getAllDatasetTypesMap()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
-		final StandardVariable standardVariable = new StandardVariable();
-		final Enumeration enumeration = new Enumeration();
-		enumeration.setDescription(TEST_ENTRY_DESCRIPTION);
-		enumeration.setName(TEST_ENTRY_NAME);
-		standardVariable.setEnumerations(Arrays.asList(enumeration));
-		when(this.ontologyDataManager
-			.getStandardVariable(TermId.ENTRY_TYPE.getId(), PROGRAM_UUID)).thenReturn(standardVariable);
-
 		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 		ContextHolder.setCurrentCrop("maize");
 	}
