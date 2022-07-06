@@ -31,6 +31,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -961,4 +962,15 @@ public class VariableValidatorTest {
         Assert.assertFalse(bindingResult.hasErrors());
     }
 
+	@Test
+	public void testValidate_InvalidAttributeCodes() {
+		final String programUUID = RandomStringUtils.random(10);
+
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+
+		final BindingResult bindingResult = Mockito.mock(BindingResult.class);
+		this.variableValidator.validateAttributeCodes(bindingResult, programUUID, Collections.singleton("ACQ_DATE"),
+			Arrays.asList(org.generationcp.middleware.domain.ontology.VariableType.ANALYSIS));
+		Mockito.verify(bindingResult).reject("germplasm.update.invalid.attribute.code", new String[] {"ACQ_DATE"}, "");
+	}
 }

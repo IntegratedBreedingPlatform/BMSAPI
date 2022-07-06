@@ -137,8 +137,6 @@ public class GermplasmUpdateDtoValidatorTest {
 		final BindingResult errors = Mockito.mock(BindingResult.class);
 		this.germplasmUpdateDtoValidator.validateAttributeAndNameCodes(errors, programUUID, germplasmUpdateList);
 		Mockito.verify(errors).reject("germplasm.update.invalid.name.code", new String[] {"LNAME"}, "");
-		// TODO add test in VariableValidator for invalid attribute
-		// Mockito.verify(errors).reject("germplasm.update.invalid.attribute.code", new String[] {"ACQ_DATE"}, "");
 	}
 
 	@Test
