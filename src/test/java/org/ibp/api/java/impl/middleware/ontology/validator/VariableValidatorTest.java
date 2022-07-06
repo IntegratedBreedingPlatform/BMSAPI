@@ -12,12 +12,12 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
+import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
 import org.junit.Assert;
@@ -972,5 +972,14 @@ public class VariableValidatorTest {
 		this.variableValidator.validateAttributeCodes(bindingResult, programUUID, Collections.singleton("ACQ_DATE"),
 			Arrays.asList(org.generationcp.middleware.domain.ontology.VariableType.ANALYSIS));
 		Mockito.verify(bindingResult).reject("germplasm.update.invalid.attribute.code", new String[] {"ACQ_DATE"}, "");
+	}
+
+	@Test
+	public void testValidate_InvalidAttributeValues() {
+		final BindingResult errors = Mockito.mock(BindingResult.class);
+		this.variableValidator.areAttributesInvalid(Collections.singletonMap("NOTES",
+			RandomStringUtils.randomAlphanumeric(AttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH +1)),
+			errors);
+		Mockito.verify(errors).reject("attribute.value.invalid.length", "");
 	}
 }
