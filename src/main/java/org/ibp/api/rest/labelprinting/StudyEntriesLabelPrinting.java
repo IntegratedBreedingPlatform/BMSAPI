@@ -49,28 +49,28 @@ import java.util.stream.Collectors;
 @Transactional
 public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 
-	public static final int ATTRIBUTE_DISPLAY_MAX_LENGTH = 200;
+	private static final int ATTRIBUTE_DISPLAY_MAX_LENGTH = 200;
 
-	public static final int NAME_DISPLAY_MAX_LENGTH = 200;
+	private static final int NAME_DISPLAY_MAX_LENGTH = 200;
 
-	protected static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
+	private static final List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
-	public static final String ORIG_FINAL_NAME = "entries";
+	private static final String ORIG_FINAL_NAME = "entries";
 
 	@Autowired
-	ResourceBundleMessageSource messageSource;
+	private ResourceBundleMessageSource messageSource;
 
 	@Autowired
 	private StudyEntryService studyEntryService;
 
 	@Autowired
-	GermplasmAttributeService germplasmAttributeService;
+	private GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
-	GermplasmNameTypeService germplasmNameTypeService;
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	@Autowired
-	GermplasmNameService germplasmNameService;
+	private GermplasmNameService germplasmNameService;
 
 	@Autowired
 	private StudyDataManager studyDataManager;
