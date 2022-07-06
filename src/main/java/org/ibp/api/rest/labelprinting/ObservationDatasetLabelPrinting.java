@@ -240,9 +240,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 		final List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getObservationSetVariables(
 			plotDatasetId,
-			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId(),
-				// fixme temporary adding entry detail type in Dataset Details list.
-				VariableType.ENTRY_DETAIL.getId()));
+			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
 
 		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
 			.getObservationSetVariables(
