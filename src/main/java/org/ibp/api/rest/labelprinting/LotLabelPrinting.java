@@ -6,6 +6,7 @@ import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -227,7 +228,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			labelTypes.add(germplasmLabelTypes);
 			this.populateLotAttributesLabelType(programUUID, labelTypes, extendedLotDtos);
 		} else {
-			this.populateAttributesLabelType(programUUID, labelTypes, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+			this.populateAttributesLabelType(programUUID, labelTypes, Collections.emptyList(), Collections.emptyList());
 		}
 
 		return labelTypes;
@@ -242,7 +243,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLotsApplyExportResultsLimit(searchDto, null);
 		final Map<Integer, Map<Integer, String>> germplasmAttributeValues = this.lotService.getGermplasmAttributeValues(searchDto);
 		final Map<Integer, Map<Integer, String>> lotAttributeValues =
-			this.lotAttributeService.getAttributesByLotIdsMap(extendedLotDtos.stream().map(lot -> lot.getLotId()).collect(
+			this.lotAttributeService.getAttributesByLotIdsMap(extendedLotDtos.stream().map(LotDto::getLotId).collect(
 				Collectors.toList()));
 
 		// Data to be exported

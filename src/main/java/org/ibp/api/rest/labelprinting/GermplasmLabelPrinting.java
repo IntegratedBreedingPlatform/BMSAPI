@@ -213,7 +213,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 				.map(nameType -> new Field(toKey(nameType.getId()), nameType.getCode()))
 				.collect(Collectors.toList()));
 		} else {
-			this.populateAttributesLabelType(programUUID, labelTypes, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+			this.populateAttributesLabelType(programUUID, labelTypes, Collections.emptyList(), Collections.emptyList());
 		}
 	}
 
