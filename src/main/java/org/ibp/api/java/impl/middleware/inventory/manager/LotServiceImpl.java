@@ -256,7 +256,7 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest, final String programUUID) {
-		this.lotInputValidator.validate(lotDtos, lotRequest);
+		this.lotInputValidator.validate(lotDtos, lotRequest, programUUID);
 		this.lotService.updateLots(lotDtos, lotRequest, programUUID);
 	}
 
