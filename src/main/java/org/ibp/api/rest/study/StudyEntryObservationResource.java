@@ -26,7 +26,6 @@ public class StudyEntryObservationResource {
 	private StudyEntryObservationService studyEntryObservationService;
 
 	@ApiOperation(value = "Add new observation for a given study entry", notes = "Add new observation for a given study entry")
-	// TODO: review permissions
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations", method = RequestMethod.POST)
 	public ResponseEntity<Integer> createObservation(
@@ -39,7 +38,6 @@ public class StudyEntryObservationResource {
 	}
 
 	@ApiOperation(value = "Updates the given study entry observation", notes = "Updates the given study entry observation")
-	// TODO: review permissions
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations", method = RequestMethod.PATCH)
 	public ResponseEntity<Integer> updateObservation(
@@ -52,7 +50,6 @@ public class StudyEntryObservationResource {
 	}
 
 	@ApiOperation(value = "Deletes the given study entry observation", notes = "Deletes the given study entry observation")
-	// TODO: review permissions
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations/{observationId}", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> deleteObservation(
@@ -65,7 +62,6 @@ public class StudyEntryObservationResource {
 	}
 
 	@ApiOperation(value = "Count study entry observations", notes = "Returns count of study entry observations given a set of variables")
-	// TODO: review permissions
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations", method = RequestMethod.HEAD)
 	public ResponseEntity<Void> countObservationsByVariables(
