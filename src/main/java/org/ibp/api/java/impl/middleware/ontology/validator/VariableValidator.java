@@ -75,6 +75,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String SCALE_ID_NAME = "scaleId";
 	private static final String EXPECTED_RANGE_NAME = "expectedRange";
 	private static final String VARIABLE_NAME = "variable";
+	private static final String VARIABLE_TYPE = "Variable Type";
 	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
 		org.generationcp.middleware.domain.ontology.VariableType.TRAIT.getId(), //
 		org.generationcp.middleware.domain.ontology.VariableType.SELECTION_METHOD.getId(), //
@@ -408,7 +409,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		// 17. Variable type IDs is required
 		if (variable.getVariableTypes().isEmpty()) {
-			this.addCustomError(errors, "variableTypes", BaseValidator.LIST_SHOULD_NOT_BE_EMPTY, new Object[] {"variable type"});
+			this.addCustomError(errors, "variableTypes", BaseValidator.LIST_SHOULD_NOT_BE_EMPTY, new Object[] {VariableValidator.VARIABLE_TYPE});
 		}
 
 		// 17.1 validate Germplasm Descriptor type
@@ -417,14 +418,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		if (hasGermplasmDescriptorType) {
 			if(StringUtils.isBlank(variable.getId())){
-				this.addCustomError(errors, "variableTypes", BaseValidator.GERMPLASM_DESCRIPTOR_IS_RESTRICTED, new Object[] {"Variable Type"});
+				this.addCustomError(errors, "variableTypes", BaseValidator.GERMPLASM_DESCRIPTOR_IS_RESTRICTED, new Object[] {VariableValidator.VARIABLE_TYPE});
 			}else{
 				final Integer requestId = Integer.valueOf(variable.getId());
 				final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true);
 				final boolean containsGermplasmDescriptorType = oldVariable.getVariableTypes()
 					.contains(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_DESCRIPTOR);
 				if (!containsGermplasmDescriptorType) {
-					this.addCustomError(errors, "variableTypes", BaseValidator.GERMPLASM_DESCRIPTOR_IS_RESTRICTED, new Object[] {"Variable Type"});
+					this.addCustomError(errors, "variableTypes", BaseValidator.GERMPLASM_DESCRIPTOR_IS_RESTRICTED, new Object[] {VariableValidator.VARIABLE_TYPE});
 
 				}
 			}
@@ -443,7 +444,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			final org.generationcp.middleware.domain.ontology.VariableType type =
 				org.generationcp.middleware.domain.ontology.VariableType.getById(this.parseVariableTypeAsInteger(variableType));
 			if (type == null) {
-				this.addCustomError(errors, "variableTypes", BaseValidator.INVALID_TYPE_ID, new Object[] {"Variable Type"});
+				this.addCustomError(errors, "variableTypes", BaseValidator.INVALID_TYPE_ID, new Object[] {VariableValidator.VARIABLE_TYPE});
 			} else if (type.equals(org.generationcp.middleware.domain.ontology.VariableType.TRAIT)) {
 				isTrait = true;
 			}
@@ -459,19 +460,19 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
         if(this.isAnalysisVariable(variable) && variable.getVariableTypes().size() > 1) {
-				this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE, new Object[]{"Variable Type"});
+				this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE, new Object[]{VariableValidator.VARIABLE_TYPE});
 		}
 
 		if (this.isInventoryAttributeVariable(variable) && variable.getVariableTypes().size() > 1) {
-			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_INVENTORY_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_INVENTORY_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {VariableValidator.VARIABLE_TYPE});
 		}
 
 		if (this.isGermplasmAttributeVariable(variable) && variable.getVariableTypes().size() > 1) {
-			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {VariableValidator.VARIABLE_TYPE});
 		}
 
 		if (this.isGermplasmPassportVariable(variable) && variable.getVariableTypes().size() > 1) {
-			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE, new Object[] {VariableValidator.VARIABLE_TYPE});
 		}
 
 		if (this.isEntryDetailVariable(variable) && variable.getVariableTypes().size() > 1) {
