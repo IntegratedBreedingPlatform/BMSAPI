@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.domain.common.PagedResult;
@@ -58,6 +59,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -185,7 +187,8 @@ public class GermplasmResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = true) final String query) {
 
-		return new ResponseEntity<>(this.variableService.searchAttributeVariables(query, programUUID), HttpStatus.OK);
+		return new ResponseEntity<>(this.variableService.searchAttributeVariables(query,
+			Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId()), programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Returns germplasm name types filtered by a list of codes", notes = "Returns germplasm name types filtered by a list of codes")

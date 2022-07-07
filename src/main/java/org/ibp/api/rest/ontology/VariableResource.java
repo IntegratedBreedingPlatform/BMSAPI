@@ -4,6 +4,7 @@ package org.ibp.api.rest.ontology;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
 import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Api(value = "Ontology Variable Service")
 @Controller
@@ -198,4 +200,20 @@ public class VariableResource {
 		return new ResponseEntity<>(this.variableService.createAnalysisVariables(analysisVariablesImportRequest), HttpStatus.CREATED);
 	}
 
+	/**
+	 * Simple search to feed autocomplete features
+	 *
+	 * @return a limited set of results matching the query criteria
+	 */
+	@ApiOperation(value = "Search attributes")
+	@RequestMapping(value = "/{cropName}/variables/attributes/search", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<Variable>> searchAttributes(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final Set<Integer> variableTypeIds,
+		@RequestParam(required = true) final String query) {
+
+		return new ResponseEntity<>(this.variableService.searchAttributeVariables(query,
+			variableTypeIds.stream().collect(Collectors.toList()), programUUID), HttpStatus.OK);
+	}
 }
