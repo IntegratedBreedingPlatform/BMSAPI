@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.cropparameter.CropParameterDTO;
+import org.generationcp.middleware.api.cropparameter.CropParameterEnum;
 import org.generationcp.middleware.api.cropparameter.CropParameterPatchRequestDTO;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.cropparameter.CropParameterService;
@@ -65,5 +66,14 @@ public class CropParameterResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	@ApiOperation("Get crop parameter by key")
+	@RequestMapping(value = "/crop-parameters/{key}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
+	public ResponseEntity<CropParameterDTO> getCropParameterByKey(
+		@PathVariable final String cropName,
+		@PathVariable final CropParameterEnum key,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.cropParameterService.getCropParameter(key), HttpStatus.OK);
+	}
 
 }
