@@ -496,7 +496,7 @@ public class LotResource {
 
 	}
 
-	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/lots/{searchRequestId}/attribute/columns", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/lots/attributes/columns", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<LotAttributeColumnDto>> getLotAttributeColumns(@PathVariable final String cropName,
 		@PathVariable final String programUUID) {
