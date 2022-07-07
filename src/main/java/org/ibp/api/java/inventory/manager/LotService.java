@@ -2,6 +2,7 @@ package org.ibp.api.java.inventory.manager;
 
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAttributeColumnDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
@@ -38,5 +39,7 @@ public interface LotService {
 	void mergeLots(String keepLotUUID, LotsSearchDto lotsSearchDto);
 
 	void splitLot(String programUUID, LotSplitRequestDto lotSplitRequestDto);
+
+	List<LotAttributeColumnDto> getLotAttributeColumnDtos(String programUUID);
 
 }
