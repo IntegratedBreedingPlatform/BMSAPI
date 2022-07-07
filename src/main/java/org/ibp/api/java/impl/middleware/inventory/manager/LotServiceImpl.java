@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequ
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAttributeColumnDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
@@ -361,6 +362,11 @@ public class LotServiceImpl implements LotService {
 			Arrays.asList(newLotDto.getLotId()).stream().collect(Collectors.toSet()),
 			lotDepositRequestDto, TransactionStatus.CONFIRMED, TransactionSourceType.SPLIT_LOT,
 			splitLotDto.getLotId());
+	}
+
+	@Override
+	public List<LotAttributeColumnDto> getLotAttributeColumnDtos(final String programUUID) {
+		return this.lotService.getLotAttributeColumnDtos(programUUID);
 	}
 
 	private String resolveStockIdPrefix(final String stockPrefix) {

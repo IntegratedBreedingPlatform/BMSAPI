@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequ
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.InventoryView;
+import org.generationcp.middleware.domain.inventory.manager.LotAttributeColumnDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMergeRequestDto;
@@ -493,6 +494,13 @@ public class LotResource {
 
 		return new ResponseEntity<>(extendedLotDtos, headers, HttpStatus.OK);
 
+	}
+
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/lots/attributes/columns", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<LotAttributeColumnDto>> getLotAttributeColumns(@PathVariable final String cropName,
+		@PathVariable final String programUUID) {
+		return new ResponseEntity<>(this.lotService.getLotAttributeColumnDtos(programUUID), HttpStatus.OK);
 	}
 
 }
