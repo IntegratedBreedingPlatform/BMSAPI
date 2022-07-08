@@ -356,7 +356,7 @@ public class LotServiceImplTest {
 	@Test
 	public void testGetLotAttributeColumnDtos() {
 		this.lotService.getLotAttributeColumnDtos(RandomStringUtils.randomAlphanumeric(10));
-		Mockito.verify(this.middlewareLotService.getLotAttributeColumnDtos(ArgumentMatchers.anyString()));
+		Mockito.verify(this.middlewareLotService).getLotAttributeColumnDtos(ArgumentMatchers.anyString());
 	}
 
 	private LotGeneratorBatchRequestDto buildLotGeneratorBatchRequestDto() {
