@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
 import factory.ExtendedLotDtoDummyFactory;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
@@ -350,6 +351,12 @@ public class LotServiceImplTest {
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("gids.invalid"));
 		}
+	}
+
+	@Test
+	public void testGetLotAttributeColumnDtos() {
+		this.lotService.getLotAttributeColumnDtos(RandomStringUtils.randomAlphanumeric(10));
+		Mockito.verify(this.middlewareLotService.getLotAttributeColumnDtos(ArgumentMatchers.anyString()));
 	}
 
 	private LotGeneratorBatchRequestDto buildLotGeneratorBatchRequestDto() {
