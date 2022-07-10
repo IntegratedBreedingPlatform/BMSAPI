@@ -282,7 +282,7 @@ public class GermplasmListLabelPrintingTest {
 		Assert.assertEquals(response.getGermplasmUUID(), dataRow.get(LabelPrintingStaticField.GUID.getFieldId()));
 
 		// Verify that name values are truncated for this file type
-		Assert.assertEquals(response.getGermplasmPreferredName().substring(0, 200) + "...", dataRow.get(TermId.PREFERRED_NAME.getId()));
+		Assert.assertEquals(response.getGermplasmPreferredName().substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...", dataRow.get(TermId.PREFERRED_NAME.getId()));
 	}
 
 	@Test
@@ -356,9 +356,9 @@ public class GermplasmListLabelPrintingTest {
 			dataRow.get(LabelPrintingStaticField.CROSS.getFieldId()));
 
 		// Verify that name values are truncated for this file type
-		Assert.assertEquals(response.getFemaleParentPreferredName().substring(0, 200) + "...",
+		Assert.assertEquals(response.getFemaleParentPreferredName().substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...",
 			dataRow.get(TermId.CROSS_FEMALE_PREFERRED_NAME.getId()));
-		Assert.assertEquals(response.getMaleParentPreferredName().substring(0, 200) + "...",
+		Assert.assertEquals(response.getMaleParentPreferredName().substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...",
 			dataRow.get(TermId.CROSS_MALE_PREFERRED_NAME.getId()));
 	}
 
@@ -422,7 +422,7 @@ public class GermplasmListLabelPrintingTest {
 				new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values are truncated for PDF file type
-		Assert.assertEquals(attributeValue.substring(0, 200) + "...", dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "...", dataRow.get(attributeId));
 	}
 
 	@Test
@@ -485,7 +485,7 @@ public class GermplasmListLabelPrintingTest {
 		Assert.assertEquals(1, dataRow.keySet().size());
 
 		// Verify that name values are truncated for this file type
-		Assert.assertEquals(nameValue.substring(0, 200) + "...", dataRow.get(nameTypeId));
+		Assert.assertEquals(nameValue.substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...", dataRow.get(nameTypeId));
 	}
 
 
