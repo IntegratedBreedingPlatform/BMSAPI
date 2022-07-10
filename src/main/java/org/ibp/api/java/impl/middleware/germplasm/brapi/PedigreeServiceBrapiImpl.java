@@ -9,6 +9,7 @@ import org.ibp.api.brapi.PedigreeServiceBrapi;
 import org.ibp.api.brapi.v2.germplasm.PedigreeNodesUpdateResponse;
 import org.ibp.api.brapi.v2.germplasm.PedigreeNodesUpdateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
@@ -54,4 +55,15 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 		pedigreeNodesUpdateResponse.setErrors(validationErrors.getAllErrors());
 		return pedigreeNodesUpdateResponse;
 	}
+
+	@Override
+	public List<PedigreeNodeDTO> searchPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest, final Pageable pageable) {
+		return this.pedigreeMiddlewareServiceBrapi.searchPedigreeNodes(pedigreeNodeSearchRequest, pageable);
+	}
+
+	@Override
+	public long countPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest) {
+		return this.pedigreeMiddlewareServiceBrapi.countPedigreeNodes(pedigreeNodeSearchRequest);
+	}
+
 }
