@@ -38,6 +38,8 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitS
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
+import org.generationcp.middleware.api.crop.CropService;
+import org.generationcp.middleware.api.crop.CropServiceImpl;
 import org.generationcp.middleware.api.cropparameter.CropParameterImpl;
 import org.generationcp.middleware.api.cropparameter.CropParameterService;
 import org.generationcp.middleware.api.file.FileMetadataService;
@@ -117,13 +119,11 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
-import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.MethodServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
-import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.NamingConfigurationService;
@@ -665,12 +665,6 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public InventoryService getInventoryService() {
-		return new InventoryServiceImpl(this.getCropDatabaseSessionProvider());
-	}
-
-	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public ObservationUnitService getObservationUnitService() {
 		return new ObservationUnitServiceImpl(this.getCropDatabaseSessionProvider());
 	}
@@ -901,6 +895,12 @@ public class MiddlewareFactory {
 	@DependsOn("WORKBENCH_SessionFactory")
 	public FeedbackService getFeedbackService() {
 		return new FeedbackServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@DependsOn("WORKBENCH_SessionFactory")
+	public CropService getCropService() {
+		return new CropServiceImpl(this.getWorkbenchSessionProvider());
 	}
 
 	@Bean

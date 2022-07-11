@@ -136,7 +136,8 @@ public class VariableResource {
 		@RequestParam(value = "propertyClasses", required = false) final Set<String> propertyClasses,
 
 		@RequestParam(required = false) final Set<Integer> datasetIds,
-		@RequestParam(required = false) final Set<String> germplasmUUIDs
+		@RequestParam(required = false) final Set<String> germplasmUUIDs,
+		@RequestParam(required = false) final Set<Integer> lotIds
 	) {
 
 		final VariableFilter variableFilter = new VariableFilter();
@@ -184,6 +185,10 @@ public class VariableResource {
 
 		if (!Util.isNullOrEmpty(germplasmUUIDs)) {
 			germplasmUUIDs.forEach(variableFilter::addGermplasmUUID);
+		}
+
+		if (!Util.isNullOrEmpty(lotIds)) {
+			lotIds.forEach(variableFilter::addLotId);
 		}
 
 		return new ResponseEntity<>(this.variableService.getVariablesByFilter(cropname, programUUID, variableFilter), HttpStatus.OK);

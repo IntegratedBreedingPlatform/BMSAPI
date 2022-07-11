@@ -1,13 +1,13 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -48,11 +48,8 @@ public class StudyInstanceServiceImplTest {
 	private org.generationcp.middleware.service.api.study.StudyInstanceService middlewareStudyInstanceService;
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
-
-	@Mock
-	private org.ibp.api.java.dataset.DatasetService datasetService;
-
+	private CropService cropServiceMW;
+	
 	@Mock
 	private StudyValidator studyValidator;
 
@@ -79,7 +76,7 @@ public class StudyInstanceServiceImplTest {
 
 	@Before
 	public void init() {
-		when(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name())).thenReturn(this.maizeCropType);
+		when(this.cropServiceMW.getCropTypeByName(CropType.CropEnum.MAIZE.name())).thenReturn(this.maizeCropType);
 	}
 
 	@Test

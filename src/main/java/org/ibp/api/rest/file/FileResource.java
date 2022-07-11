@@ -56,21 +56,24 @@ public class FileResource {
 		@RequestParam(required = false) final String observationUnitUUID,
 		@RequestParam(required = false) final String germplasmUUID,
 		@RequestParam(required = false) final Integer instanceId,
+		@RequestParam(required = false) final Integer lotId,
 		@RequestParam(required = false) final Integer termId
 	) {
 		this.validateFileStorage();
 		if (!isBlank(observationUnitUUID) || instanceId != null) {
 			FileResource.verifyHasAuthorityStudy(this.request);
-		} else {
+		} else if(lotId != null) {
+			verifyHasAuthorityLots(request);
+		}  else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
 		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
 		//Check if only one of the parameters has value
-		final boolean valid = ((isBlank(observationUnitUUID)? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1)) == 1;
+		final boolean valid = ((isBlank(observationUnitUUID)? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1) + ((lotId == null)? 0 : 1)) == 1;
 		BaseValidator.checkArgument(valid, "file.upload.entity.invalid");
 
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService
-			.upload(file, observationUnitUUID, germplasmUUID, instanceId, termId);
+			.upload(file, observationUnitUUID, germplasmUUID, instanceId, lotId, termId);
 		return new ResponseEntity<>(fileMetadataDTO, HttpStatus.CREATED);
 	}
 
@@ -106,6 +109,8 @@ public class FileResource {
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(fileUUID);
 		if (!isBlank(fileMetadataDTO.getObservationUnitUUID())) {
 			verifyHasAuthorityStudy(this.request);
+		} else if(fileMetadataDTO.getLotId() != null) {
+			verifyHasAuthorityLots(request);
 		} else {
 			verifyHasAuthorityGermplasm(this.request);
 		}
@@ -146,6 +151,16 @@ public class FileResource {
 			|| request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name())
 			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_OBSERVATION_UNITS.name())
 			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_FILES.name()))) {
+			throw new AccessDeniedException("");
+		}
+	}
+
+	public static void verifyHasAuthorityLots(final HttpServletRequest request) {
+		if (!(request.isUserInRole(PermissionsEnum.ADMIN.name())
+			|| request.isUserInRole(PermissionsEnum.MANAGE_INVENTORY.name())
+			|| request.isUserInRole(PermissionsEnum.MANAGE_LOTS.name())
+			|| request.isUserInRole(PermissionsEnum.UPDATE_LOTS.name())
+			|| request.isUserInRole(PermissionsEnum.MI_MANAGE_FILES.name()))) {
 			throw new AccessDeniedException("");
 		}
 	}
