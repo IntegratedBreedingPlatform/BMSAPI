@@ -12,18 +12,23 @@ import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
+import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -489,7 +494,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			final Integer requestId = StringUtil.parseInt(variable.getId(), null);
 			final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true);
-			ontologyVariableDataManager.fillVariableUsage(oldVariable);
+			this.ontologyVariableDataManager.fillVariableUsage(oldVariable);
 
 			if (oldVariable.getScale().getDataType() != null
 					&& Objects.equals(oldVariable.getScale().getDataType().isSystemDataType(), true)) {
@@ -576,7 +581,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 						VariableValidator.VARIABLE_NAME, "Expected range"});
 			}
             
-            if (! areAllPreviousVariableTypesPresent(oldVariable.getVariableTypes(), variable.getVariableTypes())) {
+            if (!this.areAllPreviousVariableTypesPresent(oldVariable.getVariableTypes(), variable.getVariableTypes())) {
                 this.addCustomError(errors, "variableTypes", "variable.type.in.use", new Object[] {});
             }
 
@@ -690,7 +695,57 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return;
 		}
 
-		this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, fieldUsedAs});
+		this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST,
+			new Object[] {fieldName, fieldUsedAs});
 
+	}
+
+	public boolean areAttributesInvalid(final Map<String, String> attributes, final BindingResult errors) {
+		return attributes.values().stream().anyMatch(n -> {
+			if (StringUtils.isNotEmpty(n) && n.length() > AttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH) {
+				errors.reject("attribute.value.invalid.length", "");
+				return true;
+			}
+			return false;
+		});
+	}
+
+	public void validateAttributeCodes(final BindingResult errors, final String programUUID,
+		final Set<String> attributesCodes, final List<org.generationcp.middleware.domain.ontology.VariableType> variableTypes) {
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.setProgramUuid(programUUID);
+		variableTypes.forEach(variableFilter::addVariableType);
+		attributesCodes.forEach(variableFilter::addName);
+
+		final List<Variable> existingAttributeVariables =
+			this.ontologyVariableDataManager.getWithFilter(variableFilter);
+
+		final List<String> existingVariablesNamesAndAlias = new ArrayList<>();
+		existingAttributeVariables.forEach(v -> {
+				existingVariablesNamesAndAlias.add(v.getName().toUpperCase());
+				if (StringUtils.isNotEmpty(v.getAlias())) {
+					existingVariablesNamesAndAlias.add(v.getAlias().toUpperCase());
+				}
+			}
+		);
+
+		if (existingAttributeVariables.size() != attributesCodes.size()) {
+			//Check if same variable was used by name or alias
+			existingAttributeVariables.forEach(v -> {
+				if (attributesCodes.contains(v.getName().toUpperCase()) && StringUtils.isNotEmpty(v.getAlias()) && attributesCodes
+					.contains(v.getAlias().toUpperCase())) {
+					errors.reject("germplasm.import.two.columns.referring.to.same.variable",
+						new String[] {v.getName(), v.getAlias()}, "");
+					return;
+				}
+			});
+
+			attributesCodes.removeAll(existingVariablesNamesAndAlias);
+			if (!attributesCodes.isEmpty()) {
+				errors.reject("germplasm.update.invalid.attribute.code",
+					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributesCodes), 3)}, "");
+			}
+		}
 	}
 }

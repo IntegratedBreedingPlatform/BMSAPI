@@ -11,10 +11,10 @@ import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
@@ -52,7 +52,7 @@ public class GermplasmUpdateDtoValidatorTest {
 	private BreedingMethodService breedingMethodService;
 
 	@Mock
-	private OntologyVariableDataManager ontologyVariableDataManager;
+	private VariableValidator variableValidator;
 
 	@InjectMocks
 	private GermplasmUpdateDtoValidator germplasmUpdateDtoValidator;
@@ -91,9 +91,6 @@ public class GermplasmUpdateDtoValidatorTest {
 
 		final Variable variable2 = new Variable();
 		variable2.setName("ACQ_DATE");
-
-		Mockito.when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(
-			Arrays.asList(variable1, variable2));
 
 		when(this.germplasmMiddlewareService.getGermplasmByGIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 		when(this.germplasmMiddlewareService.getGermplasmByGUIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
@@ -136,13 +133,10 @@ public class GermplasmUpdateDtoValidatorTest {
 			.thenReturn(Arrays.asList(new GermplasmNameTypeDTO(null, "DRVNM", null)));
 		final Variable variable1 = new Variable();
 		variable1.setName("NOTE");
-		Mockito.when(this.ontologyVariableDataManager.getWithFilter(Mockito.any())).thenReturn(
-			Arrays.asList(variable1));
 
 		final BindingResult errors = Mockito.mock(BindingResult.class);
 		this.germplasmUpdateDtoValidator.validateAttributeAndNameCodes(errors, programUUID, germplasmUpdateList);
 		Mockito.verify(errors).reject("germplasm.update.invalid.name.code", new String[] {"LNAME"}, "");
-		Mockito.verify(errors).reject("germplasm.update.invalid.attribute.code", new String[] {"ACQ_DATE"}, "");
 	}
 
 	@Test
