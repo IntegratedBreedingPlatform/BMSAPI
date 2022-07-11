@@ -40,9 +40,9 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 		newDto.setEntryId(random.nextInt());
 		newDto.setGid(newGid);
 
-		final StudyEntryDto dto = new StudyEntryDto(newEntryId, 6, RandomStringUtils.randomAlphabetic(20), newGid, RandomStringUtils.randomAlphabetic(20));
+		final StudyEntryDto dto = new StudyEntryDto(newEntryId, 6, newGid, RandomStringUtils.randomAlphabetic(20));
 		dto.getProperties().put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
-		Mockito.doReturn(dto).when(this.studyEntryService).replaceStudyEntry(studyId, entryId, newDto);
+		Mockito.doNothing().when(this.studyEntryService).replaceStudyEntry(studyId, entryId, newDto);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}",
@@ -50,13 +50,7 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 			.content(this.convertObjectToByte(newDto))
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$.entryId", Matchers.is(dto.getEntryId())))
-			.andExpect(jsonPath("$.designation", Matchers.is(dto.getDesignation())))
-			.andExpect(jsonPath("$.gid", Matchers.is(dto.getGid())))
-			.andExpect(jsonPath("$.entryNumber", Matchers.is(dto.getEntryNumber())))
-			.andExpect(jsonPath("$.entryCode", Matchers.is(dto.getEntryCode())));
-
+			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
 	@Test
@@ -68,22 +62,17 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 		final int entryId = random.nextInt();
 		final int gid = random.nextInt();
 
-		final StudyEntryDto dto = new StudyEntryDto(entryId, 6, RandomStringUtils.randomAlphabetic(20), gid, RandomStringUtils.randomAlphabetic(20));
+		final StudyEntryDto dto = new StudyEntryDto(entryId, 6, gid, RandomStringUtils.randomAlphabetic(20));
 		final List<StudyEntryDto> studyEntries = new ArrayList<>();
 		studyEntries.add(dto);
-		Mockito.doReturn(studyEntries).when(this.studyEntryService).createStudyEntries(studyId, listId);
+		Mockito.doNothing().when(this.studyEntryService).createStudyEntries(studyId, listId);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation?listId=" + listId,
 				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$[0].entryId", Matchers.is(dto.getEntryId())))
-			.andExpect(jsonPath("$[0].designation", Matchers.is(dto.getDesignation())))
-			.andExpect(jsonPath("$[0].gid", Matchers.is(dto.getGid())))
-			.andExpect(jsonPath("$[0].entryNumber", Matchers.is(dto.getEntryNumber())))
-			.andExpect(jsonPath("$[0].entryCode", Matchers.is(dto.getEntryCode())));
+			.andExpect(MockMvcResultMatchers.status().isOk());
 
 	}
 

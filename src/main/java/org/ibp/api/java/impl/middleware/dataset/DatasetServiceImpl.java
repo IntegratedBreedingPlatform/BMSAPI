@@ -27,7 +27,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryRepla
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
@@ -45,10 +44,10 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
-import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -91,7 +90,7 @@ public class DatasetServiceImpl implements DatasetService {
 	static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
 	static final String LOCATION_ABBR_VARIABLE_NAME = "LOCATION ABBREVIATION";
 	private static final List<Integer> PROTECTED_VARIABLE_IDS =
-		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId());
+		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(), TermId.ENTRY_NO.getId(), TermId.ENTRY_TYPE.getId());
 	public static final String MISSING_VALUE = "missing";
 	public static final String NOT_AVAILABLE_VALUE = "NA";
 	public static final String PARAM_NULL = "param.null";
@@ -133,16 +132,13 @@ public class DatasetServiceImpl implements DatasetService {
 	private OntologyDataManager ontologyDataManager;
 
 	@Autowired
-	private StudyService studyService;
-
-	@Autowired
 	private StudyTransactionsService studyTransactionsService;
 
 	@Autowired
 	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Autowired
-	private LotService lotService;
+	private TermValidator termValidator;
 
 	static final String PLOT_DATASET_NAME = "Observations";
 
@@ -219,7 +215,7 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, variableIds);
-		this.middlewareDatasetService.removeDatasetVariables(datasetId, variableIds);
+		this.middlewareDatasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 	}
 
 	@Override
@@ -842,7 +838,7 @@ public class DatasetServiceImpl implements DatasetService {
 				.getObservationSetVariables(
 					plotDatasetId,
 					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
+						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId(), VariableType.ENTRY_DETAIL.getId()));
 		final List<MeasurementVariable> treatmentFactors =
 			this.middlewareDatasetService
 				.getObservationSetVariables(plotDatasetId, Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
@@ -966,6 +962,14 @@ public class DatasetServiceImpl implements DatasetService {
 	public Long countObservationUnits(final Integer datasetId) {
 		return this.middlewareDatasetService.countObservationUnits(datasetId);
 
+	}
+
+	@Override
+	public void updateDatasetProperties(final Integer studyId, final List<Integer> variableIds) {
+		this.studyValidator.validate(studyId, true);
+		variableIds.forEach(this.termValidator::validate);
+
+		this.middlewareDatasetService.updateDatasetProperties(studyId, variableIds);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {

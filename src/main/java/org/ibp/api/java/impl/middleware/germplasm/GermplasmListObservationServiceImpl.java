@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDataDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationRequestDto;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -63,6 +64,10 @@ public class GermplasmListObservationServiceImpl implements GermplasmListObserva
 
 		final Variable variable = this.validateVariableIdIsAVariable(programUUID, germplasmListObservationRequestDto.getVariableId());
 
+		if (TermId.ENTRY_NO.getId() == variable.getId()) {
+			this.errors.reject("germplasm.list.entry.no.variable.can.not.be.created", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 		this.germplasmListVariableValidator.validateVariableIsAssociatedToList(listId, germplasmListObservationRequestDto.getVariableId());
 
 		this.validateValue(germplasmListObservationRequestDto.getValue());

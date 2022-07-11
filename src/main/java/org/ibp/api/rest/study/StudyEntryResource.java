@@ -9,8 +9,10 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
+import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.study.StudyEntryMetadata;
 import org.ibp.api.java.study.StudyEntryService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -33,6 +35,8 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 
+import static org.apache.commons.lang3.math.NumberUtils.isNumber;
+
 // TODO: Move these services to StudyResource
 @Api(value = "Study Entry Services")
 @Controller
@@ -46,37 +50,38 @@ public class StudyEntryResource {
 		notes = "Replace germplasm entry in study")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<StudyEntryDto> replaceStudyEntry(final @PathVariable String cropname,
+	public ResponseEntity<Void> replaceStudyEntry(final @PathVariable String cropname,
 														   @PathVariable final String programUUID,
 														   @PathVariable final Integer studyId, @PathVariable final Integer entryId, @RequestBody final StudyEntryDto studyEntryDto) {
-		return new ResponseEntity<>(this.studyEntryService.replaceStudyEntry(studyId, entryId, studyEntryDto),
-			HttpStatus.OK);
-
+		this.studyEntryService.replaceStudyEntry(studyId, entryId, studyEntryDto);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm ids",
 		notes = "Create germplasm entries in study based on the specified germplasm ids")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
+	public ResponseEntity<Void> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
 		@ApiParam("Study Entry template for batch generation. SearchComposite is a list of gids")
 		@RequestBody final StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto) {
-		return new ResponseEntity<>(
-			this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorRequestDto),
-			HttpStatus.OK);
+
+		this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorRequestDto);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list id",
 		notes = "Create germplasm entries in study based on the specified germplasm list id ")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<List<StudyEntryDto>> createStudyEntries(final @PathVariable String cropname,
+	public ResponseEntity<Void> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
 		@RequestParam(value = "listId", required = true) final Integer listId) {
-		return new ResponseEntity<>(
-			this.studyEntryService.createStudyEntries(studyId, listId),
-			HttpStatus.OK);
+
+		this.studyEntryService.createStudyEntries(studyId, listId);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Delete germplasm entries in study",
@@ -88,6 +93,8 @@ public class StudyEntryResource {
 		@PathVariable final Integer studyId) {
 
 		this.studyEntryService.deleteStudyEntries(studyId);
+		// TODO: this action must be moved to study PATH resource
+		this.studyEntryService.fillWithCrossExpansion(studyId, null);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
@@ -158,12 +165,12 @@ public class StudyEntryResource {
 		+ "some calculated inventory columns")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/table/columns", method = RequestMethod.GET)
-	public ResponseEntity<List<MeasurementVariable>> getEntryTableColumns(@PathVariable final String crop,
+	public ResponseEntity<List<MeasurementVariable>> getEntryTableHeader(@PathVariable final String crop,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
 
 		final List<MeasurementVariable> entryDescriptors =
-			this.studyEntryService.getEntryDescriptorColumns(studyId);
+			this.studyEntryService.getEntryTableHeader(studyId);
 
 		return new ResponseEntity<>(entryDescriptors, HttpStatus.OK);
 	}
@@ -177,4 +184,42 @@ public class StudyEntryResource {
 
 		return new ResponseEntity<>(this.studyEntryService.getStudyEntriesMetadata(studyId, programUUID), HttpStatus.OK);
 	}
+
+	@ApiOperation("Set generation level for study and fill with cross expansion")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/pedigree-generation-level", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<Void> fillWithCrossExpansion(@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody @ApiParam("a positive number, without quotation marks. E.g level: 2") final String level
+	) {
+		BaseValidator.checkArgument(isNumber(level), "error.generationlevel.invalid");
+		final int levelInt = Integer.parseInt(level);
+		BaseValidator.checkArgument(levelInt > 0 && levelInt <= 10 , "error.generationlevel.max");
+		this.studyEntryService.fillWithCrossExpansion(studyId, levelInt);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation("Get cross expansion level for study")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/pedigree-generation-level", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Integer> getCrossExpansionLevel(@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@RequestParam(required = false) final String programUUID) {
+		final Integer crossExpansionLevel = this.studyEntryService.getCrossExpansionLevel(studyId);
+		return new ResponseEntity<>(crossExpansionLevel, HttpStatus.OK);
+	}
+
+	@ApiIgnore
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/columns", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<StudyEntryColumnDTO>> getStudyEntriesColumns(@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.studyEntryService.getStudyEntryColumns(studyId), HttpStatus.OK);
+	}
+
 }

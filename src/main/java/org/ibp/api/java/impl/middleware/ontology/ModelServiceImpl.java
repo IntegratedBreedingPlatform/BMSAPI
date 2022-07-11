@@ -1,13 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-
+import com.google.common.base.Function;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -22,7 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -86,7 +86,7 @@ public class ModelServiceImpl implements ModelService {
 	}
 
 	@Override
-	public List<VariableType> getAllVariableTypes() {
+	public List<VariableType> getAllVariableTypes(final Boolean excludeRestrictedTypes) {
 
 		List<VariableType> variableTypes =
 				Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.ontology.VariableType.values()),
@@ -97,6 +97,15 @@ public class ModelServiceImpl implements ModelService {
 								return new VariableType(String.valueOf(variableType.getId()), variableType.getName(), variableType.getDescription());
 							}
 						});
+
+		if (Boolean.TRUE.equals(excludeRestrictedTypes)) {
+			Optional<VariableType> germplasmDescriptorType = variableTypes.stream().
+				filter(variableType ->
+					variableType.getId()
+						.equals(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_DESCRIPTOR.getId().toString())
+				).findFirst();
+			variableTypes.remove(germplasmDescriptorType.get());
+		}
 
 		Collections.sort(variableTypes, new Comparator<VariableType>() {
 
