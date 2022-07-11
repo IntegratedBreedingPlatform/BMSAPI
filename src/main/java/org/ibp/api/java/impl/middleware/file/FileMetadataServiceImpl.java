@@ -57,6 +57,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		final String observationUnitUUID,
 		final String germplasmUUID,
 		final Integer instanceId,
+		final Integer lotId,
 		final Integer termId
 	) {
 
@@ -67,6 +68,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 			path = this.fileMetadataService.getFilePathForGermplasm(germplasmUUID, file.getOriginalFilename());
 		} else if(instanceId != null) {
 			path = this.fileMetadataService.getFilePathForEnvironment(instanceId, file.getOriginalFilename());
+		} else if(lotId != null) {
+			path = this.fileMetadataService.getFilePathForLot(lotId, file.getOriginalFilename());
 		}
 
 
@@ -75,7 +78,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		fileMetadataDTO.setMimeType(file.getContentType());
 		fileMetadataDTO.setSize((int) file.getSize());
 		fileMetadataDTO.setPath(path);
-		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID, germplasmUUID, instanceId, termId);
+		fileMetadataDTO = this.fileMetadataService.save(fileMetadataDTO, observationUnitUUID, germplasmUUID, instanceId, lotId, termId);
 
 		// save file storage last as it is outside the transaction
 		this.fileStorageService.upload(file, path);
@@ -93,11 +96,11 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 	@Override
 	public void removeFiles(final List<Integer> variableIds, final Integer observationUnitUUID, final String germplasmUUID,
-		final Integer instanceId) {
+		final Integer instanceId, final Integer lotId) {
 		final List<FileMetadataDTO> fileMetadataDTOList = this.fileMetadataService
-			.getAll(variableIds, observationUnitUUID, germplasmUUID, instanceId);
+			.getAll(variableIds, observationUnitUUID, germplasmUUID, instanceId, lotId);
 
-		this.fileMetadataService.removeFiles(variableIds, observationUnitUUID, germplasmUUID, instanceId);
+		this.fileMetadataService.removeFiles(variableIds, observationUnitUUID, germplasmUUID, instanceId, lotId);
 
 		final List<String> paths = fileMetadataDTOList.stream().map(FileMetadataDTO::getPath).collect(toList());
 		// delete file storage last as it is outside the transaction
