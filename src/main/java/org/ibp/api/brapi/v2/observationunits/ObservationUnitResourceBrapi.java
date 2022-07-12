@@ -11,6 +11,8 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
+import org.generationcp.middleware.service.api.study.ObservationLevel;
+import org.generationcp.middleware.service.api.study.ObservationLevelFilter;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -18,15 +20,16 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
+import org.ibp.api.brapi.v2.sample.SampleResourceBrapi;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
-import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -176,4 +179,50 @@ public class ObservationUnitResourceBrapi {
 
 		return new ResponseEntity<>(new SingleEntityResponse<>(requestDTO), HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Get the Observation Levels", notes = "Get the Observation Levels")
+	@RequestMapping(value = "/{crop}/brapi/v2/observationlevels", method = RequestMethod.GET)
+	public ResponseEntity<EntityListResponse<ObservationLevel>> getObservationLevels(
+		@PathVariable final String crop,
+		@ApiParam(value = "Filter by study DbId")
+		@RequestParam(value = "studyDbId", required = false) final String studyDbId,
+		@ApiParam(value = "Filter by trial DbId")
+		@RequestParam(value = "trialDbId", required = false) final String trialDbId,
+		@ApiParam(value = "Filter by program DbId")
+		@RequestParam(value = "programDbId", required = false) final String programDbId,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize) {
+
+		final ObservationLevelFilter observationLevelFilter = new ObservationLevelFilter(studyDbId, trialDbId, programDbId);
+		final Integer finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+		final Integer finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+		final PagedResult<ObservationLevel> resultPage = new PaginatedSearch()
+			.executeBrapiSearch(finalPageNumber, finalPageSize,
+				new SearchSpec<ObservationLevel>() {
+
+					@Override
+					public long getCount() {
+						return ObservationUnitResourceBrapi.this.middlewareObservationUnitService.countObservationLevels(observationLevelFilter);
+					}
+
+					@Override
+					public List<ObservationLevel> getResults(final PagedResult<ObservationLevel> pagedResult) {
+						return ObservationUnitResourceBrapi.this.middlewareObservationUnitService
+							.getObservationLevels(observationLevelFilter, new PageRequest(finalPageNumber, finalPageSize));
+					}
+				});
+
+		final Result<ObservationLevel> results = new Result<ObservationLevel>().withData(resultPage.getPageResults());
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+
+		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
+	}
+
 }
