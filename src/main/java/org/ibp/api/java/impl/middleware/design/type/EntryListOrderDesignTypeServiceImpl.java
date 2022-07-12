@@ -17,7 +17,13 @@ import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTypeService {
@@ -188,7 +194,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 			}
 			final StudyEntryDto primaryNewGermplasm = SerializationUtils.clone(primaryGermplasm);
 			primaryNewGermplasm.getProperties().put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
-					String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+					null, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()));
 
 			newList.add(primaryNewGermplasm);
 

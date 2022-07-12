@@ -98,4 +98,11 @@ public class GermplasmListVariableValidator {
 		}
 	}
 
+	public void validateCanNotDeleteEntryNoVariable(final Set<Integer> variableIds) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+		if (variableIds.stream().filter(variableId -> variableId.equals(8230)).findFirst().isPresent()) {
+			this.errors.reject("germplasm.list.entry.no.variable.can.not.be.removed", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
 }

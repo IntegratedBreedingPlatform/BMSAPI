@@ -38,8 +38,8 @@ public interface ModelService {
 
 	/**
 	 * Get List of all variable types
-	 *
+	 * @param Boolean – excludeRestrictedTypes
 	 * @return List of Variable Types
 	 */
-	List<VariableType> getAllVariableTypes();
+	List<VariableType> getAllVariableTypes(Boolean excludeRestrictedTypes);
 }

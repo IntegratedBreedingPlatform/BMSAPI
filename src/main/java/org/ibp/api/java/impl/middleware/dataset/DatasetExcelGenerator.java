@@ -261,7 +261,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> plotVariables =
 			this.datasetService.getMeasurementVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
-					VariableType.GERMPLASM_DESCRIPTOR.getId()));
+					VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
 
 		final List<MeasurementVariable> datasetVariables = this.datasetService
 			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists
@@ -328,6 +328,15 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			xlsBook,
 			xlsSheet,
 			filterByVariableType(plotVariables, VariableType.GERMPLASM_DESCRIPTOR), PLOT);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.entry.details.column.germplasm.descriptors",
+			this.getColorIndex(xlsBook, 51, 143, 102));
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			filterByVariableType(plotVariables, VariableType.ENTRY_DETAIL), PLOT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.observation.unit",

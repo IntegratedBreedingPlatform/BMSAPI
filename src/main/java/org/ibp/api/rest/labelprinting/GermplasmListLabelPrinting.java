@@ -1,6 +1,5 @@
 package org.ibp.api.rest.labelprinting;
 
-import com.google.common.collect.ImmutableList;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
@@ -58,9 +57,8 @@ import java.util.stream.Collectors;
 public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 	static final String LABELS_FOR = "Labels-for-";
+	private static final String SORT_BY_ENTRY_NO = "VARIABLE_" + TermId.ENTRY_NO.getId();
 	protected static final int DRVNM_ID = 5;
-	private List<Field> defaultEntryDetailsFields;
-	private List<Integer> defaultEntryDetailsFieldIds;
 
 	@Autowired
 	private GermplasmListService germplasmListService;
@@ -81,8 +79,6 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		this.defaultPedigreeDetailsFields = this.buildPedigreeDetailsFields();
 		this.pedigreeFieldIds = this.defaultPedigreeDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
 
-		this.defaultEntryDetailsFields = this.buildEntryDetailsFields();
-		this.defaultEntryDetailsFieldIds = this.defaultEntryDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
 	}
 
 	@Override
@@ -159,7 +155,6 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final List<Integer> germplasmFieldIds = new ArrayList<>();
 		germplasmFieldIds.addAll(this.germplasmFieldIds);
 		germplasmFieldIds.addAll(this.pedigreeFieldIds);
-		germplasmFieldIds.addAll(this.defaultEntryDetailsFieldIds);
 		final Set<Integer> keys = this.getSelectedFieldIds(labelsGeneratorInput);
 		final boolean fieldsContainsNonGermplasmFields =
 			keys.stream().anyMatch(fieldId -> !germplasmFieldIds.contains(fieldId));
@@ -175,7 +170,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 		//Get Germplasm List Data
 		final PageRequest listDataPageRequest =
-			new PageRequest(0, this.maxTotalResults, new Sort(Sort.Direction.ASC, GermplasmListStaticColumns.ENTRY_NO.getName()));
+			new PageRequest(0, this.maxTotalResults, new Sort(Sort.Direction.ASC, GermplasmListLabelPrinting.SORT_BY_ENTRY_NO));
 		final List<GermplasmListDataSearchResponse> listDataSearchResponseList = this.germplasmListDataService
 			.searchGermplasmListData(labelsGeneratorInput.getListId(), new GermplasmListDataSearchRequest(), listDataPageRequest);
 		final Map<Integer, GermplasmSearchResponse> germplasmSearchResponseMap = responseList.stream()
@@ -201,23 +196,13 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		});
 	}
 
-	private List<Field> buildEntryDetailsFields() {
-		final String entryNoPropValue = this.getMessage("label.printing.field.germplasm.list.entry.no");
-		final String entryCodePropValue = this.getMessage("label.printing.field.germplasm.list.entry.code");
-		return ImmutableList.<Field>builder()
-			.add(new Field(TermId.ENTRY_NO.getId(), entryNoPropValue))
-			.add(new Field(TermId.ENTRY_CODE.getId(), entryCodePropValue))
-			.build();
-	}
-
 	private List<Field> getEntryDetailsFields(final String programUUID, final Integer listId) {
-		final List<Field> entryDetailFields = new ArrayList<>(this.defaultEntryDetailsFields);
 		final List<Variable> germplasmEntryDetailVariables = this.germplasmListService
 			.getGermplasmListVariables(programUUID, listId, VariableType.ENTRY_DETAIL.getId());
 
-		entryDetailFields.addAll(germplasmEntryDetailVariables.stream()
+		final List<Field> entryDetailFields = germplasmEntryDetailVariables.stream()
 			.map(variable -> new Field(toKey(variable.getId()), variable.getName()))
-			.collect(Collectors.toList()));
+			.collect(Collectors.toList());
 
 		return entryDetailFields;
 	}
@@ -243,8 +228,6 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 				if (LabelPrintingStaticField.CROSS.getFieldId().equals(id)) {
 					columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.CROSS.name()), ""));
 				}
-			} else if (this.defaultEntryDetailsFieldIds.contains(id)) {
-				this.getEntryDetailFieldDataRowValue(listData, columns, key, id);
 			} else {
 				this.getAttributeOrNameDataRowValue(isPdf, germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
 				this.getEntryDetailDataRowValue(listData, entryDetailValues, columns, key, id);
@@ -263,6 +246,12 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 			final String entryDetailValue = entryDetails.get(id);
 			if (entryDetailValue != null) {
 				columns.put(key, entryDetailValue);
+			} else {
+				// Especial case for ENTRY NO.
+				final TermId term = TermId.getById(id);
+				if (TermId.ENTRY_NO.equals(term)) {
+					columns.put(key, Objects.toString(listData.getData().get(GermplasmListLabelPrinting.SORT_BY_ENTRY_NO), ""));
+				}
 			}
 		}
 	}
@@ -272,10 +261,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final TermId term = TermId.getById(id);
 		switch (term) {
 			case ENTRY_NO:
-				columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.ENTRY_NO.name()), ""));
-				return;
-			case ENTRY_CODE:
-				columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.ENTRY_CODE.name()), ""));
+				columns.put(key, Objects.toString(listData.getData().get(TermId.ENTRY_NO.name()), ""));
 				return;
 			default:
 				//do nothing
@@ -285,10 +271,6 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 	@Override
 	public List<SortableFieldDto> getSortableFields() {
 		return Collections.emptyList();
-	}
-
-	public List<Field> getDefaultEntryDetailsFields() {
-		return this.defaultEntryDetailsFields;
 	}
 
 	void setMaxTotalResults(final int maxTotalResults) {
@@ -314,10 +296,10 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 					fields.add(TermId.UNITS_INVENTORY.getId());
 					break;
 				case IMMEDIATE_SOURCE_GID:
-					fields.add(LabelPrintingStaticField.INMEDIATE_SOURCE_GID.getFieldId());
+					fields.add(LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId());
 					break;
 				case IMMEDIATE_SOURCE_NAME:
-					fields.add(LabelPrintingStaticField.INMEDIATE_SOURCE_PREFERRED_NAME.getFieldId());
+					fields.add(LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId());
 					break;
 				case GROUP_SOURCE_GID:
 					fields.add(LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId());
@@ -357,6 +339,12 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 					break;
 				case FEMALE_PARENT:
 					fields.add(TermId.CROSS_FEMALE_PREFERRED_NAME.getId());
+					break;
+				case ENTRY_CODE:
+					fields.add(toKey(TermId.ENTRY_CODE.getId()));
+					break;
+				case ENTRY_NO:
+					fields.add(toKey(TermId.ENTRY_NO.getId()));
 					break;
 				default:
 					if (dto.getTermId() == GermplasmListLabelPrinting.DRVNM_ID
