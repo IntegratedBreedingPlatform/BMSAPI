@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.inventory.common.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Collections;
-import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
@@ -84,4 +83,5 @@ public class InventoryCommonValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
+
 }

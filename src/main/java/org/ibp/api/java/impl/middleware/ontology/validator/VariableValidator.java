@@ -12,18 +12,23 @@ import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
+import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -75,6 +80,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String SCALE_ID_NAME = "scaleId";
 	private static final String EXPECTED_RANGE_NAME = "expectedRange";
 	private static final String VARIABLE_NAME = "variable";
+	private static final String VARIABLE_TYPE = "Variable Type";
 	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
 		org.generationcp.middleware.domain.ontology.VariableType.TRAIT.getId(), //
 		org.generationcp.middleware.domain.ontology.VariableType.SELECTION_METHOD.getId(), //
@@ -408,7 +414,26 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		// 17. Variable type IDs is required
 		if (variable.getVariableTypes().isEmpty()) {
-			this.addCustomError(errors, "variableTypes", BaseValidator.LIST_SHOULD_NOT_BE_EMPTY, new Object[] {"variable type"});
+			this.addCustomError(errors, "variableTypes", BaseValidator.LIST_SHOULD_NOT_BE_EMPTY, new Object[] {VariableValidator.VARIABLE_TYPE});
+		}
+
+		// 17.1 validate Germplasm Descriptor type
+		final boolean hasGermplasmDescriptorType =
+			variable.hasVariableType(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_DESCRIPTOR.getName());
+
+		if (hasGermplasmDescriptorType) {
+			if(StringUtils.isBlank(variable.getId())){
+				this.addCustomError(errors, "variableTypes", BaseValidator.GERMPLASM_DESCRIPTOR_IS_RESTRICTED, new Object[] {VariableValidator.VARIABLE_TYPE});
+			}else{
+				final Integer requestId = Integer.valueOf(variable.getId());
+				final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true);
+				final boolean containsGermplasmDescriptorType = oldVariable.getVariableTypes()
+					.contains(org.generationcp.middleware.domain.ontology.VariableType.GERMPLASM_DESCRIPTOR);
+				if (!containsGermplasmDescriptorType) {
+					this.addCustomError(errors, "variableTypes", BaseValidator.GERMPLASM_DESCRIPTOR_IS_RESTRICTED, new Object[] {VariableValidator.VARIABLE_TYPE});
+
+				}
+			}
 		}
 
 		if (errors.getErrorCount() > initialCount) {
@@ -424,7 +449,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			final org.generationcp.middleware.domain.ontology.VariableType type =
 				org.generationcp.middleware.domain.ontology.VariableType.getById(this.parseVariableTypeAsInteger(variableType));
 			if (type == null) {
-				this.addCustomError(errors, "variableTypes", BaseValidator.INVALID_TYPE_ID, new Object[] {"Variable Type"});
+				this.addCustomError(errors, "variableTypes", BaseValidator.INVALID_TYPE_ID, new Object[] {VariableValidator.VARIABLE_TYPE});
 			} else if (type.equals(org.generationcp.middleware.domain.ontology.VariableType.TRAIT)) {
 				isTrait = true;
 			}
@@ -440,19 +465,19 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
         if(this.isAnalysisVariable(variable) && variable.getVariableTypes().size() > 1) {
-				this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE, new Object[]{"Variable Type"});
+				this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE, new Object[]{VariableValidator.VARIABLE_TYPE});
 		}
 
 		if (this.isInventoryAttributeVariable(variable) && variable.getVariableTypes().size() > 1) {
-			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_INVENTORY_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_INVENTORY_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {VariableValidator.VARIABLE_TYPE});
 		}
 
 		if (this.isGermplasmAttributeVariable(variable) && variable.getVariableTypes().size() > 1) {
-			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_ATTRIBUTE_SHOULD_BE_USED_SINGLE, new Object[] {VariableValidator.VARIABLE_TYPE});
 		}
 
 		if (this.isGermplasmPassportVariable(variable) && variable.getVariableTypes().size() > 1) {
-			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE, new Object[] {"Variable Type"});
+			this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_GERMPLASM_PASSPORT_SHOULD_BE_USED_SINGLE, new Object[] {VariableValidator.VARIABLE_TYPE});
 		}
 
 		if (this.isEntryDetailVariable(variable) && variable.getVariableTypes().size() > 1) {
@@ -489,7 +514,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			final Integer requestId = StringUtil.parseInt(variable.getId(), null);
 			final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true);
-			ontologyVariableDataManager.fillVariableUsage(oldVariable);
+			this.ontologyVariableDataManager.fillVariableUsage(oldVariable);
 
 			if (oldVariable.getScale().getDataType() != null
 					&& Objects.equals(oldVariable.getScale().getDataType().isSystemDataType(), true)) {
@@ -576,7 +601,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 						VariableValidator.VARIABLE_NAME, "Expected range"});
 			}
             
-            if (! areAllPreviousVariableTypesPresent(oldVariable.getVariableTypes(), variable.getVariableTypes())) {
+            if (!this.areAllPreviousVariableTypesPresent(oldVariable.getVariableTypes(), variable.getVariableTypes())) {
                 this.addCustomError(errors, "variableTypes", "variable.type.in.use", new Object[] {});
             }
 
@@ -690,7 +715,57 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return;
 		}
 
-		this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST, new Object[] {fieldName, fieldUsedAs});
+		this.addCustomError(errors, fieldName.toLowerCase(), BaseValidator.NAME_OR_ALIAS_ALREADY_EXIST,
+			new Object[] {fieldName, fieldUsedAs});
 
+	}
+
+	public boolean areAttributesInvalid(final Map<String, String> attributes, final BindingResult errors) {
+		return attributes.values().stream().anyMatch(n -> {
+			if (StringUtils.isNotEmpty(n) && n.length() > AttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH) {
+				errors.reject("attribute.value.invalid.length", "");
+				return true;
+			}
+			return false;
+		});
+	}
+
+	public void validateAttributeCodes(final BindingResult errors, final String programUUID,
+		final Set<String> attributesCodes, final List<org.generationcp.middleware.domain.ontology.VariableType> variableTypes) {
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.setProgramUuid(programUUID);
+		variableTypes.forEach(variableFilter::addVariableType);
+		attributesCodes.forEach(variableFilter::addName);
+
+		final List<Variable> existingAttributeVariables =
+			this.ontologyVariableDataManager.getWithFilter(variableFilter);
+
+		final List<String> existingVariablesNamesAndAlias = new ArrayList<>();
+		existingAttributeVariables.forEach(v -> {
+				existingVariablesNamesAndAlias.add(v.getName().toUpperCase());
+				if (StringUtils.isNotEmpty(v.getAlias())) {
+					existingVariablesNamesAndAlias.add(v.getAlias().toUpperCase());
+				}
+			}
+		);
+
+		if (existingAttributeVariables.size() != attributesCodes.size()) {
+			//Check if same variable was used by name or alias
+			existingAttributeVariables.forEach(v -> {
+				if (attributesCodes.contains(v.getName().toUpperCase()) && StringUtils.isNotEmpty(v.getAlias()) && attributesCodes
+					.contains(v.getAlias().toUpperCase())) {
+					errors.reject("germplasm.import.two.columns.referring.to.same.variable",
+						new String[] {v.getName(), v.getAlias()}, "");
+					return;
+				}
+			});
+
+			attributesCodes.removeAll(existingVariablesNamesAndAlias);
+			if (!attributesCodes.isEmpty()) {
+				errors.reject("germplasm.update.invalid.attribute.code",
+					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributesCodes), 3)}, "");
+			}
+		}
 	}
 }

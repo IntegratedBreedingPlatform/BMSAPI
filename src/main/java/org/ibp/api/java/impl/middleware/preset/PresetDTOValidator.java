@@ -140,7 +140,8 @@ public class PresetDTOValidator {
 		return ToolSection.DATASET_LABEL_PRINTING_PRESET.name().equals(toolSection)
 			|| ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(toolSection)
 			|| ToolSection.GERMPLASM_LABEL_PRINTING_PRESET.name().equals(toolSection)
-			|| ToolSection.GERMPLASM_LIST_LABEL_PRINTING_PRESET.name().equals(toolSection);
+			|| ToolSection.GERMPLASM_LIST_LABEL_PRINTING_PRESET.name().equals(toolSection)
+			|| ToolSection.STUDY_ENTRIES_LABEL_PRINTING_PRESET.name().equals(toolSection);
 	}
 
 	private void validateLabelPrintingPreset(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO) {
