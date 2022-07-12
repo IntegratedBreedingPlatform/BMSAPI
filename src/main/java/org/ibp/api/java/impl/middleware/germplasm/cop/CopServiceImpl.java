@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.germplasm.cop;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import org.generationcp.middleware.api.cropparameter.CropParameterDTO;
 import org.generationcp.middleware.api.cropparameter.CropParameterEnum;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.BTypeEnum;
@@ -9,7 +10,6 @@ import org.generationcp.middleware.api.germplasm.pedigree.cop.CopResponse;
 import org.generationcp.middleware.api.germplasm.pedigree.cop.CopUtils;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
-import org.generationcp.middleware.pojos.CropParameter;
 import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.cropparameter.CropParameterService;
@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.concurrent.Future;
 
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
-import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
 
 @Service
 @Transactional
@@ -95,9 +94,8 @@ public class CopServiceImpl implements CopService {
 	@Override
 	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids, final Integer listId, final boolean reset) {
 
-		final Optional<CropParameter> cropParameter = this.cropParameterService.getCropParameter(CropParameterEnum.BTYPE);
-		checkArgument(cropParameter.isPresent(), "crop.parameter.not.exists", new String[] {CropParameterEnum.BTYPE.getKey()});
-		final Optional<BTypeEnum> btype = BTypeEnum.parse(cropParameter.get().getValue());
+		final CropParameterDTO cropParameter = this.cropParameterService.getCropParameter(CropParameterEnum.BTYPE);
+		final Optional<BTypeEnum> btype = BTypeEnum.parse(cropParameter.getValue());
 		checkArgument(btype.isPresent(), "cop.btype.not.configured");
 
 		Table<Integer, Integer, Double> matrix = HashBasedTable.create();
