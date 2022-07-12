@@ -164,7 +164,7 @@ public class StudyEntryValidatorTest {
 		final int studyId = ran.nextInt();
 		final Set<String> entryNumbers = Sets.newHashSet("1", "2", "3");
 		final List<StudyEntryDto> existingStudyEntries = new ArrayList<>();
-		existingStudyEntries.add(new StudyEntryDto(RandomUtils.nextInt(), 1, "1", RandomUtils.nextInt(), ""));
+		existingStudyEntries.add(new StudyEntryDto(RandomUtils.nextInt(), 1, RandomUtils.nextInt(), ""));
 		Mockito.when(this.middlewareStudyEntryService.getStudyEntries(eq(studyId), any(), any())).thenReturn(existingStudyEntries);
 
 		try {

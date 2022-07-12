@@ -74,6 +74,8 @@ import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.program.ProgramServiceImpl;
 import org.generationcp.middleware.api.study.MyStudiesService;
 import org.generationcp.middleware.api.study.MyStudiesServiceImpl;
+import org.generationcp.middleware.api.study.StudyEntryObservationService;
+import org.generationcp.middleware.api.study.StudyEntryObservationServiceImpl;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
@@ -906,6 +908,12 @@ public class MiddlewareFactory {
 	@Bean
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StudyEntryObservationService getStudyEntryObservationService() {
+		return new StudyEntryObservationServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

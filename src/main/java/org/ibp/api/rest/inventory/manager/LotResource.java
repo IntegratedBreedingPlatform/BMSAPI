@@ -252,7 +252,7 @@ public class LotResource {
 
 		try {
 			this.inventoryLock.lockWrite();
-			this.lotService.updateLots(extendedLotDtos, lotRequest);
+			this.lotService.updateLots(extendedLotDtos, lotRequest, programUUID);
 		} finally {
 			this.inventoryLock.unlockWrite();
 		}
@@ -277,7 +277,8 @@ public class LotResource {
 		method = RequestMethod.GET)
 	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
 	public ResponseEntity<FileSystemResource> getTemplate(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID) {
+		@RequestParam(required = false) final String programUUID,
+		@RequestParam(required = false) final boolean isUpdateFormat) {
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
@@ -287,7 +288,7 @@ public class LotResource {
 				.searchLocations(cropName, new LocationSearchRequest(LotResource.STORAGE_LOCATION_TYPE, null, null, null),
 					null, null);
 
-		final File file = this.lotTemplateExportServiceImpl.export(cropName, locations, units);
+		final File file = this.lotTemplateExportServiceImpl.export(programUUID, cropName, locations, units, isUpdateFormat);
 		final HttpHeaders headers = new HttpHeaders();
 		headers
 			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));

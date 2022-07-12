@@ -31,6 +31,7 @@ public abstract class BaseValidator {
 	protected static final String LIST_SHOULD_NOT_BE_EMPTY = "list.should.not.be.empty";
 	protected static final String MIN_MAX_NOT_VALID = "min.max.not.valid";
 	protected static final String MIN_SHOULD_NOT_GREATER_THEN_MAX = "min.should.not.be.greater.than.max";
+	protected static final String GERMPLASM_DESCRIPTOR_IS_RESTRICTED = "germplasm.descriptor.variable.type.is.restricted";
 
 	protected boolean isNonNullValidNumericString(Object value) {
 		return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));

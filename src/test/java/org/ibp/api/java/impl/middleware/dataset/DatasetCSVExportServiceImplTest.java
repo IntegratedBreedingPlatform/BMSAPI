@@ -131,14 +131,6 @@ public class DatasetCSVExportServiceImplTest {
 		this.dataSetDTO.setParentDatasetId(1);
 
 		when(this.datasetTypeService.getAllDatasetTypesMap()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
-		final StandardVariable standardVariable = new StandardVariable();
-		final Enumeration enumeration = new Enumeration();
-		enumeration.setDescription(TEST_ENTRY_DESCRIPTION);
-		enumeration.setName(TEST_ENTRY_NAME);
-		standardVariable.setEnumerations(Arrays.asList(enumeration));
-		when(this.ontologyDataManager
-			.getStandardVariable(TermId.ENTRY_TYPE.getId(), PROGRAM_UUID)).thenReturn(standardVariable);
-
 		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 		ContextHolder.setCurrentCrop("maize");
 	}
@@ -299,16 +291,6 @@ public class DatasetCSVExportServiceImplTest {
 		Assert.assertEquals(3, variables.size());
 		Assert.assertEquals(LOCATION_ID.toString(), variables.get(DatasetServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
 		Assert.assertEquals(LOCATION_ABBR, variables.get(DatasetServiceImpl.LOCATION_ABBR_VARIABLE_NAME).getValue());
-	}
-
-	@Test
-	public void testTransformEntryTypeValues() {
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
-			this.createObservationUnitRowMap(TermId.ENTRY_TYPE.name(), TEST_ENTRY_DESCRIPTION);
-		this.datasetExportService.transformEntryTypeValues(observationUnitRowMap);
-		final Map<String, ObservationUnitData> variables = observationUnitRowMap.get(5).get(0).getVariables();
-		Assert.assertEquals(1, variables.size());
-		Assert.assertEquals(TEST_ENTRY_NAME, variables.get(TermId.ENTRY_TYPE.name()).getValue());
 	}
 
 	private Map<Integer, List<ObservationUnitRow>> createObservationUnitRowMap(final String variableName, final String value) {

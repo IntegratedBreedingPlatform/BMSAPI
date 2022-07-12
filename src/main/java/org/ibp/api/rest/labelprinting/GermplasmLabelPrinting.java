@@ -44,6 +44,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -58,8 +59,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
-	public static final int ATTRIBUTE_DISPLAY_MAX_LENGTH = 200;
-	public static final int NAME_DISPLAY_MAX_LENGTH = 200;
+	public static final int ATTRIBUTE_DISPLAY_MAX_LENGTH = 150;
+	public static final int NAME_DISPLAY_MAX_LENGTH = 150;
 
 	List<Field> defaultPedigreeDetailsFields;
 	List<Field> defaultGermplasmDetailsFields;
@@ -201,26 +202,18 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		namesType.setFields(new ArrayList<>());
 		labelTypes.add(namesType);
 
-		// Attributes labels
-		final String attributesPropValue = this.getMessage("label.printing.attributes.details");
-		final LabelType attributesType = new LabelType(attributesPropValue, attributesPropValue);
-		attributesType.setFields(new ArrayList<>());
-		labelTypes.add(attributesType);
-
 		if (!germplasmSearchResponses.isEmpty()) {
 			final List<Integer> gids = germplasmSearchResponses.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
 			final List<Variable> attributeVariables = this.germplasmAttributeService.getGermplasmAttributeVariables(gids, programUUID);
 			final List<GermplasmNameTypeDTO> nameTypes = this.germplasmNameTypeService.getNameTypesByGIDList(gids);
 
+			this.populateAttributesLabelType(programUUID, labelTypes, gids, attributeVariables);
+
 			namesType.getFields().addAll(nameTypes.stream()
 				.map(nameType -> new Field(toKey(nameType.getId()), nameType.getCode()))
 				.collect(Collectors.toList()));
-
-			attributesType.getFields().addAll(attributeVariables.stream()
-				.map(attributeVariable -> new Field(
-					toKey(attributeVariable.getId()),
-					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
-				.collect(Collectors.toList()));
+		} else {
+			this.populateAttributesLabelType(programUUID, labelTypes, Collections.emptyList(), Collections.emptyList());
 		}
 	}
 
@@ -387,11 +380,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			case CROSS:
 				columns.put(key, Objects.toString(germplasmSearchResponse.getPedigreeString(), ""));
 				return;
-			case INMEDIATE_SOURCE_GID:
+			case IMMEDIATE_SOURCE_GID:
 				columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourceGID(), ""));
 				return;
-			case INMEDIATE_SOURCE_PREFERRED_NAME:
-				columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourcePreferredName(), ""));
+			case IMMEDIATE_SOURCE_NAME:
+				columns.put(key, Objects.toString(germplasmSearchResponse.getImmediateSourceName(), ""));
 				return;
 			default:
 				//do nothing
@@ -521,11 +514,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.CROSS_FEMALE_PREFERRED_NAME);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.INMEDIATE_SOURCE_GID.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId())) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.IMMEDIATE_SOURCE_GID);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.INMEDIATE_SOURCE_PREFERRED_NAME.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId())) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.IMMEDIATE_SOURCE);
 		}
 	}
@@ -536,9 +529,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final String maleParentGIDPropValue = this.getMessage("label.printing.field.pedigree.male.parent.gid");
 		final String maleParentPreferredNamePropValue = this.getMessage("label.printing.field.pedigree.male.parent.preferred.name");
 		final String femaleParentPreferredNamePropValue = this.getMessage("label.printing.field.pedigree.female.parent.preferred.name");
-		final String inmediateSourceGIDPropValue = this.getMessage("label.printing.field.pedigree.inmediate.souce.gid");
-		final String inmediateSourcePreferredNamePropValue =
-			this.getMessage("label.printing.field.pedigree.inmediate.source.preferred.name");
+		final String immediateSourceGIDPropValue = this.getMessage("label.printing.field.pedigree.immediate.souce.gid");
+		final String immediateSourceNamePropValue = this.getMessage("label.printing.field.pedigree.immediate.source.name");
 
 		return ImmutableList.<Field>builder()
 			.add(new Field(LabelPrintingStaticField.CROSS.getFieldId(), crossPropValue))
@@ -546,9 +538,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			.add(new Field(TermId.CROSS_MALE_GID.getId(), maleParentGIDPropValue))
 			.add(new Field(TermId.CROSS_MALE_PREFERRED_NAME.getId(), maleParentPreferredNamePropValue))
 			.add(new Field(TermId.CROSS_FEMALE_PREFERRED_NAME.getId(), femaleParentPreferredNamePropValue))
-			.add(new Field(LabelPrintingStaticField.INMEDIATE_SOURCE_GID.getFieldId(), inmediateSourceGIDPropValue))
-			.add(
-				new Field(LabelPrintingStaticField.INMEDIATE_SOURCE_PREFERRED_NAME.getFieldId(), inmediateSourcePreferredNamePropValue))
+			.add(new Field(LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId(), immediateSourceGIDPropValue))
+			.add(new Field(LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId(), immediateSourceNamePropValue))
 			.build();
 	}
 
@@ -608,24 +599,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	public LabelPrintingPresetDTO getDefaultSetting(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		return null;
-	}
-
-	/**
-	 * Identify non-fixed columns with id = MAX_FIXED_TYPE_INDEX + column-id
-	 * Requires no collision between non-fixed columns id
-	 * Allocates some space for future fixed-columns
-	 */
-	protected static final Integer MAX_FIXED_TYPE_INDEX = 10000;
-
-	static int toKey(final int id) {
-		return id + MAX_FIXED_TYPE_INDEX;
-	}
-
-	static int toId(final int key) {
-		if (key > MAX_FIXED_TYPE_INDEX) {
-			return key - MAX_FIXED_TYPE_INDEX;
-		}
-		return key;
 	}
 
 	public String getMessage(final String code) {

@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -188,6 +189,17 @@ public class StudyValidator {
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+	}
+
+	public DataSet validateStudyHasPlotDataset(final Integer studyId) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
+		final DataSet dataSet = this.studyDataManager.findOneDataSetByType(studyId, DatasetTypeEnum.PLOT_DATA.getId());
+		if (dataSet == null) {
+			this.errors.reject("study.not.has.plot.dataset", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+		return dataSet;
 	}
 
 }

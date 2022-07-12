@@ -2,6 +2,7 @@ package org.ibp.api.rest.labelprinting;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -17,9 +18,12 @@ import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
 import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +40,9 @@ public abstract class LabelPrintingStrategy {
 
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
+
+	@Autowired
+	ResourceBundleMessageSource messageSource;
 
 	/**
 	 * Validate LabelsInfoInput
@@ -211,6 +218,42 @@ public abstract class LabelPrintingStrategy {
 				}
 			}
 		}
+	}
+
+	void populateAttributesLabelType(final String programUUID, final List<LabelType> labelTypes,
+		final List<Integer> recordIds, final List<Variable> attributeVariables) {
+		// Attributes labels
+		final String attributesPropValue = this.messageSource.getMessage(
+			"label.printing.attributes.details", null, LocaleContextHolder.getLocale());
+		final LabelType attributesType = new LabelType(attributesPropValue, attributesPropValue);
+		attributesType.setFields(new ArrayList<>());
+		labelTypes.add(attributesType);
+
+		if (!recordIds.isEmpty()) {
+			attributesType.getFields().addAll(attributeVariables.stream()
+				.map(attributeVariable -> new Field(
+					toKey(attributeVariable.getId()),
+					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
+				.collect(Collectors.toList()));
+		}
+	}
+
+	/**
+	 * Identify non-fixed columns with id = MAX_FIXED_TYPE_INDEX + column-id
+	 * Requires no collision between non-fixed columns id
+	 * Allocates some space for future fixed-columns
+	 */
+	static final Integer MAX_FIXED_TYPE_INDEX = 10000;
+
+	static int toKey(final int id) {
+		return id + MAX_FIXED_TYPE_INDEX;
+	}
+
+	static int toId(final int key) {
+		if (key > MAX_FIXED_TYPE_INDEX) {
+			return key - MAX_FIXED_TYPE_INDEX;
+		}
+		return key;
 	}
 
 	/**

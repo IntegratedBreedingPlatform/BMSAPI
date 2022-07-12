@@ -28,7 +28,7 @@ public interface LotService {
 
 	List<String> createLots(final String programUUID, LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto);
 
-	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest);
+	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest, String programUUID);
 
 	void importLotsWithInitialTransaction(String programUUID, LotImportRequestDto lotImportRequestDto);
 

@@ -40,8 +40,8 @@ public enum LabelPrintingStaticField {
 	REFERENCE(48),
 	LOTS(57),
 	CROSS(58),
-	INMEDIATE_SOURCE_GID(62),
-	INMEDIATE_SOURCE_PREFERRED_NAME(63);
+	IMMEDIATE_SOURCE_GID(62),
+	IMMEDIATE_SOURCE_NAME(63);
 
 	private Integer fieldId;
 	private static final Map<Integer, LabelPrintingStaticField> STATIC_FIELD_MAP_LOOKUP = new HashMap<>();
