@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
 import factory.ExtendedLotDtoDummyFactory;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
@@ -218,7 +219,7 @@ public class LotServiceImplTest {
 		Mockito.verify(this.middlewareLotService).saveLot(ArgumentMatchers.eq(project.getCropType()),
 			ArgumentMatchers.eq(USER_ID),
 			this.lotGeneratorInputDtoArgumentCaptor.capture());
-		LotGeneratorInputDto actualLotGeneratorInputDto = this.lotGeneratorInputDtoArgumentCaptor.getValue();
+		final LotGeneratorInputDto actualLotGeneratorInputDto = this.lotGeneratorInputDtoArgumentCaptor.getValue();
 		assertNotNull(actualLotGeneratorInputDto);
 		assertThat(actualLotGeneratorInputDto.getGid(), is(splitExtendedLotDto.getGid()));
 		assertThat(actualLotGeneratorInputDto.getUnitId(), is(splitExtendedLotDto.getUnitId()));
@@ -240,7 +241,7 @@ public class LotServiceImplTest {
 			ArgumentMatchers.eq(TransactionStatus.CONFIRMED),
 			ArgumentMatchers.eq(TransactionSourceType.SPLIT_LOT),
 			ArgumentMatchers.eq(splitExtendedLotDto.getLotId()));
-		LotDepositRequestDto actualLotDepositRequestDto = this.lotDepositRequestDtoArgumentCaptor.getValue();
+		final LotDepositRequestDto actualLotDepositRequestDto = this.lotDepositRequestDtoArgumentCaptor.getValue();
 		assertNotNull(actualLotDepositRequestDto);
 		assertThat(actualLotDepositRequestDto.getDepositsPerUnit(), IsMapContaining.hasKey(splitExtendedLotDto.getUnitName()));
 		assertThat(actualLotDepositRequestDto.getDepositsPerUnit(), IsMapContaining.hasValue(initialDeposit.getAmount()));
@@ -254,7 +255,7 @@ public class LotServiceImplTest {
 
 	@Test
 	public void testCreateLots_ThrowsException_When_SearchOriginIsNull() {
-		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = this.buildLotGeneratorBatchRequestDto();
 		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
 		searchOriginCompositeDto.setSearchRequestId(new Random().nextInt());
 		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
@@ -268,7 +269,7 @@ public class LotServiceImplTest {
 
 	@Test
 	public void testCreateLots_ThrowsException_WhenForGermplasmsearchTheSearchRequestIdNoReturnGids() {
-		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = this.buildLotGeneratorBatchRequestDto();
 		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
 		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.GERMPLASM_SEARCH);
 		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
@@ -282,12 +283,12 @@ public class LotServiceImplTest {
 
 	@Test
 	public void testCreateLots_ThrowsException_when_study_source_with_search_request_id_no_return_gids() {
-		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = this.buildLotGeneratorBatchRequestDto();
 		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
 		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
 		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
 
-		GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest = new GermplasmStudySourceSearchRequest();
+		final GermplasmStudySourceSearchRequest germplasmStudySourceSearchRequest = new GermplasmStudySourceSearchRequest();
 		Mockito.when(this.searchRequestService.getSearchRequest(Mockito.any(), Mockito.any())).thenReturn(germplasmStudySourceSearchRequest);
 		try {
 			this.lotService.createLots(LotServiceImplTest.PROGRAM_UUID, lotGeneratorBatchRequestDto);
@@ -298,13 +299,13 @@ public class LotServiceImplTest {
 
 	@Test
 	public void testCreateLots_ThrowsException_when_germplasm_Search_with_search_request_id_no_return_gids() {
-		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = this.buildLotGeneratorBatchRequestDto();
 		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
 		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.GERMPLASM_SEARCH);
 		searchOriginCompositeDto.setSearchRequestId(1);
 		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
 
-		GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		Mockito.when(this.searchRequestService.getSearchRequest(Mockito.any(), Mockito.any())).thenReturn(germplasmSearchRequest);
 		try {
 			this.lotService.createLots(LotServiceImplTest.PROGRAM_UUID, lotGeneratorBatchRequestDto);
@@ -315,7 +316,7 @@ public class LotServiceImplTest {
 
 	@Test
 	public void testCreateLots_ThrowsException_when_study_plot_with_search_request_id_no_return_gids() {
-		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = this.buildLotGeneratorBatchRequestDto();
 		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
 		final DatasetDTO datasetDTO = new DatasetDTO(1);
 		datasetDTO.setParentDatasetId(2);
@@ -323,7 +324,7 @@ public class LotServiceImplTest {
 		searchOriginCompositeDto.setSearchRequestId(1);
 		lotGeneratorBatchRequestDto.getSearchComposite().setSearchRequest(searchOriginCompositeDto);
 
-		ObservationUnitsSearchDTO observationUnitsSearchDTO = new ObservationUnitsSearchDTO();
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO = new ObservationUnitsSearchDTO();
 		Mockito.when(this.searchRequestService.getSearchRequest(Mockito.any(), Mockito.any())).thenReturn(observationUnitsSearchDTO);
 		Mockito.when(this.studyDatasetService.getDataset(Mockito.any())).thenReturn(datasetDTO);
 
@@ -337,7 +338,7 @@ public class LotServiceImplTest {
 	@Test
 	public void testCreateLots_ThrowsException_WhenSearchRequestIsNullAndItemsAreInvalid() {
 		final Set items = Sets.newSet(new Random().nextInt());
-		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = buildLotGeneratorBatchRequestDto();
+		final LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto = this.buildLotGeneratorBatchRequestDto();
 		lotGeneratorBatchRequestDto.getSearchComposite().setItemIds(items);
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotGeneratorBatchRequestDto.class.getName());
@@ -350,6 +351,12 @@ public class LotServiceImplTest {
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("gids.invalid"));
 		}
+	}
+
+	@Test
+	public void testGetLotAttributeColumnDtos() {
+		this.lotService.getLotAttributeColumnDtos(RandomStringUtils.randomAlphanumeric(10));
+		Mockito.verify(this.middlewareLotService).getLotAttributeColumnDtos(ArgumentMatchers.anyString());
 	}
 
 	private LotGeneratorBatchRequestDto buildLotGeneratorBatchRequestDto() {
