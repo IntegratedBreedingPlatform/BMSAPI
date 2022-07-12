@@ -79,7 +79,7 @@ public class ObservationDatasetLabelPrintingTest {
 				VariableType.ENVIRONMENT_CONDITION.getId()));
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(datasetDTO.getDatasetId(), Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(datasetDTO.getDatasetId(),
-			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
+			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId(),VariableType.SELECTION_METHOD
 			.getId(), VariableType.TRAIT.getId()));
 		final String studyDetailsPropValue = this.observationDatasetLabelPrinting.getMessage("label.printing.study.details");

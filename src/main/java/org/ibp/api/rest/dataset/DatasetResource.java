@@ -517,8 +517,22 @@ public class DatasetResource {
 		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 
+	@ApiIgnore
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/plot-datasets/properties", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<Void> updateDatasetProperties(@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@RequestParam(required = false) final String programUUID,
+		@RequestBody final List<Integer> variableIds) {
+		this.studyDatasetService.updateDatasetProperties(studyId, variableIds);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+
 	public ResourceBundleMessageSource getMessageSource() {
 		return this.messageSource;
 	}
+
 }
 

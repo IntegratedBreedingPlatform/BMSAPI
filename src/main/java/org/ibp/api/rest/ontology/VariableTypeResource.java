@@ -31,7 +31,9 @@ public class VariableTypeResource {
 	@ApiOperation(value = "All Variable Types", notes = "Get all Variable Types")
 	@RequestMapping(value = "/{crop}/variable-types", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<VariableType>> listAllVariableTypes(@PathVariable final String crop, @RequestParam final String programUUID) {
-		return new ResponseEntity<>(this.modelService.getAllVariableTypes(), HttpStatus.OK);
+	public ResponseEntity<List<VariableType>> listAllVariableTypes(@PathVariable final String crop,
+		@RequestParam(required = false) final Boolean excludeRestrictedTypes,
+		@RequestParam final String programUUID) {
+		return new ResponseEntity<>(this.modelService.getAllVariableTypes(excludeRestrictedTypes), HttpStatus.OK);
 	}
 }
