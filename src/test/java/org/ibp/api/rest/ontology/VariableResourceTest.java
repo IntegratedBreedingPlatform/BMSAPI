@@ -22,7 +22,6 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.ibp.api.java.ontology.ModelService;
-import org.ibp.api.java.ontology.VariableService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -67,16 +66,11 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public ModelService modelService(){
+		public ModelService modelService() {
 			return Mockito.mock(ModelService.class);
 		}
-
-		@Bean
-		@Primary
-		public VariableService variableService() {
-			return Mockito.mock(VariableService.class);
-		}
 	}
+
 
 	@Autowired
 	protected ModelService modelService;
@@ -92,9 +86,6 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
-
-	@Autowired
-	private VariableService variableService;
 
 	@Before
 	public void reset() {
@@ -124,7 +115,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(variables).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/variables?programUUID=" + this.programUuid, this.cropName)
-			.contentType(this.contentType)).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
+				.contentType(this.contentType)).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(variables.size())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is(String.valueOf(variables.get(0).getId()))))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", is(variables.get(0).getName())))
@@ -162,10 +153,10 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(project).when(this.programService).getProjectByUuidAndCrop(this.programUuid, this.cropName);
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, ontologyVariable.getId(),
-				true);
+			true);
 		Mockito.doReturn(
-				new Term(ontologyVariable.getId(), ontologyVariable.getName(), ontologyVariable.getDefinition(), CvId.VARIABLES.getId(),
-						false)).when(this.termDataManager).getTermById(ontologyVariable.getId());
+			new Term(ontologyVariable.getId(), ontologyVariable.getName(), ontologyVariable.getDefinition(), CvId.VARIABLES.getId(),
+				false)).when(this.termDataManager).getTermById(ontologyVariable.getId());
 		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(ontologyVariable.getScale().getDataType().getId()));
 
 		this.mockMvc
@@ -252,14 +243,14 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		}).when(this.ontologyVariableDataManager).addVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.post("/crops/{cropname}/variables?programUUID=" + this.programUuid, this.cropName)
-								.contentType(this.contentType).content(this.convertObjectToByte(variableDetails)))
-				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(String.valueOf(variableTerm.getId()))));
+			.perform(
+				MockMvcRequestBuilders.post("/crops/{cropname}/variables?programUUID=" + this.programUuid, this.cropName)
+					.contentType(this.contentType).content(this.convertObjectToByte(variableDetails)))
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isCreated())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(String.valueOf(variableTerm.getId()))));
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1))
-				.addVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
+			.addVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 	}
 
 	/**
@@ -287,7 +278,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		variable.setMethod(new Method(methodTerm));
 		variable.setProperty(new Property(propertyTerm));
 		variable.setScale(scale);
-	  	variable.setHasUsage(false);
+		variable.setHasUsage(false);
 
 		final Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
 		final Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
@@ -311,15 +302,15 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doNothing().when(this.ontologyVariableDataManager).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders
-								.put("/crops/{cropname}/variables/{id}?programUUID=" + this.programUuid, this.cropName,
-										variableTerm.getId()).contentType(this.contentType)
-								.content(this.convertObjectToByte(variableDetails))).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.status().isNoContent());
+			.perform(
+				MockMvcRequestBuilders
+					.put("/crops/{cropname}/variables/{id}?programUUID=" + this.programUuid, this.cropName,
+						variableTerm.getId()).contentType(this.contentType)
+					.content(this.convertObjectToByte(variableDetails))).andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNoContent());
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).updateVariable(
-				org.mockito.Matchers.any(OntologyVariableInfo.class));
+			org.mockito.Matchers.any(OntologyVariableInfo.class));
 	}
 
 	/**
@@ -336,15 +327,16 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(term).when(this.termDataManager).getTermById(ontologyVariable.getId());
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(null, ontologyVariable.getId(),
-				true);
+			true);
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(ontologyVariable.getId());
 		Mockito.doNothing().when(this.ontologyVariableDataManager).deleteVariable(ontologyVariable.getId());
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.delete("/crops/{cropname}/variables/{id}?programUUID=" + this.programUuid, this.cropName, ontologyVariable.getId())
-								.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isNoContent())
-				.andDo(MockMvcResultHandlers.print());
+			.perform(
+				MockMvcRequestBuilders.delete("/crops/{cropname}/variables/{id}?programUUID=" + this.programUuid, this.cropName,
+						ontologyVariable.getId())
+					.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isNoContent())
+			.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).deleteVariable(ontologyVariable.getId());
 	}
@@ -365,12 +357,13 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		project.setUniqueID(this.programUuid);
 		project.setProjectName("project_name");
 
-		String query = "Variable";
-		Mockito.doReturn(variables).when(this.variableService).searchAttributeVariables(query,
-			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId()),this.programUuid);
+		final String query = "Variable";
+		Mockito.doReturn(variables).when(this.ontologyVariableDataManager).searchAttributeVariables(query,
+			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId()), this.programUuid);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/variables/attributes/search?query={query}&variableTypeIds={variableType}&programUUID="
-					+ this.programUuid, this.cropName, query, VariableType.ENVIRONMENT_DETAIL.getId())
+		this.mockMvc.perform(MockMvcRequestBuilders.get(
+					"/crops/{cropname}/variables/attributes/search?query={query}&variableTypeIds={variableType}&programUUID="
+						+ this.programUuid, this.cropName, query, VariableType.ENVIRONMENT_DETAIL.getId())
 				.contentType(this.contentType)).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(variables.size())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is(variables.get(0).getId())))
