@@ -205,10 +205,10 @@ public class VariableResource {
 	 *
 	 * @return a limited set of results matching the query criteria
 	 */
-	@ApiOperation(value = "Search attributes")
+	@ApiOperation(value = "Search attribute Variables")
 	@RequestMapping(value = "/{cropName}/variables/attributes/search", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<Variable>> searchAttributes(@PathVariable final String cropName,
+	public ResponseEntity<List<Variable>> searchAttributeVariables(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Set<Integer> variableTypeIds,
 		@RequestParam(required = true) final String query) {

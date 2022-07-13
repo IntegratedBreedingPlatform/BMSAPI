@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
@@ -21,6 +22,7 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.ibp.api.java.ontology.ModelService;
+import org.ibp.api.java.ontology.VariableService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -35,6 +37,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
@@ -67,6 +70,12 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		public ModelService modelService(){
 			return Mockito.mock(ModelService.class);
 		}
+
+		@Bean
+		@Primary
+		public VariableService variableService() {
+			return Mockito.mock(VariableService.class);
+		}
 	}
 
 	@Autowired
@@ -83,6 +92,9 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
+
+	@Autowired
+	private VariableService variableService;
 
 	@Before
 	public void reset() {
@@ -335,5 +347,37 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).deleteVariable(ontologyVariable.getId());
+	}
+
+	/**
+	 * List all attribute variables with details with status code 200 : Ok
+	 * given a list of variable type IDs
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void searchAttributeVariables() throws Exception {
+
+		final List<Variable> variables = TestDataProvider.getTestVariables(4);
+
+		final Project project = new Project();
+		project.setCropType(new CropType(this.cropName));
+		project.setUniqueID(this.programUuid);
+		project.setProjectName("project_name");
+
+		String query = "Variable";
+		Mockito.doReturn(variables).when(this.variableService).searchAttributeVariables(query,
+			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId()),this.programUuid);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{cropname}/variables/attributes/search?query={query}&variableTypeIds={variableType}&programUUID="
+					+ this.programUuid, this.cropName, query, VariableType.ENVIRONMENT_DETAIL.getId())
+				.contentType(this.contentType)).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(variables.size())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is(variables.get(0).getId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", is(variables.get(0).getName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].definition", is(variables.get(0).getDefinition())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].alias", is(variables.get(0).getAlias())))
+			.andExpect(MockMvcResultMatchers
+				.jsonPath("$[0].variableTypes", IsCollectionWithSize.hasSize(variables.get(0).getVariableTypes().size())));
 	}
 }
