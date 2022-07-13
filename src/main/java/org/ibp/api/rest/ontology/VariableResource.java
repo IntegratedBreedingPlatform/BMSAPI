@@ -4,10 +4,10 @@ package org.ibp.api.rest.ontology;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
-import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.java.ontology.VariableService;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -212,8 +213,9 @@ public class VariableResource {
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = false) final Set<Integer> variableTypeIds,
 		@RequestParam(required = true) final String query) {
-
+		final List<Integer> variableTypeList = variableTypeIds == null ?
+			Collections.emptyList() : variableTypeIds.stream().collect(Collectors.toList());
 		return new ResponseEntity<>(this.variableService.searchAttributeVariables(query,
-			variableTypeIds.stream().collect(Collectors.toList()), programUUID), HttpStatus.OK);
+			variableTypeList, programUUID), HttpStatus.OK);
 	}
 }
