@@ -61,23 +61,8 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
 			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(),
 				new ArrayList<>(selectedDatasetInstancesMap.keySet()));
-		this.transformEntryTypeValues(observationUnitRowMap);
 		this.addLocationValues(observationUnitRowMap, selectedDatasetInstancesMap);
 		return observationUnitRowMap;
-	}
-
-	void transformEntryTypeValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap) {
-		final List<Enumeration> entryTypes = this.ontologyDataManager
-			.getStandardVariable(TermId.ENTRY_TYPE.getId(), ContextHolder.getCurrentProgram()).getEnumerations();
-		final Map<String, String> entryTypeDescriptionNameMap =
-			entryTypes.stream().collect(Collectors.toMap(Enumeration::getDescription, Enumeration::getName));
-
-		final List<ObservationUnitRow> allRows =
-			observationUnitRowMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
-		allRows.forEach(row -> {
-			final ObservationUnitData data = row.getVariables().get(TermId.ENTRY_TYPE.name());
-			data.setValue(entryTypeDescriptionNameMap.get(data.getValue()));
-		});
 	}
 
 	void addLocationValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,

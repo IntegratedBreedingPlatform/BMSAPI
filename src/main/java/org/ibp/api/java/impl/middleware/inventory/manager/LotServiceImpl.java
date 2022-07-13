@@ -197,7 +197,7 @@ public class LotServiceImpl implements LotService {
 						(GermplasmStudySourceSearchRequest) this.searchRequestService
 							.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(),
 								GermplasmStudySourceSearchRequest.class);
-					studyValidator.validate(germplasmStudySourceSearchRequest.getStudyId(), false);
+					this.studyValidator.validate(germplasmStudySourceSearchRequest.getStudyId(), false);
 					gids = this.germplasmStudySourceService.getGermplasmStudySources(germplasmStudySourceSearchRequest, null).stream().map(
 						GermplasmStudySourceDto::getGid).collect(Collectors.toList());
 					checkArgument(!gids.isEmpty(), "searchrequestid.no.results");
@@ -209,8 +209,8 @@ public class LotServiceImpl implements LotService {
 							.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(),
 								ObservationUnitsSearchDTO.class);
 					final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(Integer.valueOf(observationUnitsSearchDTO.getDatasetId()));
-					studyValidator.validate(datasetDTO.getParentDatasetId(), false);
-					datasetValidator.validateDataset(datasetDTO.getParentDatasetId(), observationUnitsSearchDTO.getDatasetId());
+					this.studyValidator.validate(datasetDTO.getParentDatasetId(), false);
+					this.datasetValidator.validateDataset(datasetDTO.getParentDatasetId(), observationUnitsSearchDTO.getDatasetId());
 					gids = this.studyDatasetService.getObservationUnitRows(datasetDTO.getParentDatasetId(),
 						observationUnitsSearchDTO.getDatasetId(), observationUnitsSearchDTO, null).stream().map(
 						ObservationUnitRow::getGid).collect(Collectors.toList());
@@ -256,9 +256,9 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest) {
-		this.lotInputValidator.validate(lotDtos, lotRequest);
-		this.lotService.updateLots(lotDtos, lotRequest);
+	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotRequest, final String programUUID) {
+		this.lotInputValidator.validate(lotDtos, lotRequest, programUUID);
+		this.lotService.updateLots(lotDtos, lotRequest, programUUID);
 	}
 
 	@Override

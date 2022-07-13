@@ -11,14 +11,11 @@ import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
-import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -54,7 +51,7 @@ public class GermplasmUpdateDtoValidator {
 	private BreedingMethodService breedingMethodService;
 
 	@Autowired
-	private OntologyVariableDataManager ontologyVariableDataManager;
+	private VariableValidator variableValidator;
 
 	public void validate(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
@@ -95,13 +92,7 @@ public class GermplasmUpdateDtoValidator {
 
 	private boolean areAttributesInvalid(final Map<String, String> attributes, final BindingResult errors) {
 		if (attributes != null) {
-			return attributes.values().stream().anyMatch(n -> {
-				if (StringUtils.isNotEmpty(n) && n.length() > GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH) {
-					errors.reject("germplasm.import.attribute.value.invalid.length", "");
-					return true;
-				}
-				return false;
-			});
+			return this.variableValidator.areAttributesInvalid(attributes, errors);
 		}
 		return false;
 	}
@@ -143,27 +134,7 @@ public class GermplasmUpdateDtoValidator {
 			this.germplasmService.filterGermplasmNameTypes(nameCodes).stream().map(nameType -> nameType.getCode().toUpperCase()).collect(
 				Collectors.toSet());
 
-		final Set<String> attributesCodes = new HashSet<>();
-		germplasmUpdateDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
-			.forEach(
-				g -> attributesCodes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
-
-		final VariableFilter variableFilter = new VariableFilter();
-		variableFilter.setProgramUuid(programUUID);
-		VariableType.getGermplasmAttributeVariableTypes().forEach(variableFilter::addVariableType);
-		attributesCodes.forEach(variableFilter::addName);
-
-		final List<Variable> existingAttributeVariables =
-			this.ontologyVariableDataManager.getWithFilter(variableFilter);
-
 		final List<String> existingVariablesNamesAndAlias = new ArrayList<>();
-		existingAttributeVariables.forEach(v -> {
-				existingVariablesNamesAndAlias.add(v.getName().toUpperCase());
-				if (StringUtils.isNotEmpty(v.getAlias())) {
-					existingVariablesNamesAndAlias.add(v.getAlias().toUpperCase());
-				}
-			}
-		);
 
 		if (!nameCodes.isEmpty() && !nameCodes.equals(existingNamesCodes)) {
 			errors.reject("germplasm.update.invalid.name.code", new String[] {
@@ -171,23 +142,11 @@ public class GermplasmUpdateDtoValidator {
 					Collectors.toList()))}, "");
 		}
 
-		if (existingAttributeVariables.size() != attributesCodes.size()) {
-			//Check if same variable was used by name or alias
-			existingAttributeVariables.forEach(v -> {
-				if (attributesCodes.contains(v.getName().toUpperCase()) && StringUtils.isNotEmpty(v.getAlias()) && attributesCodes
-					.contains(v.getAlias().toUpperCase())) {
-					errors.reject("germplasm.import.two.columns.referring.to.same.variable",
-						new String[] {v.getName(), v.getAlias()}, "");
-					return;
-				}
-			});
-
-			attributesCodes.removeAll(existingVariablesNamesAndAlias);
-			if (!attributesCodes.isEmpty()) {
-				errors.reject("germplasm.update.invalid.attribute.code",
-					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributesCodes), 3)}, "");
-			}
-		}
+		final Set<String> attributesCodes = new HashSet<>();
+		germplasmUpdateDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
+			.forEach(
+				g -> attributesCodes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
+		this.variableValidator.validateAttributeCodes(errors, programUUID, attributesCodes, VariableType.getGermplasmAttributeVariableTypes());
 
 		final List<String> ambiguousCodes =
 			new ArrayList<>(CollectionUtils.intersection(existingNamesCodes, existingVariablesNamesAndAlias));

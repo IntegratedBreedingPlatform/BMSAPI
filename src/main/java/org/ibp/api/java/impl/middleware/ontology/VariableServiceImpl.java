@@ -542,6 +542,10 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		if (!Util.isNullOrEmpty(variableFilter.getGermplasmUUIDs())) {
 			variableFilter.getGermplasmUUIDs().forEach(middlewareVariableFilter::addGermplasmUUID);
 		}
+
+		if (!Util.isNullOrEmpty(variableFilter.getLotIds())) {
+			variableFilter.getLotIds().forEach(middlewareVariableFilter::addLotId);
+		}
 	}
 
 	@Override

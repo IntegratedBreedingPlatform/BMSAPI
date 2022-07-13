@@ -256,7 +256,7 @@ public class GermplasmLabelPrintingTest {
 			this.germplasmLabelPrinting.getDataRow(labelsGeneratorInput, keys, response, new HashMap<>(), new HashMap<>());
 		Assert.assertEquals(2, dataRow.keySet().size());
 		Assert.assertEquals(String.valueOf(response.getGid()), dataRow.get(TermId.GID.getId()));
-		Assert.assertEquals(response.getGermplasmPreferredName().substring(0, 200) + "...", dataRow.get(TermId.PREFERRED_NAME.getId()));
+		Assert.assertEquals(response.getGermplasmPreferredName().substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...", dataRow.get(TermId.PREFERRED_NAME.getId()));
 	}
 
 	@Test
@@ -333,9 +333,9 @@ public class GermplasmLabelPrintingTest {
 		final Map<Integer, String> dataRow =
 			this.germplasmLabelPrinting.getDataRow(labelsGeneratorInput, keys, response, new HashMap<>(), new HashMap<>());
 		Assert.assertEquals(2, dataRow.keySet().size());
-		Assert.assertEquals(response.getFemaleParentPreferredName().substring(0, 200) + "...",
+		Assert.assertEquals(response.getFemaleParentPreferredName().substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...",
 			dataRow.get(TermId.CROSS_FEMALE_PREFERRED_NAME.getId()));
-		Assert.assertEquals(response.getMaleParentPreferredName().substring(0, 200) + "...",
+		Assert.assertEquals(response.getMaleParentPreferredName().substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...",
 			dataRow.get(TermId.CROSS_MALE_PREFERRED_NAME.getId()));
 	}
 
@@ -444,7 +444,7 @@ public class GermplasmLabelPrintingTest {
 		final Map<Integer, String> dataRow =
 			this.germplasmLabelPrinting.getDataRow(labelsGeneratorInput, keys, response, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(attributeValue.substring(0, 200) + "...", dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "...", dataRow.get(attributeId));
 	}
 
 	@Test
@@ -533,7 +533,7 @@ public class GermplasmLabelPrintingTest {
 		final Map<Integer, String> dataRow =
 			this.germplasmLabelPrinting.getDataRow(labelsGeneratorInput, keys, response, new HashMap<>(), nameValues);
 		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(nameValue.substring(0, 200) + "...", dataRow.get(nameTypeId));
+		Assert.assertEquals(nameValue.substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...", dataRow.get(nameTypeId));
 	}
 
 	private GermplasmSearchResponse createGermplasmSearchResponse() {

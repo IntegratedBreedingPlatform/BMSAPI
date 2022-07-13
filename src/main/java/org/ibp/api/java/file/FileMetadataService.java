@@ -17,9 +17,9 @@ public interface FileMetadataService {
 
 	Image updateImageContent(String imageDbId, byte[] imageContent);
 
-	FileMetadataDTO upload(MultipartFile file, String observationUnitUUID, String germplasmUUID, Integer instanceId, Integer termId);
+	FileMetadataDTO upload(MultipartFile file, String observationUnitUUID, String germplasmUUID, Integer instanceId, Integer lotId, Integer termId);
 
 	void delete(String fileUUID);
 
-	void removeFiles(List<Integer> variableIds, Integer observationUnitUUID, String germplasmUUID, Integer instanceId);
+	void removeFiles(List<Integer> variableIds, Integer observationUnitUUID, String germplasmUUID, Integer instanceId, Integer lotId);
 }

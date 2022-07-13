@@ -186,7 +186,6 @@ public class GermplasmListLabelPrintingTest {
 		final Map<String, LabelType> labelTypeMap = labelTypes.stream().collect(Collectors.toMap(LabelType::getKey, Function.identity()));
 		Assert.assertEquals(4, labelTypes.size());
 		Assert.assertEquals(germplasmFields, labelTypeMap.get(GERMPLASM_DETAILS).getFields());
-		Assert.assertEquals(this.labelPrinting.getDefaultEntryDetailsFields(), labelTypeMap.get(ENTRY_DETAILS).getFields());
 		Assert.assertTrue(CollectionUtils.isEmpty(labelTypeMap.get(NAMES).getFields()));
 		Assert.assertTrue(CollectionUtils.isEmpty(labelTypeMap.get(ATTRIBUTES).getFields()));
 	}
@@ -283,7 +282,7 @@ public class GermplasmListLabelPrintingTest {
 		Assert.assertEquals(response.getGermplasmUUID(), dataRow.get(LabelPrintingStaticField.GUID.getFieldId()));
 
 		// Verify that name values are truncated for this file type
-		Assert.assertEquals(response.getGermplasmPreferredName().substring(0, 200) + "...", dataRow.get(TermId.PREFERRED_NAME.getId()));
+		Assert.assertEquals(response.getGermplasmPreferredName().substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...", dataRow.get(TermId.PREFERRED_NAME.getId()));
 	}
 
 	@Test
@@ -357,9 +356,9 @@ public class GermplasmListLabelPrintingTest {
 			dataRow.get(LabelPrintingStaticField.CROSS.getFieldId()));
 
 		// Verify that name values are truncated for this file type
-		Assert.assertEquals(response.getFemaleParentPreferredName().substring(0, 200) + "...",
+		Assert.assertEquals(response.getFemaleParentPreferredName().substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...",
 			dataRow.get(TermId.CROSS_FEMALE_PREFERRED_NAME.getId()));
-		Assert.assertEquals(response.getMaleParentPreferredName().substring(0, 200) + "...",
+		Assert.assertEquals(response.getMaleParentPreferredName().substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...",
 			dataRow.get(TermId.CROSS_MALE_PREFERRED_NAME.getId()));
 	}
 
@@ -423,7 +422,7 @@ public class GermplasmListLabelPrintingTest {
 				new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values are truncated for PDF file type
-		Assert.assertEquals(attributeValue.substring(0, 200) + "...", dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "...", dataRow.get(attributeId));
 	}
 
 	@Test
@@ -486,23 +485,9 @@ public class GermplasmListLabelPrintingTest {
 		Assert.assertEquals(1, dataRow.keySet().size());
 
 		// Verify that name values are truncated for this file type
-		Assert.assertEquals(nameValue.substring(0, 200) + "...", dataRow.get(nameTypeId));
+		Assert.assertEquals(nameValue.substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...", dataRow.get(nameTypeId));
 	}
 
-	@Test
-	public void testGetDataRow_For_DefaultEntryDetailFields() {
-		this.labelPrinting.initStaticFields();
-		final Set<Integer> keys = new HashSet<>(Arrays.asList(TermId.ENTRY_NO.getId(), TermId.ENTRY_CODE.getId()));
-		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		final Map<Integer, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, new HashMap<>(), new HashMap<>(),
-				new HashMap<>());
-		Assert.assertEquals(2, dataRow.keySet().size());
-		Assert.assertEquals(listData.getData().get(TermId.ENTRY_NO.name()), dataRow.get(TermId.ENTRY_NO.getId()));
-		Assert.assertEquals(listData.getData().get(TermId.ENTRY_CODE.name()), dataRow.get(TermId.ENTRY_CODE.getId()));
-	}
 
 	@Test
 	public void testGetDataRow_For_EntryDetailFields() {
@@ -536,8 +521,7 @@ public class GermplasmListLabelPrintingTest {
 		final GermplasmListDataSearchResponse response = new GermplasmListDataSearchResponse();
 		response.setListDataId(Integer.valueOf(RandomStringUtils.randomNumeric(3)));
 		response.setData(new HashMap<>());
-		response.getData().put(GermplasmListStaticColumns.ENTRY_NO.name(), "1");
-		response.getData().put(GermplasmListStaticColumns.ENTRY_CODE.name(), RandomStringUtils.randomAlphanumeric(10));
+		response.getData().put(TermId.ENTRY_NO.name(), "1");
 		response.getData().put(GermplasmListStaticColumns.CROSS.name(), RandomStringUtils.randomAlphanumeric(10));
 		return response;
 	}

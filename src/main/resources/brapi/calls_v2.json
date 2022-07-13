@@ -346,6 +346,30 @@
     "versions": [
       "2.0"
     ]
+  },
+  {
+    "service": "search/pedigree",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "2.1"
+    ]
+  },
+  {
+    "service": "search/pedigree/{searchResultsDbId}",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "versions": [
+      "2.1"
+    ]
   }
 ]
 }

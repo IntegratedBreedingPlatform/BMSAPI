@@ -62,6 +62,9 @@ public class LabelPrintingResource {
 	private LabelPrintingStrategy germplasmListLabelPrinting;
 
 	@Autowired
+	private LabelPrintingStrategy studyEntriesLabelPrinting;
+
+	@Autowired
 	private CSVLabelsFileGenerator csvLabelsFileGenerator;
 
 	@Autowired
@@ -220,6 +223,9 @@ public class LabelPrintingResource {
 			case GERMPLASM_LIST:
 				labelPrintingStrategy = this.germplasmListLabelPrinting;
 				break;
+			case STUDY_ENTRIES:
+				labelPrintingStrategy = this.studyEntriesLabelPrinting;
+				break;
 			default:
 				labelPrintingStrategy = null;
 		}
@@ -234,6 +240,8 @@ public class LabelPrintingResource {
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.STUDIES.name())
 					|| this.request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name());
+			case STUDY_ENTRIES:
+				return true;
 			case LOT:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())

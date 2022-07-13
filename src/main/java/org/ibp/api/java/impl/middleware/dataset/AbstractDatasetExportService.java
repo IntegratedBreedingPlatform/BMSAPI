@@ -18,6 +18,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
+import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -34,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,15 +95,41 @@ public abstract class AbstractDatasetExportService {
 		// Get all variables for the dataset
 		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId());
 
+		final List<MeasurementVariable> descriptors = new ArrayList<>();
+		final Map<Integer, MeasurementVariable> entryDetails = new LinkedHashMap<>();
+		final List<MeasurementVariable> otherVariables = new ArrayList<>();
+
+		final List<MeasurementVariable> sortedColumns = new ArrayList<>();
+
+		columns.stream().forEach(variable -> {
+			if (VariableType.GERMPLASM_DESCRIPTOR == variable.getVariableType()) {
+				descriptors.add(variable);
+			} else if (VariableType.ENTRY_DETAIL == variable.getVariableType()) {
+				entryDetails.put(variable.getTermId(), variable);
+			} else {
+				otherVariables.add(variable);
+			}
+		});
+
+		sortedColumns.add(entryDetails.remove(TermId.ENTRY_NO.getId()));
+		if (entryDetails.containsKey(TermId.ENTRY_TYPE.getId())) {
+			sortedColumns.add(entryDetails.remove(TermId.ENTRY_TYPE.getId()));
+		}
+		sortedColumns.sort(Comparator.comparing(descriptor -> StudyEntryDescriptorColumns.getRankByTermId(descriptor.getTermId())));
+		sortedColumns.addAll(descriptors);
+
 		// Add Stock id column
 		if (dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
 			transactionsSearchDto.setTransactionStatus(Arrays.asList(0,1));
 			transactionsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
 			if (this.transactionService.countSearchTransactions(transactionsSearchDto) > 0) {
-				this.addStockIdColumn(columns);
+				sortedColumns.add(this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR,null, true));
 			}
 		}
+
+		sortedColumns.addAll(otherVariables);
+		sortedColumns.addAll(entryDetails.values());
 
 		// Get data
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = this.getSelectedDatasetInstancesMap(
@@ -117,10 +145,10 @@ public abstract class AbstractDatasetExportService {
 		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
 
 		if (singleFile) {
-			return this.generateInSingleFile(study, dataSet, observationUnitRowMap, columns, generator, fileExtension);
+			return this.generateInSingleFile(study, dataSet, observationUnitRowMap, sortedColumns, generator, fileExtension);
 		} else {
 			return this
-				.generateFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension);
+				.generateFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, sortedColumns, generator, fileExtension);
 		}
 
 	}
@@ -221,15 +249,6 @@ public abstract class AbstractDatasetExportService {
 			trialInstanceIndex++;
 		}
 		return columns;
-	}
-
-	protected void addStockIdColumn(final List<MeasurementVariable> plotDataSetColumns) {
-		final Optional<MeasurementVariable>
-			designationColumn = plotDataSetColumns.stream().filter(measurementVariable ->
-			measurementVariable.getTermId() == TermId.DESIG.getId()).findFirst();
-		// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
-		plotDataSetColumns.add(plotDataSetColumns.indexOf(designationColumn.get()) + 1,
-			this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR,null, true));
 	}
 
 	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
