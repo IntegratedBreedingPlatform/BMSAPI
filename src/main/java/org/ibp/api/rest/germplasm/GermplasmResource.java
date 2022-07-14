@@ -23,8 +23,6 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmInventoryImportDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
-import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.domain.common.PagedResult;
@@ -59,7 +57,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -173,22 +170,6 @@ public class GermplasmResource {
 		headers.add("X-Filtered-Count", Long.toString(result.getFilteredResults()));
 
 		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
-	}
-
-	/**
-	 * Simple search to feed autocomplete features
-	 *
-	 * @return a limited set of results matching the query criteria
-	 */
-	@ApiOperation(value = "Search germplasm attributes")
-	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes/search", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<Variable>> searchAttributes(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = true) final String query) {
-
-		return new ResponseEntity<>(this.variableService.searchAttributeVariables(query,
-			Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId()), programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Returns germplasm name types filtered by a list of codes", notes = "Returns germplasm name types filtered by a list of codes")
