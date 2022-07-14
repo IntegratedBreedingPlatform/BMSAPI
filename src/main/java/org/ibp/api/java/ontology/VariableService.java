@@ -78,7 +78,7 @@ public interface VariableService {
 
 	List<VariableDetails> getVariablesByFilter(VariableFilter variableFilter);
 
-	List<Variable> searchAttributeVariables(String query, String programUUID);
+	List<Variable> searchAttributeVariables(String query, List<Integer> variableTypeIds, String programUUID);
 
 	List<VariableDetails> createAnalysisVariables(AnalysisVariablesImportRequest analysisVariablesImportRequest);
 }
