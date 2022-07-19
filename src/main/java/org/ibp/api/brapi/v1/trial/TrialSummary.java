@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.commons.lang.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.study.Contact;
 import org.ibp.api.brapi.v1.study.StudySummaryDto;
@@ -58,7 +59,7 @@ public class TrialSummary {
 	private String documentationURL = StringUtils.EMPTY;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private List<String> externalReferences = new ArrayList<>();
+	private List<ExternalReferenceDTO> externalReferences = new ArrayList<>();
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private List<String> publications = new ArrayList<>();
@@ -199,11 +200,11 @@ public class TrialSummary {
 		this.documentationURL = documentationURL;
 	}
 
-	public List<String> getExternalReferences() {
+	public List<ExternalReferenceDTO> getExternalReferences() {
 		return this.externalReferences;
 	}
 
-	public void setExternalReferences(final List<String> externalReferences) {
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 		this.externalReferences = externalReferences;
 	}
 
