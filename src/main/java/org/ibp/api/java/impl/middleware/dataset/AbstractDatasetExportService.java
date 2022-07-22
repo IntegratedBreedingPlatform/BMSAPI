@@ -12,13 +12,12 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
-import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
+import org.generationcp.middleware.service.impl.study.StudyEntryGermplasmDescriptorColumns;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -39,7 +38,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public abstract class AbstractDatasetExportService {
@@ -115,7 +113,7 @@ public abstract class AbstractDatasetExportService {
 		if (entryDetails.containsKey(TermId.ENTRY_TYPE.getId())) {
 			sortedColumns.add(entryDetails.remove(TermId.ENTRY_TYPE.getId()));
 		}
-		sortedColumns.sort(Comparator.comparing(descriptor -> StudyEntryDescriptorColumns.getRankByTermId(descriptor.getTermId())));
+		sortedColumns.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
 
 		// Add Stock id column

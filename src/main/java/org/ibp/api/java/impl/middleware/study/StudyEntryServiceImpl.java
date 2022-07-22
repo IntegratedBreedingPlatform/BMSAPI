@@ -16,7 +16,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
+import org.generationcp.middleware.service.impl.study.StudyEntryGermplasmDescriptorColumns;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
@@ -210,7 +210,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		}
 
 		// Sort descriptors by how they are arranged in StudyEntryDescriptorColumns::rank
-		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryDescriptorColumns.getRankByTermId(descriptor.getTermId())));
+		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
 
 		//Add Inventory related columns
@@ -274,9 +274,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId) {
+	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId, final String programUUID) {
 		this.studyValidator.validate(studyId, false);
-		return this.middlewareStudyEntryService.getStudyEntryColumns(studyId);
+		return this.middlewareStudyEntryService.getStudyEntryColumns(studyId, programUUID);
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
