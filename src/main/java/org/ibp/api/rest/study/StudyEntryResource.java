@@ -191,7 +191,7 @@ public class StudyEntryResource {
 	@ResponseBody
 	public ResponseEntity<Void> fillWithCrossExpansion(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@RequestParam(required = false) final String programUUID,
+		@PathVariable final String programUUID,
 		@RequestBody @ApiParam("a positive number, without quotation marks. E.g level: 2") final String level
 	) {
 		BaseValidator.checkArgument(isNumber(level), "error.generationlevel.invalid");
@@ -207,7 +207,7 @@ public class StudyEntryResource {
 	@ResponseBody
 	public ResponseEntity<Integer> getCrossExpansionLevel(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@RequestParam(required = false) final String programUUID) {
+		@PathVariable final String programUUID) {
 		final Integer crossExpansionLevel = this.studyEntryService.getCrossExpansionLevel(studyId);
 		return new ResponseEntity<>(crossExpansionLevel, HttpStatus.OK);
 	}
@@ -218,8 +218,8 @@ public class StudyEntryResource {
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryColumnDTO>> getStudyEntriesColumns(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@RequestParam(required = false) final String programUUID) {
-		return new ResponseEntity<>(this.studyEntryService.getStudyEntryColumns(studyId), HttpStatus.OK);
+		@PathVariable final String programUUID) {
+		return new ResponseEntity<>(this.studyEntryService.getStudyEntryColumns(studyId, programUUID), HttpStatus.OK);
 	}
 
 }
