@@ -1,12 +1,15 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
@@ -17,10 +20,12 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
@@ -77,6 +82,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Autowired
 	private SearchCompositeDtoValidator searchCompositeDtoValidator;
+
+	@Autowired
+	public ProgramValidator programValidator;
 
 	@Resource
 	private org.generationcp.middleware.service.api.study.StudyEntryService middlewareStudyEntryService;
@@ -137,7 +145,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final StudyEntryPropertyBatchUpdateRequest batchUpdateRequest) {
 		this.studyValidator.validate(studyId, true);
 		this.studyValidator.validateStudyShouldNotHaveObservation(studyId);
-		this.studyEntryValidator.validateStudyContainsEntries(studyId, new ArrayList<>(batchUpdateRequest.getSearchComposite().getItemIds()));
+		this.studyEntryValidator.validateStudyContainsEntries(studyId,
+			new ArrayList<>(batchUpdateRequest.getSearchComposite().getItemIds()));
 		this.termValidator.validate(batchUpdateRequest.getVariableId());
 		this.middlewareStudyEntryService.updateStudyEntriesProperty(batchUpdateRequest);
 	}
@@ -231,7 +240,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public long countAllCheckTestEntries(final Integer studyId, final String programUuid, final Boolean checkOnly) {
-		if(checkOnly) {
+		if (checkOnly) {
 			return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
 				Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())));
 		} else {
@@ -243,12 +252,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		}
 	}
 
-  @Override public long countAllNonReplicatedTestEntries(final Integer studyId) {
-	return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
+	@Override
+	public long countAllNonReplicatedTestEntries(final Integer studyId) {
+		return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
 			Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())));
-  }
+	}
 
-  @Override
+	@Override
 	public StudyEntryMetadata getStudyEntriesMetadata(final Integer studyId, final String programUuid) {
 		this.studyValidator.validate(studyId, false);
 		final StudyEntryMetadata studyEntryMetadata = new StudyEntryMetadata();
@@ -279,6 +289,21 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return this.middlewareStudyEntryService.getStudyEntryColumns(studyId);
 	}
 
+	@Override
+	public List<Variable> getStudyEntryDetails(final String cropName, final String programUUID,
+		final Integer studyId, final Integer variableTypeId) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), StudyEntryServiceImpl.class.getName());
+		if (!StringUtils.isEmpty(programUUID)) {
+			this.programValidator.validate(new ProgramDTO(cropName, programUUID), errors);
+			if (errors.hasErrors()) {
+				throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+			}
+		}
+		this.studyValidator.validate(studyId, true);
+
+		return this.middlewareStudyEntryService.getStudyEntryDetails(cropName, programUUID, studyId, variableTypeId);
+	}
+
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
 		final MeasurementVariable sampleColumn = new MeasurementVariable();
 		sampleColumn.setName(name);
@@ -291,5 +316,4 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public void setDatasetService(final DatasetService datasetService) {
 		this.datasetService = datasetService;
 	}
-
 }

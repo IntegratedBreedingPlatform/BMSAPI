@@ -1,6 +1,7 @@
 package org.ibp.api.java.study;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
@@ -45,4 +46,5 @@ public interface StudyEntryService {
 
 	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId);
 
+	List<Variable> getStudyEntryDetails(String cropName, String programUUID, Integer studyId, Integer variableTypeId);
 }

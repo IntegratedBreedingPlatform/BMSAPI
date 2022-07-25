@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
@@ -222,4 +223,14 @@ public class StudyEntryResource {
 		return new ResponseEntity<>(this.studyEntryService.getStudyEntryColumns(studyId), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get the variables associated to the study filtered by variableType", notes = "Get the list variables filtered by variableType")
+	@RequestMapping(value = "/{cropName}/studies/{studyId}/entries/variables", method = RequestMethod.GET)
+	public ResponseEntity<List<Variable>> getVariables(
+		@PathVariable final String cropName, @PathVariable final Integer studyId,
+		@RequestParam(required = false) final String programUUID, @RequestParam final Integer variableTypeId) {
+
+		final List<Variable> variables =
+			this.studyEntryService.getStudyEntryDetails(cropName, programUUID, studyId, variableTypeId);
+		return new ResponseEntity<>(variables, HttpStatus.OK);
+	}
 }
