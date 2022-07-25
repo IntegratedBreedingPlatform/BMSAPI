@@ -186,17 +186,26 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		final List<MeasurementVariable> columns =
 			this.datasetService.getObservationSetVariables(plotDatasetId,
-				Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
+				Lists.newArrayList(VariableType.GERMPLASM_ATTRIBUTE.getId(),
+					VariableType.GERMPLASM_PASSPORT.getId(),
+					VariableType.GERMPLASM_DESCRIPTOR.getId(),
+					VariableType.ENTRY_DETAIL.getId()));
 
 		//Remove OBS_UNIT_ID column if present
 		columns.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
 		final List<MeasurementVariable> descriptors = new ArrayList<>();
+		final List<MeasurementVariable> passports = new ArrayList<>();
+		final List<MeasurementVariable> attributes = new ArrayList<>();
 		// Using LinkedHashMap to preserve the order by rank of the variables
 		final Map<Integer, MeasurementVariable> entryDetails = new LinkedHashMap<>();
 		columns.stream().forEach(variable -> {
 			if (variable.getVariableType() == VariableType.ENTRY_DETAIL) {
 				entryDetails.put(variable.getTermId(), variable);
+			} else if (variable.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE) {
+				attributes.add(variable);
+			} else if (variable.getVariableType() == VariableType.GERMPLASM_PASSPORT) {
+				passports.add(variable);
 			} else {
 				descriptors.add(variable);
 			}
@@ -212,6 +221,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		// Sort descriptors by how they are arranged in StudyEntryDescriptorColumns::rank
 		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
+
+		passports.sort(this.getVariableComparator());
+		sortedColumns.addAll(passports);
+		attributes.sort(this.getVariableComparator());
+		sortedColumns.addAll(attributes);
 
 		//Add Inventory related columns
 		sortedColumns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
@@ -290,6 +304,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	public void setDatasetService(final DatasetService datasetService) {
 		this.datasetService = datasetService;
+	}
+
+	private Comparator<MeasurementVariable> getVariableComparator() {
+		return Comparator.comparing(MeasurementVariable::getAlias, Comparator.nullsLast(Comparator.naturalOrder()))
+			.thenComparing(MeasurementVariable::getName);
 	}
 
 }
