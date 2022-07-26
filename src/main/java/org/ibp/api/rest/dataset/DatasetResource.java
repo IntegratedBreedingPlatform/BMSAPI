@@ -523,7 +523,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> updatePlotDatasetProperties(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@RequestParam(required = false) final String programUUID,
+		@PathVariable final String programUUID,
 		@RequestBody final List<Integer> variableIds) {
 		this.studyDatasetService.updatePlotDatasetProperties(studyId, variableIds);
 		return new ResponseEntity<>(HttpStatus.OK);
