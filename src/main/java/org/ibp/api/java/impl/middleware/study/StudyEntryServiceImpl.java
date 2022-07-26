@@ -222,9 +222,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
 
-		passports.sort(this.getVariableComparator());
+		passports.sort(Comparator.comparing(MeasurementVariable::getName));
 		sortedColumns.addAll(passports);
-		attributes.sort(this.getVariableComparator());
+		attributes.sort(Comparator.comparing(MeasurementVariable::getName));
 		sortedColumns.addAll(attributes);
 
 		//Add Inventory related columns
@@ -304,11 +304,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	public void setDatasetService(final DatasetService datasetService) {
 		this.datasetService = datasetService;
-	}
-
-	private Comparator<MeasurementVariable> getVariableComparator() {
-		return Comparator.comparing(MeasurementVariable::getAlias, Comparator.nullsLast(Comparator.naturalOrder()))
-			.thenComparing(MeasurementVariable::getName);
 	}
 
 }
