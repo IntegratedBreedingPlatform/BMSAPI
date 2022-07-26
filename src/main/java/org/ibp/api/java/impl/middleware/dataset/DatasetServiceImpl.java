@@ -984,7 +984,7 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, variableIds);
+		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, variableIds, programUUID);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
