@@ -965,11 +965,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void updateDatasetProperties(final Integer studyId, final List<Integer> variableIds) {
+	public void updatePlotDatasetProperties(final Integer studyId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, true);
 		variableIds.forEach(this.termValidator::validate);
 
-		this.middlewareDatasetService.updateDatasetProperties(studyId, variableIds);
+		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, variableIds);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
