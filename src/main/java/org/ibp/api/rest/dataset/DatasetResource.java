@@ -525,7 +525,7 @@ public class DatasetResource {
 		@PathVariable final Integer studyId,
 		@PathVariable final String programUUID,
 		@RequestBody final List<Integer> variableIds) {
-		this.studyDatasetService.updatePlotDatasetProperties(studyId, variableIds);
+		this.studyDatasetService.updatePlotDatasetProperties(studyId, variableIds, programUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
