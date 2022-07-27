@@ -7,10 +7,12 @@ import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateReq
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.ibp.api.domain.study.StudyEntryDetailsValueMap;
 import org.ibp.api.java.impl.middleware.study.StudyEntryMetadata;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface StudyEntryService {
 
@@ -47,4 +49,6 @@ public interface StudyEntryService {
 	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId);
 
 	List<Variable> getStudyEntryDetails(String cropName, String programUUID, Integer studyId, Integer variableTypeId);
+
+	void importUpdates(Integer studyId, List<StudyEntryDetailsValueMap> entryDetailsValues);
 }

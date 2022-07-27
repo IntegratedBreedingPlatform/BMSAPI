@@ -17,9 +17,11 @@ import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
+import org.ibp.api.domain.study.StudyEntryDetailsValueMap;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
@@ -31,6 +33,7 @@ import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDt
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.ibp.api.java.study.StudyEntryObservationService;
 import org.ibp.api.java.study.StudyEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -94,6 +97,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private EntryTypeService entryTypeService;
+
+	@Resource
+	private StudyEntryObservationService studyEntryObservationService;
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
@@ -302,6 +308,37 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		this.studyValidator.validate(studyId, true);
 
 		return this.middlewareStudyEntryService.getStudyEntryDetails(cropName, programUUID, studyId, variableTypeId);
+	}
+
+	@Override
+	public void importUpdates(final Integer studyId, final List<StudyEntryDetailsValueMap> entryDetailsValues) {
+		this.studyValidator.validate(studyId, true);
+
+		final Map<String, List<StockPropertyData>> entriesMap = entryDetailsValues.stream()
+			.collect(Collectors.toMap(StudyEntryDetailsValueMap::getEntryNumber, StudyEntryDetailsValueMap::getData));
+		this.studyEntryValidator.validateStudyContainsEntryNumbers(studyId, entriesMap.keySet());
+
+		// retrieve study entries dto
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setEntryNumbers(new ArrayList<>(entriesMap.keySet()));
+		final List<StudyEntryDto> studyEntries =
+			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+
+		studyEntries.forEach(entry -> {
+			this.processStudyEntry(studyId, entriesMap.get(String.valueOf(entry.getEntryNumber())), entry);
+		});
+	}
+
+	private void processStudyEntry(final Integer studyId, final List<StockPropertyData> entriesDataList,
+		final StudyEntryDto entry) {
+		if (!org.fest.util.Collections.isEmpty(entriesDataList)) {
+			entriesDataList.forEach(variable -> {
+				variable.setStockId(entry.getEntryId());
+				if (variable.hasValue() && !variable.getValue().isEmpty()) {
+					this.studyEntryObservationService.updateObservation(studyId, variable);
+				}
+			});
+		}
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {

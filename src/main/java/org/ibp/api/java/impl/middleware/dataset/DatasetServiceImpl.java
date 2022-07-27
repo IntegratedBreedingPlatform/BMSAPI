@@ -29,6 +29,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.dataset.DatasetVariable;
+import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
@@ -181,6 +182,26 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable) {
 		this.studyValidator.validate(studyId, true);
+
+		return this.getMeasurementVariable(studyId, datasetId, datasetVariable);
+
+	}
+
+	@Override
+	public void addDatasetVariables(final Integer studyId, final List<DatasetVariable> datasetVariables) {
+		this.studyValidator.validate(studyId, true);
+
+		//TODO check null pointers, add study variable specific validations
+		final Integer datasetId = this.getDatasets(
+			studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0).getDatasetId();
+
+		datasetVariables.forEach(datasetVariable -> {
+			this.getMeasurementVariable(studyId, datasetId, datasetVariable);
+		});
+	}
+
+	private MeasurementVariable getMeasurementVariable(final Integer studyId, final Integer datasetId,
+		final DatasetVariable datasetVariable) {
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable traitVariable =
 			this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
@@ -193,7 +214,6 @@ public class DatasetServiceImpl implements DatasetService {
 		measurementVariable.setVariableType(type);
 		measurementVariable.setRequired(false);
 		return measurementVariable;
-
 	}
 
 	@Override
