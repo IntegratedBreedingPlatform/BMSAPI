@@ -199,7 +199,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
@@ -207,9 +206,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Note: this configuration now contains beans not only from Middleware, so it's used as a general purpose factory
@@ -228,9 +224,6 @@ public class MiddlewareFactory {
 
 	@Autowired
 	private ApplicationContext applicationContext;
-
-	@Autowired
-	private Environment environment;
 
 	public MiddlewareFactory() {
 		super();
@@ -492,15 +485,7 @@ public class MiddlewareFactory {
 
 	@Bean
 	public CrossExpansionProperties getCrossExpansionProperties() {
-		final String defaultLevel = this.environment.getProperty("default.generation.level");
-		final String pedigreeProfile = this.environment.getProperty("pedigree.profile");
-		final List<String> list = Arrays.asList(this.environment.getProperty("hybrid.breeding.methods").split(","));
-
 		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
-		crossExpansionProperties.setDefaultLevel(Integer.parseInt(defaultLevel));
-		crossExpansionProperties.setProfile(pedigreeProfile);
-		crossExpansionProperties
-			.setHybridBreedingMethods(list.stream().map(Integer::valueOf).collect(Collectors.toSet()));
 		return crossExpansionProperties;
 	}
 
