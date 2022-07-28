@@ -69,12 +69,21 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	}
 
 	@Override
-	public Integer updateObservation(final Integer studyId, final StockPropertyData stockPropertyData) {
+	public Integer updateObservation(final Integer studyId, final StockPropertyData stockPropertyData,
+		final boolean allowCreate) {
 		this.commonValidations(studyId, stockPropertyData, false);
-		this.validateStudyEntryVariableShouldExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
+
+		if (!allowCreate) {
+			this.validateStudyEntryVariableShouldExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
+		}
 
 		this.setCategoricalValueId(stockPropertyData);
-		return this.studyEntryObservationService.updateObservation(stockPropertyData);
+		return this.studyEntryObservationService.updateObservation(stockPropertyData, allowCreate);
+	}
+
+	@Override
+	public Integer updateObservation(final Integer studyId, final StockPropertyData stockPropertyData) {
+		return this.updateObservation(studyId, stockPropertyData, false);
 	}
 
 	@Override

@@ -335,7 +335,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			entriesDataList.forEach(variable -> {
 				variable.setStockId(entry.getEntryId());
 				if (variable.hasValue() && !variable.getValue().isEmpty()) {
-					this.studyEntryObservationService.updateObservation(studyId, variable);
+					this.studyEntryObservationService.updateObservation(studyId, variable, true);
+				} else {
+					this.studyEntryObservationService.deleteObservation(studyId, entry.getEntryId());
 				}
 			});
 		}
