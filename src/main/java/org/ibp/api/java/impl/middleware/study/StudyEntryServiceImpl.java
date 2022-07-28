@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateReq
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
@@ -56,6 +57,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -324,9 +326,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final List<StudyEntryDto> studyEntries =
 			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
 
-		studyEntries.forEach(entry -> {
-			this.processStudyEntry(studyId, entriesMap.get(String.valueOf(entry.getEntryNumber())), entry);
-		});
+		studyEntries.forEach(entry ->
+			this.processStudyEntry(studyId, entriesMap.get(String.valueOf(entry.getEntryNumber())), entry)
+		);
 	}
 
 	private void processStudyEntry(final Integer studyId, final List<StockPropertyData> entriesDataList,
@@ -337,7 +339,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				if (variable.hasValue() && !variable.getValue().isEmpty()) {
 					this.studyEntryObservationService.updateObservation(studyId, variable, true);
 				} else {
-					this.studyEntryObservationService.deleteObservation(studyId, entry.getEntryId());
+					final Optional<StockProperty> stockPropertyOptional = this.middlewareStudyEntryService.getByStockIdAndTypeId(
+						variable.getStockId(), variable.getVariableId());
+
+					if (stockPropertyOptional.isPresent()) {
+						this.studyEntryObservationService.deleteObservation(studyId, stockPropertyOptional.get().getStockPropId());
+					}
 				}
 			});
 		}
