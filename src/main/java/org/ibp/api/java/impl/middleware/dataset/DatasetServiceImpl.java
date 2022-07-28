@@ -968,21 +968,8 @@ public class DatasetServiceImpl implements DatasetService {
 	public void updatePlotDatasetProperties(final Integer studyId, final List<Integer> variableIds, final String programUUID) {
 		this.studyValidator.validate(studyId, true);
 		variableIds.forEach(this.termValidator::validate);
-
-		final List<String> unsupportedVariableIds = this.ontologyDataManager.getStandardVariables(variableIds, programUUID)
-			.stream()
-			.filter(standardVariable -> standardVariable.getVariableTypes().stream().noneMatch(variableType ->
-				VariableType.GERMPLASM_DESCRIPTOR == variableType ||
-					VariableType.GERMPLASM_ATTRIBUTE == variableType ||
-					VariableType.GERMPLASM_PASSPORT == variableType)
-			)
-			.map(standardVariable -> String.valueOf(standardVariable.getId()))
-			.collect(Collectors.toList());
-		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		if (!CollectionUtils.isEmpty(unsupportedVariableIds)) {
-			errors.reject("study.entry.update.columns.unsupported.variables", new String[] {String.join(", ", unsupportedVariableIds)}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(variableIds, programUUID);
+		this.studyValidator.validateMaxStudyEntryColumnsAllowed(studyId, variableIds, programUUID);
 
 		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, variableIds, programUUID);
 	}
