@@ -39,7 +39,7 @@ public class ObservationResourceBrapiTest extends ApiUnitTestBase {
 			.getObservationLevels(Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE),Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER + 1)))
 			.thenReturn(observationLevels);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/observationLevels")
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/observationlevels")
 			.contentType(this.contentType)
 			.locale(locale))
 			.andExpect(MockMvcResultMatchers.status().isOk())
