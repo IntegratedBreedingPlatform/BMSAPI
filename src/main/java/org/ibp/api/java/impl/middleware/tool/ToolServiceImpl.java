@@ -5,7 +5,7 @@ import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.domain.workbench.ToolDTO;
 import org.generationcp.middleware.domain.workbench.ToolLinkDTO;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
@@ -52,7 +52,7 @@ public class ToolServiceImpl implements ToolService {
 	public ProgramValidator programValidator;
 
 	@Autowired
-	public WorkbenchDataManager workbenchDataManager;
+	public RoleService roleService;
 
 	@Autowired
 	public ProgramService programService;

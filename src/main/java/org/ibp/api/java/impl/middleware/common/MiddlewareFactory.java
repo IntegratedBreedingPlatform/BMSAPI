@@ -91,7 +91,7 @@ import org.generationcp.middleware.manager.PresetServiceImpl;
 import org.generationcp.middleware.manager.SearchRequestServiceImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserProgramStateDataManagerImpl;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
+import org.generationcp.middleware.api.role.RoleServiceImpl;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -103,7 +103,7 @@ import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
@@ -470,8 +470,8 @@ public class MiddlewareFactory {
 
 	@Bean
 	@DependsOn("WORKBENCH_SessionFactory")
-	public WorkbenchDataManager getWorkbenchDataManager() {
-		return new WorkbenchDataManagerImpl(this.getWorkbenchSessionProvider());
+	public RoleService getRoleService() {
+		return new RoleServiceImpl(this.getWorkbenchSessionProvider());
 	}
 
 	@Bean
