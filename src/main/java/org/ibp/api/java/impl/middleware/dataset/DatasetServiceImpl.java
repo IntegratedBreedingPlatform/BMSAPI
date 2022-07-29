@@ -353,7 +353,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
 
-		// TODO: we need to remove this because it won't work when names will be added to germplasm & checks table.
+		// TODO: we need to remove this because it won't work when names will be added to observations table.
 		// We are assuming that every sort property correspond to a term, and this won't be longer valid for names
 		Pageable convertedPageable = null;
 		if (pageable != null && pageable.getSort() != null) {
