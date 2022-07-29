@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.role;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.role.RoleTypeService;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -48,6 +49,9 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 
 	@Mock
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Mock
+	private RoleTypeService roleTypeService;
 
 	@InjectMocks
 	private RoleServiceImpl roleServiceImpl;

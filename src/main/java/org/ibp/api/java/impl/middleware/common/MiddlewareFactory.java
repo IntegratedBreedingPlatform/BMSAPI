@@ -72,6 +72,8 @@ import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.program.ProgramServiceImpl;
+import org.generationcp.middleware.api.role.RoleTypeService;
+import org.generationcp.middleware.api.role.RoleTypeServiceImpl;
 import org.generationcp.middleware.api.study.MyStudiesService;
 import org.generationcp.middleware.api.study.MyStudiesServiceImpl;
 import org.generationcp.middleware.api.study.StudyEntryObservationService;
@@ -903,6 +905,12 @@ public class MiddlewareFactory {
 	@DependsOn("WORKBENCH_SessionFactory")
 	public CropService getCropService() {
 		return new CropServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@DependsOn("WORKBENCH_SessionFactory")
+	public RoleTypeService getRoleTypeService() {
+		return new RoleTypeServiceImpl(this.getWorkbenchSessionProvider());
 	}
 
 	@Bean
