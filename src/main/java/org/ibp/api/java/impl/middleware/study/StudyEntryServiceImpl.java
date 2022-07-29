@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
@@ -151,14 +152,22 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 		this.studyValidator.validate(studyId, false);
 
+		// TODO: we need to remove this because it won't work when names will be added to germplasm & checks table.
+		// We are assuming that every sort property correspond to a term, and this won't be longer valid for names
 		Pageable convertedPageable = null;
 		if (pageable != null && pageable.getSort() != null) {
 			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
 			if (iterator.hasNext()) {
 				// Convert the sort property name from termid to actual term name.
 				final Sort.Order sort = iterator.next();
-				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
-				final String sortProperty = Objects.isNull(term) ? sort.getProperty() : term.getName();
+				final String sortProperty;
+				if (NumberUtils.isNumber(sort.getProperty()) && Integer.valueOf(sort.getProperty()) > 0) {
+					final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
+					sortProperty = term.getName();
+				} else {
+					sortProperty = sort.getProperty();
+				}
+
 				pageable.getSort().and(new Sort(sort.getDirection(), sortProperty));
 				convertedPageable =
 					new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(),
