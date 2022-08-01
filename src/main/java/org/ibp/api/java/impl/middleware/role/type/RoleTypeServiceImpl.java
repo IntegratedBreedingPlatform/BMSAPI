@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.role.type;
 
 import org.apache.commons.lang3.text.WordUtils;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.ibp.api.domain.role.RoleTypeDto;
 import org.ibp.api.java.role.type.RoleTypeService;
@@ -15,12 +14,12 @@ import java.util.stream.Collectors;
 public class RoleTypeServiceImpl implements RoleTypeService {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private org.generationcp.middleware.api.role.RoleTypeService roleTypeService;
 
 	@Override
 	public List<RoleTypeDto> getRoleTypes() {
 
-		final List<RoleType> roleTypes = this.workbenchDataManager.getRoleTypes();
+		final List<RoleType> roleTypes = this.roleTypeService.getRoleTypes();
 		final List<RoleTypeDto> roleTypeDtos = roleTypes.stream()
 			.map(roleType -> new RoleTypeDto(roleType.getId(), WordUtils.capitalizeFully(roleType.getName())))
 			.collect(Collectors.toList());

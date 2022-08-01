@@ -10,7 +10,7 @@ import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -54,7 +54,7 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 	private GermplasmListManager germplasmListManager;
 
 	@Autowired
-	public WorkbenchDataManager workbenchDataManager;
+	public RoleService roleService;
 
 	@Autowired
 	public GermplasmDataManager germplasmDataManager;
@@ -394,8 +394,8 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 		this.germplasmListManager = germplasmListManager;
 	}
 
-	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
+	public void setRoleService(final RoleService roleService) {
+		this.roleService = roleService;
 	}
 
 	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
