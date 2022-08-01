@@ -228,17 +228,20 @@ public class StudyValidator {
 		}
 	}
 
-	public void validateMaxStudyEntryColumnsAllowed(final Integer studyId, final List<Integer> variableIds, final String programUUID) {
+	public void validateMaxStudyEntryColumnsAllowed(final List<Integer> variableIds, final String programUUID) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
 		final List<StandardVariable> variables = this.ontologyDataManager.getStandardVariables(variableIds, programUUID)
 			.stream()
-			.filter(standardVariable -> standardVariable.getVariableTypes().stream().noneMatch(variableType ->
+			.filter(standardVariable -> standardVariable.getVariableTypes().stream().anyMatch(variableType ->
 				VariableType.GERMPLASM_ATTRIBUTE == variableType ||
 					VariableType.GERMPLASM_PASSPORT == variableType)
 			)
 			.collect(Collectors.toList());
 
 		if (variables.size() > MAX_NUMBER_OF_COLUMNS_ALLOWED) {
-			this.errors.reject("study.entry.update.columns.exceeded.maximun.allowed", new String[] { String.valueOf(MAX_NUMBER_OF_COLUMNS_ALLOWED)},"");
+			this.errors.reject("study.entry.update.columns.exceeded.maximum.allowed",
+				new String[] { String.valueOf(variables.size()), String.valueOf(MAX_NUMBER_OF_COLUMNS_ALLOWED) },"");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

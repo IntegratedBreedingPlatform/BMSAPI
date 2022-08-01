@@ -76,7 +76,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeSet;
@@ -977,7 +976,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		variableIds.forEach(this.termValidator::validate);
 		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(variableIds, programUUID);
-		this.studyValidator.validateMaxStudyEntryColumnsAllowed(studyId, variableIds, programUUID);
+		this.studyValidator.validateMaxStudyEntryColumnsAllowed(variableIds, programUUID);
 
 		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, variableIds, programUUID);
 	}
