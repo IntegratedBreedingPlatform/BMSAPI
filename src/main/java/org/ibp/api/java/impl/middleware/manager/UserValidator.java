@@ -6,7 +6,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.RoleType;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -70,7 +70,7 @@ public class UserValidator {
 	public static final int STATUS_MAX_LENGTH = 11;
 
 	@Autowired
-	protected WorkbenchDataManager workbenchDataManager;
+	protected RoleService roleService;
 
 	@Autowired
 	protected ProgramService programService;
@@ -208,7 +208,7 @@ public class UserValidator {
 			// Roles in the list must exist
 			final Set<Integer> roleIds = userRoles.stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 
-			final List<Role> savedRoles = this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds));
+			final List<Role> savedRoles = this.roleService.getRoles(new RoleSearchDto(null, null, roleIds));
 
 			if (savedRoles.size() != roleIds.size()) {
 				this.errors.reject("user.invalid.roles", new String[] {
@@ -379,8 +379,8 @@ public class UserValidator {
 		this.validatePersonEmailIfExists(errors, email);
 	}
 
-	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
+	public void setRoleService(final RoleService roleService) {
+		this.roleService = roleService;
 	}
 
 	public void setSecurityService(final SecurityService securityService) {

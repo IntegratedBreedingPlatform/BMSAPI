@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.role;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.role.RoleTypeService;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
@@ -48,7 +48,7 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 	private UserService userService;
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 
 	@Mock
 	private RoleTypeService roleTypeService;
@@ -64,7 +64,7 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		this.createTestRoles();
 		final List<Role> assignableRoles = new ArrayList<>(this.allRoles);
 		assignableRoles.remove(this.restrictedRole);
-		Mockito.doReturn(assignableRoles).when(this.workbenchDataManager).getRoles(new RoleSearchDto(Boolean.TRUE, null, null));
+		Mockito.doReturn(assignableRoles).when(this.roleService).getRoles(new RoleSearchDto(Boolean.TRUE, null, null));
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
 
 		when(this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false)).thenReturn(errors);
-		when(this.workbenchDataManager.getRoleById(roleGeneratorInput.getId())).thenReturn(role);
+		when(this.roleService.getRoleById(roleGeneratorInput.getId())).thenReturn(role);
 		when(this.userService.getUsersWithRole(roleGeneratorInput.getId())).thenReturn(new ArrayList<>());
 
 		when(this.permissionService.getPermissionsByIds(new HashSet<>(roleGeneratorInput.getPermissions())))
@@ -94,7 +94,7 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		this.roleServiceImpl.updateRole(roleGeneratorInput);
 
 		verify(this.roleValidator).validateRoleGeneratorInput(roleGeneratorInput, false);
-		verify(this.workbenchDataManager).saveRole(role);
+		verify(this.roleService).saveRole(role);
 		assertEquals(roleGeneratorInput.getName(), role.getName());
 		assertEquals(roleGeneratorInput.getDescription(), role.getDescription());
 		assertEquals(permissionId, role.getPermissions().get(0).getPermissionId().intValue());
@@ -134,7 +134,7 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
 
 		when(this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false)).thenReturn(errors);
-		when(this.workbenchDataManager.getRoleById(roleGeneratorInput.getId())).thenReturn(role);
+		when(this.roleService.getRoleById(roleGeneratorInput.getId())).thenReturn(role);
 		when(this.userService.getUsersWithRole(roleGeneratorInput.getId())).thenReturn(Arrays.asList(new WorkbenchUser()));
 
 		when(this.permissionService.getPermissionsByIds(new HashSet<>(roleGeneratorInput.getPermissions())))
@@ -176,7 +176,7 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
 
 		when(this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false)).thenReturn(errors);
-		when(this.workbenchDataManager.getRoleById(roleGeneratorInput.getId())).thenReturn(role);
+		when(this.roleService.getRoleById(roleGeneratorInput.getId())).thenReturn(role);
 		when(this.userService.getUsersWithRole(roleGeneratorInput.getId())).thenReturn(Arrays.asList(new WorkbenchUser()));
 		when(this.permissionService.getPermissionsByIds(new HashSet<>(roleGeneratorInput.getPermissions())))
 			.thenReturn(Arrays.asList(permission1, permission2));
