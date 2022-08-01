@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.role;
 
 import com.google.common.collect.Sets;
 import org.generationcp.commons.security.SecurityUtil;
+import org.generationcp.middleware.api.role.RoleTypeService;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -42,6 +43,9 @@ public class RoleServiceImpl implements RoleService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
+	private RoleTypeService roleTypeService;
+
+	@Autowired
 	private PermissionService permissionService;
 
 	@Override
@@ -75,7 +79,7 @@ public class RoleServiceImpl implements RoleService {
 		role.setCreatedBy(user);
 		role.setActive(true);
 		role.setPermissions(this.getPermission(dto.getPermissions()));
-		role.setRoleType(this.workbenchDataManager.getRoleType(dto.getRoleType()));
+		role.setRoleType(this.roleTypeService.getRoleType(dto.getRoleType()));
 		role.setUpdatedBy(user);
 		role.setUpdatedDate(new Date());
 		this.workbenchDataManager.saveRole(role);
@@ -126,7 +130,7 @@ public class RoleServiceImpl implements RoleService {
 		role.setName(roleGeneratorInput.getName());
 		role.setDescription(roleGeneratorInput.getDescription());
 		role.setPermissions(this.getPermission(roleGeneratorInput.getPermissions()));
-		role.setRoleType(this.workbenchDataManager.getRoleType(roleGeneratorInput.getRoleType()));
+		role.setRoleType(this.roleTypeService.getRoleType(roleGeneratorInput.getRoleType()));
 		this.workbenchDataManager.saveRole(role);
 	}
 

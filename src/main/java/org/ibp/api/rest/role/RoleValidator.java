@@ -1,6 +1,7 @@
 package org.ibp.api.rest.role;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.role.RoleTypeService;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.RoleTypePermission;
@@ -29,6 +30,9 @@ public class RoleValidator {
 	@Autowired
 	private PermissionService permissionService;
 
+	@Autowired
+	private RoleTypeService roleTypeService;
+
 	public BindingResult validateRoleGeneratorInput(final RoleGeneratorInput roleGeneratorInput, final boolean isNewRole) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
@@ -55,7 +59,7 @@ public class RoleValidator {
 			errors.rejectValue(ROLE_DESCRIPTION_FIELD, "role.description.length");
 		}
 
-		final org.generationcp.middleware.pojos.workbench.RoleType roleType = this.workbenchDataManager.getRoleType(roleGeneratorInput.getRoleType());
+		final org.generationcp.middleware.pojos.workbench.RoleType roleType = this.roleTypeService.getRoleType(roleGeneratorInput.getRoleType());
 		if (roleType == null) {
 			errors.reject("role.role.type.does.not.exist");
 		} else {
