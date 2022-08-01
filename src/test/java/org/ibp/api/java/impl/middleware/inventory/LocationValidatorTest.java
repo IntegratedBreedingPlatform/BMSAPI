@@ -13,7 +13,6 @@ import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -58,9 +57,6 @@ public class LocationValidatorTest {
 	private static final String LOCATION_NAME = RandomStringUtils.randomAlphabetic(10);
 	private static final String LOCATION_ABBR = RandomStringUtils.randomAlphabetic(3);
 	private static final Integer LOCATION_TYPE = 410;
-
-	@Mock
-	private LocationDataManager locationDataManager;
 
 	@Mock
 	private LocationService locationService;
@@ -125,7 +121,7 @@ public class LocationValidatorTest {
 		this.lotGeneratorInputDto.setNotes(COMMENTS);
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		Mockito.when(this.locationDataManager.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(null);
+		Mockito.when(this.locationService.getLocationByID(LocationValidatorTest.LOCATION_ID)).thenReturn(null);
 		this.locationValidator.validateSeedLocationId(this.errors, LocationValidatorTest.LOCATION_ID);
 
 		Assert.assertEquals(1, this.errors.getAllErrors().size());
@@ -146,7 +142,7 @@ public class LocationValidatorTest {
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(new LocationDTO());
-		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(LocationValidatorTest.LOCATION_ID)))
+		Mockito.when(this.locationService.getAllSeedingLocations(Lists.newArrayList(LocationValidatorTest.LOCATION_ID)))
 			.thenReturn(Lists.newArrayList());
 		this.locationValidator.validateSeedLocationId(this.errors, LocationValidatorTest.LOCATION_ID);
 
@@ -169,7 +165,7 @@ public class LocationValidatorTest {
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 
 		Mockito.when(this.locationService.getLocation(LocationValidatorTest.LOCATION_ID)).thenReturn(new LocationDTO());
-		Mockito.when(this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(LocationValidatorTest.LOCATION_ID)))
+		Mockito.when(this.locationService.getAllSeedingLocations(Lists.newArrayList(LocationValidatorTest.LOCATION_ID)))
 			.thenReturn(Collections.singletonList(new Location()));
 		this.locationValidator.validateSeedLocationId(this.errors, LocationValidatorTest.LOCATION_ID);
 
