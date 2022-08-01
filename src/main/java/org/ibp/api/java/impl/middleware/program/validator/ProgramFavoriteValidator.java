@@ -9,7 +9,6 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.program.ProgramFavoriteRequestDto;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Location;
@@ -30,8 +29,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class ProgramFavoriteValidator {
-	@Autowired
-	private LocationDataManager locationDataManager;
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
@@ -141,7 +138,7 @@ public class ProgramFavoriteValidator {
 	}
 
 	private void validateLocationId(final BindingResult errors, final Set<Integer> locationsIds) {
-		final List<Location> locations = this.locationDataManager.getLocationsByIDs(Lists.newArrayList(locationsIds));
+		final List<Location> locations = this.locationService.getLocationsByIDs(Lists.newArrayList(locationsIds));
 		final List<Integer> locIds = locations.stream().map(Location::getLocid).collect(Collectors.toList());
 
 		locationsIds.removeAll(locIds);

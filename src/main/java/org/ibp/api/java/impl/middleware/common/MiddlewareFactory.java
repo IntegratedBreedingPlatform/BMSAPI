@@ -72,6 +72,8 @@ import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.program.ProgramServiceImpl;
+import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.api.role.RoleServiceImpl;
 import org.generationcp.middleware.api.role.RoleTypeService;
 import org.generationcp.middleware.api.role.RoleTypeServiceImpl;
 import org.generationcp.middleware.api.study.MyStudiesService;
@@ -84,26 +86,22 @@ import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
 import org.generationcp.middleware.manager.InventoryDataManagerImpl;
-import org.generationcp.middleware.manager.LocationDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
 import org.generationcp.middleware.manager.PresetServiceImpl;
 import org.generationcp.middleware.manager.SearchRequestServiceImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserProgramStateDataManagerImpl;
-import org.generationcp.middleware.api.role.RoleServiceImpl;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
-import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
@@ -364,12 +362,6 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public InventoryDataManager getInventoryDataManager() {
 		return new InventoryDataManagerImpl(this.getCropDatabaseSessionProvider());
-	}
-
-	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public LocationDataManager getLocationDataManager() {
-		return new LocationDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
