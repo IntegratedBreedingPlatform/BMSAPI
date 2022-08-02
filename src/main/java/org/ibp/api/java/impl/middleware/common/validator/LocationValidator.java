@@ -12,7 +12,6 @@ import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
@@ -41,8 +40,6 @@ public class LocationValidator {
 	private static final Integer LOCATION_NAME_MAX_LENGTH = 60;
 	private static final Integer LOCATION_ABBR_MAX_LENGTH = 12;
 	private static final List<Integer> RESTRICTED_LOCATION_TYPES = Arrays.asList(401, 405, 406);
-	@Autowired
-	private LocationDataManager locationDataManager;
 
 	@Autowired
 	private LocationService locationService;
@@ -74,7 +71,7 @@ public class LocationValidator {
 			errors.reject("location.invalid", "");
 			return;
 		}
-		final List<Location> locationList = this.locationDataManager.getAllSeedingLocations(Lists.newArrayList(locationId));
+		final List<Location> locationList = this.locationService.getAllSeedingLocations(Lists.newArrayList(locationId));
 		if (locationList.isEmpty()) {
 			errors.reject("seed.location.invalid", "");
 			return;
@@ -258,19 +255,19 @@ public class LocationValidator {
 		List<Integer> blockIds = null;
 		if (LocdesType.FIELD.getId().equals(locationDTO.getType())) {
 			blockIds =
-				this.locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString())).stream().map(Locdes::getLocationId)
+				this.locationService.getLocdes(null, Arrays.asList(locationDTO.getId().toString())).stream().map(Locdes::getLocationId)
 					.collect(Collectors.toList());
 		} else if (LocdesType.BLOCK.getId().equals(locationDTO.getType())) {
-			blockIds = this.locationDataManager.getLocdes(Arrays.asList(locationDTO.getId()), null).stream()
+			blockIds = this.locationService.getLocdes(Arrays.asList(locationDTO.getId()), null).stream()
 				.filter(locdes -> LocdesType.BLOCK_PARENT.getId().equals(locdes.getTypeId())).map(Locdes::getLocationId)
 				.collect(Collectors.toList());
 		} else {
 			final List<Locdes> fieldParentLocation =
-				this.locationDataManager.getLocdes(null, Arrays.asList(locationDTO.getId().toString()));
+				this.locationService.getLocdes(null, Arrays.asList(locationDTO.getId().toString()));
 			if (!fieldParentLocation.isEmpty()) {
 				final List<String> fieldParentIds =
 					fieldParentLocation.stream().map(Locdes::getLocationId).map(Object::toString).collect(Collectors.toList());
-				blockIds = this.locationDataManager.getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId)
+				blockIds = this.locationService.getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId)
 					.collect(Collectors.toList());
 			}
 		}

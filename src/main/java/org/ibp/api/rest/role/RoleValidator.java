@@ -1,7 +1,8 @@
 package org.ibp.api.rest.role;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleTypeService;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.RoleTypePermission;
 import org.generationcp.middleware.service.api.permission.PermissionService;
@@ -24,10 +25,13 @@ public class RoleValidator {
 	public static final String ROLE_DESCRIPTION_FIELD = "roleDescription";
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 
 	@Autowired
 	private PermissionService permissionService;
+
+	@Autowired
+	private RoleTypeService roleTypeService;
 
 	public BindingResult validateRoleGeneratorInput(final RoleGeneratorInput roleGeneratorInput, final boolean isNewRole) {
 
@@ -47,7 +51,7 @@ public class RoleValidator {
 			errors.rejectValue(ROLE_NAME_FIELD, "role.name.length");
 		}
 
-		if (isNewRole && this.workbenchDataManager.getRoleByName(roleGeneratorInput.getName()) != null) {
+		if (isNewRole && this.roleService.getRoleByName(roleGeneratorInput.getName()) != null) {
 			errors.rejectValue(ROLE_NAME_FIELD, "role.name.already.exists");
 		}
 
@@ -55,7 +59,7 @@ public class RoleValidator {
 			errors.rejectValue(ROLE_DESCRIPTION_FIELD, "role.description.length");
 		}
 
-		final org.generationcp.middleware.pojos.workbench.RoleType roleType = this.workbenchDataManager.getRoleType(roleGeneratorInput.getRoleType());
+		final org.generationcp.middleware.pojos.workbench.RoleType roleType = this.roleTypeService.getRoleType(roleGeneratorInput.getRoleType());
 		if (roleType == null) {
 			errors.reject("role.role.type.does.not.exist");
 		} else {

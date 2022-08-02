@@ -10,7 +10,7 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitS
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -115,8 +115,8 @@ public abstract class ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public WorkbenchDataManager workbenchDataManager() {
-			return Mockito.mock(WorkbenchDataManager.class);
+		public RoleService roleService() {
+			return Mockito.mock(RoleService.class);
 		}
 
 		@Bean

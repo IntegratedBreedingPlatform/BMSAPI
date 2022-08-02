@@ -5,7 +5,6 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.program.ProgramFavoriteRequestDto;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -25,9 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 
 public class ProgramFavoriteValidatorTest {
-
-	@Mock
-	private LocationDataManager locationDataManager;
 
 	@Mock
 	private BreedingMethodService breedingMethodService;
@@ -83,7 +79,7 @@ public class ProgramFavoriteValidatorTest {
 	public void testValidateAddFavorites_ThrowsException_WhenLocationIdNotExists(){
 		this.programFavoriteRequestDtos.setEntityIds(new HashSet<>(Arrays.asList(RandomUtils.nextInt())));
 		this.programFavoriteRequestDtos.setFavoriteType(ProgramFavorite.FavoriteType.LOCATION);
-		Mockito.when(this.locationDataManager.getLocationsByIDs(Mockito.any())).thenReturn(Arrays.asList());
+		Mockito.when(this.locationService.getLocationsByIDs(Mockito.any())).thenReturn(Arrays.asList());
 
 		try {
 			this.programFavoriteValidator.validateAddFavorites(null, this.programFavoriteRequestDtos);

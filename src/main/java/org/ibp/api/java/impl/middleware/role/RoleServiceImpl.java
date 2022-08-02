@@ -2,7 +2,8 @@ package org.ibp.api.java.impl.middleware.role;
 
 import com.google.common.collect.Sets;
 import org.generationcp.commons.security.SecurityUtil;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleTypeService;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -13,7 +14,6 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.role.RoleDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
-import org.ibp.api.java.role.RoleService;
 import org.ibp.api.rest.role.RoleGeneratorInput;
 import org.ibp.api.rest.role.RoleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class RoleServiceImpl implements RoleService {
+public class RoleServiceImpl implements org.ibp.api.java.role.RoleService {
 
 	@Autowired
 	private RoleValidator roleValidator;
@@ -39,7 +39,10 @@ public class RoleServiceImpl implements RoleService {
 	private UserService userService;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
+
+	@Autowired
+	private RoleTypeService roleTypeService;
 
 	@Autowired
 	private PermissionService permissionService;
@@ -47,7 +50,7 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public List<RoleDto> getRoles(final RoleSearchDto roleSearchDto) {
 
-		final List<Role> filteredRoles = this.workbenchDataManager.getRoles(roleSearchDto);
+		final List<Role> filteredRoles = this.roleService.getRoles(roleSearchDto);
 		final List<RoleDto> roles = filteredRoles.stream()
 			.map(role -> new RoleDto(role))
 			.collect(Collectors.toList());
@@ -75,16 +78,16 @@ public class RoleServiceImpl implements RoleService {
 		role.setCreatedBy(user);
 		role.setActive(true);
 		role.setPermissions(this.getPermission(dto.getPermissions()));
-		role.setRoleType(this.workbenchDataManager.getRoleType(dto.getRoleType()));
+		role.setRoleType(this.roleTypeService.getRoleType(dto.getRoleType()));
 		role.setUpdatedBy(user);
 		role.setUpdatedDate(new Date());
-		this.workbenchDataManager.saveRole(role);
+		this.roleService.saveRole(role);
 		return role.getId();
 	}
 
 	@Override
 	public RoleDto getRole(final Integer id) {
-		final Role role = this.workbenchDataManager.getRoleById(id);
+		final Role role = this.roleService.getRoleById(id);
 		if (role == null) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("role.invalid.id");
@@ -103,7 +106,7 @@ public class RoleServiceImpl implements RoleService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final Role role = this.workbenchDataManager.getRoleById(roleGeneratorInput.getId());
+		final Role role = this.roleService.getRoleById(roleGeneratorInput.getId());
 		final List<WorkbenchUser> roleUsers = this.userService.getUsersWithRole(roleGeneratorInput.getId());
 
 		// If the role is already assigned to any user and the role type has changed, throw an error.
@@ -126,8 +129,8 @@ public class RoleServiceImpl implements RoleService {
 		role.setName(roleGeneratorInput.getName());
 		role.setDescription(roleGeneratorInput.getDescription());
 		role.setPermissions(this.getPermission(roleGeneratorInput.getPermissions()));
-		role.setRoleType(this.workbenchDataManager.getRoleType(roleGeneratorInput.getRoleType()));
-		this.workbenchDataManager.saveRole(role);
+		role.setRoleType(this.roleTypeService.getRoleType(roleGeneratorInput.getRoleType()));
+		this.roleService.saveRole(role);
 	}
 
 	private List<Permission> getPermission(final List<Integer> permissions) {
