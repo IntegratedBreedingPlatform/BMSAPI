@@ -191,7 +191,6 @@ public class DatasetServiceImpl implements DatasetService {
 	public void addDatasetVariables(final Integer studyId, final List<DatasetVariable> datasetVariables) {
 		this.studyValidator.validate(studyId, true);
 
-		//TODO check null pointers, add study variable specific validations
 		final Integer datasetId = this.getDatasets(
 			studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0).getDatasetId();
 

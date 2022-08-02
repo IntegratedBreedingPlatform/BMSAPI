@@ -6,8 +6,6 @@ import java.util.List;
 
 public class StudyEntryDetailsImportRequest {
 
-	private String programUuid;
-
 	private List<StudyEntryDetailsValueMap> data;
 
 	private List<DatasetVariable> newVariables;
@@ -16,20 +14,11 @@ public class StudyEntryDetailsImportRequest {
 		super();
 	}
 
-	public StudyEntryDetailsImportRequest(final String programUuid, final List<StudyEntryDetailsValueMap> data,
+	public StudyEntryDetailsImportRequest(final List<StudyEntryDetailsValueMap> data,
 		final List<DatasetVariable> newVariables) {
 		super();
-		this.programUuid = programUuid;
 		this.data = data;
 		this.newVariables = newVariables;
-	}
-
-	public String getProgramUuid() {
-		return this.programUuid;
-	}
-
-	public void setProgramUuid(final String programUuid) {
-		this.programUuid = programUuid;
 	}
 
 	public List<StudyEntryDetailsValueMap> getData() {

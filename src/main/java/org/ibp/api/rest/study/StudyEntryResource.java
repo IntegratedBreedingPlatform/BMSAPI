@@ -230,10 +230,11 @@ public class StudyEntryResource {
 	}
 
 	@ApiOperation(value = "Get the variables associated to the study filtered by variableType", notes = "Get the list variables filtered by variableType")
-	@RequestMapping(value = "/{cropName}/studies/{studyId}/entries/variables", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries/variables", method = RequestMethod.GET)
 	public ResponseEntity<List<Variable>> getVariables(
 		@PathVariable final String cropName, @PathVariable final Integer studyId,
-		@RequestParam(required = false) final String programUUID, @RequestParam final Integer variableTypeId) {
+		@PathVariable final String programUUID, @RequestParam final Integer variableTypeId) {
 
 		final List<Variable> variables =
 			this.studyEntryService.getStudyEntryDetails(cropName, programUUID, studyId, variableTypeId);
@@ -241,10 +242,12 @@ public class StudyEntryResource {
 	}
 
 	@ApiOperation(value = "Import Study Entry Details")
-	@RequestMapping(value = "/{cropName}/studies/{studyId}/entries/import", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries/import", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> importStudyEntryDetails(
 		@PathVariable final String cropName, @PathVariable final Integer studyId,
+		@PathVariable final String programUUID,
 		@RequestBody final StudyEntryDetailsImportRequest studyEntryDetailsImportRequest
 	) {
 		if (!Collections.isEmpty(studyEntryDetailsImportRequest.getNewVariables())) {
