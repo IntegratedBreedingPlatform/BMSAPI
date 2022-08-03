@@ -38,7 +38,8 @@ public class StudyInstanceResource {
 	public ResponseEntity<List<StudyInstance>> createStudyInstances(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestParam final Integer numberOfInstancesToGenerate) {
-		return new ResponseEntity<>(this.studyInstanceService.createStudyInstances(cropname, studyId, programUUID, numberOfInstancesToGenerate),
+		return new ResponseEntity<>(
+			this.studyInstanceService.createStudyInstances(cropname, studyId, programUUID, numberOfInstancesToGenerate),
 			HttpStatus.OK);
 
 	}
@@ -116,7 +117,8 @@ public class StudyInstanceResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/descriptors", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<InstanceDescriptorData> addInstanceDescriptor(final @PathVariable String cropname, @PathVariable final String programUUID,
+	public ResponseEntity<InstanceDescriptorData> addInstanceDescriptor(final @PathVariable String cropname,
+		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer instanceId,
 		@RequestBody final InstanceDescriptorData instanceDescriptorData) {
 		return new ResponseEntity<>(this.studyInstanceService.addInstanceDescriptorData(studyId, instanceId, instanceDescriptorData),
@@ -135,6 +137,17 @@ public class StudyInstanceResource {
 		return new ResponseEntity<>(this.studyInstanceService
 			.updateInstanceDescriptorData(studyId, instanceId, descriptorDataId, instanceDescriptorData),
 			HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Delete georeference associated to an instance",
+		notes = "Delete georeference of associated to an instance")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/georeferences", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity<Void> deleteInstanceGeoreferences(final @PathVariable String cropname, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @PathVariable final Integer instanceId) {
+		this.studyInstanceService.deleteInstanceGeoreferences(studyId, instanceId);
+		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
 
 }
