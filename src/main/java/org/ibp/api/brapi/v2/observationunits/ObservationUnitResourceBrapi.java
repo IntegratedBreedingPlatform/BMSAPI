@@ -11,8 +11,8 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.ObservationLevel;
-import org.generationcp.middleware.service.api.study.ObservationLevelFilter;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -20,7 +20,6 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
-import org.ibp.api.brapi.v2.sample.SampleResourceBrapi;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -40,7 +39,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 @Api(value = "BrAPI Observation Unit Services")
@@ -198,30 +200,12 @@ public class ObservationUnitResourceBrapi {
 			required = false) final Integer pageSize) {
 
 		final ObservationLevelFilter observationLevelFilter = new ObservationLevelFilter(studyDbId, trialDbId, programDbId);
-		final Integer finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
-		final Integer finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
-		final PagedResult<ObservationLevel> resultPage = new PaginatedSearch()
-			.executeBrapiSearch(finalPageNumber, finalPageSize,
-				new SearchSpec<ObservationLevel>() {
 
-					@Override
-					public long getCount() {
-						return ObservationUnitResourceBrapi.this.middlewareObservationUnitService.countObservationLevels(observationLevelFilter);
-					}
-
-					@Override
-					public List<ObservationLevel> getResults(final PagedResult<ObservationLevel> pagedResult) {
-						return ObservationUnitResourceBrapi.this.middlewareObservationUnitService
-							.getObservationLevels(observationLevelFilter, new PageRequest(finalPageNumber, finalPageSize));
-					}
-				});
-
-		final Result<ObservationLevel> results = new Result<ObservationLevel>().withData(resultPage.getPageResults());
-		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
-
-		final Metadata metadata = new Metadata().withPagination(pagination);
-
+		// The response doesn't require pagination. The value for the "pagination" key is returned with all the keys set to zero.
+		final Result<ObservationLevel> results = new Result<ObservationLevel>().withData(this.observationUnitService
+			.getObservationLevels(observationLevelFilter, crop));
+		final Metadata metadata = new Metadata();
+		metadata.withPagination(new Pagination(0, 0, 0l, 0));
 		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 	}
 
