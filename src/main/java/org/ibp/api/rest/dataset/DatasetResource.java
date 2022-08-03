@@ -521,11 +521,11 @@ public class DatasetResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/plot-datasets/properties", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<Void> updateDatasetProperties(@PathVariable final String crop,
+	public ResponseEntity<Void> updatePlotDatasetProperties(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@RequestParam(required = false) final String programUUID,
+		@PathVariable final String programUUID,
 		@RequestBody final List<Integer> variableIds) {
-		this.studyDatasetService.updateDatasetProperties(studyId, variableIds);
+		this.studyDatasetService.updatePlotDatasetProperties(studyId, variableIds, programUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
