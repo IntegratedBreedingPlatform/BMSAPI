@@ -1,13 +1,11 @@
 package org.ibp.api.rest.labelprinting;
 
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
@@ -67,9 +65,6 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 	private GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
-	private GermplasmNameTypeService germplasmNameTypeService;
-
-	@Autowired
 	private GermplasmNameService germplasmNameService;
 
 	@Autowired
@@ -104,19 +99,23 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		// Germplasm Details labels
 		final String germplasmDetailsPropValue = this.getMessage("label.printing.germplasm.details");
 		final String entryDetailsPropValue = this.getMessage("label.printing.entry.details");
+		final String attributesPropValue = this.getMessage("label.printing.attributes.details");
 
 		final LabelType germplasmLabelType = new LabelType(germplasmDetailsPropValue, germplasmDetailsPropValue);
 		final LabelType entryDetailsLabelType = new LabelType(entryDetailsPropValue, entryDetailsPropValue);
+		final LabelType attributesType = new LabelType(attributesPropValue, attributesPropValue);
 
 		final List<Field> germplasmFields = new LinkedList<>();
 		final List<Field> entryDetailsFields = new LinkedList<>();
+		final List<Field> attributeFields = new LinkedList<>();
 
 		germplasmLabelType.setFields(germplasmFields);
 		entryDetailsLabelType.setFields(entryDetailsFields);
+		attributesType.setFields(attributeFields);
 
 		labelTypes.add(germplasmLabelType);
 		labelTypes.add(entryDetailsLabelType);
-
+		labelTypes.add(attributesType);
 
 		final List<MeasurementVariable> variables = this.studyEntryService.getEntryTableHeader(labelsInfoInput.getStudyId());
 
@@ -126,8 +125,9 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 				germplasmFields.add(field);
 			} else if (VariableType.ENTRY_DETAIL.equals(Variable.getVariableType())) {
 				entryDetailsFields.add(field);
+			} else if (VariableType.GERMPLASM_PASSPORT.equals(Variable.getVariableType()) || VariableType.GERMPLASM_ATTRIBUTE.equals(Variable.getVariableType())) {
+				attributeFields.add(field);
 			}
-
 		});
 
 		return labelTypes;
@@ -138,8 +138,6 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		final StudyEntrySearchDto.Filter filter = null;
 		Pageable pageable = null;
 		List<StudyEntryDto> studyEntryDtos = this.studyEntryService.getStudyEntries(labelsGeneratorInput.getStudyId(), filter, pageable);
-
-		final Map<Integer, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
 
 		// Data to be exported
 		final List<Map<Integer, String>> results = new LinkedList<>();
