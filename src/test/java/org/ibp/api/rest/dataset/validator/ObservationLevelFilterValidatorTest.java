@@ -59,7 +59,7 @@ public class ObservationLevelFilterValidatorTest {
 			.thenReturn(Collections.singletonList(studyInstanceDto));
 		try {
 			this.validator.validate(filter, CROP);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Assert.fail("No ApiRequestValidationException should be thrown.");
 		}
 	}
@@ -78,7 +78,7 @@ public class ObservationLevelFilterValidatorTest {
 			.thenReturn(Collections.singletonList(studySummary));
 		try {
 			this.validator.validate(filter, CROP);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Assert.fail("No ApiRequestValidationException should be thrown.");
 		}
 	}
@@ -91,7 +91,7 @@ public class ObservationLevelFilterValidatorTest {
 		try {
 			this.validator.validate(filter, CROP);
 			Assert.fail("ApiRequestValidationException should be thrown.");
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			MatcherAssert
 				.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("observation.level.invalid.programdbid"));
 		}
@@ -105,7 +105,7 @@ public class ObservationLevelFilterValidatorTest {
 		try {
 			this.validator.validate(filter, CROP);
 			Assert.fail("ApiRequestValidationException should be thrown.");
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			MatcherAssert
 				.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("studydbid.invalid"));
 		}
@@ -128,7 +128,7 @@ public class ObservationLevelFilterValidatorTest {
 		try {
 			this.validator.validate(filter, CROP);
 			Assert.fail("ApiRequestValidationException should be thrown.");
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			MatcherAssert
 				.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("observation.level.invalid"));
 		}
@@ -145,7 +145,7 @@ public class ObservationLevelFilterValidatorTest {
 			.thenReturn(null);
 		try {
 			this.validator.validate(filter, CROP);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			MatcherAssert
 				.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("observation.level.invalid.trialdbid"));
 		}
@@ -165,7 +165,7 @@ public class ObservationLevelFilterValidatorTest {
 			.thenReturn(Collections.singletonList(studySummary));
 		try {
 			this.validator.validate(filter, CROP);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			MatcherAssert
 				.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("observation.level.invalid"));
 		}

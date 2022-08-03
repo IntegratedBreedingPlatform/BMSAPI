@@ -74,7 +74,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	}
 
 	@Override
-	public List<ObservationLevel> getObservationLevels(ObservationLevelFilter observationLevelFilter, final String crop) {
+	public List<ObservationLevel> getObservationLevels(final ObservationLevelFilter observationLevelFilter, final String crop) {
 		this.observationLevelFilterValidator.validate(observationLevelFilter, crop);
 		return this.middlewareObservationUnitService.getObservationLevels(observationLevelFilter);
 	}
