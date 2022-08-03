@@ -1,7 +1,7 @@
 package org.ibp.api.domain.user;
 
 import org.generationcp.commons.spring.util.ContextUtil;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -27,7 +27,7 @@ public class UserMapperTest {
 	private UserServiceImpl userServiceImpl;
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 
 	@Mock
 	private SecurityService securityService;
@@ -50,7 +50,7 @@ public class UserMapperTest {
 		this.messageSource.setUseCodeAsDefaultMessage(true);
 		MockitoAnnotations.initMocks(this);
 		this.userServiceImpl = new UserServiceImpl();
-		this.userValidator.setWorkbenchDataManager(this.workbenchDataManager);
+		this.userValidator.setRoleService(this.roleService);
 		this.userServiceImpl.setUserValidator(this.userValidator);
 		this.userServiceImpl.setSecurityService(this.securityService);
 		this.userServiceImpl.setUserService(this.middlewareUserService);

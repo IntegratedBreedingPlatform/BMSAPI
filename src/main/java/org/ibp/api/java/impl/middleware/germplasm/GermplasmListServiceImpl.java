@@ -26,7 +26,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -92,7 +92,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	private GermplasmListManager germplasmListManager;
 
 	@Autowired
-	public WorkbenchDataManager workbenchDataManager;
+	public RoleService roleService;
 
 	@Autowired
 	public GermplasmDataManager germplasmDataManager;
@@ -595,8 +595,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListManager = germplasmListManager;
 	}
 
-	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
+	public void setRoleService(final RoleService roleService) {
+		this.roleService = roleService;
 	}
 
 	public void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
