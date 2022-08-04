@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.fest.util.Collections;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
@@ -237,7 +236,7 @@ public class StudyEntryResource {
 		@PathVariable final String programUUID, @RequestParam final Integer variableTypeId) {
 
 		final List<Variable> variables =
-			this.studyEntryService.getStudyEntryDetails(cropName, programUUID, studyId, variableTypeId);
+			this.studyEntryService.getVariableListByStudyAndType(cropName, programUUID, studyId, variableTypeId);
 		return new ResponseEntity<>(variables, HttpStatus.OK);
 	}
 

@@ -303,7 +303,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public List<Variable> getStudyEntryDetails(final String cropName, final String programUUID,
+	public List<Variable> getVariableListByStudyAndType(final String cropName, final String programUUID,
 		final Integer studyId, final Integer variableTypeId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), StudyEntryServiceImpl.class.getName());
 		if (!StringUtils.isEmpty(programUUID)) {

@@ -47,7 +47,7 @@ public interface StudyEntryService {
 
 	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId);
 
-	List<Variable> getStudyEntryDetails(String cropName, String programUUID, Integer studyId, Integer variableTypeId);
+	List<Variable> getVariableListByStudyAndType(String cropName, String programUUID, Integer studyId, Integer variableTypeId);
 
 	void importUpdates(Integer studyId, StudyEntryDetailsImportRequest studyEntryDetailsImportRequest);
 }
