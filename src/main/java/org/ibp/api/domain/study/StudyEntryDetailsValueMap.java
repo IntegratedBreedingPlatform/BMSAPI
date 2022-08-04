@@ -1,6 +1,7 @@
 package org.ibp.api.domain.study;
 
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
+import org.pojomatic.Pojomatic;
 
 import java.util.List;
 
@@ -34,5 +35,21 @@ public class StudyEntryDetailsValueMap {
 
 	public void setData(final List<StockPropertyData> data) {
 		this.data = data;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+
 	}
 }
