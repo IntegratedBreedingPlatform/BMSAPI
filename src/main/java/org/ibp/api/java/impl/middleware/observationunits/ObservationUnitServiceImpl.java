@@ -1,5 +1,7 @@
 package org.ibp.api.java.impl.middleware.observationunits;
 
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
@@ -7,12 +9,14 @@ import org.ibp.api.brapi.v2.observationunits.ObservationUnitImportResponse;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Transactional
 @Service
 public class ObservationUnitServiceImpl implements ObservationUnitService {
 
@@ -21,6 +25,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	@Autowired
 	private org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService middlewareObservationUnitService;
+
+	@Autowired
+	private ObservationLevelFilterValidator observationLevelFilterValidator;
 
 	@Override
 	public ObservationUnitImportResponse createObservationUnits(final String cropName,
@@ -64,6 +71,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	@Override
 	public long countObservationUnits(final ObservationUnitSearchRequestDTO requestDTO) {
 		return this.middlewareObservationUnitService.countObservationUnits(requestDTO);
+	}
+
+	@Override
+	public List<ObservationLevel> getObservationLevels(final ObservationLevelFilter observationLevelFilter, final String crop) {
+		this.observationLevelFilterValidator.validate(observationLevelFilter, crop);
+		return this.middlewareObservationUnitService.getObservationLevels(observationLevelFilter);
 	}
 
 }

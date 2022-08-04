@@ -1,5 +1,7 @@
 package org.ibp.api.java.observationunits;
 
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.ibp.api.brapi.v2.observationunits.ObservationUnitImportResponse;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
@@ -15,5 +17,7 @@ public interface ObservationUnitService {
 	List<ObservationUnitDto> searchObservationUnits(Integer pageSize, Integer pageNumber, ObservationUnitSearchRequestDTO requestDTO);
 
 	long countObservationUnits(ObservationUnitSearchRequestDTO requestDTO);
+
+	List<ObservationLevel> getObservationLevels(ObservationLevelFilter observationLevelFilter, final String crop);
 
 }

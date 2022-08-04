@@ -11,6 +11,8 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -20,7 +22,6 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
-import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -176,4 +177,32 @@ public class ObservationUnitResourceBrapi {
 
 		return new ResponseEntity<>(new SingleEntityResponse<>(requestDTO), HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Get the Observation Levels", notes = "Get the Observation Levels")
+	@RequestMapping(value = "/{crop}/brapi/v2/observationlevels", method = RequestMethod.GET)
+	public ResponseEntity<EntityListResponse<ObservationLevel>> getObservationLevels(
+		@PathVariable final String crop,
+		@ApiParam(value = "Filter by study DbId")
+		@RequestParam(value = "studyDbId", required = false) final String studyDbId,
+		@ApiParam(value = "Filter by trial DbId")
+		@RequestParam(value = "trialDbId", required = false) final String trialDbId,
+		@ApiParam(value = "Filter by program DbId")
+		@RequestParam(value = "programDbId", required = false) final String programDbId,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize) {
+
+		final ObservationLevelFilter observationLevelFilter = new ObservationLevelFilter(studyDbId, trialDbId, programDbId);
+
+		// The response doesn't require pagination. The value for the "pagination" key is returned with all the keys set to zero.
+		final Result<ObservationLevel> results = new Result<ObservationLevel>().withData(this.observationUnitService
+			.getObservationLevels(observationLevelFilter, crop));
+		final Metadata metadata = new Metadata();
+		metadata.withPagination(new Pagination(0, 0, 0l, 0));
+		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
+	}
+
 }
