@@ -254,6 +254,7 @@ public class StudyEntryServiceImplTest {
 	public void testImportUpdates() {
 
 		final Integer studyId = this.random.nextInt();
+		final Integer datasetId = this.random.nextInt();
 		final String entryId = this.random.toString();
 		final Integer variableId = this.random.nextInt();
 
@@ -267,9 +268,15 @@ public class StudyEntryServiceImplTest {
 			Arrays.asList(valueMap), datasetVariables
 		);
 
+		org.ibp.api.rest.dataset.DatasetDTO dataset = new org.ibp.api.rest.dataset.DatasetDTO();
+		dataset.setDatasetId(datasetId);
+		Mockito.when(this.datasetService.getDatasets(
+			studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())))
+			.thenReturn(Arrays.asList(dataset));
+
 		this.studyEntryService.importUpdates(studyId, studyEntryDetailsImportRequest);
 
-		Mockito.verify(this.datasetService).addDatasetVariables(studyId, datasetVariables);
+		Mockito.verify(this.datasetService).addDatasetVariables(studyId, datasetId, datasetVariables);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.studyEntryValidator).validateStudyContainsEntryNumbers(studyId, Collections.singleton(entryId));
 		Mockito.verify(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),

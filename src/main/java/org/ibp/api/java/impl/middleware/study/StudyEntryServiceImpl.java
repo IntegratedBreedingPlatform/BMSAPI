@@ -351,7 +351,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public void importUpdates(final Integer studyId, final StudyEntryDetailsImportRequest studyEntryDetailsImportRequest) {
 		if (!org.fest.util.Collections.isEmpty(studyEntryDetailsImportRequest.getNewVariables())) {
-			this.datasetService.addDatasetVariables(studyId, studyEntryDetailsImportRequest.getNewVariables());
+			final Integer datasetId = this.datasetService.getDatasets(
+				studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0).getDatasetId();
+			this.datasetService.addDatasetVariables(studyId, datasetId, studyEntryDetailsImportRequest.getNewVariables());
 		}
 
 		this.studyValidator.validate(studyId, true);

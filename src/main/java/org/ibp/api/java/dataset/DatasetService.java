@@ -82,7 +82,7 @@ public interface DatasetService {
 	 */
 	MeasurementVariable addDatasetVariable(Integer studyId, Integer datasetId, DatasetVariable datasetVariable);
 
-	void addDatasetVariables(Integer studyId, List<DatasetVariable> datasetVariable);
+	void addDatasetVariables(Integer studyId, Integer datasetId, List<DatasetVariable> datasetVariable);
 
 	/**
 	 * Get the list of dataset variables of an specific variable type
