@@ -250,14 +250,10 @@ public class StudyEntryResource {
 		@PathVariable final String programUUID,
 		@RequestBody final StudyEntryDetailsImportRequest studyEntryDetailsImportRequest
 	) {
-		if (!Collections.isEmpty(studyEntryDetailsImportRequest.getNewVariables())) {
-			this.datasetService.addDatasetVariables(studyId, studyEntryDetailsImportRequest.getNewVariables());
-		}
-
 		if (studyEntryDetailsImportRequest.getData() != null && !studyEntryDetailsImportRequest.getData().isEmpty()) {
-			this.studyEntryService.importUpdates(studyId, studyEntryDetailsImportRequest.getData());
+			this.studyEntryService.importUpdates(studyId, studyEntryDetailsImportRequest);
 		}
 
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

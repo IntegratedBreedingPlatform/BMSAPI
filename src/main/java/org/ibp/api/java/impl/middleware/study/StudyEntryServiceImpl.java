@@ -22,6 +22,7 @@ import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
+import org.ibp.api.domain.study.StudyEntryDetailsImportRequest;
 import org.ibp.api.domain.study.StudyEntryDetailsValueMap;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.entrytype.EntryTypeService;
@@ -95,7 +96,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private org.generationcp.middleware.service.api.study.StudyEntryService middlewareStudyEntryService;
 
 	@Resource
-	private DatasetService datasetService;
+	private org.ibp.api.java.dataset.DatasetService datasetService;
+
+	@Resource
+	private DatasetService middlewareDatasetService;
 
 	@Resource
 	private EntryTypeService entryTypeService;
@@ -196,13 +200,14 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<MeasurementVariable> getEntryTableHeader(final Integer studyId) {
 		this.studyValidator.validate(studyId, false);
 		final Integer plotDatasetId =
-			this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+			this.middlewareDatasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
+				.getDatasetId();
 
 		final List<Integer> termsToRemove = Lists
 			.newArrayList(TermId.OBS_UNIT_ID.getId());
 
 		final List<MeasurementVariable> columns =
-			this.datasetService.getObservationSetVariables(plotDatasetId,
+			this.middlewareDatasetService.getObservationSetVariables(plotDatasetId,
 				Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
 
 		//Remove OBS_UNIT_ID column if present
@@ -313,9 +318,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public void importUpdates(final Integer studyId, final List<StudyEntryDetailsValueMap> entryDetailsValues) {
-		this.studyValidator.validate(studyId, true);
+	public void importUpdates(final Integer studyId, final StudyEntryDetailsImportRequest studyEntryDetailsImportRequest) {
+		if (!org.fest.util.Collections.isEmpty(studyEntryDetailsImportRequest.getNewVariables())) {
+			this.datasetService.addDatasetVariables(studyId, studyEntryDetailsImportRequest.getNewVariables());
+		}
 
+		this.studyValidator.validate(studyId, true);
+		final List<StudyEntryDetailsValueMap> entryDetailsValues = studyEntryDetailsImportRequest.getData();
 		final Map<String, List<StockPropertyData>> entriesMap = entryDetailsValues.stream()
 			.collect(Collectors.toMap(StudyEntryDetailsValueMap::getEntryNumber, StudyEntryDetailsValueMap::getData));
 		this.studyEntryValidator.validateStudyContainsEntryNumbers(studyId, entriesMap.keySet());
@@ -357,9 +366,5 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		sampleColumn.setTermId(termId.getId());
 		sampleColumn.setFactor(true);
 		return sampleColumn;
-	}
-
-	public void setDatasetService(final DatasetService datasetService) {
-		this.datasetService = datasetService;
 	}
 }
