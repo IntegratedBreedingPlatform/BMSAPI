@@ -28,4 +28,5 @@ public interface StudyInstanceService {
 	InstanceDescriptorData updateInstanceDescriptorData(Integer studyId, Integer instanceId, Integer descriptorDataId,
 		InstanceDescriptorData instanceDescriptorData);
 
+	void deleteInstanceGeoreferences(Integer studyId, Integer instanceId);
 }

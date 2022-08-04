@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
@@ -196,6 +197,13 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		instanceDescriptorData.setInstanceId(instanceId);
 		this.middlewareStudyInstanceService.updateInstanceDescriptorData(instanceDescriptorData);
 		return instanceDescriptorData;
+	}
+
+	@Override
+	public void deleteInstanceGeoreferences(final Integer studyId, final Integer instanceId) {
+		this.studyValidator.validate(studyId, true);
+		this.instanceValidator.validateStudyInstance(studyId, Sets.newHashSet(instanceId));
+		this.middlewareStudyInstanceService.deleteInstanceGeoreferences(instanceId);
 	}
 
 	private void validateInstanceData(
