@@ -40,7 +40,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.crop.CropServiceImpl;
-import org.generationcp.middleware.api.cropparameter.CropParameterImpl;
+import org.generationcp.middleware.api.cropparameter.CropParameterServiceImpl;
 import org.generationcp.middleware.api.cropparameter.CropParameterService;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
@@ -270,7 +270,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public CropParameterService getCropParameterService() {
-		return new CropParameterImpl(this.getCropDatabaseSessionProvider());
+		return new CropParameterServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
