@@ -141,7 +141,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Delete georeference associated to an instance",
 		notes = "Delete georeference of associated to an instance")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/{instanceId}/georeferences", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<Void> deleteInstanceGeoreferences(final @PathVariable String cropname, @PathVariable final String programUUID,
