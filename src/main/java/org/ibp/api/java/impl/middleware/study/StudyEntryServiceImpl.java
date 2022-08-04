@@ -33,6 +33,7 @@ import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyEntryObservationService;
@@ -91,6 +92,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Autowired
 	public ProgramValidator programValidator;
+
+	@Autowired
+	public VariableValidator variableValidator;
 
 	@Resource
 	private org.generationcp.middleware.service.api.study.StudyEntryService middlewareStudyEntryService;
@@ -306,12 +310,17 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<Variable> getVariableListByStudyAndType(final String cropName, final String programUUID,
 		final Integer studyId, final Integer variableTypeId) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), StudyEntryServiceImpl.class.getName());
+
+		this.variableValidator.validateVariableTypeId(variableTypeId, errors);
+
 		if (!StringUtils.isEmpty(programUUID)) {
 			this.programValidator.validate(new ProgramDTO(cropName, programUUID), errors);
-			if (errors.hasErrors()) {
-				throw new ResourceNotFoundException(errors.getAllErrors().get(0));
-			}
 		}
+
+		if (errors.hasErrors()) {
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
 		this.studyValidator.validate(studyId, true);
 
 		return this.middlewareStudyEntryService.getStudyEntryDetails(cropName, programUUID, studyId, variableTypeId);
