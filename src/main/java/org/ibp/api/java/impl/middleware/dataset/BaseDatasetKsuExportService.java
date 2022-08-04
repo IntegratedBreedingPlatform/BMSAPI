@@ -173,7 +173,8 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 			this.datasetService
 				.getObservationSetVariables(plotDatasetId,
 					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId(), VariableType.ENTRY_DETAIL.getId()));
+						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId(), VariableType.ENTRY_DETAIL.getId(),
+						VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId()));
 
 		final List<MeasurementVariable> allVariables = new ArrayList<>();
 		allVariables.addAll(plotDataSetColumns);
@@ -183,7 +184,9 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 				this.datasetService
 					.getObservationSetVariables(datasetId, Lists.newArrayList(
 						VariableType.GERMPLASM_DESCRIPTOR.getId(),
-						VariableType.OBSERVATION_UNIT.getId()));
+						VariableType.OBSERVATION_UNIT.getId(),
+						VariableType.GERMPLASM_ATTRIBUTE.getId(),
+						VariableType.GERMPLASM_PASSPORT.getId()));
 			allVariables.addAll(subObservationSetColumns);
 		}
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.OBS_UNIT_ID.getId());

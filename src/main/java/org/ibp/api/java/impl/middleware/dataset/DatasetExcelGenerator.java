@@ -261,7 +261,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> plotVariables =
 			this.datasetService.getMeasurementVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
-					VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
+					VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId(), VariableType.GERMPLASM_ATTRIBUTE.getId(),
+					VariableType.GERMPLASM_PASSPORT.getId()));
 
 		final List<MeasurementVariable> datasetVariables = this.datasetService
 			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists
@@ -328,6 +329,24 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			xlsBook,
 			xlsSheet,
 			filterByVariableType(plotVariables, VariableType.GERMPLASM_DESCRIPTOR), PLOT);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.passports",
+			this.getColorIndex(xlsBook, 51, 153, 102));
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			filterByVariableType(plotVariables, VariableType.GERMPLASM_PASSPORT), PLOT);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.attributes",
+			this.getColorIndex(xlsBook, 51, 153, 102));
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			filterByVariableType(plotVariables, VariableType.GERMPLASM_ATTRIBUTE), PLOT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.entry.details.column.germplasm.descriptors",

@@ -94,14 +94,19 @@ public abstract class AbstractDatasetExportService {
 		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId());
 
 		final List<MeasurementVariable> descriptors = new ArrayList<>();
+		final List<MeasurementVariable> passports = new ArrayList<>();
+		final List<MeasurementVariable> attributes = new ArrayList<>();
 		final Map<Integer, MeasurementVariable> entryDetails = new LinkedHashMap<>();
 		final List<MeasurementVariable> otherVariables = new ArrayList<>();
 
 		final List<MeasurementVariable> sortedColumns = new ArrayList<>();
-
 		columns.stream().forEach(variable -> {
 			if (VariableType.GERMPLASM_DESCRIPTOR == variable.getVariableType()) {
 				descriptors.add(variable);
+			} else if (variable.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE) {
+				attributes.add(variable);
+			} else if (variable.getVariableType() == VariableType.GERMPLASM_PASSPORT) {
+				passports.add(variable);
 			} else if (VariableType.ENTRY_DETAIL == variable.getVariableType()) {
 				entryDetails.put(variable.getTermId(), variable);
 			} else {
@@ -115,6 +120,11 @@ public abstract class AbstractDatasetExportService {
 		}
 		sortedColumns.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
+
+		passports.sort(Comparator.comparing(MeasurementVariable::getName));
+		sortedColumns.addAll(passports);
+		attributes.sort(Comparator.comparing(MeasurementVariable::getName));
+		sortedColumns.addAll(attributes);
 
 		// Add Stock id column
 		if (dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
