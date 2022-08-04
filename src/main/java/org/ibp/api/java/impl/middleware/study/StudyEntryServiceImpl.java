@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -21,7 +22,7 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
+import org.generationcp.middleware.service.impl.study.StudyEntryGermplasmDescriptorColumns;
 import org.ibp.api.domain.study.StudyEntryDetailsImportRequest;
 import org.ibp.api.domain.study.StudyEntryDetailsValueMap;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -58,7 +59,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -176,14 +176,22 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<StudyEntryDto> getStudyEntries(final Integer studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 		this.studyValidator.validate(studyId, false);
 
+		// TODO: we need to remove this because it won't work when names will be added to germplasm & checks table.
+		// We are assuming that every sort property correspond to a term, and this won't be longer valid for names
 		Pageable convertedPageable = null;
 		if (pageable != null && pageable.getSort() != null) {
 			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
 			if (iterator.hasNext()) {
 				// Convert the sort property name from termid to actual term name.
 				final Sort.Order sort = iterator.next();
-				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
-				final String sortProperty = Objects.isNull(term) ? sort.getProperty() : term.getName();
+				final String sortProperty;
+				if (NumberUtils.isNumber(sort.getProperty()) && Integer.valueOf(sort.getProperty()) > 0) {
+					final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
+					sortProperty = term.getName();
+				} else {
+					sortProperty = sort.getProperty();
+				}
+
 				pageable.getSort().and(new Sort(sort.getDirection(), sortProperty));
 				convertedPageable =
 					new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(),
@@ -212,17 +220,26 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		final List<MeasurementVariable> columns =
 			this.middlewareDatasetService.getObservationSetVariables(plotDatasetId,
-				Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
+				Lists.newArrayList(VariableType.GERMPLASM_ATTRIBUTE.getId(),
+					VariableType.GERMPLASM_PASSPORT.getId(),
+					VariableType.GERMPLASM_DESCRIPTOR.getId(),
+					VariableType.ENTRY_DETAIL.getId()));
 
 		//Remove OBS_UNIT_ID column if present
 		columns.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
 		final List<MeasurementVariable> descriptors = new ArrayList<>();
+		final List<MeasurementVariable> passports = new ArrayList<>();
+		final List<MeasurementVariable> attributes = new ArrayList<>();
 		// Using LinkedHashMap to preserve the order by rank of the variables
 		final Map<Integer, MeasurementVariable> entryDetails = new LinkedHashMap<>();
 		columns.stream().forEach(variable -> {
 			if (variable.getVariableType() == VariableType.ENTRY_DETAIL) {
 				entryDetails.put(variable.getTermId(), variable);
+			} else if (variable.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE) {
+				attributes.add(variable);
+			} else if (variable.getVariableType() == VariableType.GERMPLASM_PASSPORT) {
+				passports.add(variable);
 			} else {
 				descriptors.add(variable);
 			}
@@ -236,8 +253,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		}
 
 		// Sort descriptors by how they are arranged in StudyEntryDescriptorColumns::rank
-		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryDescriptorColumns.getRankByTermId(descriptor.getTermId())));
+		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
+
+		passports.sort(Comparator.comparing(MeasurementVariable::getName));
+		sortedColumns.addAll(passports);
+		attributes.sort(Comparator.comparing(MeasurementVariable::getName));
+		sortedColumns.addAll(attributes);
 
 		//Add Inventory related columns
 		sortedColumns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
@@ -301,9 +323,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId) {
+	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId, final String programUUID) {
 		this.studyValidator.validate(studyId, false);
-		return this.middlewareStudyEntryService.getStudyEntryColumns(studyId);
+		return this.middlewareStudyEntryService.getStudyEntryColumns(studyId, programUUID);
 	}
 
 	@Override

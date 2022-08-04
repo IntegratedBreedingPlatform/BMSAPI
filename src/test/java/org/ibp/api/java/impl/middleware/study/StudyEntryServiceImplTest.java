@@ -263,8 +263,10 @@ public class StudyEntryServiceImplTest {
 			.newArrayList(entryCodeVariable, observationUnitIdVariable, entryNoVariable, designationVariable,
 				crossVariable, gidVariable);
 
-		Mockito.when(this.datasetService.getObservationSetVariables(datasetId, Lists
-			.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()))).thenReturn(measurementVariables);
+		Mockito.when(this.datasetService.getObservationSetVariables(datasetId, Lists.newArrayList(VariableType.GERMPLASM_ATTRIBUTE.getId(),
+			VariableType.GERMPLASM_PASSPORT.getId(),
+			VariableType.GERMPLASM_DESCRIPTOR.getId(),
+			VariableType.ENTRY_DETAIL.getId()))).thenReturn(measurementVariables);
 
 		final List<MeasurementVariable> results = this.studyEntryService.getEntryTableHeader(studyId);
 

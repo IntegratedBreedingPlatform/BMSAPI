@@ -5,8 +5,11 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
@@ -31,6 +34,8 @@ import java.util.stream.Collectors;
 @Component
 public class StudyValidator {
 
+	public final static long MAX_NUMBER_OF_COLUMNS_ALLOWED = 30;
+
 	@Autowired
 	private SecurityService securityService;
 
@@ -45,6 +50,9 @@ public class StudyValidator {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private OntologyDataManager ontologyDataManager;
 
 	private BindingResult errors;
 
@@ -200,6 +208,42 @@ public class StudyValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		return dataSet;
+	}
+
+	public void validateUpdateStudyEntryColumnsWithSupportedVariableTypes(final List<Integer> variableIds, final String programUUID) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
+		final List<String> unsupportedVariableIds = this.ontologyDataManager.getStandardVariables(variableIds, programUUID)
+			.stream()
+			.filter(standardVariable -> standardVariable.getVariableTypes().stream().noneMatch(variableType ->
+				VariableType.GERMPLASM_DESCRIPTOR == variableType ||
+					VariableType.GERMPLASM_ATTRIBUTE == variableType ||
+					VariableType.GERMPLASM_PASSPORT == variableType)
+			)
+			.map(standardVariable -> String.valueOf(standardVariable.getId()))
+			.collect(Collectors.toList());
+		if (!org.springframework.util.CollectionUtils.isEmpty(unsupportedVariableIds)) {
+			this.errors.reject("study.entry.update.columns.unsupported.variables", new String[] {String.join(", ", unsupportedVariableIds)}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validateMaxStudyEntryColumnsAllowed(final List<Integer> variableIds, final String programUUID) {
+		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
+		final List<StandardVariable> variables = this.ontologyDataManager.getStandardVariables(variableIds, programUUID)
+			.stream()
+			.filter(standardVariable -> standardVariable.getVariableTypes().stream().anyMatch(variableType ->
+				VariableType.GERMPLASM_ATTRIBUTE == variableType ||
+					VariableType.GERMPLASM_PASSPORT == variableType)
+			)
+			.collect(Collectors.toList());
+
+		if (variables.size() > MAX_NUMBER_OF_COLUMNS_ALLOWED) {
+			this.errors.reject("study.entry.update.columns.exceeded.maximum.allowed",
+				new String[] { String.valueOf(variables.size()), String.valueOf(MAX_NUMBER_OF_COLUMNS_ALLOWED) },"");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 }

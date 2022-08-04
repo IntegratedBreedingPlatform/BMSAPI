@@ -45,7 +45,7 @@ public interface StudyEntryService {
 
 	Integer getCrossExpansionLevel(Integer studyId);
 
-	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId);
+	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId, final String programUUID);
 
 	List<Variable> getVariableListByStudyAndType(String cropName, String programUUID, Integer studyId, Integer variableTypeId);
 

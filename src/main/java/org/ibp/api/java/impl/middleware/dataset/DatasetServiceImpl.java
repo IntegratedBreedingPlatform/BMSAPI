@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -76,7 +77,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeSet;
@@ -371,14 +371,21 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
 
+		// TODO: we need to remove this because it won't work when names will be added to observations table.
+		// We are assuming that every sort property correspond to a term, and this won't be longer valid for names
 		Pageable convertedPageable = null;
 		if (pageable != null && pageable.getSort() != null) {
 			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
 			if (iterator.hasNext()) {
 				// Convert the sort property name from termid to actual term name.
 				final Sort.Order sort = iterator.next();
-				final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
-				final String sortProperty = Objects.isNull(term) ? sort.getProperty() : term.getName();
+				final String sortProperty;
+				if (NumberUtils.isNumber(sort.getProperty()) && Integer.valueOf(sort.getProperty()) > 0) {
+					final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
+					sortProperty = term.getName();
+				} else {
+					sortProperty = sort.getProperty();
+				}
 				pageable.getSort().and(new Sort(sort.getDirection(), sortProperty));
 				convertedPageable =
 					new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort.getDirection(), sortProperty);
@@ -984,11 +991,13 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void updateDatasetProperties(final Integer studyId, final List<Integer> variableIds) {
+	public void updatePlotDatasetProperties(final Integer studyId, final List<Integer> variableIds, final String programUUID) {
 		this.studyValidator.validate(studyId, true);
 		variableIds.forEach(this.termValidator::validate);
+		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(variableIds, programUUID);
+		this.studyValidator.validateMaxStudyEntryColumnsAllowed(variableIds, programUUID);
 
-		this.middlewareDatasetService.updateDatasetProperties(studyId, variableIds);
+		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, variableIds, programUUID);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
