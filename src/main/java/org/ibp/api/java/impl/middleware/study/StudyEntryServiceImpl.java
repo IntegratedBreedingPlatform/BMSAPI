@@ -1,13 +1,18 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
@@ -15,18 +20,25 @@ import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.impl.study.StudyEntryGermplasmDescriptorColumns;
+import org.ibp.api.domain.study.StudyEntryDetailsImportRequest;
+import org.ibp.api.domain.study.StudyEntryDetailsValueMap;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.ibp.api.java.study.StudyEntryObservationService;
 import org.ibp.api.java.study.StudyEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -48,7 +60,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,14 +90,26 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Autowired
 	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
+	@Autowired
+	public ProgramValidator programValidator;
+
+	@Autowired
+	public VariableValidator variableValidator;
+
 	@Resource
 	private org.generationcp.middleware.service.api.study.StudyEntryService middlewareStudyEntryService;
 
 	@Resource
-	private DatasetService datasetService;
+	private org.ibp.api.java.dataset.DatasetService datasetService;
+
+	@Resource
+	private DatasetService middlewareDatasetService;
 
 	@Resource
 	private EntryTypeService entryTypeService;
+
+	@Resource
+	private StudyEntryObservationService studyEntryObservationService;
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
@@ -138,7 +161,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final StudyEntryPropertyBatchUpdateRequest batchUpdateRequest) {
 		this.studyValidator.validate(studyId, true);
 		this.studyValidator.validateStudyShouldNotHaveObservation(studyId);
-		this.studyEntryValidator.validateStudyContainsEntries(studyId, new ArrayList<>(batchUpdateRequest.getSearchComposite().getItemIds()));
+		this.studyEntryValidator.validateStudyContainsEntries(studyId,
+			new ArrayList<>(batchUpdateRequest.getSearchComposite().getItemIds()));
 		this.termValidator.validate(batchUpdateRequest.getVariableId());
 		this.middlewareStudyEntryService.updateStudyEntriesProperty(batchUpdateRequest);
 	}
@@ -188,13 +212,14 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public List<MeasurementVariable> getEntryTableHeader(final Integer studyId) {
 		this.studyValidator.validate(studyId, false);
 		final Integer plotDatasetId =
-			this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+			this.middlewareDatasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
+				.getDatasetId();
 
 		final List<Integer> termsToRemove = Lists
 			.newArrayList(TermId.OBS_UNIT_ID.getId());
 
 		final List<MeasurementVariable> columns =
-			this.datasetService.getObservationSetVariables(plotDatasetId,
+			this.middlewareDatasetService.getObservationSetVariables(plotDatasetId,
 				Lists.newArrayList(VariableType.GERMPLASM_ATTRIBUTE.getId(),
 					VariableType.GERMPLASM_PASSPORT.getId(),
 					VariableType.GERMPLASM_DESCRIPTOR.getId(),
@@ -254,7 +279,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public long countAllCheckTestEntries(final Integer studyId, final String programUuid, final Boolean checkOnly) {
-		if(checkOnly) {
+		if (checkOnly) {
 			return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
 				Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())));
 		} else {
@@ -266,12 +291,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		}
 	}
 
-  @Override public long countAllNonReplicatedTestEntries(final Integer studyId) {
-	return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
+	@Override
+	public long countAllNonReplicatedTestEntries(final Integer studyId) {
+		return this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
 			Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())));
-  }
+	}
 
-  @Override
+	@Override
 	public StudyEntryMetadata getStudyEntriesMetadata(final Integer studyId, final String programUuid) {
 		this.studyValidator.validate(studyId, false);
 		final StudyEntryMetadata studyEntryMetadata = new StudyEntryMetadata();
@@ -302,6 +328,70 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return this.middlewareStudyEntryService.getStudyEntryColumns(studyId, programUUID);
 	}
 
+	@Override
+	public List<Variable> getVariableListByStudyAndType(final String cropName, final String programUUID,
+		final Integer studyId, final Integer variableTypeId) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), StudyEntryServiceImpl.class.getName());
+
+		this.variableValidator.validateVariableTypeId(variableTypeId, errors);
+
+		if (!StringUtils.isEmpty(programUUID)) {
+			this.programValidator.validate(new ProgramDTO(cropName, programUUID), errors);
+		}
+
+		if (errors.hasErrors()) {
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
+		this.studyValidator.validate(studyId, true);
+
+		return this.middlewareStudyEntryService.getStudyEntryDetails(cropName, programUUID, studyId, variableTypeId);
+	}
+
+	@Override
+	public void importUpdates(final Integer studyId, final StudyEntryDetailsImportRequest studyEntryDetailsImportRequest) {
+		if (!org.fest.util.Collections.isEmpty(studyEntryDetailsImportRequest.getNewVariables())) {
+			final Integer datasetId = this.datasetService.getDatasets(
+				studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0).getDatasetId();
+			this.datasetService.addDatasetVariables(studyId, datasetId, studyEntryDetailsImportRequest.getNewVariables());
+		}
+
+		this.studyValidator.validate(studyId, true);
+
+		final List<StudyEntryDetailsValueMap> entryDetailsValues = studyEntryDetailsImportRequest.getData();
+		final Map<String, List<StockPropertyData>> entriesMap = entryDetailsValues.stream()
+			.collect(Collectors.toMap(StudyEntryDetailsValueMap::getEntryNumber, StudyEntryDetailsValueMap::getData));
+		this.studyEntryValidator.validateStudyContainsEntryNumbers(studyId, entriesMap.keySet());
+
+		// retrieve study entries dto
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setEntryNumbers(new ArrayList<>(entriesMap.keySet()));
+		final List<StudyEntryDto> studyEntries =
+			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+
+		final MultiKeyMap stockPropertyMap = this.middlewareStudyEntryService.getStudyEntryStockPropertyMap(studyId, studyEntries);
+		studyEntries.forEach(entry ->
+			this.processStudyEntry(studyId, entriesMap.get(String.valueOf(entry.getEntryNumber())),
+				entry.getEntryId(), stockPropertyMap)
+		);
+	}
+
+	private void processStudyEntry(final Integer studyId, final List<StockPropertyData> stockPropDataList,
+		final Integer stockId, final MultiKeyMap stockPropertyMap) {
+		if (!CollectionUtils.isEmpty(stockPropDataList)) {
+			stockPropDataList.forEach(stockProp -> {
+				if (stockProp.hasValue() && !stockProp.getValue().isEmpty()) {
+					stockProp.setStockId(stockId);
+					if (stockPropertyMap.containsKey(stockProp.getStockId(), stockProp.getVariableId())) {
+						this.studyEntryObservationService.updateObservation(studyId, stockProp);
+					} else {
+						this.studyEntryObservationService.createObservation(studyId, stockProp);
+					}
+				}
+			});
+		}
+	}
+
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
 		final MeasurementVariable sampleColumn = new MeasurementVariable();
 		sampleColumn.setName(name);
@@ -310,9 +400,4 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		sampleColumn.setFactor(true);
 		return sampleColumn;
 	}
-
-	public void setDatasetService(final DatasetService datasetService) {
-		this.datasetService = datasetService;
-	}
-
 }

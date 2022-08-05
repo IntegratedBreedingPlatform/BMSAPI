@@ -1,11 +1,13 @@
 package org.ibp.api.java.study;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.ibp.api.domain.study.StudyEntryDetailsImportRequest;
 import org.ibp.api.java.impl.middleware.study.StudyEntryMetadata;
 import org.springframework.data.domain.Pageable;
 
@@ -45,4 +47,7 @@ public interface StudyEntryService {
 
 	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId, final String programUUID);
 
+	List<Variable> getVariableListByStudyAndType(String cropName, String programUUID, Integer studyId, Integer variableTypeId);
+
+	void importUpdates(Integer studyId, StudyEntryDetailsImportRequest studyEntryDetailsImportRequest);
 }

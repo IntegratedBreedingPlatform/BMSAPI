@@ -6,12 +6,15 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.study.StudyEntryDetailsImportRequest;
+import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.study.StudyEntryMetadata;
 import org.ibp.api.java.study.StudyEntryService;
@@ -46,13 +49,16 @@ public class StudyEntryResource {
 	@Resource
 	private StudyEntryService studyEntryService;
 
+	@Resource
+	private DatasetService datasetService;
+
 	@ApiOperation(value = "Replace germplasm entry in study",
 		notes = "Replace germplasm entry in study")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<Void> replaceStudyEntry(final @PathVariable String cropname,
-														   @PathVariable final String programUUID,
-														   @PathVariable final Integer studyId, @PathVariable final Integer entryId, @RequestBody final StudyEntryDto studyEntryDto) {
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @PathVariable final Integer entryId, @RequestBody final StudyEntryDto studyEntryDto) {
 		this.studyEntryService.replaceStudyEntry(studyId, entryId, studyEntryDto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -62,7 +68,7 @@ public class StudyEntryResource {
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<Void> createStudyEntries(final @PathVariable String cropname,
-		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
+		@PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@ApiParam("Study Entry template for batch generation. SearchComposite is a list of gids")
 		@RequestBody final StudyEntryGeneratorRequestDto studyEntryGeneratorRequestDto) {
 
@@ -76,7 +82,7 @@ public class StudyEntryResource {
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> createStudyEntries(final @PathVariable String cropname,
-		@PathVariable final String programUUID,	@PathVariable final Integer studyId,
+		@PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@RequestParam(value = "listId", required = true) final Integer listId) {
 
 		this.studyEntryService.createStudyEntries(studyId, listId);
@@ -180,7 +186,7 @@ public class StudyEntryResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/metadata", method = RequestMethod.GET)
 	public ResponseEntity<StudyEntryMetadata> countStudyTestEntries(@PathVariable final String crop,
-		@PathVariable final String programUUID,	@PathVariable final Integer studyId) {
+		@PathVariable final String programUUID, @PathVariable final Integer studyId) {
 
 		return new ResponseEntity<>(this.studyEntryService.getStudyEntriesMetadata(studyId, programUUID), HttpStatus.OK);
 	}
@@ -196,7 +202,7 @@ public class StudyEntryResource {
 	) {
 		BaseValidator.checkArgument(isNumber(level), "error.generationlevel.invalid");
 		final int levelInt = Integer.parseInt(level);
-		BaseValidator.checkArgument(levelInt > 0 && levelInt <= 10 , "error.generationlevel.max");
+		BaseValidator.checkArgument(levelInt > 0 && levelInt <= 10, "error.generationlevel.max");
 		this.studyEntryService.fillWithCrossExpansion(studyId, levelInt);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -222,4 +228,31 @@ public class StudyEntryResource {
 		return new ResponseEntity<>(this.studyEntryService.getStudyEntryColumns(studyId, programUUID), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get the variables associated to the study filtered by variableType", notes = "Get the list variables filtered by variableType")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries/variables", method = RequestMethod.GET)
+	public ResponseEntity<List<Variable>> getVariables(
+		@PathVariable final String cropName, @PathVariable final Integer studyId,
+		@PathVariable final String programUUID, @RequestParam final Integer variableTypeId) {
+
+		final List<Variable> variables =
+			this.studyEntryService.getVariableListByStudyAndType(cropName, programUUID, studyId, variableTypeId);
+		return new ResponseEntity<>(variables, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Import Study Entry Details")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries/import", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> importStudyEntryDetails(
+		@PathVariable final String cropName, @PathVariable final Integer studyId,
+		@PathVariable final String programUUID,
+		@RequestBody final StudyEntryDetailsImportRequest studyEntryDetailsImportRequest
+	) {
+		if (studyEntryDetailsImportRequest.getData() != null && !studyEntryDetailsImportRequest.getData().isEmpty()) {
+			this.studyEntryService.importUpdates(studyId, studyEntryDetailsImportRequest);
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }
