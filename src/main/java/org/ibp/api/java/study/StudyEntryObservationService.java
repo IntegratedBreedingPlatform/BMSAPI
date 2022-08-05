@@ -10,8 +10,6 @@ public interface StudyEntryObservationService {
 
 	Integer updateObservation(Integer studyId, StockPropertyData stockPropertyData);
 
-	Integer createOrUpdateObservation(Integer studyId, StockPropertyData stockPropertyData);
-
 	void deleteObservation(Integer studyId, Integer stockPropertyId);
 
 	long countObservationsByVariables(Integer studyId, List<Integer> variableIds);

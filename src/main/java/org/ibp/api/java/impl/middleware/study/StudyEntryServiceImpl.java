@@ -357,6 +357,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		}
 
 		this.studyValidator.validate(studyId, true);
+
 		final List<StudyEntryDetailsValueMap> entryDetailsValues = studyEntryDetailsImportRequest.getData();
 		final Map<String, List<StockPropertyData>> entriesMap = entryDetailsValues.stream()
 			.collect(Collectors.toMap(StudyEntryDetailsValueMap::getEntryNumber, StudyEntryDetailsValueMap::getData));
@@ -367,29 +368,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		filter.setEntryNumbers(new ArrayList<>(entriesMap.keySet()));
 		final List<StudyEntryDto> studyEntries =
 			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
-
-		studyEntries.forEach(entry ->
-			this.processStudyEntry(studyId, entriesMap.get(String.valueOf(entry.getEntryNumber())), entry)
-		);
-	}
-
-	private void processStudyEntry(final Integer studyId, final List<StockPropertyData> entriesDataList,
-		final StudyEntryDto entry) {
-		if (!org.fest.util.Collections.isEmpty(entriesDataList)) {
-			entriesDataList.forEach(variable -> {
-				variable.setStockId(entry.getEntryId());
-				if (variable.hasValue() && !variable.getValue().isEmpty()) {
-					this.studyEntryObservationService.createOrUpdateObservation(studyId, variable);
-				} else {
-					final Optional<StockProperty> stockPropertyOptional = this.middlewareStudyEntryService.getByStockIdAndTypeId(
-						variable.getStockId(), variable.getVariableId());
-
-					if (stockPropertyOptional.isPresent()) {
-						this.studyEntryObservationService.deleteObservation(studyId, stockPropertyOptional.get().getStockPropId());
-					}
-				}
-			});
-		}
+		this.middlewareStudyEntryService.importUpdates(studyId, studyEntries, entriesMap);
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {

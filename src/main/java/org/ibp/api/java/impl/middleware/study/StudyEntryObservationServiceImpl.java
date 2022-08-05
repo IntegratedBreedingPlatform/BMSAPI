@@ -77,13 +77,6 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	}
 
 	@Override
-	public Integer createOrUpdateObservation(final Integer studyId, final StockPropertyData stockPropertyData) {
-		this.commonValidations(studyId, stockPropertyData, false);
-		this.setCategoricalValueId(stockPropertyData);
-		return this.studyEntryObservationService.createOrUpdateObservation(stockPropertyData);
-	}
-
-	@Override
 	public void deleteObservation(final Integer studyId, final Integer stockPropertyId) {
 		BaseValidator.checkNotNull(stockPropertyId, "param.null", new String[] {"stockPropertyId"});
 
