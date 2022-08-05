@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Api(value = "Planting Services")
 @RestController
@@ -35,6 +36,7 @@ public class PlantingResource {
 	private static final String HAS_PLANTING_PERMISSIONS =
 		"hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS' , 'MS_WITHDRAW_INVENTORY')";
 
+	@ApiIgnore
 	@ApiOperation(value = "Planting preparation search", notes = "Planting search returns data necessary to prepare planting")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/preparation/search", method = RequestMethod.POST)
 	@PreAuthorize(HAS_PLANTING_PERMISSIONS + " or hasAnyAuthority('MS_CREATE_PENDING_WITHDRAWALS', 'MS_CREATE_CONFIRMED_WITHDRAWALS')")
@@ -52,6 +54,7 @@ public class PlantingResource {
 		return new ResponseEntity<>(plantingPreparationDTO, HttpStatus.OK);
 	}
 
+	@ApiIgnore
 	@ApiOperation(value = "Get existing planting information for selected observation units", notes = "Get existing planting information for selected observation units")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/metadata", method = RequestMethod.POST)
 	@ResponseBody
@@ -66,6 +69,8 @@ public class PlantingResource {
 		return new ResponseEntity<>(plantingService.getPlantingMetadata(studyId, datasetId, plantingRequestDto), HttpStatus.OK);
 	}
 
+
+	@ApiIgnore
 	@ApiOperation(value = "Generate pending planting for the selected observation units", notes = "Generate pending planting for the selected observation units")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/pending-generation", method = RequestMethod.POST)
 	@ResponseBody
@@ -86,6 +91,7 @@ public class PlantingResource {
 		}
 	}
 
+	@ApiIgnore
 	@ApiOperation(value = "Generate confirmed planting for the selected observation units", notes = "Generate confirmed planting for the selected observation units")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/planting/confirmed-generation", method = RequestMethod.POST)
 	@ResponseBody
