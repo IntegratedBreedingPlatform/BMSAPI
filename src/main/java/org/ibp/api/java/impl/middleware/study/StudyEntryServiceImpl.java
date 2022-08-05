@@ -19,7 +19,6 @@ import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateReq
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
@@ -370,7 +369,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final List<StudyEntryDto> studyEntries =
 			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
 
-		MultiKeyMap stockPropertyMap = this.middlewareStudyEntryService.getStudyEntryStockPropertyMap(studyId, studyEntries);
+		final MultiKeyMap stockPropertyMap = this.middlewareStudyEntryService.getStudyEntryStockPropertyMap(studyId, studyEntries);
 		studyEntries.forEach(entry ->
 			this.processStudyEntry(studyId, entriesMap.get(String.valueOf(entry.getEntryNumber())),
 				entry.getEntryId(), stockPropertyMap)
@@ -381,19 +380,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final Integer stockId, final MultiKeyMap stockPropertyMap) {
 		if (!CollectionUtils.isEmpty(stockPropDataList)) {
 			stockPropDataList.forEach(stockProp -> {
-				stockProp.setStockId(stockId);
-				final boolean hasStockProperty = stockPropertyMap.containsKey(stockProp.getStockId(), stockProp.getVariableId());
-
 				if (stockProp.hasValue() && !stockProp.getValue().isEmpty()) {
-					if (hasStockProperty) {
+					stockProp.setStockId(stockId);
+					if (stockPropertyMap.containsKey(stockProp.getStockId(), stockProp.getVariableId())) {
 						this.studyEntryObservationService.updateObservation(studyId, stockProp);
 					} else {
 						this.studyEntryObservationService.createObservation(studyId, stockProp);
-					}
-				} else {
-					if (hasStockProperty) {
-						final StockProperty sp = (StockProperty) stockPropertyMap.get(stockProp.getStockId(), stockProp.getVariableId());
-						this.studyEntryObservationService.deleteObservation(studyId, sp.getStockPropId());
 					}
 				}
 			});
